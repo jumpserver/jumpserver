@@ -49,7 +49,6 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
-
         if not auth or auth[0].lower() != self.keyword.lower().encode():
             return None
 
@@ -80,7 +79,8 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
         request_signature = sign[1]
 
         return self.authenticate_credentials(
-            request, access_key_id, request_signature)
+            request, access_key_id, request_signature
+        )
 
     @staticmethod
     def authenticate_credentials(request, access_key_id, request_signature):

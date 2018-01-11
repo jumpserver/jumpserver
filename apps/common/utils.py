@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-
+import re
 from collections import OrderedDict
 from six import string_types
 import base64
 import os
 from itertools import chain
-import string
 import logging
 import datetime
 import time
@@ -14,7 +13,8 @@ import hashlib
 from email.utils import formatdate
 import calendar
 import threading
-from six import StringIO
+from io import StringIO
+import uuid
 
 import paramiko
 import sshpubkeys
@@ -25,9 +25,7 @@ from django.conf import settings
 from django.utils import timezone
 
 
-from .compat import to_bytes, to_string
-
-SECRET_KEY = settings.SECRET_KEY
+UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
 
 def reverse(view_name, urlconf=None, args=None, kwargs=None,
@@ -48,9 +46,22 @@ def get_object_or_none(model, **kwargs):
     return obj
 
 
-class Signer(object):
+class Singleton(type):
+    def __init__(cls, *args, **kwargs):
+        cls.__instance = None
+        super().__init__(*args, **kwargs)
+
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__call__(*args, **kwargs)
+            return cls.__instance
+        else:
+            return cls.__instance
+
+
+class Signer(metaclass=Singleton):
     """用来加密,解密,和基于时间戳的方式验证token"""
-    def __init__(self, secret_key=SECRET_KEY):
+    def __init__(self, secret_key=None):
         self.secret_key = secret_key
 
     def sign(self, value):
@@ -99,56 +110,8 @@ def combine_seq(s1, s2, callback=None):
     return seq
 
 
-def search_object_attr(obj, value='', attr_list=None, ignore_case=False):
-    """It's provide a method to search a object attribute equal some value
-
-    If object some attribute equal :param: value, return True else return False
-
-    class A():
-        name = 'admin'
-        age = 7
-
-    :param obj: A object
-    :param value: A string match object attribute
-    :param attr_list: Only match attribute in attr_list
-    :param ignore_case: Ignore case
-    :return: Boolean
-    """
-    if value == '':
-        return True
-
-    try:
-        object_attr = obj.__dict__
-    except AttributeError:
-        return False
-
-    if attr_list is not None:
-        new_object_attr = {}
-        for attr in attr_list:
-            new_object_attr[attr] = object_attr.pop(attr)
-        object_attr = new_object_attr
-
-    if ignore_case:
-        if not isinstance(value, string_types):
-            return False
-
-        if value.lower() in map(string.lower, map(str, object_attr.values())):
-            return True
-    else:
-        if value in object_attr.values():
-            return True
-    return False
-
-
 def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
-
-
-def int_seq(seq):
-    try:
-        return map(int, seq)
-    except ValueError:
-        return seq
 
 
 def timesince(dt, since='', default="just now"):
@@ -181,25 +144,25 @@ def timesince(dt, since='', default="just now"):
     return default
 
 
-def ssh_key_string_to_obj(text):
+def ssh_key_string_to_obj(text, password=None):
     key = None
     try:
-        key = paramiko.RSAKey.from_private_key( StringIO(text) )
+        key = paramiko.RSAKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
 
     try:
-        key = paramiko.DSSKey.from_private_key( StringIO(text) )
+        key = paramiko.DSSKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
     return key
 
 
-def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost'):
+def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost', password=None):
     if isinstance(private_key, bytes):
         private_key = private_key.decode("utf-8")
     if isinstance(private_key, string_types):
-        private_key = ssh_key_string_to_obj(private_key)
+        private_key = ssh_key_string_to_obj(private_key, password=password)
     if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey)):
         raise IOError('Invalid private key')
 
@@ -223,7 +186,6 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
         hostname = os.uname()[1]
 
     f = StringIO()
-
     try:
         if type == 'rsa':
             private_key_obj = paramiko.RSAKey.generate(length)
@@ -239,14 +201,14 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
         raise IOError('These is error when generate ssh key.')
 
 
-def validate_ssh_private_key(text):
+def validate_ssh_private_key(text, password=None):
     if isinstance(text, bytes):
         try:
             text = text.decode("utf-8")
         except UnicodeDecodeError:
             return False
 
-    key = ssh_key_string_to_obj(text)
+    key = ssh_key_string_to_obj(text, password=password)
     if key is None:
         return False
     else:
@@ -276,8 +238,10 @@ def content_md5(data):
 
     返回值可以直接作为HTTP Content-Type头部的值
     """
-    m = hashlib.md5(to_bytes(data))
-    return to_string(base64.b64encode(m.digest()))
+    if isinstance(data, str):
+        data = hashlib.md5(data.encode('utf-8'))
+    value = base64.b64encode(data.digest())
+    return value.decode('utf-8')
 
 _STRPTIME_LOCK = threading.Lock()
 
@@ -325,13 +289,11 @@ def make_signature(access_key_secret, date=None):
     return content_md5(data)
 
 
-def encrypt_password(password):
+def encrypt_password(password, salt=None):
     from passlib.hash import sha512_crypt
     if password:
-        return sha512_crypt.using(rounds=5000).hash(password)
+        return sha512_crypt.using(rounds=5000).hash(password, salt=salt)
     return None
-
-
 
 
 def capacity_convert(size, expect='auto', rate=1000):
@@ -367,6 +329,10 @@ def capacity_convert(size, expect='auto', rate=1000):
             if rate > std_size/rate_ > 1:
                 expect = unit
                 break
+
+    if expect not in rate_mapping:
+        expect = 'K'
+
     expect_size = std_size / rate_mapping[expect]
     return expect_size, expect
 
@@ -380,4 +346,17 @@ def sum_capacity(cap_list):
     return capacity_convert(total, expect='auto')
 
 
-signer = Signer()
+def get_short_uuid_str():
+    return str(uuid.uuid4()).split('-')[-1]
+
+
+def is_uuid(s):
+    if UUID_PATTERN.match(s):
+        return True
+    else:
+        return False
+
+
+def get_signer():
+    signer = Signer(settings.SECRET_KEY)
+    return signer

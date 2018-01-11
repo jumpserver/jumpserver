@@ -27,9 +27,7 @@ sys.path.append(PROJECT_DIR)
 
 # Import project config setting
 try:
-    from config import config as env_config, env
-
-    CONFIG = env_config.get(env, 'default')()
+    from config import config as CONFIG
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
@@ -59,20 +57,19 @@ INSTALLED_APPS = [
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
-    'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
-    'applications.apps.ApplicationsConfig',
+    'terminal.apps.TerminalConfig',
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
     'bootstrap3',
     'captcha',
+    'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
 ]
 
 MIDDLEWARE = [
@@ -97,6 +94,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'jumpserver.context_processor.jumpserver_processor',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -119,31 +117,30 @@ SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
 
-
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-if CONFIG.DB_ENGINE == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
-            'ATOMIC_REQUESTS': True,
-        }
+# if CONFIG.DB_ENGINE == 'sqlite':
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
+#             'ATOMIC_REQUESTS': True,
+#         }
+#     }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
+        'NAME': CONFIG.DB_NAME,
+        'HOST': CONFIG.DB_HOST,
+        'PORT': CONFIG.DB_PORT,
+        'USER': CONFIG.DB_USER,
+        'PASSWORD': CONFIG.DB_PASSWORD,
+        'ATOMIC_REQUESTS': True,
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.%s' % CONFIG.DB_ENGINE,
-            'NAME': CONFIG.DB_NAME,
-            'HOST': CONFIG.DB_HOST,
-            'PORT': CONFIG.DB_PORT,
-            'USER': CONFIG.DB_USER,
-            'PASSWORD': CONFIG.DB_PASSWORD,
-            'ATOMIC_REQUESTS': True,
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -193,7 +190,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+            'filename': os.path.join(CONFIG.LOG_DIR, 'jumpserver.log')
         },
         'ansible_logs': {
             'level': 'DEBUG',
@@ -243,7 +240,7 @@ LOGGING = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-cn'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -260,6 +257,9 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_DIR, "data", "static")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -269,13 +269,13 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
+MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 
 # Use django-bootstrap-form to format template, input max width arg
 # BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
-FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'),]
 
 # Email config
 EMAIL_HOST = CONFIG.EMAIL_HOST
@@ -299,6 +299,8 @@ REST_FRAMEWORK = {
         'users.authentication.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
+    'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -312,37 +314,37 @@ AUTH_USER_MODEL = 'users.User'
 # Auth LDAP settings
 if CONFIG.AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, 'django_auth_ldap.backend.LDAPBackend')
-AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
-AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
-AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
-# AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
-AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    CONFIG.AUTH_LDAP_SEARCH_OU,
-    ldap.SCOPE_SUBTREE,
-    CONFIG.AUTH_LDAP_SEARCH_FILTER
-)
-AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
-AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
+    AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
+    AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
+    AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(
+        CONFIG.AUTH_LDAP_SEARCH_OU,
+        ldap.SCOPE_SUBTREE,
+        CONFIG.AUTH_LDAP_SEARCH_FILTER
+    )
+    AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
+    AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 
 # Celery using redis as broker
-BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
+CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
     'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
 }
-CELERY_RESULT_BACKEND = BROKER_URL
-
-# TERMINAL_HEATBEAT_INTERVAL = CONFIG.TERMINAL_HEATBEAT_INTERVAL or 30
-
-# crontab job
-# CELERYBEAT_SCHEDULE = {
-#     Check applications is alive every 10m
-# 'check_terminal_alive': {
-#     'task': 'applications.tasks.check_terminal_alive',
-#     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
-#     'args': (),
-# },
-# }
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_RESULT_EXPIRES = 3600
+# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_REDIRECT_STDOUTS = True
+CELERY_REDIRECT_STDOUTS_LEVEL = "INFO"
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 
 # Cache use redis
@@ -363,9 +365,7 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORE_BACKEND = 'audits.backends.command.db'
-RECORD_STORE_BACKEND = 'audits.backends.record.db'
-
+COMMAND_STORAGE_BACKEND = 'terminal.backends.command.db'
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
@@ -374,6 +374,7 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': True,
+    'success_css_class': '',
 }
 
 

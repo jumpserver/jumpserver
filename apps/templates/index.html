@@ -35,7 +35,7 @@
                     <h5>在线用户</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="{% url 'audits:proxy-log-online-list' %}"> <span id="online_users"></span>{{ online_user_count }}</a></h1>
+                    <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_users"></span>{{ online_user_count }}</a></h1>
                     <small>Online user</small>
                 </div>
             </div>
@@ -45,11 +45,11 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-danger pull-right">Connected</span>
-                    <h5>已连接服务器</h5>
+                    <h5>在线会话</h5>
                 </div>
                 <div class="ibox-content">
-                        <h1 class="no-margins"><a href="{% url 'audits:proxy-log-online-list' %}"> <span id="online_hosts"></span>{{ online_asset_count }}</a></h1>
-                    <small>Connected host</small>
+                        <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_hosts"></span>{{ online_asset_count }}</a></h1>
+                    <small>Online sessions</small>
                 </div>
             </div>
         </div>

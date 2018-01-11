@@ -21,11 +21,11 @@
                             </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-asset">
-                                    <i class="fa fa-edit"></i>Delete
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
                             {% endif %}
@@ -63,7 +63,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Public IP' %}:</td>
-                                            <td><b>{{ asset.public_ip }}</b></td>
+                                            <td><b>{{ asset.public_ip|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Port' %}:</td>
@@ -71,55 +71,55 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>
-                                            {% if asset.admin_user %}
-                                            <td><b>{{ asset.admin_user.name }}</b></td>
+                                            {% if asset.admin_user_avail %}
+                                            <td><b>{{ asset.admin_user_avail.name }}</b></td>
                                             {% else %}
-                                            <td><b>None</b></td>
+                                            <td></td>
                                             {% endif %}
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Remote card IP' %}:</td>
-                                            <td><b>{{ asset.remote_card_ip }}</b></td>
+                                            <td><b>{{ asset.remote_card_ip|default:"" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'IDC' %}:</td>
-                                            <td><b>{{ asset.idc.name }}</b></td>
+                                            <td>{% trans 'Cluster' %}:</td>
+                                            <td><b>{{ asset.cluster.name }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cabinet number' %}:</td>
-                                            <td><b>{{ asset.cabinet_no }}</b></td>
+                                            <td><b>{{ asset.cabinet_no|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cabinet position' %}:</td>
-                                            <td><b>{{ asset.cabinet_pos }}</b></td>
+                                            <td><b>{{ asset.cabinet_pos|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Vendor' %}:</td>
-                                            <td><b>{{ asset.vendor }}</b></td>
+                                            <td><b>{{ asset.vendor|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Model' %}:</td>
-                                            <td><b>{{ asset.model }}</b></td>
+                                            <td><b>{{ asset.model|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'CPU' %}:</td>
-                                            <td><b>{{ asset.cpu_model }} {{ asset.cpu_count }}*{{ asset.cpu_cores }}</b></td>
+                                            <td><b>{{ asset.cpu_model|default:"" }} {{ asset.cpu_count|default:"" }}*{{ asset.cpu_cores|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Memory' %}:</td>
-                                            <td><b>{{ asset.memory }}</b></td>
+                                            <td><b>{{ asset.memory|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Disk' %}:</td>
-                                            <td><b>{{ asset.disk_total }}</b></td>
+                                            <td><b>{{ asset.disk_total|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Platform' %}:</td>
-                                            <td><b>{{ asset.platform }}</b></td>
+                                            <td><b>{{ asset.platform|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'OS' %}:</td>
-                                            <td><b>{{ asset.os }} {{ asset.os_version }} {{ asset.os_arch }}</b></td>
+                                            <td><b>{{ asset.os|default:"" }} {{ asset.os_version|default:"" }} {{ asset.os_arch|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset status' %}:</td>
@@ -127,7 +127,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is active' %}:</td>
-                                            <td><b>{{ asset.is_active }}</b></td>
+                                            <td><b>{{ asset.is_active|yesno:"Yes,No" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset type' %}:</td>
@@ -139,11 +139,11 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Serial number' %}:</td>
-                                            <td><b>{{ asset.sn }}</b></td>
+                                            <td><b>{{ asset.sn|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset number' %}:</td>
-                                            <td><b>{{ asset.number }}</b></td>
+                                            <td><b>{{ asset.number|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
@@ -173,17 +173,19 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                           <td width="50%">{% trans 'Active' %}:</td>
-                                            <td><span class="pull-right">
-                                                <div class="switch">
-                                                    <div class="onoffswitch">
-                                                        <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
-                                                        <label class="onoffswitch-label" for="is_active">
-                                                            <span class="onoffswitch-inner"></span>
-                                                            <span class="onoffswitch-switch"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </span></td>
+                                            <td>
+                                              <span class="pull-right">
+                                                  <div class="switch">
+                                                      <div class="onoffswitch">
+                                                          <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                          <label class="onoffswitch-label" for="is_active">
+                                                              <span class="onoffswitch-inner"></span>
+                                                              <span class="onoffswitch-switch"></span>
+                                                          </label>
+                                                      </div>
+                                                  </div>
+                                              </span>
+                                          </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
@@ -194,10 +196,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Test admin user' %}:</td>
+                                            <td>{% trans 'Test connective' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_test_admin_user" style="width: 54px;">{% trans 'Test' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-test-is-alive" style="width: 54px">{% trans 'Test' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -225,7 +227,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-user-group">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -234,7 +236,7 @@
                                         <tr>
                                           <td ><b class="bdg_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-leave-group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -242,42 +244,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="panel panel-warning">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2systemuser">
-                                        <tbody>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users_all %}
-                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-warning btn-sm btn-system-user">{% trans 'Confirm' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        {% for system_user in system_users %}
-                                        <tr>
-                                            <td ><b class="bdg_group" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
-                                            <td>
-                                                <button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            {% endif %}
+                        {% endif %}
                         </div>
                     </div>
                 </div>
@@ -288,9 +255,8 @@
 {% block custom_foot_js %}
 <script>
 jumpserver.groups_selected = {};
-jumpserver.system_user_selected = {};
 function updateAssetGroups(groups) {
-    var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
+    var the_url = "{% url 'api-assets:asset-detail' pk=asset.id %}";
     var body = {
         groups: Object.assign([], groups)
     };
@@ -304,7 +270,7 @@ function updateAssetGroups(groups) {
             $('#add-asset2group tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });
@@ -318,44 +284,20 @@ function updateAssetGroups(groups) {
     });
 }
 
-function updateAssetSystemUser(system_users) {
-    var the_url = "{% url 'api-assets:asset-update-system-users' pk=asset.id %}";
-    var body = {
-        system_users: Object.assign([], system_users)
-    };
-    var success = function(data) {
-        $('.select2-selection__rendered').empty();
-        $('#groups_selected').val('');
-        $.map(jumpserver.system_user_selected, function(name, index) {
-            $('#opt_' + index).remove();
-
-            $('#add-asset2systemuser tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_group" data-sid="' + index + '">' + name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.groups_selected
-        jumpserver.system_user_selected = {};
-    };
-    APIUpdateAttr({
-        url: the_url,
-        body: JSON.stringify(body),
-        success: success
-    });
-}
-
 function refreshAssetHardware() {
     var the_url = "{% url 'api-assets:asset-refresh' pk=asset.id %}";
     var success = function (data) {
         location.reload();
     };
+    var error = function (data) {
+        alert(data)
+    };
     APIUpdateAttr({
         url: the_url,
         success: success,
+        error: error,
         method: 'GET'
-    })
+    });
 }
 
 
@@ -367,13 +309,6 @@ $(document).ready(function () {
         var data = evt.params.data;
         delete jumpserver.groups_selected[data.id]
     });
-    $('.select2.system-user').select2().on('select2:select', function(evt) {
-        var data = evt.params.data;
-        jumpserver.system_user_selected[data.id] = data.text;
-    }).on('select2:unselect', function(evt) {
-        var data = evt.params.data;
-        delete jumpserver.system_user_selected[data.id]
-    })
 }).on('click', '#is_active', function () {
     var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
     var checked = $(this).prop('checked');
@@ -392,7 +327,7 @@ $(document).ready(function () {
     }else{
             $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
     }
-}).on('click', '#btn_add_user_group', function () {
+}).on('click', '#btn-add-user-group', function () {
     if (Object.keys(jumpserver.groups_selected).length === 0) {
        return false;
     }
@@ -400,11 +335,11 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     $.map(jumpserver.groups_selected, function(value, index) {
-        groups.push(parseInt(index));
+        groups.push(index);
         $('#opt_' + index).remove();
     });
     updateAssetGroups(groups)
-}).on('click', '.btn_leave_group', function() {
+}).on('click', '.btn-leave-group', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
     var $badge = $tr.find('.bdg_group');
@@ -418,54 +353,29 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     updateAssetGroups(groups)
-}).on('click', '.btn-system-user', function () {
-    if (Object.keys(jumpserver.system_user_selected).length === 0) {
-        return false;
-    }
-    var system_users = $('.bdg_group').map(function() {
-            return $(this).data('sid');
-    }).get();
-    $.map(jumpserver.system_user_selected, function(value, index) {
-        system_users.push(parseInt(index));
-        $('#opt_' + index).remove();
-    });
-    updateAssetSystemUser(system_users)
-
-}).on('click', '.btn_leave_system', function () {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_group');
-    var sid = $badge.data('sid');
-    var name = $badge.html() || $badge.text();
-    $('#groups_selected').append(
-        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
-    );
-    $tr.remove();
-    var system_users = $('.bdg_group').map(function () {
-            return $(this).data('sid');
-        }).get();
-    updateAssetSystemUser(system_users)
-
 }).on('click', '.btn-delete-asset', function () {
     var $this = $(this);
     var name = "{{ asset.hostname }}";
     var uid = "{{ asset.id }}";
-    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'assets:asset-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 }).on('click', '#btn_refresh_asset', function () {
-    alert('请等待几秒, 等待完成');
+    alert('关闭alert, 等待完成, 自动刷新页面');
     refreshAssetHardware()
-}).on('click', '#btn_test_admin_user', function () {
-    $.ajax({
-        url: '{% url "api-assets:asset-admin-user-test" pk=asset.id %}'
-    }).done(function (data, textStatue, jqXHR) {
-        toastr.success('Success')
-    }).fail(function (data, textStaue, errorThrown) {
-        toastr.error('Error')
-    })
+}).on('click', '#btn-test-is-alive', function () {
+    var the_url = "{% url 'api-assets:asset-alive-test' pk=asset.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    alert('关闭alert, 等待完成');
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success_message: "{% trans "Reachable" %}"
+    });
 })
-
 
 </script>
 {% endblock %}

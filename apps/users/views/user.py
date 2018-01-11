@@ -8,6 +8,7 @@ import csv
 import codecs
 from io import StringIO
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
@@ -18,7 +19,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import (
     CreateView, UpdateView, FormMixin, FormView
@@ -27,17 +27,19 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
+from common.const import create_success_msg, update_success_msg
+from common.mixins import JSONResponseMixin
+from common.utils import get_logger, get_object_or_none, is_uuid
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, user_add_success_next
-from common.mixins import JSONResponseMixin
-from common.utils import get_logger, get_object_or_none
-from perms.models import AssetPermission
+from ..utils import AdminUserRequiredMixin
+from ..signals import on_user_created
+
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
-    'UserUpdateView', 'UserAssetPermissionCreateView',
-    'UserAssetPermissionView', 'UserGrantedAssetView',
+    'UserUpdateView',
+    'UserGrantedAssetView',
     'UserExportView',  'UserBulkImportView', 'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserBulkUpdateView',
@@ -51,7 +53,7 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'users/user_list.html'
 
     def get_context_data(self, **kwargs):
-        context = super(UserListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'app': _('Users'),
             'action': _('User list'),
@@ -64,10 +66,10 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
-        context = super(UserCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('Create user')})
         return context
 
@@ -75,48 +77,36 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
-        user_add_success_next(user)
-        return super(UserCreateView, self).form_valid(form)
-
-    def get_success_message(self, cleaned_data):
-        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
-        return self.success_message.format(
-            url=url, name=self.object.name
-        )
+        on_user_created.send(self.__class__, user=user)
+        return super().form_valid(form)
 
 
-class UserUpdateView(AdminUserRequiredMixin, UpdateView):
+class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
     form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
-
-    def form_valid(self, form):
-        username = self.object.username
-        user = form.save(commit=False)
-        user.username = username
-        user.save()
-        password = self.request.POST.get('password', '')
-        if password:
-            user.set_password(password)
-        return super(UserUpdateView, self).form_valid(form)
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
-        context = super(UserUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Update user')})
-        return context
+        context = {'app': _('Users'), 'action': _('Update user')}
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
-class UserBulkUpdateView(AdminUserRequiredMixin, ListView):
+class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
     model = User
     form_class = forms.UserBulkUpdateForm
     template_name = 'users/user_bulk_update.html'
     success_url = reverse_lazy('users:user-list')
+    success_message = _("Bulk update user success")
+    form = None
+    id_list = None
 
     def get(self, request, *args, **kwargs):
         users_id = self.request.GET.get('users_id', '')
-        self.id_list = [int(i) for i in users_id.split(',') if i.isdigit()]
+        self.id_list = [i for i in users_id.split(',')]
 
         if kwargs.get('form'):
             self.form = kwargs['form']
@@ -126,12 +116,13 @@ class UserBulkUpdateView(AdminUserRequiredMixin, ListView):
             )
         else:
             self.form = self.form_class()
-        return super(UserBulkUpdateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, self.success_message)
             return redirect(self.success_url)
         else:
             return self.get(request, form=form, *args, **kwargs)
@@ -142,10 +133,9 @@ class UserBulkUpdateView(AdminUserRequiredMixin, ListView):
             'action': 'Bulk update asset',
             'form': self.form,
             'users_selected': self.id_list,
-            'users': User.objects.all(),
         }
         kwargs.update(context)
-        return super(UserBulkUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserDetailView(AdminUserRequiredMixin, DetailView):
@@ -161,19 +151,7 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
             'groups': groups
         }
         kwargs.update(context)
-        return super(UserDetailView, self).get_context_data(**kwargs)
-
-
-# USER_ATTR_MAPPING = (
-#     ('name', 'Name'),
-#     ('username', 'Username'),
-#     ('email', 'Email'),
-#     ('groups', 'User groups'),
-#     ('role', 'Role'),
-#     ('phone', 'Phone'),
-#     ('wechat', 'Wechat'),
-#     ('comment', 'Comment'),
-# )
+        return super().get_context_data(**kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -182,14 +160,15 @@ class UserExportView(View):
         fields = [
             User._meta.get_field(name)
             for name in [
-                'id', 'name', 'username', 'email', 'role', 'wechat', 'phone',
-                'enable_otp', 'is_active', 'comment',
+                'id', 'name', 'username', 'email', 'role',
+                'wechat', 'phone', 'is_active', 'comment',
             ]
         ]
         spm = request.GET.get('spm', '')
-        users_id = cache.get(spm, ['1'])
+        users_id = cache.get(spm, [])
         filename = 'users-{}.csv'.format(
-            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         response.write(codecs.BOM_UTF8)
@@ -233,6 +212,7 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         }
         return self.render_json_response(data)
 
+    # todo: need be patch, method to long
     def form_valid(self, form):
         file = form.cleaned_data['file']
         data = file.read().decode('utf-8').strip(codecs.BOM_UTF8.decode('utf-8'))
@@ -243,8 +223,8 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         fields = [
             User._meta.get_field(name)
             for name in [
-                'id', 'name', 'username', 'email', 'role', 'wechat', 'phone',
-                'enable_otp', 'is_active', 'comment',
+                'id', 'name', 'username', 'email', 'role',
+                'wechat', 'phone', 'is_active', 'comment',
             ]
         ]
         mapping_reverse = {field.verbose_name: field.name for field in fields}
@@ -261,10 +241,9 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             if set(row) == {''}:
                 continue
             user_dict = dict(zip(attr, row))
-            id_ = user_dict.pop('id', 0)
-            user = get_object_or_none(User, id=id_)
+            id_ = user_dict.pop('id')
             for k, v in user_dict.items():
-                if k in ['enable_otp', 'is_active']:
+                if k in ['is_active']:
                     if v.lower() == 'false':
                         v = False
                     else:
@@ -276,13 +255,14 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     continue
                 user_dict[k] = v
 
+            user = get_object_or_none(User, id=id_) if is_uuid(id_) else None
             if not user:
                 try:
                     groups = user_dict.pop('groups')
                     user = User.objects.create(**user_dict)
                     user.groups.set(groups)
                     created.append(user_dict['username'])
-                    user_add_success_next(user)
+                    on_user_created.send(self.__class__, user=user)
                 except Exception as e:
                     failed.append('%s: %s' % (user_dict['username'], str(e)))
             else:
@@ -312,71 +292,22 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
 
-class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin,
-                              SingleObjectMixin, ListView):
-    model = User
-    template_name = 'users/user_asset_permission.html'
-    context_object_name = 'user'
-    form_class = forms.UserPrivateAssetPermissionForm
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=User.objects.all())
-        return super(UserAssetPermissionView, self).get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': 'Users',
-            'action': 'User asset permissions',
-        }
-        kwargs.update(context)
-        return super(UserAssetPermissionView, self).get_context_data(**kwargs)
-
-
-class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
-    form_class = forms.UserPrivateAssetPermissionForm
-    model = AssetPermission
-
-    def get(self, request, *args, **kwargs):
-        user = self.get_object(queryset=User.objects.all())
-        return redirect(reverse('users:user-asset-permission',
-                                kwargs={'pk': user.id}))
-
-    def post(self, request, *args, **kwargs):
-        self.user = self.get_object(queryset=User.objects.all())
-        return super(UserAssetPermissionCreateView, self)\
-            .post(request, *args, **kwargs)
-
-    def get_form(self, form_class=None):
-        form = super(UserAssetPermissionCreateView, self)\
-            .get_form(form_class=form_class)
-        form.user = self.user
-        return form
-
-    def form_invalid(self, form):
-        return redirect(reverse('users:user-asset-permission',
-                                kwargs={'pk': self.user.id}))
-
-    def get_success_url(self):
-        return reverse('users:user-asset-permission',
-                       kwargs={'pk': self.user.id})
-
-
 class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_granted_asset.html'
-    context_object_name = 'user'
+    object = None
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=User.objects.all())
-        return super(UserGrantedAssetView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'User granted asset',
+            'app': _('Users'),
+            'action': _('User granted assets'),
         }
         kwargs.update(context)
-        return super(UserGrantedAssetView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserProfileView(LoginRequiredMixin, TemplateView):
@@ -386,12 +317,12 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         from perms.utils import get_user_granted_assets
         assets = get_user_granted_assets(self.request.user)
         context = {
-            'app': 'User',
-            'action': 'User Profile',
+            'app': _('Users'),
+            'action': _('Profile'),
             'assets': assets,
         }
         kwargs.update(context)
-        return super(UserProfileView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
@@ -399,24 +330,17 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = forms.UserProfileForm
     success_url = reverse_lazy('users:user-profile')
-    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
 
     def get_object(self, queryset=None):
         return self.request.user
 
-    def get_success_message(self, cleaned_data):
-        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
-        return self.success_message.format(
-            url=url, name=self.object.name
-        )
-
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Profile update',
+            'app': _('User'),
+            'action': _('Profile setting'),
         }
         kwargs.update(context)
-        return super(UserProfileUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
@@ -430,15 +354,15 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Password update',
+            'app': _('Users'),
+            'action': _('Password update'),
         }
         kwargs.update(context)
-        return super(UserPasswordUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         auth_logout(self.request)
-        return super(UserPasswordUpdateView, self).get_success_url()
+        return super().get_success_url()
 
 
 class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
@@ -452,10 +376,11 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Public key update',
+            'app': _('Users'),
+            'action': _('Public key update'),
         }
         kwargs.update(context)
+<<<<<<< HEAD
         return super(UserPublicKeyUpdateView, self).get_context_data(**kwargs)
 
 class UserOtpBindingView(LoginRequiredMixin, UpdateView):
@@ -496,3 +421,6 @@ class UserOtpUnbingingView(LoginRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super(UserOtpUnbingingView, self).get_context_data(**kwargs)
+=======
+        return super().get_context_data(**kwargs)
+>>>>>>> upstream/dev

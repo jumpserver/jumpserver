@@ -9,8 +9,8 @@ generate_fake()
 EOF
 
 python ../apps/manage.py dbshell << EOF
-delete from django_content_type;
 delete from auth_permission;
+delete from django_content_type;
 EOF
 
 

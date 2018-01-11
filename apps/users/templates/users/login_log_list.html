@@ -1,0 +1,99 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% load common_tags %}
+{% block content_left_head %}
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d'}}">
+{#                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" >#}
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d'}}">
+            </div>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="user">
+                <option value="">{% trans 'Select user' %}</option>
+                {% for u in user_list %}
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="{% trans 'Search' %}" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    {% trans "Search" %}
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center">{% trans 'Username' %}</th>
+    <th class="text-center">{% trans 'Type' %}</th>
+    <th class="text-center">{% trans 'UA' %}</th>
+    <th class="text-center">{% trans 'IP' %}</th>
+    <th class="text-center">{% trans 'City' %}</th>
+    <th class="text-center">{% trans 'Date' %}</th>
+{% endblock %}
+
+{% block table_body %}
+    {% for login_log in object_list %}
+        <tr class="gradeX">
+            <td class="text-center">{{ forloop.counter }}</td>
+            <td class="text-center">{{ login_log.username }}</td>
+            <td class="text-center">{{ login_log.get_type_display }}</td>
+            <td class="text-center">
+                <span href="javascript:void(0);" data-toggle="tooltips" title="{{ login_log.user_agent  }}">{{ login_log.user_agent | truncatechars:20 }}</span>
+            </td>
+            <td class="text-center">{{ login_log.ip }}</td>
+            <td class="text-center">{{ login_log.city }}</td>
+            <td class="text-center">{{ login_log.datetime }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "searching": false,
+                "bInfo" : false,
+                "paging": false,
+                "order": []
+            });
+            $('#date .input-daterange').datepicker({
+                format: "yyyy-mm-dd",
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+
+            });
+            $('.select2').select2({
+                dropdownAutoWidth: true,
+                width: 'auto'
+            });
+        })
+    </script>
+{% endblock %}
+

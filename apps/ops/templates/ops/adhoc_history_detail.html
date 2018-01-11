@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                           <li class="active">
+                                <a href="{% url 'ops:adhoc-history-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history detail' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{% trans 'History detail of' %} {{ object.task.name }}: {{ object.adhoc.short_id }} </b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%">{% trans 'ID' %}:</td>
+                                            <td><b>{{ object.id }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">{% trans 'Task name' %}:</td>
+                                            <td><b>{{ object.task.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Version' %}:</td>
+                                            <td><b>{{ object.adhoc.short_id }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date start' %}:</td>
+                                            <td><b>{{ object.date_start }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Time delta' %}:</td>
+                                            <td><b>{{ object.timedelta|floatformat}} s</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Is finished' %}:</td>
+                                            <td><b>{{ object.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Is success ' %}:</td>
+                                            <td><b>{{ object.is_success|yesno:"Yes,No,Unkown" }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Failed assets' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% for host, task in object.failed_hosts.items %}
+                                        {% if forloop.first %}
+                                        <tr class="no-borders-tr">
+                                        {% else %}
+                                        <tr>
+                                            {% endif %}
+                                            <td>{{ host }}: </td>
+                                            <td>
+                                                {% for name, result in task.items %}
+                                                    <b>{{ name }}</b> => {{  result.msg }}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                            <tr class="no-borders-tr">
+                                                <td>{% trans 'No assets' %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Success assets' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% for host in object.success_hosts %}
+                                        {% if forloop.first %}
+                                        <tr class="no-borders-tr">
+                                        {% else %}
+                                        <tr>
+                                        {% endif %}
+                                            <td>{{ host }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'No assets' %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'users/_user_update_pk_modal.html' %}
+{% endblock %}
+

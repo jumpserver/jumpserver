@@ -19,18 +19,19 @@
     <h3>{% trans 'Basic' %}</h3>
     {% bootstrap_field form.hostname layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
-    {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.port layout="horizontal" %}
+    {% bootstrap_field form.cluster layout="horizontal" %}
+    {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.type layout="horizontal" %}
+    {% bootstrap_field form.env layout="horizontal" %}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Auth' %}</h3>
+    {% bootstrap_field form.admin_user layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Group' %}</h3>
-    {% bootstrap_field form.idc layout="horizontal" %}
     {% bootstrap_field form.groups layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Asset user' %}</h3>
-    {% bootstrap_field form.admin_user layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
@@ -45,7 +46,6 @@
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
     {% bootstrap_field form.status layout="horizontal" %}
-    {% bootstrap_field form.env layout="horizontal" %}
     {% bootstrap_field form.comment layout="horizontal" %}
     {% bootstrap_field form.is_active layout="horizontal" %}
 
@@ -63,7 +63,9 @@
 {% block custom_foot_js %}
     <script>
         $(document).ready(function () {
-            $('.select2').select2();
+            $('.select2').select2({
+                allowClear: true
+            });
             $("#tags").select2({
                 tags: true,
                 maximumSelectionLength: 8  //最多能够选择的个数

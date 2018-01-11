@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                           <li>
+                                <a href="{% url 'ops:adhoc-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Version detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'ops:adhoc-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Version run history' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-12" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'History of ' %} <b>{{ object.task.name }}:{{ object.short_id }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover " id="task-history-list-table" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                </th>
+                                                <th>{% trans 'Date start' %}</th>
+                                                <th>{% trans 'F/S/T' %}</th>
+                                                <th>{% trans 'Ratio' %}</th>
+                                                <th>{% trans 'Is finished' %}</th>
+                                                <th>{% trans 'Is success' %}</th>
+                                                <th>{% trans 'Time' %}</th>
+                                                <th>{% trans 'Version' %}</th>
+                                                <th>{% trans 'Action' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+function initTable() {
+    var options = {
+        ele: $('#task-history-list-table'),
+        buttons: [],
+        order: [],
+        select: [],
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                $(td).html(cellData);
+             }},
+            {targets: 2, createdCell: function (td, cellData) {
+                var total = "<span>" + cellData.total + "</span>";
+                var success = "<span class='text-navy'>" + cellData.success + "</span>";
+                var failed = "<span class='text-danger'>" + cellData.failed + "</span>";
+                $(td).html(failed + '/' + success + '/' + total );
+            }},
+            {targets: 3, createdCell: function (td, cellData) {
+                var val = 0;
+                var innerHtml = "";
+                if (cellData.total !== 0) {
+                    val = cellData.success/cellData.total * 100;
+                }
+
+                if (val === 100) {
+                    innerHtml = "<span class='text-navy'>" + val + "% </span>";
+                } else {
+                    innerHtml = "<span class='text-danger'>" + val + "% </span>";
+                }
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
+                if (cellData) {
+                    $(td).html(cellData.toFixed(2) + ' s')
+                } else {
+                    $(td).html("0" + ' s')
+                }
+            }},
+            {targets: 8, createdCell: function (td, cellData) {
+               var run_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" href="{% url 'ops:adhoc-history-detail' pk=DEFAULT_PK %}">{% trans "Detail" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+               if (cellData) {
+                   $(td).html(run_btn);
+               }
+            }}
+        ],
+        ajax_url: '{% url "api-ops:history-list" %}?adhoc={{ object.pk }}',
+        columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "stat"}, {data: "stat"}, {data: "is_finished"},
+                  {data: "is_success"}, {data: "timedelta"}, {data: 'adhoc_short_id'}, {data: "id"}]
+    };
+    jumpserver.initDataTable(options);
+}
+
+$(document).ready(function () {
+    initTable();
+})
+
+</script>
+{% endblock %}

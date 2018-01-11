@@ -5,12 +5,6 @@
 <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 
-{#<style>#}
-{#    .custom{#}
-{#        margin-right:5px;#}
-{#        }#}
-{#    #modal .modal-body { max-height: 200px; }#}
-{#</style>#}
 {% endblock %}
 {% block content_left_head %}{% endblock %}
 
@@ -27,9 +21,8 @@
     </div>
 {% endblock %}
 
-
 {% block table_container %}
-<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>
+<div class="uc pull-left m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>
 <table class="table table-striped table-bordered table-hover " id="asset_list_table" >
     <thead>
         <tr>
@@ -37,11 +30,12 @@
             <th class="text-center">{% trans 'Hostname' %}</th>
             <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'Port' %}</th>
+            <th class="text-center">{% trans 'Cluster' %}</th>
             <th class="text-center">{% trans 'Type' %}</th>
             <th class="text-center">{% trans 'Env' %}</th>
             <th class="text-center">{% trans 'Hardware' %}</th>
-            <th class="text-center">{% trans 'Valid' %}</th>
-            <th class="text-center">{% trans 'Alive' %}</th>
+            <th class="text-center">{% trans 'Active' %}</th>
+            <th class="text-center">{% trans 'Reachable' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
@@ -54,7 +48,7 @@
             <option value="delete">{% trans 'Delete selected' %}</option>
             <option value="update">{% trans 'Update selected' %}</option>
             <option value="deactive">{% trans 'Deactive selected' %}</option>
-            <option value="active">{% trans 'Active' %}</option>
+            <option value="active">{% trans 'Active selected' %}</option>
         </select>
         <div class="input-group-btn pull-left" style="padding-left: 5px;">
             <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
@@ -70,41 +64,25 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
-window.onload = function (){
-        var tag_on = document.getElementsByName("tag_on");
-        var oDiv = document.getElementById("ydxbd");
-        if(tag_on.length > 0){
-            oDiv.style.display = "block";
-        }
-    };
 
-function tagShow() {
-    var oDiv = document.getElementById("ydxbd");
-    if (oDiv.style.display == 'none'){
-        oDiv.style.display = "block";
-    }else{
-        oDiv.style.display = "none";
-    }
-}  //onload;
-
-
-
-$(document).ready(function(){
+function initTable() {
     var options = {
         ele: $('#asset_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
+                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
+                console.log('{{ the_url }}');
+                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
-            {targets: 7, createdCell: function (td, cellData) {
+            {targets: 8, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
             }},
-            {targets: 8, createdCell: function (td, cellData) {
+            {targets: 9, createdCell: function (td, cellData) {
                 if (cellData == 'Unknown'){
                     $(td).html('<i class="fa fa-circle text-warning"></i>')
                 } else if (!cellData) {
@@ -113,59 +91,62 @@ $(document).ready(function(){
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
                 }
             }},
-            {targets: 9, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+            {targets: 10, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
-        columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
-            {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware"},
-            {data: "is_active" }, {data: "is_online"}, {data: "id" }],
+        columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "cluster_name"},
+            {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
+            {data: "is_active" }, {data: "is_connective"}, {data: "id" }],
         op_html: $('#actions').html()
     };
-    var table = jumpserver.initDataTable(options);
+    return jumpserver.initDataTable(options);
+}
 
-    $('.btn_export').click(function () {
-        var assets = [];
-        var rows = table.rows('.selected').data();
-        $.each(rows, function (index, obj) {
-            assets.push(obj.id)
-        });
-        console.log(assets);
-        $.ajax({
-            url: "{% url "assets:asset-export" %}",
-            method: 'POST',
-            data: JSON.stringify({assets_id: assets}),
-            dataType: "json",
-            success: function (data, textStatus) {
-                window.open(data.redirect)
-            },
-            error: function () {
-                toastr.error('Export failed');
-            }
-        })
+$(document).ready(function(){
+    initTable();
+})
+.on('click', '.btn_export', function () {
+    var $data_table = $('#asset_list_table').DataTable();
+    var rows = $data_table.rows('.selected').data();
+    var assets = [];
+    $.each(rows, function (index, obj) {
+        assets.push(obj.id)
     });
-     $('#btn_asset_import').click(function() {
-        var $form = $('#fm_asset_import');
-        $form.find('.help-block').remove();
-        function success (data) {
-            if (data.valid === false) {
-                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
-            } else {
-                $('#id_created').html(data.created_info);
-                $('#id_created_detail').html(data.created.join(', '));
-                $('#id_updated').html(data.updated_info);
-                $('#id_updated_detail').html(data.updated.join(', '));
-                $('#id_failed').html(data.failed_info);
-                $('#id_failed_detail').html(data.failed.join(', '));
-                var $data_table = $('#asset_list_table').DataTable();
-                $data_table.ajax.reload();
-            }
+    $.ajax({
+        url: "{% url "assets:asset-export" %}",
+        method: 'POST',
+        data: JSON.stringify({assets_id: assets}),
+        dataType: "json",
+        success: function (data, textStatus) {
+            window.open(data.redirect)
+        },
+        error: function () {
+            toastr.error('Export failed');
         }
-        $form.ajaxSubmit({success: success});
     })
+})
+.on('click', '#btn_asset_import', function () {
+    var $form = $('#fm_asset_import');
+    $form.find('.help-block').remove();
+    function success (data) {
+        if (data.valid === false) {
+            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+        } else {
+            $('#id_created').html(data.created_info);
+            $('#id_created_detail').html(data.created.join(', '));
+            $('#id_updated').html(data.updated_info);
+            $('#id_updated_detail').html(data.updated.join(', '));
+            $('#id_failed').html(data.failed_info);
+            $('#id_failed_detail').html(data.failed.join(', '));
+            var $data_table = $('#asset_list_table').DataTable();
+            $data_table.ajax.reload();
+        }
+    }
+    $form.ajaxSubmit({success: success});
 })
 
 .on('click', '.btn_asset_delete', function () {
@@ -173,8 +154,7 @@ $(document).ready(function(){
     var $data_table = $("#asset_list_table").DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var uid = $this.data('uid');
-    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
-    console.log(the_url);
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();
@@ -187,24 +167,28 @@ $(document).ready(function(){
     $data_table.rows({selected: true}).every(function(){
         id_list.push(this.data().id);
     });
-    if (id_list.length == 0) {
+    if (id_list.length === 0) {
         return false;
     }
     var the_url = "{% url 'api-assets:asset-list' %}";
 
     function doDeactive() {
-        var body = $.each(id_list, function(index, asset_object) {
-            asset_object['is_active'] = false;
+        var data = [];
+        $.each(id_list, function(index, object_id) {
+            var obj = {"pk": object_id, "is_active": false};
+            data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
         $data_table.ajax.reload();
         jumpserver.checked = false;
     }
     function doActive() {
-        var body = $.each(id_list, function(index, asset_object) {
-            asset_object['is_active'] = true;
+        var data = [];
+        $.each(id_list, function(index, object_id) {
+            var obj = {"pk": object_id, "is_active": true};
+            data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
         $data_table.ajax.reload();
         jumpserver.checked = false;
     }
@@ -227,8 +211,13 @@ $(document).ready(function(){
                 var msg = "{% trans 'Asset Deleting failed.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "error");
             };
-            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
-            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            var url_delete = the_url + '?id__in=' + JSON.stringify(id_list);
+            APIUpdateAttr({
+                url: url_delete,
+                method: 'DELETE',
+                success: success,
+                error: fail
+            });
             $data_table.ajax.reload();
             jumpserver.checked = false;
         });
@@ -255,65 +244,6 @@ $(document).ready(function(){
             break;
     }
 });
-{##}
-{#.on('click', '#btn_asset_bulk_update', function () {#}
-{#    var json_data = $("#fm_asset_bulk_update").serializeObject();#}
-{#    var body = {};#}
-{#    body.enable_otp = (json_data.enable_otp === 'on')? true: false;#}
-{#    if (json_data.type != '') {#}
-{#        body.type = json_data.type;#}
-{#    }#}
-{#    if (json_data.groups != undefined) {#}
-{#        body.groups = json_data.groups;#}
-{#    }#}
-{#    if (typeof body.groups === 'string') {#}
-{#        body.groups = [parseInt(body.groups)]#}
-{#    } else if(typeof body.groups === 'array') {#}
-{#        var new_groups = body.groups.map(Number);#}
-{#        body.groups = new_groups;#}
-{#    }#}
-{##}
-{#    if (json_data.system_users != undefined) {#}
-{#        body.system_users = json_data.system_users;#}
-{#    }#}
-{#    if (typeof body.system_users === 'string') {#}
-{#        body.system_users = [parseInt(body.system_users)]#}
-{#    } else if(typeof body.system_users === 'array') {#}
-{#        var new_users = body.system_users.map(Number);#}
-{#        body.system_users = new_users;#}
-{#    }#}
-{##}
-{#    if (json_data.tags != undefined) {#}
-{#        body.tags = json_data.tags;#}
-{#    }#}
-{#    if (typeof body.tags == 'string') {#}
-{#        body.tags = [parseInt(body.tags)];#}
-{#    } else if (typeof body.tags === 'array') {#}
-{#        var new_tags = body.tags.map(Number);#}
-{#        body.tags = new_tags;#}
-{#    }#}
-{##}
-{#    var $data_table = $('#asset_list_table').DataTable();#}
-{#    var post_list = [];#}
-{#    $data_table.rows({selected: true}).every(function(){#}
-{#        var content = Object.assign({id: this.data().id}, body);#}
-{#        post_list.push(content);#}
-{#    });#}
-{#    if (post_list === []) {#}
-{#        return false#}
-{#    }#}
-{#    var the_url = "{% url 'api-assets:asset-list' %}";#}
-{#    var success = function() {#}
-{#        var msg = "{% trans 'The selected assets has been updated successfully.' %}";#}
-{#        swal("{% trans 'Asset Updated' %}", msg, "success");#}
-{#        $('#asset_list_table').DataTable().ajax.reload();#}
-{#        jumpserver.checked = false;#}
-{#    };#}
-{#    console.log(JSON.stringify(post_list));#}
-{#    console.log(the_url);#}
-{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
-{#    $('#asset_bulk_update_modal').modal('hide');#}
-{#})#}
 
 </script>
 {% endblock %}

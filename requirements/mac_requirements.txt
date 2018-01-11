@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 brew install openssl libtiff libjpeg webp little-cms2
+=======
+brew install libtiff libjpeg webp little-cms2 openssl
+>>>>>>> upstream/dev

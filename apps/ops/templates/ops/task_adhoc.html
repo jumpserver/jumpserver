@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'ops:task-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'ops:task-adhoc' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task versions' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:task-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-12" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Versions of ' %} <b>{{ object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover " id="task-version-list-table" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                </th>
+                                                <th>{% trans 'Version' %}</th>
+                                                <th>{% trans 'Hosts' %}</th>
+                                                <th>{% trans 'Pattern' %}</th>
+                                                <th>{% trans 'Run as' %}</th>
+                                                <th>{% trans 'Become' %}</th>
+                                                <th>{% trans 'Datetime' %}</th>
+                                                <th>{% trans 'Action' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            var options = {
+                ele: $('#task-version-list-table'),
+                buttons: [],
+                order: [],
+                select: [],
+                columnDefs: [
+                    {targets: 1, createdCell: function (td, cellData, rowData) {
+{#                        var detail_btn = '<a href="' + cellData + '</a>';#}
+                        $(td).html(cellData);
+                     }},
+                    {targets: 2, createdCell: function (td, cellData, rowData) {
+                        var dataLength = cellData.length;
+                        $(td).html(dataLength);
+                    }},
+                    {targets: 4, createdCell: function (td, cellData) {
+                        if (!cellData) {
+                            $(td).html("Admin")
+                        } else {
+                            $(td).html(cellData)
+                        }
+                    }},
+                    {targets: 5, createdCell: function (td, cellData, rowData) {
+                        if (!cellData) {
+                            $(td).html("")
+                        } else {
+                            $(td).html(cellData.user)
+                        }
+                    }},
+                    {targets: 7, createdCell: function (td, cellData, rowData) {
+                       var detail_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" href="{% url 'ops:adhoc-detail' pk=DEFAULT_PK %}">{% trans "Detail" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                       if (cellData) {
+                           $(td).html(detail_btn);
+                       }
+                    }}
+                ],
+                ajax_url: '{% url "api-ops:adhoc-list" %}?task={{ object.pk }}',
+                columns: [{data: function(){return ""}}, {data: "short_id" }, {data: "hosts"}, {data: "pattern"},
+                          {data: "run_as"}, {data: "become"}, {data: "date_created"}, {data: "id"}]
+            };
+            jumpserver.initDataTable(options);
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Terminal detail' %} </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'terminal:terminal-update' pk=terminal.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ terminal.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%">{% trans 'Name' %}:</td>
+                                            <td><b>{{ terminal.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Remote addr' %}:</td>
+                                            <td><b>{{ terminal.remote_addr }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'SSH port' %}:</td>
+                                            <td><b>{{ terminal.ssh_port }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Http port' %}:</td>
+                                            <td><b>{{ terminal.http_port }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ terminal.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ asset.comment }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

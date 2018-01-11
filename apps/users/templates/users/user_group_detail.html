@@ -3,13 +3,13 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <link href="{% static "css/plugins/dataTables/datatables.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/datatables/datatables.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
-    <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
+    <script src="{% static "js/plugins/datatables/datatables.min.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -21,18 +21,15 @@
                             <li class="active">
                                 <a href="{% url 'users:user-group-detail' pk=user_group.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User group detail' %} </a>
                             </li>
-                            <li>
-                                <a href="{% url 'users:user-group-asset-permission' pk=user_group.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-group-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
-                            </li>
+{#                            <li>#}
+{#                                <a href="{% url 'users:user-group-granted-asset' pk=user_group.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>#}
+{#                            </li>#}
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'users:user-group-update' pk=user_group.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'users:user-group-update' pk=user_group.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-user-group">
-                                    <i class="fa fa-edit"></i>Delete
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
                         </ul>
@@ -174,7 +171,6 @@ $(document).ready(function () {
     var users = $('.bdg_user').map(function() {
         return $(this).data('uid');
     }).get();
-    console.log(users);
     updateGroupMember(users)
 }).on('click', '#btn_add_user', function() {
     if (Object.keys(jumpserver.users_selected).length === 0) {
@@ -184,16 +180,15 @@ $(document).ready(function () {
         return $(this).data('uid');
     }).get();
     $.map(jumpserver.users_selected, function(value, index) {
-        users.push(parseInt(index));
+        users.push(index);
         $('#opt_' + index).remove();
     });
-    console.log(users);
     updateGroupMember(users)
 }).on('click', '.btn-delete-user-group', function () {
     var $this = $(this);
     var name = "{{ user_group.name }}";
     var uid = "{{ user_group.id }}";
-    var the_url = '{% url "api-users:user-group-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-users:user-group-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'users:user-group-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })

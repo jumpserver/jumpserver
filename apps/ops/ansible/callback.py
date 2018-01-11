@@ -1,65 +1,103 @@
 # ~*~ coding: utf-8 ~*~
 
-from collections import defaultdict
 from ansible.plugins.callback import CallbackBase
+from ansible.plugins.callback.default import CallbackModule
 
 
-class CommandResultCallback(CallbackBase):
-    def __init__(self, display=None):
-        self.result_q = dict(contacted={}, dark={})
-        super(CommandResultCallback, self).__init__(display)
-
-    def gather_result(self, n, res):
-        self.result_q[n][res._host.name] = {}
-        self.result_q[n][res._host.name]['cmd'] = res._result.get('cmd')
-        self.result_q[n][res._host.name]['stderr'] = res._result.get('stderr')
-        self.result_q[n][res._host.name]['stdout'] = res._result.get('stdout')
-        self.result_q[n][res._host.name]['rc'] = res._result.get('rc')
-
-    def v2_runner_on_ok(self, result):
-        self.gather_result("contacted", result)
-
-    def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.gather_result("dark", result)
-
-    def v2_runner_on_unreachable(self, result):
-        self.gather_result("dark", result)
-
-    def v2_runner_on_skipped(self, result):
-        self.gather_result("dark", result)
-
-
-class AdHocResultCallback(CallbackBase):
+class AdHocResultCallback(CallbackModule):
     """
-    AdHoc result Callback
+    Task result Callback
     """
-    def __init__(self, display=None):
-        self.result_q = dict(contacted={}, dark={})
-        super(AdHocResultCallback, self).__init__(display)
+    def __init__(self, display=None, options=None):
+        # result_raw example: {
+        #   "ok": {"hostname": {"task_name": {}，...},..},
+        #   "failed": {"hostname": {"task_name": {}..}, ..},
+        #   "unreachable: {"hostname": {"task_name": {}, ..}},
+        #   "skipped": {"hostname": {"task_name": {}, ..}, ..},
+        # }
+        # results_summary example: {
+        #   "contacted": {"hostname",...},
+        #   "dark": {"hostname": {"task_name": {}, "task_name": {}},...,},
+        # }
+        self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
+        self.results_summary = dict(contacted=[], dark={})
+        super().__init__()
 
-    def gather_result(self, n, res):
-        if res._host.name in self.result_q[n]:
-            self.result_q[n][res._host.name].append(res._result)
+    def gather_result(self, t, res):
+        self._clean_results(res._result, res._task.action)
+        host = res._host.get_name()
+        task_name = res.task_name
+        task_result = res._result
+
+        if self.results_raw[t].get(host):
+            self.results_raw[t][host][task_name] = task_result
         else:
-            self.result_q[n][res._host.name] = [res._result]
+            self.results_raw[t][host] = {task_name: task_result}
+        self.clean_result(t, host, task_name, task_result)
 
-    def v2_runner_on_ok(self, result):
-        self.gather_result("contacted", result)
+    def clean_result(self, t, host, task_name, task_result):
+        contacted = self.results_summary["contacted"]
+        dark = self.results_summary["dark"]
+        if t in ("ok", "skipped") and host not in dark:
+            if host not in contacted:
+                contacted.append(host)
+        else:
+            if dark.get(host):
+                dark[host][task_name] = task_result.values
+            else:
+                dark[host] = {task_name: task_result}
+            if host in contacted:
+                contacted.remove(host)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.gather_result("dark", result)
+        self.gather_result("failed", result)
+        super().v2_runner_on_failed(result, ignore_errors=ignore_errors)
 
-    def v2_runner_on_unreachable(self, result):
-        self.gather_result("dark", result)
+    def v2_runner_on_ok(self, result):
+        self.gather_result("ok", result)
+        super().v2_runner_on_ok(result)
 
     def v2_runner_on_skipped(self, result):
-        self.gather_result("dark", result)
+        self.gather_result("skipped", result)
+        super().v2_runner_on_skipped(result)
 
-    def v2_playbook_on_task_start(self, task, is_conditional):
-        pass
+    def v2_runner_on_unreachable(self, result):
+        self.gather_result("unreachable", result)
+        super().v2_runner_on_unreachable(result)
 
-    def v2_playbook_on_play_start(self, play):
-        pass
+
+class CommandResultCallback(AdHocResultCallback):
+    """
+    Command result callback
+    """
+    def __init__(self, display=None):
+        # results_command: {
+        #   "cmd": "",
+        #   "stderr": "",
+        #   "stdout": "",
+        #   "rc": 0,
+        #   "delta": 0:0:0.123
+        # }
+        #
+        self.results_command = dict()
+        super().__init__(display)
+
+    def gather_result(self, t, res):
+        super().gather_result(t, res)
+        self.gather_cmd(t, res)
+
+    def gather_cmd(self, t, res):
+        host = res._host.get_name()
+        cmd = {}
+        if t == "ok":
+            cmd['cmd'] = res._result.get('cmd')
+            cmd['stderr'] = res._result.get('stderr')
+            cmd['stdout'] = res._result.get('stdout')
+            cmd['rc'] = res._result.get('rc')
+            cmd['delta'] = res._result.get('delta')
+        else:
+            cmd['err'] = "Error: {}".format(res)
+        self.results_command[host] = cmd
 
 
 class PlaybookResultCallBack(CallbackBase):

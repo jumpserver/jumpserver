@@ -1,0 +1,141 @@
+{% extends '_base_list.html' %}
+{% load i18n static %}
+{% block custom_head_css_js %}
+{{ block.super }}
+<style>
+    div.dataTables_wrapper div.dataTables_filter,
+    .dataTables_length {
+        float: right !important;
+    }
+    div.dataTables_wrapper div.dataTables_filter {
+        margin-left: 15px;
+    }
+
+    #modal .modal-body { max-height: 200px; }
+</style>
+{% endblock %}
+
+{% block table_search %}{% endblock %}
+
+{% block table_container %}
+<table class="table table-striped table-bordered table-hover " id="terminal_list_table" >
+    <thead>
+        <tr>
+            <th class="text-center">
+                <div class="checkbox checkbox-default">
+                    <input type="checkbox" class="ipt_check_all">
+                </div>
+            </th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'Addr' %}</th>
+            <th class="text-center">{% trans 'SSH port' %}</th>
+            <th class="text-center">{% trans 'Http port' %}</th>
+            <th class="text-center">{% trans 'Sessions' %}</th>
+            <th class="text-center">{% trans 'Active' %}</th>
+            <th class="text-center">{% trans 'Alive' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+{% include 'terminal/terminal_modal_accept.html' %}
+{% endblock %}
+{% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script>
+function initTable() {
+    var options = {
+        ele: $('#terminal_list_table'),
+        buttons: [],
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "terminal:terminal-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+             }},
+            {targets: 6, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }},
+            {targets: 7, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-circle text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-circle text-navy"></i>')
+                }
+            }},
+            {targets: 8, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "terminal:terminal-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData);
+                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
+                        .replace('99991938', rowData.name);
+                var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="{{ DEFAULT_PK }}">{% trans "Accept" %}</a> '
+                        .replace('{{ DEFAULT_PK }}', cellData);
+                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Reject" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
+                        .replace('99991938', rowData.name);
+                if (rowData.is_accepted) {
+                    $(td).html(update_btn + delete_btn);
+                } else {
+                    {% if user.is_superuser %}
+                    $(td).html(accept_btn + reject_btn);
+                    {% endif %}
+                }
+             }}
+        ],
+        ajax_url: '{% url "api-terminal:terminal-list" %}',
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
+                  {data: "session_online"}, {data: "is_active" }, {data: 'is_alive'}, {data: "id"}],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initDataTable(options);
+}
+$(document).ready(function(){
+    initTable();
+
+}).on('click', '#btn-confirm',function () {
+    var $form = $('#form_terminal_accept');
+    function success(data, textStatus, jqXHR) {
+        if (data.success === true) {
+            window.location.reload()
+        } else {
+            $('#modal-error').html(data.msg).css('display', 'block');
+        }
+    }
+    $form.ajaxSubmit({success: success});
+}).on('click', '.btn-del', function(){
+    var $this = $(this);
+    var id = $this.data('id');
+    var name = $(this).data('name');
+    var the_url = '{% url "api-terminal:terminal-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', id);
+    objectDelete($this, name, the_url)
+
+}).on('click', '.btn-accept', function () {
+    var $this = $(this);
+    var terminal_id = $this.data('id');
+    var the_url = "{% url 'api-terminal:terminal-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', terminal_id);
+    var post_url = "{% url 'terminal:terminal-accept' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', terminal_id);
+    $.ajax({
+        url: the_url,
+        method: 'GET',
+        success: function (data) {
+            $('#id_name').val(data.name);
+            $('#id_remote_addr').val(data.remote_addr);
+            $('#id_url').val(data.url);
+            $('#id_comment').val(data.comment);
+            $('#form_terminal_accept').attr('action', post_url)
+        }
+    });
+    $('#modal_terminal_accept').modal({
+        show: true
+    });
+}).on('click', '.btn-connect', function () {
+    var $this = $(this);
+    var id = $this.data('id');
+})
+</script>
+{% endblock %}

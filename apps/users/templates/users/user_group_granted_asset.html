@@ -4,8 +4,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -16,9 +16,6 @@
                         <ul class="nav nav-tabs">
                             <li>
                                 <a href="{% url 'users:user-group-detail' pk=user_group.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-group-asset-permission' pk=user_group.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
                             </li>
                             <li class="active">
                                 <a href="{% url 'users:user-group-granted-asset' pk=user_group.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
@@ -113,8 +110,8 @@
                 select: [],
                 columnDefs: [
                     {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }},
                     {targets: 4, createdCell: function (td, cellData, rowData) {
                         if (cellData.length > 10){
@@ -142,8 +139,8 @@
                 select: [],
                 columnDefs: [
                     {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }}
                 ],
                 ajax_url: '{% url "api-perms:user-group-asset-groups" pk=user_group.id %}',

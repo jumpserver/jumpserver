@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load common_tags %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#" class="text-center"> {% trans 'Session detail' %} </a>
+                            </li>
+{#                            <li>#}
+{#                                <a href="#" class="text-center"> {% trans 'Session commands' %} </a>#}
+{#                            </li>#}
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Command list' %} <b></b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table id="command-log" class="footable table table-stripped toggle-arrow-tiny" data-page-size="10">
+                                        <thead>
+                                        <tr>
+                                            <th data-toggle="true">ID</th>
+                                            <th>{% trans 'Command' %}</th>
+                                            <th data-hide="all"></th>
+                                            <th>{% trans 'Datetime' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for command in object_list %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ command.input }}</td>
+                                                <td><pre style="border: none;background: none">{{ command.output }}</pre></td>
+                                                <td>{{ command.timestamp|ts_to_date}}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="3">{% trans "There is no command about this session" %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <ul class="pagination pull-right"></ul>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% if object.is_finished %}
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Replay session' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" onclick="window.open('/luna/replay/{{ object.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Go' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <!--<tr>-->
+                                            <!--<td class="no-borders" >{% trans 'Monitor session' %}:</td>-->
+                                            <!--<td class="no-borders" >-->
+                                                <!--<span class="pull-right">-->
+                                                    <!--<button type="button" class="btn btn-primary btn-xs " style="width: 54px">{% trans 'Go' %}</button>-->
+                                                <!--</span>-->
+                                            <!--</td>-->
+                                        <!--</tr>-->
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Terminate session' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs btn-term" value="{{ object.id }}" terminal="{{ object.terminal.id }}"  style="width: 54px;">{% trans 'Confirm' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+    <script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+    <script>
+        function terminateSession(data) {
+            function success() {
+                window.setTimeout(function () {
+                    window.location.reload()
+                }, 300)
+            }
+            var the_url = "{% url 'api-terminal:tasks-list' %}";
+            APIUpdateAttr({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
+        }
+        $(document).ready(function () {
+            $('.footable').footable();
+        }).on('click', '.btn-term', function () {
+            var $this = $(this);
+            var session_id = $this.attr('value');
+            var terminal_id = $this.attr('terminal');
+            alert(session_id);
+            var data = {
+                name: "kill_session",
+                args: session_id,
+                terminal: terminal_id
+            };
+            terminateSession(data)
+        })
+    </script>
+{% endblock %}

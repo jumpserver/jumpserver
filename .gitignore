@@ -24,3 +24,9 @@ tags
 jumpserver.iml
 .python-version
 tmp/*
+sessions/*
+media
+celerybeat.pid
+django.db
+celerybeat-schedule.db
+static

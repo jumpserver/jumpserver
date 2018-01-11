@@ -1,0 +1,119 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% load common_tags %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content_left_head %}
+{% endblock %}
+
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+            </div>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="user">
+                <option value="">{% trans 'User' %}</option>
+                {% for u in user_list %}
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="asset">
+                <option value="">{% trans 'Asset' %}</option>
+                {% for a in asset_list %}
+                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="system_user">
+                <option value="">{% trans 'System user' %}</option>
+                {% for s in system_user_list %}
+                    <option value="{{ s }}" {% if s == system_user %} selected {% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="command" placeholder="{% trans 'Command' %}" value="{{ command }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    {% trans 'Search' %}
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block table_container %}
+    <table class="footable table table-stripped toggle-arrow-tiny" data-page="false">
+        <thead>
+        <tr>
+            <th data-toggle="true">ID</th>
+            <th>{% trans 'Command' %}</th>
+            <th>{% trans 'User' %}</th>
+            <th>{% trans 'Asset' %}</th>
+            <th>{% trans 'System user'%}</th>
+            <th>{% trans 'Session' %}</th>
+            <th>{% trans 'Datetime' %}</th>
+            <th data-hide="all"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for command in command_list %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ command.input }}</td>
+                <td>{{ command.user }}</td>
+                <td>{{ command.asset }}</td>
+                <td>{{ command.system_user }}</td>
+                <td><a href="{% url 'terminal:session-detail' pk=command.session %}">{% trans "Goto" %}</a></td>
+                <td>{{ command.timestamp|ts_to_date }}</td>
+                <td><pre style="border: none; background: none">{{ command.output }}</pre></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.footable').footable();
+        $('.select2').select2({
+            dropdownAutoWidth : true,
+            width: 'auto'
+        });
+        $('#date .input-daterange').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+    });
+</script>
+{% endblock %}
+
+

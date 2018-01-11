@@ -61,7 +61,6 @@ function GetTableDataBox() {
             id_list.push(i);
          }
         }
-    console.log(id_list);
     for (i in id_list) {
         console.log(tabProduct);
         tableData.push(GetRowData(tabProduct.rows[id_list[i]]));
@@ -98,30 +97,6 @@ function move_left(from, to, from_o, to_o) {
     });
 }
 
-//function move_all(from, to) {
-//    $("#" + from).children().each(function () {
-//        $("#" + to).append(this);
-//    });
-//}
-//
-
-//function selectAllOption(){
-//         var checklist = document.getElementsByName ("selected");
-//            if(document.getElementById("select_all").checked)
-//            {
-//            for(var i=0;i<checklist.length;i++)
-//            {
-//              checklist[i].checked = 1;
-//            }
-//            }else{
-//            for(var j=0;j<checklist.length;j++)
-//            {
-//             checklist[j].checked = 0;
-//            }
-//            }
-//
-//        }
-
 
 function selectAll(){
     // Select all check box
@@ -130,15 +105,6 @@ function selectAll(){
     });
 }
 
-
-// function getIDall() {
-//     var check_array = [];
-//     $(".gradeX input:checked").each(function () {
-//         var id = $(this).attr("value");
-//         check_array.push(id);
-//     });
-//     return check_array.join(",");
-// }
 
 function getCookie(name) {
     var cookieValue = null;
@@ -189,8 +155,8 @@ function activeNav() {
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
-    var success_message = props.success_message || 'Update Successfully!';
-    var fail_message = props.fail_message || 'Error occurred while updating.';
+    var success_message = props.success_message || '更新成功!';
+    var fail_message = props.fail_message || '更新时发生未知错误.';
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
@@ -202,11 +168,10 @@ function APIUpdateAttr(props) {
         if (typeof props.success === 'function') {
             return props.success(data);
         } 
-      
-    }).fail(function(jqXHR, textStatue, errorThrown) {
+    }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error(fail_message);
         if (typeof props.error === 'function') {
-            return props.error(errorThrown);
+            return props.error(jqXHR.responseText);
         } 
     });
   // return true;
@@ -217,7 +182,7 @@ function objectDelete(obj, name, url, redirectTo) {
     function doDelete() {
         var body = {};
         var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            // swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             if (!redirectTo) {
                 $(obj).parent().parent().remove();
             } else {
@@ -225,7 +190,7 @@ function objectDelete(obj, name, url, redirectTo) {
             }
         };
         var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
         };
         APIUpdateAttr({
             url: url,
@@ -236,14 +201,14 @@ function objectDelete(obj, name, url, redirectTo) {
         });
     }
     swal({
-        title: 'Are you sure delete ?',
+        title: '你确定删除吗 ?',
         text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true,
     }, function () {
         doDelete()       
     });
@@ -279,27 +244,30 @@ jumpserver.initDataTable = function (options) {
   //    buttons: ['excel', 'pdf', 'print'],
   //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
   //    uc_html: '<a>header button</a>',
-  //    op_html: 'div.btn-group?'
+  //    op_html: 'div.btn-group?',
+  //    paging: true
   // }
   var ele = options.ele || $('.dataTable');
   var columnDefs = [
-    {
-      targets: 0,
-      orderable: false,
-      createdCell: function(td, cellData) {
-          $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
-      }},
-    {className: 'text-center', targets: '_all'}
+      {
+          targets: 0,
+          orderable: false,
+          createdCell: function (td, cellData) {
+              $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+          }
+      },
+      {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
+  var select = {
+            style: 'multi',
+            selector: 'td:first-child'
+      };
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        language: {
-            url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
-        },
-        order: options.order || [[ 1, 'asc' ]],
-        select: options.select || 'multi',
+        order: options.order || [],
+        // select: options.select || 'multi',
         buttons: [],
         columnDefs: columnDefs,
         ajax: {
@@ -307,6 +275,22 @@ jumpserver.initDataTable = function (options) {
             dataSrc: ""
         },
         columns: options.columns || [],
+        select: options.select || select,
+        language: {
+            search: "搜索",
+            lengthMenu: "每页  _MENU_",
+            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
+            infoFiltered:   "",
+            infoEmpty:      "",
+            zeroRecords:    "没有匹配项",
+            emptyTable:     "没有记录",
+            paginate: {
+                first:      "«",
+                previous:   "‹",
+                next:       "›",
+                last:       "»"
+            }
+        },
         lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
@@ -317,7 +301,8 @@ jumpserver.initDataTable = function (options) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
         jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
-    }).on('draw', function(){
+    }).
+    on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
     });
@@ -325,11 +310,11 @@ jumpserver.initDataTable = function (options) {
       if (!jumpserver.checked) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
-          table.rows().select();
+          table.rows({search:'applied'}).select();
       } else {
           $(this).closest('table').find('.ipt_check').prop('checked', false);
           jumpserver.checked = false;
-          table.rows().deselect();
+          table.rows({search:'applied'}).deselect();
       }
     });
 
@@ -366,4 +351,20 @@ String.prototype.format = function(args) {
         }
     }
     return result;
+};
+
+function setCookie(key, value) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+}
+
+
+function delCookie(key) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() - 1);
+    var val = getCookie(key);
+    if (val !== null) {
+        document.cookie = key + '=' + val + ";expires" + expires.toUTCString() + ';path=/';
+    }
 }

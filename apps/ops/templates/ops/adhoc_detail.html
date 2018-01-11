@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                           <li class="active">
+                                <a href="{% url 'ops:adhoc-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Version detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:adhoc-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Version run history' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ object.task.name }}: {{ object.short_id }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%">{% trans 'ID' %}:</td>
+                                            <td><b>{{ object.id }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">{% trans 'Hosts' %}:</td>
+                                            <td><b>{{ object.hosts | length }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%">{% trans 'Pattern' %}:</td>
+                                            <td><b>{{ object.pattern }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Options' %}</td>
+                                            <td>
+                                                <b>
+                                                {% for k, v in object.options.items %}
+                                                {{ k }} = {{ v }} <br/>
+                                                {% endfor %}
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        {% if object.run_as_admin %}
+                                        <tr>
+                                            <td>{% trans 'Run as' %}</td>
+                                            <td><b> Admin </b></td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td>{% trans 'Run as' %}:</td>
+                                            <td><b>{{ object.get_latest_history.date_start }}</b></td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td>{% trans 'Become' %}</td>
+                                            <td><b>{{ object.become.user }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}</td>
+                                            <td><b>{{ object.created_by }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Run times' %}:</td>
+                                            <td><b>{{ object.history.all | length }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Last run' %}:</td>
+                                            <td><b>{{ object.latest_history.short_id }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Time delta' %}:</td>
+                                            <td><b>{{ object.latest_history.timedelta|floatformat}} s</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Is finished' %}:</td>
+                                            <td><b>{{ object.latest_history.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Is success ' %}:</td>
+                                            <td><b>{{ object.latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Tasks' %}:</td>
+                                            <td>
+                                                <b>
+                                                {% for task in object.tasks %}
+                                                {{ forloop.counter }}. {{ task.name }} ::: {{ task.action.module }}  <br/>
+                                                {% endfor %}
+                                                </b>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Last run failed hosts' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% for host, task in object.latest_history.failed_hosts.items %}
+                                        {% if forloop.first %}
+                                        <tr class="no-borders-tr">
+                                        {% else %}
+                                        <tr>
+                                            {% endif %}
+                                            <td>{{ host }}: </td>
+                                            <td>
+                                                {% for name, result in task.items %}
+                                                    <b>{{ name }}</b> => {{  result.msg }}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                            <tr class="no-borders-tr">
+                                                <td>{% trans 'No hosts' %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Last run success hosts' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% for host in object.latest_history.success_hosts %}
+                                        {% if forloop.first %}
+                                        <tr class="no-borders-tr">
+                                        {% else %}
+                                        <tr>
+                                        {% endif %}
+                                            <td>{{ host }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'No hosts' %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'users/_user_update_pk_modal.html' %}
+{% endblock %}
+
