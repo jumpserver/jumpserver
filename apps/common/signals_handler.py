@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-import ldap
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
-from django_auth_ldap.config import LDAPSearch
+from django.db.utils import ProgrammingError, OperationalError
 
 from .models import Setting
 from .utils import get_logger
@@ -25,7 +24,10 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 def refresh_all_settings_on_django_ready(sender, **kwargs):
     logger.debug("Receive django ready signal")
     logger.debug("  - fresh all settings")
-    Setting.refresh_all_settings()
+    try:
+        Setting.refresh_all_settings()
+    except (ProgrammingError, OperationalError):
+        pass
 
 
 @receiver(ldap_auth_enable, dispatch_uid="my_unique_identifier")
