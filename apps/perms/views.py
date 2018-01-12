@@ -93,7 +93,7 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
                               ListView):
     template_name = 'perms/asset_permission_user.html'
     context_object_name = 'asset_permission'
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     object = None
 
     def get(self, request, *args, **kwargs):
@@ -123,7 +123,7 @@ class AssetPermissionAssetView(AdminUserRequiredMixin,
                                ListView):
     template_name = 'perms/asset_permission_asset.html'
     context_object_name = 'asset_permission'
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     object = None
 
     def get(self, request, *args, **kwargs):

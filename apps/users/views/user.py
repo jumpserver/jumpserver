@@ -76,7 +76,6 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
-        on_user_created.send(self.__class__, user=user)
         return super().form_valid(form)
 
 

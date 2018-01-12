@@ -85,7 +85,7 @@ class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
 
 
 class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     template_name = 'assets/admin_user_assets.html'
     context_object_name = 'admin_user'
     object = None

@@ -151,12 +151,12 @@ def check_user_valid(**kwargs):
     return None, _('Password or SSH public key invalid')
 
 
-def refresh_token(token, user, expiration=settings.CONFIG.TOKEN_EXPIRATION or 3600):
+def refresh_token(token, user, expiration=settings.TOKEN_EXPIRATION or 3600):
     cache.set(token, user.id, expiration)
 
 
 def generate_token(request, user):
-    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+    expiration = settings.TOKEN_EXPIRATION or 3600
     remote_addr = request.META.get('REMOTE_ADDR', '')
     if not isinstance(remote_addr, bytes):
         remote_addr = remote_addr.encode("utf-8")

@@ -185,7 +185,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': settings.CONFIG.USER_GUIDE_URL
+            'user_guide_url': settings.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 
@@ -216,7 +216,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
 class LoginLogListView(DatetimeSearchMixin, ListView):
     template_name = 'users/login_log_list.html'
     model = LoginLog
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     user = keyword = ""
     date_to = date_from = None
 

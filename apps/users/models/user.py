@@ -148,12 +148,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
-
         super().save(*args, **kwargs)
-        # Add the current user to the default group.
-        if not self.groups.count():
-            group = UserGroup.initial()
-            self.groups.add(group)
 
     @property
     def private_token(self):
@@ -253,6 +248,7 @@ class User(AbstractUser):
     #: Use this method initial user
     @classmethod
     def initial(cls):
+        from .group import UserGroup
         user = cls(username='admin',
                    email='admin@jumpserver.org',
                    name=_('Administrator'),
@@ -268,6 +264,7 @@ class User(AbstractUser):
         from random import seed, choice
         import forgery_py
         from django.db import IntegrityError
+        from .group import UserGroup
 
         seed()
         for i in range(count):

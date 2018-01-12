@@ -14,10 +14,10 @@
                             <li>
                                 <a href="{% url 'settings:basic-setting' %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
                             </li>
-                            <li>
+                            <li class="active">
                                 <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
                             </li>
                         </ul>
@@ -78,7 +78,7 @@ $(document).ready(function () {
         data[field.name] = field.value;
     });
 
-    var the_url = "{% url 'api-common:mail-testing' %}";
+    var the_url = "{% url 'api-common:ldap-testing' %}";
 
     function error(message) {
         toastr.error(message)
@@ -95,7 +95,6 @@ $(document).ready(function () {
         success: success,
         error: error
     });
-
 })
 </script>
 {% endblock %}

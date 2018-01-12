@@ -92,7 +92,7 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 
 class AssetModalListView(AdminUserRequiredMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_modal_list'
     template_name = 'assets/asset_modal_list.html'

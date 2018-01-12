@@ -69,8 +69,8 @@
 {#        <li id="download"><a href="">{% trans 'File download' %}</a></li>#}
 {#    </ul>#}
 {#</li>#}
-{#<li id="">#}
-{#    <a href="">#}
-{#        <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>#}
-{#    </a>#}
-{#</li>#}
+<li id="settings">
+    <a href="{% url 'settings:email-setting' %}">
+        <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>
+    </a>
+</li>

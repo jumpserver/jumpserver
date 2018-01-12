@@ -1,33 +1,85 @@
-from django.views.generic import View
-from django.shortcuts import render
+from django.views.generic import View, TemplateView
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
-from .forms import EmailSettingForm
+from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm
 from .mixins import AdminUserRequiredMixin
+from .signals import ldap_auth_enable
 
 
-class EmailSettingView(AdminUserRequiredMixin, View):
+class BasicSettingView(AdminUserRequiredMixin, TemplateView):
+    form_class = BasicSettingForm
+    template_name = "common/basic_setting.html"
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Basic setting'),
+            'form': self.form_class(),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            if "AUTH_LDAP" in form.cleaned_data:
+                ldap_auth_enable.send(form.cleaned_data["AUTH_LDAP"])
+            messages.success(request, _("Update basic setting successfully"))
+            return redirect('settings:basic-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)
+
+
+class EmailSettingView(AdminUserRequiredMixin, TemplateView):
     form_class = EmailSettingForm
     template_name = "common/email_setting.html"
 
-    def get(self, request):
+    def get_context_data(self, **kwargs):
         context = {
-            'app': 'settings',
-            'action': 'Email setting',
-            "form": EmailSettingForm(),
+            'app': _('Settings'),
+            'action': _('Email setting'),
+            'form': self.form_class(),
         }
-        return render(request, self.template_name, context)
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
     def post(self, request):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, _("Update email setting successfully"))
+            return redirect('settings:email-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)
 
+
+class LDAPSettingView(AdminUserRequiredMixin, TemplateView):
+    form_class = LDAPSettingForm
+    template_name = "common/ldap_setting.html"
+
+    def get_context_data(self, **kwargs):
         context = {
-            'app': 'settings',
-            'action': 'Email setting',
-            "form": EmailSettingForm(),
+            'app': _('Settings'),
+            'action': _('LDAP setting'),
+            'form': self.form_class(),
         }
-        return render(request, self.template_name, context)
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Update ldap setting successfully"))
+            return redirect('settings:ldap-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)

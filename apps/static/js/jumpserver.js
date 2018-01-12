@@ -157,6 +157,11 @@ function APIUpdateAttr(props) {
     props = props || {};
     var success_message = props.success_message || '更新成功!';
     var fail_message = props.fail_message || '更新时发生未知错误.';
+    var flash_message = true;
+    if (props.flash_message === false){
+        flash_message = false;
+    }
+
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
@@ -164,12 +169,16 @@ function APIUpdateAttr(props) {
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function(data, textStatue, jqXHR) {
-        toastr.success(success_message);
+        if (flash_message) {
+            toastr.success(success_message);
+        }
         if (typeof props.success === 'function') {
             return props.success(data);
         } 
     }).fail(function(jqXHR, textStatus, errorThrown) {
-        toastr.error(fail_message);
+        if (flash_message) {
+            toastr.error(fail_message);
+        }
         if (typeof props.error === 'function') {
             return props.error(jqXHR.responseText);
         } 
