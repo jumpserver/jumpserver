@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 15:51+0800\n"
+"POT-Creation-Date: 2018-01-12 18:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1107,10 +1107,10 @@ msgstr "选择资产"
 msgid "Task has been send, seen left assets status"
 msgstr "任务已下发，查看左侧资产状态"
 
-#: assets/templates/assets/cluster_create_update.html:41 common/views.py:17
-#: common/views.py:44 common/views.py:69 templates/_nav.html:74
+#: assets/templates/assets/cluster_create_update.html:41
+#: users/templates/users/reset_password.html:57
 #: users/templates/users/user_profile.html:20
-msgid "Settings"
+msgid "Setting"
 msgstr "设置"
 
 #: assets/templates/assets/cluster_list.html:11 assets/views/cluster.py:43
@@ -1408,6 +1408,11 @@ msgstr "LDAP设置"
 #: common/templates/common/ldap_setting.html:55
 msgid "Test connection"
 msgstr "测试连接"
+
+#: common/views.py:17 common/views.py:44 common/views.py:69
+#: templates/_nav.html:69
+msgid "Settings"
+msgstr "系统设置"
 
 #: common/views.py:30 common/views.py:55 common/views.py:80
 msgid "Update setting successfully"
@@ -1955,13 +1960,13 @@ msgstr "离线会话"
 msgid "Command"
 msgstr "命令"
 
-#: templates/_nav.html:56 templates/_nav_user.html:14
-msgid "Web terminal"
-msgstr "Web终端"
-
 #: templates/_nav_user.html:4
 msgid "My assets"
 msgstr "我的资产"
+
+#: templates/_nav_user.html:14
+msgid "Web terminal"
+msgstr "Web终端"
 
 #: templates/captcha/image.html:3
 msgid "Play CAPTCHA as audio file"
@@ -2422,10 +2427,6 @@ msgstr "重置密码"
 #: users/templates/users/reset_password.html:55
 msgid "Password again"
 msgstr "再次输入密码"
-
-#: users/templates/users/reset_password.html:57
-msgid "Setting"
-msgstr "设置"
 
 #: users/templates/users/user_create.html:4
 #: users/templates/users/user_list.html:16 users/views/user.py:72

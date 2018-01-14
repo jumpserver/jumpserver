@@ -46,7 +46,7 @@ class ClusterCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView)
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
-        cluster = form.save(commit=False)
+        cluster = form.save()
         cluster.created_by = self.request.user.username
         cluster.save()
         return super().form_valid(form)
