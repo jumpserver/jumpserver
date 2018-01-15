@@ -351,7 +351,7 @@ class UserGroupGrantedAssetGroupsApi(ListAPIView):
 
 
 class ValidateUserAssetPermissionView(APIView):
-    permission_classes = (IsAppUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
     @staticmethod
     def get(request):

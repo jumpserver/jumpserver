@@ -27,7 +27,8 @@ class BasicSettingView(AdminUserRequiredMixin, TemplateView):
             form.save()
             if "AUTH_LDAP" in form.cleaned_data:
                 ldap_auth_enable.send(form.cleaned_data["AUTH_LDAP"])
-            messages.success(request, _("Update setting successfully"))
+            msg = _("Update setting successfully, please restart program")
+            messages.success(request, msg)
             return redirect('settings:basic-setting')
         else:
             context = self.get_context_data()
@@ -52,7 +53,8 @@ class EmailSettingView(AdminUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, _("Update setting successfully"))
+            msg = _("Update setting successfully, please restart program")
+            messages.success(request, msg)
             return redirect('settings:email-setting')
         else:
             context = self.get_context_data()
@@ -77,7 +79,8 @@ class LDAPSettingView(AdminUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, _("Update setting successfully"))
+            msg = _("Update setting successfully, please restart program")
+            messages.success(request, msg)
             return redirect('settings:ldap-setting')
         else:
             context = self.get_context_data()
