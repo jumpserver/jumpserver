@@ -288,9 +288,17 @@ REST_FRAMEWORK = {
         'users.authentication.PrivateTokenAuthentication',
         'users.authentication.SessionAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'ORDERING_PARAM': "order",
+    'SEARCH_PARAM': "search",
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 15
 }
 
 AUTHENTICATION_BACKENDS = [
