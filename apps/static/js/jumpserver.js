@@ -373,7 +373,6 @@ jumpserver.initServerSideDataTable = function (options) {
             url: options.ajax_url ,
             data: function (data) {
                 delete data.columns;
-                var length = data.length;
                 if (data.length !== null ){
                     data.limit = data.length;
                     delete data.length;
@@ -395,6 +394,12 @@ jumpserver.initServerSideDataTable = function (options) {
                     data.order = order;
                 }
             },
+            dataFilter: function(data){
+                var json = jQuery.parseJSON( data );
+                json.recordsTotal = json.count;
+                json.recordsFiltered = json.count;
+                return JSON.stringify(json); // return JSON string
+            },
             dataSrc: "results"
         },
         columns: options.columns || [],
@@ -414,7 +419,7 @@ jumpserver.initServerSideDataTable = function (options) {
                 last:       "»"
             }
         },
-        lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
+        lengthMenu: [[15, 25, 50], [15, 25, 50]]
     });
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
