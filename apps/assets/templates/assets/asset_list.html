@@ -71,9 +71,20 @@ function initTable() {
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                 {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
-                console.log('{{ the_url }}');
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                 $(td).html(rowData.cluster_name)
+            }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                 $(td).html(rowData.get_type_display)
+            }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.get_env_display)
+            }},
+            {targets: 7, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.hardware_info)
             }},
             {targets: 8, createdCell: function (td, cellData) {
                 if (!cellData) {
@@ -98,12 +109,15 @@ function initTable() {
             }}
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
-        columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "cluster_name"},
-            {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
-            {data: "is_active" }, {data: "is_connective"}, {data: "id" }],
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+            {data: "cluster"}, {data: "type" }, {data: "env"},
+            {data: "cpu_cores"}, {data: "is_active", orderable: false },
+            {data: "is_connective", orderable: false}, {data: "id", orderable: false }
+        ],
         op_html: $('#actions').html()
     };
-    return jumpserver.initDataTable(options);
+    return jumpserver.initServerSideDataTable(options);
 }
 
 $(document).ready(function(){

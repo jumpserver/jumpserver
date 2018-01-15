@@ -47,8 +47,9 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class IDInFilterMixin(object):
+class CustomFilterMixin(object):
     def filter_queryset(self, queryset):
+        queryset = super(CustomFilterMixin, self).filter_queryset(queryset)
         id_list = self.request.query_params.get('id__in')
         if id_list:
             import json

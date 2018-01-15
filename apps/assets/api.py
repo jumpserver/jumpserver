@@ -19,8 +19,9 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from rest_framework.pagination import LimitOffsetPagination
 
-from common.mixins import IDInFilterMixin
+from common.mixins import CustomFilterMixin
 from common.utils import get_logger
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
@@ -34,12 +35,16 @@ from .tasks import update_asset_hardware_info_manual, test_admin_user_connectabi
 logger = get_logger(__file__)
 
 
-class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
+class AssetViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
+    filter_fields = ("hostname", "ip")
+    search_fields = filter_fields
+    ordering_fields = ("hostname", "ip", "port", "cluster", "type", "env", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
@@ -78,7 +83,7 @@ class UserAssetListView(generics.ListAPIView):
         return queryset
 
 
-class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
+class AssetGroupViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     Asset group api set, for add,delete,update,list,retrieve resource
     """
@@ -112,7 +117,7 @@ class GroupAddAssetsApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
+class ClusterViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     Cluster api set, for add,delete,update,list,retrieve resource
     """
@@ -153,7 +158,7 @@ class ClusterAddAssetsApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
+class AdminUserViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
@@ -189,7 +194,7 @@ class SystemUserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
+class AssetListUpdateApi(CustomFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     Asset bulk update api
     """

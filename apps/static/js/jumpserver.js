@@ -330,6 +330,120 @@ jumpserver.initDataTable = function (options) {
     return table;
 };
 
+jumpserver.initServerSideDataTable = function (options) {
+  // options = {
+  //    ele *: $('#dataTable_id'),
+  //    ajax_url *: '{% url 'users:user-list-api' %}',
+  //    columns *: [{data: ''}, ....],
+  //    dom: 'fltip',
+  //    i18n_url: '{% static "js/...../en-us.json" %}',
+  //    order: [[1, 'asc'], [2, 'asc'], ...],
+  //    buttons: ['excel', 'pdf', 'print'],
+  //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
+  //    uc_html: '<a>header button</a>',
+  //    op_html: 'div.btn-group?',
+  //    paging: true
+  // }
+  var ele = options.ele || $('.dataTable');
+  var columnDefs = [
+      {
+          targets: 0,
+          orderable: false,
+          createdCell: function (td, cellData) {
+              $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+          }
+      },
+      {className: 'text-center', targets: '_all'}
+  ];
+  columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
+  var select = {
+            style: 'multi',
+            selector: 'td:first-child'
+      };
+  var table = ele.DataTable({
+        pageLength: options.pageLength || 15,
+        dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        order: options.order || [],
+        // select: options.select || 'multi',
+        buttons: [],
+        columnDefs: columnDefs,
+        serverSide: true,
+        processing: true,
+        ajax: {
+            url: options.ajax_url ,
+            data: function (data) {
+                delete data.columns;
+                var length = data.length;
+                if (data.length !== null ){
+                    data.limit = data.length;
+                    delete data.length;
+                }
+                if (data.start !== null) {
+                    data.offset = data.start;
+                    delete data.start;
+                }
+                if (data.search !== null) {
+                    var search_val = data.search.value;
+                    data.search = search_val;
+                }
+                if (data.order !== null && data.order.length === 1) {
+                    var col = data.order[0].column;
+                    var order = options.columns[col].data;
+                    if (data.order[0].dir = "desc") {
+                        order = "-" + order;
+                    }
+                    data.order = order;
+                }
+            },
+            dataSrc: "results"
+        },
+        columns: options.columns || [],
+        select: options.select || select,
+        language: {
+            search: "搜索",
+            lengthMenu: "每页  _MENU_",
+            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
+            infoFiltered:   "",
+            infoEmpty:      "",
+            zeroRecords:    "没有匹配项",
+            emptyTable:     "没有记录",
+            paginate: {
+                first:      "«",
+                previous:   "‹",
+                next:       "›",
+                last:       "»"
+            }
+        },
+        lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
+    });
+    table.on('select', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', true);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = true
+    }).on('deselect', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', false);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
+    }).
+    on('draw', function(){
+        $('#op').html(options.op_html || '');
+        $('#uc').html(options.uc_html || '');
+    });
+    $('.ipt_check_all').on('click', function() {
+      if (!jumpserver.checked) {
+          $(this).closest('table').find('.ipt_check').prop('checked', true);
+          jumpserver.checked = true;
+          table.rows({search:'applied'}).select();
+      } else {
+          $(this).closest('table').find('.ipt_check').prop('checked', false);
+          jumpserver.checked = false;
+          table.rows({search:'applied'}).deselect();
+      }
+    });
+
+    return table;
+};
+
 /**
  * 替换所有匹配exp的字符串为指定字符串
  * @param exp 被替换部分的正则
