@@ -319,11 +319,11 @@ jumpserver.initDataTable = function (options) {
       if (!jumpserver.checked) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
-          table.rows({search:'applied'}).select();
+          table.rows({search:'applied', page:'current'}).select();
       } else {
           $(this).closest('table').find('.ipt_check').prop('checked', false);
           jumpserver.checked = false;
-          table.rows({search:'applied'}).deselect();
+          table.rows({search:'applied', page:'current'}).deselect();
       }
     });
 
@@ -438,11 +438,11 @@ jumpserver.initServerSideDataTable = function (options) {
       if (!jumpserver.checked) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
-          table.rows({search:'applied'}).select();
+          table.rows({search:'applied', page:'current'}).select();
       } else {
           $(this).closest('table').find('.ipt_check').prop('checked', false);
           jumpserver.checked = false;
-          table.rows({search:'applied'}).deselect();
+          table.rows({search:'applied', page:'current'}).deselect();
       }
     });
 
