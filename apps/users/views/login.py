@@ -53,7 +53,7 @@ class UserLoginView(FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
-        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split()
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
         if x_forwarded_for:
             login_ip = x_forwarded_for[0]
         else:

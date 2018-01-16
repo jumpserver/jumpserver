@@ -180,6 +180,7 @@ def validate_ip(ip):
 
 def write_login_log(username, type='', ip='', user_agent=''):
     if not (ip and validate_ip(ip)):
+        ip = ip[:15]
         city = "Unknown"
     else:
         city = get_ip_city(ip)

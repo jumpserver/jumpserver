@@ -128,7 +128,7 @@ class UserAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR').split()
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
             if x_forwarded_for:
                 login_ip = x_forwarded_for[0]
             else:
