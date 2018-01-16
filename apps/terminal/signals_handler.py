@@ -13,10 +13,6 @@ RUNNING = False
 logger = get_logger(__file__)
 
 
-@shared_task
-@register_as_period_task(interval=3600)
-@after_app_ready_start
-@after_app_shutdown_clean
 def set_session_info_cache():
     logger.debug("")
     from .utils import get_session_asset_list, get_session_user_list, \

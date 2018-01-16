@@ -16,6 +16,8 @@ def update_or_create_ansible_task(
         run_as_admin=False, run_as="", become_info=None,
         created_by=None,
     ):
+    if not hosts or not tasks or not task_name:
+        return
 
     defaults = {
         'name': task_name,
