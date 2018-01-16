@@ -30,6 +30,7 @@ class AssetUser(models.Model):
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    labels = models.ManyToManyField('assets.Label', blank=True, verbose_name=_("Labels"))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)

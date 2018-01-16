@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
-from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser
+from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser, Label
 from .const import ADMIN_USER_CONN_CACHE_KEY, SYSTEM_USER_CONN_CACHE_KEY
 
 
@@ -284,3 +284,44 @@ class MyAssetGroupGrantedSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_assets_amount(obj):
         return len(obj.assets_granted)
+
+
+class LabelSerializer(serializers.ModelSerializer):
+    asset_count = serializers.SerializerMethodField()
+    admin_user_count = serializers.SerializerMethodField()
+    system_user_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Label
+        fields = '__all__'
+        list_serializer_class = BulkListSerializer
+
+    @staticmethod
+    def get_asset_count(obj):
+        return obj.asset_count
+
+    @staticmethod
+    def get_admin_user_count(obj):
+        return obj.admin_user_count
+
+    @staticmethod
+    def get_system_user_count(obj):
+        return obj.system_user_count
+
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields.extend(['get_category_display'])
+        return fields
+
+
+class LabelDistinctSerializer(serializers.ModelSerializer):
+    value = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Label
+        fields = ("name", "value")
+
+    @staticmethod
+    def get_value(obj):
+        labels = Label.objects.filter(name=obj["name"])
+        return ', '.join([label.value for label in labels])

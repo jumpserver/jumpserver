@@ -17,15 +17,15 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 from rest_framework.pagination import LimitOffsetPagination
+from django.shortcuts import get_object_or_404
+from django.db.models import Q, Count
 
 from common.mixins import CustomFilterMixin
 from common.utils import get_logger
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
-from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
+from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser, Label
 from . import serializers
 from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_manual, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
@@ -295,3 +295,17 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
         system_user = self.get_object()
         test_system_user_connectability_manual.delay(system_user)
         return Response({"msg": "Task created"})
+
+
+class LabelViewSet(BulkModelViewSet):
+    queryset = Label.objects.annotate(asset_count=Count("assets"))\
+        .annotate(admin_user_count=Count("adminuser")) \
+        .annotate(system_user_count=Count("systemuser"))
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.LabelSerializer
+
+    def list(self, request, *args, **kwargs):
+        if request.query_params.get("distinct"):
+            self.serializer_class = serializers.LabelDistinctSerializer
+            self.queryset = self.queryset.values("name").distinct()
+        return super().list(request, *args, **kwargs)
