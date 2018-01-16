@@ -180,8 +180,9 @@ def validate_ip(ip):
 
 def write_login_log(username, type='', ip='', user_agent=''):
     if not (ip and validate_ip(ip)):
-        ip = '0.0.0.0'
-    city = get_ip_city(ip)
+        city = "Unknown"
+    else:
+        city = get_ip_city(ip)
     LoginLog.objects.create(
         username=username, type=type,
         ip=ip, city=city, user_agent=user_agent
