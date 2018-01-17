@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 18:51+0800\n"
+"POT-Creation-Date: 2018-01-17 17:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -129,7 +129,7 @@ msgid "Password or private key password"
 msgstr "密码或秘钥不合法"
 
 #: assets/forms.py:201 assets/forms.py:262 assets/models/user.py:30
-#: common/forms.py:110 users/forms.py:16 users/forms.py:24
+#: common/forms.py:107 users/forms.py:16 users/forms.py:24
 #: users/templates/users/login.html:56
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_create.html:11
@@ -661,7 +661,7 @@ msgstr "其它"
 #: assets/templates/assets/asset_group_create.html:16
 #: assets/templates/assets/asset_update.html:55
 #: assets/templates/assets/cluster_create_update.html:54
-#: common/templates/common/basic_setting.html:56
+#: common/templates/common/basic_setting.html:55
 #: common/templates/common/email_setting.html:56
 #: common/templates/common/ldap_setting.html:56
 #: perms/templates/perms/asset_permission_create_update.html:67
@@ -681,10 +681,10 @@ msgstr "重置"
 #: assets/templates/assets/asset_bulk_update.html:24
 #: assets/templates/assets/asset_create.html:41
 #: assets/templates/assets/asset_group_create.html:17
-#: assets/templates/assets/asset_list.html:55
+#: assets/templates/assets/asset_list.html:53
 #: assets/templates/assets/asset_update.html:56
 #: assets/templates/assets/cluster_create_update.html:55
-#: common/templates/common/basic_setting.html:57
+#: common/templates/common/basic_setting.html:56
 #: common/templates/common/email_setting.html:57
 #: common/templates/common/ldap_setting.html:57
 #: perms/templates/perms/asset_permission_create_update.html:68
@@ -726,8 +726,8 @@ msgstr "资产列表"
 #: assets/templates/assets/asset_detail.html:24
 #: assets/templates/assets/asset_group_detail.html:18
 #: assets/templates/assets/asset_group_detail.html:177
-#: assets/templates/assets/asset_group_list.html:42
-#: assets/templates/assets/asset_list.html:95
+#: assets/templates/assets/asset_group_list.html:38
+#: assets/templates/assets/asset_list.html:98
 #: assets/templates/assets/cluster_assets.html:170
 #: assets/templates/assets/cluster_detail.html:25
 #: assets/templates/assets/cluster_list.html:43
@@ -750,8 +750,8 @@ msgstr "更新"
 #: assets/templates/assets/admin_user_list.html:84
 #: assets/templates/assets/asset_detail.html:28
 #: assets/templates/assets/asset_group_detail.html:22
-#: assets/templates/assets/asset_group_list.html:43
-#: assets/templates/assets/asset_list.html:96
+#: assets/templates/assets/asset_group_list.html:39
+#: assets/templates/assets/asset_list.html:99
 #: assets/templates/assets/cluster_detail.html:29
 #: assets/templates/assets/cluster_list.html:44
 #: assets/templates/assets/system_user_detail.html:30
@@ -776,7 +776,6 @@ msgstr "资产列表"
 
 #: assets/templates/assets/admin_user_assets.html:62
 #: assets/templates/assets/asset_group_detail.html:53
-#: assets/templates/assets/asset_list.html:34
 #: assets/templates/assets/cluster_assets.html:54
 #: assets/templates/assets/user_asset_list.html:22
 #: users/templates/users/login_log_list.html:50
@@ -786,7 +785,7 @@ msgstr "类型"
 #: assets/templates/assets/admin_user_assets.html:63
 #: assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/asset_detail.html:376
-#: assets/templates/assets/asset_list.html:38
+#: assets/templates/assets/asset_list.html:36
 #: assets/templates/assets/system_user_asset.html:55
 #: assets/templates/assets/system_user_list.html:27
 msgid "Reachable"
@@ -827,8 +826,8 @@ msgstr "使用集群管理用户"
 
 #: assets/templates/assets/admin_user_detail.html:101
 #: assets/templates/assets/asset_detail.html:230
-#: assets/templates/assets/asset_group_list.html:85
-#: assets/templates/assets/asset_list.html:214
+#: assets/templates/assets/asset_group_list.html:81
+#: assets/templates/assets/asset_list.html:220
 #: assets/templates/assets/cluster_assets.html:104
 #: assets/templates/assets/cluster_list.html:89
 #: assets/templates/assets/system_user_detail.html:164
@@ -859,7 +858,7 @@ msgstr "比例"
 #: assets/templates/assets/admin_user_list.html:29
 #: assets/templates/assets/asset_group_detail.html:55
 #: assets/templates/assets/asset_group_list.html:18
-#: assets/templates/assets/asset_list.html:39
+#: assets/templates/assets/asset_list.html:37
 #: assets/templates/assets/cluster_assets.html:56
 #: assets/templates/assets/cluster_list.html:23
 #: assets/templates/assets/system_user_list.html:31
@@ -909,7 +908,7 @@ msgid "Quick modify"
 msgstr "快速修改"
 
 #: assets/templates/assets/asset_detail.html:175
-#: assets/templates/assets/asset_list.html:37
+#: assets/templates/assets/asset_list.html:35
 #: assets/templates/assets/user_asset_list.html:25 perms/models.py:20
 #: perms/templates/perms/asset_permission_create_update.html:47
 #: perms/templates/perms/asset_permission_detail.html:116
@@ -970,8 +969,8 @@ msgstr "移除"
 msgid "Create asset group"
 msgstr "创建资产组"
 
-#: assets/templates/assets/asset_group_list.html:80
-#: assets/templates/assets/asset_list.html:209
+#: assets/templates/assets/asset_group_list.html:76
+#: assets/templates/assets/asset_list.html:215
 #: assets/templates/assets/cluster_list.html:84
 #: assets/templates/assets/system_user_list.html:129
 #: users/templates/users/user_detail.html:333
@@ -981,29 +980,29 @@ msgstr "创建资产组"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_group_list.html:81
+#: assets/templates/assets/asset_group_list.html:77
 #: users/templates/users/user_group_list.html:78
 msgid "This will delete the selected groups !!!"
 msgstr "删除选择组"
 
-#: assets/templates/assets/asset_group_list.html:89
+#: assets/templates/assets/asset_group_list.html:85
 msgid "Group deleted"
 msgstr "组已被删除"
 
-#: assets/templates/assets/asset_group_list.html:90
-#: assets/templates/assets/asset_group_list.html:95
+#: assets/templates/assets/asset_group_list.html:86
+#: assets/templates/assets/asset_group_list.html:91
 msgid "Group Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_group_list.html:94
+#: assets/templates/assets/asset_group_list.html:90
 msgid "Group deleting failed."
 msgstr "删除失败"
 
-#: assets/templates/assets/asset_group_list.html:157
+#: assets/templates/assets/asset_group_list.html:153
 msgid "The selected asset groups has been updated successfully."
 msgstr "更新成功"
 
-#: assets/templates/assets/asset_group_list.html:158
+#: assets/templates/assets/asset_group_list.html:154
 msgid "AssetGroup Updated"
 msgstr "资产组更新"
 
@@ -1021,52 +1020,47 @@ msgstr "导出"
 msgid "Create asset"
 msgstr "创建资产"
 
-#: assets/templates/assets/asset_list.html:35
-#: assets/templates/assets/user_asset_list.html:23
-msgid "Env"
-msgstr "环境"
-
-#: assets/templates/assets/asset_list.html:36
+#: assets/templates/assets/asset_list.html:34
 #: assets/templates/assets/user_asset_list.html:24
 msgid "Hardware"
 msgstr "硬件"
 
-#: assets/templates/assets/asset_list.html:48
+#: assets/templates/assets/asset_list.html:46
 #: users/templates/users/user_list.html:37
 msgid "Delete selected"
 msgstr "批量删除"
 
-#: assets/templates/assets/asset_list.html:49
+#: assets/templates/assets/asset_list.html:47
 #: users/templates/users/user_list.html:38
 msgid "Update selected"
 msgstr "批量更新"
 
-#: assets/templates/assets/asset_list.html:50
+#: assets/templates/assets/asset_list.html:48
 #: users/templates/users/user_list.html:39
 msgid "Deactive selected"
 msgstr "禁用所选"
 
-#: assets/templates/assets/asset_list.html:51
+#: assets/templates/assets/asset_list.html:49
 #: users/templates/users/user_list.html:40
 msgid "Active selected"
 msgstr "激活所选"
 
-#: assets/templates/assets/asset_list.html:210
+#: assets/templates/assets/asset_list.html:216
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
 # msgid "Deleted!"
 # msgstr "删除"
-#: assets/templates/assets/asset_list.html:218
+#: assets/templates/assets/asset_list.html:224
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:219
-#: assets/templates/assets/asset_list.html:224
+#: assets/templates/assets/asset_list.html:225
+#: assets/templates/assets/asset_list.html:230
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:223
+#: assets/templates/assets/asset_list.html:229
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1202,6 +1196,10 @@ msgstr "删除系统用户"
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
+#: assets/templates/assets/user_asset_list.html:23
+msgid "Env"
+msgstr "环境"
+
 #: assets/templates/assets/user_asset_list.html:26
 msgid "Connective"
 msgstr "连接性"
@@ -1309,65 +1307,65 @@ msgstr "用户第一次登录，修改profile后重定向到地址"
 msgid "Email Subject Prefix"
 msgstr "Email主题前缀"
 
-#: common/forms.py:76
-msgid "Enable LDAP Auth"
-msgstr "开启LDAP认证"
-
-#: common/forms.py:82
+#: common/forms.py:79
 msgid "SMTP host"
 msgstr "SMTP主机"
 
-#: common/forms.py:84
+#: common/forms.py:81
 msgid "SMTP port"
 msgstr "SMTP端口"
 
-#: common/forms.py:86
+#: common/forms.py:83
 msgid "SMTP user"
 msgstr "SMTP账号"
 
-#: common/forms.py:89
+#: common/forms.py:86
 msgid "SMTP password"
 msgstr "SMTP密码"
 
-#: common/forms.py:90
+#: common/forms.py:87
 msgid "Some provider use token except password"
 msgstr "一些邮件提供商需要输入的是Token"
 
-#: common/forms.py:93 common/forms.py:130
+#: common/forms.py:90 common/forms.py:127
 msgid "Use SSL"
 msgstr "使用SSL"
 
-#: common/forms.py:94
+#: common/forms.py:91
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用SSL"
 
-#: common/forms.py:97
+#: common/forms.py:94
 msgid "Use TLS"
 msgstr "使用TLS"
 
-#: common/forms.py:98
+#: common/forms.py:95
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用TLS"
 
-#: common/forms.py:104
+#: common/forms.py:101
 msgid "LDAP server"
 msgstr "LDAP地址"
 
-#: common/forms.py:107
+#: common/forms.py:104
 msgid "Bind DN"
 msgstr "绑定DN"
 
-#: common/forms.py:114
+#: common/forms.py:111
 msgid "User OU"
 msgstr "用户OU"
 
-#: common/forms.py:117
+#: common/forms.py:114
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: common/forms.py:120
+#: common/forms.py:117
 msgid "User attr map"
 msgstr "LDAP属性映射"
+
+#: common/forms.py:130
+msgid "Enable LDAP Auth"
+msgstr "开启LDAP认证"
 
 #: common/mixins.py:29
 msgid "is discard"
@@ -1393,7 +1391,7 @@ msgstr "基本设置"
 
 #: common/templates/common/basic_setting.html:18
 #: common/templates/common/email_setting.html:18
-#: common/templates/common/ldap_setting.html:18 common/views.py:45
+#: common/templates/common/ldap_setting.html:18 common/views.py:44
 msgid "Email setting"
 msgstr "邮件设置"
 
@@ -1403,20 +1401,19 @@ msgstr "邮件设置"
 msgid "LDAP setting"
 msgstr "LDAP设置"
 
-#: common/templates/common/basic_setting.html:55
 #: common/templates/common/email_setting.html:55
 #: common/templates/common/ldap_setting.html:55
 msgid "Test connection"
 msgstr "测试连接"
 
-#: common/views.py:17 common/views.py:44 common/views.py:69
+#: common/views.py:17 common/views.py:43 common/views.py:69
 #: templates/_nav.html:69
 msgid "Settings"
 msgstr "系统设置"
 
-#: common/views.py:30 common/views.py:55 common/views.py:80
-msgid "Update setting successfully"
-msgstr "更新设置成功"
+#: common/views.py:28 common/views.py:54 common/views.py:82
+msgid "Update setting successfully, please restart program"
+msgstr "更新设置成功, 请手动重启程序"
 
 #: ops/models.py:32
 msgid "Interval"
@@ -1912,8 +1909,8 @@ msgid "Close"
 msgstr "关闭"
 
 #: templates/_nav.html:9 users/views/group.py:28 users/views/group.py:44
-#: users/views/group.py:62 users/views/group.py:79 users/views/login.py:194
-#: users/views/login.py:243 users/views/user.py:57 users/views/user.py:72
+#: users/views/group.py:62 users/views/group.py:79 users/views/login.py:197
+#: users/views/login.py:246 users/views/user.py:57 users/views/user.py:72
 #: users/views/user.py:91 users/views/user.py:147 users/views/user.py:304
 #: users/views/user.py:318 users/views/user.py:355 users/views/user.py:377
 msgid "Users"
@@ -2740,48 +2737,48 @@ msgstr "编辑用户组"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:84
+#: users/views/login.py:87
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:85
+#: users/views/login.py:88
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:101
+#: users/views/login.py:104
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:114
+#: users/views/login.py:117
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:115
+#: users/views/login.py:118
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:129
+#: users/views/login.py:132
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:130
+#: users/views/login.py:133
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:147 users/views/login.py:160
+#: users/views/login.py:150 users/views/login.py:163
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:156
+#: users/views/login.py:159
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:194
+#: users/views/login.py:197
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:244
+#: users/views/login.py:247
 msgid "Login log list"
 msgstr "登录日志"
 
