@@ -1311,7 +1311,7 @@ msgstr "Email主题前缀"
 
 #: common/forms.py:76
 msgid "Enable LDAP Auth"
-msgstr "二次验证"
+msgstr "LDAP认证"
 
 #: common/forms.py:82
 msgid "SMTP host"
