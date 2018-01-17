@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Count
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.mixins import CustomFilterMixin
@@ -87,7 +87,7 @@ class AssetGroupViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     Asset group api set, for add,delete,update,list,retrieve resource
     """
-    queryset = AssetGroup.objects.all()
+    queryset = AssetGroup.objects.all().annotate(asset_count=Count("assets"))
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsSuperUser,)
 

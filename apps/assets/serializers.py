@@ -22,7 +22,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.assets.count()
+        return obj.asset_count
 
 
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
