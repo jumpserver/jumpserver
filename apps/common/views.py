@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm
+from .models import Setting
 from .mixins import AdminUserRequiredMixin
 from .signals import ldap_auth_enable
 
@@ -82,6 +83,33 @@ class LDAPSettingView(AdminUserRequiredMixin, TemplateView):
             msg = _("Update setting successfully, please restart program")
             messages.success(request, msg)
             return redirect('settings:ldap-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)
+
+
+class StorageSettingView(AdminUserRequiredMixin, TemplateView):
+    form_class = LDAPSettingForm
+    template_name = "common/storage_setting.html"
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Storage setting'),
+            'form': self.form_class(),
+            'command_storage': Setting.objects.filter(name__endswith="_COMMAND_STORAGE")
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            msg = _("Update setting successfully, please restart program")
+            messages.success(request, msg)
+            return redirect('settings:storage-setting')
         else:
             context = self.get_context_data()
             context.update({"form": form})
