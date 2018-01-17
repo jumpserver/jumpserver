@@ -72,9 +72,6 @@ class BasicSettingForm(BaseForm):
         max_length=1024, label=_("Email Subject Prefix"),
         initial="[Jumpserver] "
     )
-    AUTH_LDAP = forms.BooleanField(
-        label=_("Enable LDAP Auth"), initial=False, required=False
-    )
 
 
 class EmailSettingForm(BaseForm):
@@ -128,4 +125,7 @@ class LDAPSettingForm(BaseForm):
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
     AUTH_LDAP_START_TLS = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False
+    )
+    AUTH_LDAP = forms.BooleanField(
+        label=_("Enable LDAP Auth"), initial=False, required=False
     )
