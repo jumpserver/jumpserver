@@ -13,7 +13,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from .group import UserGroup
 from common.utils import get_signer, date_expired_default
 
 
@@ -35,7 +34,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     email = models.EmailField(max_length=128, unique=True, verbose_name=_('Email'))
-    groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
+    groups = models.ManyToManyField('users.UserGroup', related_name='users', blank=True, verbose_name=_('User group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
     avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))
@@ -149,12 +148,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
-
         super().save(*args, **kwargs)
-        # Add the current user to the default group.
-        if not self.groups.count():
-            group = UserGroup.initial()
-            self.groups.add(group)
 
     @property
     def private_token(self):
@@ -254,6 +248,7 @@ class User(AbstractUser):
     #: Use this method initial user
     @classmethod
     def initial(cls):
+        from .group import UserGroup
         user = cls(username='admin',
                    email='admin@jumpserver.org',
                    name=_('Administrator'),
@@ -269,6 +264,7 @@ class User(AbstractUser):
         from random import seed, choice
         import forgery_py
         from django.db import IntegrityError
+        from .group import UserGroup
 
         seed()
         for i in range(count):

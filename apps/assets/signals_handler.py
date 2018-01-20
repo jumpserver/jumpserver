@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-
-from django.db.models.signals import post_save, post_init, m2m_changed, pre_save
+from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
@@ -27,16 +26,17 @@ def test_asset_conn_on_created(asset):
 
 
 def push_cluster_system_users_to_asset(asset):
-    logger.info("Push cluster system user to asset: {}".format(asset))
-    task_name = _("Push cluster system users to asset")
-    system_users = asset.cluster.systemuser_set.all()
-    push_system_user_util.delay(system_users, [asset], task_name)
+    if asset.cluster:
+        logger.info("Push cluster system user to asset: {}".format(asset))
+        task_name = _("Push cluster system users to asset")
+        system_users = asset.cluster.systemuser_set.all()
+        push_system_user_util.delay(system_users, [asset], task_name)
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
 def on_asset_created(sender, instance=None, created=False, **kwargs):
     if instance and created:
-        logger.info("Asset `` create signal received".format(instance))
+        logger.info("Asset `{}` create signal received".format(instance))
         update_asset_hardware_info_on_created(instance)
         test_asset_conn_on_created(instance)
         push_cluster_system_users_to_asset(instance)

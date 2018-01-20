@@ -141,7 +141,9 @@ class StatusViewSet(viewsets.ModelViewSet):
             session = serializer.save()
             return session
         else:
-            msg = "session data is not valid {}".format(serializer.errors)
+            msg = "session data is not valid {}: {}".format(
+                serializer.errors, str(serializer.data)
+            )
             logger.error(msg)
             return None
 

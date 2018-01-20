@@ -53,7 +53,11 @@ class UserLoginView(FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
-        login_ip = self.request.META.get('REMOTE_ADDR', '')
+        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+        if x_forwarded_for:
+            login_ip = x_forwarded_for[0]
+        else:
+            login_ip = self.request.META.get('REMOTE_ADDR', '')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         write_login_log_async.delay(
             self.request.user.username, type='W',
@@ -184,7 +188,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': settings.CONFIG.USER_GUIDE_URL
+            'user_guide_url': settings.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 
@@ -215,7 +219,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
 class LoginLogListView(DatetimeSearchMixin, ListView):
     template_name = 'users/login_log_list.html'
     model = LoginLog
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     user = keyword = ""
     date_to = date_from = None
 

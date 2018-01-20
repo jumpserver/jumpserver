@@ -10,7 +10,7 @@ from .hands import AdminUserRequiredMixin
 
 
 class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
     context_object_name = 'task_list'

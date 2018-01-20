@@ -20,12 +20,6 @@ class UserGroup(NoDeleteModelMixin):
     def __str__(self):
         return self.name
 
-    def delete(self, using=None, keep_parents=False):
-        if self.name != 'Default':
-            self.users.clear()
-            return super(UserGroup, self).delete()
-        return True
-
     class Meta:
         ordering = ['name']
 

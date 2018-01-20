@@ -26,36 +26,7 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 
 ### Install 安装
 
-    1. 安装 Python3
-       略
-
-    2. 安装依赖
-
-    ```
-    $ cd requirements && yum -y install $(cat rpm_requirements.txt) && pip install -r requirements.txt
-    ```
-
-    3. 修改配置文件
-
-    ```
-    $ cp config_example.py config.py
-    ```
-
-    4. 修改表结构
-
-    ```
-    $ cd apps && python manage.py makemigrations && python manage.py migrate
-    ```
-
-    5. 运行
-
-    ```
-    $ python run_server.py
-    ```
-
-    6. 其它
-
-    整合luna,coco需要nginx来配合, 详见详细安装文档
+    [详细安装](https://github.com/jumpserver/jumpserver/wiki/v0.5.0-%E5%9F%BA%E4%BA%8E-CentOS7)
 
 
 ### Usage 使用

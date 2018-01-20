@@ -15,7 +15,6 @@ import sys
 
 import ldap
 from django_auth_ldap.config import LDAPSearch
-
 from django.urls import reverse_lazy
 
 
@@ -120,15 +119,6 @@ SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-# if CONFIG.DB_ENGINE == 'sqlite':
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
-#             'ATOMIC_REQUESTS': True,
-#         }
-#     }
 
 DATABASES = {
     'default': {
@@ -284,7 +274,7 @@ EMAIL_HOST_USER = CONFIG.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = CONFIG.EMAIL_HOST_PASSWORD
 EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
 EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
-EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX
+EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX or ''
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -298,9 +288,17 @@ REST_FRAMEWORK = {
         'users.authentication.PrivateTokenAuthentication',
         'users.authentication.SessionAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'ORDERING_PARAM': "order",
+    'SEARCH_PARAM': "search",
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 15
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -312,18 +310,28 @@ AUTH_USER_MODEL = 'users.User'
 
 
 # Auth LDAP settings
-if CONFIG.AUTH_LDAP:
-    AUTHENTICATION_BACKENDS.insert(0, 'django_auth_ldap.backend.LDAPBackend')
-    AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
-    AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
-    AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
-    AUTH_LDAP_USER_SEARCH = LDAPSearch(
-        CONFIG.AUTH_LDAP_SEARCH_OU,
-        ldap.SCOPE_SUBTREE,
-        CONFIG.AUTH_LDAP_SEARCH_FILTER
-    )
-    AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
-    AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
+AUTH_LDAP = CONFIG.AUTH_LDAP
+AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
+AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
+AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
+AUTH_LDAP_SEARCH_OU = CONFIG.AUTH_LDAP_SEARCH_OU
+AUTH_LDAP_SEARCH_FILTER = CONFIG.AUTH_LDAP_SEARCH_FILTER
+AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
+AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+   AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER,
+)
+AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
+AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
+)
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
+
+if AUTH_LDAP:
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
+
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
@@ -374,4 +382,10 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': True,
+    'success_css_class': '',
 }
+
+TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
+DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
+DEFAULT_EXPIRED_YEARS = 70
+USER_GUIDE_URL = ""

@@ -237,6 +237,16 @@ $(document).ready(function () {
     }).get();
     updateSystemUser(system_users);
     $tr.remove()
+}).on('click', '#is_active', function () {
+    var the_url = '{% url "api-perms:asset-permission-detail" pk=asset_permission.id %}';
+    var checked = $(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+    });
 })
 </script>
 {% endblock %}

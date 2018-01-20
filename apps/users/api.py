@@ -13,14 +13,14 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
 from .utils import check_user_valid, generate_token
-from common.mixins import IDInFilterMixin
+from common.mixins import CustomFilterMixin
 from common.utils import get_logger
 
 
 logger = get_logger(__name__)
 
 
-class UserViewSet(IDInFilterMixin, BulkModelViewSet):
+class UserViewSet(CustomFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
@@ -72,7 +72,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
+class UserGroupViewSet(CustomFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
 
@@ -128,7 +128,11 @@ class UserAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = request.META.get('HTTP_X_REAL_IP') or request.META.get("REMOTE_ADDR")
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+            if x_forwarded_for:
+                login_ip = x_forwarded_for[0]
+            else:
+                login_ip = request.META.get("REMOTE_ADDR")
 
         user, msg = check_user_valid(
             username=username, password=password,

@@ -1,6 +1,6 @@
 {% load i18n %}
 {% block first_login_message %}
-    {% if user.is_authenticated and user.is_first_login %}
+    {% if request.user.is_authenticated and request.user.is_first_login %}
     <div class="alert alert-danger help-message">
         {% url 'users:user-first-login' as first_login_url %}
         {% blocktrans %}
@@ -10,7 +10,7 @@
     {% endif %}
 {% endblock %}
 {% block update_public_key_message %}
-    {% if user.is_authenticated and not user.is_public_key_valid %}
+    {% if request.user.is_authenticated and not request.user.is_public_key_valid %}
     <div class="alert alert-danger help-message">
         {% url 'users:user-pubkey-update' as user_pubkey_update %}
         {% blocktrans %}

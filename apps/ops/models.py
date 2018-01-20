@@ -165,7 +165,7 @@ class AdHoc(models.Model):
         if item and isinstance(item, list):
             self._tasks = json.dumps(item)
         else:
-            raise SyntaxError('Tasks should be a list')
+            raise SyntaxError('Tasks should be a list: {}'.format(item))
 
     @property
     def hosts(self):
@@ -218,8 +218,8 @@ class AdHoc(models.Model):
             history.result = raw
             history.summary = summary
             return raw, summary
-        except:
-            return {}, {}
+        except Exception as e:
+            return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start

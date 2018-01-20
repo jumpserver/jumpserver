@@ -7,42 +7,41 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
+from django.contrib.messages.views import SuccessMessageMixin
 
+from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 
 
-__all__ = ['AssetGroupCreateView', 'AssetGroupDetailView',
-           'AssetGroupUpdateView', 'AssetGroupListView',
-           'AssetGroupDeleteView',
-           ]
+__all__ = [
+    'AssetGroupCreateView', 'AssetGroupDetailView',
+    'AssetGroupUpdateView', 'AssetGroupListView',
+    'AssetGroupDeleteView',
+]
 
 
-class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
+class AssetGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = AssetGroup
     form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('Create asset group'),
-            'assets_count': 0,
         }
         kwargs.update(context)
-        return super(AssetGroupCreateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
-        asset_group = form.save()
-        assets_id_list = self.request.POST.getlist('assets', [])
-        assets = [get_object_or_404(Asset, id=int(asset_id))
-                  for asset_id in assets_id_list]
-        asset_group.created_by = self.request.user.username or 'Admin'
-        asset_group.assets.add(*tuple(assets))
-        asset_group.save()
-        return super(AssetGroupCreateView, self).form_valid(form)
+        group = form.save()
+        group.created_by = self.request.user.username
+        group.save()
+        return super().form_valid(form)
 
 
 class AssetGroupListView(AdminUserRequiredMixin, TemplateView):
@@ -54,7 +53,6 @@ class AssetGroupListView(AdminUserRequiredMixin, TemplateView):
             'action': _('Asset group list'),
             'assets': Asset.objects.all(),
             'system_users': SystemUser.objects.all(),
-            'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(AssetGroupListView, self).get_context_data(**kwargs)
@@ -77,27 +75,20 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
+class AssetGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AssetGroup
     form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=AssetGroup.objects.all())
-        return super(AssetGroupUpdateView, self).get(request, *args, **kwargs)
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
-        assets_all = self.object.assets.all()
         context = {
             'app': _('Assets'),
             'action': _('Create asset group'),
-            'assets_on_list': assets_all,
-            'assets_count': len(assets_all),
-            'group_id': self.object.id,
         }
         kwargs.update(context)
-        return super(AssetGroupUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):

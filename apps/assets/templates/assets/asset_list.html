@@ -31,8 +31,6 @@
             <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'Port' %}</th>
             <th class="text-center">{% trans 'Cluster' %}</th>
-            <th class="text-center">{% trans 'Type' %}</th>
-            <th class="text-center">{% trans 'Env' %}</th>
             <th class="text-center">{% trans 'Hardware' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Reachable' %}</th>
@@ -71,18 +69,23 @@ function initTable() {
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                 {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
-                console.log('{{ the_url }}');
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
-            {targets: 8, createdCell: function (td, cellData) {
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                 $(td).html(rowData.cluster_name)
+            }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.hardware_info)
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
             }},
-            {targets: 9, createdCell: function (td, cellData) {
+            {targets: 7, createdCell: function (td, cellData) {
                 if (cellData == 'Unknown'){
                     $(td).html('<i class="fa fa-circle text-warning"></i>')
                 } else if (!cellData) {
@@ -91,19 +94,22 @@ function initTable() {
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
                 }
             }},
-            {targets: 10, createdCell: function (td, cellData, rowData) {
+            {targets: 8, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
-        columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "cluster_name"},
-            {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
-            {data: "is_active" }, {data: "is_connective"}, {data: "id" }],
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+            {data: "cluster"},
+            {data: "cpu_cores"}, {data: "is_active", orderable: false },
+            {data: "is_connective", orderable: false}, {data: "id", orderable: false }
+        ],
         op_html: $('#actions').html()
     };
-    return jumpserver.initDataTable(options);
+    return jumpserver.initServerSideDataTable(options);
 }
 
 $(document).ready(function(){
@@ -178,9 +184,15 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": false};
             data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload()
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
     }
     function doActive() {
         var data = [];
@@ -188,9 +200,15 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": true};
             data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload();
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
     }
     function doDelete() {
         swal({

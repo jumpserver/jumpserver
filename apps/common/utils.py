@@ -91,7 +91,7 @@ class Signer(metaclass=Singleton):
 
 def date_expired_default():
     try:
-        years = int(settings.CONFIG.DEFAULT_EXPIRED_YEARS)
+        years = int(settings.DEFAULT_EXPIRED_YEARS)
     except TypeError:
         years = 70
     return timezone.now() + timezone.timedelta(days=365*years)

@@ -161,18 +161,30 @@ $(document).ready(function(){
         var body = $.each(id_list, function(index, user_object) {
             user_object['is_active'] = false;
         });
-        console.log(body);
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload();
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            success: success
+        });
+        location.reload();
     }
     function  doActive() {
         var body = $.each(id_list, function(index, user_object) {
             user_object['is_active'] = true;
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload();
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(body),
+            success: success
+        });
     }
     function doDelete() {
         swal({

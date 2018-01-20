@@ -2,17 +2,15 @@
 
 from __future__ import unicode_literals
 from django import forms
-from django.shortcuts import reverse, redirect
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
-from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, UpdateView, FormMixin
-from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 
 from common.utils import get_logger
-from perms.models import AssetPermission
+from common.const import create_success_msg, update_success_msg
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
 from .. import forms
@@ -39,9 +37,7 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
-    success_message = _(
-        'User group <a href={url}> {name} </a> was created successfully'
-    )
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -51,21 +47,13 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        url = reverse_lazy(
-            'users:user-group-detail',
-            kwargs={'pk': self.object.id}
-        )
-        return self.success_message.format(
-            url=url, name=self.object.name
-        )
 
-
-class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
+class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
         users = User.objects.all()

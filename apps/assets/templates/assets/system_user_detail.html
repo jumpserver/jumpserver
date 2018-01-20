@@ -25,6 +25,11 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:system-user-update' pk=system_user.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-del">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -259,6 +264,13 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     updateSystemUserCluster(clusters);
+}).on('click', '.btn-del', function () {
+    var $this = $(this);
+    var name = "{{ system_user.name}}";
+    var uid = "{{ system_user.id }}";
+    var the_url = '{% url "api-assets:system-user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:system-user-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
 })
 </script>
 {% endblock %}

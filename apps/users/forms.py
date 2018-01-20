@@ -29,7 +29,7 @@ class UserCreateUpdateForm(forms.ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'role', 'date_expired', 'comment', 'password'
+            'phone', 'role', 'date_expired', 'comment',
         ]
         help_texts = {
             'username': '* required',
@@ -38,13 +38,16 @@ class UserCreateUpdateForm(forms.ModelForm):
         }
         widgets = {
             'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Join user groups')}),
+                attrs={
+                    'class': 'select2',
+                    'data-placeholder': _('Join user groups')
+                }
+            ),
         }
 
     def save(self, commit=True):
-        user = super().save(commit=commit)
         password = self.cleaned_data.get('password')
+        user = super().save(commit=commit)
         if password:
             user.set_password(password)
             user.save()
@@ -153,7 +156,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['users', 'role', 'groups', 'date_expired', 'is_active']
+        fields = ['users', 'role', 'groups', 'date_expired']
         widgets = {
             "groups": forms.SelectMultiple(
                 attrs={
@@ -169,6 +172,7 @@ class UserBulkUpdateForm(forms.ModelForm):
             if self.data.get(field) is not None:
                 changed_fields.append(field)
 
+        print(changed_fields)
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
         users = cleaned_data.pop('users', '')
@@ -183,7 +187,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.exclude(role=User.ROLE_APP),
         label=_("User"),
         widget=forms.SelectMultiple(
             attrs={

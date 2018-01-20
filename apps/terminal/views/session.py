@@ -26,7 +26,7 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     model = Session
     template_name = 'terminal/session_list.html'
     context_object_name = 'session_list'
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    paginate_by = settings.DISPLAY_PER_PAGE
     user = asset = system_user = ''
     date_from = date_to = None
 
