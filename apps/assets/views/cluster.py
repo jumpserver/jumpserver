@@ -60,11 +60,6 @@ class ClusterUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView)
     success_url = reverse_lazy('assets:cluster-list')
     success_message = update_success_msg
 
-    def form_valid(self, form):
-        cluster = form.save(commit=False)
-        cluster.save()
-        return super().form_valid(form)
-
     def get_context_data(self, **kwargs):
         context = {
             'app': _('assets'),

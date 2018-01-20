@@ -18,5 +18,20 @@ class AbstractSessionCommand(models.Model):
     class Meta:
         abstract = True
 
+    @classmethod
+    def from_dict(cls, d):
+        self = cls()
+        for k, v in d.items():
+            setattr(self, k, v)
+        return self
+
+    @classmethod
+    def from_multi_dict(cls, l):
+        commands = []
+        for d in l:
+            command = cls.from_dict(d)
+            commands.append(command)
+        return commands
+
     def __str__(self):
         return self.input

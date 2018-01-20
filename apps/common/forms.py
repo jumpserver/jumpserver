@@ -4,7 +4,9 @@ import json
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import escape
 from django.db import transaction
+from django.conf import settings
 
 from .models import Setting
 from .fields import DictField
@@ -30,28 +32,32 @@ def to_form_value(value):
 class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        settings = Setting.objects.all()
+        db_settings = Setting.objects.all()
         for name, field in self.fields.items():
-            db_value = getattr(settings, name).value
-            if db_value:
+            db_value = getattr(db_settings, name).value
+            django_value = getattr(settings, name) if hasattr(settings, name) else None
+            if db_value is not None:
                 field.initial = to_form_value(db_value)
+            elif django_value is not None:
+                field.initial = django_value
 
-    def save(self):
+    def save(self, category="default"):
         if not self.is_bound:
             raise ValueError("Form is not bound")
 
-        settings = Setting.objects.all()
+        db_settings = Setting.objects.all()
         if self.is_valid():
             with transaction.atomic():
                 for name, value in self.cleaned_data.items():
                     field = self.fields[name]
                     if isinstance(field.widget, forms.PasswordInput) and not value:
                         continue
-                    if value == to_form_value(getattr(settings, name).value):
+                    if value == to_form_value(getattr(db_settings, name).value):
                         continue
 
                     defaults = {
                         'name': name,
+                        'category': category,
                         'value': to_model_value(value)
                     }
                     Setting.objects.update_or_create(defaults=defaults, name=name)
@@ -128,4 +134,29 @@ class LDAPSettingForm(BaseForm):
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
     AUTH_LDAP_START_TLS = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False
+    )
+
+
+class TerminalSettingForm(BaseForm):
+    SORT_BY_CHOICES = (
+        ('hostname', _('Hostname')),
+        ('ip', _('IP')),
+    )
+    TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
+        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
+    )
+    TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
+        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
+    )
+    TERMINAL_PASSWORD_AUTH = forms.BooleanField(
+        initial=True, required=False, label=_("Password auth")
+    )
+    TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
+        initial=True, required=False, label=_("Public key auth")
+    )
+    TERMINAL_COMMAND_STORAGE = DictField(
+        label=_("Command storage"), help_text=_(
+            "Set terminal storage setting, `default` is the using as default,"
+            "You can set other storage and some terminal using"
+        )
     )

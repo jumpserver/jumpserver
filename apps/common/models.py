@@ -24,6 +24,7 @@ class SettingManager(models.Manager):
 class Setting(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     value = models.TextField(verbose_name=_("Value"))
+    category = models.CharField(max_length=128, default="default")
     enabled = models.BooleanField(verbose_name=_("Enabled"), default=True)
     comment = models.TextField(verbose_name=_("Comment"))
 
@@ -33,11 +34,19 @@ class Setting(models.Model):
         return self.name
 
     @property
-    def value_(self):
+    def cleaned_value(self):
         try:
             return json.loads(self.value)
         except json.JSONDecodeError:
             return None
+
+    @cleaned_value.setter
+    def cleaned_value(self, item):
+        try:
+            v = json.dumps(item)
+            self.value = v
+        except json.JSONDecodeError as e:
+            raise ValueError("Json dump error: {}".format(str(e)))
 
     @classmethod
     def refresh_all_settings(cls):
@@ -53,9 +62,9 @@ class Setting(models.Model):
         setattr(settings, self.name, value)
 
         if self.name == "AUTH_LDAP":
-            if self.value_ and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
+            if self.cleaned_value and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
                 settings.AUTHENTICATION_BACKENDS.insert(0, settings.AUTH_LDAP_BACKEND)
-            elif not self.value_ and settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
+            elif not self.cleaned_value and settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
                 settings.AUTHENTICATION_BACKENDS.remove(settings.AUTH_LDAP_BACKEND)
 
         if self.name == "AUTH_LDAP_SEARCH_FILTER":

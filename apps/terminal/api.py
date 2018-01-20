@@ -21,7 +21,7 @@ from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
-from .backends import get_command_store, SessionCommandSerializer
+from .backends import get_terminal_command_store, SessionCommandSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -196,7 +196,7 @@ class CommandViewSet(viewsets.ViewSet):
     }
 
     """
-    command_store = get_command_store()
+    command_store = get_terminal_command_store()
     serializer_class = SessionCommandSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -260,3 +260,10 @@ class SessionReplayViewSet(viewsets.ViewSet):
             return redirect(url)
         else:
             return HttpResponseNotFound()
+
+
+class LoadConfig(APIView):
+    permission_classes = (IsAppUser,)
+
+    def get(self, request):
+        pass

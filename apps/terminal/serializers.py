@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Terminal, Status, Session, Task
-from .backends import get_command_store
+from .backends import get_terminal_command_store
 
 
 class TerminalSerializer(serializers.ModelSerializer):
@@ -43,7 +43,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(serializers.ModelSerializer):
     command_amount = serializers.SerializerMethodField()
-    command_store = get_command_store()
+    command_store = get_terminal_command_store()
 
     class Meta:
         model = Session

@@ -10,7 +10,7 @@ from .models import Terminal
 class TerminalForm(forms.ModelForm):
     class Meta:
         model = Terminal
-        fields = ['name', 'remote_addr', 'ssh_port', 'http_port', 'comment']
+        fields = ['name', 'remote_addr', 'ssh_port', 'http_port', 'comment', 'command_storage']
         help_texts = {
             'ssh_port': _("Coco ssh listen port"),
             'http_port': _("Coco http/ws listen port"),

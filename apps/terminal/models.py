@@ -4,9 +4,17 @@ import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from users.models import User
 from .backends.command.models import AbstractSessionCommand
+
+
+def get_all_command_storage():
+    storage_choices = []
+    for k, v in settings.TERMINAL_COMMAND_STORAGE.items():
+        storage_choices.append((k, k))
+    return storage_choices
 
 
 class Terminal(models.Model):
@@ -15,6 +23,8 @@ class Terminal(models.Model):
     remote_addr = models.CharField(max_length=128, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
+    command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default', choices=get_all_command_storage())
+    replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
     user = models.OneToOneField(User, related_name='terminal', verbose_name='Application User', null=True, on_delete=models.CASCADE)
     is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
     is_deleted = models.BooleanField(default=False)
@@ -32,6 +42,16 @@ class Terminal(models.Model):
         if self.user:
             self.user.is_active = active
             self.user.save()
+
+    def get_common_storage(self):
+        pass
+
+    def get_replay_storage(self):
+        pass
+
+    @property
+    def config(self):
+        return
 
     def create_app_user(self):
         random = uuid.uuid4().hex[:6]

@@ -19,3 +19,9 @@ class CommandBase(object):
                input=None, session=None):
         pass
 
+    @abc.abstractmethod
+    def count(self, date_from=None, date_to=None,
+               user=None, asset=None, system_user=None,
+               input=None, session=None):
+        pass
+
