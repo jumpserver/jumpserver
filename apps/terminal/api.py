@@ -262,8 +262,11 @@ class SessionReplayViewSet(viewsets.ViewSet):
             return HttpResponseNotFound()
 
 
-class LoadConfig(APIView):
+class TerminalConfig(APIView):
     permission_classes = (IsAppUser,)
 
     def get(self, request):
-        pass
+        user = request.user
+        terminal = user.terminal
+        configs = terminal.config
+        return Response(configs, status=200)

@@ -44,14 +44,24 @@ class Terminal(models.Model):
             self.user.save()
 
     def get_common_storage(self):
-        pass
+        storage_all = settings.TERMINAL_COMMAND_STORAGE
+        if self.command_storage in storage_all:
+            storage = storage_all.get(self.command_storage)
+        else:
+            storage = storage_all.get('default')
+        return {"TERMINAL_COMMAND_STORAGE": storage}
 
     def get_replay_storage(self):
         pass
 
     @property
     def config(self):
-        return
+        configs = {}
+        for k in dir(settings):
+            if k.startswith('TERMINAL'):
+                configs[k] = getattr(settings, k)
+        configs.update(self.get_common_storage())
+        return configs
 
     def create_app_user(self):
         random = uuid.uuid4().hex[:6]
