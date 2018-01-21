@@ -391,6 +391,7 @@ TERMINAL_COMMAND_STORAGE = {
     # }
 }
 
+
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-2',

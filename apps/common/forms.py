@@ -78,9 +78,6 @@ class BasicSettingForm(BaseForm):
         max_length=1024, label=_("Email Subject Prefix"),
         initial="[Jumpserver] "
     )
-    AUTH_LDAP = forms.BooleanField(
-        label=_("Enable LDAP Auth"), initial=False, required=False
-    )
 
 
 class EmailSettingForm(BaseForm):

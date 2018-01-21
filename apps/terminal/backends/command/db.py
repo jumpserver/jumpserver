@@ -73,7 +73,7 @@ class CommandStore(CommandBase):
             session=session,
         )
         queryset = self.model.objects.filter(**filter_kwargs)
-        return queryset
+        return [command.to_dict() for command in queryset]
 
     def count(self, date_from=None, date_to=None,
                user=None, asset=None, system_user=None,

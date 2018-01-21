@@ -11,10 +11,11 @@ from .backends.command.models import AbstractSessionCommand
 
 
 def get_all_command_storage():
-    storage_choices = []
+    # storage_choices = []
+    from common.models import Setting
+    Setting.refresh_all_settings()
     for k, v in settings.TERMINAL_COMMAND_STORAGE.items():
-        storage_choices.append((k, k))
-    return storage_choices
+        yield (k, k)
 
 
 class Terminal(models.Model):

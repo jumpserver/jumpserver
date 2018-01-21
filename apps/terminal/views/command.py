@@ -9,10 +9,10 @@ from django.utils.translation import ugettext as _
 from common.mixins import DatetimeSearchMixin
 from ..models import Command
 from .. import utils
-from ..backends import get_terminal_command_store
+from ..backends import get_multi_command_store
 
 __all__ = ['CommandListView']
-command_store_list = get_terminal_command_store()
+common_storage = get_multi_command_store()
 
 
 class CommandListView(DatetimeSearchMixin, ListView):
@@ -39,10 +39,7 @@ class CommandListView(DatetimeSearchMixin, ListView):
             filter_kwargs['system_user'] = self.system_user
         if self.command:
             filter_kwargs['input'] = self.command
-        queryset = []
-        for store in command_store_list:
-            queryset.extend(store.filter(**filter_kwargs))
-        queryset = sorted(queryset, key=lambda c: c.timestamp, reverse=True)
+        queryset = common_storage.filter(**filter_kwargs)
         return queryset
 
     def get_context_data(self, **kwargs):

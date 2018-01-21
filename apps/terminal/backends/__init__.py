@@ -3,7 +3,7 @@ from django.conf import settings
 from .command.serializers import SessionCommandSerializer
 
 TYPE_ENGINE_MAPPING = {
-    'elasticsearch': 'terminal.backends.command.db',
+    'elasticsearch': 'terminal.backends.command.es',
 }
 
 
@@ -30,5 +30,11 @@ def get_terminal_command_store():
         storage_list[name] = storage
     return storage_list
 
+
+def get_multi_command_store():
+    from .command.multi import CommandStore
+    storage_list = get_terminal_command_store().values()
+    storage = CommandStore(storage_list)
+    return storage
 
 

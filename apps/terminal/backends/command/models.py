@@ -33,5 +33,11 @@ class AbstractSessionCommand(models.Model):
             commands.append(command)
         return commands
 
+    def to_dict(self):
+        d = {}
+        for field in self._meta.fields:
+            d[field.name] = getattr(self, field.name)
+        return d
+
     def __str__(self):
         return self.input
