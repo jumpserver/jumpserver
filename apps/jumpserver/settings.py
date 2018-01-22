@@ -385,10 +385,6 @@ TERMINAL_COMMAND_STORAGE = {
     #     'TYPE': 'elasticsearch',
     #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
     # },
-    # 'ali-hz-es': {
-    #     'TYPE': 'elasticsearch',
-    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
-    # }
 }
 
 

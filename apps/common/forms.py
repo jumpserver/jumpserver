@@ -36,9 +36,9 @@ class BaseForm(forms.Form):
         for name, field in self.fields.items():
             db_value = getattr(db_settings, name).value
             django_value = getattr(settings, name) if hasattr(settings, name) else None
-            if db_value is not None:
+            if db_value is False or db_value:
                 field.initial = to_form_value(db_value)
-            elif django_value is not None:
+            elif django_value is False or django_value:
                 field.initial = django_value
 
     def save(self, category="default"):

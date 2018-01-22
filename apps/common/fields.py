@@ -18,7 +18,6 @@ class DictField(forms.Field):
         # we don't need to handle that explicitly.
         if isinstance(value, six.string_types):
             try:
-                print(value)
                 value = json.loads(value)
                 return value
             except json.JSONDecodeError:

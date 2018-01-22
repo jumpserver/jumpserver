@@ -107,7 +107,6 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
     def post(self, request):
-        print(request.POST)
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()

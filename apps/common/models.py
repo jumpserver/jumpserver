@@ -2,6 +2,7 @@ import json
 
 import ldap
 from django.db import models
+from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django_auth_ldap.config import LDAPSearch
@@ -50,9 +51,12 @@ class Setting(models.Model):
 
     @classmethod
     def refresh_all_settings(cls):
-        settings_list = cls.objects.all()
-        for setting in settings_list:
-            setting.refresh_setting()
+        try:
+            settings_list = cls.objects.all()
+            for setting in settings_list:
+                setting.refresh_setting()
+        except (ProgrammingError, OperationalError):
+            pass
 
     def refresh_setting(self):
         try:
