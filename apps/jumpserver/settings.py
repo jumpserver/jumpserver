@@ -378,8 +378,8 @@ COMMAND_STORAGE = {
 }
 
 TERMINAL_COMMAND_STORAGE = {
-    'default': {
-        'TYPE': 'server',
+    "default": {
+        "TYPE": "server",
     },
     # 'ali-es': {
     #     'TYPE': 'elasticsearch',

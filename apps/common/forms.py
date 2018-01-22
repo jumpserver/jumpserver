@@ -26,7 +26,7 @@ def to_form_value(value):
             data = value
         return data
     except json.JSONDecodeError:
-        return ''
+        return ""
 
 
 class BaseForm(forms.Form):
@@ -39,7 +39,7 @@ class BaseForm(forms.Form):
             if db_value is False or db_value:
                 field.initial = to_form_value(db_value)
             elif django_value is False or django_value:
-                field.initial = django_value
+                field.initial = to_form_value(to_model_value(django_value))
 
     def save(self, category="default"):
         if not self.is_bound:
