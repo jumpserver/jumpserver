@@ -59,3 +59,4 @@ gunicorn==19.7.1
 django_celery_beat==1.1.0
 ephem==3.7.6.0
 python-gssapi==0.6.4
+jms-es-sdk==0.5.1
