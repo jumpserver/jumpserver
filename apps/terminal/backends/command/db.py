@@ -8,7 +8,7 @@ from .base import CommandBase
 
 class CommandStore(CommandBase):
 
-    def __init__(self):
+    def __init__(self, params):
         from terminal.models import Command
         self.model = Command
 
@@ -37,9 +37,11 @@ class CommandStore(CommandBase):
             ))
         return self.model.objects.bulk_create(_commands)
 
-    def filter(self, date_from=None, date_to=None,
-               user=None, asset=None, system_user=None,
-               input=None, session=None):
+    @staticmethod
+    def make_filter_kwargs(
+            date_from=None, date_to=None,
+            user=None, asset=None, system_user=None,
+            input=None, session=None):
         filter_kwargs = {}
         date_from_default = timezone.now() - datetime.timedelta(days=7)
         date_to_default = timezone.now()
@@ -60,10 +62,28 @@ class CommandStore(CommandBase):
         if session:
             filter_kwargs['session'] = session
 
-        queryset = self.model.objects.filter(**filter_kwargs)
-        return queryset
+        return filter_kwargs
 
-    def all(self):
-        """返回所有数据"""
-        return self.model.objects.iterator()
+    def filter(self, date_from=None, date_to=None,
+               user=None, asset=None, system_user=None,
+               input=None, session=None):
+        filter_kwargs = self.make_filter_kwargs(
+            date_from=date_from, date_to=date_to, user=user,
+            asset=asset, system_user=system_user, input=input,
+            session=session,
+        )
+        queryset = self.model.objects.filter(**filter_kwargs)
+        return [command.to_dict() for command in queryset]
+
+    def count(self, date_from=None, date_to=None,
+               user=None, asset=None, system_user=None,
+               input=None, session=None):
+        filter_kwargs = self.make_filter_kwargs(
+            date_from=date_from, date_to=date_to, user=user,
+            asset=asset, system_user=system_user, input=input,
+            session=session,
+        )
+        count = self.model.objects.filter(**filter_kwargs).count()
+        return count
+
 

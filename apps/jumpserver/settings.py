@@ -373,7 +373,20 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORAGE_BACKEND = 'terminal.backends.command.db'
+COMMAND_STORAGE = {
+    'ENGINE': 'terminal.backends.command.db',
+}
+
+TERMINAL_COMMAND_STORAGE = {
+    'default': {
+        'TYPE': 'server',
+    },
+    # 'ali-es': {
+    #     'TYPE': 'elasticsearch',
+    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
+    # },
+}
+
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

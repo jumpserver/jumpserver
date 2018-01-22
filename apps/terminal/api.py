@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from collections import OrderedDict
-import copy
 import logging
 import os
 import uuid
@@ -21,7 +20,8 @@ from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
-from .backends import get_command_store, SessionCommandSerializer
+from .backends import get_command_store, get_multi_command_store, \
+    SessionCommandSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -197,6 +197,7 @@ class CommandViewSet(viewsets.ViewSet):
 
     """
     command_store = get_command_store()
+    multi_command_storage = get_multi_command_store()
     serializer_class = SessionCommandSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -217,7 +218,7 @@ class CommandViewSet(viewsets.ViewSet):
             return Response({"msg": msg}, status=401)
 
     def list(self, request, *args, **kwargs):
-        queryset = list(self.command_store.all())
+        queryset = self.multi_command_storage.filter()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
@@ -260,3 +261,13 @@ class SessionReplayViewSet(viewsets.ViewSet):
             return redirect(url)
         else:
             return HttpResponseNotFound()
+
+
+class TerminalConfig(APIView):
+    permission_classes = (IsAppUser,)
+
+    def get(self, request):
+        user = request.user
+        terminal = user.terminal
+        configs = terminal.config
+        return Response(configs, status=200)

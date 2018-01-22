@@ -14,13 +14,13 @@
                             <li>
                                 <a href="{% url 'settings:basic-setting' %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
                             </li>
                             <li>
                                 <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
                             </li>
-                            <li>
+                            <li class="active">
                                 <a href="{% url 'settings:terminal-setting' %}" class="text-center"><i class="fa fa-hdd-o"></i> {% trans 'Terminal setting' %} </a>
                             </li>
                         </ul>
@@ -35,6 +35,7 @@
                                          </div>
                                     {% endif %}
                                     {% csrf_token %}
+                                    <h3>{% trans "Basic setting" %}</h3>
                                     {% for field in form %}
                                         {% if not field.field|is_bool_field %}
                                             {% bootstrap_field field layout="horizontal" %}
@@ -52,10 +53,32 @@
                                             </div>
                                         {% endif %}
                                     {% endfor %}
+
+                                    <div class="hr-line-dashed"></div>
+                                    <h3>{% trans "Command storage" %}</h3>
+                                    <table class="table table-hover " id="task-history-list-table" >
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans 'Name' %}</th>
+                                                <th>{% trans 'Type' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for name, setting in command_storage.items %}
+                                            <tr>
+                                                <td>{{ name }}</td>
+                                                <td>{{ setting.TYPE }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+{#                                    <button class="btn btn-default btn-circle btn-add-command-storage" data-toggle="modal" data-target="#add_command_storage_model" tabindex="0" type="button"><i class="fa fa-plus"></i></button>#}
+                                    <div class="hr-line-dashed"></div>
+                                    <h3>{% trans "Replay storage" %}</h3>
+
                                     <div class="hr-line-dashed"></div>
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">
-                                            <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                         </div>
@@ -69,6 +92,7 @@
             </div>
         </div>
     </div>
+    {% include 'common/_add_terminal_command_storage_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -81,7 +105,7 @@ $(document).ready(function () {
         data[field.name] = field.value;
     });
 
-    var the_url = "{% url 'api-common:mail-testing' %}";
+    var the_url = "{% url 'api-common:ldap-testing' %}";
 
     function error(message) {
         toastr.error(message)
@@ -98,6 +122,8 @@ $(document).ready(function () {
         success: success,
         error: error
     });
+})
+.on('click', '', function () {
 
 })
 </script>

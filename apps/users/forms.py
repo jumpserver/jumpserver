@@ -172,7 +172,6 @@ class UserBulkUpdateForm(forms.ModelForm):
             if self.data.get(field) is not None:
                 changed_fields.append(field)
 
-        print(changed_fields)
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
         users = cleaned_data.pop('users', '')
