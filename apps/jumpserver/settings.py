@@ -274,7 +274,7 @@ EMAIL_HOST_USER = CONFIG.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = CONFIG.EMAIL_HOST_PASSWORD
 EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
 EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
-EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX
+EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX or ''
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -298,7 +298,7 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    # 'PAGE_SIZE': 15
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -373,7 +373,20 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORAGE_BACKEND = 'terminal.backends.command.db'
+COMMAND_STORAGE = {
+    'ENGINE': 'terminal.backends.command.db',
+}
+
+TERMINAL_COMMAND_STORAGE = {
+    "default": {
+        "TYPE": "server",
+    },
+    # 'ali-es': {
+    #     'TYPE': 'elasticsearch',
+    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
+    # },
+}
+
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

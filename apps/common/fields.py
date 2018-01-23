@@ -5,6 +5,7 @@ import json
 from django import forms
 from django.utils import six
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
 
 
 class DictField(forms.Field):
@@ -18,16 +19,16 @@ class DictField(forms.Field):
         # we don't need to handle that explicitly.
         if isinstance(value, six.string_types):
             try:
-                print(value)
                 value = json.loads(value)
                 return value
             except json.JSONDecodeError:
-                pass
-        value = {}
-        return value
+                return ValidationError(_("Not a valid json"))
+        else:
+            return ValidationError(_("Not a string type"))
 
     def validate(self, value):
-        print(value)
+        if isinstance(value, ValidationError):
+            raise value
         if not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 

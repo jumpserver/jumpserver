@@ -1,5 +1,5 @@
 # ~*~ coding: utf-8 ~*~
-# Copyright (C) 2014-2017 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
+# Copyright (C) 2014-2018 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
 #
 # Licensed under the GNU General Public License v2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ class AssetGroupViewSet(CustomFilterMixin, BulkModelViewSet):
     """
     Asset group api set, for add,delete,update,list,retrieve resource
     """
-    queryset = AssetGroup.objects.all()
+    queryset = AssetGroup.objects.all().annotate(asset_count=Count("assets"))
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
@@ -298,9 +298,7 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
 
 
 class LabelViewSet(BulkModelViewSet):
-    queryset = Label.objects.annotate(asset_count=Count("assets"))\
-        .annotate(admin_user_count=Count("adminuser")) \
-        .annotate(system_user_count=Count("systemuser"))
+    queryset = Label.objects.annotate(asset_count=Count("assets"))
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.LabelSerializer
 

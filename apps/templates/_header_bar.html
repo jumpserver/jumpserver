@@ -10,9 +10,9 @@
             <!--</form>-->
         </div>
         <ul class="nav navbar-top-links navbar-right">
-            <li>
-                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>
-            </li>
+{#            <li>#}
+{#                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>#}
+{#            </li>#}
             <li class="dropdown">
                 <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
                      <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %}</span>
@@ -22,11 +22,10 @@
                 {% if request.user.is_authenticated %}
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                     <span class="m-r-sm text-muted welcome-message">
-                        <img alt="image" class="img-circle" width="40" height="40" src="{{ request.user.avatar_url }}"/>
-                        <strong class="font-bold"> {{ request.user.name }}
-                            <span style="color: #8095a8"></span>
+                        <img alt="image" class="img-circle" width="30" height="30" src="{{ request.user.avatar_url }}"/>
+                        <span style="font-size: 13px;font-weight: 400"> {{ request.user.name }}
                             <b class="caret"></b>
-                        </strong>
+                        </span>
                     </span>
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs">

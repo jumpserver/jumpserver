@@ -303,7 +303,7 @@ div.dataTables_wrapper div.dataTables_filter {
 
 .profile-element div:first-child {
     line-height: 60px;
-    width: 70px;
+    /*width: 70px;*/
     float: left;
     text-align: center;
 }

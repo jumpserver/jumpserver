@@ -14,8 +14,6 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Value' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
-        <th class="text-center">{% trans 'Admin user' %}</th>
-        <th class="text-center">{% trans 'System user' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
     </thead>
@@ -36,7 +34,7 @@ function initTable() {
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
 
-            {targets: 6, createdCell: function (td, cellData, rowData) {
+            {targets: 4, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:cluster-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_cluster_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
@@ -44,8 +42,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:label-list" %}?sort=name',
         columns: [
             {data: "id"}, {data: "name" }, {data: "value" },
-            {data: "asset_count" }, {data: "admin_user_count" },
-            {data: "system_user_count" }, {data: "id"}
+            {data: "asset_count" }, {data: "id"}
         ],
         op_html: $('#actions').html()
     };

@@ -164,7 +164,7 @@
                                 {% for login in last_login_ten %}
                                     <div class="feed-element">
                                         <a href="#" class="pull-left">
-                                            <img alt="image" class="img-circle" src="/static/img/root.png">
+                                            <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png' %}">
                                         </a>
                                         <div class="media-body ">
                                             {% ifequal login.is_finished 0 %}

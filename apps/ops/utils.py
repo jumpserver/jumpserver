@@ -16,6 +16,8 @@ def update_or_create_ansible_task(
         run_as_admin=False, run_as="", become_info=None,
         created_by=None,
     ):
+    if not hosts or not tasks or not task_name:
+        return
 
     defaults = {
         'name': task_name,
@@ -41,7 +43,7 @@ def update_or_create_ansible_task(
     new_adhoc.become = become_info
 
     if not adhoc or adhoc != new_adhoc:
-        logger.debug("Task create new adhoc: {}".format(task_name))
+        print("Task create new adhoc: {}".format(task_name))
         new_adhoc.save()
         task.latest_adhoc = new_adhoc
         created = True

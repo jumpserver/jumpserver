@@ -165,7 +165,7 @@ class AdHoc(models.Model):
         if item and isinstance(item, list):
             self._tasks = json.dumps(item)
         else:
-            raise SyntaxError('Tasks should be a list')
+            raise SyntaxError('Tasks should be a list: {}'.format(item))
 
     @property
     def hosts(self):

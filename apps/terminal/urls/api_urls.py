@@ -20,7 +20,8 @@ urlpatterns = [
     url(r'^v1/sessions/(?P<pk>[0-9a-zA-Z\-]{36})/replay/$',
         api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
         name='session-replay'),
-    url(r'^v1/terminal/(?P<terminal>[a-zA-Z0-9\-]{36})/access-key', api.TerminalTokenApi.as_view(), name='terminal-access-key')
+    url(r'^v1/terminal/(?P<terminal>[a-zA-Z0-9\-]{36})/access-key', api.TerminalTokenApi.as_view(), name='terminal-access-key'),
+    url(r'^v1/terminal/config', api.TerminalConfig.as_view(), name='terminal-config'),
 ]
 
 urlpatterns += router.urls

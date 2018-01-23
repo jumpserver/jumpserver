@@ -63,8 +63,6 @@ class LDAPTestingAPI(APIView):
             search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
             attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
 
-            print(serializer.validated_data)
-
             try:
                 attr_map = json.loads(attr_map)
             except json.JSONDecodeError:
@@ -77,9 +75,6 @@ class LDAPTestingAPI(APIView):
             except Exception as e:
                 return Response({"error": str(e)}, status=401)
 
-            print(search_ou)
-            print(search_filter % ({"user": "*"}))
-            print(attr_map.values())
             ok = conn.search(search_ou, search_filter % ({"user": "*"}),
                              attributes=list(attr_map.values()))
             if not ok:

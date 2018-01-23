@@ -22,7 +22,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.assets.count()
+        return obj.asset_count
 
 
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
@@ -288,8 +288,6 @@ class MyAssetGroupGrantedSerializer(serializers.ModelSerializer):
 
 class LabelSerializer(serializers.ModelSerializer):
     asset_count = serializers.SerializerMethodField()
-    admin_user_count = serializers.SerializerMethodField()
-    system_user_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Label
@@ -299,14 +297,6 @@ class LabelSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_asset_count(obj):
         return obj.asset_count
-
-    @staticmethod
-    def get_admin_user_count(obj):
-        return obj.admin_user_count
-
-    @staticmethod
-    def get_system_user_count(obj):
-        return obj.system_user_count
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
