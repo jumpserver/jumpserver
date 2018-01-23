@@ -24,8 +24,9 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
+
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-delete-user">
+                                <a class="btn btn-outline {% if request.user != user_object and user_object.username != "admin" %} btn-danger btn-delete-user {% else %} disabled {% endif %}">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
@@ -128,7 +129,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %} {% if request.user == user_object %} disabled="disabled" {% endif %} class="onoffswitch-checkbox disabled" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -156,7 +157,7 @@
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -164,7 +165,7 @@
                                             <td>{% trans 'Send reset ssh key mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -331,7 +332,7 @@ $(document).ready(function() {
     }
     swal({
         title: "{% trans 'Are you sure?' %}",
-        text: "{% trans "This will reset the user's password. A password-reset email will be sent to the user\'s mailbox." %}",
+        text: "{% trans "This will reset the user password and send a reset mail"%}",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
@@ -356,7 +357,7 @@ $(document).ready(function() {
     }
     swal({
         title: "{% trans 'Are you sure?' %}",
-        text: "{% trans 'This will reset the user\'s public key.' %}",
+        text: "{% trans 'This will reset the user public key and send a reset mail' %}",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",

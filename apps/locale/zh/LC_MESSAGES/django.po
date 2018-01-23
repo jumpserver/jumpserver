@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-22 11:04+0800\n"
+"POT-Creation-Date: 2018-01-23 11:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -66,7 +66,7 @@ msgstr "端口"
 #: assets/templates/assets/system_user_list.html:26 perms/models.py:17
 #: perms/templates/perms/asset_permission_create_update.html:40
 #: perms/templates/perms/asset_permission_list.html:28 templates/_nav.html:22
-#: terminal/backends/command/models.py:11 terminal/models.py:124
+#: terminal/backends/command/models.py:11 terminal/models.py:116
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
 #: terminal/templates/terminal/session_list.html:41
@@ -106,8 +106,8 @@ msgstr "选择的系统用户将会在该集群资产上创建"
 #: perms/templates/perms/asset_permission_create_update.html:33
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:25
-#: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:23
-#: terminal/models.py:149 terminal/templates/terminal/terminal_detail.html:43
+#: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:15
+#: terminal/models.py:141 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
 #: users/models/user.py:35 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:62
@@ -403,7 +403,7 @@ msgstr "创建日期"
 #: assets/templates/assets/system_user_detail.html:100
 #: assets/templates/assets/system_user_list.html:30 common/models.py:30
 #: ops/models.py:37 perms/models.py:24
-#: perms/templates/perms/asset_permission_detail.html:98 terminal/models.py:33
+#: perms/templates/perms/asset_permission_detail.html:98 terminal/models.py:25
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
 #: users/models/user.py:47 users/templates/users/user_detail.html:110
 #: users/templates/users/user_group_detail.html:67
@@ -495,7 +495,7 @@ msgstr "Shell"
 #: assets/models/user.py:269 perms/models.py:19
 #: perms/templates/perms/asset_permission_detail.html:136
 #: perms/templates/perms/asset_permission_list.html:30 templates/_nav.html:26
-#: terminal/backends/command/models.py:12 terminal/models.py:125
+#: terminal/backends/command/models.py:12 terminal/models.py:117
 #: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/command_list.html:74
 #: terminal/templates/terminal/session_list.html:49
@@ -603,24 +603,20 @@ msgid "Import asset"
 msgstr "导入资产"
 
 #: assets/templates/assets/_asset_import_modal.html:9
-#: common/templates/common/_add_terminal_command_storage_modal.html:9
 #: users/templates/users/_user_import_modal.html:10
 msgid "Template"
 msgstr "模板"
 
 #: assets/templates/assets/_asset_import_modal.html:10
-#: common/templates/common/_add_terminal_command_storage_modal.html:10
 #: users/templates/users/_user_import_modal.html:11
 msgid "Download"
 msgstr "下载"
 
 #: assets/templates/assets/_asset_import_modal.html:13
-#: common/templates/common/_add_terminal_command_storage_modal.html:13
 msgid "Asset csv file"
 msgstr "资产csv文件"
 
 #: assets/templates/assets/_asset_import_modal.html:16
-#: common/templates/common/_add_terminal_command_storage_modal.html:16
 msgid "If set id, will use this id update asset existed"
 msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
@@ -672,7 +668,7 @@ msgstr "其它"
 #: common/templates/common/terminal_setting.html:82
 #: perms/templates/perms/asset_permission_create_update.html:67
 #: terminal/templates/terminal/terminal_update.html:46
-#: users/templates/users/_user.html:49
+#: users/templates/users/_user.html:43
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_password_update.html:58
 #: users/templates/users/user_profile.html:139
@@ -696,7 +692,7 @@ msgstr "重置"
 #: common/templates/common/terminal_setting.html:83
 #: perms/templates/perms/asset_permission_create_update.html:68
 #: terminal/templates/terminal/terminal_update.html:47
-#: users/templates/users/_user.html:50
+#: users/templates/users/_user.html:44
 #: users/templates/users/first_login.html:62
 #: users/templates/users/forgot_password.html:44
 #: users/templates/users/user_bulk_update.html:24
@@ -1299,6 +1295,16 @@ msgstr "<b>%(name)s</b> 创建成功"
 msgid "<b>%(name)s</b> was updated successfully"
 msgstr "<b>%(name)s</b> 更新成功"
 
+#: common/fields.py:25
+#, fuzzy
+#| msgid "Not a valid ssh public key"
+msgid "Not a valid json"
+msgstr "ssh密钥不合法"
+
+#: common/fields.py:27
+msgid "Not a string type"
+msgstr ""
+
 #: common/forms.py:70
 msgid "Current SITE URL"
 msgstr "当前站点URL"
@@ -1392,7 +1398,7 @@ msgid "Public key auth"
 msgstr "秘钥认证"
 
 #: common/forms.py:155 common/templates/common/terminal_setting.html:58
-#: terminal/models.py:27
+#: terminal/forms.py:21 terminal/models.py:19
 msgid "Command storage"
 msgstr "命令存储"
 
@@ -1417,10 +1423,6 @@ msgstr "值"
 #: common/models.py:29
 msgid "Enabled"
 msgstr "启用"
-
-#: common/templates/common/_add_terminal_command_storage_modal.html:4
-msgid "Add command storage"
-msgstr "添加命令存储"
 
 #: common/templates/common/basic_setting.html:15
 #: common/templates/common/email_setting.html:15
@@ -1455,10 +1457,6 @@ msgstr "终端设置"
 #: common/templates/common/ldap_setting.html:58
 msgid "Test connection"
 msgstr "测试连接"
-
-#: common/templates/common/terminal_setting.html:77 terminal/models.py:28
-msgid "Replay storage"
-msgstr "录像存储"
 
 #: common/views.py:20 common/views.py:46 common/views.py:72 common/views.py:101
 #: templates/_nav.html:69
@@ -1616,7 +1614,7 @@ msgstr "执行历史"
 
 #: ops/templates/ops/adhoc_history.html:52
 #: ops/templates/ops/adhoc_history_detail.html:58
-#: ops/templates/ops/task_history.html:55 terminal/models.py:132
+#: ops/templates/ops/task_history.html:55 terminal/models.py:124
 #: terminal/templates/terminal/session_list.html:77
 msgid "Date start"
 msgstr "开始日期"
@@ -1740,7 +1738,7 @@ msgstr "选择用户"
 #: perms/forms.py:18 perms/models.py:15
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/asset_permission_list.html:26 templates/_nav.html:12
-#: terminal/backends/command/models.py:10 terminal/models.py:123
+#: terminal/backends/command/models.py:10 terminal/models.py:115
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
@@ -1889,16 +1887,12 @@ msgstr "资产授权包含用户"
 msgid "Asset permission asset list"
 msgstr "资产组授权包含资产"
 
-#: templates/_header_bar.html:14
-msgid "Welcome to use Jumpserver system"
-msgstr "欢迎使用Jumpserver开源跳板机系统"
-
 #: templates/_header_bar.html:18
 msgid "Help"
 msgstr "帮助"
 
-#: templates/_header_bar.html:33 templates/_nav_user.html:9
-#: users/templates/users/_user.html:42
+#: templates/_header_bar.html:32 templates/_nav_user.html:9
+#: users/templates/users/_user.html:36
 #: users/templates/users/user_password_update.html:37
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
@@ -1907,24 +1901,24 @@ msgstr "帮助"
 msgid "Profile"
 msgstr "个人信息"
 
-#: templates/_header_bar.html:37
+#: templates/_header_bar.html:36
 msgid "Admin page"
 msgstr "管理页面"
 
-#: templates/_header_bar.html:39
+#: templates/_header_bar.html:38
 msgid "User page"
 msgstr "用户页面"
 
-#: templates/_header_bar.html:42
+#: templates/_header_bar.html:41
 msgid "Logout"
 msgstr "注销登录"
 
-#: templates/_header_bar.html:46 users/templates/users/login.html:42
+#: templates/_header_bar.html:45 users/templates/users/login.html:42
 #: users/templates/users/login.html:61
 msgid "Login"
 msgstr "登录"
 
-#: templates/_header_bar.html:59 templates/_nav.html:4
+#: templates/_header_bar.html:58 templates/_nav.html:4
 msgid "Dashboard"
 msgstr "仪表盘"
 
@@ -1999,7 +1993,7 @@ msgstr "在线会话"
 msgid "Session offline"
 msgstr "离线会话"
 
-#: templates/_nav.html:53 terminal/models.py:130
+#: templates/_nav.html:53 terminal/models.py:122
 #: terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
 #: terminal/templates/terminal/session_detail.html:48
@@ -2040,64 +2034,68 @@ msgstr "输出"
 msgid "Session"
 msgstr "会话"
 
-#: terminal/forms.py:15
+#: terminal/forms.py:27
 msgid "Coco ssh listen port"
 msgstr "SSH 监听端口"
 
-#: terminal/forms.py:16
+#: terminal/forms.py:28
 msgid "Coco http/ws listen port"
 msgstr "Http/Websocket 监听端口"
 
-#: terminal/models.py:24
+#: terminal/models.py:16
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models.py:25
+#: terminal/models.py:17
 msgid "SSH Port"
 msgstr "SSH端口"
 
-#: terminal/models.py:26
+#: terminal/models.py:18
 msgid "HTTP Port"
 msgstr "HTTP端口"
 
-#: terminal/models.py:99
+#: terminal/models.py:20
+msgid "Replay storage"
+msgstr "录像存储"
+
+#: terminal/models.py:91
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models.py:100
+#: terminal/models.py:92
 msgid "CPU Usage"
 msgstr "CPU使用"
 
-#: terminal/models.py:101
+#: terminal/models.py:93
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models.py:102
+#: terminal/models.py:94
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models.py:103
+#: terminal/models.py:95
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models.py:104
+#: terminal/models.py:96
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models.py:127 terminal/templates/terminal/session_list.html:74
+#: terminal/models.py:119 terminal/templates/terminal/session_list.html:74
 #: terminal/templates/terminal/terminal_detail.html:47
 msgid "Remote addr"
 msgstr "远端地址"
 
-#: terminal/models.py:129 terminal/templates/terminal/session_list.html:100
+#: terminal/models.py:121 terminal/templates/terminal/session_list.html:100
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models.py:133
+#: terminal/models.py:125
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models.py:150
+#: terminal/models.py:142
 msgid "Args"
 msgstr "参数"
 
@@ -2451,7 +2449,7 @@ msgstr "忘记密码"
 
 #: users/templates/users/forgot_password.html:33
 msgid "Input your email, that will send a mail to your"
-msgstr "输入您的邮箱, 将会发一封重置短信邮件到您的邮箱中"
+msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
 #: users/templates/users/login.html:47
 msgid "Captcha invalid"
@@ -2520,10 +2518,8 @@ msgid "An e-mail has been sent to the user\\'s mailbox."
 msgstr "已发送邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:334
-msgid ""
-"This will reset the user's password. A password-reset email will be sent to "
-"the user\\'s mailbox."
-msgstr "重设密码邮件将会发送到用户邮箱"
+msgid "This will reset the user password and send a reset mail"
+msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:348
 msgid ""
@@ -2537,8 +2533,8 @@ msgid "Reset SSH public key"
 msgstr "重置SSH密钥"
 
 #: users/templates/users/user_detail.html:359
-msgid "This will reset the user\\"
-msgstr "重置"
+msgid "This will reset the user public key and send a reset mail"
+msgstr "将会失效用户当前秘钥，并发送重置邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:376
 #: users/templates/users/user_profile.html:170
@@ -2859,6 +2855,15 @@ msgstr "密码更新"
 #: users/views/user.py:378
 msgid "Public key update"
 msgstr "秘钥更新"
+
+#~ msgid "Add command storage"
+#~ msgstr "添加命令存储"
+
+#~ msgid "Welcome to use Jumpserver system"
+#~ msgstr "欢迎使用Jumpserver开源跳板机系统"
+
+#~ msgid "This will reset the user\\"
+#~ msgstr "重置"
 
 #~ msgid "Enable LDAP Auth"
 #~ msgstr "LDAP认证"

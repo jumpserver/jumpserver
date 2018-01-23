@@ -76,7 +76,7 @@ function initTable() {
                 var update_btn = '<a href="{% url "users:user-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
 
                 var del_btn = "";
-                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ user.username }}") {
+                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ request.user.username }}") {
                     del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', rowData.name);
