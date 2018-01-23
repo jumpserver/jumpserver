@@ -3542,7 +3542,7 @@ body.body-small .footer.fixed {
 }
 .table-bordered > thead > tr > th,
 .table-bordered > thead > tr > td {
-  background-color: #F5F5F6;
+  /*background-color: #F5F5F6;*/
   border-bottom-width: 1px;
 }
 .table-bordered > thead > tr > th,
