@@ -2,6 +2,8 @@
 {% load static %}
 {% load bootstrap3 %}
 {% load i18n %}
+{% load asset_tags %}
+{% load common_tags %}
 
 {% block form %}
     <form action="" method="post" class="form-horizontal">
@@ -29,10 +31,30 @@
     {% bootstrap_field form.groups layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Labels' %}</h3>
+    <div class="form-group">
+        <label for="{{ form.labels.id_for_label }}" class="col-md-2 control-label">{% trans 'Labels' %}</label>
+        <div class="col-md-9">
+            <select name="labels" class="select2" data-placeholder="Select labels" style="width: 100%" multiple="" tabindex="4" id="{{ form.labels.id_for_label }}">
+                {% for name, labels in form.labels.field.queryset|group_labels %}
+                <optgroup label="{{ name }}">
+                    {% for label in labels %}
+                        {% if label in form.labels.initial %}
+                            <option value="{{ label.id }}" selected>{{ label.name }}:{{ label.value }}</option>
+                        {% else %}
+                            <option value="{{ label.id }}">{{ label.name }}:{{ label.value }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
     {% bootstrap_field form.comment layout="horizontal" %}
     {% bootstrap_field form.is_active layout="horizontal" %}
-
 
     <div class="hr-line-dashed"></div>
     <div class="form-group">

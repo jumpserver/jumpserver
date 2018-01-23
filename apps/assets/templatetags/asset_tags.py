@@ -1,6 +1,12 @@
+from collections import defaultdict
 
 from django import template
-from django.utils import timezone
-from django.conf import settings
 register = template.Library()
 
+
+@register.filter
+def group_labels(queryset):
+    grouped = defaultdict(list)
+    for label in queryset:
+        grouped[label.name].append(label)
+    return [(name, labels) for name, labels in grouped.items()]

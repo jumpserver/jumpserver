@@ -54,5 +54,6 @@ urlpatterns = [
     #     name='system-user-asset-group'),
 
     url(r'^label/$', views.LabelListView.as_view(), name='label-list'),
+    url(r'^label/create/$', views.LabelCreateView.as_view(), name='label-create'),
 ]
 

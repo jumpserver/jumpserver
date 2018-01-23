@@ -23,8 +23,15 @@ class Label(models.Model):
         auto_now_add=True, null=True, blank=True, verbose_name=_('Date created')
     )
 
+    @classmethod
+    def get_queryset_group_by_name(cls):
+        names = cls.objects.values_list('name', flat=True)
+        for name in names:
+            yield name, cls.objects.filter(name=name)
+
     def __str__(self):
         return "{}:{}".format(self.name, self.value)
 
     class Meta:
         db_table = "assets_label"
+        unique_together = ('name', 'value')

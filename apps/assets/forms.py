@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import Cluster, Asset, AssetGroup, AdminUser, SystemUser
+from .models import Cluster, Asset, AssetGroup, AdminUser, SystemUser, Label
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, get_logger
 
 
@@ -10,20 +10,20 @@ logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
-
     class Meta:
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
             'cluster', 'groups', 'status', 'env', 'is_active',
-            'admin_user'
+            'admin_user', 'labels'
 
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
             'cluster': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select cluster')}),
             'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select admin user')}),
-            'port': forms.TextInput()
+            'labels': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select labels')}),
+            'port': forms.TextInput(),
         }
         help_texts = {
             'hostname': '* required',
@@ -40,6 +40,10 @@ class AssetCreateForm(forms.ModelForm):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
+    def save(self, commit=True):
+        print(self.cleaned_data)
+        return super().save(commit=commit)
+
 
 class AssetUpdateForm(forms.ModelForm):
     class Meta:
@@ -47,7 +51,7 @@ class AssetUpdateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'port', 'groups', "cluster", 'is_active',
             'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
-            'cabinet_pos', 'number', 'comment', 'admin_user',
+            'cabinet_pos', 'number', 'comment', 'admin_user', 'labels'
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
@@ -68,13 +72,15 @@ class AssetUpdateForm(forms.ModelForm):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
+    def save(self, commit=True):
+        print(self.cleaned_data)
+        return super().save(commit=commit)
+
 
 class AssetBulkUpdateForm(forms.ModelForm):
     assets = forms.ModelMultipleChoiceField(
-        required=True,
-        help_text='* required',
-        label=_('Select assets'),
-        queryset=Asset.objects.all(),
+        required=True, help_text='* required',
+        label=_('Select assets'), queryset=Asset.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -83,10 +89,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         )
     )
     port = forms.IntegerField(
-        label=_('Port'),
-        required=False,
-        min_value=1,
-        max_value=65535,
+        label=_('Port'), required=False, min_value=1, max_value=65535,
     )
 
     class Meta:
@@ -96,7 +99,9 @@ class AssetBulkUpdateForm(forms.ModelForm):
             'type', 'env',
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}
+            ),
         }
 
     def save(self, commit=True):
@@ -140,7 +145,7 @@ class AssetGroupForm(forms.ModelForm):
 
     def save(self, commit=True):
         group = super().save(commit=commit)
-        assets= self.cleaned_data['assets']
+        assets = self.cleaned_data['assets']
         group.assets.set(assets)
         return group
 
@@ -377,3 +382,22 @@ class SystemUserAuthForm(forms.Form):
 
 class FileForm(forms.Form):
     file = forms.FileField()
+
+
+class LabelForm(forms.ModelForm):
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(), label=_('Asset'), required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')}
+        )
+    )
+
+    class Meta:
+        model = Label
+        fields = ['name', 'value', 'assets']
+
+    def save(self, commit=True):
+        label = super().save(commit=commit)
+        assets = self.cleaned_data['assets']
+        label.assets.set(assets)
+        return label
