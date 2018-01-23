@@ -1,5 +1,5 @@
 # ~*~ coding: utf-8 ~*~
-# Copyright (C) 2014-2018 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
+# Copyright (C) 2014-2017 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
 #
 # Licensed under the GNU General Public License v2.0 (the "License");
 # you may not use this file except in compliance with the License.
