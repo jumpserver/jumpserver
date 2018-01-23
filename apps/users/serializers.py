@@ -71,3 +71,9 @@ class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
         model = UserGroup
         fields = ['id', 'users']
 
+
+class ChangeUserPasswordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['password']

@@ -1,14 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import BulkModelViewSet
 
 from .serializers import UserSerializer, UserGroupSerializer, \
     UserGroupUpdateMemeberSerializer, UserPKUpdateSerializer, \
-    UserUpdateGroupSerializer
+    UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
@@ -24,8 +24,19 @@ class UserViewSet(CustomFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsSuperUser, IsAuthenticated)
     filter_fields = ('username', 'email', 'name', 'id')
+
+
+class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    queryset = User.objects.all()
+    serializer_class = ChangeUserPasswordSerializer
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        user.password_raw = serializer.validated_data["password"]
+        user.save()
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -37,6 +48,7 @@ class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.

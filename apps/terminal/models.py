@@ -10,21 +10,13 @@ from users.models import User
 from .backends.command.models import AbstractSessionCommand
 
 
-def get_all_command_storage():
-    # storage_choices = []
-    from common.models import Setting
-    Setting.refresh_all_settings()
-    for k, v in settings.TERMINAL_COMMAND_STORAGE.items():
-        yield (k, k)
-
-
 class Terminal(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     remote_addr = models.CharField(max_length=128, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
-    command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default', choices=get_all_command_storage())
+    command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
     replay_storage = models.CharField(max_length=128, verbose_name=_("Replay storage"), default='default')
     user = models.OneToOneField(User, related_name='terminal', verbose_name='Application User', null=True, on_delete=models.CASCADE)
     is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
