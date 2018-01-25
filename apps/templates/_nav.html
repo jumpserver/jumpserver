@@ -1,12 +1,12 @@
 {% load i18n %}
 <li id="index">
     <a href="{% url 'index' %}">
-        <i class="fa fa-dashboard"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span class="label label-info pull-right"></span>
+        <i class="fa fa-dashboard" style="font-size: 13px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
 <li id="users">
     <a href="#">
-        <i class="fa fa-group"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-group" style="font-size: 13px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level active">
         <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
@@ -34,14 +34,6 @@
         </li>
     </ul>
 </li>
-<li id="ops">
-    <a>
-        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task' %}</a></li>
-    </ul>
-</li>
 <li id="terminal">
     <a>
         <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Terminal' %}</span><span class="fa arrow"></span>
@@ -53,8 +45,14 @@
         <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Command' %}</a></li>
     </ul>
 </li>
-
-
+<li id="ops">
+    <a>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task' %}</a></li>
+    </ul>
+</li>
 {#<li id="">#}
 {#    <a href="#">#}
 {#        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>#}
