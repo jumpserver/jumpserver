@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class AssetGroup(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date created'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 

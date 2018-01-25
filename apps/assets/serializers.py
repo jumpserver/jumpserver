@@ -13,7 +13,9 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     资产组序列化数据模型
     """
     assets_amount = serializers.SerializerMethodField()
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+    assets = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Asset.objects.all(), required=False
+    )
 
     class Meta:
         model = AssetGroup
@@ -22,7 +24,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.asset_count
+        return obj.assets.all().count()
 
 
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
