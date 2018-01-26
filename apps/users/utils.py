@@ -59,7 +59,10 @@ def send_user_created_mail(user):
         'login_url': reverse('users:login', external=True),
     }
     if settings.DEBUG:
-        print(message)
+        try:
+            print(message)
+        except OSError:
+            pass
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
