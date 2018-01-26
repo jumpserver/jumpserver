@@ -418,6 +418,12 @@ class LabelForm(forms.ModelForm):
         model = Label
         fields = ['name', 'value', 'assets']
 
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance', None):
+            initial = kwargs.get('initial', {})
+            initial['assets'] = kwargs['instance'].assets.all()
+        super().__init__(*args, **kwargs)
+
     def save(self, commit=True):
         label = super().save(commit=commit)
         assets = self.cleaned_data['assets']
