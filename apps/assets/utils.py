@@ -36,6 +36,7 @@ def check_assets_have_system_user(assets, system_users):
 
 class LabelFilter:
     def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         query_keys = self.request.query_params.keys()
         all_label_keys = Label.objects.values_list('name', flat=True)
         valid_keys = set(all_label_keys) & set(query_keys)
