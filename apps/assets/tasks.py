@@ -56,7 +56,7 @@ def set_assets_hardware_info(result, **kwargs):
         else:
             ___cpu_model = 'Unknown'
         ___cpu_count = info['ansible_processor_count']
-        ___cpu_cores = info.get('ansible_processor_cores', '')
+        ___cpu_cores = info.get('ansible_processor_cores', None) or len(info.get('ansible_processor', []))
         ___memory = '%s %s' % capacity_convert('{} MB'.format(info['ansible_memtotal_mb']))
         disk_info = {}
         for dev, dev_info in info['ansible_devices'].items():
