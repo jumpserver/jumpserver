@@ -27,7 +27,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser, Label
 from ..hands import AdminUserRequiredMixin
 
 
@@ -48,6 +48,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
             'app': _('Assets'),
             'action': _('Asset list'),
             'system_users': SystemUser.objects.all(),
+            'labels': Label.objects.all().order_by('name'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -72,12 +73,13 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_valid(self, form):
-        asset = form.save()
-        asset.created_by = self.request.user.username or 'Admin'
-        asset.date_created = timezone.now()
-        asset.save()
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     print("form valid")
+    #     asset = form.save()
+    #     asset.created_by = self.request.user.username or 'Admin'
+    #     asset.date_created = timezone.now()
+    #     asset.save()
+    #     return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = {

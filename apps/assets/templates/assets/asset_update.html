@@ -2,6 +2,8 @@
 {% load static %}
 {% load bootstrap3 %}
 {% load i18n %}
+{% load asset_tags %}
+{% load common_tags %}
 
 {% block custom_head_css_js_create %}
     <link href="{% static "css/plugins/inputTags.css" %}" rel="stylesheet">
@@ -34,6 +36,27 @@
     {% bootstrap_field form.groups layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Labels' %}</h3>
+    <div class="form-group">
+        <label for="{{ form.labels.id_for_label }}" class="col-md-2 control-label">{% trans 'Label' %}</label>
+        <div class="col-md-9">
+            <select name="labels" class="select2 labels" data-placeholder="Select labels" style="width: 100%" multiple="" tabindex="4" id="{{ form.labels.id_for_label }}">
+                {% for name, labels in form.labels.field.queryset|group_labels %}
+                <optgroup label="{{ name }}">
+                    {% for label in labels %}
+                        {% if label in form.labels.initial %}
+                            <option value="{{ label.id }}" selected>{{ label.value }}</option>
+                        {% else %}
+                            <option value="{{ label.id }}">{{ label.value }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
     {% bootstrap_field form.number layout="horizontal" %}
     {% bootstrap_field form.remote_card_ip layout="horizontal" %}
@@ -62,14 +85,18 @@
 
 {% block custom_foot_js %}
     <script>
-        $(document).ready(function () {
-            $('.select2').select2({
-                allowClear: true
-            });
-            $("#tags").select2({
-                tags: true,
-                maximumSelectionLength: 8  //最多能够选择的个数
-            });
-        })
+    function format(item) {
+        var group = item.element.parentElement.label;
+        return group + ':' + item.text;
+    }
+    $(document).ready(function () {
+        $('.select2').select2({
+            allowClear: true
+        });
+        $(".labels").select2({
+            allowClear: true,
+            templateSelection: format
+        });
+    })
     </script>
 {% endblock %}

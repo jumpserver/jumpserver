@@ -12,6 +12,7 @@ router.register(r'v1/assets', api.AssetViewSet, 'asset')
 router.register(r'v1/clusters', api.ClusterViewSet, 'cluster')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
+router.register(r'v1/labels', api.LabelViewSet, 'label')
 
 urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),

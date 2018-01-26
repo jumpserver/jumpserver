@@ -53,5 +53,8 @@ urlpatterns = [
     # url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/asset-group$', views.SystemUserAssetGroupView.as_view(),
     #     name='system-user-asset-group'),
 
+    url(r'^label/$', views.LabelListView.as_view(), name='label-list'),
+    url(r'^label/create/$', views.LabelCreateView.as_view(), name='label-create'),
+    url(r'^label/(?P<pk>[0-9a-zA-Z\-]{36})/update/$', views.LabelUpdateView.as_view(), name='label-update'),
 ]
 

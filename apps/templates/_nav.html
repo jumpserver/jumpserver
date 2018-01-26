@@ -24,6 +24,7 @@
         <li id="cluster"><a href="{% url 'assets:cluster-list' %}">{% trans 'Cluster' %}</a></li>
         <li id="admin-user"><a href="{% url 'assets:admin-user-list' %}">{% trans 'Admin user' %}</a></li>
         <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
+        <li id="label"><a href="{% url 'assets:label-list' %}">{% trans 'Labels' %}</a></li>
     </ul>
 </li>
 <li id="perms">
@@ -36,13 +37,13 @@
 </li>
 <li id="terminal">
     <a>
-        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Terminal' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
-        <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
         <li id="session-online"><a href="{% url 'terminal:session-online-list' %}">{% trans 'Session online' %}</a></li>
         <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
-        <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Command' %}</a></li>
+        <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Commands' %}</a></li>
+        <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
     </ul>
 </li>
 <li id="ops">

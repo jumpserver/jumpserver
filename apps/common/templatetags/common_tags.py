@@ -92,3 +92,8 @@ def is_bool_field(field):
         return True
     else:
         return False
+
+
+@register.filter
+def to_dict(data):
+    return dict(data)

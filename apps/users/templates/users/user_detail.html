@@ -129,7 +129,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %} {% if request.user == user_object %} disabled="disabled" {% endif %} class="onoffswitch-checkbox disabled" id="is_active">
+                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %} {% if request.user == user_object %} disabled {% endif %} class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>

@@ -244,6 +244,33 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Labels' %}
+                                </div>
+                                <div class="panel-body">
+{#                                    <table class="table">#}
+{#                                        <tbody>#}
+{#                                        {% for label in asset.labels.all %}#}
+{#                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %}>#}
+{#                                            <td>{{ label.name }}</td>#}
+{#                                            <td>#}
+{#                                                <span class="pull-right">#}
+{#                                                    {{ label.value }}#}
+{#                                                </span>#}
+{#                                            </td>#}
+{#                                        </tr>#}
+{#                                        {% endfor %}#}
+{#                                        </tbody>#}
+{#                                    </table>#}
+                                    <ul class="tag-list" style="padding: 0">
+                                        {% for label in asset.labels.all %}
+                                            <li ><a href=""><i class="fa fa-tag"></i> {{ label.name }}:{{ label.value }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
                         {% endif %}
                         </div>
                     </div>
