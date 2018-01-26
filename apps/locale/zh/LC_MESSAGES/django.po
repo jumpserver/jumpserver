@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-26 15:43+0800\n"
+"POT-Creation-Date: 2018-01-26 16:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -32,6 +32,7 @@ msgid "Select admin user"
 msgstr "选择管理用户"
 
 #: assets/forms.py:31 assets/forms.py:78
+#: assets/templates/assets/asset_create.html:38
 msgid "Select labels"
 msgstr "选择标签"
 
@@ -377,10 +378,8 @@ msgid "Hostname raw"
 msgstr "主机名原始"
 
 #: assets/models/asset.py:91 assets/templates/assets/asset_create.html:34
-#: assets/templates/assets/asset_create.html:36
 #: assets/templates/assets/asset_detail.html:250
-#: assets/templates/assets/asset_update.html:39
-#: assets/templates/assets/asset_update.html:41
+#: assets/templates/assets/asset_update.html:39 templates/_nav.html:27
 msgid "Labels"
 msgstr "标签管理"
 
@@ -560,43 +559,43 @@ msgstr "推送系统用户到: {}->{}"
 msgid "Push system user to assets"
 msgstr "推送系统用户到资产"
 
-#: assets/tasks.py:91
+#: assets/tasks.py:92
 msgid "Update some assets hardware info"
 msgstr "更新一些资产硬件信息"
 
-#: assets/tasks.py:107
+#: assets/tasks.py:108
 msgid "Update asset hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:121
+#: assets/tasks.py:122
 msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
-#: assets/tasks.py:189
+#: assets/tasks.py:190
 msgid "Test admin user connectability period: {}"
 msgstr "定期测试管理用户可连接性: {}"
 
-#: assets/tasks.py:203
+#: assets/tasks.py:204
 msgid "Test admin user connectability: {}"
 msgstr "测试管理用户可连接性: {}"
 
-#: assets/tasks.py:212
+#: assets/tasks.py:213
 msgid "Test asset connectability"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:283
+#: assets/tasks.py:284
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:295
+#: assets/tasks.py:296
 msgid "Test system user connectability period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:376
+#: assets/tasks.py:377
 msgid "Push system user to cluster assets: {}"
 msgstr "推送系统用户到资产: {}"
 
-#: assets/tasks.py:397
+#: assets/tasks.py:398
 msgid "Push cluster system users to assets period: {}"
 msgstr "定期推送集群系统用户到资产: {}"
 
@@ -686,7 +685,7 @@ msgid "Auto generate key"
 msgstr "自动生成秘钥"
 
 #: assets/templates/assets/_system_user.html:65
-#: assets/templates/assets/asset_create.html:61
+#: assets/templates/assets/asset_create.html:60
 #: assets/templates/assets/asset_update.html:70
 #: assets/templates/assets/cluster_create_update.html:46
 #: perms/templates/perms/asset_permission_create_update.html:45
@@ -697,7 +696,7 @@ msgstr "其它"
 #: assets/templates/assets/_system_user.html:71
 #: assets/templates/assets/admin_user_create_update.html:45
 #: assets/templates/assets/asset_bulk_update.html:23
-#: assets/templates/assets/asset_create.html:68
+#: assets/templates/assets/asset_create.html:67
 #: assets/templates/assets/asset_group_create.html:16
 #: assets/templates/assets/asset_update.html:78
 #: assets/templates/assets/cluster_create_update.html:54
@@ -721,7 +720,7 @@ msgstr "重置"
 #: assets/templates/assets/_system_user.html:72
 #: assets/templates/assets/admin_user_create_update.html:46
 #: assets/templates/assets/asset_bulk_update.html:24
-#: assets/templates/assets/asset_create.html:69
+#: assets/templates/assets/asset_create.html:68
 #: assets/templates/assets/asset_group_create.html:17
 #: assets/templates/assets/asset_list.html:61
 #: assets/templates/assets/asset_update.html:79
@@ -925,6 +924,12 @@ msgstr "动作"
 msgid "Group"
 msgstr "组"
 
+#: assets/templates/assets/asset_create.html:36
+#: assets/templates/assets/asset_list.html:27
+#: assets/templates/assets/asset_update.html:41
+msgid "Label"
+msgstr "标签"
+
 #: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:188
 #: assets/views/cluster.py:98
 msgid "Asset detail"
@@ -1067,10 +1072,6 @@ msgstr "导出"
 #: assets/templates/assets/asset_list.html:25 assets/views/asset.py:87
 msgid "Create asset"
 msgstr "创建资产"
-
-#: assets/templates/assets/asset_list.html:27 templates/_nav.html:27
-msgid "Label"
-msgstr "标签"
 
 #: assets/templates/assets/asset_list.html:42
 #: assets/templates/assets/user_asset_list.html:24
@@ -2509,7 +2510,7 @@ msgstr "城市"
 
 #: users/templates/users/reset_password.html:45
 #: users/templates/users/user_detail.html:325
-#: users/templates/users/user_profile.html:136 users/utils.py:68
+#: users/templates/users/user_profile.html:136 users/utils.py:71
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2730,7 +2731,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:70
+#: users/utils.py:73
 #, python-format
 msgid ""
 "\n"
@@ -2774,11 +2775,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:101
+#: users/utils.py:104
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:103
+#: users/utils.py:106
 #, python-format
 msgid ""
 "\n"
@@ -2803,15 +2804,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:136
+#: users/utils.py:139
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:138
+#: users/utils.py:141
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:151
+#: users/utils.py:154
 msgid "Password or SSH public key invalid"
 msgstr "密码或秘钥不合法"
 
