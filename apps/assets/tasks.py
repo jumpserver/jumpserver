@@ -36,9 +36,10 @@ def set_assets_hardware_info(result, **kwargs):
     result_raw = result[0]
     assets_updated = []
     for hostname, info in result_raw.get('ok', {}).items():
-        if info:
+        if info and info.get('setup'):
             info = info['setup']['ansible_facts']
         else:
+            logger.error("Get asset info failed: {}".format(hostname))
             continue
 
         asset = get_object_or_none(Asset, hostname=hostname)
@@ -50,7 +51,7 @@ def set_assets_hardware_info(result, **kwargs):
         ___sn = info['ansible_product_serial']
 
         for ___cpu_model in info['ansible_processor']:
-            if ___cpu_model.endswith('GHz'):
+            if ___cpu_model.endswith('GHz') or ___cpu_model.startswith("Intel"):
                 break
         else:
             ___cpu_model = 'Unknown'
