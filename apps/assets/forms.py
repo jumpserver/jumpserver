@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from .models import Cluster, Asset, AssetGroup, AdminUser, SystemUser, Label
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, get_logger
 
-
 logger = get_logger(__file__)
 
 
@@ -19,10 +18,18 @@ class AssetCreateForm(forms.ModelForm):
 
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
-            'cluster': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select cluster')}),
-            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select admin user')}),
-            'labels': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select labels')}),
+            'groups': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select asset groups')
+            }),
+            'cluster': forms.Select(attrs={
+                'class': 'select2', 'data-placeholder': _('Select cluster')
+            }),
+            'admin_user': forms.Select(attrs={
+                'class': 'select2', 'data-placeholder': _('Select admin user')
+            }),
+            'labels': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select labels')
+            }),
             'port': forms.TextInput(),
         }
         help_texts = {
@@ -40,9 +47,13 @@ class AssetCreateForm(forms.ModelForm):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
-    def save(self, commit=True):
-        print(self.cleaned_data)
-        return super().save(commit=commit)
+    def is_valid(self):
+        print(self.data)
+        result = super().is_valid()
+        if not result:
+            print(self.errors)
+            print(self.cleaned_data)
+        return result
 
 
 class AssetUpdateForm(forms.ModelForm):
@@ -54,8 +65,19 @@ class AssetUpdateForm(forms.ModelForm):
             'cabinet_pos', 'number', 'comment', 'admin_user', 'labels'
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _("Default using cluster admin user")})
+            'groups': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select asset groups')
+            }),
+            'cluster': forms.Select(attrs={
+                'class': 'select2', 'data-placeholder': _('Select cluster')
+            }),
+            'admin_user': forms.Select(attrs={
+                'class': 'select2', 'data-placeholder': _('Select admin user')
+            }),
+            'labels': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select labels')
+            }),
+            'port': forms.TextInput(),
         }
         help_texts = {
             'hostname': '* required',
@@ -72,9 +94,9 @@ class AssetUpdateForm(forms.ModelForm):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
-    def save(self, commit=True):
-        print(self.cleaned_data)
-        return super().save(commit=commit)
+    def is_valid(self):
+        print(self.data)
+        return super().is_valid()
 
 
 class AssetBulkUpdateForm(forms.ModelForm):

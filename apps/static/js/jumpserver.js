@@ -383,7 +383,22 @@ jumpserver.initServerSideDataTable = function (options) {
                 }
                 if (data.search !== null) {
                     var search_val = data.search.value;
-                    data.search = search_val;
+                    var search_list = search_val.split(" ");
+                    var search_attr = {};
+                    var search_raw = [];
+
+                    search_list.map(function (val, index) {
+                       var kv = val.split(":");
+                       if (kv.length === 2) {
+                           search_attr[kv[0]] = kv[1]
+                       } else {
+                           search_raw.push(kv)
+                       }
+                    });
+                    data.search = search_raw.join("");
+                    $.each(search_attr, function (k, v) {
+                        data[k] = v
+                    })
                 }
                 if (data.order !== null && data.order.length === 1) {
                     var col = data.order[0].column;
@@ -446,6 +461,7 @@ jumpserver.initServerSideDataTable = function (options) {
       }
     });
 
+    jumpserver.table = table;
     return table;
 };
 

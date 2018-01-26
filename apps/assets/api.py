@@ -30,12 +30,13 @@ from . import serializers
 from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_manual, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
     test_system_user_connectability_manual
+from .utils import LabelFilter
 
 
 logger = get_logger(__file__)
 
 
-class AssetViewSet(CustomFilterMixin, BulkModelViewSet):
+class AssetViewSet(CustomFilterMixin, LabelFilter, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
