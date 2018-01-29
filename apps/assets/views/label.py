@@ -67,4 +67,6 @@ class LabelDetailView(AdminUserRequiredMixin, DetailView):
 
 
 class LabelDeleteView(AdminUserRequiredMixin, DeleteView):
-    pass
+    model = Label
+    template_name = 'delete_confirm.html'
+    success_url = reverse_lazy('assets:label-list')

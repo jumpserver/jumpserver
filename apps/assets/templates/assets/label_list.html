@@ -36,7 +36,7 @@ function initTable() {
 
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:label-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_cluster_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:label-list" %}?sort=name',
@@ -51,12 +51,12 @@ function initTable() {
 $(document).ready(function(){
     initTable();
 })
-.on('click', '.btn_cluster_delete', function () {
+.on('click', '.btn-delete', function () {
     var $this = $(this);
-    var $data_table = $('#cluster_list_table').DataTable();
+    var $data_table = $('#label_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var uid = $this.data('uid');
-    var the_url = '{% url "api-assets:cluster-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var the_url = '{% url "api-assets:label-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();
