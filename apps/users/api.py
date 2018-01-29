@@ -1,4 +1,7 @@
 # ~*~ coding: utf-8 ~*~
+import uuid
+
+from django.core.cache import cache
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,7 +14,8 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup
-from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
+from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
+    IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token
 from common.mixins import CustomFilterMixin
 from common.utils import get_logger
@@ -160,3 +164,30 @@ class UserAuthApi(APIView):
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)
+
+
+class UserConnectionTokenApi(APIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def post(self, request):
+        user_id = request.data.get('user', '')
+        asset_id = request.data.get('asset', '')
+        system_user_id = request.data.get('system_user', '')
+        token = str(uuid.uuid4())
+        value = {
+            'user': user_id,
+            'asset': asset_id,
+            'system_user': system_user_id
+        }
+        cache.set(token, value, timeout=3600)
+        return Response({"token": token}, status=201)
+
+    def get(self, request):
+        token = request.query_params.get('token')
+        value = cache.get(token, None)
+        if value:
+            cache.delete(token)
+        return Response(value)
+
+
+

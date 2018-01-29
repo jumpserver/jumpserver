@@ -80,7 +80,8 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
-        return super().get(request, *args, **kwargs)
+        response = super().get(request, *args, **kwargs)
+        return response
 
     def get_context_data(self, **kwargs):
         context = {
