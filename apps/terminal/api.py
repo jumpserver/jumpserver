@@ -56,6 +56,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
             return Response(data, status=201)
         else:
             data = serializer.errors
+            logger.error("Register terminal error: {}".format(data))
             return Response(data, status=400)
 
     def get_permissions(self):
