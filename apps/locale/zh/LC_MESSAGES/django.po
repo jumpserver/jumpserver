@@ -2012,7 +2012,7 @@ msgstr "资产授权"
 
 #: templates/_nav.html:40
 msgid "Sessions"
-msgstr "会话"
+msgstr "会话管理"
 
 #: templates/_nav.html:43
 msgid "Session online"
@@ -2020,7 +2020,7 @@ msgstr "在线会话"
 
 #: templates/_nav.html:44
 msgid "Session offline"
-msgstr "离线会话"
+msgstr "历史会话"
 
 #: templates/_nav.html:45
 msgid "Commands"
