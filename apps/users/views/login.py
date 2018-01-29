@@ -29,10 +29,12 @@ from ..tasks import write_login_log_async
 from .. import forms
 
 
-__all__ = ['UserLoginView', 'UserLogoutView',
-           'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
-           'UserResetPasswordView', 'UserResetPasswordSuccessView',
-           'UserFirstLoginView', 'LoginLogListView']
+__all__ = [
+    'UserLoginView', 'UserLogoutView',
+    'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
+    'UserResetPasswordView', 'UserResetPasswordSuccessView',
+    'UserFirstLoginView', 'LoginLogListView'
+]
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
