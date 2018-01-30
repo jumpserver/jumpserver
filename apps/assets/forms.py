@@ -107,6 +107,15 @@ class AssetBulkUpdateForm(forms.ModelForm):
     port = forms.IntegerField(
         label=_('Port'), required=False, min_value=1, max_value=65535,
     )
+    cluster = forms.ModelChoiceField(
+        required=False, label=_("Cluster"), queryset=Cluster.objects.all(),
+        widget=forms.Select(
+            attrs={
+                'class': 'select2',
+                'data-placeholder': _('Select cluster')
+            }
+        )
+    )
 
     class Meta:
         model = Asset
@@ -116,6 +125,9 @@ class AssetBulkUpdateForm(forms.ModelForm):
         widgets = {
             'groups': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}
+            ),
+            'labels': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('Select lables')}
             ),
         }
 
@@ -129,11 +141,15 @@ class AssetBulkUpdateForm(forms.ModelForm):
                         if k in changed_fields}
         assets = cleaned_data.pop('assets')
         groups = cleaned_data.pop('groups', [])
+        labels = cleaned_data.pop('labels', [])
         assets = Asset.objects.filter(id__in=[asset.id for asset in assets])
         assets.update(**cleaned_data)
         if groups:
             for asset in assets:
                 asset.groups.set(groups)
+        if labels:
+            for asset in assets:
+                asset.labels.set(labels)
         return assets
 
 
