@@ -42,7 +42,7 @@ class AssetViewSet(CustomFilterMixin, LabelFilter, BulkModelViewSet):
     """
     filter_fields = ("hostname", "ip")
     search_fields = filter_fields
-    ordering_fields = ("hostname", "ip", "port", "cluster", "type", "env", "cpu_cores")
+    ordering_fields = ("hostname", "ip", "port", "cluster", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination

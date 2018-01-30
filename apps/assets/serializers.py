@@ -12,7 +12,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     资产组序列化数据模型
     """
-    assets_amount = serializers.SerializerMethodField()
+    assets_display = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Asset.objects.all(), required=False
     )
@@ -20,11 +20,11 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
         list_serializer_class = BulkListSerializer
-        fields = ['id', 'name', 'comment', 'assets_amount', 'assets']
+        fields = ['id', 'name', 'comment', 'assets_display', 'assets']
 
     @staticmethod
-    def get_assets_amount(obj):
-        return obj.assets.all().count()
+    def get_assets_display(obj):
+        return [asset.hostname for asset in obj.assets.all()]
 
 
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):

@@ -340,4 +340,9 @@ div.dataTables_wrapper div.dataTables_filter {
     border: none;
 }
 
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    padding-left: 20px;
+    padding-right: 20px;
+}
 

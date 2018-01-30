@@ -33,14 +33,18 @@ $(document).ready(function(){
             {targets: 1, createdCell: function (td, cellData, rowData) {
                 var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-             }},
+            }},
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                var html = createPopover(cellData);
+                $(td).html(html);
+            }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-group-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_group_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:asset-group-list" %}',
-        columns: [{data: "id"}, {data: "name" }, {data: "assets_amount" }, {data: "comment" }, {data: "id"}],
+        columns: [{data: "id"}, {data: "name" }, {data: "assets_display" }, {data: "comment" }, {data: "id"}],
 	    op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);

@@ -48,19 +48,24 @@ function initTable() {
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
             {targets: 2, createdCell: function (td, cellData) {
-                $(td).html(cellData.length);
+                var html = createPopover(cellData);
+                $(td).html(html);
             }},
             {targets: 3, createdCell: function (td, cellData) {
-                $(td).html(cellData.length);
+                var html = createPopover(cellData);
+                $(td).html(html);
             }},
             {targets: 4, createdCell: function (td, cellData) {
-                $(td).html(cellData.length);
+                var html = createPopover(cellData);
+                $(td).html(html);
             }},
             {targets: 5, createdCell: function (td, cellData) {
-                $(td).html(cellData.length);
+                var html = createPopover(cellData);
+                $(td).html(html);
             }},
             {targets: 6, createdCell: function (td, cellData) {
-                $(td).html(cellData.length);
+                var html = createPopover(cellData);
+                $(td).html(html);
             }},
             {targets: 7, createdCell: function (td, cellData) {
                 if (!cellData) {
@@ -85,11 +90,15 @@ function initTable() {
         ],
         op_html: $('#actions').html()
     };
-    jumpserver.initDataTable(options);
+    jumpserver.initDataTable(options).on('daw', function () {
+        $('[data-toggle="popover"]').popover({
+            html: true
+        });
+    });
 }
 
 $(document).ready(function(){
-    initTable();
+    initTable()
 })
 
 .on('click', '.btn-del', function () {

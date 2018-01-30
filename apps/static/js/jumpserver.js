@@ -310,10 +310,15 @@ jumpserver.initDataTable = function (options) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
         jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
-    }).
-    on('draw', function(){
+    }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
+        $('[data-toggle="popover"]').popover({
+            html: true,
+            placement: 'bottom',
+            trigger: 'hover',
+            container: 'body'
+        });
     });
     $('.ipt_check_all').on('click', function() {
       if (!jumpserver.checked) {
@@ -511,4 +516,18 @@ function delCookie(key) {
     if (val !== null) {
         document.cookie = key + '=' + val + ";expires" + expires.toUTCString() + ';path=/';
     }
+}
+
+function createPopover(dataset, title, callback) {
+    if (callback !== undefined){
+        var new_dataset = [];
+        $.each(dataset, function (index, value) {
+            new_dataset.push(callback(value))
+        });
+        dataset = new_dataset;
+    }
+    var data_content = dataset.join("</br>");
+
+    var html = "<a data-toggle='popover' data-content='" + data_content + "'>" + dataset.length + "</a>";
+    return html;
 }
