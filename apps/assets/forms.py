@@ -228,46 +228,29 @@ class ClusterForm(forms.ModelForm):
         return instance
 
 
-class AdminUserForm(forms.ModelForm):
+class PasswordAndKeyAuthForm(forms.ModelForm):
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(
         widget=forms.PasswordInput, max_length=128,
         strip=True, required=False,
-        help_text=_('Password or private key password'),
+        help_text=_('Password or private key passphrase'),
         label=_("Password"),
     )
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False, label=_("Private key"))
-
-    def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        admin_user = super().save(commit=commit)
-        password = self.cleaned_data['password']
-        private_key = self.cleaned_data['private_key_file']
-        public_key = None
-
-        if not password:
-            password = None
-
-        if private_key:
-            public_key = ssh_pubkey_gen(private_key, password=password)
-
-        admin_user.set_auth(password=password, public_key=public_key, private_key=private_key)
-        return admin_user
 
     def clean_private_key_file(self):
         private_key_file = self.cleaned_data['private_key_file']
         password = self.cleaned_data['password']
 
         if private_key_file:
-            private_key = private_key_file.read()
-            if not validate_ssh_private_key(private_key, password):
+            key_string = private_key_file.read()
+            private_key_file.seek(0)
+            if not validate_ssh_private_key(key_string, password):
                 raise forms.ValidationError(_('Invalid private key'))
-            return private_key
         return private_key_file
 
-    def clean(self):
-        super().clean()
+    def validate_password_key(self):
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data.get('private_key_file', '')
 
@@ -276,10 +259,34 @@ class AdminUserForm(forms.ModelForm):
                 'Password and private key file must be input one'
             ))
 
+    def gen_keys(self):
+        password = self.cleaned_data.get('password', '') or None
+        private_key_file = self.cleaned_data['private_key_file']
+        public_key = private_key = None
+
+        if private_key_file:
+            private_key = private_key_file.read().strip().decode('utf-8')
+            public_key = ssh_pubkey_gen(private_key=private_key, password=password)
+        return private_key, public_key
+
+
+class AdminUserForm(PasswordAndKeyAuthForm):
+    def save(self, commit=True):
+        # Because we define custom field, so we need rewrite :method: `save`
+        admin_user = super().save(commit=commit)
+        password = self.cleaned_data.get('password', '') or None
+        private_key, public_key = super().gen_keys()
+        admin_user.set_auth(password=password, public_key=public_key, private_key=private_key)
+        return admin_user
+
+    def clean(self):
+        super().clean()
+        if not self.instance:
+            super().validate_password_key()
+
     class Meta:
         model = AdminUser
-        fields = ['name', 'username', 'password',
-                  'private_key_file', 'comment']
+        fields = ['name', 'username', 'password', 'private_key_file', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
@@ -290,54 +297,35 @@ class AdminUserForm(forms.ModelForm):
         }
 
 
-class SystemUserForm(forms.ModelForm):
+class SystemUserForm(PasswordAndKeyAuthForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
-    # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False, label=_("Private key"))
-    # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False,
-                               max_length=128, strip=True, label=_("Password"))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
         system_user = super().save()
-        password = self.cleaned_data.get('password', None)
-        private_key_file = self.cleaned_data.get('private_key_file')
-        auto_generate_key = self.cleaned_data.get('auto_generate_key')
-        private_key = None
-        public_key = None
+        password = self.cleaned_data.get('password', '') or None
+        auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
+        private_key, public_key = super().gen_keys()
 
-        if auto_generate_key:
-            logger.info('Auto set system user auth')
+        if not self.instance and auto_generate_key:
+            logger.info('Auto generate key and set system user auth')
             system_user.auto_gen_auth()
         else:
-            if private_key_file:
-                private_key = private_key_file.read().strip().decode('utf-8')
-                public_key = ssh_pubkey_gen(private_key=private_key)
             system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
         return system_user
 
-    def clean_private_key_file(self):
-        if self.cleaned_data.get('private_key_file'):
-            key_string = self.cleaned_data['private_key_file'].read()
-            self.cleaned_data['private_key_file'].seek(0)
-            if not validate_ssh_private_key(key_string):
-                raise forms.ValidationError(_('Invalid private key'))
-        return self.cleaned_data['private_key_file']
-
-    def clean_password(self):
-        if not self.cleaned_data.get('password') and \
-                not self.cleaned_data.get('private_key_file') and \
-                not self.cleaned_data.get('auto_generate_key'):
-            raise forms.ValidationError(_('Auth info required, private_key or password'))
-        return self.cleaned_data['password']
+    def clean(self):
+        super().clean()
+        auto_generate = self.cleaned_data.get('auto_generate_key')
+        if not self.instance and not auto_generate:
+            super().validate_password_key()
 
     class Meta:
         model = SystemUser
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key',
-            'private_key_file', 'password', 'auto_push', 'sudo',
+            'password', 'private_key_file', 'auto_push', 'sudo',
             'comment', 'shell', 'cluster', 'priority',
         ]
         widgets = {
@@ -357,58 +345,6 @@ class SystemUserForm(forms.ModelForm):
             'auto_push': _('Auto push system user to asset'),
             'priority': _('High level will be using login asset as default, if user was granted more than 2 system user'),
         }
-
-
-class SystemUserUpdateForm(SystemUserForm):
-    def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        password = self.cleaned_data.get('password', None)
-        private_key_file = self.cleaned_data.get('private_key_file')
-        system_user = super(forms.ModelForm, self).save()
-
-        if private_key_file:
-            private_key = private_key_file.read().strip().decode('utf-8')
-            public_key = ssh_pubkey_gen(private_key=private_key)
-        else:
-            private_key = public_key = None
-        system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
-        return system_user
-
-    def clean_password(self):
-        return self.cleaned_data['password']
-
-
-class SystemUserAuthForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=128, strip=True)
-    private_key_file = forms.FileField(required=False)
-
-    def clean_private_key_file(self):
-        if self.cleaned_data.get('private_key_file'):
-            key_string = self.cleaned_data['private_key_file'].read()
-            self.cleaned_data['private_key_file'].seek(0)
-            if not validate_ssh_private_key(key_string):
-                raise forms.ValidationError(_('Invalid private key'))
-        return self.cleaned_data['private_key_file']
-
-    def clean_password(self):
-        if not self.cleaned_data.get('password') and \
-                not self.cleaned_data.get('private_key_file'):
-            msg = _('Auth info required, private_key or password')
-            raise forms.ValidationError(msg)
-        return self.cleaned_data['password']
-
-    def update(self, system_user):
-        password = self.cleaned_data.get('password')
-        private_key_file = self.cleaned_data.get('private_key_file')
-
-        if private_key_file:
-            private_key = private_key_file.read().strip()
-            public_key = ssh_pubkey_gen(private_key=private_key)
-        else:
-            private_key = None
-            public_key = None
-        system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
-        return system_user
 
 
 class FileForm(forms.Form):
