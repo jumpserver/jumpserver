@@ -36,6 +36,7 @@ class Asset(models.Model):
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
     cluster = models.ForeignKey(Cluster, related_name='assets', default=default_cluster, on_delete=models.SET_DEFAULT, verbose_name=_('Cluster'))
+    nodes = models.ManyToManyField('assets.Node', blank=True, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
