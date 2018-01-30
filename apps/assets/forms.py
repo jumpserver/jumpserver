@@ -12,9 +12,8 @@ class AssetCreateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
-            'cluster', 'groups', 'status', 'env', 'is_active',
-            'admin_user', 'labels'
+            'hostname', 'ip', 'public_ip', 'port',  'comment', 'cluster',
+            'groups', 'is_active', 'admin_user', 'labels'
 
         ]
         widgets = {
@@ -61,8 +60,7 @@ class AssetUpdateForm(forms.ModelForm):
         model = Asset
         fields = [
             'hostname', 'ip', 'port', 'groups', "cluster", 'is_active',
-            'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
-            'cabinet_pos', 'number', 'comment', 'admin_user', 'labels'
+            'public_ip', 'number', 'comment', 'admin_user', 'labels'
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={
@@ -94,10 +92,6 @@ class AssetUpdateForm(forms.ModelForm):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
-    def is_valid(self):
-        print(self.data)
-        return super().is_valid()
-
 
 class AssetBulkUpdateForm(forms.ModelForm):
     assets = forms.ModelMultipleChoiceField(
@@ -117,8 +111,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port', 'groups', "cluster",
-            'type', 'env',
+            'assets', 'port', 'groups', "cluster", 'labels'
         ]
         widgets = {
             'groups': forms.SelectMultiple(

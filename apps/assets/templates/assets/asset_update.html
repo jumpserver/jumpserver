@@ -24,8 +24,6 @@
     {% bootstrap_field form.port layout="horizontal" %}
     {% bootstrap_field form.cluster layout="horizontal" %}
     {% bootstrap_field form.public_ip layout="horizontal" %}
-    {% bootstrap_field form.type layout="horizontal" %}
-    {% bootstrap_field form.env layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Auth' %}</h3>
@@ -59,16 +57,9 @@
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
     {% bootstrap_field form.number layout="horizontal" %}
-    {% bootstrap_field form.remote_card_ip layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Location' %}</h3>
-    {% bootstrap_field form.cabinet_no layout="horizontal" %}
-    {% bootstrap_field form.cabinet_pos layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
-    {% bootstrap_field form.status layout="horizontal" %}
     {% bootstrap_field form.comment layout="horizontal" %}
     {% bootstrap_field form.is_active layout="horizontal" %}
 

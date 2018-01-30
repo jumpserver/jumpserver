@@ -78,20 +78,8 @@
                                             {% endif %}
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Remote card IP' %}:</td>
-                                            <td><b>{{ asset.remote_card_ip|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
                                             <td>{% trans 'Cluster' %}:</td>
                                             <td><b>{{ asset.cluster.name }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Cabinet number' %}:</td>
-                                            <td><b>{{ asset.cabinet_no|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Cabinet position' %}:</td>
-                                            <td><b>{{ asset.cabinet_pos|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Vendor' %}:</td>
@@ -122,20 +110,8 @@
                                             <td><b>{{ asset.os|default:"" }} {{ asset.os_version|default:"" }} {{ asset.os_arch|default:"" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Asset status' %}:</td>
-                                            <td><b>{{ asset.status }}</b></td>
-                                        </tr>
-                                        <tr>
                                             <td>{% trans 'Is active' %}:</td>
                                             <td><b>{{ asset.is_active|yesno:"Yes,No" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Asset type' %}:</td>
-                                            <td><b>{{ asset.type }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Asset environment' %}:</td>
-                                            <td><b>{{ asset.env }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Serial number' %}:</td>
@@ -250,20 +226,6 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Labels' %}
                                 </div>
                                 <div class="panel-body">
-{#                                    <table class="table">#}
-{#                                        <tbody>#}
-{#                                        {% for label in asset.labels.all %}#}
-{#                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %}>#}
-{#                                            <td>{{ label.name }}</td>#}
-{#                                            <td>#}
-{#                                                <span class="pull-right">#}
-{#                                                    {{ label.value }}#}
-{#                                                </span>#}
-{#                                            </td>#}
-{#                                        </tr>#}
-{#                                        {% endfor %}#}
-{#                                        </tbody>#}
-{#                                    </table>#}
                                     <ul class="tag-list" style="padding: 0">
                                         {% for label in asset.labels.all %}
                                             <li ><a href=""><i class="fa fa-tag"></i> {{ label.name }}:{{ label.value }}</a></li>
