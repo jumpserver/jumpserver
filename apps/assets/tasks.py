@@ -36,9 +36,8 @@ def set_assets_hardware_info(result, **kwargs):
     result_raw = result[0]
     assets_updated = []
     for hostname, info in result_raw.get('ok', {}).items():
-        if info and info.get('setup'):
-            info = info['setup']['ansible_facts']
-        else:
+        info = info.get('setup', {}).get('ansible_facts', {})
+        if not info:
             logger.error("Get asset info failed: {}".format(hostname))
             continue
 
@@ -46,31 +45,31 @@ def set_assets_hardware_info(result, **kwargs):
         if not asset:
             continue
 
-        ___vendor = info['ansible_system_vendor']
-        ___model = info['ansible_product_version']
-        ___sn = info['ansible_product_serial']
+        ___vendor = info.get('ansible_system_vendor', 'Unknown')
+        ___model = info.get('ansible_product_version', 'Unknown')
+        ___sn = info.get('ansible_product_serial', 'Unknown')
 
-        for ___cpu_model in info['ansible_processor']:
+        for ___cpu_model in info.get('ansible_processor', []):
             if ___cpu_model.endswith('GHz') or ___cpu_model.startswith("Intel"):
                 break
         else:
             ___cpu_model = 'Unknown'
         ___cpu_model = ___cpu_model[:64]
-        ___cpu_count = info['ansible_processor_count']
+        ___cpu_count = info.get('ansible_processor_count', 'Unknown')
         ___cpu_cores = info.get('ansible_processor_cores', None) or len(info.get('ansible_processor', []))
-        ___memory = '%s %s' % capacity_convert('{} MB'.format(info['ansible_memtotal_mb']))
+        ___memory = '%s %s' % capacity_convert('{} MB'.format(info.get('ansible_memtotal_mb')))
         disk_info = {}
-        for dev, dev_info in info['ansible_devices'].items():
+        for dev, dev_info in info.get('ansible_devices', {}).items():
             if disk_pattern.match(dev) and dev_info['removable'] == '0':
                 disk_info[dev] = dev_info['size']
         ___disk_total = '%s %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)
 
-        ___platform = info['ansible_system']
-        ___os = info['ansible_distribution']
-        ___os_version = info['ansible_distribution_version']
-        ___os_arch = info['ansible_architecture']
-        ___hostname_raw = info['ansible_hostname']
+        ___platform = info.get('ansible_system', 'Unknown')
+        ___os = info.get('ansible_distribution', 'Unknown')
+        ___os_version = info.get('ansible_distribution_version', 'Unknown')
+        ___os_arch = info.get('ansible_architecture', 'Unknown')
+        ___hostname_raw = info.get('ansible_hostname', 'Unknown')
 
         for k, v in locals().items():
             if k.startswith('___'):
