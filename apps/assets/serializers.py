@@ -297,7 +297,7 @@ class LabelSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_asset_count(obj):
-        return obj.asset_count
+        return obj.assets.count()
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

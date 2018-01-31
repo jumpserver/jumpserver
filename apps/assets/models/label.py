@@ -29,10 +29,6 @@ class Label(models.Model):
         for name in names:
             yield name, cls.objects.filter(name=name)
 
-    @property
-    def asset_count(self):
-        return self.assets.count()
-
     def __str__(self):
         return "{}:{}".format(self.name, self.value)
 
