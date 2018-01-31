@@ -57,5 +57,7 @@ urlpatterns = [
     url(r'^label/create/$', views.LabelCreateView.as_view(), name='label-create'),
     url(r'^label/(?P<pk>[0-9a-zA-Z\-]{36})/update/$', views.LabelUpdateView.as_view(), name='label-update'),
     url(r'^label/(?P<pk>[0-9a-zA-Z\-]{36})/delete/$', views.LabelDeleteView.as_view(), name='label-delete'),
+
+    url(r'^tree/$', views.TreeView.as_view(), name='tree-view'),
 ]
 

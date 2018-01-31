@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
@@ -25,7 +26,7 @@ from common.mixins import CustomFilterMixin
 from common.utils import get_logger
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
-from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser, Label
+from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser, Label, Node
 from . import serializers
 from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_manual, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
@@ -308,3 +309,23 @@ class LabelViewSet(BulkModelViewSet):
             self.serializer_class = serializers.LabelDistinctSerializer
             self.queryset = self.queryset.values("name").distinct()
         return super().list(request, *args, **kwargs)
+
+
+class TreeViewApi(APIView):
+
+    def get_queryset(self):
+        return Node.objects.all()
+
+    def get(self, request):
+        data = []
+        for node in self.get_queryset():
+            if node.id == "0":
+                parent = "#"
+            else:
+                parent = ":".join(node.id.split(":")[:-1])
+            data.append({
+                "id": node.id,
+                "parent": parent,
+                "text": node.name
+            })
+        return Response(data)

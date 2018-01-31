@@ -42,6 +42,7 @@ urlpatterns = [
         api.SystemUserPushApi.as_view(), name='system-user-push'),
     url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',
         api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
+    url(r'^v1/tree/$', api.TreeViewApi.as_view(), name='tree-view')
 ]
 
 urlpatterns += router.urls

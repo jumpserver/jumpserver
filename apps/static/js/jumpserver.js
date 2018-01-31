@@ -316,7 +316,7 @@ jumpserver.initDataTable = function (options) {
         $('[data-toggle="popover"]').popover({
             html: true,
             placement: 'bottom',
-            trigger: 'hover',
+            // trigger: 'hover',
             container: 'body'
         });
     });
