@@ -10,7 +10,7 @@ __all__ = ['Node']
 
 class Node(models.Model):
     id = models.CharField(primary_key=True, max_length=64)  # '1:1:1:1'
-    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
 

@@ -13,12 +13,12 @@ class AssetCreateForm(forms.ModelForm):
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port',  'comment', 'cluster',
-            'groups', 'is_active', 'admin_user', 'labels'
+            'nodes', 'is_active', 'admin_user', 'labels',
 
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Select asset groups')
+            'nodes': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select nodes')
             }),
             'cluster': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Select cluster')
@@ -59,12 +59,12 @@ class AssetUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'port', 'groups', "cluster", 'is_active',
-            'public_ip', 'number', 'comment', 'admin_user', 'labels'
+            'hostname', 'ip', 'port', 'nodes', "cluster", 'is_active',
+            'public_ip', 'number', 'comment', 'admin_user', 'labels',
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Select asset groups')
+            'nodes': forms.SelectMultiple(attrs={
+                'class': 'select2', 'data-placeholder': _('Select nodes')
             }),
             'cluster': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Select cluster')

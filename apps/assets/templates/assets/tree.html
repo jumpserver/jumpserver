@@ -4,7 +4,7 @@
 
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/jstree/style.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/ztree/ztreestyle/ztreestyle.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
 {#    <link href="{% static 'css/plugins/ztree/demo.css' %}" rel="stylesheet">#}
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
     <script type="text/javascript">
@@ -268,7 +268,8 @@
     function initTree() {
         var setting = {
             view: {
-                dblClickExpand: false
+                dblClickExpand: false,
+                showLine: true
             },
             data: {
                 simpleData: {
