@@ -108,7 +108,7 @@
 
 <div id="rMenu">
     <ul class="dropdown-menu">
-        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>重命名</a></li>
+        <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a>重命名</a></li>
         <li id="m_add" tabindex="-1" onclick="addTreeNode();"><a>添加节点</a></li>
         <li class="divider"></li>
         <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>删除节点</a></li>
@@ -183,9 +183,7 @@
 	function showRMenu(type, x, y) {
 		$("#rMenu ul").show();
 		if (type === "root") {
-			$("#m_del").hide();
-			$("#m_check").hide();
-			$("#m_unCheck").hide();
+			return
 		} else {
 			$("#m_del").show();
 			$("#m_check").show();
@@ -232,12 +230,11 @@
 		    return
         }
         var url = "{% url 'api-assets:node-children' pk='0:0' %}".replace("0:0", parentNode.id );
-
         $.post(url,  {}, function (data, status){
             if (status === "success") {
                 var newNode = { name:data["name"], id:data["id"],  pId: parentNode.id };
                 newNode.checked = zTree.getSelectedNodes()[0].checked;
-                zTree.addNodes(parentNode, newNode);
+                zTree.addNodes(parentNode, 0, newNode);
             } else {
                 alert("{% trans 'Create node failed' %}")
             }
@@ -265,6 +262,31 @@
 		}
 	}
 
+	function onRenameNode(event, treeId, treeNode, isCancel){
+        console.log(treeNode);
+        var url = "{% url 'api-assets:node-detail' pk='0:0' %}".replace("0:0", treeNode.id);
+        var data = {"name": treeNode.name};
+        if (isCancel){
+            return
+        }
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(data),
+            method: "PATCH"
+        })
+    }
+
+	function editTreeNode() {
+        hideRMenu();
+		var current_node = zTree.getSelectedNodes()[0];
+		if (!current_node){
+		    return
+        }
+        console.log("Edit tree");
+		console.log(current_node);
+        zTree.editName(current_node);
+    }
+
     function initTree() {
         var setting = {
             view: {
@@ -279,7 +301,8 @@
             callback: {
                 onRightClick: OnRightClick,
                 beforeClick: beforeClick,
-				onClick: onClick
+				onClick: onClick,
+                onRename: onRenameNode
             }
         };
 
