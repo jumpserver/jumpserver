@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -21,6 +21,7 @@ from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count
+from django.utils.translation import ugettext_lazy as _
 
 from common.mixins import CustomFilterMixin
 from common.utils import get_logger
@@ -311,21 +312,41 @@ class LabelViewSet(BulkModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class TreeViewApi(APIView):
+class NodeViewSet(BulkModelViewSet):
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.NodeSerializer
 
-    def get_queryset(self):
-        return Node.objects.all()
+    def perform_create(self, serializer):
+        child_id = Node.get_root_node().get_next_child_id()
+        serializer.validated_data["id"] = child_id
+        serializer.save()
 
-    def get(self, request):
-        data = []
-        for node in self.get_queryset():
-            parent = ":".join(node.id.split(":")[:-1])
-            d = {
-                "id": node.id,
-                "pId": parent,
-                "name": node.name
-            }
-            if node.id == "0":
-                d["open"] = True
-            data.append(d)
-        return Response(data)
+
+class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.NodeSerializer
+    instance = None
+
+    def post(self, request, *args, **kwargs):
+        if not request.data.get("name"):
+            request.data["name"] = _("New node {}").format(
+                Node.get_root_node().get_next_child_id().split(":")[-1]
+            )
+        return super().post(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        instance = self.get_object()
+        name = request.data.get("name")
+        node = instance.create_child(name=name)
+        return Response({"id": node.id, "name": node.name}, status=201)
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if self.request.query_params.get("all"):
+            children = instance.get_all_children()
+        else:
+            children = instance.get_children()
+        response = [{"id": node.id, "name": node.name} for node in children]
+        return Response(response, status=200)

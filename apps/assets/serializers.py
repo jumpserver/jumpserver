@@ -4,8 +4,8 @@ from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
-from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser, Label
-from .const import ADMIN_USER_CONN_CACHE_KEY, SYSTEM_USER_CONN_CACHE_KEY
+from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser, Label, Node
+from .const import ADMIN_USER_CONN_CACHE_KEY
 
 
 class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -316,3 +316,26 @@ class LabelDistinctSerializer(serializers.ModelSerializer):
     def get_value(obj):
         labels = Label.objects.filter(name=obj["name"])
         return ', '.join([label.value for label in labels])
+
+
+class NodeSerializer(serializers.ModelSerializer):
+    parent = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Node
+        fields = ['id', 'name', 'parent']
+        list_serializer_class = BulkListSerializer
+
+    @staticmethod
+    def get_parent(obj):
+        if obj.id == "0":
+            return "#"
+        if not obj.id.startswith("0"):
+            return "0"
+        return ":".join(obj.id.split(":")[:-1])
+
+    def get_fields(self):
+        fields = super().get_fields()
+        field = fields["id"]
+        field.required = False
+        return fields

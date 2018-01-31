@@ -13,6 +13,7 @@ router.register(r'v1/clusters', api.ClusterViewSet, 'cluster')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 router.register(r'v1/labels', api.LabelViewSet, 'label')
+router.register(r'v1/nodes', api.NodeViewSet, 'node')
 
 urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
@@ -42,7 +43,7 @@ urlpatterns = [
         api.SystemUserPushApi.as_view(), name='system-user-push'),
     url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',
         api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
-    url(r'^v1/tree/$', api.TreeViewApi.as_view(), name='tree-view')
+    url(r'^v1/nodes/(?P<pk>[0-9:]+)/children/$', api.NodeChildrenApi.as_view(), name='node-children'),
 ]
 
 urlpatterns += router.urls

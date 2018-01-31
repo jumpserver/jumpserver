@@ -13,8 +13,26 @@
 		});
 	</script>
 	<style type="text/css">
-        .ztree li span.button.add {
-            margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle
+        div#rMenu {
+            position:absolute;
+            visibility:hidden;
+            text-align: left;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            float: left;
+            padding: 5px 0;
+            margin: 2px 0 0;
+            list-style: none;
+            background-clip: padding-box;
+        }
+        div#rMenu li{
+        	margin: 1px 0;
+        	cursor: pointer;
+        	{#list-style: none outside none;#}
+        }
+        .dropdown a:hover {
+            background-color: #f1f1f1
         }
 	</style>
 
@@ -28,8 +46,9 @@
                <div class="ibox-content mailbox-content">
                    <div class="file-manager">
                        <h5>Tree View</h5>
-                       <div id="treeDemo" class="ztree">
+                       <div id="assetTree" class="ztree">
                        </div>
+
                        <div class="clearfix"></div>
                    </div>
                </div>
@@ -83,9 +102,17 @@
            </div>
            <div class="row">
            </div>
-
        </div>
    </div>
+</div>
+
+<div id="rMenu">
+    <ul class="dropdown-menu">
+        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>重命名</a></li>
+        <li id="m_add" tabindex="-1" onclick="addTreeNode();"><a>添加节点</a></li>
+        <li class="divider"></li>
+        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>删除节点</a></li>
+    </ul>
 </div>
 {% endblock %}
 
@@ -93,6 +120,7 @@
 <script src="{% static 'js/plugins/jstree/jstree.min.js' %}"></script>
 
 <script>
+    var zTree, rMenu;
     function initTable() {
         var options = {
             ele: $('#asset_list_table'),
@@ -142,123 +170,105 @@
         return jumpserver.initServerSideDataTable(options);
     }
 
-    function beforeDrag(treeId, treeNodes) {
-        showLog("Before drag");
-        return false;
+    function OnRightClick(event, treeId, treeNode) {
+	    if (!treeNode && event.target.tagName.toLowerCase() !== "button" && $(event.target).parents("a").length == 0) {
+			zTree.cancelSelectedNode();
+			showRMenu("root", event.clientX, event.clientY);
+		} else if (treeNode && !treeNode.noR) {
+			zTree.selectNode(treeNode);
+			showRMenu("node", event.clientX, event.clientY);
+		}
     }
 
-    function beforeEditName(treeId, treeNode) {
-        showLog("Before edit name");
-        className = (className === "dark" ? "" : "dark");
-        showLog("[ " + getTime() + " beforeEditName ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
-        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-        zTree.selectNode(treeNode);
-        setTimeout(function () {
-            if (confirm("进入节点 -- " + treeNode.name + " 的编辑状态吗？")) {
-                setTimeout(function () {
-                    zTree.editName(treeNode);
-                }, 0);
-            }
-        }, 0);
-        return false;
-    }
+	function showRMenu(type, x, y) {
+		$("#rMenu ul").show();
+		if (type === "root") {
+			$("#m_del").hide();
+			$("#m_check").hide();
+			$("#m_unCheck").hide();
+		} else {
+			$("#m_del").show();
+			$("#m_check").show();
+			$("#m_unCheck").show();
+		}
+        {#y += $("#page-wrapper")[0].scrollTop;#}
+        {#x += $("#page-wrapper")[0].scrollLeft;#}
+        x -= 220;
+        {#y -= 100;#}
+        {#y += document.body.scrollTop;#}
+        {#x += document.body.scrollLeft;#}
+        rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 
-    function beforeRemove(treeId, treeNode) {
-        showLog("[ " + getTime() + " beforeRemove ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
-        className = (className === "dark" ? "" : "dark");
-        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-        zTree.selectNode(treeNode);
-        return confirm("确认删除 节点 -- " + treeNode.name + " 吗？");
-    }
+		$("body").bind("mousedown", onBodyMouseDown);
+	}
 
-    function onRemove(e, treeId, treeNode) {
-        showLog("Remove node")
-    }
-
-    function beforeRename(treeId, treeNode, newName, isCancel) {
-        showLog((isCancel ? "<span style='color:red'>" : "") + "[ " + getTime() + " beforeRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>" : ""));
-        className = (className === "dark" ? "" : "dark");
-        if (newName.length == 0) {
-            setTimeout(function () {
-                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-                zTree.cancelEditName();
-                alert("节点名称不能为空.");
-            }, 0);
-            return false;
-        }
+	function beforeClick(treeId, treeNode, clickFlag) {
         return true;
-    }
+	}
+	
+	function onClick(event, treeId, treeNode, clickFlag) {
+		showLog("On click");
+	}
 
-    function onRename(e, treeId, treeNode, isCancel) {
-        console.log("On remname");
-        {#showLog((isCancel ? "<span style='color:red'>" : "") + "[ " + getTime() + " onRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>" : ""));#}
-    }
-
-    function showRemoveBtn(treeId, treeNode) {
-        showLog("Show remove btn");
-        return !treeNode.isFirstNode;
-    }
-
-    function showRenameBtn(treeId, treeNode) {
-        showLog("Show rename btn");
-        return !treeNode.isLastNode;
-    }
-
-    function showLog(str) {
+	function showLog(str) {
         console.log(str)
-    }
+	}
 
-    function getTime() {
-        var now = new Date(),
-            h = now.getHours(),
-            m = now.getMinutes(),
-            s = now.getSeconds(),
-            ms = now.getMilliseconds();
-        return (h + ":" + m + ":" + s + " " + ms);
-    }
+	function hideRMenu() {
+		if (rMenu) rMenu.css({"visibility": "hidden"});
+		$("body").unbind("mousedown", onBodyMouseDown);
+	}
 
-    var newCount = 1;
+	function onBodyMouseDown(event){
+		if (!(event.target.id === "rMenu" || $(event.target).parents("#rMenu").length>0)) {
+			rMenu.css({"visibility" : "hidden"});
+		}
+	}
 
-    function addHoverDom(treeId, treeNode) {
-        var sObj = $("#" + treeNode.tId + "_span");
-        if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
-        var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
-            + "' title='add node' onfocus='this.blur();'></span>";
-        sObj.after(addStr);
-        var btn = $("#addBtn_" + treeNode.tId);
-        if (btn) btn.bind("click", function () {
-            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-            zTree.addNodes(treeNode, {
-                id: (100 + newCount),
-                pId: treeNode.id,
-                name: "new node" + (newCount++)
-            });
-            return false;
+	function addTreeNode() {
+		hideRMenu();
+		var parentNode = zTree.getSelectedNodes()[0];
+		if (!parentNode){
+		    return
+        }
+        var url = "{% url 'api-assets:node-children' pk='0:0' %}".replace("0:0", parentNode.id );
+
+        $.post(url,  {}, function (data, status){
+            if (status === "success") {
+                var newNode = { name:data["name"], id:data["id"],  pId: parentNode.id };
+                newNode.checked = zTree.getSelectedNodes()[0].checked;
+                zTree.addNodes(parentNode, newNode);
+            } else {
+                alert("{% trans 'Create node failed' %}")
+            }
         });
-    };
+	}
 
-    function removeHoverDom(treeId, treeNode) {
-        showLog("Remove hove dom");
-        $("#addBtn_" + treeNode.tId).unbind().remove();
-    };
+	function removeTreeNode() {
+		hideRMenu();
+		var current_node = zTree.getSelectedNodes()[0];
+		if (!current_node){
+		    return
+        }
 
-    function selectAll() {
-        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-        zTree.setting.edit.editNameSelectAll = $("#selectAll").attr("checked");
-    }
+		if (current_node.children && current_node.children.length > 0) {
+			alert("{% trans 'Have child node, cancel' %}")
+		} else {
+            var url = "{% url 'api-assets:node-detail' pk='0:0' %}".replace("0:0", current_node.id );
+			$.ajax({
+                url: url,
+                method: "DELETE",
+                success: function () {
+                    zTree.removeNode(current_node);
+                }
+            });
+		}
+	}
 
     function initTree() {
         var setting = {
             view: {
-                addHoverDom: addHoverDom,
-                removeHoverDom: removeHoverDom,
-                selectedMulti: false
-            },
-            edit: {
-                enable: true,
-                editNameSelectAll: true,
-                showRemoveBtn: showRemoveBtn,
-                showRenameBtn: showRenameBtn
+                dblClickExpand: false
             },
             data: {
                 simpleData: {
@@ -266,23 +276,25 @@
                 }
             },
             callback: {
-                beforeDrag: beforeDrag,
-                beforeEditName: beforeEditName,
-                beforeRemove: beforeRemove,
-                beforeRename: beforeRename,
-                onRemove: onRemove,
-                onRename: onRename
+                onRightClick: OnRightClick,
+                beforeClick: beforeClick,
+				onClick: onClick
             }
         };
 
         var zNodes = [];
-        $.get("{% url 'api-assets:tree-view' %}", function(data, status){
+        $.get("{% url 'api-assets:node-list' %}", function(data, status){
+            $.each(data, function (index, value) {
+                value["pId"] = value["parent"];
+                if (value["id"] === "0") {
+                    value["open"] = true;
+                }
+            });
             zNodes = data;
-            console.log(data);
-            console.log(status);
-            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            $.fn.zTree.init($("#assetTree"), setting, zNodes);
+            zTree = $.fn.zTree.getZTreeObj("assetTree");
+			rMenu = $("#rMenu");
         });
-		$("#selectAll").bind("click", selectAll);
     }
     $(document).ready(function(){
         initTable();
