@@ -4,6 +4,20 @@
 
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/jstree/style.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/ztree/ztreestyle/ztreestyle.css' %}" rel="stylesheet">
+{#    <link href="{% static 'css/plugins/ztree/demo.css' %}" rel="stylesheet">#}
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+    <script type="text/javascript">
+		$(document).ready(function(){
+
+		});
+	</script>
+	<style type="text/css">
+        .ztree li span.button.add {
+            margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle
+        }
+	</style>
+
 {% endblock %}
 
 {% block content %}
@@ -14,7 +28,7 @@
                <div class="ibox-content mailbox-content">
                    <div class="file-manager">
                        <h5>Tree View</h5>
-                       <div id="jstree">
+                       <div id="treeDemo" class="ztree">
                        </div>
                        <div class="clearfix"></div>
                    </div>
@@ -22,49 +36,54 @@
            </div>
        </div>
        <div class="col-lg-9 animated fadeInRight">
-           <div class="mail-box-header">
-               <div class="uc pull-left m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>
-               <div class="btn-group" style="float: right">
-                   <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
-                   <ul class="dropdown-menu labels">
-                       {% for label in labels %}
-                           <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
-                       {% endfor %}
-                   </ul>
-               </div>
-               <table class="table table-striped table-bordered table-hover " id="asset_list_table" >
-                   <thead>
-                       <tr>
-                           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                           <th class="text-center">{% trans 'Hostname' %}</th>
-                           <th class="text-center">{% trans 'IP' %}</th>
-                           <th class="text-center">{% trans 'Port' %}</th>
-                           <th class="text-center">{% trans 'Cluster' %}</th>
-                           <th class="text-center">{% trans 'Hardware' %}</th>
-                           <th class="text-center">{% trans 'Active' %}</th>
-                           <th class="text-center">{% trans 'Reachable' %}</th>
-                           <th class="text-center">{% trans 'Action' %}</th>
-                       </tr>
-                   </thead>
-                   <tbody>
-                   </tbody>
-               </table>
-               <div id="actions" class="hide">
-                   <div class="input-group">
-                       <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-                           <option value="delete">{% trans 'Delete selected' %}</option>
-                           <option value="update">{% trans 'Update selected' %}</option>
-                           <option value="deactive">{% trans 'Deactive selected' %}</option>
-                           <option value="active">{% trans 'Active selected' %}</option>
-                       </select>
-                       <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                           <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-                            {% trans 'Submit' %}
-                           </button>
+           <div class="row">
+               <div class="mail-box-header">
+                   <div class="uc pull-left m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Add asset" %} </a></div>
+                   <div class="btn-group" style="float: right">
+                       <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
+                       <ul class="dropdown-menu labels">
+                           {% for label in labels %}
+                               <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
+                           {% endfor %}
+                       </ul>
+                   </div>
+                   <table class="table table-striped table-bordered table-hover " id="asset_list_table" >
+                       <thead>
+                           <tr>
+                               <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                               <th class="text-center">{% trans 'Hostname' %}</th>
+                               <th class="text-center">{% trans 'IP' %}</th>
+                               <th class="text-center">{% trans 'Port' %}</th>
+                               <th class="text-center">{% trans 'Cluster' %}</th>
+                               <th class="text-center">{% trans 'Hardware' %}</th>
+                               <th class="text-center">{% trans 'Active' %}</th>
+                               <th class="text-center">{% trans 'Reachable' %}</th>
+                               <th class="text-center">{% trans 'Action' %}</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                       </tbody>
+                   </table>
+                   <div id="actions" class="hide">
+                       <div class="input-group">
+                           <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                               <option value="delete">{% trans 'Delete selected' %}</option>
+                               <option value="update">{% trans 'Update selected' %}</option>
+                               <option value="deactive">{% trans 'Deactive selected' %}</option>
+                               <option value="active">{% trans 'Active selected' %}</option>
+                           </select>
+                           <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                               <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                                {% trans 'Submit' %}
+                               </button>
+                           </div>
                        </div>
                    </div>
                </div>
            </div>
+           <div class="row">
+           </div>
+
        </div>
    </div>
 </div>
@@ -121,46 +140,154 @@
             op_html: $('#actions').html()
         };
         return jumpserver.initServerSideDataTable(options);
+    }
 
+    function beforeDrag(treeId, treeNodes) {
+        showLog("Before drag");
+        return false;
+    }
+
+    function beforeEditName(treeId, treeNode) {
+        showLog("Before edit name");
+        className = (className === "dark" ? "" : "dark");
+        showLog("[ " + getTime() + " beforeEditName ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree.selectNode(treeNode);
+        setTimeout(function () {
+            if (confirm("进入节点 -- " + treeNode.name + " 的编辑状态吗？")) {
+                setTimeout(function () {
+                    zTree.editName(treeNode);
+                }, 0);
+            }
+        }, 0);
+        return false;
+    }
+
+    function beforeRemove(treeId, treeNode) {
+        showLog("[ " + getTime() + " beforeRemove ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+        className = (className === "dark" ? "" : "dark");
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree.selectNode(treeNode);
+        return confirm("确认删除 节点 -- " + treeNode.name + " 吗？");
+    }
+
+    function onRemove(e, treeId, treeNode) {
+        showLog("Remove node")
+    }
+
+    function beforeRename(treeId, treeNode, newName, isCancel) {
+        showLog((isCancel ? "<span style='color:red'>" : "") + "[ " + getTime() + " beforeRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>" : ""));
+        className = (className === "dark" ? "" : "dark");
+        if (newName.length == 0) {
+            setTimeout(function () {
+                var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+                zTree.cancelEditName();
+                alert("节点名称不能为空.");
+            }, 0);
+            return false;
+        }
+        return true;
+    }
+
+    function onRename(e, treeId, treeNode, isCancel) {
+        console.log("On remname");
+        {#showLog((isCancel ? "<span style='color:red'>" : "") + "[ " + getTime() + " onRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>" : ""));#}
+    }
+
+    function showRemoveBtn(treeId, treeNode) {
+        showLog("Show remove btn");
+        return !treeNode.isFirstNode;
+    }
+
+    function showRenameBtn(treeId, treeNode) {
+        showLog("Show rename btn");
+        return !treeNode.isLastNode;
+    }
+
+    function showLog(str) {
+        console.log(str)
+    }
+
+    function getTime() {
+        var now = new Date(),
+            h = now.getHours(),
+            m = now.getMinutes(),
+            s = now.getSeconds(),
+            ms = now.getMilliseconds();
+        return (h + ":" + m + ":" + s + " " + ms);
+    }
+
+    var newCount = 1;
+
+    function addHoverDom(treeId, treeNode) {
+        var sObj = $("#" + treeNode.tId + "_span");
+        if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
+        var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+            + "' title='add node' onfocus='this.blur();'></span>";
+        sObj.after(addStr);
+        var btn = $("#addBtn_" + treeNode.tId);
+        if (btn) btn.bind("click", function () {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            zTree.addNodes(treeNode, {
+                id: (100 + newCount),
+                pId: treeNode.id,
+                name: "new node" + (newCount++)
+            });
+            return false;
+        });
+    };
+
+    function removeHoverDom(treeId, treeNode) {
+        showLog("Remove hove dom");
+        $("#addBtn_" + treeNode.tId).unbind().remove();
+    };
+
+    function selectAll() {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        zTree.setting.edit.editNameSelectAll = $("#selectAll").attr("checked");
+    }
+
+    function initTree() {
+        var setting = {
+            view: {
+                addHoverDom: addHoverDom,
+                removeHoverDom: removeHoverDom,
+                selectedMulti: false
+            },
+            edit: {
+                enable: true,
+                editNameSelectAll: true,
+                showRemoveBtn: showRemoveBtn,
+                showRenameBtn: showRenameBtn
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            callback: {
+                beforeDrag: beforeDrag,
+                beforeEditName: beforeEditName,
+                beforeRemove: beforeRemove,
+                beforeRename: beforeRename,
+                onRemove: onRemove,
+                onRename: onRename
+            }
+        };
+
+        var zNodes = [];
+        $.get("{% url 'api-assets:tree-view' %}", function(data, status){
+            zNodes = data;
+            console.log(data);
+            console.log(status);
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        });
+		$("#selectAll").bind("click", selectAll);
     }
     $(document).ready(function(){
         initTable();
-        $('#jstree').jstree({
-            'core' : {
-                'check_callback' : true,
-                'data': {
-                    'url': '{% url "api-assets:tree-view" %}',
-                    'data': function (node) {
-                        return {'id': node.id}
-                    }
-                }
-            },
-            'plugins' : [ 'types', 'dnd'],
-            "checkbox" : {
-                "keep_selected_style" : true
-            },
-            'types' : {
-                'default' : {
-                    'icon' : 'fa fa-folder'
-                },
-                'html' : {
-                    'icon' : 'fa fa-file-code-o'
-                },
-                'svg' : {
-                    'icon' : 'fa fa-file-picture-o'
-                },
-                'css' : {
-                    'icon' : 'fa fa-file-code-o'
-                },
-                'img' : {
-                    'icon' : 'fa fa-file-image-o'
-                },
-                'js' : {
-                    'icon' : 'fa fa-file-text-o'
-                }
-            }
-        });
-    })
+        initTree();
+    });
 </script>
 
 {% endblock %}

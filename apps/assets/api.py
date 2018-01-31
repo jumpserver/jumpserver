@@ -319,13 +319,13 @@ class TreeViewApi(APIView):
     def get(self, request):
         data = []
         for node in self.get_queryset():
-            if node.id == "0":
-                parent = "#"
-            else:
-                parent = ":".join(node.id.split(":")[:-1])
-            data.append({
+            parent = ":".join(node.id.split(":")[:-1])
+            d = {
                 "id": node.id,
-                "parent": parent,
-                "text": node.name
-            })
+                "pId": parent,
+                "name": node.name
+            }
+            if node.id == "0":
+                d["open"] = True
+            data.append(d)
         return Response(data)
