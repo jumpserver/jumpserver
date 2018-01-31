@@ -51,7 +51,6 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-	                                            <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Alive' %}</th>
 	                                            <th>{% trans 'Action' %}</th>
                                             </tr>
@@ -172,8 +171,9 @@ function initTable() {
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?cluster_id={{ cluster.id }}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "get_type_display" }, {data: "is_connective" }, {data: "id"}],
+		columns: [
+		    {data: "hostname" }, {data: "ip" }, {data: "port" },
+			{data: "is_connective" }, {data: "id"}],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initServerSideDataTable(options);
