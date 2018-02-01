@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-01 12:29+0800\n"
+"POT-Creation-Date: 2018-02-01 12:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1258,6 +1258,10 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
+#: common/api.py:91
+msgid "Match {} s users"
+msgstr "匹配 {} 个用户"
+
 #: common/const.py:6
 #, python-format
 msgid "<b>%(name)s</b> was created successfully"
@@ -1357,7 +1361,8 @@ msgstr "LDAP属性映射"
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
-msgstr "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
+msgstr ""
+"用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的属性"
 
 #: common/forms.py:137
