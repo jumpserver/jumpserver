@@ -24,9 +24,15 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
    * Python 3.6  
    * Django 1.11
 
-### Install 安装
+### 快速启动
 
-    [详细安装](https://github.com/jumpserver/jumpserver/wiki/v0.5.0-%E5%9F%BA%E4%BA%8E-CentOS7)
+```
+$ docker run -p 8080:80 -p 2222:2222 jumpserver:0.5.0-beta2
+```
+
+### 详细安装步骤
+
+    [文档](https://github.com/jumpserver/jumpserver/wiki/v0.5.0-%E5%9F%BA%E4%BA%8E-CentOS7)
 
 
 ### Usage 使用
