@@ -11,7 +11,7 @@ from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOr
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_asset_permissions, get_user_group_asset_permissions, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups
-from .models import AssetPermission
+from .models import AssetPermission, NodePermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
     AssetGroup, AssetGroupGrantedSerializer, SystemUser, MyAssetGroupGrantedSerializer
 from . import serializers
@@ -21,28 +21,33 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     资产授权列表的增删改查api
     """
-    queryset = AssetPermission.objects.all()
-    serializer_class = serializers.AssetPermissionSerializer
+    queryset = NodePermission.objects.all()
+    serializer_class = serializers.AssetPermissionCreateUpdateSerializer
     permission_classes = (IsSuperUser,)
 
-    def get_queryset(self):
-        queryset = super(AssetPermissionViewSet, self).get_queryset()
-        user_id = self.request.query_params.get('user', '')
-        user_group_id = self.request.query_params.get('user_group', '')
-
-        if user_id and user_id.isdigit():
-            user = get_object_or_404(User, id=int(user_id))
-            queryset = get_user_asset_permissions(user)
-
-        if user_group_id:
-            user_group = get_object_or_404(UserGroup, id=user_group_id)
-            queryset = get_user_group_asset_permissions(user_group)
-        return queryset
-
     def get_serializer_class(self):
-        if getattr(self, 'user_id', ''):
-            return serializers.UserAssetPermissionSerializer
-        return serializers.AssetPermissionSerializer
+        if self.action in ("list", 'retrieve'):
+            return serializers.AssetPermissionListSerializer
+        return self.serializer_class
+
+    # def get_queryset(self):
+    #     queryset = super(AssetPermissionViewSet, self).get_queryset()
+    #     user_id = self.request.query_params.get('user', '')
+    #     user_group_id = self.request.query_params.get('user_group', '')
+    #
+    #     if user_id and user_id.isdigit():
+    #         user = get_object_or_404(User, id=int(user_id))
+    #         queryset = get_user_asset_permissions(user)
+    #
+    #     if user_group_id:
+    #         user_group = get_object_or_404(UserGroup, id=user_group_id)
+    #         queryset = get_user_group_asset_permissions(user_group)
+    #     return queryset
+
+    # def get_serializer_class(self):
+    #     if getattr(self, 'user_id', ''):
+    #         return serializers.UserAssetPermissionCreateUpdateSerializer
+    #     return serializers.AssetPermissionCreateUpdateSerializer
 
 
 class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):

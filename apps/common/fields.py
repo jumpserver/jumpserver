@@ -6,6 +6,7 @@ from django import forms
 from django.utils import six
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
+from rest_framework import serializers
 
 
 class DictField(forms.Field):
@@ -36,3 +37,9 @@ class DictField(forms.Field):
         # Sometimes data or initial may be a string equivalent of a boolean
         # so we should run it through to_python first to get a boolean value
         return self.to_python(initial) != self.to_python(data)
+
+
+class StringIDField(serializers.Field):
+    def to_representation(self, value):
+        return {"pk": value.pk, "name": value.__str__()}
+

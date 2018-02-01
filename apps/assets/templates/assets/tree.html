@@ -229,7 +229,7 @@
 		if (!parentNode){
 		    return
         }
-        var url = "{% url 'api-assets:node-children' pk='0:0' %}".replace("0:0", parentNode.id );
+        var url = "{% url 'api-assets:node-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", parentNode.id );
         $.post(url,  {}, function (data, status){
             if (status === "success") {
                 var newNode = { name:data["name"], id:data["id"],  pId: parentNode.id };
@@ -263,9 +263,8 @@
 	}
 
 	function onRenameNode(event, treeId, treeNode, isCancel){
-        console.log(treeNode);
-        var url = "{% url 'api-assets:node-detail' pk='0:0' %}".replace("0:0", treeNode.id);
-        var data = {"name": treeNode.name};
+        var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", treeNode.id);
+        var data = {"value": treeNode.name};
         if (isCancel){
             return
         }
@@ -282,8 +281,6 @@
 		if (!current_node){
 		    return
         }
-        console.log("Edit tree");
-		console.log(current_node);
         zTree.editName(current_node);
     }
 
@@ -310,9 +307,10 @@
         $.get("{% url 'api-assets:node-list' %}", function(data, status){
             $.each(data, function (index, value) {
                 value["pId"] = value["parent"];
-                if (value["id"] === "0") {
+                if (value["key"] === "0") {
                     value["open"] = true;
                 }
+                value["name"] = value["value"]
             });
             zNodes = data;
             $.fn.zTree.init($("#assetTree"), setting, zNodes);

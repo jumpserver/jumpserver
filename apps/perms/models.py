@@ -70,6 +70,7 @@ class AssetPermission(models.Model):
 
 
 class NodePermission(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, verbose_name=_("Node"))
     user_group = models.ForeignKey('users.UserGroup', on_delete=models.CASCADE, verbose_name=_("User group"))
     system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, verbose_name=_("System user"))

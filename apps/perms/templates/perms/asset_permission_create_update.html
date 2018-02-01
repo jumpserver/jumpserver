@@ -30,17 +30,10 @@
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
-                            <h3>{% trans 'Name' %}</h3>
-                            {% bootstrap_field form.name layout="horizontal" %}
-                            <div class="hr-line-dashed"></div>
-                            <h3>{% trans 'User' %}</h3>
-                            {% bootstrap_field form.users layout="horizontal" %}
-                            {% bootstrap_field form.user_groups layout="horizontal" %}
-                            <div class="hr-line-dashed"></div>
-                            <h3>{% trans 'Asset' %}</h3>
-                            {% bootstrap_field form.assets layout="horizontal" %}
-                            {% bootstrap_field form.asset_groups layout="horizontal" %}
-                            {% bootstrap_field form.system_users layout="horizontal" %}
+                            <h3>{% trans 'Basic' %}</h3>
+                            {% bootstrap_field form.node layout="horizontal" %}
+                            {% bootstrap_field form.user_group layout="horizontal" %}
+                            {% bootstrap_field form.system_user layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Other' %}</h3>
                             <div class="form-group">
@@ -59,7 +52,7 @@
                                     </div>
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                 </div>
-                             </div>
+                            </div>
                             {% bootstrap_field form.comment layout="horizontal" %}
 
                             <div class="form-group">

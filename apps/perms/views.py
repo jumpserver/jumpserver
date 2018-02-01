@@ -5,21 +5,20 @@ from __future__ import unicode_literals, absolute_import
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.generic import ListView, CreateView, UpdateView
-from django.views.generic.edit import DeleteView, FormView
+from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
-from django.contrib import messages
 
 from common.const import create_success_msg, update_success_msg
 from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, \
     Asset, AssetGroup
-from .models import AssetPermission
+from .models import AssetPermission, NodePermission
 from .forms import AssetPermissionForm
 
 
 class AssetPermissionListView(AdminUserRequiredMixin, ListView):
-    model = AssetPermission
+    model = NodePermission
     context_object_name = 'asset_permission_list'
     template_name = 'perms/asset_permission_list.html'
 
@@ -32,12 +31,11 @@ class AssetPermissionListView(AdminUserRequiredMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
-    model = AssetPermission
+class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
+    model = NodePermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
-    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -48,12 +46,11 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, Cre
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = AssetPermission
+class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = NodePermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy("perms:asset-permission-list")
-    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
         context = {

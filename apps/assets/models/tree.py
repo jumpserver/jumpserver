@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -9,34 +10,35 @@ __all__ = ['Node']
 
 
 class Node(models.Model):
-    id = models.CharField(primary_key=True, max_length=64)  # '1:1:1:1'
-    name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
+    value = models.CharField(max_length=128, unique=True, verbose_name=_("Value"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return self.value
 
     @property
     def level(self):
-        return len(self.id.split(':'))
+        return len(self.key.split(':'))
 
-    def get_next_child_id(self):
+    def get_next_child_key(self):
         mark = self.child_mark
         self.child_mark += 1
         self.save()
-        return "{}:{}".format(self.id, mark)
+        return "{}:{}".format(self.key, mark)
 
-    def create_child(self, name):
-        child_id = self.get_next_child_id()
-        child = self.__class__.objects.create(id=child_id, name=name)
+    def create_child(self, value):
+        child_key = self.get_next_child_key()
+        child = self.__class__.objects.create(key=child_key, value=value)
         return child
 
     def get_children(self):
-        return self.__class__.objects.filter(id__regex=r'{}:[0-9]+$'.format(self.id))
+        return self.__class__.objects.filter(key__regex=r'{}:[0-9]+$'.format(self.key))
 
     def get_all_children(self):
-        return self.__class__.objects.filter(id__startswith='{}:'.format(self.id))
+        return self.__class__.objects.filter(key__startswith='{}:'.format(self.key))
 
     def get_assets(self):
         from .asset import Asset
@@ -53,6 +55,6 @@ class Node(models.Model):
     @classmethod
     def root(cls):
         obj, created = cls.objects.get_or_create(
-            id='0', defaults={"id": '0', 'name': "ROOT"}
+            key='0', defaults={"key": '0', 'value': "ROOT"}
         )
         return obj
