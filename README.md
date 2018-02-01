@@ -27,7 +27,7 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 ### 快速启动
 
 ```
-$ docker run -p 8080:80 -p 2222:2222 jumpserver:0.5.0-beta2
+$ docker run -p 8080:80 -p 2222:2222 jumpserver/jumpserver:0.5.0-beta2
 ```
 更多见 [Dockerfile](https://github.com/jumpserver/Dockerfile.git)
 
