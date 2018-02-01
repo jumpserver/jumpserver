@@ -117,7 +117,8 @@ class LDAPSettingForm(BaseForm):
         label=_("User OU"), initial='ou=tech,dc=jumpserver,dc=org'
     )
     AUTH_LDAP_SEARCH_FILTER = forms.CharField(
-        label=_("User search filter"), initial='(cn=%(user)s)'
+        label=_("User search filter"), initial='(cn=%(user)s)',
+        help_text=_("User search filter must contain ([cn,uid,sAMAccountName,...]=%(user)s)")
     )
     AUTH_LDAP_USER_ATTR_MAP = DictField(
         label=_("User attr map"),
@@ -125,13 +126,15 @@ class LDAPSettingForm(BaseForm):
             "username": "cn",
             "name": "sn",
             "email": "mail"
-        })
+        }),
+        help_text=_("User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr")
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
     AUTH_LDAP_START_TLS = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False
     )
+    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), initial=False)
 
 
 class TerminalSettingForm(BaseForm):

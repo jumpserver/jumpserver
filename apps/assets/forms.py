@@ -127,7 +127,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
                 attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}
             ),
             'labels': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Select lables')}
+                attrs={'class': 'select2', 'data-placeholder': _('Select labels')}
             ),
         }
 
