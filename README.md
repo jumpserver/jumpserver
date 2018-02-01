@@ -70,6 +70,11 @@ demo使用了开发者模式，并发只能为1
 
 参见 https://github.com/jumpserver/jumpserver/milestone/2
 
+### SDK 
+
+- python: https://github.com/jumpserver/jumpserver-python-sdk
+- java: https://github.com/KaiJunYan/jumpserver-java-sdk.git
+
 ### Docs 开发者文档
 
 
