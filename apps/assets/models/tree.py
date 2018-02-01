@@ -51,7 +51,7 @@ class Node(models.Model):
         return assets
 
     @classmethod
-    def get_root_node(cls):
+    def root(cls):
         obj, created = cls.objects.get_or_create(
             id='0', defaults={"id": '0', 'name': "ROOT"}
         )

@@ -318,7 +318,7 @@ class NodeViewSet(BulkModelViewSet):
     serializer_class = serializers.NodeSerializer
 
     def perform_create(self, serializer):
-        child_id = Node.get_root_node().get_next_child_id()
+        child_id = Node.root().get_next_child_id()
         serializer.validated_data["id"] = child_id
         serializer.save()
 
@@ -332,7 +332,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         if not request.data.get("name"):
             request.data["name"] = _("New node {}").format(
-                Node.get_root_node().get_next_child_id().split(":")[-1]
+                Node.root().get_next_child_id().split(":")[-1]
             )
         return super().post(request, *args, **kwargs)
 
