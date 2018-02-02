@@ -314,8 +314,10 @@ def get_push_system_user_tasks(system_user):
     if system_user.username == "root":
         return []
 
-    tasks = [
-        {
+    tasks = []
+
+    if system_user.password:
+        tasks.append({
             'name': 'Add user {}'.format(system_user.username),
             'action': {
                 'module': 'user',
@@ -324,8 +326,9 @@ def get_push_system_user_tasks(system_user):
                     encrypt_password(system_user.password, salt="K3mIlKK"),
                 ),
             }
-        },
-        {
+        })
+    if system_user.public_key:
+        tasks.append({
             'name': 'Set {} authorized key'.format(system_user.username),
             'action': {
                 'module': 'authorized_key',
@@ -333,8 +336,9 @@ def get_push_system_user_tasks(system_user):
                     system_user.username, system_user.public_key
                 )
             }
-        },
-        {
+        })
+    if system_user.sudo:
+        tasks.append({
             'name': 'Set {} sudo setting'.format(system_user.username),
             'action': {
                 'module': 'lineinfile',
@@ -345,8 +349,7 @@ def get_push_system_user_tasks(system_user):
                     system_user.sudo,
                 )
             }
-        }
-    ]
+        })
     return tasks
 
 
