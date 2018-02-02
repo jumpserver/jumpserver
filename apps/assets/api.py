@@ -23,7 +23,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count
 from django.utils.translation import ugettext_lazy as _
 
-from common.mixins import CustomFilterMixin
+from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
@@ -38,7 +38,7 @@ from .utils import LabelFilter
 logger = get_logger(__file__)
 
 
-class AssetViewSet(CustomFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -56,6 +56,7 @@ class AssetViewSet(CustomFilterMixin, LabelFilter, BulkModelViewSet):
         asset_group_id = self.request.query_params.get('asset_group_id')
         admin_user_id = self.request.query_params.get('admin_user_id')
         system_user_id = self.request.query_params.get('system_user_id')
+        node_id = self.request.query_params.get("node_id")
 
         if cluster_id:
             queryset = queryset.filter(cluster__id=cluster_id)
@@ -70,6 +71,9 @@ class AssetViewSet(CustomFilterMixin, LabelFilter, BulkModelViewSet):
             system_user = get_object_or_404(SystemUser, id=system_user_id)
             clusters = system_user.get_clusters()
             queryset = queryset.filter(cluster__in=clusters)
+        if node_id:
+            node = get_object_or_404(Node, id=node_id)
+            queryset = queryset.filter(nodes__key__startswith=node.key)
         return queryset
 
 
@@ -86,7 +90,7 @@ class UserAssetListView(generics.ListAPIView):
         return queryset
 
 
-class AssetGroupViewSet(CustomFilterMixin, BulkModelViewSet):
+class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Asset group api set, for add,delete,update,list,retrieve resource
     """
@@ -120,7 +124,7 @@ class GroupAddAssetsApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class ClusterViewSet(CustomFilterMixin, BulkModelViewSet):
+class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Cluster api set, for add,delete,update,list,retrieve resource
     """
@@ -161,7 +165,7 @@ class ClusterAddAssetsApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class AdminUserViewSet(CustomFilterMixin, BulkModelViewSet):
+class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
@@ -197,7 +201,7 @@ class SystemUserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class AssetListUpdateApi(CustomFilterMixin, ListBulkCreateUpdateDestroyAPIView):
+class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     Asset bulk update api
     """
@@ -318,8 +322,8 @@ class NodeViewSet(BulkModelViewSet):
     serializer_class = serializers.NodeSerializer
 
     def perform_create(self, serializer):
-        child_id = Node.root().get_next_child_id()
-        serializer.validated_data["id"] = child_id
+        child_key = Node.root().get_next_child_key()
+        serializer.validated_data["key"] = child_key
         serializer.save()
 
 
@@ -330,17 +334,20 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     instance = None
 
     def post(self, request, *args, **kwargs):
-        if not request.data.get("name"):
-            request.data["name"] = _("New node {}").format(
-                Node.root().get_next_child_id().split(":")[-1]
+        if not request.data.get("value"):
+            request.data["value"] = _("New node {}").format(
+                Node.root().get_next_child_key().split(":")[-1]
             )
         return super().post(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         instance = self.get_object()
-        name = request.data.get("name")
-        node = instance.create_child(name=name)
-        return Response({"id": node.id, "name": node.name}, status=201)
+        value = request.data.get("value")
+        node = instance.create_child(value=value)
+        return Response(
+            {"id": node.id, "key": node.key, "value": node.value},
+            status=201,
+        )
 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -348,5 +355,5 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
             children = instance.get_all_children()
         else:
             children = instance.get_children()
-        response = [{"id": node.id, "name": node.name} for node in children]
+        response = [{"id": node.id, "key": node.key, "value": node.value} for node in children]
         return Response(response, status=200)

@@ -10,9 +10,9 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from common.const import create_success_msg, update_success_msg
+from common.utils import get_object_or_none
 from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, \
-    Asset, AssetGroup
+    Asset, AssetGroup, Node
 from .models import AssetPermission, NodePermission
 from .forms import AssetPermissionForm
 
@@ -36,6 +36,15 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        node_id = self.request.GET.get("node_id")
+        node = get_object_or_none(Node, id=node_id)
+        if not node:
+            node = Node.root()
+        form['node'].initial = node
+        return form
 
     def get_context_data(self, **kwargs):
         context = {

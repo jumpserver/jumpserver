@@ -9,10 +9,9 @@ from rest_framework import viewsets
 from common.utils import get_object_or_none
 from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOrAppUser
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
-    get_user_asset_permissions, get_user_group_asset_permissions, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission, NodePermission
-from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
+from .hands import AssetGrantedSerializer, User, UserGroup, Node, Asset, \
     AssetGroup, AssetGroupGrantedSerializer, SystemUser, MyAssetGroupGrantedSerializer
 from . import serializers
 
@@ -30,24 +29,12 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return serializers.AssetPermissionListSerializer
         return self.serializer_class
 
-    # def get_queryset(self):
-    #     queryset = super(AssetPermissionViewSet, self).get_queryset()
-    #     user_id = self.request.query_params.get('user', '')
-    #     user_group_id = self.request.query_params.get('user_group', '')
-    #
-    #     if user_id and user_id.isdigit():
-    #         user = get_object_or_404(User, id=int(user_id))
-    #         queryset = get_user_asset_permissions(user)
-    #
-    #     if user_group_id:
-    #         user_group = get_object_or_404(UserGroup, id=user_group_id)
-    #         queryset = get_user_group_asset_permissions(user_group)
-    #     return queryset
-
-    # def get_serializer_class(self):
-    #     if getattr(self, 'user_id', ''):
-    #         return serializers.UserAssetPermissionCreateUpdateSerializer
-    #     return serializers.AssetPermissionCreateUpdateSerializer
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        node_id = self.request.query_params.get('node_id')
+        if node_id:
+            queryset = queryset.filter(node__id=node_id)
+        return queryset
 
 
 class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):

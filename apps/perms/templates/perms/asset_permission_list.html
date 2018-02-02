@@ -1,56 +1,100 @@
-{% extends '_base_list.html' %}
+{% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block table_search %}
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/jstree/style.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+	<style type="text/css">
+        div#rMenu {
+            position:absolute;
+            visibility:hidden;
+            text-align: left;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            float: left;
+            padding: 5px 0;
+            margin: 2px 0 0;
+            list-style: none;
+            background-clip: padding-box;
+        }
+        div#rMenu li{
+        	margin: 1px 0;
+        	cursor: pointer;
+        	{#list-style: none outside none;#}
+        }
+        .dropdown a:hover {
+            background-color: #f1f1f1
+        }
+	</style>
+
 {% endblock %}
 
-{% block help_message %}
-    <div class="alert alert-info help-message">
-    </div>
-{% endblock %}
-
-{% block table_container %}
-<div class="uc pull-left m-r-5">
-    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary ">
-        {% trans "Create permission" %}
-    </a>
+{% block content %}
+<div class="wrapper wrapper-content">
+   <div class="row">
+       <div class="col-lg-3">
+           <div class="ibox float-e-margins">
+               <div class="ibox-content mailbox-content" style="padding-top: 0">
+                   <div class="file-manager ">
+                       <div id="assetTree" class="ztree">
+                       </div>
+                       <div class="clearfix"></div>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div class="col-lg-9 animated fadeInRight">
+          <div class="mail-box-header">
+              <div class="uc pull-left m-r-5">
+                   <a class="btn btn-sm btn-primary btn-create-permission">
+                       {% trans "Create permission" %}
+                   </a>
+              </div>
+              <table class="table table-striped table-bordered table-hover" id="permission_list_table" >
+                  <thead>
+                  <tr>
+                    <th class="text-center">
+                          <input type="checkbox" id="check_all" class="ipt_check_all" >
+                    </th>
+                    <th class="text-center">{% trans 'Node' %}</th>
+                    <th class="text-center">{% trans 'User group' %}</th>
+                    <th class="text-center">{% trans 'System user' %}</th>
+                    <th class="text-center">{% trans 'Is active' %}</th>
+                    <th class="text-center">{% trans 'Date expired' %}</th>
+                    <th class="text-center">{% trans 'Action' %}</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+              </table>
+          </div>
+       </div>
+   </div>
 </div>
-<table class="table table-striped table-bordered table-hover" id="permission_list_table" >
-    <thead>
-    <tr>
-      <th class="text-center">
-            <input type="checkbox" id="check_all" class="ipt_check_all" >
-      </th>
-      <th class="text-center">{% trans 'Node' %}</th>
-      <th class="text-center">{% trans 'User group' %}</th>
-      <th class="text-center">{% trans 'System user' %}</th>
-      <th class="text-center">{% trans 'Is active' %}</th>
-      <th class="text-center">{% trans 'Date expired' %}</th>
-      <th class="text-center">{% trans 'Action' %}</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 {% endblock %}
 
 {% block custom_foot_js %}
+
 <script>
+var zTree, rMenu, table;
 function initTable() {
     var options = {
         ele: $('#permission_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData) {
-                var html = '<a href="">' + cellData.name + '</a>';
-                $(td).html(html)
+                var html = '<a href="{% url 'assets:tree-view' %}?node=99899">' + cellData.name + '</a>';
+                $(td).html(html.replace("99899", cellData.pk));
             }},
             {targets: 2, createdCell: function (td, cellData) {
-                var html = '<a href="">' + cellData.name + '</a>';
-                $(td).html(html)
+                var html = '<a href="{% url "users:user-group-detail" pk=DEFAULT_PK %}">' + cellData.name + '</a>';
+                $(td).html(html.replace("{{ DEFAULT_PK }}", cellData.pk))
             }},
             {targets: 3, createdCell: function (td, cellData) {
-                var html = '<a href="">' + cellData.name + '</a>';
-                $(td).html(html)
+                var html = '<a href="{% url 'assets:system-user-detail' pk=DEFAULT_PK %}">' + cellData.name + '</a>';
+                $(td).html(html.replace("{{ DEFAULT_PK }}", cellData.pk));
             }},
             {targets: 4, createdCell: function (td, cellData) {
                 if (!cellData) {
@@ -59,7 +103,14 @@ function initTable() {
 					$(td).html('<i class="fa fa-check text-navy"></i>')
 				}
             }},
-
+            {targets: 5, createdCell: function (td, cellData) {
+                var date_expired = cellData.split(" ");
+                if (date_expired && date_expired.length === 3) {
+                    $(td).html(date_expired[0]);
+                } else {
+                    $(td).html(cellData);
+                }
+            }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "perms:asset-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
@@ -76,13 +127,75 @@ function initTable() {
         ],
         op_html: $('#actions').html()
     };
-    jumpserver.initDataTable(options)
+    table = jumpserver.initDataTable(options);
+    return table
+}
+
+
+function onSelected(event, treeNode) {
+    var url = table.ajax.url();
+    url = setUrlParam(url, "node_id", treeNode.id);
+    table.ajax.url(url);
+    table.ajax.reload();
+}
+
+function selectQueryNode() {
+    var node_id = $.getUrlParam("node");
+    if (node_id !== null) {
+        var node = zTree.getNodesByParam("id", node_id, null);
+        if (node) {
+            zTree.selectNode(node[0]);
+        }
+    }
+}
+
+function initTree() {
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            showLine: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onSelected: onSelected
+        }
+    };
+
+    var zNodes = [];
+    $.get("{% url 'api-assets:node-list' %}", function(data, status){
+        $.each(data, function (index, value) {
+            value["pId"] = value["parent"];
+            if (value["key"] === "0") {
+                value["open"] = true;
+            }
+            value["name"] = value["value"]
+        });
+        zNodes = data;
+        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+        zTree = $.fn.zTree.getZTreeObj("assetTree");
+		rMenu = $("#rMenu");
+		selectQueryNode();
+    });
 }
 
 $(document).ready(function(){
-    initTable()
+    initTable();
+    initTree();
 })
-
+.on('click', '.btn-create-asset', function () {
+    var url = "{% url 'assets:asset-create' %}";
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+        url += "?node=" + current_node.id;
+    }
+    window.open(url);
+})
 .on('click', '.btn-del', function () {
     var $this = $(this);
     var name = $this.data('name');
@@ -91,5 +204,16 @@ $(document).ready(function(){
             .replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
 })
+.on('click', '.btn-create-permission', function () {
+    var url = "{% url 'perms:asset-permission-create' %}";
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+        url += "?node_id=" + current_node.id;
+    }
+    window.open(url);
+})
+
 </script>
 {% endblock %}

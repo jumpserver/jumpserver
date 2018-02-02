@@ -27,7 +27,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser, Label
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser, Label, Node
 from ..hands import AdminUserRequiredMixin
 
 
@@ -41,13 +41,12 @@ logger = get_logger(__file__)
 
 
 class AssetListView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'assets/asset_list.html'
+    template_name = 'assets/tree.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),
-            'system_users': SystemUser.objects.all(),
             'labels': Label.objects.all().order_by('name'),
         }
         kwargs.update(context)
@@ -80,6 +79,16 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     #     asset.date_created = timezone.now()
     #     asset.save()
     #     return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        node_id = self.request.GET.get("node_id")
+        if node_id:
+            node = get_object_or_none(Node, id=node_id)
+        else:
+            node = Node.root()
+        form["nodes"].initial = node
+        return form
 
     def get_context_data(self, **kwargs):
         context = {

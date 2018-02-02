@@ -531,3 +531,43 @@ function createPopover(dataset, title, callback) {
     var html = "<a data-toggle='popover' data-content='" + data_content + "'>" + dataset.length + "</a>";
     return html;
 }
+
+
+ $(function () {
+    (function ($) {
+        $.getUrlParam = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    })(jQuery);
+});
+
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+}
+
+function setUrlParam(url, name, value) {
+    var urlArray = url.split("?");
+    if (urlArray.length===1){
+        url += "?" + name + "=" + value;
+    } else {
+        var oriParam = urlArray[1].split("&");
+        var oriParamMap = {};
+        $.each(oriParam, function (index, value) {
+            var v = value.split("=");
+            oriParamMap[v[0]] = v[1];
+        });
+        oriParamMap[name] = value;
+        url = urlArray[0] + "?";
+        var newParam = [];
+        $.each(oriParamMap, function (index, value) {
+            console.log(index, value);
+            newParam.push(index + "=" + value);
+        });
+        url += newParam.join("&")
+    }
+    return url
+}

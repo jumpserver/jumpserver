@@ -17,7 +17,14 @@ class Node(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.value
+        return self.full_value
+
+    @property
+    def full_value(self):
+        if self == self.__class__.root():
+            return self.value
+        else:
+            return '{}/{}'.format( self.value, self.parent.full_value)
 
     @property
     def level(self):
@@ -51,6 +58,21 @@ class Node(models.Model):
         children = self.get_all_children()
         assets = Asset.objects.filter(nodes__in=children)
         return assets
+
+    @property
+    def parent(self):
+        if self.key == "0":
+            return self.__class__.root()
+        elif not self.key.startswith("0"):
+            return self.__class__.root()
+
+        parent_key = ":".join(self.key.split(":")[:-1])
+        try:
+            parent = self.__class__.objects.get(key=parent_key)
+        except Node.DoesNotExist:
+            return self.__class__.root()
+        else:
+            return parent
 
     @classmethod
     def root(cls):

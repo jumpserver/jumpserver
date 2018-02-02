@@ -328,11 +328,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parent(obj):
-        if obj.key == "0":
-            return "#"
-        if not obj.key.startswith("0"):
-            return "0"
-        return ":".join(obj.key.split(":")[:-1])
+        return obj.parent.id
 
     def get_fields(self):
         fields = super().get_fields()

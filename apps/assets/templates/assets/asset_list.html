@@ -64,7 +64,6 @@
     </div>
 </div>
 {% include 'assets/_asset_import_modal.html' %}
-{#{% include 'assets/_asset_bulk_update_modal.html' %}#}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -126,15 +125,7 @@ $(document).ready(function(){
 })
 .on('click', '.labels li', function () {
     var val = $(this).text();
-    {#var origin_val = $("#asset_list_table_filter input").val();#}
-    {#var new_val;#}
-    {#if (origin_val === "") {#}
-    {#    new_val = val;#}
-    {# } else { #}
-    {#    new_val = origin_val + " " + val;#}
-    {# } #}
     $("#asset_list_table_filter input").val(val);
-    {#$('#asset_list_table').DataTable().search(val).draw();#}
     jumpserver.table.search(val).draw();
 })
 .on('click', '.btn_export', function () {
