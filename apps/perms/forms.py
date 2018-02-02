@@ -8,16 +8,15 @@ from .models import NodePermission
 
 
 class AssetPermissionForm(forms.ModelForm):
-
     class Meta:
         model = NodePermission
         fields = [
             'node', 'user_group', 'system_user', 'is_active',
-            'date_expired', 'comment'
+            'date_expired', 'comment',
         ]
         widgets = {
             'node': forms.Select(
-                attrs={'class': 'select2', 'data-placeholder': _("Node")}
+                attrs={'style': 'display:none'}
             ),
             'user_group': forms.Select(
                 attrs={'class': 'select2', 'data-placeholder': _("User group")}

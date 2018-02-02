@@ -81,7 +81,8 @@ class NodePermission(models.Model):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __str__(self):
-        return "{}:{}:{}".format(self.node.name, self.user_group.name, self.system_user.name)
+        return "{}:{}:{}".format(self.node.value, self.user_group.name, self.system_user.name)
 
     class Meta:
         unique_together = ('node', 'user_group', 'system_user')
+        verbose_name = _("Asset permission")

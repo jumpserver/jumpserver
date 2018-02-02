@@ -2,12 +2,19 @@
 
 from __future__ import absolute_import, unicode_literals
 import collections
+from django.utils import timezone
 
 from common.utils import setattr_bulk, get_logger
 from .tasks import push_users
-from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
+from .hands import AssetGroup
 
 logger = get_logger(__file__)
+
+
+def get_user_group_permissions(user_group):
+    return user_group.nodepermission_set.all() \
+        .filter(is_active=True) \
+        .filter(date_expired=timezone.now())
 
 
 def get_user_group_granted_asset_groups(user_group):
