@@ -212,8 +212,10 @@ class AdminUser(AssetUser):
 
 class SystemUser(AssetUser):
     SSH_PROTOCOL = 'ssh'
+    RDP_PROTOCOL = 'rdp'
     PROTOCOL_CHOICES = (
         (SSH_PROTOCOL, 'ssh'),
+        (RDP_PROTOCOL, 'rdp'),
     )
 
     cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
