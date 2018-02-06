@@ -5,16 +5,43 @@ import collections
 from django.utils import timezone
 
 from common.utils import setattr_bulk, get_logger
+import copy
 from .tasks import push_users
 from .hands import AssetGroup
 
 logger = get_logger(__file__)
 
 
-def get_user_group_permissions(user_group):
-    return user_group.nodepermission_set.all() \
-        .filter(is_active=True) \
-        .filter(date_expired=timezone.now())
+class NodePermissionUtil:
+
+    @staticmethod
+    def get_user_group_permissions(user_group):
+        return user_group.nodepermission_set.all() \
+            .filter(is_active=True) \
+            .filter(date_expired__gt=timezone.now())
+
+    @classmethod
+    def get_user_group_nodes(cls, user_group):
+        """
+        获取用户组授权的node和系统用户
+        :param user_group:
+        :return: {"node": set(systemuser1, systemuser2), ..}
+        """
+        permissions = cls.get_user_group_permissions(user_group)
+        nodes_directed = collections.defaultdict(set)
+
+        for perm in permissions:
+            nodes_directed[perm.node].add(perm.system_user)
+
+        nodes = copy.deepcopy(nodes_directed)
+        for node, system_users in nodes_directed.items():
+            for child in node.get_all_children():
+                nodes[child].update(system_users)
+        return nodes
+
+    @classmethod
+    def get_user_group(cls):
+        pass
 
 
 def get_user_group_granted_asset_groups(user_group):

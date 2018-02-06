@@ -105,9 +105,10 @@
 
 <div id="rMenu">
     <ul class="dropdown-menu">
-        <li id="m_add" class="btn-create-asset" tabindex="-1" onclick="addTreeNode();"><a>{% trans 'Create asset' %}</a></li>
+        <li id="menu_asset_create" class="btn-create-asset" tabindex="-1"><a>{% trans 'Create asset' %}</a></li>
+        <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a>{% trans 'Add asset' %}</a></li>
         <li class="divider"></li>
-        <li id="m_add" tabindex="-1" onclick="addTreeNode();"><a>{% trans 'Add node' %}</a></li>
+        <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a>{% trans 'Add node' %}</a></li>
         <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a>{% trans 'Rename node' %}</a></li>
         <li class="divider"></li>
         <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>{% trans 'Delete node' %}</a></li>
@@ -115,6 +116,7 @@
 </div>
 
 {% include 'assets/_asset_import_modal.html' %}
+{% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -165,6 +167,8 @@ function initTable() {
     asset_table = jumpserver.initServerSideDataTable(options);
     return asset_table
 }
+
+
 
 
 function addTreeNode() {
@@ -232,13 +236,13 @@ function OnRightClick(event, treeId, treeNode) {
 
 function showRMenu(type, x, y) {
 	$("#rMenu ul").show();
-	if (type === "root") {
-		return
-	} else {
-		$("#m_del").show();
-		$("#m_check").show();
-		$("#m_unCheck").show();
-	}
+	{#if (type === "root") {#}
+	{#	return#}
+	{# } else {#}
+	{#	$("#m_del").show();#}
+	{#	$("#m_check").show();#}
+	{#	$("#m_unCheck").show();#}
+	{# }#}
     x -= 220;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 

@@ -321,7 +321,7 @@ jumpserver.initDataTable = function (options) {
         });
     });
     $('.ipt_check_all').on('click', function() {
-      if (!jumpserver.checked) {
+      if ($(this).prop("checked")) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
           table.rows({search:'applied', page:'current'}).select();
@@ -455,18 +455,16 @@ jumpserver.initServerSideDataTable = function (options) {
         $('#uc').html(options.uc_html || '');
     });
     $('.ipt_check_all').on('click', function() {
-      if (!jumpserver.checked) {
-          $(this).closest('table').find('.ipt_check').prop('checked', true);
-          jumpserver.checked = true;
-          table.rows({search:'applied', page:'current'}).select();
-      } else {
-          $(this).closest('table').find('.ipt_check').prop('checked', false);
-          jumpserver.checked = false;
-          table.rows({search:'applied', page:'current'}).deselect();
-      }
+        if ($(this).prop("checked")) {
+            $(this).closest('table').find('.ipt_check').prop('checked', true);
+            table.rows({search:'applied', page:'current'}).select();
+        } else {
+            $(this).closest('table').find('.ipt_check').prop('checked', false);
+            table.rows({search:'applied', page:'current'}).deselect();
+        }
     });
 
-    jumpserver.table = table;
+    // jumpserver.table = table;
     return table;
 };
 
