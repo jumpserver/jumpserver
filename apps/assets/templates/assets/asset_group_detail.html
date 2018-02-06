@@ -50,7 +50,6 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-	                                            <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Alive' %}</th>
 	                                            <th>{% trans 'Action' %}</th>
                                             </tr>
@@ -166,22 +165,23 @@ function initTable() {
 				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
 				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
-			{targets: 4, createdCell: function (td, cellData) {
+			{targets: 3, createdCell: function (td, cellData) {
 				if (!cellData) {
 					$(td).html('<i class="fa fa-times text-danger"></i>')
 				} else {
 					$(td).html('<i class="fa fa-check text-navy"></i>')
 				}
 			}},
-			{targets: 5, createdCell: function (td, cellData, rowData) {
+			{targets: 4, createdCell: function (td, cellData, rowData) {
 				var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
 				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-leave-group" data-aid="{{ DEFAULT_PK }}">{% trans "Remove" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
 				$(td).html(update_btn + del_btn)
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "get_type_display" }, {data: "is_connective" }, {data: "id"}],
+		columns: [
+		    {data: "hostname" }, {data: "ip" }, {data: "port" },
+			{data: "is_connective" }, {data: "id"}],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initServerSideDataTable(options);

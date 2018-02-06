@@ -88,7 +88,7 @@ class LDAPTestingAPI(APIView):
                         user[attr] = getattr(entry, mapping)
                 users.append(user)
             if len(users) > 0:
-                return Response({"msg": "Match {} s users".format(len(users))})
+                return Response({"msg": _("Match {} s users").format(len(users))})
             else:
                 return Response({"error": "Have user but attr mapping error"}, status=401)
         else:
