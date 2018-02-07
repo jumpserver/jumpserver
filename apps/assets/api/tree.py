@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from rest_framework import generics, mixins
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.utils.translation import ugettext_lazy as _
@@ -25,7 +26,10 @@ from .. import serializers
 
 
 logger = get_logger(__file__)
-__all__ = ['NodeViewSet', 'NodeChildrenApi']
+__all__ = [
+    'NodeViewSet', 'NodeChildrenApi',
+    'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
+]
 
 
 class NodeViewSet(BulkModelViewSet):
@@ -70,3 +74,26 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         response = [{"id": node.id, "key": node.key, "value": node.value} for node in children]
         return Response(response, status=200)
 
+
+class NodeAddAssetsApi(generics.UpdateAPIView):
+    serializer_class = serializers.NodeAssetsSerializer
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    instance = None
+
+    def perform_update(self, serializer):
+        assets = serializer.validated_data.get('assets')
+        instance = self.get_object()
+        instance.assets.add(*tuple(assets))
+
+
+class NodeRemoveAssetsApi(generics.UpdateAPIView):
+    serializer_class = serializers.NodeAssetsSerializer
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    instance = None
+
+    def perform_update(self, serializer):
+        assets = serializer.validated_data.get('assets')
+        instance = self.get_object()
+        instance.assets.remove(*tuple(assets))

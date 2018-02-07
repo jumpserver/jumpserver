@@ -109,7 +109,20 @@ $(document).ready(function(){
         return
     }
 
+    var data = {
+        'assets': id_list
+    };
 
+    var success = function () {
+        modal_table.ajax.reload()
+    };
+
+    APIUpdateAttr({
+        'url': '/api/assets/v1/nodes/' + current_node.id + '/assets/add/',
+        'method': 'PUT',
+        'body': JSON.stringify(data),
+        'success': success
+    })
 })
 </script>
 

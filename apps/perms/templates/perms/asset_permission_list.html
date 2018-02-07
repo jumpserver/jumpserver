@@ -135,17 +135,26 @@ function initTable() {
 function onSelected(event, treeNode) {
     var url = table.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.id);
+    setCookie('node_selected', treeNode.id);
     table.ajax.url(url);
     table.ajax.reload();
 }
 
 function selectQueryNode() {
-    var node_id = $.getUrlParam("node");
-    if (node_id !== null) {
-        var node = zTree.getNodesByParam("id", node_id, null);
-        if (node) {
-            zTree.selectNode(node[0]);
-        }
+    var query_node_id = $.getUrlParam("node");
+    var cookie_node_id = getCookie('node_selected');
+    var node;
+    var node_id;
+
+    if (query_node_id !== null) {
+        node_id = query_node_id
+    } else if (cookie_node_id !== null) {
+        node_id = cookie_node_id;
+    }
+
+    node = zTree.getNodesByParam("id", node_id, null);
+    if (node){
+        zTree.selectNode(node[0]);
     }
 }
 

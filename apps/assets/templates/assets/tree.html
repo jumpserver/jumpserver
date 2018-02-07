@@ -88,6 +88,7 @@
                            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
                                <option value="delete">{% trans 'Delete selected' %}</option>
                                <option value="update">{% trans 'Update selected' %}</option>
+                               <option value="remove">{% trans 'Remove from this node' %}</option>
                                <option value="deactive">{% trans 'Deactive selected' %}</option>
                                <option value="active">{% trans 'Active selected' %}</option>
                            </select>
@@ -167,8 +168,6 @@ function initTable() {
     asset_table = jumpserver.initServerSideDataTable(options);
     return asset_table
 }
-
-
 
 
 function addTreeNode() {
@@ -281,17 +280,26 @@ function onRename(event, treeId, treeNode, isCancel){
 function onSelected(event, treeNode) {
     var url = asset_table.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.id);
+    setCookie('node_selected', treeNode.id);
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
 }
 
 function selectQueryNode() {
-    var node_id = $.getUrlParam("node");
-    if (node_id !== null) {
-        var node = zTree.getNodesByParam("id", node_id, null);
-        if (node){
-            zTree.selectNode(node[0]);
-        }
+    var query_node_id = $.getUrlParam("node");
+    var cookie_node_id = getCookie('node_selected');
+    var node;
+    var node_id;
+
+    if (query_node_id !== null) {
+        node_id = query_node_id
+    } else if (cookie_node_id !== null) {
+        node_id = cookie_node_id;
+    }
+
+    node = zTree.getNodesByParam("id", node_id, null);
+    if (node){
+        zTree.selectNode(node[0]);
     }
 }
 
@@ -479,6 +487,31 @@ $(document).ready(function(){
         var url = "{% url 'assets:asset-bulk-update' %}?assets_id=" + id_list_string;
         location.href = url
     }
+
+    function doRemove() {
+        var current_node;
+        var nodes = zTree.getSelectedNodes();
+        if (nodes && nodes.length === 1) {
+            current_node = nodes[0]
+        } else {
+            return
+        }
+
+        var data = {
+            'assets': id_list
+        };
+
+        var success = function () {
+            asset_table.ajax.reload()
+        };
+
+        APIUpdateAttr({
+            'url': '/api/assets/v1/nodes/' + current_node.id + '/assets/remove/',
+            'method': 'PUT',
+            'body': JSON.stringify(data),
+            'success': success
+        })
+    }
     switch(action) {
         case 'deactive':
             doDeactive();
@@ -491,6 +524,9 @@ $(document).ready(function(){
             break;
         case 'active':
             doActive();
+            break;
+        case 'remove':
+            doRemove();
             break;
         default:
             break;

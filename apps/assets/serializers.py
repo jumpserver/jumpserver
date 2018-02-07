@@ -335,3 +335,11 @@ class NodeSerializer(serializers.ModelSerializer):
         field = fields["key"]
         field.required = False
         return fields
+
+
+class NodeAssetsSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = Node
+        fields = ['assets']

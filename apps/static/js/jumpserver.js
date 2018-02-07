@@ -562,7 +562,6 @@ function setUrlParam(url, name, value) {
         url = urlArray[0] + "?";
         var newParam = [];
         $.each(oriParamMap, function (index, value) {
-            console.log(index, value);
             newParam.push(index + "=" + value);
         });
         url += newParam.join("&")

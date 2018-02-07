@@ -62,7 +62,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             queryset = queryset.filter(cluster__in=clusters)
         if node_id:
             node = get_object_or_404(Node, id=node_id)
-            queryset = queryset.filter(nodes__key__startswith=node.key)
+            queryset = queryset.filter(nodes__key__startswith=node.key).distinct()
         return queryset
 
 
