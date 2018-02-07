@@ -47,16 +47,20 @@ class Node(models.Model):
     def get_all_children(self):
         return self.__class__.objects.filter(key__startswith='{}:'.format(self.key))
 
+    def get_family(self):
+        children = list(self.get_all_children())
+        children.append(self)
+        return children
+
     def get_assets(self):
         from .asset import Asset
-        children = self.get_children()
-        assets = Asset.objects.filter(nodes__in=children)
+        assets = Asset.objects.filter(nodes__id=self.id)
         return assets
 
     def get_all_assets(self):
         from .asset import Asset
-        children = self.get_all_children()
-        assets = Asset.objects.filter(nodes__in=children)
+        nodes = self.get_family()
+        assets = Asset.objects.filter(nodes__in=nodes)
         return assets
 
     @property

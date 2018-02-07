@@ -7,9 +7,9 @@ app_name = 'assets'
 
 
 router = BulkRouter()
-router.register(r'v1/groups', api.AssetGroupViewSet, 'asset-group')
+# router.register(r'v1/groups', api.AssetGroupViewSet, 'asset-group')
 router.register(r'v1/assets', api.AssetViewSet, 'asset')
-router.register(r'v1/clusters', api.ClusterViewSet, 'cluster')
+# router.register(r'v1/clusters', api.ClusterViewSet, 'cluster')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 router.register(r'v1/labels', api.LabelViewSet, 'label')
@@ -26,15 +26,15 @@ urlpatterns = [
     url(r'^v1/assets/user-assets/$',
         api.UserAssetListView.as_view(), name='user-asset-list'),
     # update the asset group, which add or delete the asset to the group
-    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
-        api.GroupUpdateAssetsApi.as_view(), name='group-update-assets'),
-    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/add/$',
-        api.GroupAddAssetsApi.as_view(), name='group-add-assets'),
+    #url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
+    #    api.GroupUpdateAssetsApi.as_view(), name='group-update-assets'),
+    #url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/add/$',
+    #    api.GroupAddAssetsApi.as_view(), name='group-add-assets'),
     # update the Cluster, and add or delete the assets to the Cluster
-    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
-        api.ClusterAddAssetsApi.as_view(), name='cluster-add-assets'),
-    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/connective/$',
-        api.ClusterTestAssetsAliveApi.as_view(), name='cluster-test-connective'),
+    #url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
+    #    api.ClusterAddAssetsApi.as_view(), name='cluster-add-assets'),
+    #url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/connective/$',
+    #    api.ClusterTestAssetsAliveApi.as_view(), name='cluster-test-connective'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/clusters/$',
         api.AdminUserAddClustersApi.as_view(), name='admin-user-add-clusters'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',

@@ -12,7 +12,7 @@ from django.db.models import Q
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
-    get_user_granted_assets
+    NodePermissionUtil
 from ..models import  Asset, SystemUser, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
@@ -41,16 +41,10 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        cluster_id = self.request.query_params.get('cluster_id')
-        asset_group_id = self.request.query_params.get('asset_group_id')
         admin_user_id = self.request.query_params.get('admin_user_id')
         system_user_id = self.request.query_params.get('system_user_id')
         node_id = self.request.query_params.get("node_id")
 
-        if cluster_id:
-            queryset = queryset.filter(cluster__id=cluster_id)
-        if asset_group_id:
-            queryset = queryset.filter(groups__id=asset_group_id)
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
             assets_direct = [asset.id for asset in admin_user.asset_set.all()]
@@ -72,7 +66,7 @@ class UserAssetListView(generics.ListAPIView):
     permission_classes = (IsValidUser,)
 
     def get_queryset(self):
-        assets_granted = get_user_granted_assets(self.request.user)
+        assets_granted = NodePermissionUtil.get_user_assets(self.request.user).keys()
         queryset = self.queryset.filter(
             id__in=[asset.id for asset in assets_granted]
         )

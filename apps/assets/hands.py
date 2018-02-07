@@ -14,5 +14,5 @@
 from users.utils import AdminUserRequiredMixin
 from users.permissions import IsAppUser, IsSuperUser, IsValidUser, IsSuperUserOrAppUser
 from users.models import User, UserGroup
-from perms.utils import get_user_granted_assets
+from perms.utils import NodePermissionUtil
 from perms.tasks import push_users
