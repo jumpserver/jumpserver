@@ -41,7 +41,7 @@ logger = get_logger(__file__)
 
 
 class AssetListView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'assets/tree.html'
+    template_name = 'assets/asset_list.html'
 
     def get_context_data(self, **kwargs):
         context = {

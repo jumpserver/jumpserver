@@ -28,19 +28,22 @@ def default_cluster():
     return cluster.id
 
 
+def default_node():
+    from .tree import Node
+    return Node.root()
+
+
 class Asset(models.Model):
     # Important
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
-    cluster = models.ForeignKey(Cluster, related_name='assets', default=default_cluster, on_delete=models.SET_DEFAULT, verbose_name=_('Cluster'))
-    nodes = models.ManyToManyField('assets.Node', blank=True, related_name='assets', verbose_name=_("Nodes"))
+    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser',  on_delete=models.PROTECT, verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))

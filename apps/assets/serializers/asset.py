@@ -12,7 +12,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     资产的数据结构
     """
-    cluster_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Asset
@@ -26,10 +25,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'hardware_info', 'is_connective',
         ])
         return fields
-
-    @staticmethod
-    def get_cluster_name(obj):
-        return obj.cluster.name
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):

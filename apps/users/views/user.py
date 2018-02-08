@@ -295,10 +295,6 @@ class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
     template_name = 'users/user_granted_asset.html'
     object = None
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=User.objects.all())
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Users'),

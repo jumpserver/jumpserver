@@ -4,8 +4,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -15,77 +15,41 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li>
-                                <a href="{% url 'users:user-detail' pk=user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
+                                <a href="{% url 'users:user-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
                             <li class="active">
-                                <a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
+                                <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-6" style="padding-left: 0;">
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Assets granted of ' %} <b>{{ user.name }}</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <table class="table table-hover " id="user_assets_table" >
-                                        <thead>
-                                            <tr>
-                                                <th>{% trans 'Hostname' %}</th>
-                                                <th>{% trans 'IP' %}</th>
-                                                <th>{% trans 'System user' %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <div class="col-lg-3" style="padding-left: 0px">
+                           <div class="ibox float-e-margins">
+                               <div class="ibox-content mailbox-content" style="padding-top: 0">
+                                   <div class="file-manager ">
+                                       <div id="assetTree" class="ztree">
+                                       </div>
+
+                                       <div class="clearfix"></div>
+                                   </div>
+                               </div>
+                           </div>
                         </div>
-                        <div class="col-sm-6" style="padding-left: 0;padding-right: 0">
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Asset groups granted of ' %} <b>{{ user.name }}</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <table class="table table-hover" id="user_asset_groups_table" >
-                                        <thead>
-                                            <tr>
-                                                <th>{% trans 'Name' %}</th>
-                                                <th>{% trans 'Asset' %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <div class="col-lg-9 animated fadeInRight">
+                            <div class="mail-box-header">
+                                <table class="table table-striped table-bordered table-hover" id="user_assets_table" >
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                                            <th class="text-center">{% trans 'Hostname' %}</th>
+                                            <th class="text-center">{% trans 'IP' %}</th>
+                                            <th class="text-center">{% trans 'Active' %}</th>
+                                            <th class="text-center">{% trans 'Reachable' %}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -96,42 +60,114 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2();
-            var options = {
-                ele: $('#user_assets_table'),
-                buttons: [],
-                order: [],
-                select: [],
-                columnDefs: [
-                    {targets: 0, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-                     }}
-                ],
-                ajax_url: '{% url "api-perms:user-assets" pk=user.id %}',
-                columns: [{data: "hostname" }, {data: "ip" },
-                          {data: "system_users_join"}
-                ]
-            };
-            var options2 = {
-                ele: $('#user_asset_groups_table'),
-                buttons: [],
-                order: [],
-                select: [],
-                columnDefs: [
-                    {targets: 0, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-                     }}
-                ],
-                ajax_url: '{% url "api-perms:user-asset-groups" pk=user.id %}',
-                columns: [{data: "name" }, {data: "assets_amount" }],
-                paging: false
-            };
-            jumpserver.initDataTable(options);
-            jumpserver.initDataTable(options2);
+<script>
+var zTree;
+var inited = false;
+
+function initTable() {
+    if (inited){
+        return
+    } else {
+        inited = true;
+    }
+    var options = {
+        ele: $('#user_assets_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
+                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 3, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                if (cellData === 'Unknown'){
+                    $(td).html('<i class="fa fa-circle text-warning"></i>')
+                } else if (!cellData) {
+                    $(td).html('<i class="fa fa-circle text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-circle text-navy"></i>')
+                }
+            }}
+        ],
+        ajax_url: '{% url "api-assets:asset-list" %}',
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" },
+            {data: "is_active", orderable: false },
+            {data: "is_connective", orderable: false}
+        ]
+    };
+    asset_table = jumpserver.initServerSideDataTable(options);
+    return asset_table
+}
+
+function onSelected(event, treeNode) {
+    initTable();
+    var url = asset_table.ajax.url();
+    url = setUrlParam(url, "node_id", treeNode.id);
+    setCookie('node_selected', treeNode.id);
+    asset_table.ajax.url(url);
+    asset_table.ajax.reload();
+}
+
+function selectQueryNode() {
+    var query_node_id = $.getUrlParam("node");
+    var cookie_node_id = getCookie('node_selected');
+    var node;
+    var node_id;
+
+    if (query_node_id !== null) {
+        node_id = query_node_id
+    } else if (cookie_node_id !== null) {
+        node_id = cookie_node_id;
+    }
+
+    node = zTree.getNodesByParam("id", node_id, null);
+    if (node){
+        zTree.selectNode(node[0]);
+    }
+}
+
+function initTree() {
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            showLine: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onSelected: onSelected
+        }
+    };
+
+    var zNodes = [];
+    $.get("{% url 'api-perms:user-nodes' pk=object.id %}", function(data, status){
+        $.each(data, function (index, value) {
+            value["pId"] = value["parent"];
+            if (value["key"] === "0") {
+                value["open"] = true;
+            }
+            value["name"] = value["value"]
         });
-    </script>
+        zNodes = data;
+        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+        zTree = $.fn.zTree.getZTreeObj("assetTree");
+		rMenu = $("#rMenu");
+		selectQueryNode();
+    });
+}
+
+$(document).ready(function () {
+    initTree();
+});
+</script>
 {% endblock %}

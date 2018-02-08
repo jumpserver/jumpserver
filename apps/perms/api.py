@@ -10,7 +10,7 @@ from users.permissions import IsValidUser, IsSuperUser, IsSuperUserOrAppUser
 from .utils import NodePermissionUtil
 from .models import NodePermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, \
-    NodeGrantedSerializer, SystemUser
+    NodeGrantedSerializer, SystemUser, NodeSerializer
 from . import serializers
 
 
@@ -30,8 +30,10 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         node_id = self.request.query_params.get('node_id')
+
         if node_id:
             queryset = queryset.filter(node__id=node_id)
+
         return queryset
 
 
@@ -60,6 +62,20 @@ class UserGrantedAssetsApi(ListAPIView):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class UserGrantedNodesApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = NodeSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('pk', '')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+        else:
+            user = self.request.user
+        nodes = NodePermissionUtil.get_user_nodes(user)
+        return nodes.keys()
 
 
 class UserGrantedNodesWithAssetsApi(ListAPIView):
@@ -134,7 +150,22 @@ class UserGroupGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-class UserGroupGrantedNodeApi(ListAPIView):
+class UserGroupGrantedNodesApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = NodeSerializer
+
+    def get_queryset(self):
+        group_id = self.kwargs.get('pk', '')
+        queryset = []
+
+        if group_id:
+            group = get_object_or_404(UserGroup, id=group_id)
+            nodes = NodePermissionUtil.get_user_group_nodes(group)
+            queryset = nodes.keys()
+        return queryset
+
+
+class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = NodeGrantedSerializer
 

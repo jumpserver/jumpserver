@@ -34,8 +34,6 @@ class SystemUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_assets_amount(obj):
         amount = 0
-        for cluster in obj.cluster.all():
-            amount += cluster.assets.all().count()
         return amount
 
 

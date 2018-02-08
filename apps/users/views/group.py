@@ -88,10 +88,7 @@ class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
     model = UserGroup
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=self.model.objects.all())
-        return super().get(request, *args, **kwargs)
+    object = None
 
     def get_context_data(self, **kwargs):
         context = {

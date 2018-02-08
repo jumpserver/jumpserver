@@ -1,0 +1,280 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% block custom_head_css_js %}
+<link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+
+{% endblock %}
+{% block content_left_head %}{% endblock %}
+
+{% block table_search %}
+    <div class="html5buttons">
+        <div class="dt-buttons btn-group">
+            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+            </a>
+            <a class="btn btn-default btn_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block table_container %}
+<div class="uc pull-left m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>
+<div class="btn-group" style="float: right">
+    <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
+    <ul class="dropdown-menu labels">
+        {% for label in labels %}
+            <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+<table class="table table-striped table-bordered table-hover " id="asset_list_table" >
+    <thead>
+        <tr>
+            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+            <th class="text-center">{% trans 'Hostname' %}</th>
+            <th class="text-center">{% trans 'IP' %}</th>
+            <th class="text-center">{% trans 'Port' %}</th>
+            <th class="text-center">{% trans 'Cluster' %}</th>
+            <th class="text-center">{% trans 'Hardware' %}</th>
+            <th class="text-center">{% trans 'Active' %}</th>
+            <th class="text-center">{% trans 'Reachable' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<div id="actions" class="hide">
+    <div class="input-group">
+        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+            <option value="delete">{% trans 'Delete selected' %}</option>
+            <option value="update">{% trans 'Update selected' %}</option>
+            <option value="deactive">{% trans 'Deactive selected' %}</option>
+            <option value="active">{% trans 'Active selected' %}</option>
+        </select>
+        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+             {% trans 'Submit' %}
+            </button>
+        </div>
+    </div>
+</div>
+{% include 'assets/_asset_import_modal.html' %}
+{% endblock %}
+
+{% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script type="text/javascript">
+
+function initTable() {
+    var options = {
+        ele: $('#asset_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
+                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                 $(td).html(rowData.cluster_name)
+            }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.hardware_info)
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+            }},
+            {targets: 7, createdCell: function (td, cellData) {
+                if (cellData == 'Unknown'){
+                    $(td).html('<i class="fa fa-circle text-warning"></i>')
+                } else if (!cellData) {
+                    $(td).html('<i class="fa fa-circle text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-circle text-navy"></i>')
+                }
+            }},
+            {targets: 8, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                $(td).html(update_btn + del_btn)
+            }}
+        ],
+        ajax_url: '{% url "api-assets:asset-list" %}',
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+            {data: "cluster"},
+            {data: "cpu_cores"}, {data: "is_active", orderable: false },
+            {data: "is_connective", orderable: false}, {data: "id", orderable: false }
+        ],
+        op_html: $('#actions').html()
+    };
+    return jumpserver.initServerSideDataTable(options);
+}
+
+$(document).ready(function(){
+    initTable();
+    $(".select2").select2();
+})
+.on('click', '.labels li', function () {
+    var val = $(this).text();
+    $("#asset_list_table_filter input").val(val);
+    jumpserver.table.search(val).draw();
+})
+.on('click', '.btn_export', function () {
+    var $data_table = $('#asset_list_table').DataTable();
+    var rows = $data_table.rows('.selected').data();
+    var assets = [];
+    $.each(rows, function (index, obj) {
+        assets.push(obj.id)
+    });
+    $.ajax({
+        url: "{% url "assets:asset-export" %}",
+        method: 'POST',
+        data: JSON.stringify({assets_id: assets}),
+        dataType: "json",
+        success: function (data, textStatus) {
+            window.open(data.redirect)
+        },
+        error: function () {
+            toastr.error('Export failed');
+        }
+    })
+})
+.on('click', '#btn_asset_import', function () {
+    var $form = $('#fm_asset_import');
+    $form.find('.help-block').remove();
+    function success (data) {
+        if (data.valid === false) {
+            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+        } else {
+            $('#id_created').html(data.created_info);
+            $('#id_created_detail').html(data.created.join(', '));
+            $('#id_updated').html(data.updated_info);
+            $('#id_updated_detail').html(data.updated.join(', '));
+            $('#id_failed').html(data.failed_info);
+            $('#id_failed_detail').html(data.failed.join(', '));
+            var $data_table = $('#asset_list_table').DataTable();
+            $data_table.ajax.reload();
+        }
+    }
+    $form.ajaxSubmit({success: success});
+})
+
+.on('click', '.btn_asset_delete', function () {
+    var $this = $(this);
+    var $data_table = $("#asset_list_table").DataTable();
+    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
+    objectDelete($this, name, the_url);
+    setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
+})
+.on('click', '#btn_bulk_update', function () {
+    var action = $('#slct_bulk_update').val();
+    var $data_table = $('#asset_list_table').DataTable();
+    var id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push(this.data().id);
+    });
+    if (id_list.length === 0) {
+        return false;
+    }
+    var the_url = "{% url 'api-assets:asset-list' %}";
+
+    function doDeactive() {
+        var data = [];
+        $.each(id_list, function(index, object_id) {
+            var obj = {"pk": object_id, "is_active": false};
+            data.push(obj);
+        });
+        function success() {
+            location.reload()
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
+    }
+    function doActive() {
+        var data = [];
+        $.each(id_list, function(index, object_id) {
+            var obj = {"pk": object_id, "is_active": true};
+            data.push(obj);
+        });
+        function success() {
+            location.reload();
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
+    }
+    function doDelete() {
+        swal({
+            title: "{% trans 'Are you sure?' %}",
+            text: "{% trans 'This will delete the selected assets !!!' %}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: false
+        }, function() {
+            var success = function() {
+                var msg = "{% trans 'Asset Deleted.' %}";
+                swal("{% trans 'Asset Delete' %}", msg, "success");
+                $('#asset_list_table').DataTable().ajax.reload();
+            };
+            var fail = function() {
+                var msg = "{% trans 'Asset Deleting failed.' %}";
+                swal("{% trans 'Asset Delete' %}", msg, "error");
+            };
+            var url_delete = the_url + '?id__in=' + JSON.stringify(id_list);
+            APIUpdateAttr({
+                url: url_delete,
+                method: 'DELETE',
+                success: success,
+                error: fail
+            });
+            $data_table.ajax.reload();
+            jumpserver.checked = false;
+        });
+    }
+    function doUpdate() {
+        var id_list_string = id_list.join(',');
+        var url = "{% url 'assets:asset-bulk-update' %}?assets_id=" + id_list_string;
+        location.href = url
+    }
+    switch(action) {
+        case 'deactive':
+            doDeactive();
+            break;
+        case 'delete':
+            doDelete();
+            break;
+        case 'update':
+            doUpdate();
+            break;
+        case 'active':
+            doActive();
+            break;
+        default:
+            break;
+    }
+});
+
+</script>
+{% endblock %}
