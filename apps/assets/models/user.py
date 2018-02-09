@@ -218,7 +218,7 @@ class SystemUser(AssetUser):
         (RDP_PROTOCOL, 'rdp'),
     )
 
-    cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
+    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
@@ -227,21 +227,6 @@ class SystemUser(AssetUser):
 
     def __str__(self):
         return self.name
-
-    def get_clusters_assets(self):
-        from .asset import Asset
-        clusters = self.get_clusters()
-        return Asset.objects.filter(cluster__in=clusters)
-
-    def get_clusters(self):
-        return self.cluster.all()
-
-    def get_clusters_joined(self):
-        return ', '.join([cluster.name for cluster in self.get_clusters()])
-
-    @property
-    def assets_amount(self):
-        return len(self.get_clusters_assets())
 
     def to_json(self):
         return {
@@ -265,6 +250,12 @@ class SystemUser(AssetUser):
     @property
     def reachable_assets(self):
         return self.assets_connective.get('contacted', [])
+
+    def is_need_push(self):
+        if self.auto_push and self.protocol == self.__class__.SSH_PROTOCOL:
+            return True
+        else:
+            return False
 
     class Meta:
         ordering = ['name']

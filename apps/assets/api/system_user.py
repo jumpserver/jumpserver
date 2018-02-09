@@ -20,7 +20,7 @@ from common.utils import get_logger
 from ..hands import IsSuperUser, IsSuperUserOrAppUser
 from ..models import SystemUser
 from .. import serializers
-from ..tasks import push_system_user_to_cluster_assets_manual, \
+from ..tasks import push_system_user_to_assets_manual, \
     test_system_user_connectability_manual
 
 
@@ -68,7 +68,7 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        push_system_user_to_cluster_assets_manual.delay(system_user)
+        push_system_user_to_assets_manual.delay(system_user)
         return Response({"msg": "Task created"})
 
 

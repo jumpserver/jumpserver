@@ -99,7 +99,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     result = task.run()
     # Todo: may be somewhere using
     # Manual run callback function
-    assets_updated = set_assets_hardware_info(result)
+    set_assets_hardware_info(result)
     return result
 
 
@@ -262,21 +262,23 @@ def test_system_user_connectability_util(system_user, task_name):
     :param task_name:
     :return:
     """
-    from ops.utils import update_or_create_ansible_task
-    assets = system_user.get_clusters_assets()
-    hosts = [asset.hostname for asset in assets]
-    tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    if not hosts:
-        logger.info("No hosts, passed")
-        return {}
-    task, created = update_or_create_ansible_task(
-        task_name, hosts=hosts, tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS,
-        run_as=system_user.name, created_by="System",
-    )
-    result = task.run()
-    set_system_user_connectablity_info(result, system_user=system_user.name)
-    return result
+    # todo
+    # from ops.utils import update_or_create_ansible_task
+    # assets = system_user.get_clusters_assets()
+    # hosts = [asset.hostname for asset in assets]
+    # tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    # if not hosts:
+    #     logger.info("No hosts, passed")
+    #     return {}
+    # task, created = update_or_create_ansible_task(
+    #     task_name, hosts=hosts, tasks=tasks, pattern='all',
+    #     options=const.TASK_OPTIONS,
+    #     run_as=system_user.name, created_by="System",
+    # )
+    # result = task.run()
+    # set_system_user_connectablity_info(result, system_user=system_user.name)
+    # return result
+    return {}
 
 
 @shared_task
@@ -290,21 +292,23 @@ def test_system_user_connectability_manual(system_user):
 @after_app_ready_start
 @after_app_shutdown_clean
 def test_system_user_connectability_period():
-    from ops.utils import update_or_create_ansible_task
-    system_users = SystemUser.objects.all()
-    for system_user in system_users:
-        task_name = _("Test system user connectability period: {}").format(
-            system_user.name
-        )
-        assets = system_user.get_clusters_assets()
-        hosts = [asset.hostname for asset in assets]
-        tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=False,  run_as=system_user.name,
-            created_by='System', interval=3600, is_periodic=True,
-            callback=set_admin_user_connectability_info.name,
-        )
+    # Todo
+    pass
+    # from ops.utils import update_or_create_ansible_task
+    # system_users = SystemUser.objects.all()
+    # for system_user in system_users:
+    #     task_name = _("Test system user connectability period: {}").format(
+    #         system_user.name
+    #     )
+    #     assets = system_user.get_clusters_assets()
+    #     hosts = [asset.hostname for asset in assets]
+    #     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    #     update_or_create_ansible_task(
+    #         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
+    #         options=const.TASK_OPTIONS, run_as_admin=False,  run_as=system_user.name,
+    #         created_by='System', interval=3600, is_periodic=True,
+    #         callback=set_admin_user_connectability_info.name,
+    #     )
 
 
 ####  Push system user tasks ####
@@ -315,7 +319,6 @@ def get_push_system_user_tasks(system_user):
         return []
 
     tasks = []
-
     if system_user.password:
         tasks.append({
             'name': 'Add user {}'.format(system_user.username),
@@ -358,7 +361,8 @@ def push_system_user_util(system_users, assets, task_name):
     from ops.utils import update_or_create_ansible_task
     tasks = []
     for system_user in system_users:
-        tasks.extend(get_push_system_user_tasks(system_user))
+        if system_user.is_need_push():
+            tasks.extend(get_push_system_user_tasks(system_user))
 
     if not tasks:
         logger.info("Not tasks, passed")
@@ -375,11 +379,41 @@ def push_system_user_util(system_users, assets, task_name):
     return task.run()
 
 
+def get_node_push_system_user_task_name(system_user, node):
+    return _("Push system user to node: {} => {}").format(
+        system_user.name,
+        node.value
+    )
+
+
+def push_system_user_to_node(system_user, node):
+    assets = node.get_all_assets()
+    task_name = get_node_push_system_user_task_name(system_user, node)
+    push_system_user_util.delay([system_user], assets, task_name)
+
+
 @shared_task
-def push_system_user_to_cluster_assets_manual(system_user):
-    task_name = _("Push system user to cluster assets: {}").format(system_user.name)
-    assets = system_user.get_clusters_assets()
-    return push_system_user_util([system_user], assets, task_name)
+def push_system_user_related_nodes(system_user):
+    nodes = system_user.nodes.all()
+    for node in nodes:
+        push_system_user_to_node(system_user, node)
+
+
+@shared_task
+def push_system_user_to_assets_manual(system_user):
+    push_system_user_related_nodes(system_user)
+
+
+def push_node_system_users_to_asset(node, assets):
+    system_users = []
+    nodes = node.ancestor_with_node
+    # 获取该节点所有父节点有的系统用户, 然后推送
+    for n in nodes:
+        system_users.extend(list(n.systemuser_set.all()))
+
+    if system_users:
+        task_name = _("Push system users to node: {}").format(node.value)
+        push_system_user_util.delay(system_users, assets, task_name)
 
 
 @shared_task
@@ -387,23 +421,5 @@ def push_system_user_to_cluster_assets_manual(system_user):
 @after_app_ready_start
 @after_app_shutdown_clean
 def push_system_user_period():
-    from ops.utils import update_or_create_ansible_task
-    clusters = Cluster.objects.all()
-
-    for cluster in clusters:
-        tasks = []
-        system_users = [system_user for system_user in cluster.systemuser_set.all() if system_user.auto_push]
-        if not system_users:
-            return
-        for system_user in system_users:
-            tasks.extend(get_push_system_user_tasks(system_user))
-
-        task_name = _("Push cluster system users to assets period: {}").format(
-            cluster.name
-        )
-        hosts = [asset.hostname for asset in cluster.assets.all()]
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
-            interval=60*60*24, is_periodic=True,
-        )
+    for system_user in SystemUser.objects.all():
+        push_system_user_related_nodes(system_user)

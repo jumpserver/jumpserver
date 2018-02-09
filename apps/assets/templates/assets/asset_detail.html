@@ -71,11 +71,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>
-                                            {% if asset.admin_user_avail %}
-                                            <td><b>{{ asset.admin_user_avail.name }}</b></td>
-                                            {% else %}
-                                            <td></td>
-                                            {% endif %}
+                                            <td><b>{{ asset.admin_user }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cluster' %}:</td>

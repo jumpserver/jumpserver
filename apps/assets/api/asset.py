@@ -33,7 +33,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     """
     filter_fields = ("hostname", "ip")
     search_fields = filter_fields
-    ordering_fields = ("hostname", "ip", "port", "cluster", "cpu_cores")
+    ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
@@ -47,13 +47,9 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
 
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-            assets_direct = [asset.id for asset in admin_user.asset_set.all()]
-            clusters = [cluster.id for cluster in admin_user.cluster_set.all()]
-            queryset = queryset.filter(Q(cluster__id__in=clusters)|Q(id__in=assets_direct))
+            queryset = queryset.filter(admin_user=admin_user)
         if system_user_id:
             system_user = get_object_or_404(SystemUser, id=system_user_id)
-            clusters = system_user.get_clusters()
-            queryset = queryset.filter(cluster__in=clusters)
         if node_id:
             node = get_object_or_404(Node, id=node_id)
             queryset = queryset.filter(nodes__key__startswith=node.key).distinct()

@@ -24,7 +24,7 @@ class Node(models.Model):
         if self == self.__class__.root():
             return self.value
         else:
-            return '{}/{}'.format( self.value, self.parent.full_value)
+            return '{}/{}'.format(self.value, self.parent.full_value)
 
     @property
     def level(self):
@@ -77,6 +77,19 @@ class Node(models.Model):
             return self.__class__.root()
         else:
             return parent
+
+    @property
+    def ancestor(self):
+        if self.parent == self.__class__.root():
+            return [self.__class__.root()]
+        else:
+            return [self.parent, *tuple(self.parent.ancestor)]
+
+    @property
+    def ancestor_with_node(self):
+        ancestor = self.ancestor
+        ancestor.insert(0, self)
+        return ancestor
 
     @classmethod
     def root(cls):

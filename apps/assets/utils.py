@@ -23,17 +23,6 @@ def get_system_user_by_name(name):
     return system_user
 
 
-def check_assets_have_system_user(assets, system_users):
-    errors = defaultdict(list)
-
-    for system_user in system_users:
-        clusters = system_user.cluster.all()
-        for asset in assets:
-            if asset.cluster not in clusters:
-                errors[asset].append(system_user)
-    return errors
-
-
 class LabelFilter:
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -53,3 +42,7 @@ class LabelFilter:
             for kwargs in conditions:
                 queryset = queryset.filter(**kwargs)
         return queryset
+
+
+
+

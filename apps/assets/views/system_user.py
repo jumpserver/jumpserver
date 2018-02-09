@@ -70,11 +70,9 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
     model = SystemUser
 
     def get_context_data(self, **kwargs):
-        cluster_remain = Cluster.objects.exclude(systemuser=self.object)
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
-            'cluster_remain': cluster_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

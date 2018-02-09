@@ -29,8 +29,11 @@ def default_cluster():
 
 
 def default_node():
-    from .tree import Node
-    return Node.root()
+    try:
+        from .tree import Node
+        return Node.root()
+    except:
+        return None
 
 
 class Asset(models.Model):
@@ -43,7 +46,7 @@ class Asset(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser',  on_delete=models.PROTECT, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
@@ -102,30 +105,12 @@ class Asset(models.Model):
         else:
             return False
 
-    @property
-    def admin_user_avail(self):
-        if self.admin_user:
-            admin_user = self.admin_user
-        elif self.cluster and self.cluster.admin_user:
-            admin_user = self.cluster.admin_user
-        else:
-            return None
-        return admin_user
-
-    @property
-    def is_has_private_admin_user(self):
-        if self.admin_user:
-            return True
-        else:
-            return False
-
     def to_json(self):
         return {
             'id': self.id,
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
-            'groups': [group.name for group in self.groups.all()],
         }
 
     def _to_secret_json(self):
@@ -136,13 +121,14 @@ class Asset(models.Model):
         Todo: May be move to ops implements it
         """
         data = self.to_json()
-        if self.admin_user_avail:
-            admin_user = self.admin_user_avail
+        if self.admin_user:
+            admin_user = self.admin_user
             data.update({
                 'username': admin_user.username,
                 'password': admin_user.password,
                 'private_key': admin_user.private_key_file,
                 'become': admin_user.become_info,
+                'groups': [node.value for node in self.nodes.all()],
             })
         return data
 
@@ -161,7 +147,6 @@ class Asset(models.Model):
             asset = cls(ip='%s.%s.%s.%s' % (i, i, i, i),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
-                        cluster=choice(Cluster.objects.all()),
                         port=22,
                         created_by='Fake')
             try:
