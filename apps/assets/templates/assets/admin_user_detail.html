@@ -31,7 +31,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ admin_user.name }}</b></span>
@@ -77,11 +77,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
-
-                            <div class="panel panel-info">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Using this as cluster admin user' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace assets admin user with this' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit" id="table-clusters">
@@ -89,25 +88,19 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select cluster' %}"  id="cluster_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for cluster in cluster_remain %}
-                                                        <option value="{{ cluster.id }}" id="opt_{{ cluster.id }}" >{{ cluster.name }}</option>
+                                                    <select data-placeholder="{% trans 'Nodes' %}"  id="nodes_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for node in nodes %}
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.value }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-cluster">{% trans 'Confirm' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm" id="btn-change-admin-user">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
-
-                                        {% for cluster in admin_user.cluster_set.all %}
-                                        <tr>
-                                          <td ><b class="bdg_cluster" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>
-                                        </tr>
-                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -123,29 +116,20 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function bindToCluster(clusters) {
-    var the_url = "{% url 'api-assets:admin-user-add-clusters' pk=admin_user.id %}";
+function replaceNodeAssetsAdminUser(nodes) {
+    var the_url = "{% url 'api-assets:replace-nodes-admin-user' pk=admin_user.id %}";
     var body = {
-        clusters: clusters
+        nodes: nodes
     };
     var success = function(data) {
         // remove all the selected groups from select > option and rendered ul element;
         $('.select2-selection__rendered').empty();
-        $('#cluster_selected').val('');
-        $.map(jumpserver.cluster_selected, function(cluster_name, index) {
-            $('#opt_' + index).remove();
-            // change tr html of user groups.
-            $('#table-clusters tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_cluster" data-gid="' + index + '">' + cluster_name + '</b></td>' +
-                '</tr>'
-            )
-        });
-        $.map(jumpserver.cluster_selected, function(value, index) {
+        $('#nodes_selected').val('');
+        $.map(jumpserver.nodes_selected, function(value, index) {
             $('#opt_' + index).remove();
         });
         // clear jumpserver.groups_selected
-    jumpserver.cluster_selected = {};
+        jumpserver.nodes_selected = {};
     };
     APIUpdateAttr({
         url: the_url,
@@ -154,15 +138,15 @@ function bindToCluster(clusters) {
     });
 }
 
-jumpserver.cluster_selected = {};
+jumpserver.nodes_selected = {};
 $(document).ready(function () {
     $('.select2').select2()
     .on('select2:select', function(evt) {
         var data = evt.params.data;
-        jumpserver.cluster_selected[data.id] = data.text;
+        jumpserver.nodes_selected[data.id] = data.text;
     }).on('select2:unselect', function(evt) {
         var data = evt.params.data;
-        delete jumpserver.cluster_selected[data.id]
+        delete jumpserver.nodes_selected[data.id]
     });
 })
 .on('click', '.btn-delete-admin-user', function () {
@@ -173,15 +157,15 @@ $(document).ready(function () {
     var redirect_url = "{% url 'assets:admin-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })
-.on('click', '#btn-add-cluster', function () {
-    if (Object.keys(jumpserver.cluster_selected).length === 0) {
+.on('click', '#btn-change-admin-user', function () {
+    if (Object.keys(jumpserver.nodes_selected).length === 0) {
        return false;
     }
-    var clusters = [];
-     $.map(jumpserver.cluster_selected, function(value, index) {
-        clusters.push(index);
+    var nodes = [];
+    $.map(jumpserver.nodes_selected, function(value, index) {
+        nodes.push(index);
     });
-    bindToCluster(clusters)
+    replaceNodeAssetsAdminUser(nodes);
 })
 </script>
 {% endblock %}

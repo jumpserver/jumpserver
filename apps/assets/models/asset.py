@@ -30,7 +30,7 @@ def default_cluster():
 
 def default_node():
     try:
-        from .tree import Node
+        from .node import Node
         return Node.root()
     except:
         return None

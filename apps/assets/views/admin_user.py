@@ -10,7 +10,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import AdminUser, Cluster
+from ..models import AdminUser, Node
 from ..hands import AdminUserRequiredMixin
 
 __all__ = [
@@ -77,6 +77,7 @@ class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': _('Assets'),
             'action': _('Admin user detail'),
+            'nodes': Node.objects.all()
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

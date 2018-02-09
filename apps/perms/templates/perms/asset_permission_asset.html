@@ -191,7 +191,7 @@ function updateGroup(groups) {
 }
 
 jumpserver.assets_selected = {};
-jumpserver.groups_selected = {};
+jumpserver.nodes_selected = {};
 
 $(document).ready(function () {
      $('.select2.asset').select2()
@@ -206,11 +206,11 @@ $(document).ready(function () {
     $('.select2.group').select2()
         .on('select2:select', function(evt) {
              var data = evt.params.data;
-             jumpserver.groups_selected[data.id] = data.text;
+             jumpserver.nodes_selected[data.id] = data.text;
         })
         .on('select2:unselect', function(evt) {
             var data = evt.params.data;
-            delete jumpserver.groups_selected[data.id]
+            delete jumpserver.nodes_selected[data.id]
         })
 })
 .on('click', '.btn-add-assets', function () {
@@ -232,7 +232,7 @@ $(document).ready(function () {
     removeAssets(assets)
 })
 .on('click', '#btn-add-group', function () {
-    if (Object.keys(jumpserver.groups_selected).length === 0) {
+    if (Object.keys(jumpserver.nodes_selected).length === 0) {
 		return false;
 	}
 
@@ -240,7 +240,7 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
 
-    $.map(jumpserver.groups_selected, function(group_name, index) {
+    $.map(jumpserver.nodes_selected, function(group_name, index) {
         groups.push(index);
         $('#opt_' + index).remove();
         $('.group_edit tbody').append(

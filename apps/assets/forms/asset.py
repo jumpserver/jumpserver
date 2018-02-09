@@ -86,7 +86,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port', 'labels', 'admin_user'
+            'assets', 'port',  'admin_user', 'nodes',
         ]
         widgets = {
             'admin_user': forms.SelectMultiple(
@@ -94,6 +94,9 @@ class AssetBulkUpdateForm(forms.ModelForm):
             ),
             'labels': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('Labels')}
+            ),
+            'nodes': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('Nodes')}
             ),
         }
 

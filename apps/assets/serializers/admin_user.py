@@ -2,7 +2,7 @@
 #
 from django.core.cache import cache
 from rest_framework import serializers
-from ..models import Cluster, AdminUser
+from ..models import Node, AdminUser
 from ..const import ADMIN_USER_CONN_CACHE_KEY
 
 
@@ -39,14 +39,14 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return obj.assets_amount
 
 
-class AdminUserUpdateClusterSerializer(serializers.ModelSerializer):
+class ReplaceNodeAdminUserSerializer(serializers.ModelSerializer):
     """
     管理用户更新关联到的集群
     """
-    clusters = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Cluster.objects.all()
+    nodes = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Node.objects.all()
     )
 
     class Meta:
         model = AdminUser
-        fields = ['id', 'clusters']
+        fields = ['id', 'nodes']

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.db import transaction
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -20,14 +21,14 @@ from rest_framework_bulk import BulkModelViewSet
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from ..hands import IsSuperUser
-from ..models import AdminUser
+from ..models import AdminUser, Asset
 from .. import serializers
 from ..tasks import test_admin_user_connectability_manual
 
 
 logger = get_logger(__file__)
 __all__ = [
-    'AdminUserViewSet', 'AdminUserAddClustersApi', 'AdminUserTestConnectiveApi'
+    'AdminUserViewSet', 'ReplaceNodesAdminUserApi', 'AdminUserTestConnectiveApi'
 ]
 
 
@@ -40,19 +41,23 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-class AdminUserAddClustersApi(generics.UpdateAPIView):
+class ReplaceNodesAdminUserApi(generics.UpdateAPIView):
     queryset = AdminUser.objects.all()
-    serializer_class = serializers.AdminUserUpdateClusterSerializer
+    serializer_class = serializers.ReplaceNodeAdminUserSerializer
     permission_classes = (IsSuperUser,)
 
     def update(self, request, *args, **kwargs):
         admin_user = self.get_object()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            clusters = serializer.validated_data['clusters']
-            for cluster in clusters:
-                cluster.admin_user = admin_user
-                cluster.save()
+            nodes = serializer.validated_data['nodes']
+            assets = []
+            for node in nodes:
+                assets.extend([asset.id for asset in node.get_all_assets()])
+
+            with transaction.atomic():
+                Asset.objects.filter(id__in=assets).update(admin_user=admin_user)
+
             return Response({"msg": "ok"})
         else:
             return Response({'error': serializer.errors}, status=400)

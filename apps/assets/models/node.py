@@ -17,7 +17,11 @@ class Node(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.full_value
+        return self.value
+
+    @property
+    def name(self):
+        return self.value
 
     @property
     def full_value(self):

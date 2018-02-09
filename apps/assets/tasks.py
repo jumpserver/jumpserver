@@ -46,7 +46,7 @@ def set_assets_hardware_info(result, **kwargs):
             continue
 
         ___vendor = info.get('ansible_system_vendor', 'Unknown')
-        ___model = info.get('ansible_product_version', 'Unknown')
+        ___model = info.get('ansible_product_name', 'Unknown')
         ___sn = info.get('ansible_product_serial', 'Unknown')
 
         for ___cpu_model in info.get('ansible_processor', []):

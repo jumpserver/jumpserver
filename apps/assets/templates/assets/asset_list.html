@@ -325,9 +325,9 @@ function initTree() {
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
-            if (value["key"] === "0") {
-                value["open"] = true;
-            }
+            {#if (value["key"] === "0") {#}
+            value["open"] = true;
+            {# }#}
             value["name"] = value["value"]
         });
         zNodes = data;

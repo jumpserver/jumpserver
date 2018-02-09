@@ -34,8 +34,7 @@ from ..hands import AdminUserRequiredMixin
 __all__ = [
     'AssetListView', 'AssetCreateView', 'AssetUpdateView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
-    'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
-    'BulkImportAssetView',
+    'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
 ]
 logger = get_logger(__file__)
 
@@ -102,22 +101,22 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return create_success_msg % ({"name": cleaned_data["hostname"]})
 
 
-class AssetModalListView(AdminUserRequiredMixin, ListView):
-    paginate_by = settings.DISPLAY_PER_PAGE
-    model = Asset
-    context_object_name = 'asset_modal_list'
-    template_name = 'assets/asset_modal_list.html'
-
-    def get_context_data(self, **kwargs):
-        assets = Asset.objects.all()
-        assets_id = self.request.GET.get('assets_id', '')
-        assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
-        context = {
-            'all_assets': assets_id_list,
-            'assets': assets
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+# class AssetModalListView(AdminUserRequiredMixin, ListView):
+#     paginate_by = settings.DISPLAY_PER_PAGE
+#     model = Asset
+#     context_object_name = 'asset_modal_list'
+#     template_name = 'assets/_asset_list_modal.html'
+#
+#     def get_context_data(self, **kwargs):
+#         assets = Asset.objects.all()
+#         assets_id = self.request.GET.get('assets_id', '')
+#         assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
+#         context = {
+#             'all_assets': assets_id_list,
+#             'assets': assets
+#         }
+#         kwargs.update(context)
+#         return super().get_context_data(**kwargs)
 
 
 class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
@@ -191,14 +190,11 @@ class AssetDetailView(DetailView):
     template_name = 'assets/asset_detail.html'
 
     def get_context_data(self, **kwargs):
-        asset_groups = self.object.groups.all()
+        nodes_remain = Node.objects.exclude(assets=self.object)
         context = {
             'app': _('Assets'),
             'action': _('Asset detail'),
-            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
-                                    if asset_group not in asset_groups],
-            'asset_groups': asset_groups,
-            'system_users_all': SystemUser.objects.all(),
+            'nodes_remain': nodes_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

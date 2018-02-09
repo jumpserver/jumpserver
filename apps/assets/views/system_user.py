@@ -9,7 +9,7 @@ from django.views.generic.detail import DetailView
 
 from common.const import create_success_msg, update_success_msg
 from ..forms import SystemUserForm
-from ..models import SystemUser, Cluster
+from ..models import SystemUser, Node
 from ..hands import AdminUserRequiredMixin
 
 
@@ -73,6 +73,7 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
+            'nodes_remain': Node.objects.exclude(systemuser=self.object)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

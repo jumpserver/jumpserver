@@ -42,14 +42,11 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         admin_user_id = self.request.query_params.get('admin_user_id')
-        system_user_id = self.request.query_params.get('system_user_id')
         node_id = self.request.query_params.get("node_id")
 
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
             queryset = queryset.filter(admin_user=admin_user)
-        if system_user_id:
-            system_user = get_object_or_404(SystemUser, id=system_user_id)
         if node_id:
             node = get_object_or_404(Node, id=node_id)
             queryset = queryset.filter(nodes__key__startswith=node.key).distinct()

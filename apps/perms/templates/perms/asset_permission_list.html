@@ -85,7 +85,7 @@ function initTable() {
         ele: $('#permission_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData) {
-                var html = '<a href="{% url 'assets:tree-view' %}?node=99899">' + cellData.name + '</a>';
+                var html = '<a href="{% url 'assets:asset-list' %}?node=99899">' + cellData.name + '</a>';
                 $(td).html(html.replace("99899", cellData.pk));
             }},
             {targets: 2, createdCell: function (td, cellData) {
@@ -178,9 +178,9 @@ function initTree() {
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
-            if (value["key"] === "0") {
-                value["open"] = true;
-            }
+            {#if (value["key"] === "0") {#}
+            value["open"] = true;
+            {# }#}
             value["name"] = value["value"]
         });
         zNodes = data;
