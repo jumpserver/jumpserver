@@ -13,7 +13,7 @@ from apps import __version__
 try:
     from config import config as CONFIG
 except ImportError:
-    CONFIG = type('_', (), {'__getattr__': None})()
+    CONFIG = type('_', (), {'__getattr__': lambda *arg: None})()
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"
 
