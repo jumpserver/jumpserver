@@ -74,7 +74,8 @@ $(document).ready(function(){
                 if (val === 100) {
                     innerHtml = "<span class='text-navy'>" + val + "% </span>";
                 } else {
-                    innerHtml = "<span class='text-danger'>" + val + "% </span>";
+                    var num = new Number(val);
+                    innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
 

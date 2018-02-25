@@ -174,7 +174,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.status_set.all()
+            self.queryset = terminal.session_set.all()
         return self.queryset
 
 

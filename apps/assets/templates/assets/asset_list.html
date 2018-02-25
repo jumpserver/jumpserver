@@ -329,7 +329,7 @@ function initTree() {
             {#if (value["key"] === "0") {#}
             value["open"] = true;
             {# }#}
-            value["name"] = value["value"]
+            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')'
         });
         zNodes = data;
         $.fn.zTree.init($("#assetTree"), setting, zNodes);

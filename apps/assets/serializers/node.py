@@ -38,15 +38,20 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 class NodeSerializer(serializers.ModelSerializer):
     parent = serializers.SerializerMethodField()
+    assets_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent']
+        fields = ['id', 'key', 'value', 'parent', 'assets_amount']
         list_serializer_class = BulkListSerializer
 
     @staticmethod
     def get_parent(obj):
         return obj.parent.id
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return obj.get_all_assets().count()
 
     def get_fields(self):
         fields = super().get_fields()

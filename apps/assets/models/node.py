@@ -63,9 +63,15 @@ class Node(models.Model):
 
     def get_all_assets(self):
         from .asset import Asset
-        nodes = self.get_family()
-        assets = Asset.objects.filter(nodes__in=nodes)
+        if self.is_root():
+            assets = Asset.objects.all()
+        else:
+            nodes = self.get_family()
+            assets = Asset.objects.filter(nodes__in=nodes)
         return assets
+
+    def is_root(self):
+        return self.key == '0'
 
     @property
     def parent(self):

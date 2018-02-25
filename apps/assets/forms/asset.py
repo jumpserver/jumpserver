@@ -3,7 +3,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from ..models import Asset
+from ..models import Asset, AdminUser
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -85,16 +85,23 @@ class AssetBulkUpdateForm(forms.ModelForm):
     port = forms.IntegerField(
         label=_('Port'), required=False, min_value=1, max_value=65535,
     )
+    admin_user = forms.ModelChoiceField(
+        required=False, queryset=AdminUser.objects.all(),
+        label=_("Admin user"),
+        widget=forms.Select(
+            attrs={
+                'class': 'select2',
+                'data-placeholder': _('Admin user')
+            }
+        )
+    )
 
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port',  'admin_user', 'nodes',
+            'assets', 'port',  'admin_user', 'labels', 'nodes',
         ]
         widgets = {
-            'admin_user': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Admin user')}
-            ),
             'labels': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('Labels')}
             ),
@@ -106,17 +113,21 @@ class AssetBulkUpdateForm(forms.ModelForm):
     def save(self, commit=True):
         changed_fields = []
         for field in self._meta.fields:
-            if self.data.get(field) is not None:
+            if self.data.get(field) not in [None, '']:
                 changed_fields.append(field)
 
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
         assets = cleaned_data.pop('assets')
         labels = cleaned_data.pop('labels', [])
+        nodes = cleaned_data.pop('nodes')
         assets = Asset.objects.filter(id__in=[asset.id for asset in assets])
         assets.update(**cleaned_data)
 
         if labels:
-            for asset in assets:
-                asset.labels.set(labels)
+            for label in labels:
+                label.assets.add(*tuple(assets))
+        if nodes:
+            for node in nodes:
+                node.assets.add(*tuple(assets))
         return assets
