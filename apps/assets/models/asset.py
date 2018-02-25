@@ -46,7 +46,7 @@ class Asset(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
