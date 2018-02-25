@@ -166,6 +166,8 @@ def test_admin_user_connectability_util(admin_user, task_name):
 
     assets = admin_user.get_related_assets()
     hosts = [asset.hostname for asset in assets]
+    if not hosts:
+        return
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -184,19 +186,10 @@ def test_admin_user_connectability_period():
     """
     A period task that update the ansible task period
     """
-    from ops.utils import update_or_create_ansible_task
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
-        task_name = _("Test admin user connectability period: {}").format(admin_user)
-        assets = admin_user.get_related_assets()
-        hosts = [asset.hostname for asset in assets]
-        tasks = const.TEST_ADMIN_USER_CONN_TASKS
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
-            interval=3600, is_periodic=True,
-            callback=set_admin_user_connectability_info.name,
-        )
+        task_name = _("Test admin user connectability period: {}".format(admin_user.name))
+        test_admin_user_connectability_util(admin_user, task_name)
 
 
 @shared_task
@@ -262,23 +255,21 @@ def test_system_user_connectability_util(system_user, task_name):
     :param task_name:
     :return:
     """
-    # todo
-    # from ops.utils import update_or_create_ansible_task
-    # assets = system_user.get_clusters_assets()
-    # hosts = [asset.hostname for asset in assets]
-    # tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    # if not hosts:
-    #     logger.info("No hosts, passed")
-    #     return {}
-    # task, created = update_or_create_ansible_task(
-    #     task_name, hosts=hosts, tasks=tasks, pattern='all',
-    #     options=const.TASK_OPTIONS,
-    #     run_as=system_user.name, created_by="System",
-    # )
-    # result = task.run()
-    # set_system_user_connectablity_info(result, system_user=system_user.name)
-    # return result
-    return {}
+    from ops.utils import update_or_create_ansible_task
+    assets = system_user.assets
+    hosts = [asset.hostname for asset in assets]
+    tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    if not hosts:
+        logger.info("No hosts, passed")
+        return {}
+    task, created = update_or_create_ansible_task(
+        task_name, hosts=hosts, tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS,
+        run_as=system_user.name, created_by="System",
+    )
+    result = task.run()
+    set_system_user_connectablity_info(result, system_user=system_user.name)
+    return result
 
 
 @shared_task
@@ -292,23 +283,10 @@ def test_system_user_connectability_manual(system_user):
 @after_app_ready_start
 @after_app_shutdown_clean
 def test_system_user_connectability_period():
-    # Todo
-    pass
-    # from ops.utils import update_or_create_ansible_task
-    # system_users = SystemUser.objects.all()
-    # for system_user in system_users:
-    #     task_name = _("Test system user connectability period: {}").format(
-    #         system_user.name
-    #     )
-    #     assets = system_user.get_clusters_assets()
-    #     hosts = [asset.hostname for asset in assets]
-    #     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    #     update_or_create_ansible_task(
-    #         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-    #         options=const.TASK_OPTIONS, run_as_admin=False,  run_as=system_user.name,
-    #         created_by='System', interval=3600, is_periodic=True,
-    #         callback=set_admin_user_connectability_info.name,
-    #     )
+    system_users = SystemUser.objects.all()
+    for system_user in system_users:
+        task_name = _("test system user connectability period: {}".format(system_user))
+        test_system_user_connectability_util(system_user, task_name)
 
 
 ####  Push system user tasks ####
@@ -416,10 +394,10 @@ def push_node_system_users_to_asset(node, assets):
         push_system_user_util.delay(system_users, assets, task_name)
 
 
-@shared_task
-@register_as_period_task(interval=3600)
-@after_app_ready_start
-@after_app_shutdown_clean
-def push_system_user_period():
-    for system_user in SystemUser.objects.all():
-        push_system_user_related_nodes(system_user)
+# @shared_task
+# @register_as_period_task(interval=3600)
+# @after_app_ready_start
+# # @after_app_shutdown_clean
+# def push_system_user_period():
+#     for system_user in SystemUser.objects.all():
+#         push_system_user_related_nodes(system_user)

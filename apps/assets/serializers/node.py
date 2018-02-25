@@ -14,17 +14,22 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_granted = AssetGrantedSerializer(many=True, read_only=True)
     assets_amount = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Node
         fields = [
-            'id', 'key', 'value', 'parent',
+            'id', 'key', 'name', 'value', 'parent',
             'assets_granted', 'assets_amount',
         ]
 
     @staticmethod
     def get_assets_amount(obj):
         return len(obj.assets_granted)
+
+    @staticmethod
+    def get_name(obj):
+        return obj.name
 
     @staticmethod
     def get_parent(obj):

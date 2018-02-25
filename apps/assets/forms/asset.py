@@ -64,7 +64,10 @@ class AssetUpdateForm(forms.ModelForm):
             'ip': '* required',
             'port': '* required',
             'cluster': '* required',
-            'admin_user': _('')
+            'admin_user': _(
+                'Admin user is a privilege user exist on this asset,'
+                'Example: root or other NOPASSWD sudo privilege user'
+            )
         }
 
 

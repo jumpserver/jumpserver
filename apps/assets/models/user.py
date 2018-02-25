@@ -239,6 +239,13 @@ class SystemUser(AssetUser):
         }
 
     @property
+    def assets(self):
+        assets = set()
+        for node in self.nodes.all():
+            assets.update(set(node.get_all_assets()))
+        return assets
+
+    @property
     def assets_connective(self):
         _result = cache.get(SYSTEM_USER_CONN_CACHE_KEY.format(self.name), {})
         return _result

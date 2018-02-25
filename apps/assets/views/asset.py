@@ -213,22 +213,19 @@ class AssetExportView(View):
             ]
         ]
         filename = 'assets-{}.csv'.format(
-            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         response.write(codecs.BOM_UTF8)
         assets = Asset.objects.filter(id__in=assets_id)
-        writer = csv.writer(response, dialect='excel',
-                            quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
 
         header = [field.verbose_name for field in fields]
-        header.append(_('Asset groups'))
         writer.writerow(header)
 
         for asset in assets:
-            groups = ','.join([group.name for group in asset.groups.all()])
             data = [getattr(asset, field.name) for field in fields]
-            data.append(groups)
             writer.writerow(data)
         return response
 
@@ -262,7 +259,6 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         ]
         header_ = csv_data[0]
         mapping_reverse = {field.verbose_name: field.name for field in fields}
-        mapping_reverse[_('Asset groups')] = 'groups'
         attr = [mapping_reverse.get(n, None) for n in header_]
         if None in attr:
             data = {'valid': False,
@@ -279,20 +275,15 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset_dict = dict(zip(attr, row))
             id_ = asset_dict.pop('id', 0)
             for k, v in asset_dict.items():
-                if k == 'cluster':
-                    v = get_object_or_none(Cluster, name=v)
-                elif k == 'is_active':
-                    v = bool(v)
+                if k == 'is_active':
+                    v = True if v in ['TRUE', 1, 'true'] else False
                 elif k == 'admin_user':
                     v = get_object_or_none(AdminUser, name=v)
-                elif k in ['port', 'cabinet_pos', 'cpu_count', 'cpu_cores']:
+                elif k in ['port', 'cpu_count', 'cpu_cores']:
                     try:
                         v = int(v)
                     except ValueError:
                         v = 0
-                elif k == 'groups':
-                    groups_name = v.split(',')
-                    v = AssetGroup.objects.filter(name__in=groups_name)
                 else:
                     continue
                 asset_dict[k] = v
@@ -300,20 +291,15 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset = get_object_or_none(Asset, id=id_) if is_uuid(id_) else None
             if not asset:
                 try:
-                    groups = asset_dict.pop('groups')
                     if len(Asset.objects.filter(hostname=asset_dict.get('hostname'))):
                         raise Exception(_('already exists'))
                     asset = Asset.objects.create(**asset_dict)
-                    asset.groups.set(groups)
                     created.append(asset_dict['hostname'])
                     assets.append(asset)
                 except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
                 for k, v in asset_dict.items():
-                    if k == 'groups':
-                        asset.groups.set(v)
-                        continue
                     if v:
                         setattr(asset, k, v)
                 try:

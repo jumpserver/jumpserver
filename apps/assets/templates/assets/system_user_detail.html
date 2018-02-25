@@ -289,5 +289,29 @@ $(document).ready(function () {
     var redirect_url = "{% url 'assets:system-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })
+.on('click', '.btn-push', function () {
+    var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success_message: "{% trans "Task has been send, Go to ops task list seen result" %}"
+    });
+})
+.on('click', '.btn-test-connective', function () {
+    var the_url = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success_message: "{% trans "Task has been send, seen left assets status" %}"
+    });
+})
 </script>
 {% endblock %}

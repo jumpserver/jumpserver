@@ -96,4 +96,5 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
         instance = self.get_object()
-        instance.assets.remove(*tuple(assets))
+        if instance != Node.root():
+            instance.assets.remove(*tuple(assets))

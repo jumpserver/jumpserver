@@ -308,12 +308,9 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
-        from perms.utils import get_user_granted_assets
-        assets = get_user_granted_assets(self.request.user)
         context = {
             'app': _('Users'),
             'action': _('Profile'),
-            'assets': assets,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

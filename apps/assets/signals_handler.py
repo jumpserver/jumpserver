@@ -24,9 +24,15 @@ def test_asset_conn_on_created(asset):
     test_asset_connectability_util.delay(asset)
 
 
+def set_asset_root_node(asset):
+    logger.debug("Set asset default node: {}".format(Node.root()))
+    asset.nodes.add(Node.root())
+
+
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
-def on_asset_created(sender, instance=None, created=False, **kwargs):
-    if instance and created:
+def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
+    set_asset_root_node(instance)
+    if created:
         logger.info("Asset `{}` create signal received".format(instance))
         update_asset_hardware_info_on_created(instance)
         test_asset_conn_on_created(instance)

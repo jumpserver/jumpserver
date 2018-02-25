@@ -112,13 +112,13 @@ function initTable() {
                 }
             }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
+                var name = rowData.user_group.name + "=>" + rowData.system_user.name + "=>" + rowData.node.name;
                 var update_btn = '<a href="{% url "perms:asset-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
                     .replace('{{ DEFAULT_PK }}', cellData)
-                    .replace('99991938', rowData.name);
+                    .replace('99991938', name);
 				$(td).html(update_btn + del_btn);
             }}
-
         ],
         ajax_url: '{% url "api-perms:asset-permission-list" %}',
         columns: [
@@ -207,8 +207,8 @@ $(document).ready(function(){
 })
 .on('click', '.btn-del', function () {
     var $this = $(this);
-    var name = $this.data('name');
     var uid = $this.data('uid');
+    var name = $this.data('name');
     var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
             .replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
