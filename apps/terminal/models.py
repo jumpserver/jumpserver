@@ -45,7 +45,12 @@ class Terminal(models.Model):
         return {"TERMINAL_COMMAND_STORAGE": storage}
 
     def get_replay_storage(self):
-        pass
+        storage_all = settings.TERMINAL_REPLAY_STORAGE
+        if self.replay_storage in storage_all:
+            storage = storage_all.get(self.replay_storage)
+        else:
+            storage = storage_all.get('default')
+        return {"TERMINAL_REPLAY_STORAGE": storage}
 
     @property
     def config(self):
@@ -54,6 +59,7 @@ class Terminal(models.Model):
             if k.startswith('TERMINAL'):
                 configs[k] = getattr(settings, k)
         configs.update(self.get_common_storage())
+        configs.update(self.get_replay_storage())
         return configs
 
     def create_app_user(self):
