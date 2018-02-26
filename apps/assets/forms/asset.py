@@ -103,10 +103,10 @@ class AssetBulkUpdateForm(forms.ModelForm):
         ]
         widgets = {
             'labels': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Labels')}
+                attrs={'class': 'select2', 'data-placeholder': _('Select labels')}
             ),
             'nodes': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Nodes')}
+                attrs={'class': 'select2', 'data-placeholder': _('Select nodes')}
             ),
         }
 

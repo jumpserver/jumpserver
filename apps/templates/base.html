@@ -17,8 +17,8 @@
     {% include '_left_side_bar.html' %}
     <div id="page-wrapper" class="gray-bg">
         {% include '_header_bar.html' %}
-        {% include '_message.html' %}
         {% block help_message %} {% endblock %}
+        {% include '_message.html' %}
         {% block content %}{% endblock %}
         {% include '_footer.html' %}
     </div>
