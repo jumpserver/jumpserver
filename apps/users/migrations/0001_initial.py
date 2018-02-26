@@ -28,6 +28,9 @@ def add_default_admin(apps, schema_editor):
         email="admin@mycomany.com", role="Admin",
         password=make_password("admin"),
     )
+    group_model = apps.get_model("users", "UserGroup")
+    default_group = group_model.objects.using(db_alias).get(name="Default")
+    admin.groups.add(default_group)
 
 
 class Migration(migrations.Migration):
