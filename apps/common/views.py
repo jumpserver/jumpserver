@@ -97,10 +97,12 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         command_storage = settings.TERMINAL_COMMAND_STORAGE
+        replay_storage = settings.TERMINAL_REPLAY_STORAGE
         context = {
             'app': _('Settings'),
             'action': _('Terminal setting'),
             'form': self.form_class(),
+            'replay_storage': replay_storage,
             'command_storage': command_storage,
         }
         kwargs.update(context)
@@ -117,3 +119,4 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
             context = self.get_context_data()
             context.update({"form": form})
             return render(request, self.template_name, context)
+

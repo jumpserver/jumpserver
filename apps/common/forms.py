@@ -127,7 +127,8 @@ class LDAPSettingForm(BaseForm):
             "name": "sn",
             "email": "mail"
         }),
-        help_text=_("User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr")
+        help_text=_(
+            "User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr")
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
@@ -160,3 +161,10 @@ class TerminalSettingForm(BaseForm):
             "You can set other storage and some terminal using"
         )
     )
+    TERMINAL_REPLAY_STORAGE = DictField(
+        label=_("Replay storage"), help_text=_(
+            "Set replay storage setting, `default` is the using as default,"
+            "You can set other storage and some terminal using"
+        )
+    )
+
