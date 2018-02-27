@@ -38,6 +38,14 @@ def default_node():
 
 class Asset(models.Model):
     # Important
+    PLATFORM_CHOICES = (
+        ('Linux', 'Linux'),
+        ('Unix', 'Unix'),
+        ('MacOS', 'MacOS'),
+        ('BSD', 'BSD'),
+        ('Windows', 'Windows'),
+        ('Other', 'Other'),
+    )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
@@ -64,7 +72,7 @@ class Asset(models.Model):
     disk_total = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk total'))
     disk_info = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk info'))
 
-    platform = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Platform'))
+    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
     os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
@@ -87,6 +95,12 @@ class Asset(models.Model):
             return True, ''
         return False, warning
 
+    def is_unixlike(self):
+        if self.platform not in ("Windows", "Other"):
+            return True
+        else:
+            return False
+
     @property
     def hardware_info(self):
         if self.cpu_count:
@@ -99,6 +113,8 @@ class Asset(models.Model):
 
     @property
     def is_connective(self):
+        if not self.is_unixlike():
+            return True
         val = cache.get(ASSET_ADMIN_CONN_CACHE_KEY.format(self.hostname))
         if val == 1:
             return True
