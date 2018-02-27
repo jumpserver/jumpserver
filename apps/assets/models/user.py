@@ -175,15 +175,12 @@ class AdminUser(AssetUser):
         return info
 
     def get_related_assets(self):
-        assets = []
-        for cluster in self.cluster_set.all():
-            assets.extend(cluster.assets.all())
-        assets.extend(self.asset_set.all())
-        return list(set(assets))
+        assets = self.asset_set.all()
+        return assets
 
     @property
     def assets_amount(self):
-        return len(self.get_related_assets())
+        return self.get_related_assets().count()
 
     class Meta:
         ordering = ['name']
