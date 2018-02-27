@@ -71,7 +71,7 @@ class BasicSettingForm(BaseForm):
         help_text="eg: http://jumpserver.abc.com:8080"
     )
     USER_GUIDE_URL = forms.URLField(
-        label=_("User Guide URL"),
+        label=_("User Guide URL"), required=False,
         help_text=_("User first login update profile done redirect to it")
     )
     EMAIL_SUBJECT_PREFIX = forms.CharField(

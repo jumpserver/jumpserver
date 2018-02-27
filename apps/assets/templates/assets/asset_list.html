@@ -415,7 +415,7 @@ $(document).ready(function(){
         current_node = nodes[0];
         url += "?node_id=" + current_node.id;
     }
-    window.open(url);
+    window.open(url, '_self');
 })
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);
