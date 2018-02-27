@@ -768,10 +768,8 @@ msgid "Create admin user"
 msgstr "创建管理用户"
 
 #: assets/templates/assets/admin_user_detail.html:83
-#, fuzzy
-#| msgid "Replace assets admin user with this"
 msgid "Replace node assets admin user with this"
-msgstr "替换资产管理员"
+msgstr "替换资产的管理员"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:198

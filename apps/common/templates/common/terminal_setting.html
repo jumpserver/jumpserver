@@ -77,9 +77,6 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    {#                                    <button class="btn btn-default btn-circle btn-add-command-storage" data-toggle="modal" data-target="#add_command_storage_model" tabindex="0" type="button"><i class="fa fa-plus"></i></button>#}
-                                    {#                                    <div class="hr-line-dashed"></div>#}
-                                    {#                                    <h3>{% trans "Replay storage" %}</h3>#}
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans "Replay storage" %}</h3>
                                     <table class="table table-hover " id="task-history-list-table">
@@ -87,7 +84,6 @@
                                         <tr>
                                             <th>{% trans 'Name' %}</th>
                                             <th>{% trans 'Type' %}</th>
-                                            <th>{% trans 'Setting' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -95,7 +91,6 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
-                                                <td>{{ setting }}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
