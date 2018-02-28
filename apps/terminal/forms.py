@@ -25,18 +25,22 @@ def get_all_replay_storage():
 
 
 class TerminalForm(forms.ModelForm):
-    command_storage = forms.ChoiceField(choices=get_all_command_storage(),
-                                        label=_("Command storage"))
-    replay_storage = forms.ChoiceField(choices=get_all_replay_storage(),
-                                       label=_("Replay storage"))
+    command_storage = forms.ChoiceField(
+        choices=get_all_command_storage(),
+        label=_("Command storage")
+    )
+    replay_storage = forms.ChoiceField(
+        choices=get_all_replay_storage(),
+        label=_("Replay storage")
+    )
 
     class Meta:
         model = Terminal
-        fields = ['name', 'remote_addr', 'ssh_port', 'http_port', 'comment', 'command_storage', 'replay_storage']
+        fields = [
+            'name', 'remote_addr', 'ssh_port', 'http_port', 'comment',
+            'command_storage', 'replay_storage',
+        ]
         help_texts = {
             'ssh_port': _("Coco ssh listen port"),
             'http_port': _("Coco http/ws listen port"),
-        }
-        widgets = {
-            'name': forms.TextInput(attrs={'readonly': 'readonly'})
         }
