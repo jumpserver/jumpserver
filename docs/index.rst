@@ -28,7 +28,7 @@ Jumpserver 支持容器化部署，windows，LDAP, s3, elasticsearch存储等功
 
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: 文档:
 
    installation

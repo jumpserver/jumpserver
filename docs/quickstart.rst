@@ -21,3 +21,28 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 浏览器访问: http://localhost:8080
 
 ssh访问: ssh -p 2222 localhost
+
+
+额外环境变量
+```````````````
+
+- DB_ENGINE = mysql
+- DB_HOST = mysql_host
+- DB_PORT = 3306
+- DB_USER = xxx
+- DB_PASSWORD = xxxx
+- DB_NAME = jumpserver
+
+- REDIS_HOST = ''
+- REDIS_PORT = ''
+- REDIS_PASSWORD = ''
+
+ ::
+
+   docker run -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  jumpserver/jumpserver:0.5.0-beta2
+
+
+仓库地址
+```````````````
+
+https://github.com/jumpserver/Dockerfile

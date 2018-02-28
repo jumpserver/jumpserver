@@ -6,3 +6,4 @@
 
    quickstart
    step_by_step
+   upgrade

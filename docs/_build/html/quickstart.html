@@ -93,6 +93,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">快速安装</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id2">快速启动</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id3">访问</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">额外环境变量</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">仓库地址</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="step_by_step.html">一步一步安装</a></li>
@@ -100,7 +102,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="admin_guide.html">管理文档</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">用户使用文档</a></li>
-<li class="toctree-l1"><a class="reference internal" href="development.html">开发指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">开发文档</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributor.html">贡献者</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contact.html">联系方式</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
@@ -171,7 +173,8 @@
             
   <div class="section" id="id1">
 <h1>快速安装<a class="headerlink" href="#id1" title="永久链接至标题">¶</a></h1>
-<p>Jumpserver 封装了一个All in one Docker，可以快速启动。</p>
+<p>Jumpserver 封装了一个All in one Docker，可以快速启动。该镜像集成了所有需要的组件，可以使用外置db和redis</p>
+<p>Tips: 不建议在生产中使用</p>
 <p>Docker 安装见: <a class="reference external" href="https://docs.docker.com/install/">Docker官方安装文档</a></p>
 <div class="section" id="id2">
 <h2>快速启动<a class="headerlink" href="#id2" title="永久链接至标题">¶</a></h2>
@@ -184,6 +187,29 @@
 <h2>访问<a class="headerlink" href="#id3" title="永久链接至标题">¶</a></h2>
 <p>浏览器访问: <a class="reference external" href="http://localhost:8080">http://localhost:8080</a></p>
 <p>ssh访问: ssh -p 2222 localhost</p>
+</div>
+<div class="section" id="id4">
+<h2>额外环境变量<a class="headerlink" href="#id4" title="永久链接至标题">¶</a></h2>
+<ul class="simple">
+<li>DB_ENGINE = mysql</li>
+<li>DB_HOST = mysql_host</li>
+<li>DB_PORT = 3306</li>
+<li>DB_USER = xxx</li>
+<li>DB_PASSWORD = xxxx</li>
+<li>DB_NAME = jumpserver</li>
+<li>REDIS_HOST = ‘’</li>
+<li>REDIS_PORT = ‘’</li>
+<li>REDIS_PASSWORD = ‘’</li>
+</ul>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">p</span> <span class="mi">8080</span><span class="p">:</span><span class="mi">80</span> <span class="o">-</span><span class="n">p</span> <span class="mi">2222</span><span class="p">:</span><span class="mi">2222</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_ENGINE</span><span class="o">=</span><span class="n">mysql</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_HOST</span><span class="o">=</span><span class="mf">192.168</span><span class="o">.</span><span class="mf">1.1</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_PORT</span><span class="o">=</span><span class="mi">3306</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_USER</span><span class="o">=</span><span class="n">root</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">xxx</span> <span class="o">-</span><span class="n">e</span> <span class="n">DB_NAME</span><span class="o">=</span><span class="n">jumpserver</span>  <span class="n">jumpserver</span><span class="o">/</span><span class="n">jumpserver</span><span class="p">:</span><span class="mf">0.5</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">beta2</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="id5">
+<h2>仓库地址<a class="headerlink" href="#id5" title="永久链接至标题">¶</a></h2>
+<p><a class="reference external" href="https://github.com/jumpserver/Dockerfile">https://github.com/jumpserver/Dockerfile</a></p>
 </div>
 </div>
 
