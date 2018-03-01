@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from ..hands import IsSuperUser
 from ..models import Node
 from .. import serializers
@@ -29,6 +29,7 @@ logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
+    'NodeAddChildrenApi',
 ]
 
 
@@ -73,6 +74,24 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
             children = instance.get_children()
         response = [{"id": node.id, "key": node.key, "value": node.value} for node in children]
         return Response(response, status=200)
+
+
+class NodeAddChildrenApi(generics.UpdateAPIView):
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.NodeAddChildrenSerializer
+    instance = None
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        nodes_id = request.data.get("nodes")
+        children = [get_object_or_none(Node, id=pk) for pk in nodes_id]
+        for node in children:
+            if not node:
+                continue
+            node.parent = instance
+            node.save()
+        return Response("OK")
 
 
 class NodeAddAssetsApi(generics.UpdateAPIView):

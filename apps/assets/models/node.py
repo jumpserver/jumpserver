@@ -94,6 +94,10 @@ class Node(models.Model):
         else:
             return parent
 
+    @parent.setter
+    def parent(self, parent):
+        self.key = parent.get_next_child_key()
+
     @property
     def ancestor(self):
         if self.parent == self.__class__.root():

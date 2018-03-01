@@ -224,6 +224,7 @@ function editTreeNode() {
 	if (!current_node){
 	    return
     }
+    current_node.name = current_node.value;
     zTree.editName(current_node);
 }
 
@@ -308,6 +309,44 @@ function selectQueryNode() {
     }
 }
 
+function beforeDrag() {
+    return true
+}
+
+function beforeDrop() {
+    return true
+}
+
+function onDrag(event, treeId, treeNodes) {
+}
+
+function onDrop(event, treeId, treeNodes, targetNode, moveType) {
+    console.log("DROP");
+    console.log(event);
+    console.log(treeNodes);
+    console.log(targetNode);
+    console.log(moveType);
+
+    var treeNodesNames = [];
+    var treeNodesIds = [];
+    $.each(treeNodes, function (index, value) {
+        treeNodesNames.push(value.value);
+        treeNodesIds.push(value.id);
+    });
+
+    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
+    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.id);
+    var body = {nodes: treeNodesIds};
+    if (confirm(msg)){
+        APIUpdateAttr({
+            url: the_url,
+            method: "PUT",
+            body: JSON.stringify(body)
+        })
+    }
+
+}
+
 function initTree() {
     var setting = {
         view: {
@@ -319,11 +358,24 @@ function initTree() {
                 enable: true
             }
         },
+        edit: {
+            enable: true,
+			showRemoveBtn: false,
+			showRenameBtn: false,
+            drag: {
+                isCopy: true,
+                isMove: true
+            }
+        },
         callback: {
             onRightClick: OnRightClick,
             beforeClick: beforeClick,
             onRename: onRename,
-            onSelected: onSelected
+            onSelected: onSelected,
+            beforeDrag: beforeDrag,
+            onDrag: onDrag,
+            beforeDrop: beforeDrop,
+            onDrop: onDrop
         }
     };
 
@@ -334,7 +386,8 @@ function initTree() {
             {#if (value["key"] === "0") {#}
             value["open"] = true;
             {# }#}
-            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')'
+            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
+            value['value'] = value['value'];
         });
         zNodes = data;
         $.fn.zTree.init($("#assetTree"), setting, zNodes);
