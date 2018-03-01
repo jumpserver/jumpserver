@@ -56,7 +56,7 @@ class NodePermissionUtil:
         nodes_with_assets = dict()
         for node, system_users in nodes.items():
             nodes_with_assets[node] = {
-                'assets': node.get_assets(),
+                'assets': node.get_active_assets(),
                 'system_users': system_users
             }
         return nodes_with_assets
@@ -87,7 +87,7 @@ class NodePermissionUtil:
         nodes_with_assets = dict()
         for node, system_users in nodes.items():
             nodes_with_assets[node] = {
-                'assets': node.get_assets(),
+                'assets': node.get_active_assets(),
                 'system_users': system_users
             }
         return nodes_with_assets
