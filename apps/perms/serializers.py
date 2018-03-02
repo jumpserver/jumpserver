@@ -12,7 +12,7 @@ class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodePermission
         fields = [
-            'node', 'user_group', 'system_user',
+            'id', 'node', 'user_group', 'system_user',
             'is_active', 'date_expired'
         ]
 

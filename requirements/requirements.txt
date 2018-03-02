@@ -56,8 +56,8 @@ uritemplate==3.0.0
 urllib3==1.22
 vine==1.1.4
 gunicorn==19.7.1
-https://github.com/celery/django-celery-beat/zipball/master#egg=django-celery-beat
-#django_celery_beat==1.1.0
+#https://github.com/celery/django-celery-beat/zipball/master#egg=django-celery-beat
+django_celery_beat==1.1.1
 ephem==3.7.6.0
 python-gssapi==0.6.4
 jms-es-sdk

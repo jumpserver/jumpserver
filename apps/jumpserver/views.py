@@ -45,7 +45,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return self.session_week.values('user').distinct().count()
 
     def get_week_login_asset_count(self):
-        return self.session_week.values('asset').distinct().count()
+        return self.session_week.count()
+        # return self.session_week.values('asset').distinct().count()
 
     def get_month_day_metrics(self):
         month_str = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']
