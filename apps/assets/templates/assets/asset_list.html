@@ -2,6 +2,12 @@
 {% load static %}
 {% load i18n %}
 
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产
+    </div>
+{% endblock %}
+
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
@@ -321,12 +327,6 @@ function onDrag(event, treeId, treeNodes) {
 }
 
 function onDrop(event, treeId, treeNodes, targetNode, moveType) {
-    console.log("DROP");
-    console.log(event);
-    console.log(treeNodes);
-    console.log(targetNode);
-    console.log(moveType);
-
     var treeNodesNames = [];
     var treeNodesIds = [];
     $.each(treeNodes, function (index, value) {

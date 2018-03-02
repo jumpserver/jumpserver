@@ -60,12 +60,16 @@
                         </div>
                         <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Login' %}</button>
 
+                        {% if demo_mode %}
+                        <p class="text-muted font-bold" style="color: red">
+                            Demo账号: admin 密码: admin
+                        </p>
+                        {% endif %}
+
                         <a href="{% url 'users:forgot-password' %}">
                             <small>{% trans 'Forgot password' %}?</small>
                         </a>
 
-                        <p class="text-muted text-center">
-                        </p>
                     </form>
                     <p class="m-t">
                     </p>
