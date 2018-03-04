@@ -313,7 +313,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Users'),
             'action': _('Profile'),
         }
         kwargs.update(context)

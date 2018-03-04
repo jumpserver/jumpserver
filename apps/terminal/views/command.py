@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from common.mixins import DatetimeSearchMixin
+from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from ..models import Command
 from .. import utils
 from ..backends import get_multi_command_store
@@ -15,7 +15,7 @@ __all__ = ['CommandListView']
 common_storage = get_multi_command_store()
 
 
-class CommandListView(DatetimeSearchMixin, ListView):
+class CommandListView(DatetimeSearchMixin, AdminUserRequiredMixin, ListView):
     model = Command
     template_name = "terminal/command_list.html"
     context_object_name = 'command_list'

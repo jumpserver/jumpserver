@@ -319,32 +319,36 @@ function beforeDrag() {
     return true
 }
 
-function beforeDrop() {
-    return true
+function beforeDrop(treeId, treeNodes, targetNode, moveType) {
+    var treeNodesNames = [];
+    $.each(treeNodes, function (index, value) {
+        treeNodesNames.push(value.value);
+    });
+
+    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
+    if (confirm(msg)){
+        return true
+    } else {
+        return false
+    }
 }
 
 function onDrag(event, treeId, treeNodes) {
 }
 
 function onDrop(event, treeId, treeNodes, targetNode, moveType) {
-    var treeNodesNames = [];
     var treeNodesIds = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesNames.push(value.value);
         treeNodesIds.push(value.id);
     });
 
-    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
     var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.id);
     var body = {nodes: treeNodesIds};
-    if (confirm(msg)){
-        APIUpdateAttr({
-            url: the_url,
-            method: "PUT",
-            body: JSON.stringify(body)
-        })
-    }
-
+    APIUpdateAttr({
+        url: the_url,
+        method: "PUT",
+        body: JSON.stringify(body)
+    })
 }
 
 function initTree() {

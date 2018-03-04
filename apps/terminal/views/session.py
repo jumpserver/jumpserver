@@ -97,7 +97,7 @@ class SessionOfflineListView(SessionListView):
         return super().get_context_data(**kwargs)
 
 
-class SessionDetailView(SingleObjectMixin, ListView):
+class SessionDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
     object = None

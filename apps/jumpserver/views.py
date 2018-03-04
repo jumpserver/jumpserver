@@ -1,4 +1,5 @@
-from django.views.generic import TemplateView
+from django.http import HttpResponse
+from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -150,3 +151,12 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
         kwargs.update(context)
         return super(IndexView, self).get_context_data(**kwargs)
+
+
+class LunaView(View):
+    def get(self, request):
+        msg = """
+        Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, 
+        如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
+        """
+        return HttpResponse(msg)

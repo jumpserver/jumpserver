@@ -62,11 +62,11 @@
             <li>
                 <a href="">{% trans 'Dashboard' %}</a>
             </li>
-            <li>
             {% if app %}
+            <li>
                 <a>{{ app }}</a>
-            {% endif %}
             </li>
+            {% endif %}
             {% if action %}
             <li class="active">
                 <strong>{{ action }}</strong>

@@ -84,7 +84,7 @@ msgstr "资产"
 
 #: assets/forms/user.py:24
 msgid "Password or private key passphrase"
-msgstr "密码或秘钥密码"
+msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:25 assets/models/user.py:30 common/forms.py:113
 #: users/forms.py:16 users/forms.py:24 users/templates/users/login.html:56
@@ -683,7 +683,7 @@ msgstr "认证"
 
 #: assets/templates/assets/_system_user.html:47
 msgid "Auto generate key"
-msgstr "自动生成秘钥"
+msgstr "自动生成密钥"
 
 #: assets/templates/assets/_system_user.html:64
 #: assets/templates/assets/asset_create.html:58
@@ -1192,7 +1192,7 @@ msgstr "密码认证"
 
 #: common/forms.py:156
 msgid "Public key auth"
-msgstr "秘钥认证"
+msgstr "密钥认证"
 
 #: common/forms.py:159 common/templates/common/terminal_setting.html:63
 #: terminal/forms.py:30 terminal/models.py:20
@@ -1731,7 +1731,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"                您的ssh秘钥没有设置或已失效，请点击 <a href="
+"                您的ssh密钥没有设置或已失效，请点击 <a href="
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
@@ -2329,7 +2329,7 @@ msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱
 msgid ""
 "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
 "the user to update his new ssh public key."
-msgstr "重设秘钥邮件将会发送到用户邮箱"
+msgstr "重设密钥邮件将会发送到用户邮箱"
 
 #: users/templates/users/user_detail.html:350
 #: users/templates/users/user_profile.html:140
@@ -2338,7 +2338,7 @@ msgstr "重置SSH密钥"
 
 #: users/templates/users/user_detail.html:360
 msgid "This will reset the user public key and send a reset mail"
-msgstr "将会失效用户当前秘钥，并发送重置邮件到用户邮箱"
+msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:377
 #: users/templates/users/user_profile.html:166
@@ -2561,7 +2561,7 @@ msgstr "禁用或失效"
 
 #: users/utils.py:154
 msgid "Password or SSH public key invalid"
-msgstr "密码或秘钥不合法"
+msgstr "密码或密钥不合法"
 
 #: users/views/group.py:29
 msgid "User group list"
@@ -2642,7 +2642,7 @@ msgstr "密码更新"
 
 #: users/views/user.py:375
 msgid "Public key update"
-msgstr "秘钥更新"
+msgstr "密钥更新"
 
 #~ msgid "Help"
 #~ msgstr "帮助"
