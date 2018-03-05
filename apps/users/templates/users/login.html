@@ -22,24 +22,27 @@
     <div class="loginColumns animated fadeInDown">
         <div class="row">
             <div class="col-md-6">
-                <h2 class="font-bold">欢迎使用Jumpserver开源跳板机</h2>
+                <h2 class="font-bold">欢迎使用Jumpserver开源堡垒机</h2>
                 <p>
-                    符合4A规范的专业运维审计系统：拥有跳板机的所有功能，认证，授权，审计，文件上传；
+                    全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计系统。
                 </p>
                 <p>
-                    极致的用户使用体验：拥有时尚外观是区别与以往版本和其他软件的铭牌，高雅的气质让你爱不释手；
+                    使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
                 </p>
                 <p>
-                    混合云环境下的堡垒机：怎么能容忍传统堡垒机的繁琐步骤，Jumpserver让你极致省力;
+                    采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发访问限制。
                 </p>
                 <p>
-                    <small>改变世界，从一点点开始。</small>
+                    改变世界，从一点点开始。
                 </p>
 
             </div>
             <div class="col-md-6">
                 <div class="ibox-content">
-                    <div><img src="{% static 'img/logo.png' %}" width="82" height="82"> <span class="font-bold text-center" style="font-size: 32px; font-family: inherit">{% trans 'Login' %}</span></div>
+                    <div>
+                        <img src="{% static 'img/logo.png' %}" width="60" height="60">
+                        <span class="font-bold text-center" style="font-size: 24px; font-family: inherit; margin-left: 20px">{% trans 'Login' %}</span>
+                    </div>
                     <form class="m-t" role="form" method="post" action="">
                         {% csrf_token %}
                         {% if form.errors %}

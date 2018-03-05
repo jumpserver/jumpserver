@@ -230,7 +230,9 @@ function editTreeNode() {
 	if (!current_node){
 	    return
     }
-    current_node.name = current_node.value;
+    if (current_node.value) {
+        current_node.name = current_node.value;
+    }
     zTree.editName(current_node);
 }
 
