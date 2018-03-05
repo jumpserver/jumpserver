@@ -42,7 +42,6 @@ release = '0.5.0'
 extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'chinese_search',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
