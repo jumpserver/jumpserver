@@ -42,6 +42,7 @@ release = '0.5.0'
 extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'chinese_search',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -70,7 +71,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-html_show_sourcelink = True
+html_show_sourcelink = False
 
 
 # -- Options for HTML output -------------------------------------------------
