@@ -11,20 +11,13 @@ Jumpserver 文档
 
 欢迎来到 Jumpserver 文档。
 
-Jumpserver 是一款完全开源的跳板机(堡垒机)系统，遵循GPL v2协议，使用Python，Django开发。
+Jumpserver是全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计系统。
 
-Jumpserver 是符合4A（认证Authentication，账号Account，授权Authorization，审计Audit) 的专业运维审计系统。
+Jumpserver使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
 
-Jumpserver 从设计时考虑分布式，没有性能瓶颈，满足混合云架构，一个中心，不同Region不同登录点。
+Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发访问限制。
 
-Jumpserver 界面漂亮、简单易用，并有领先的Web terminal解决方案。
-
-Jumpserver 深度集成了Ansible，支持自动化运维任务。
-
-Jumpserver 支持容器化部署，windows，LDAP, s3, elasticsearch存储等功能，并提供了强大API方便对接其它系统。
-
-
-
+改变世界，从一点点开始。
 
 
 .. toctree::
