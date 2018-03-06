@@ -18,3 +18,4 @@ Jumpserver 文档
    development
    contributor
    contact
+   snapshot
