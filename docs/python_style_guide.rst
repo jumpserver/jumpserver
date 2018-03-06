@@ -34,8 +34,7 @@ Guidance`_\ ，但是有些细节部分会尽量放开 参考国内翻译
 ^^^^
 
 1. Python严格采用4个空格的缩进，任何python代码都都必须遵守此规定。
-2. web部分代码(HTML, CSS,
-   JavaScript)，Node.js采用2空格缩进，同样不使用tab (:raw-latex:`\t`)。
+2. web部分代码(HTML, CSS,JavaScript)，Node.js采用2空格缩进，同样不使用tab。
    之所以与Python不同，是因为js中有大量回调式的写法，2空格可以显著降低视觉上的负担。
 
 最大行长度
