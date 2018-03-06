@@ -230,16 +230,16 @@ Luna已改为纯前端，需要nginx来运行访问
 五. 安装Windows支持组件
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-使用docker启动 guacamole
+因为手动安装 guacamole 组件比较复杂，这里提供打包好的docker使用, 启动 guacamole
 
 .. code:: shell
 
-    docker run \
-      -p 8080:8080 \
-      -e JUMPSERVER_SERVER=http://<jumpserver>:8080 \
+    docker run -d \
+      -p 8081:8080 \
+      -e JUMPSERVER_SERVER=http://localhost:8080 \
       jumpserver/guacamole
 
-这里所需要注意的是guacamole暴露出来的端口是8080，若与jumpserver部署在同一主机上自定义一下。
+这里所需要注意的是guacamole暴露出来的端口是8081，若与主机上其他端口冲突请自定义一下。
 
 修改JUMPSERVER_SERVER的配置，填上jumpserver的内网地址
 
@@ -275,13 +275,20 @@ Luna已改为纯前端，需要nginx来运行访问
 
         location /socket.io/ {
             proxy_pass       http://localhost:5000/socket.io/;
+            proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
         }
 
         location /guacamole/ {
-            proxy_pass http://<guacamole>:8080/;
+            proxy_pass       http://localhost:8081/;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+            access_log off;
         }
 
         location / {

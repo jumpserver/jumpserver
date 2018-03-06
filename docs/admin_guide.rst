@@ -6,5 +6,6 @@
 .. toctree::
    :maxdepth: 1
 
+   admin_instruction
    admin_user
    admin_asset
