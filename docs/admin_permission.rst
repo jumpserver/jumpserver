@@ -6,4 +6,4 @@
 .. toctree::
    :maxdepth: 1
 
-   asset_authorized
+   permission_asset_authorized
