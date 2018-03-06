@@ -20,7 +20,7 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'jumpserver'
+project = 'Jumpserver'
 copyright = '北京堆栈科技有限公司 © 2014-2018'
 author = 'Jumpserver team'
 
@@ -88,7 +88,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #
 html_theme_options = {
     'logo_only': True,
-    'display_version': False
+    'display_version': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -137,7 +137,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'jumpserver.tex', 'jumpserver Documentation',
+    (master_doc, 'Jumpserver.tex', 'Jumpserver Documentation',
      'Jumpserver team', 'manual'),
 ]
 
@@ -147,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'jumpserver', 'jumpserver Documentation',
+    (master_doc, 'Jumpserver', 'Jumpserver Documentation',
      [author], 1)
 ]
 
@@ -158,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'jumpserver', 'jumpserver Documentation',
-     author, 'jumpserver', 'One line description of project.',
+    (master_doc, 'Jumpserver', 'Jumpserver 文档',
+     author, 'Jumpserver', ' Jumpserver是全球首款完全开源的堡垒机，是符合 4A 的专业运维审计系统',
      'Miscellaneous'),
 ]
 
