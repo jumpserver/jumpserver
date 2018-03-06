@@ -61,6 +61,9 @@ class Node(models.Model):
         assets = Asset.objects.filter(nodes__id=self.id)
         return assets
 
+    def get_active_assets(self):
+        return self.get_assets().filter(is_active=True)
+
     def get_all_assets(self):
         from .asset import Asset
         if self.is_root():
@@ -69,6 +72,9 @@ class Node(models.Model):
             nodes = self.get_family()
             assets = Asset.objects.filter(nodes__in=nodes)
         return assets
+
+    def get_all_active_assets(self):
+        return self.get_all_assets().filter(is_active=True)
 
     def is_root(self):
         return self.key == '0'
@@ -87,6 +93,10 @@ class Node(models.Model):
             return self.__class__.root()
         else:
             return parent
+
+    @parent.setter
+    def parent(self, parent):
+        self.key = parent.get_next_child_key()
 
     @property
     def ancestor(self):

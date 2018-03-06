@@ -215,16 +215,6 @@ $(document).ready(function(){
     initTable();
     initTree();
 })
-.on('click', '.btn-create-asset', function () {
-    var url = "{% url 'assets:asset-create' %}";
-    var nodes = zTree.getSelectedNodes();
-    var current_node;
-    if (nodes && nodes.length ===1 ){
-        current_node = nodes[0];
-        url += "?node=" + current_node.id;
-    }
-    window.open(url);
-})
 .on('click', '.btn-del', function () {
     var $this = $(this);
     var uid = $this.data('uid');
@@ -241,7 +231,7 @@ $(document).ready(function(){
         current_node = nodes[0];
         url += "?node_id=" + current_node.id;
     }
-    window.open(url);
+    window.open(url, '_self');
 })
 
 </script>

@@ -151,6 +151,10 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
+        if self.username == 'admin':
+            self.role = 'Admin'
+            self.is_active = True
+
         super().save(*args, **kwargs)
 
     @property
@@ -247,6 +251,7 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['username']
+        verbose_name = _("User")
 
     #: Use this method initial user
     @classmethod

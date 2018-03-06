@@ -66,3 +66,7 @@ class NodeAssetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = ['assets']
+
+
+class NodeAddChildrenSerializer(serializers.Serializer):
+    nodes = serializers.ListField()

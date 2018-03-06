@@ -26,14 +26,14 @@ signer = get_signer()
 class AssetUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=16, verbose_name=_('Username'))
+    username = models.CharField(max_length=128, verbose_name=_('Username'))
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
     def password(self):
@@ -175,15 +175,12 @@ class AdminUser(AssetUser):
         return info
 
     def get_related_assets(self):
-        assets = []
-        for cluster in self.cluster_set.all():
-            assets.extend(cluster.assets.all())
-        assets.extend(self.asset_set.all())
-        return list(set(assets))
+        assets = self.asset_set.all()
+        return assets
 
     @property
     def assets_amount(self):
-        return len(self.get_related_assets())
+        return self.get_related_assets().count()
 
     class Meta:
         ordering = ['name']

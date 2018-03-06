@@ -1,12 +1,13 @@
 {% load i18n %}
 <li id="index">
     <a href="{% url 'index' %}">
-        <i class="fa fa-dashboard" style="font-size: 13px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span class="label label-info pull-right"></span>
+        <i class="fa fa-dashboard" style="width: 14px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span
+            class="label label-info pull-right"></span>
     </a>
 </li>
 <li id="users">
     <a href="#">
-        <i class="fa fa-group" style="font-size: 13px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-group" style="width: 14px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level active">
         <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User list' %}</a></li>
@@ -16,7 +17,7 @@
 </li>
 <li id="assets">
     <a>
-        <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-inbox" style="width: 14px"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset list' %}</a></li>
@@ -26,7 +27,7 @@
     </ul>
 </li>
 <li id="perms">
-    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
+    <a href="#"><i class="fa fa-edit" style="width: 14px"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="asset-permission">
             <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
@@ -35,18 +36,23 @@
 </li>
 <li id="terminal">
     <a>
-        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-rocket" style="width: 14px"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="session-online"><a href="{% url 'terminal:session-online-list' %}">{% trans 'Session online' %}</a></li>
         <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
         <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Commands' %}</a></li>
+        <li>
+            <a href="{% url 'terminal:web-terminal' %}" target="_blank">
+            <span class="nav-label">{% trans 'Web terminal' %}</span>
+            </a>
+        </li>
         <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
     </ul>
 </li>
 <li id="ops">
     <a>
-        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>

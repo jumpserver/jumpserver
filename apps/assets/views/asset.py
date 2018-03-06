@@ -58,8 +58,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
-            'action': _('Asset list'),
+            'action': _('My assets'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)
@@ -248,6 +247,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         f = form.cleaned_data['file']
         det_result = chardet.detect(f.read())
         f.seek(0)  # reset file seek index
+
         file_data = f.read().decode(det_result['encoding']).strip(codecs.BOM_UTF8.decode())
         csv_file = StringIO(file_data)
         reader = csv.reader(csv_file)

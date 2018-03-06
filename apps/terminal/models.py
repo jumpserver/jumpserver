@@ -4,6 +4,7 @@ import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.conf import settings
 
 from users.models import User
@@ -127,6 +128,7 @@ class Session(models.Model):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
+    date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
     date_start = models.DateTimeField(verbose_name=_("Date start"))
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 

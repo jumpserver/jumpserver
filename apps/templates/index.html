@@ -11,7 +11,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'users:user-list' %}">{{ users_count }}</a></h1>
-                    <small>All user</small>
+                    <small>All users</small>
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'assets:asset-list' %}">{{ assets_count }}</a></h1>
-                    <small>All host</small>
+                    <small>All hosts</small>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_users"></span>{{ online_user_count }}</a></h1>
-                    <small>Online user</small>
+                    <small>Online users</small>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
     <div class="row">
         <div class="col-sm-2 border-bottom white-bg dashboard-header" style="margin-left:15px;height: 346px">
             <h2>活跃用户TOP5</h2>
-            <small>过去一周共有<span class="text-info">{{ user_visit_count_weekly }}</span>位用户登录<span class="text-success">{{ asset_visit_count_weekly }}</span>次服务器.</small>
+            <small>过去一周共有<span class="text-info">{{ user_visit_count_weekly }}</span>位用户登录<span class="text-success">{{ asset_visit_count_weekly }}</span>次资产.</small>
             <ul class="list-group clear-list m-t">
                 {% for data in user_visit_count_top_five %}
                     <li class="list-group-item fist-item">

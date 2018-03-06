@@ -75,6 +75,7 @@
     <th class="text-center">{% trans 'Terminal' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
+{#    <th class="text-center">{% trans 'Date last active' %}</th>#}
     <th class="text-center">{% trans 'Duration' %}</th>
     <th class="text-center">{% trans 'Action' %}</th>
 {% endblock %}
@@ -94,6 +95,7 @@
             <td class="text-center">{{ session.id | get_session_command_amount }}</td>
 
             <td class="text-center">{{ session.date_start }}</td>
+{#            <td class="text-center">{{ session.date_last_active }}</td>#}
             <td class="text-center">{{ session.date_start|time_util_with_seconds:session.date_end }}</td>
             <td>
                 {% if session.is_finished %}
@@ -105,6 +107,21 @@
             </td>
         </tr>
     {% endfor %}
+{% endblock %}
+
+{% block content_bottom_left %}
+    <div id="actions" >
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="delete">{% trans 'Terminate selected' %}</option>
+            </select>
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                 {% trans 'Submit' %}
+                </button>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block custom_foot_js %}

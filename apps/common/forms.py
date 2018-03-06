@@ -68,10 +68,10 @@ class BaseForm(forms.Form):
 class BasicSettingForm(BaseForm):
     SITE_URL = forms.URLField(
         label=_("Current SITE URL"),
-        help_text="http://jumpserver.abc.com:8080"
+        help_text="eg: http://jumpserver.abc.com:8080"
     )
     USER_GUIDE_URL = forms.URLField(
-        label=_("User Guide URL"),
+        label=_("User Guide URL"), required=False,
         help_text=_("User first login update profile done redirect to it")
     )
     EMAIL_SUBJECT_PREFIX = forms.CharField(
@@ -135,7 +135,7 @@ class LDAPSettingForm(BaseForm):
     AUTH_LDAP_START_TLS = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False
     )
-    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), initial=False)
+    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), initial=False, required=False)
 
 
 class TerminalSettingForm(BaseForm):

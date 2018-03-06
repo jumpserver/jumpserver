@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+import os
 from django import forms
 from django.shortcuts import render
 from django.contrib.auth import login as auth_login, logout as auth_logout
@@ -56,6 +57,7 @@ class UserLoginView(FormView):
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+
         if x_forwarded_for and x_forwarded_for[0]:
             login_ip = x_forwarded_for[0]
         else:
@@ -74,6 +76,13 @@ class UserLoginView(FormView):
         return self.request.POST.get(
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, reverse('index')))
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'demo_mode': os.environ.get("DEMO_MODE"),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -237,7 +246,7 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
         if self.user:
             queryset = queryset.filter(username=self.user)
         if self.keyword:
-            queryset = self.queryset.filter(
+            queryset = queryset.filter(
                 Q(ip__contains=self.keyword) |
                 Q(city__contains=self.keyword) |
                 Q(username__contains=self.keyword)

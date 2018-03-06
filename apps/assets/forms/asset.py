@@ -15,7 +15,7 @@ class AssetCreateForm(forms.ModelForm):
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port',  'comment',
-            'nodes', 'is_active', 'admin_user', 'labels',
+            'nodes', 'is_active', 'admin_user', 'labels', 'platform',
 
         ]
         widgets = {
@@ -44,7 +44,7 @@ class AssetUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'port', 'nodes',  'is_active',
+            'hostname', 'ip', 'port', 'nodes',  'is_active', 'platform',
             'public_ip', 'number', 'comment', 'admin_user', 'labels',
         ]
         widgets = {

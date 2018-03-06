@@ -6,6 +6,7 @@ import json
 import uuid
 import csv
 import codecs
+import chardet
 from io import StringIO
 
 from django.contrib import messages
@@ -20,6 +21,7 @@ from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
+from django.db import transaction
 from django.views.generic.edit import (
     CreateView, UpdateView, FormMixin, FormView
 )
@@ -33,7 +35,7 @@ from common.utils import get_logger, get_object_or_none, is_uuid
 from .. import forms
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
-from ..signals import on_user_created
+from ..signals import post_user_create
 
 
 __all__ = [
@@ -212,8 +214,10 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
     # todo: need be patch, method to long
     def form_valid(self, form):
-        file = form.cleaned_data['file']
-        data = file.read().decode('utf-8').strip(codecs.BOM_UTF8.decode('utf-8'))
+        f = form.cleaned_data['file']
+        det_result = chardet.detect(f.read())
+        f.seek(0)  # reset file seek index
+        data = f.read().decode(det_result['encoding']).strip(codecs.BOM_UTF8.decode())
         csv_file = StringIO(data)
         reader = csv.reader(csv_file)
         csv_data = [row for row in reader]
@@ -252,15 +256,15 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 else:
                     continue
                 user_dict[k] = v
-
-            user = get_object_or_none(User, id=id_) if is_uuid(id_) else None
+            user = get_object_or_none(User, id=id_) if id_ and is_uuid(id_) else None
             if not user:
                 try:
-                    groups = user_dict.pop('groups')
-                    user = User.objects.create(**user_dict)
-                    user.groups.set(groups)
-                    created.append(user_dict['username'])
-                    on_user_created.send(self.__class__, user=user)
+                    with transaction.atomic():
+                        groups = user_dict.pop('groups')
+                        user = User.objects.create(**user_dict)
+                        user.groups.set(groups)
+                        created.append(user_dict['username'])
+                        post_user_create.send(self.__class__, user=user)
                 except Exception as e:
                     failed.append('%s: %s' % (user_dict['username'], str(e)))
             else:
@@ -309,7 +313,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Users'),
             'action': _('Profile'),
         }
         kwargs.update(context)
