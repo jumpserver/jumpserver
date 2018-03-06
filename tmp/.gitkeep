@@ -1,1 +1,0 @@
-Because ansible connect remote host using key file path except key string, so I create this dir for keep them.
