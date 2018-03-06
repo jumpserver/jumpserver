@@ -1,3 +1,10 @@
+架构说明
+=================
+
+.. image:: _static/img/structure.png
+    :alt: 组件架构图
+
+
 组件说明
 =================
 
@@ -35,7 +42,3 @@ Jumpserver API Python SDK，Coco目前使用该SDK与Jumpserver API交互
 `Github <https://github.com/jumpserver/jumpserver-python-sdk.git>`__
 
 
-架构图
-
-.. image:: _static/img/structure.png
-    :alt: 组件架构图
