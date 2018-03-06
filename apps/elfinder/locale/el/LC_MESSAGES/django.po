@@ -1,0 +1,78 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-06-08 22:56+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: connector.py:336 connector.py:344
+msgid "File not found"
+msgstr "Δε βρέθηκε το αρχείο"
+
+#: connector.py:339
+msgid "Access denied"
+msgstr "Απαγορεύεται η πρόσβαση"
+
+#: exceptions.py:61
+msgid "Volume could not be found"
+msgstr "Δε βρέθηκε ο δίσκος"
+
+#: exceptions.py:87
+msgid "This is not a valid image file"
+msgstr "Μη έγκυρο αρχείο εικόνας"
+
+#: fields.py:50
+msgid "This file is no longer valid"
+msgstr "Αυτό το αρχείο δεν είναι πια έγκυρο"
+
+#: widgets.py:93
+msgid "Size"
+msgstr "Μέγεθος"
+
+#: widgets.py:94
+msgid "Path"
+msgstr "Διαδρομή"
+
+#: widgets.py:95
+msgid "Link"
+msgstr "Σύνδεσμος"
+
+#: widgets.py:96
+msgid "Modified"
+msgstr "Τροποποίηση"
+
+#: widgets.py:97
+msgid "Dimensions"
+msgstr "Διαστάσεις"
+
+#: widgets.py:98
+msgid "Update"
+msgstr "Αλλαγή"
+
+#: widgets.py:99
+msgid "Set"
+msgstr "Ορισμός"
+
+#: widgets.py:100
+msgid "Clear"
+msgstr "Εκκαθάριση"
+
+#: volumes/base.py:192
+msgid "No volume id found"
+msgstr "Δε βρέθηκε το volume id"
+
+#: volumes/base.py:1189
+msgid "Unknown"
+msgstr "Άγνωστο"
