@@ -283,7 +283,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
             config = self.app.config.get("REPLAY_STORAGE", None)
             if config:
                 for name in config.keys():
-                    if config[name] == "s3":
+                    if config[name].get("TYPE", '') == "s3":
                         client, bucket = self.s3Client(config[name])
                         try:
                             client.head_object(Bucket=bucket, Key=path)
