@@ -30,4 +30,4 @@ celerybeat.pid
 django.db
 celerybeat-schedule.db
 data/static
-_build/
+docs/_build/

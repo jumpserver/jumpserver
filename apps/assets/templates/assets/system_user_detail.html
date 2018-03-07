@@ -131,7 +131,8 @@
                                             </td>
                                         </tr>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Push system user manually' %}:</td>
+                                        {% if system_user.auto_push %}
+                                            <td width="50%">{% trans 'Push system user now' %}:</td>
                                             <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs btn-push" style="width: 54px">{% trans 'Push' %}</button>
@@ -139,6 +140,7 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                        {% endif %}
                                             <td width="50%">{% trans 'Test assets connective' %}:</td>
                                             <td>
                                                 <span style="float: right">

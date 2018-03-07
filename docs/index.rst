@@ -6,24 +6,16 @@
 Jumpserver 文档
 ======================================
 
+目录：
+
 .. toctree::
    :maxdepth: 2
-   :caption: 文档:
 
-   intro
+   introduce
    installation
    admin_guide
    user_guide
    development
    contributor
    contact
-   faq
-
-
-
-索引
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   snapshot
