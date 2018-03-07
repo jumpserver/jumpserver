@@ -34,9 +34,11 @@ class AssetCreateForm(forms.ModelForm):
             'hostname': '* required',
             'ip': '* required',
             'port': '* required',
-            'admin_user': _('Admin user is a privilege user exist on this asset,'
-                            'Example: root or other NOPASSWD sudo privilege user'
-                            )
+            'admin_user': _(
+                'Admin user is a privilege user exist on this asset,'
+                'Example: root or other NOPASSWD sudo privilege user'
+                'If asset not support ansible, set any one'
+            )
         }
 
 
@@ -67,6 +69,7 @@ class AssetUpdateForm(forms.ModelForm):
             'admin_user': _(
                 'Admin user is a privilege user exist on this asset,'
                 'Example: root or other NOPASSWD sudo privilege user'
+                'If asset not support ansible, set any one'
             )
         }
 

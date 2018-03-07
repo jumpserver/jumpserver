@@ -343,8 +343,12 @@ def push_system_user_util(system_users, assets, task_name):
     from ops.utils import update_or_create_ansible_task
     tasks = []
     for system_user in system_users:
-        if system_user.is_need_push():
-            tasks.extend(get_push_system_user_tasks(system_user))
+        if not system_user.is_need_push():
+            msg = "push system user `{}` passed, may be not auto push or ssh " \
+                  "protocol is not ssh".format(system_user.name)
+            logger.info(msg)
+            continue
+        tasks.extend(get_push_system_user_tasks(system_user))
 
     if not tasks:
         logger.info("Not tasks, passed")
@@ -376,6 +380,12 @@ def push_system_user_to_node(system_user, node):
 
 @shared_task
 def push_system_user_related_nodes(system_user):
+    if not system_user.is_need_push():
+        msg = "push system user `{}` passed, may be not auto push or ssh " \
+              "protocol is not ssh".format(system_user.name)
+        logger.info(msg)
+        return
+
     nodes = system_user.nodes.all()
     for node in nodes:
         push_system_user_to_node(system_user, node)

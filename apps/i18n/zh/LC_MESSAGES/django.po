@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-07 11:54+0800\n"
+"POT-Creation-Date: 2018-03-07 21:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,40 +21,42 @@ msgstr ""
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/forms/asset.py:23 assets/forms/asset.py:52 assets/forms/user.py:125
+#: assets/forms/asset.py:23 assets/forms/asset.py:54 assets/forms/user.py:125
 #: assets/models/asset.py:53 assets/models/user.py:218
 #: assets/templates/assets/asset_detail.html:181
 #: assets/templates/assets/asset_detail.html:189
-#: assets/templates/assets/system_user_detail.html:164
+#: assets/templates/assets/system_user_detail.html:166
 msgid "Nodes"
 msgstr "节点管理"
 
-#: assets/forms/asset.py:26 assets/forms/asset.py:55 assets/forms/asset.py:90
-#: assets/forms/asset.py:94 assets/models/asset.py:57
+#: assets/forms/asset.py:26 assets/forms/asset.py:57 assets/forms/asset.py:93
+#: assets/forms/asset.py:97 assets/models/asset.py:57
 #: assets/models/cluster.py:19 assets/models/user.py:187
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:24
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:29 assets/forms/asset.py:58 assets/models/asset.py:81
+#: assets/forms/asset.py:29 assets/forms/asset.py:60 assets/models/asset.py:81
 #: assets/templates/assets/asset_create.html:32
 #: assets/templates/assets/asset_detail.html:218
 #: assets/templates/assets/asset_update.html:37 templates/_nav.html:26
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/forms/asset.py:37 assets/forms/asset.py:68
+#: assets/forms/asset.py:38 assets/forms/asset.py:70
 msgid ""
 "Admin user is a privilege user exist on this asset,Example: root or other "
-"NOPASSWD sudo privilege user"
-msgstr "管理用户是资产上已经存在的特权用户，如 root或者其它有NOPASSWD的用户"
+"NOPASSWD sudo privilege userIf asset not support ansible, set any one"
+msgstr ""
+"管理用户是资产上已经存在的特权用户，如 root或者其它有NOPASSWD的用户, 如果资产"
+"不支持ansible, 任意设置一个即可"
 
-#: assets/forms/asset.py:77 assets/forms/asset.py:81 assets/forms/label.py:15
+#: assets/forms/asset.py:80 assets/forms/asset.py:84 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:88 users/forms.py:242
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:86 assets/models/asset.py:52
+#: assets/forms/asset.py:89 assets/models/asset.py:52
 #: assets/templates/assets/admin_user_assets.html:53
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/system_user_asset.html:51
@@ -62,11 +64,11 @@ msgstr "选择资产"
 msgid "Port"
 msgstr "端口"
 
-#: assets/forms/asset.py:106 assets/templates/assets/asset_create.html:36
+#: assets/forms/asset.py:109 assets/templates/assets/asset_create.html:36
 msgid "Select labels"
 msgstr "选择标签"
 
-#: assets/forms/asset.py:109 assets/templates/assets/admin_user_detail.html:91
+#: assets/forms/asset.py:112 assets/templates/assets/admin_user_detail.html:91
 msgid "Select nodes"
 msgstr "选择节点"
 
@@ -454,11 +456,11 @@ msgstr "测试系统用户可连接性: {}"
 msgid "test system user connectability period: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:365
+#: assets/tasks.py:369
 msgid "Push system user to node: {} => {}"
 msgstr "推送系统用户到节点: {}->{}"
 
-#: assets/tasks.py:397
+#: assets/tasks.py:407
 msgid "Push system users to node: {}"
 msgstr "推送系统用户到节点: {}"
 
@@ -748,7 +750,7 @@ msgstr "测试可连接性"
 #: assets/templates/assets/admin_user_assets.html:75
 #: assets/templates/assets/asset_detail.html:170
 #: assets/templates/assets/system_user_asset.html:81
-#: assets/templates/assets/system_user_detail.html:145
+#: assets/templates/assets/system_user_detail.html:147
 msgid "Test"
 msgstr "测试"
 
@@ -763,7 +765,7 @@ msgstr "替换资产的管理员"
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:198
 #: assets/templates/assets/asset_list.html:541
-#: assets/templates/assets/system_user_detail.html:181
+#: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:135 templates/_modal.html:16
 #: terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:339
@@ -936,27 +938,27 @@ msgid "Assets of "
 msgstr "资产"
 
 #: assets/templates/assets/system_user_asset.html:70
-#: assets/templates/assets/system_user_detail.html:134
-msgid "Push system user manually"
-msgstr "手动推送系统"
+#: assets/templates/assets/system_user_detail.html:135
+msgid "Push system user now"
+msgstr "立刻推送系统"
 
 #: assets/templates/assets/system_user_asset.html:73
-#: assets/templates/assets/system_user_detail.html:137
+#: assets/templates/assets/system_user_detail.html:138
 msgid "Push"
 msgstr "推送"
 
 #: assets/templates/assets/system_user_asset.html:78
-#: assets/templates/assets/system_user_detail.html:142
+#: assets/templates/assets/system_user_detail.html:144
 msgid "Test assets connective"
 msgstr "测试资产可连接性"
 
 #: assets/templates/assets/system_user_asset.html:147
-#: assets/templates/assets/system_user_detail.html:301
+#: assets/templates/assets/system_user_detail.html:303
 msgid "Task has been send, Go to ops task list seen result"
 msgstr "任务已下发，查看ops任务列表"
 
 #: assets/templates/assets/system_user_asset.html:159
-#: assets/templates/assets/system_user_detail.html:313
+#: assets/templates/assets/system_user_detail.html:315
 msgid "Task has been send, seen left assets status"
 msgstr "任务已下发，查看左侧资产状态"
 
@@ -968,7 +970,7 @@ msgstr "家目录"
 msgid "Uid"
 msgstr "Uid"
 
-#: assets/templates/assets/system_user_detail.html:172
+#: assets/templates/assets/system_user_detail.html:174
 msgid "Add to node"
 msgstr "添加到节点"
 
