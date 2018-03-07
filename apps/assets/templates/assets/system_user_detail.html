@@ -178,7 +178,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-cluster">{% trans 'Confirm' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-node">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -187,7 +187,7 @@
                                         <tr>
                                           <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-cluster" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -204,27 +204,27 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function updateSystemUserCluster(clusters) {
+function updateSystemUserCluster(nodes) {
     var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
     var body = {
-        cluster: Object.assign([], clusters)
+        nodes: Object.assign([], nodes)
     };
     var success = function(data) {
         // remove all the selected groups from select > option and rendered ul element;
         $('.select2-selection__rendered').empty();
         $('#cluster_selected').val('');
-        $.map(jumpserver.cluster_selected, function(cluster_name, index) {
+        $.map(jumpserver.nodes_selected, function(cluster_name, index) {
             $('#opt_' + index).remove();
             // change tr html of user groups.
             $('.cluster_edit tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_node" data-gid="' + index + '">' + cluster_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-cluster" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });
         // clear jumpserver.groups_selected
-        jumpserver.cluster_selected = {};
+        jumpserver.nodes_selected = {};
     };
     APIUpdateAttr({
         url: the_url,
@@ -232,16 +232,16 @@ function updateSystemUserCluster(clusters) {
         success: success
     });
 }
-jumpserver.cluster_selected = {};
+jumpserver.nodes_selected = {};
 $(document).ready(function () {
     $('.select2').select2()
     .on('select2:select', function(evt) {
             var data = evt.params.data;
-            jumpserver.cluster_selected[data.id] = data.text;
+            jumpserver.nodes_selected[data.id] = data.text;
     })
     .on('select2:unselect', function(evt) {
         var data = evt.params.data;
-        delete jumpserver.cluster_selected[data.id];
+        delete jumpserver.nodes_selected[data.id];
     });
 })
 .on('click', '#btn-auto-push', function () {
@@ -255,26 +255,26 @@ $(document).ready(function () {
         body: JSON.stringify(body)
     });
 })
-.on('click', '#btn-add-to-cluster', function() {
-    if (Object.keys(jumpserver.cluster_selected).length === 0) {
+.on('click', '#btn-add-to-node', function() {
+    if (Object.keys(jumpserver.nodes_selected).length === 0) {
         return false;
     }
-    var clusters = $('.bdg_node').map(function() {
+    var nodes = $('.bdg_node').map(function() {
         return $(this).data('gid');
     }).get();
-    $.map(jumpserver.cluster_selected, function(value, index) {
-        clusters.push(index);
+    $.map(jumpserver.nodes_selected, function(value, index) {
+        nodes.push(index);
     });
-    updateSystemUserCluster(clusters);
+    updateSystemUserCluster(nodes);
 })
-.on('click', '.btn-remove-from-cluster', function() {
+.on('click', '.btn-remove-from-node', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
     var $badge = $tr.find('.bdg_node');
     var gid = $badge.data('gid');
-    var cluster_name = $badge.html() || $badge.text();
+    var node_name = $badge.html() || $badge.text();
     $('#groups_selected').append(
-        '<option value="' + gid + '" id="opt_' + gid + '">' + cluster_name + '</option>'
+        '<option value="' + gid + '" id="opt_' + gid + '">' + node_name + '</option>'
     );
     $tr.remove();
     var clusters = $('.bdg_node').map(function () {

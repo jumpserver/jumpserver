@@ -22,6 +22,7 @@ class UserGroup(NoDeleteModelMixin):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("User group")
 
     @classmethod
     def initial(cls):

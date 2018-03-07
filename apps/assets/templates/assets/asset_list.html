@@ -2,6 +2,12 @@
 {% load static %}
 {% load i18n %}
 
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产
+    </div>
+{% endblock %}
+
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
@@ -224,7 +230,9 @@ function editTreeNode() {
 	if (!current_node){
 	    return
     }
-    current_node.name = current_node.value;
+    if (current_node.value) {
+        current_node.name = current_node.value;
+    }
     zTree.editName(current_node);
 }
 
@@ -313,38 +321,36 @@ function beforeDrag() {
     return true
 }
 
-function beforeDrop() {
-    return true
+function beforeDrop(treeId, treeNodes, targetNode, moveType) {
+    var treeNodesNames = [];
+    $.each(treeNodes, function (index, value) {
+        treeNodesNames.push(value.value);
+    });
+
+    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
+    if (confirm(msg)){
+        return true
+    } else {
+        return false
+    }
 }
 
 function onDrag(event, treeId, treeNodes) {
 }
 
 function onDrop(event, treeId, treeNodes, targetNode, moveType) {
-    console.log("DROP");
-    console.log(event);
-    console.log(treeNodes);
-    console.log(targetNode);
-    console.log(moveType);
-
-    var treeNodesNames = [];
     var treeNodesIds = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesNames.push(value.value);
         treeNodesIds.push(value.id);
     });
 
-    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
     var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.id);
     var body = {nodes: treeNodesIds};
-    if (confirm(msg)){
-        APIUpdateAttr({
-            url: the_url,
-            method: "PUT",
-            body: JSON.stringify(body)
-        })
-    }
-
+    APIUpdateAttr({
+        url: the_url,
+        method: "PUT",
+        body: JSON.stringify(body)
+    })
 }
 
 function initTree() {

@@ -58,8 +58,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
-            'action': _('Asset list'),
+            'action': _('My assets'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)

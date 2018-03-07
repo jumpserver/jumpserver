@@ -13,7 +13,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>{% trans 'Create system user' %}</h5>
+                        <h5>{{ action }}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -81,6 +81,14 @@
 {% block custom_foot_js %}
     <script>
         var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
+        var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
+        var password_id = '#' + '{{ form.password.id_for_label }}';
+        var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+        var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
+        var shell_id = '#' + '{{ form.shell.id_for_label }}';
+
+        var need_change_field = [auto_generate_key, private_key_id, sudo_id, shell_id] ;
+
         function authFieldsDisplay() {
             if ($(auto_generate_key).prop('checked')) {
                 $('.auth-fields').addClass('hidden');
@@ -88,9 +96,23 @@
                 $('.auth-fields').removeClass('hidden');
             }
         }
+
+        function protocolChange() {
+            if ($(protocol_id).attr('value') === 'rdp') {
+                $.each(need_change_field, function (index, value) {
+                    $(value).addClass('hidden')
+                });
+                $(password_id).removeClass('hidden')
+            } else {
+                $.each(need_change_field, function (index, value) {
+                    $(value).removeClass('hidden')
+                });
+            }
+        }
         $(document).ready(function () {
             $('.select2').select2();
             authFieldsDisplay();
+            protocolChange();
             $(auto_generate_key).change(function () {
                 authFieldsDisplay();
             });

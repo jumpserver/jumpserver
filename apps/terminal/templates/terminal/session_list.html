@@ -109,6 +109,21 @@
     {% endfor %}
 {% endblock %}
 
+{% block content_bottom_left %}
+    <div id="actions" {% if type != "online" %} style="display: none" {% endif %}>
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="terminate">{% trans 'Terminate selected' %}</option>
+            </select>
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                 {% trans 'Submit' %}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
@@ -119,7 +134,7 @@
                 }, 1000)
             }
             var success_message = '{% trans "Terminate task send, waiting ..." %}';
-            var the_url = "{% url 'api-terminal:tasks-list' %}";
+            var the_url = "{% url 'api-terminal:kill-session' %}";
             APIUpdateAttr({
                 url: the_url,
                 method: 'POST',
@@ -150,14 +165,31 @@
         }).on('click', '.btn-term', function () {
             var $this = $(this);
             var session_id = $this.attr('value');
-            var terminal_id = $this.attr('terminal');
-            var data = {
-                name: "kill_session",
-                args: session_id,
-                terminal: terminal_id
-            };
+            var data = [
+                session_id
+            ];
             terminateSession(data)
-        })
+        }).on('click', '#btn_bulk_update', function () {
+            var action = $('#slct_bulk_update').val();
+            var id_list = [];
+            $(".cbx-term:checked").each(function (index, data) {
+                id_list.push($(data).attr("value"))
+            });
+            if (id_list.length === 0) {
+                return false;
+            }
+
+            function doTerminate() {
+                terminateSession(id_list)
+            }
+            switch(action) {
+                case 'terminate':
+                    doTerminate();
+                    break;
+                default:
+                    break;
+            }
+        });
     </script>
 {% endblock %}
 

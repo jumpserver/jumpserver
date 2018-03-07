@@ -251,6 +251,7 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['username']
+        verbose_name = _("User")
 
     #: Use this method initial user
     @classmethod

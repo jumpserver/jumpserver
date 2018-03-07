@@ -129,7 +129,7 @@ class Session(models.Model):
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
     date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
-    date_start = models.DateTimeField(verbose_name=_("Date start"))
+    date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
     class Meta:

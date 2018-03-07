@@ -92,8 +92,8 @@ class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'User group granted asset',
+            'app': _('Users'),
+            'action': _('User group granted asset'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

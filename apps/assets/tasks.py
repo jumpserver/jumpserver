@@ -91,7 +91,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     if task_name is None:
         task_name = _("Update some assets hardware info")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
-    hostname_list = [asset.hostname for asset in assets]
+    hostname_list = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     task, created = update_or_create_ansible_task(
         task_name, hosts=hostname_list, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
@@ -120,7 +120,10 @@ def update_assets_hardware_info_period():
     """
     from ops.utils import update_or_create_ansible_task
     task_name = _("Update assets hardware info period")
-    hostname_list = [asset.hostname for asset in Asset.objects.all()]
+    hostname_list = [
+        asset.hostname for asset in Asset.objects.all()
+        if asset.is_active and asset.is_unixlike()
+    ]
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
 
     # Only create, schedule by celery beat
@@ -165,7 +168,8 @@ def test_admin_user_connectability_util(admin_user, task_name):
     from ops.utils import update_or_create_ansible_task
 
     assets = admin_user.get_related_assets()
-    hosts = [asset.hostname for asset in assets]
+    hosts = [asset.hostname for asset in assets
+             if asset.is_active and asset.is_unixlike()]
     if not hosts:
         return
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
@@ -257,7 +261,7 @@ def test_system_user_connectability_util(system_user, task_name):
     """
     from ops.utils import update_or_create_ansible_task
     assets = system_user.assets
-    hosts = [asset.hostname for asset in assets]
+    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     if not hosts:
         logger.info("No hosts, passed")
@@ -346,7 +350,7 @@ def push_system_user_util(system_users, assets, task_name):
         logger.info("Not tasks, passed")
         return {}
 
-    hosts = [asset.hostname for asset in assets]
+    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("Not hosts, passed")
         return {}

@@ -1,4 +1,7 @@
-from django.views.generic import TemplateView
+import datetime
+
+from django.http import HttpResponse
+from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -45,15 +48,22 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return self.session_week.values('user').distinct().count()
 
     def get_week_login_asset_count(self):
-        return self.session_week.values('asset').distinct().count()
+        return self.session_week.count()
+        # return self.session_week.values('asset').distinct().count()
 
     def get_month_day_metrics(self):
         month_str = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']
         return month_str
 
     def get_month_login_metrics(self):
-        return [self.session_month.filter(date_start__date=d).count()
-                for d in self.session_month_dates]
+        data = []
+        time_min = datetime.datetime.min.time()
+        time_max = datetime.datetime.max.time()
+        for d in self.session_month_dates:
+            ds = datetime.datetime.combine(d, time_min).replace(tzinfo=timezone.get_current_timezone())
+            de = datetime.datetime.combine(d, time_max).replace(tzinfo=timezone.get_current_timezone())
+            data.append(self.session_month.filter(date_start__range=(ds, de)).count())
+        return data
 
     def get_month_active_user_metrics(self):
         if self.session_month_dates_archive:
@@ -119,10 +129,18 @@ class IndexView(LoginRequiredMixin, TemplateView):
         self.session_week = Session.objects.filter(date_start__gt=week_ago)
         self.session_month = Session.objects.filter(date_start__gt=month_ago)
         self.session_month_dates = self.session_month.dates('date_start', 'day')
-        self.session_month_dates_archive = [
-            self.session_month.filter(date_start__date=d)
-            for d in self.session_month_dates
-        ]
+
+        self.session_month_dates_archive = []
+        time_min = datetime.datetime.min.time()
+        time_max = datetime.datetime.max.time()
+
+        for d in self.session_month_dates:
+            ds = datetime.datetime.combine(d, time_min).replace(
+                tzinfo=timezone.get_current_timezone())
+            de = datetime.datetime.combine(d, time_max).replace(
+                tzinfo=timezone.get_current_timezone())
+            self.session_month_dates_archive.append(
+                self.session_month.filter(date_start__range=(ds, de)))
 
         context = {
             'assets_count': self.get_asset_count(),
@@ -149,3 +167,12 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
         kwargs.update(context)
         return super(IndexView, self).get_context_data(**kwargs)
+
+
+class LunaView(View):
+    def get(self, request):
+        msg = """
+        Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, 
+        如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
+        """
+        return HttpResponse(msg)

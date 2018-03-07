@@ -99,9 +99,8 @@ class DatetimeSearchMixin:
 
         if date_from_s:
             date_from = timezone.datetime.strptime(date_from_s, self.date_format)
-            self.date_from = date_from.replace(
-                tzinfo=timezone.get_current_timezone()
-            )
+            tz = timezone.get_current_timezone()
+            self.date_from = tz.localize(date_from)
         else:
             self.date_from = timezone.now() - timezone.timedelta(7)
 
