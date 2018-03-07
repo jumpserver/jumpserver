@@ -34,7 +34,6 @@ ephem==3.7.6.0
 eventlet==0.21.0
 ForgeryPy==0.1
 greenlet==0.4.12
-gssapi==1.2.4
 gunicorn==19.7.1
 idna==2.6
 itsdangerous==0.24
