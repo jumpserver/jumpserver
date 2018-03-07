@@ -9,3 +9,4 @@
    admin_instruction
    admin_user
    admin_asset
+   admin_system_settings
