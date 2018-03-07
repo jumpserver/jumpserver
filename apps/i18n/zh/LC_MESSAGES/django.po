@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-07 11:27+0800\n"
+"POT-Creation-Date: 2018-03-07 11:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -434,31 +434,31 @@ msgstr "更新资产硬件信息"
 msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
-#: assets/tasks.py:191
+#: assets/tasks.py:195
 msgid "Test admin user connectability period: {}"
 msgstr "定期测试管理用户可连接性: {}"
 
-#: assets/tasks.py:197
+#: assets/tasks.py:201
 msgid "Test admin user connectability: {}"
 msgstr "测试管理用户可连接性: {}"
 
-#: assets/tasks.py:206
+#: assets/tasks.py:210
 msgid "Test asset connectability"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:277
+#: assets/tasks.py:281
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:288
+#: assets/tasks.py:292
 msgid "test system user connectability period: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:361
+#: assets/tasks.py:365
 msgid "Push system user to node: {} => {}"
 msgstr "推送系统用户到节点: {}->{}"
 
-#: assets/tasks.py:393
+#: assets/tasks.py:397
 msgid "Push system users to node: {}"
 msgstr "推送系统用户到节点: {}"
 
