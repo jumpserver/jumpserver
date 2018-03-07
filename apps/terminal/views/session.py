@@ -74,6 +74,7 @@ class SessionOnlineListView(SessionListView):
         context = {
             'app': _('Terminal'),
             'action': _('Session online list'),
+            'type': 'online',
             'now': timezone.now(),
         }
         kwargs.update(context)

@@ -13,7 +13,7 @@ from .views import IndexView, LunaView
 schema_view = get_schema_view(title='Users API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^luna/$', LunaView.as_view(), name='luna-error'),
+    url(r'^luna/', LunaView.as_view(), name='luna-error'),
     url(r'^users/', include('users.urls.views_urls', namespace='users')),
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),

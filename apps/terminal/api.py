@@ -5,14 +5,15 @@ import logging
 import os
 import uuid
 
-from rest_framework import viewsets, serializers
-from rest_framework.views import APIView, Response
-from rest_framework.permissions import AllowAny
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
+from rest_framework import viewsets, serializers
+from rest_framework.views import APIView, Response
+from rest_framework.permissions import AllowAny
+from rest_framework_bulk import BulkModelViewSet
 
 from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
@@ -178,10 +179,27 @@ class SessionViewSet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+
+
+class KillSessionAPI(APIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+    model = Task
+
+    def post(self, request, *args, **kwargs):
+        validated_session = []
+        for session_id in request.data:
+            session = get_object_or_none(Session, id=session_id)
+            if session and not session.is_finished:
+                validated_session.append(session_id)
+                self.model.objects.create(
+                    name="kill_session", args=session.id,
+                    terminal=session.terminal,
+                )
+        return Response({"ok": validated_session})
 
 
 class CommandViewSet(viewsets.ViewSet):

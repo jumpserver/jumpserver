@@ -3,7 +3,11 @@
 
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework_bulk.serializers import BulkListSerializer
 
+
+from common.mixins import BulkSerializerMixin
+from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
 from .backends import get_multi_command_store
 
@@ -47,6 +51,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
+        list_serializer_class = BulkListSerializer
         fields = '__all__'
 
     def get_command_amount(self, obj):
@@ -60,11 +65,12 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
         model = Task
+        list_serializer_class = BulkListSerializer
 
 
 class ReplaySerializer(serializers.Serializer):

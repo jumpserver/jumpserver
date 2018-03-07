@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-06 17:57+0800\n"
+"POT-Creation-Date: 2018-03-07 11:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -660,12 +660,6 @@ msgstr "更新"
 msgid "Delete"
 msgstr "删除"
 
-#: assets/templates/assets/_system_user.html:16
-#: assets/templates/assets/system_user_list.html:16
-#: assets/views/system_user.py:45
-msgid "Create system user"
-msgstr "创建系统用户"
-
 #: assets/templates/assets/_system_user.html:37
 #: assets/templates/assets/asset_create.html:16
 #: assets/templates/assets/asset_update.html:21
@@ -762,12 +756,6 @@ msgstr "测试"
 msgid "Task has been send, seen left asset status"
 msgstr "任务已下发，查看左侧资产状态"
 
-#: assets/templates/assets/admin_user_create_update.html:16
-#: assets/templates/assets/admin_user_list.html:14
-#: assets/views/admin_user.py:48
-msgid "Create admin user"
-msgstr "创建管理用户"
-
 #: assets/templates/assets/admin_user_detail.html:83
 msgid "Replace node assets admin user with this"
 msgstr "替换资产的管理员"
@@ -787,6 +775,11 @@ msgstr "替换资产的管理员"
 #: users/templates/users/user_profile.html:177
 msgid "Confirm"
 msgstr "确认"
+
+#: assets/templates/assets/admin_user_list.html:14
+#: assets/views/admin_user.py:48
+msgid "Create admin user"
+msgstr "创建管理用户"
 
 #: assets/templates/assets/admin_user_list.html:26
 #: assets/templates/assets/system_user_list.html:28
@@ -978,6 +971,11 @@ msgstr "Uid"
 #: assets/templates/assets/system_user_detail.html:172
 msgid "Add to node"
 msgstr "添加到节点"
+
+#: assets/templates/assets/system_user_list.html:16
+#: assets/views/system_user.py:45
+msgid "Create system user"
+msgstr "创建系统用户"
 
 #: assets/templates/assets/system_user_list.html:131
 msgid "This will delete the selected System Users !!!"
@@ -1607,10 +1605,6 @@ msgstr "选择资产组"
 msgid "Join"
 msgstr "加入"
 
-#: perms/templates/perms/asset_permission_create_update.html:17
-msgid "Create asset permission "
-msgstr "创建资产权限"
-
 #: perms/templates/perms/asset_permission_detail.html:66
 msgid "User count"
 msgstr "用户数量"
@@ -1783,7 +1777,7 @@ msgstr "Web终端"
 
 #: templates/_nav.html:50 terminal/templates/terminal/session_list.html:75
 #: terminal/views/command.py:47 terminal/views/session.py:75
-#: terminal/views/session.py:92 terminal/views/session.py:114
+#: terminal/views/session.py:93 terminal/views/session.py:115
 #: terminal/views/terminal.py:31 terminal/views/terminal.py:46
 #: terminal/views/terminal.py:58
 msgid "Terminal"
@@ -1896,7 +1890,7 @@ msgid "Goto"
 msgstr "转到"
 
 #: terminal/templates/terminal/session_detail.html:17
-#: terminal/views/session.py:115
+#: terminal/views/session.py:116
 msgid "Session detail"
 msgstr "会话详情"
 
@@ -1939,10 +1933,8 @@ msgid "Terminate"
 msgstr "终断"
 
 #: terminal/templates/terminal/session_list.html:116
-#, fuzzy
-#| msgid "Deactive selected"
 msgid "Terminate selected"
-msgstr "禁用所选"
+msgstr "终断所选"
 
 #: terminal/templates/terminal/session_list.html:136
 msgid "Terminate task send, waiting ..."
@@ -1991,7 +1983,7 @@ msgstr "信息"
 msgid "Session online list"
 msgstr "在线会话"
 
-#: terminal/views/session.py:93
+#: terminal/views/session.py:94
 msgid "Session offline list"
 msgstr "离线会话"
 
@@ -2653,3 +2645,6 @@ msgstr "密码更新"
 #: users/views/user.py:374
 msgid "Public key update"
 msgstr "密钥更新"
+
+#~ msgid "Create asset permission "
+#~ msgstr "创建资产权限"
