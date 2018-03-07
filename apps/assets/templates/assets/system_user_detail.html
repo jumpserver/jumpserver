@@ -164,12 +164,12 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Nodes' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table cluster_edit" id="add-asset2group">
+                                    <table class="table node_edit" id="add-asset2group">
                                         <tbody>
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add to node' %}" id="cluster_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for node in nodes_remain %}
                                                         <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.name }}</option>
                                                         {% endfor %}
@@ -212,13 +212,13 @@ function updateSystemUserCluster(nodes) {
     var success = function(data) {
         // remove all the selected groups from select > option and rendered ul element;
         $('.select2-selection__rendered').empty();
-        $('#cluster_selected').val('');
-        $.map(jumpserver.nodes_selected, function(cluster_name, index) {
+        $('#node_selected').val('');
+        $.map(jumpserver.nodes_selected, function(node_name, index) {
             $('#opt_' + index).remove();
             // change tr html of user groups.
-            $('.cluster_edit tbody').append(
+            $('.node_edit tbody').append(
                 '<tr>' +
-                '<td><b class="bdg_node" data-gid="' + index + '">' + cluster_name + '</b></td>' +
+                '<td><b class="bdg_node" data-gid="' + index + '">' + node_name + '</b></td>' +
                 '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
@@ -277,10 +277,10 @@ $(document).ready(function () {
         '<option value="' + gid + '" id="opt_' + gid + '">' + node_name + '</option>'
     );
     $tr.remove();
-    var clusters = $('.bdg_node').map(function () {
+    var nodes = $('.bdg_node').map(function () {
         return $(this).data('gid');
     }).get();
-    updateSystemUserCluster(clusters);
+    updateSystemUserCluster(nodes);
 }).on('click', '.btn-del', function () {
     var $this = $(this);
     var name = "{{ system_user.name}}";
