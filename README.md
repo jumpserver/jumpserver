@@ -36,7 +36,6 @@ Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点�
 
 也可以查看我们完整文档包括了使用和开发 [文档](http://docs.jumpserver.org)
 
-
 ### Demo 和 截图 
 
 我们提供了DEMO和截图可以让你快速了解Jumpserver
