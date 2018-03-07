@@ -300,7 +300,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
         REGION = config.get("REGION", None)
         ACCESS_KEY = config.get("ACCESS_KEY", None)
         SECRET_KEY = config.get("SECRET_KEY", None)
-        if self.ACCESS_KEY and REGION and SECRET_KEY:
+        if ACCESS_KEY and REGION and SECRET_KEY:
             s3 = boto3.client('s3',
                               region_name=REGION,
                               aws_access_key_id=ACCESS_KEY,
