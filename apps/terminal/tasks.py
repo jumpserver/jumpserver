@@ -31,6 +31,6 @@ def delete_terminal_status_period():
 def clean_orphan_session():
     active_sessions = Session.objects.filter(is_finished=False)
     for session in active_sessions:
-        if not session.terminal.is_active:
+        if not session.terminal or not session.terminal.is_active:
             session.is_finished = True
             session.save()
