@@ -1,15 +1,12 @@
-简介
-============
+架构说明
+=================
 
-Jumpserver是混合云下更好用的堡垒机, 分布式架构设计无限扩展，轻松对接混合云资产，支持使用云存储（AWS S3, ES等）存储录像、命令
-
-Jumpserver颠覆传统堡垒机, 无主机和并发数量限制，支持水平扩容，FIT2CLOUD提供完备的商业服务支持，用户无后顾之忧
-
-Jumpserver拥有极致的用户体验, 极致UI体验，容器化的部署方式，部署过程方便快捷，可持续升级
+.. image:: _static/img/structure.png
+    :alt: 组件架构图
 
 
 组件说明
-++++++++++++++++++++++++
+=================
 
 Jumpserver
 ```````````
@@ -45,7 +42,3 @@ Jumpserver API Python SDK，Coco目前使用该SDK与Jumpserver API交互
 `Github <https://github.com/jumpserver/jumpserver-python-sdk.git>`__
 
 
-组件架构图
-++++++++++++++++++++++++
-.. image:: _static/img/structure.png
-    :alt: 组件架构图
