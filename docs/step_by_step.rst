@@ -234,9 +234,11 @@ Luna已改为纯前端，需要nginx来运行访问
 
 .. code:: shell
 
+
+
     docker run -d \
       -p 8081:8080 \
-      -e JUMPSERVER_SERVER=http://localhost:8080 \
+      -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
       jumpserver/guacamole
 
 这里所需要注意的是guacamole暴露出来的端口是8081，若与主机上其他端口冲突请自定义一下。
