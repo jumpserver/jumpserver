@@ -238,8 +238,9 @@ def content_md5(data):
     """
     if isinstance(data, str):
         data = hashlib.md5(data.encode('utf-8'))
-    value = base64.b64encode(data.digest())
+    value = base64.b64encode(data.hexdigest().encode('utf-8'))
     return value.decode('utf-8')
+
 
 _STRPTIME_LOCK = threading.Lock()
 

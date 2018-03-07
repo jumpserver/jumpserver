@@ -570,7 +570,7 @@ seriesTypes.heatmap = extendClass(seriesTypes.scatter, merge(colorSeriesMixin, {
 				y1 = Math.round(yAxis.translate(point.y - yPad, 0, 1, 0, 1)),
 				y2 = Math.round(yAxis.translate(point.y + yPad, 0, 1, 0, 1));
 
-			// Set plotX and plotY for use in K-D-Tree and more
+			// Set plotX and plotY for use in K-D-TreeView and more
 			point.plotX = (x1 + x2) / 2;
 			point.plotY = (y1 + y2) / 2;
 

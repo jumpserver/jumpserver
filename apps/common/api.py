@@ -9,7 +9,7 @@ from django.core.mail import get_connection, send_mail
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .permissions import IsSuperUser
+from .permissions import IsSuperUser, IsAppUser
 from .serializers import MailTestSerializer, LDAPTestSerializer
 
 
@@ -63,8 +63,6 @@ class LDAPTestingAPI(APIView):
             search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
             attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
 
-            print(serializer.validated_data)
-
             try:
                 attr_map = json.loads(attr_map)
             except json.JSONDecodeError:
@@ -77,9 +75,6 @@ class LDAPTestingAPI(APIView):
             except Exception as e:
                 return Response({"error": str(e)}, status=401)
 
-            print(search_ou)
-            print(search_filter % ({"user": "*"}))
-            print(attr_map.values())
             ok = conn.search(search_ou, search_filter % ({"user": "*"}),
                              attributes=list(attr_map.values()))
             if not ok:
@@ -93,7 +88,7 @@ class LDAPTestingAPI(APIView):
                         user[attr] = getattr(entry, mapping)
                 users.append(user)
             if len(users) > 0:
-                return Response({"msg": "Match {} s users".format(len(users))})
+                return Response({"msg": _("Match {} s users").format(len(users))})
             else:
                 return Response({"error": "Have user but attr mapping error"}, status=401)
         else:
@@ -102,9 +97,11 @@ class LDAPTestingAPI(APIView):
 
 class DjangoSettingsAPI(APIView):
     def get(self, request):
+        if not settings.DEBUG:
+            return Response('Only debug mode support')
+
         configs = {}
         for i in dir(settings):
             if i.isupper():
                 configs[i] = str(getattr(settings, i))
         return Response(configs)
-

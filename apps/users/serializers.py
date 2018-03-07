@@ -52,7 +52,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    user_amount = serializers.SerializerMethodField()
+    users = serializers.SerializerMethodField()
 
     class Meta:
         model = UserGroup
@@ -60,8 +60,8 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         fields = '__all__'
 
     @staticmethod
-    def get_user_amount(obj):
-        return obj.users.count()
+    def get_users(obj):
+        return [user.name for user in obj.users.all()]
 
 
 class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
@@ -71,3 +71,9 @@ class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
         model = UserGroup
         fields = ['id', 'users']
 
+
+class ChangeUserPasswordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['password']

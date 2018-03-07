@@ -43,7 +43,7 @@ def update_or_create_ansible_task(
     new_adhoc.become = become_info
 
     if not adhoc or adhoc != new_adhoc:
-        logger.debug("Task create new adhoc: {}".format(task_name))
+        print("Task create new adhoc: {}".format(task_name))
         new_adhoc.save()
         task.latest_adhoc = new_adhoc
         created = True

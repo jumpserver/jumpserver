@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+import os
 from django import forms
 from django.shortcuts import render
 from django.contrib.auth import login as auth_login, logout as auth_logout
@@ -29,10 +30,12 @@ from ..tasks import write_login_log_async
 from .. import forms
 
 
-__all__ = ['UserLoginView', 'UserLogoutView',
-           'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
-           'UserResetPasswordView', 'UserResetPasswordSuccessView',
-           'UserFirstLoginView', 'LoginLogListView']
+__all__ = [
+    'UserLoginView', 'UserLogoutView',
+    'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
+    'UserResetPasswordView', 'UserResetPasswordSuccessView',
+    'UserFirstLoginView', 'LoginLogListView'
+]
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
@@ -54,7 +57,8 @@ class UserLoginView(FormView):
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-        if x_forwarded_for:
+
+        if x_forwarded_for and x_forwarded_for[0]:
             login_ip = x_forwarded_for[0]
         else:
             login_ip = self.request.META.get('REMOTE_ADDR', '')
@@ -73,6 +77,13 @@ class UserLoginView(FormView):
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, reverse('index')))
 
+    def get_context_data(self, **kwargs):
+        context = {
+            'demo_mode': os.environ.get("DEMO_MODE"),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
 
 @method_decorator(never_cache, name='dispatch')
 class UserLogoutView(TemplateView):
@@ -80,7 +91,8 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
-        return super().get(request, *args, **kwargs)
+        response = super().get(request, *args, **kwargs)
+        return response
 
     def get_context_data(self, **kwargs):
         context = {
@@ -234,7 +246,7 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
         if self.user:
             queryset = queryset.filter(username=self.user)
         if self.keyword:
-            queryset = self.queryset.filter(
+            queryset = queryset.filter(
                 Q(ip__contains=self.keyword) |
                 Q(city__contains=self.keyword) |
                 Q(username__contains=self.keyword)

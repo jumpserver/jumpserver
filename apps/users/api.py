@@ -1,31 +1,46 @@
 # ~*~ coding: utf-8 ~*~
+import uuid
+
+from django.core.cache import cache
 
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import BulkModelViewSet
 
 from .serializers import UserSerializer, UserGroupSerializer, \
     UserGroupUpdateMemeberSerializer, UserPKUpdateSerializer, \
-    UserUpdateGroupSerializer
+    UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup
-from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
+from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
+    IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token
-from common.mixins import CustomFilterMixin
+from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
 
 logger = get_logger(__name__)
 
 
-class UserViewSet(CustomFilterMixin, BulkModelViewSet):
+class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsSuperUser, IsAuthenticated)
     filter_fields = ('username', 'email', 'name', 'id')
+
+
+class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    queryset = User.objects.all()
+    serializer_class = ChangeUserPasswordSerializer
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        user.password_raw = serializer.validated_data["password"]
+        user.save()
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -37,6 +52,7 @@ class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -72,7 +88,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class UserGroupViewSet(CustomFilterMixin, BulkModelViewSet):
+class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
 
@@ -129,7 +145,8 @@ class UserAuthApi(APIView):
 
         if not login_ip:
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-            if x_forwarded_for:
+
+            if x_forwarded_for and x_forwarded_for[0]:
                 login_ip = x_forwarded_for[0]
             else:
                 login_ip = request.META.get("REMOTE_ADDR")
@@ -148,3 +165,30 @@ class UserAuthApi(APIView):
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)
+
+
+class UserConnectionTokenApi(APIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def post(self, request):
+        user_id = request.data.get('user', '')
+        asset_id = request.data.get('asset', '')
+        system_user_id = request.data.get('system_user', '')
+        token = str(uuid.uuid4())
+        value = {
+            'user': user_id,
+            'asset': asset_id,
+            'system_user': system_user_id
+        }
+        cache.set(token, value, timeout=3600)
+        return Response({"token": token}, status=201)
+
+    def get(self, request):
+        token = request.query_params.get('token')
+        value = cache.get(token, None)
+        if value:
+            cache.delete(token)
+        return Response(value)
+
+
+

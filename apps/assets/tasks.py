@@ -19,7 +19,7 @@ FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
-disk_pattern = re.compile(r'^hd|sd|xvd')
+disk_pattern = re.compile(r'^hd|sd|xvd|vd')
 
 
 @shared_task
@@ -36,39 +36,40 @@ def set_assets_hardware_info(result, **kwargs):
     result_raw = result[0]
     assets_updated = []
     for hostname, info in result_raw.get('ok', {}).items():
-        if info:
-            info = info['setup']['ansible_facts']
-        else:
+        info = info.get('setup', {}).get('ansible_facts', {})
+        if not info:
+            logger.error("Get asset info failed: {}".format(hostname))
             continue
 
         asset = get_object_or_none(Asset, hostname=hostname)
         if not asset:
             continue
 
-        ___vendor = info['ansible_system_vendor']
-        ___model = info['ansible_product_version']
-        ___sn = info['ansible_product_serial']
+        ___vendor = info.get('ansible_system_vendor', 'Unknown')
+        ___model = info.get('ansible_product_name', 'Unknown')
+        ___sn = info.get('ansible_product_serial', 'Unknown')
 
-        for ___cpu_model in info['ansible_processor']:
-            if ___cpu_model.endswith('GHz'):
+        for ___cpu_model in info.get('ansible_processor', []):
+            if ___cpu_model.endswith('GHz') or ___cpu_model.startswith("Intel"):
                 break
         else:
             ___cpu_model = 'Unknown'
-        ___cpu_count = info['ansible_processor_count']
-        ___cpu_cores = info['ansible_processor_cores']
-        ___memory = '%s %s' % capacity_convert('{} MB'.format(info['ansible_memtotal_mb']))
+        ___cpu_model = ___cpu_model[:64]
+        ___cpu_count = info.get('ansible_processor_count', 0)
+        ___cpu_cores = info.get('ansible_processor_cores', None) or len(info.get('ansible_processor', []))
+        ___memory = '%s %s' % capacity_convert('{} MB'.format(info.get('ansible_memtotal_mb')))
         disk_info = {}
-        for dev, dev_info in info['ansible_devices'].items():
+        for dev, dev_info in info.get('ansible_devices', {}).items():
             if disk_pattern.match(dev) and dev_info['removable'] == '0':
                 disk_info[dev] = dev_info['size']
         ___disk_total = '%s %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)
 
-        ___platform = info['ansible_system']
-        ___os = info['ansible_distribution']
-        ___os_version = info['ansible_distribution_version']
-        ___os_arch = info['ansible_architecture']
-        ___hostname_raw = info['ansible_hostname']
+        ___platform = info.get('ansible_system', 'Unknown')
+        ___os = info.get('ansible_distribution', 'Unknown')
+        ___os_version = info.get('ansible_distribution_version', 'Unknown')
+        ___os_arch = info.get('ansible_architecture', 'Unknown')
+        ___hostname_raw = info.get('ansible_hostname', 'Unknown')
 
         for k, v in locals().items():
             if k.startswith('___'):
@@ -90,7 +91,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     if task_name is None:
         task_name = _("Update some assets hardware info")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
-    hostname_list = [asset.hostname for asset in assets]
+    hostname_list = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     task, created = update_or_create_ansible_task(
         task_name, hosts=hostname_list, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
@@ -98,7 +99,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     result = task.run()
     # Todo: may be somewhere using
     # Manual run callback function
-    assets_updated = set_assets_hardware_info(result)
+    set_assets_hardware_info(result)
     return result
 
 
@@ -119,7 +120,10 @@ def update_assets_hardware_info_period():
     """
     from ops.utils import update_or_create_ansible_task
     task_name = _("Update assets hardware info period")
-    hostname_list = [asset.hostname for asset in Asset.objects.all()]
+    hostname_list = [
+        asset.hostname for asset in Asset.objects.all()
+        if asset.is_active and asset.is_unixlike()
+    ]
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
 
     # Only create, schedule by celery beat
@@ -164,7 +168,10 @@ def test_admin_user_connectability_util(admin_user, task_name):
     from ops.utils import update_or_create_ansible_task
 
     assets = admin_user.get_related_assets()
-    hosts = [asset.hostname for asset in assets]
+    hosts = [asset.hostname for asset in assets
+             if asset.is_active and asset.is_unixlike()]
+    if not hosts:
+        return
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -183,19 +190,10 @@ def test_admin_user_connectability_period():
     """
     A period task that update the ansible task period
     """
-    from ops.utils import update_or_create_ansible_task
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
-        task_name = _("Test admin user connectability period: {}").format(admin_user)
-        assets = admin_user.get_related_assets()
-        hosts = [asset.hostname for asset in assets]
-        tasks = const.TEST_ADMIN_USER_CONN_TASKS
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
-            interval=3600, is_periodic=True,
-            callback=set_admin_user_connectability_info.name,
-        )
+        task_name = _("Test admin user connectability period: {}".format(admin_user.name))
+        test_admin_user_connectability_util(admin_user, task_name)
 
 
 @shared_task
@@ -262,8 +260,8 @@ def test_system_user_connectability_util(system_user, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    assets = system_user.get_clusters_assets()
-    hosts = [asset.hostname for asset in assets]
+    assets = system_user.assets
+    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     if not hosts:
         logger.info("No hosts, passed")
@@ -289,21 +287,10 @@ def test_system_user_connectability_manual(system_user):
 @after_app_ready_start
 @after_app_shutdown_clean
 def test_system_user_connectability_period():
-    from ops.utils import update_or_create_ansible_task
     system_users = SystemUser.objects.all()
     for system_user in system_users:
-        task_name = _("Test system user connectability period: {}").format(
-            system_user.name
-        )
-        assets = system_user.get_clusters_assets()
-        hosts = [asset.hostname for asset in assets]
-        tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=False,  run_as=system_user.name,
-            created_by='System', interval=3600, is_periodic=True,
-            callback=set_admin_user_connectability_info.name,
-        )
+        task_name = _("test system user connectability period: {}".format(system_user))
+        test_system_user_connectability_util(system_user, task_name)
 
 
 ####  Push system user tasks ####
@@ -313,8 +300,9 @@ def get_push_system_user_tasks(system_user):
     if system_user.username == "root":
         return []
 
-    tasks = [
-        {
+    tasks = []
+    if system_user.password:
+        tasks.append({
             'name': 'Add user {}'.format(system_user.username),
             'action': {
                 'module': 'user',
@@ -323,8 +311,9 @@ def get_push_system_user_tasks(system_user):
                     encrypt_password(system_user.password, salt="K3mIlKK"),
                 ),
             }
-        },
-        {
+        })
+    if system_user.public_key:
+        tasks.append({
             'name': 'Set {} authorized key'.format(system_user.username),
             'action': {
                 'module': 'authorized_key',
@@ -332,8 +321,9 @@ def get_push_system_user_tasks(system_user):
                     system_user.username, system_user.public_key
                 )
             }
-        },
-        {
+        })
+    if system_user.sudo:
+        tasks.append({
             'name': 'Set {} sudo setting'.format(system_user.username),
             'action': {
                 'module': 'lineinfile',
@@ -344,8 +334,7 @@ def get_push_system_user_tasks(system_user):
                     system_user.sudo,
                 )
             }
-        }
-    ]
+        })
     return tasks
 
 
@@ -354,13 +343,14 @@ def push_system_user_util(system_users, assets, task_name):
     from ops.utils import update_or_create_ansible_task
     tasks = []
     for system_user in system_users:
-        tasks.extend(get_push_system_user_tasks(system_user))
+        if system_user.is_need_push():
+            tasks.extend(get_push_system_user_tasks(system_user))
 
     if not tasks:
         logger.info("Not tasks, passed")
         return {}
 
-    hosts = [asset.hostname for asset in assets]
+    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("Not hosts, passed")
         return {}
@@ -371,35 +361,47 @@ def push_system_user_util(system_users, assets, task_name):
     return task.run()
 
 
-@shared_task
-def push_system_user_to_cluster_assets_manual(system_user):
-    task_name = _("Push system user to cluster assets: {}").format(system_user.name)
-    assets = system_user.get_clusters_assets()
-    return push_system_user_util([system_user], assets, task_name)
+def get_node_push_system_user_task_name(system_user, node):
+    return _("Push system user to node: {} => {}").format(
+        system_user.name,
+        node.value
+    )
+
+
+def push_system_user_to_node(system_user, node):
+    assets = node.get_all_assets()
+    task_name = get_node_push_system_user_task_name(system_user, node)
+    push_system_user_util.delay([system_user], assets, task_name)
 
 
 @shared_task
-@register_as_period_task(interval=3600)
-@after_app_ready_start
-@after_app_shutdown_clean
-def push_system_user_period():
-    from ops.utils import update_or_create_ansible_task
-    clusters = Cluster.objects.all()
+def push_system_user_related_nodes(system_user):
+    nodes = system_user.nodes.all()
+    for node in nodes:
+        push_system_user_to_node(system_user, node)
 
-    for cluster in clusters:
-        tasks = []
-        system_users = [system_user for system_user in cluster.systemuser_set.all() if system_user.auto_push]
-        if not system_users:
-            return
-        for system_user in system_users:
-            tasks.extend(get_push_system_user_tasks(system_user))
 
-        task_name = _("Push cluster system users to assets period: {}").format(
-            cluster.name
-        )
-        hosts = [asset.hostname for asset in cluster.assets.all()]
-        update_or_create_ansible_task(
-            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
-            interval=60*60*24, is_periodic=True,
-        )
+@shared_task
+def push_system_user_to_assets_manual(system_user):
+    push_system_user_related_nodes(system_user)
+
+
+def push_node_system_users_to_asset(node, assets):
+    system_users = []
+    nodes = node.ancestor_with_node
+    # 获取该节点所有父节点有的系统用户, 然后推送
+    for n in nodes:
+        system_users.extend(list(n.systemuser_set.all()))
+
+    if system_users:
+        task_name = _("Push system users to node: {}").format(node.value)
+        push_system_user_util.delay(system_users, assets, task_name)
+
+
+# @shared_task
+# @register_as_period_task(interval=3600)
+# @after_app_ready_start
+# # @after_app_shutdown_clean
+# def push_system_user_period():
+#     for system_user in SystemUser.objects.all():
+#         push_system_user_related_nodes(system_user)

@@ -2,6 +2,8 @@
 {% load static %}
 {% load bootstrap3 %}
 {% load i18n %}
+{% load asset_tags %}
+{% load common_tags %}
 
 {% block form %}
     <form action="" method="post" class="form-horizontal">
@@ -15,24 +17,47 @@
     {% bootstrap_field form.hostname layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
     {% bootstrap_field form.port layout="horizontal" %}
-    {% bootstrap_field form.cluster layout="horizontal" %}
+    {% bootstrap_field form.platform layout="horizontal" %}
     {% bootstrap_field form.public_ip layout="horizontal" %}
-    {% bootstrap_field form.type layout="horizontal" %}
-    {% bootstrap_field form.env layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Auth' %}</h3>
     {% bootstrap_field form.admin_user layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Group' %}</h3>
-    {% bootstrap_field form.groups layout="horizontal" %}
+    <h3>{% trans 'Node' %}</h3>
+    {% bootstrap_field form.nodes layout="horizontal" %}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Labels' %}</h3>
+    <div class="form-group {% if form.errors.labels %} has-error {% endif %}">
+        <label for="{{ form.labels.id_for_label }}" class="col-md-2 control-label">{% trans 'Label' %}</label>
+        <div class="col-md-9">
+            <select name="labels" class="select2 labels" data-placeholder="{% trans 'Select labels' %}" style="width: 100%" multiple="" tabindex="4" id="{{ form.labels.id_for_label }}">
+                {% for name, labels in form.labels.field.queryset|group_labels %}
+                <optgroup label="{{ name }}">
+                    {% for label in labels %}
+                        {% if label in form.labels.initial %}
+                            <option value="{{ label.id }}" selected>{{ label.value }}</option>
+                        {% else %}
+                            <option value="{{ label.id }}">{{ label.value }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+            {% if form.errors.labels %}
+                {% for e in form.errors.labels %}
+                    <div class="help-block">{{ e }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
     {% bootstrap_field form.comment layout="horizontal" %}
     {% bootstrap_field form.is_active layout="horizontal" %}
-
 
     <div class="hr-line-dashed"></div>
     <div class="form-group">
@@ -45,11 +70,20 @@
 {% endblock %}
 
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2({
-                allowClear: true
-            });
-        })
-    </script>
+<script>
+function format(item) {
+   var group = item.element.parentElement.label;
+   return group + ':' + item.text;
+}
+
+$(document).ready(function () {
+    $('.select2').select2({
+        allowClear: true
+    });
+    $(".labels").select2({
+        allowClear: true,
+        templateSelection: format
+    });
+})
+</script>
 {% endblock %}

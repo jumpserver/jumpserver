@@ -10,7 +10,7 @@ from django.conf import settings
 from users.utils import AdminUserRequiredMixin
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
-from ..backends import get_command_store
+from ..backends import get_multi_command_store
 from .. import utils
 
 
@@ -19,7 +19,7 @@ __all__ = [
     'SessionDetailView',
 ]
 
-command_store = get_command_store()
+command_store = get_multi_command_store()
 
 
 class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
@@ -74,6 +74,7 @@ class SessionOnlineListView(SessionListView):
         context = {
             'app': _('Terminal'),
             'action': _('Session online list'),
+            'type': 'online',
             'now': timezone.now(),
         }
         kwargs.update(context)
@@ -97,7 +98,7 @@ class SessionOfflineListView(SessionListView):
         return super().get_context_data(**kwargs)
 
 
-class SessionDetailView(SingleObjectMixin, ListView):
+class SessionDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
     object = None

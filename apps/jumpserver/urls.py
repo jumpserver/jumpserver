@@ -4,16 +4,16 @@ from __future__ import unicode_literals
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve as static_serve
 
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
 
-from .views import IndexView
+from .views import IndexView, LunaView
 
 schema_view = get_schema_view(title='Users API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^luna/', LunaView.as_view(), name='luna-error'),
     url(r'^users/', include('users.urls.views_urls', namespace='users')),
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),

@@ -310,13 +310,18 @@ jumpserver.initDataTable = function (options) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
         jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
-    }).
-    on('draw', function(){
+    }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
+        $('[data-toggle="popover"]').popover({
+            html: true,
+            placement: 'bottom',
+            // trigger: 'hover',
+            container: 'body'
+        });
     });
     $('.ipt_check_all').on('click', function() {
-      if (!jumpserver.checked) {
+      if ($(this).prop("checked")) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
           table.rows({search:'applied', page:'current'}).select();
@@ -383,7 +388,22 @@ jumpserver.initServerSideDataTable = function (options) {
                 }
                 if (data.search !== null) {
                     var search_val = data.search.value;
-                    data.search = search_val;
+                    var search_list = search_val.split(" ");
+                    var search_attr = {};
+                    var search_raw = [];
+
+                    search_list.map(function (val, index) {
+                       var kv = val.split(":");
+                       if (kv.length === 2) {
+                           search_attr[kv[0]] = kv[1]
+                       } else {
+                           search_raw.push(kv)
+                       }
+                    });
+                    data.search = search_raw.join("");
+                    $.each(search_attr, function (k, v) {
+                        data[k] = v
+                    })
                 }
                 if (data.order !== null && data.order.length === 1) {
                     var col = data.order[0].column;
@@ -435,17 +455,16 @@ jumpserver.initServerSideDataTable = function (options) {
         $('#uc').html(options.uc_html || '');
     });
     $('.ipt_check_all').on('click', function() {
-      if (!jumpserver.checked) {
-          $(this).closest('table').find('.ipt_check').prop('checked', true);
-          jumpserver.checked = true;
-          table.rows({search:'applied', page:'current'}).select();
-      } else {
-          $(this).closest('table').find('.ipt_check').prop('checked', false);
-          jumpserver.checked = false;
-          table.rows({search:'applied', page:'current'}).deselect();
-      }
+        if ($(this).prop("checked")) {
+            $(this).closest('table').find('.ipt_check').prop('checked', true);
+            table.rows({search:'applied', page:'current'}).select();
+        } else {
+            $(this).closest('table').find('.ipt_check').prop('checked', false);
+            table.rows({search:'applied', page:'current'}).deselect();
+        }
     });
 
+    // jumpserver.table = table;
     return table;
 };
 
@@ -495,4 +514,57 @@ function delCookie(key) {
     if (val !== null) {
         document.cookie = key + '=' + val + ";expires" + expires.toUTCString() + ';path=/';
     }
+}
+
+function createPopover(dataset, title, callback) {
+    if (callback !== undefined){
+        var new_dataset = [];
+        $.each(dataset, function (index, value) {
+            new_dataset.push(callback(value))
+        });
+        dataset = new_dataset;
+    }
+    var data_content = dataset.join("</br>");
+
+    var html = "<a data-toggle='popover' data-content='" + data_content + "'>" + dataset.length + "</a>";
+    return html;
+}
+
+
+ $(function () {
+    (function ($) {
+        $.getUrlParam = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    })(jQuery);
+});
+
+function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+}
+
+function setUrlParam(url, name, value) {
+    var urlArray = url.split("?");
+    if (urlArray.length===1){
+        url += "?" + name + "=" + value;
+    } else {
+        var oriParam = urlArray[1].split("&");
+        var oriParamMap = {};
+        $.each(oriParam, function (index, value) {
+            var v = value.split("=");
+            oriParamMap[v[0]] = v[1];
+        });
+        oriParamMap[name] = value;
+        url = urlArray[0] + "?";
+        var newParam = [];
+        $.each(oriParamMap, function (index, value) {
+            newParam.push(index + "=" + value);
+        });
+        url += newParam.join("&")
+    }
+    return url
 }

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 #
 from collections import OrderedDict
-import copy
 import logging
 import os
 import uuid
 
-from rest_framework import viewsets, serializers
-from rest_framework.views import APIView, Response
-from rest_framework.permissions import AllowAny
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
+from rest_framework import viewsets, serializers
+from rest_framework.views import APIView, Response
+from rest_framework.permissions import AllowAny
+from rest_framework_bulk import BulkModelViewSet
 
 from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
@@ -21,7 +21,9 @@ from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
-from .backends import get_command_store, SessionCommandSerializer
+from .backends import get_command_store, get_multi_command_store, \
+    SessionCommandSerializer
+import boto3  # AWS S3 sdk
 
 logger = logging.getLogger(__file__)
 
@@ -56,6 +58,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
             return Response(data, status=201)
         else:
             data = serializer.errors
+            logger.error("Register terminal error: {}".format(data))
             return Response(data, status=400)
 
     def get_permissions(self):
@@ -173,14 +176,31 @@ class SessionViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.status_set.all()
+            self.queryset = terminal.session_set.all()
         return self.queryset
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+
+
+class KillSessionAPI(APIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+    model = Task
+
+    def post(self, request, *args, **kwargs):
+        validated_session = []
+        for session_id in request.data:
+            session = get_object_or_none(Session, id=session_id)
+            if session and not session.is_finished:
+                validated_session.append(session_id)
+                self.model.objects.create(
+                    name="kill_session", args=session.id,
+                    terminal=session.terminal,
+                )
+        return Response({"ok": validated_session})
 
 
 class CommandViewSet(viewsets.ViewSet):
@@ -197,6 +217,7 @@ class CommandViewSet(viewsets.ViewSet):
 
     """
     command_store = get_command_store()
+    multi_command_storage = get_multi_command_store()
     serializer_class = SessionCommandSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -217,7 +238,7 @@ class CommandViewSet(viewsets.ViewSet):
             return Response({"msg": msg}, status=401)
 
     def list(self, request, *args, **kwargs):
-        queryset = list(self.command_store.all())
+        queryset = self.multi_command_storage.filter()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
@@ -229,7 +250,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
 
     def gen_session_path(self):
         date = self.session.date_start.strftime('%Y-%m-%d')
-        return os.path.join(date, str(self.session.id)+'.gz')
+        return os.path.join(date, str(self.session.id) + '.gz')
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -259,4 +280,39 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
+            config = self.app.config.get("REPLAY_STORAGE", None)
+            if config:
+                for name in config.keys():
+                    if config[name].get("TYPE", '') == "s3":
+                        client, bucket = self.s3Client(config[name])
+                        try:
+                            client.head_object(Bucket=bucket, Key=path)
+                            client.download_file(bucket, path, default_storage.base_location + '/' + path)
+                            return redirect(default_storage.url(path))
+                        except:
+                            pass
             return HttpResponseNotFound()
+
+    def s3Client(self, config):
+        bucket = config.get("BUCKET", "jumpserver")
+        REGION = config.get("REGION", None)
+        ACCESS_KEY = config.get("ACCESS_KEY", None)
+        SECRET_KEY = config.get("SECRET_KEY", None)
+        if self.ACCESS_KEY and REGION and SECRET_KEY:
+            s3 = boto3.client('s3',
+                              region_name=REGION,
+                              aws_access_key_id=ACCESS_KEY,
+                              aws_secret_access_key=SECRET_KEY)
+        else:
+            s3 = boto3.client('s3')
+        return s3, bucket
+
+
+class TerminalConfig(APIView):
+    permission_classes = (IsAppUser,)
+
+    def get(self, request):
+        user = request.user
+        terminal = user.terminal
+        configs = terminal.config
+        return Response(configs, status=200)

@@ -29,4 +29,5 @@ media
 celerybeat.pid
 django.db
 celerybeat-schedule.db
-static
+data/static
+_build/

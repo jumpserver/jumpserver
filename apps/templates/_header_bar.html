@@ -10,28 +10,31 @@
             <!--</form>-->
         </div>
         <ul class="nav navbar-top-links navbar-right">
-            <li>
-                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>
+{#            <li>#}
+{#                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>#}
+{#            </li>#}
+            <li class="dropdown">
+                <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">
+                    <span class="m-r-sm text-muted welcome-message">{% trans 'Supports' %}</span>
+                </a>
             </li>
             <li class="dropdown">
-                <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                     <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %}</span>
+                <a class="count-info"  href="http://jumpserver.readthedocs.io/" target="_blank">
+                     <span class="m-r-sm text-muted welcome-message">{% trans 'Docs' %}</span>
                 </a>
             </li>
             <li class="dropdown">
                 {% if request.user.is_authenticated %}
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                     <span class="m-r-sm text-muted welcome-message">
-                        <img alt="image" class="img-circle" width="40" height="40" src="{{ request.user.avatar_url }}"/>
-                        <strong class="font-bold"> {{ request.user.name }}
-                            <span style="color: #8095a8"></span>
+                        <img alt="image" class="img-circle" width="30" height="30" src="{{ request.user.avatar_url }}"/>
+                        <span style="font-size: 13px;font-weight: 400"> {{ request.user.name }}
                             <b class="caret"></b>
-                        </strong>
+                        </span>
                     </span>
                 </a>
-                <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                    <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs">  </i><span> {% trans 'Profile' %}</span></a></li>
-                    <li class="divider"></li>
+                <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
+                    <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs"> </i><span> {% trans 'Profile' %}</span></a></li>
                     {% if request.user.is_superuser %}
                         {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
                             <li><a id="switch_admin"><i class="fa fa-exchange"></i><span> {% trans 'Admin page' %}</span></a></li>
@@ -58,11 +61,11 @@
             <li>
                 <a href="">{% trans 'Dashboard' %}</a>
             </li>
-            <li>
             {% if app %}
+            <li>
                 <a>{{ app }}</a>
-            {% endif %}
             </li>
+            {% endif %}
             {% if action %}
             <li class="active">
                 <strong>{{ action }}</strong>

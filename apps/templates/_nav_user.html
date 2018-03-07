@@ -1,16 +1,16 @@
 {% load i18n %}
 <li id="assets">
     <a href="{% url 'assets:user-asset-list' %}">
-        <i class="fa fa-files-o"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
+        <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
 <li id="users">
     <a href="{% url 'users:user-profile' %}">
-        <i class="fa fa-user" ></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
+        <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
 <li >
-    <a href="{% url 'terminal:web-terminal' %}" target="_blank"><i class="fa fa-window-maximize"></i>
+    <a href="{% url 'terminal:web-terminal' %}" target="_blank"><i class="fa fa-window-maximize" style="width: 14px"></i>
         <span class="nav-label">{% trans 'Web terminal' %}</span>
     </a>
 </li>

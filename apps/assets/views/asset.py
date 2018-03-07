@@ -27,15 +27,14 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser, Label, Node
 from ..hands import AdminUserRequiredMixin
 
 
 __all__ = [
     'AssetListView', 'AssetCreateView', 'AssetUpdateView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
-    'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
-    'BulkImportAssetView',
+    'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
 ]
 logger = get_logger(__file__)
 
@@ -44,10 +43,11 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'assets/asset_list.html'
 
     def get_context_data(self, **kwargs):
+        Node.root()
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),
-            'system_users': SystemUser.objects.all(),
+            'labels': Label.objects.all().order_by('name'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -58,8 +58,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
-            'action': _('Asset list'),
+            'action': _('My assets'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)
@@ -72,12 +71,23 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_valid(self, form):
-        asset = form.save()
-        asset.created_by = self.request.user.username or 'Admin'
-        asset.date_created = timezone.now()
-        asset.save()
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     print("form valid")
+    #     asset = form.save()
+    #     asset.created_by = self.request.user.username or 'Admin'
+    #     asset.date_created = timezone.now()
+    #     asset.save()
+    #     return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        node_id = self.request.GET.get("node_id")
+        if node_id:
+            node = get_object_or_none(Node, id=node_id)
+        else:
+            node = Node.root()
+        form["nodes"].initial = node
+        return form
 
     def get_context_data(self, **kwargs):
         context = {
@@ -91,22 +101,22 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return create_success_msg % ({"name": cleaned_data["hostname"]})
 
 
-class AssetModalListView(AdminUserRequiredMixin, ListView):
-    paginate_by = settings.DISPLAY_PER_PAGE
-    model = Asset
-    context_object_name = 'asset_modal_list'
-    template_name = 'assets/asset_modal_list.html'
-
-    def get_context_data(self, **kwargs):
-        assets = Asset.objects.all()
-        assets_id = self.request.GET.get('assets_id', '')
-        assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
-        context = {
-            'all_assets': assets_id_list,
-            'assets': assets
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+# class AssetModalListView(AdminUserRequiredMixin, ListView):
+#     paginate_by = settings.DISPLAY_PER_PAGE
+#     model = Asset
+#     context_object_name = 'asset_modal_list'
+#     template_name = 'assets/_asset_list_modal.html'
+#
+#     def get_context_data(self, **kwargs):
+#         assets = Asset.objects.all()
+#         assets_id = self.request.GET.get('assets_id', '')
+#         assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
+#         context = {
+#             'all_assets': assets_id_list,
+#             'assets': assets
+#         }
+#         kwargs.update(context)
+#         return super().get_context_data(**kwargs)
 
 
 class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
@@ -180,14 +190,11 @@ class AssetDetailView(DetailView):
     template_name = 'assets/asset_detail.html'
 
     def get_context_data(self, **kwargs):
-        asset_groups = self.object.groups.all()
+        nodes_remain = Node.objects.exclude(assets=self.object)
         context = {
             'app': _('Assets'),
             'action': _('Asset detail'),
-            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
-                                    if asset_group not in asset_groups],
-            'asset_groups': asset_groups,
-            'system_users_all': SystemUser.objects.all(),
+            'nodes_remain': nodes_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -206,22 +213,19 @@ class AssetExportView(View):
             ]
         ]
         filename = 'assets-{}.csv'.format(
-            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         response.write(codecs.BOM_UTF8)
         assets = Asset.objects.filter(id__in=assets_id)
-        writer = csv.writer(response, dialect='excel',
-                            quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
 
         header = [field.verbose_name for field in fields]
-        header.append(_('Asset groups'))
         writer.writerow(header)
 
         for asset in assets:
-            groups = ','.join([group.name for group in asset.groups.all()])
             data = [getattr(asset, field.name) for field in fields]
-            data.append(groups)
             writer.writerow(data)
         return response
 
@@ -243,6 +247,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         f = form.cleaned_data['file']
         det_result = chardet.detect(f.read())
         f.seek(0)  # reset file seek index
+
         file_data = f.read().decode(det_result['encoding']).strip(codecs.BOM_UTF8.decode())
         csv_file = StringIO(file_data)
         reader = csv.reader(csv_file)
@@ -255,7 +260,6 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         ]
         header_ = csv_data[0]
         mapping_reverse = {field.verbose_name: field.name for field in fields}
-        mapping_reverse[_('Asset groups')] = 'groups'
         attr = [mapping_reverse.get(n, None) for n in header_]
         if None in attr:
             data = {'valid': False,
@@ -272,20 +276,15 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset_dict = dict(zip(attr, row))
             id_ = asset_dict.pop('id', 0)
             for k, v in asset_dict.items():
-                if k == 'cluster':
-                    v = get_object_or_none(Cluster, name=v)
-                elif k == 'is_active':
-                    v = bool(v)
+                if k == 'is_active':
+                    v = True if v in ['TRUE', 1, 'true'] else False
                 elif k == 'admin_user':
                     v = get_object_or_none(AdminUser, name=v)
-                elif k in ['port', 'cabinet_pos', 'cpu_count', 'cpu_cores']:
+                elif k in ['port', 'cpu_count', 'cpu_cores']:
                     try:
                         v = int(v)
                     except ValueError:
                         v = 0
-                elif k == 'groups':
-                    groups_name = v.split(',')
-                    v = AssetGroup.objects.filter(name__in=groups_name)
                 else:
                     continue
                 asset_dict[k] = v
@@ -293,20 +292,15 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset = get_object_or_none(Asset, id=id_) if is_uuid(id_) else None
             if not asset:
                 try:
-                    groups = asset_dict.pop('groups')
                     if len(Asset.objects.filter(hostname=asset_dict.get('hostname'))):
                         raise Exception(_('already exists'))
                     asset = Asset.objects.create(**asset_dict)
-                    asset.groups.set(groups)
                     created.append(asset_dict['hostname'])
                     assets.append(asset)
                 except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
                 for k, v in asset_dict.items():
-                    if k == 'groups':
-                        asset.groups.set(v)
-                        continue
                     if v:
                         setattr(asset, k, v)
                 try:

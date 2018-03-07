@@ -26,14 +26,14 @@ signer = get_signer()
 class AssetUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=16, verbose_name=_('Username'))
+    username = models.CharField(max_length=128, verbose_name=_('Username'))
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     @property
     def password(self):
@@ -175,15 +175,12 @@ class AdminUser(AssetUser):
         return info
 
     def get_related_assets(self):
-        assets = []
-        for cluster in self.cluster_set.all():
-            assets.extend(cluster.assets.all())
-        assets.extend(self.asset_set.all())
-        return list(set(assets))
+        assets = self.asset_set.all()
+        return assets
 
     @property
     def assets_amount(self):
-        return len(self.get_related_assets())
+        return self.get_related_assets().count()
 
     class Meta:
         ordering = ['name']
@@ -212,11 +209,13 @@ class AdminUser(AssetUser):
 
 class SystemUser(AssetUser):
     SSH_PROTOCOL = 'ssh'
+    RDP_PROTOCOL = 'rdp'
     PROTOCOL_CHOICES = (
         (SSH_PROTOCOL, 'ssh'),
+        (RDP_PROTOCOL, 'rdp'),
     )
 
-    cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
+    nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
@@ -225,21 +224,6 @@ class SystemUser(AssetUser):
 
     def __str__(self):
         return self.name
-
-    def get_clusters_assets(self):
-        from .asset import Asset
-        clusters = self.get_clusters()
-        return Asset.objects.filter(cluster__in=clusters)
-
-    def get_clusters(self):
-        return self.cluster.all()
-
-    def get_clusters_joined(self):
-        return ', '.join([cluster.name for cluster in self.get_clusters()])
-
-    @property
-    def assets_amount(self):
-        return len(self.get_clusters_assets())
 
     def to_json(self):
         return {
@@ -250,6 +234,13 @@ class SystemUser(AssetUser):
             'priority': self.priority,
             'auto_push': self.auto_push,
         }
+
+    @property
+    def assets(self):
+        assets = set()
+        for node in self.nodes.all():
+            assets.update(set(node.get_all_assets()))
+        return assets
 
     @property
     def assets_connective(self):
@@ -263,6 +254,12 @@ class SystemUser(AssetUser):
     @property
     def reachable_assets(self):
         return self.assets_connective.get('contacted', [])
+
+    def is_need_push(self):
+        if self.auto_push and self.protocol == self.__class__.SSH_PROTOCOL:
+            return True
+        else:
+            return False
 
     class Meta:
         ordering = ['name']

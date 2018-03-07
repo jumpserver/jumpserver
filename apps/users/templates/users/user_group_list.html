@@ -10,7 +10,7 @@
                 <input id="" type="checkbox" class="ipt_check_all">
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
-            <th class="text-center">{% trans 'User count' %}</th>
+            <th class="text-center">{% trans 'User' %}</th>
             <th class="text-center">{% trans 'Comment' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
@@ -31,6 +31,10 @@ $(document).ready(function() {
                 var detail_btn = '<a href="{% url "users:user-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                var html = createPopover(cellData);
+                $(td).html(html);
+             }},
             {targets: 3, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
@@ -49,7 +53,7 @@ $(document).ready(function() {
             }}
         ],
         ajax_url: '{% url "api-users:user-group-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "user_amount"},
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "users"},
                   {data: "comment"}, {data: "id" }],
         order: [],
         op_html: $('#actions').html()

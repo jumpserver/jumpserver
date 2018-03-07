@@ -10,7 +10,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import AdminUser, Cluster
+from ..models import AdminUser, Node
 from ..hands import AdminUserRequiredMixin
 
 __all__ = [
@@ -74,11 +74,10 @@ class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
     object = None
 
     def get_context_data(self, **kwargs):
-        cluster_remain = Cluster.objects.exclude(admin_user=self.object)
         context = {
             'app': _('Assets'),
             'action': _('Admin user detail'),
-            'cluster_remain': cluster_remain,
+            'nodes': Node.objects.all()
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -95,11 +94,8 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = []
-        for cluster in self.object.cluster_set.all():
-            queryset.extend([asset for asset in cluster.assets.all() if not asset.admin_user])
-        self.queryset = queryset
-        return queryset
+        self.queryset = self.object.asset_set.all()
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = {

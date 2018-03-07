@@ -3,9 +3,13 @@
 
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework_bulk.serializers import BulkListSerializer
 
+
+from common.mixins import BulkSerializerMixin
+from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
-from .backends import get_command_store
+from .backends import get_multi_command_store
 
 
 class TerminalSerializer(serializers.ModelSerializer):
@@ -43,14 +47,15 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(serializers.ModelSerializer):
     command_amount = serializers.SerializerMethodField()
-    command_store = get_command_store()
+    command_store = get_multi_command_store()
 
     class Meta:
         model = Session
+        list_serializer_class = BulkListSerializer
         fields = '__all__'
 
     def get_command_amount(self, obj):
-        return len(self.command_store.filter(session=obj.session))
+        return self.command_store.count(session=str(obj.id))
 
 
 class StatusSerializer(serializers.ModelSerializer):
@@ -60,11 +65,12 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
         model = Task
+        list_serializer_class = BulkListSerializer
 
 
 class ReplaySerializer(serializers.Serializer):

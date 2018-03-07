@@ -49,6 +49,9 @@ class User(AbstractUser):
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
+    def __str__(self):
+        return self.username
+
     @property
     def password_raw(self):
         raise AttributeError('Password raw is not a readable attribute')
@@ -148,6 +151,10 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
+        if self.username == 'admin':
+            self.role = 'Admin'
+            self.is_active = True
+
         super().save(*args, **kwargs)
 
     @property
@@ -244,6 +251,7 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ['username']
+        verbose_name = _("User")
 
     #: Use this method initial user
     @classmethod

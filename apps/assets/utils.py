@@ -1,8 +1,13 @@
 # ~*~ coding: utf-8 ~*~
 #
 from collections import defaultdict
+from functools import reduce
+import operator
+
+from django.db.models import Q
+
 from common.utils import get_object_or_none
-from .models import Asset, SystemUser
+from .models import Asset, SystemUser, Label
 
 
 def get_assets_by_id_list(id_list):
@@ -18,12 +23,26 @@ def get_system_user_by_name(name):
     return system_user
 
 
-def check_assets_have_system_user(assets, system_users):
-    errors = defaultdict(list)
+class LabelFilter:
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        query_keys = self.request.query_params.keys()
+        all_label_keys = Label.objects.values_list('name', flat=True)
+        valid_keys = set(all_label_keys) & set(query_keys)
+        labels_query = {}
+        for key in valid_keys:
+            labels_query[key] = self.request.query_params.get(key)
 
-    for system_user in system_users:
-        clusters = system_user.cluster.all()
-        for asset in assets:
-            if asset.cluster not in clusters:
-                errors[asset].append(system_user)
-    return errors
+        conditions = []
+        for k, v in labels_query.items():
+            query = {'labels__name': k, 'labels__value': v}
+            conditions.append(query)
+
+        if conditions:
+            for kwargs in conditions:
+                queryset = queryset.filter(**kwargs)
+        return queryset
+
+
+
+

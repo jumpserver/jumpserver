@@ -20,14 +20,6 @@
                             <li class="active">
                                 <a href="{% url 'assets:admin-user-assets' pk=admin_user.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Assets list' %} </a>
                             </li>
-                            <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
-                            </li>
-                            <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-delete-admin-user">
-                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
-                                </a>
-                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -59,7 +51,6 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-                                                <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Reachable' %}</th>
                                             </tr>
                                         </thead>
@@ -109,7 +100,7 @@ function initTable() {
 				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
 				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
-			{targets: 5, createdCell: function (td, cellData) {
+			{targets: 4, createdCell: function (td, cellData) {
 				if (!cellData) {
 					$(td).html('<i class="fa fa-times text-danger"></i>')
 				} else {
@@ -117,8 +108,9 @@ function initTable() {
 				}
 			}}],
 		ajax_url: '{% url "api-assets:asset-list" %}?admin_user_id={{ admin_user.id }}',
-		columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "type" }, {data: "is_connective" }],
+		columns: [
+		    {data: function(){return ""}}, {data: "hostname" }, {data: "ip" },
+            {data: "port" },  {data: "is_connective" }],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initServerSideDataTable(options);
@@ -126,14 +118,6 @@ function initTable() {
 
 $(document).ready(function () {
 	initTable();
-})
-.on('click', '.btn-delete-admin-user', function () {
-    var $this = $(this);
-    var name = "{{ admin_user.name }}";
-    var uid = "{{ admin_user.id }}";
-    var the_url = '{% url "api-assets:admin-user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
-    var redirect_url = "{% url 'assets:admin-user-list' %}";
-    objectDelete($this, name, the_url, redirect_url);
 })
 .on('click', '.btn-test-connective', function () {
     var the_url = "{% url 'api-assets:admin-user-connective' pk=admin_user.id %}";

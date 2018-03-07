@@ -28,46 +28,36 @@ def default_cluster():
     return cluster.id
 
 
-class Asset(models.Model):
-    # Todo: Move them to settings
-    STATUS_CHOICES = (
-        ('In use', _('In use')),
-        ('Out of use', _('Out of use')),
-    )
-    TYPE_CHOICES = (
-        ('Server', _('Server')),
-        ('VM', _('VM')),
-        ('Switch', _('Switch')),
-        ('Router', _('Router')),
-        ('Firewall', _('Firewall')),
-        ('Storage', _("Storage")),
-    )
-    ENV_CHOICES = (
-        ('Prod', _('Production')),
-        ('Dev', _('Development')),
-        ('Test', _('Testing')),
-    )
+def default_node():
+    try:
+        from .node import Node
+        return Node.root()
+    except:
+        return None
 
+
+class Asset(models.Model):
     # Important
+    PLATFORM_CHOICES = (
+        ('Linux', 'Linux'),
+        ('Unix', 'Unix'),
+        ('MacOS', 'MacOS'),
+        ('BSD', 'BSD'),
+        ('Windows', 'Windows'),
+        ('Other', 'Other'),
+    )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
-    cluster = models.ForeignKey(Cluster, related_name='assets', default=default_cluster, on_delete=models.SET_DEFAULT, verbose_name=_('Cluster'))
+    nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True, default='Server', verbose_name=_('Asset type'),)
-    env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True, default='Prod', verbose_name=_('Asset environment'),)
-    status = models.CharField(choices=STATUS_CHOICES, max_length=12, null=True, blank=True, default='In use', verbose_name=_('Asset status'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
-    remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote control card IP'))
-    cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
-    cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     # Collect
@@ -82,12 +72,13 @@ class Asset(models.Model):
     disk_total = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk total'))
     disk_info = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk info'))
 
-    platform = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Platform'))
+    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
     os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
 
+    labels = models.ManyToManyField('assets.Label', blank=True, related_name='assets', verbose_name=_("Labels"))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
@@ -104,6 +95,12 @@ class Asset(models.Model):
             return True, ''
         return False, warning
 
+    def is_unixlike(self):
+        if self.platform not in ("Windows", "Other"):
+            return True
+        else:
+            return False
+
     @property
     def hardware_info(self):
         if self.cpu_count:
@@ -116,25 +113,10 @@ class Asset(models.Model):
 
     @property
     def is_connective(self):
+        if not self.is_unixlike():
+            return True
         val = cache.get(ASSET_ADMIN_CONN_CACHE_KEY.format(self.hostname))
         if val == 1:
-            return True
-        else:
-            return False
-
-    @property
-    def admin_user_avail(self):
-        if self.admin_user:
-            admin_user = self.admin_user
-        elif self.cluster and self.cluster.admin_user:
-            admin_user = self.cluster.admin_user
-        else:
-            return None
-        return admin_user
-
-    @property
-    def is_has_private_admin_user(self):
-        if self.admin_user:
             return True
         else:
             return False
@@ -145,7 +127,6 @@ class Asset(models.Model):
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
-            'groups': [group.name for group in self.groups.all()],
         }
 
     def _to_secret_json(self):
@@ -156,13 +137,14 @@ class Asset(models.Model):
         Todo: May be move to ops implements it
         """
         data = self.to_json()
-        if self.admin_user_avail:
-            admin_user = self.admin_user_avail
+        if self.admin_user:
+            admin_user = self.admin_user
             data.update({
                 'username': admin_user.username,
                 'password': admin_user.password,
                 'private_key': admin_user.private_key_file,
                 'become': admin_user.become_info,
+                'groups': [node.value for node in self.nodes.all()],
             })
         return data
 
@@ -181,7 +163,6 @@ class Asset(models.Model):
             asset = cls(ip='%s.%s.%s.%s' % (i, i, i, i),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
-                        cluster=choice(Cluster.objects.all()),
                         port=22,
                         created_by='Fake')
             try:

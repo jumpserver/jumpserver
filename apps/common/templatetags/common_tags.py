@@ -73,17 +73,20 @@ def to_html(s):
 
 @register.filter
 def time_util_with_seconds(date_from, date_to):
-    if date_from and date_to:
-        delta = date_to - date_from
-        seconds = delta.seconds
-        if seconds < 60:
-            return '{} s'.format(seconds)
-        elif seconds < 60*60:
-            return '{} m'.format(seconds//60)
-        else:
-            return '{} h'.format(seconds//3600)
-    else:
+    if not date_from:
         return ''
+    if not date_to:
+        return ''
+        date_to = timezone.now()
+
+    delta = date_to - date_from
+    seconds = delta.seconds
+    if seconds < 60:
+        return '{} s'.format(seconds)
+    elif seconds < 60*60:
+        return '{} m'.format(seconds//60)
+    else:
+        return '{} h'.format(seconds//3600)
 
 
 @register.filter
@@ -92,3 +95,8 @@ def is_bool_field(field):
         return True
     else:
         return False
+
+
+@register.filter
+def to_dict(data):
+    return dict(data)

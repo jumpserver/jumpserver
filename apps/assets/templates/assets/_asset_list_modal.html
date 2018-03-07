@@ -1,0 +1,132 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_id %}asset_list_modal{% endblock %}
+{#{% block modal_title%}{% trans "Please select assets" %}{% endblock %}#}
+{% block modal_body %}
+{#<div class="btn-group" style="float: right">#}
+{#   <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>#}
+{#   <ul class="dropdown-menu labels">#}
+{#       {% for label in labels %}#}
+{#           <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>#}
+{#       {% endfor %}#}
+{#   </ul>#}
+{#</div>#}
+<table class="table table-striped table-bordered table-hover " id="asset_modal_table" width="100%">
+   <thead>
+       <tr>
+           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+           <th class="text-center">{% trans 'Hostname' %}</th>
+           <th class="text-center">{% trans 'IP' %}</th>
+           <th class="text-center">{% trans 'Hardware' %}</th>
+           <th class="text-center">{% trans 'Active' %}</th>
+           <th class="text-center">{% trans 'Reachable' %}</th>
+           <th class="text-center">{% trans 'Action' %}</th>
+       </tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+<div id="actions" class="hide">
+   <div class="input-group">
+       <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+           <option value="delete">{% trans 'Delete selected' %}</option>
+           <option value="update">{% trans 'Update selected' %}</option>
+           <option value="deactive">{% trans 'Deactive selected' %}</option>
+           <option value="active">{% trans 'Active selected' %}</option>
+       </select>
+       <div class="input-group-btn pull-left" style="padding-left: 5px;">
+           <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+            {% trans 'Submit' %}
+           </button>
+       </div>
+   </div>
+</div>
+<script>
+
+var modal_table;
+
+function initModalTable() {
+    var options = {
+        ele: $('#asset_modal_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
+                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.hardware_info)
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                if (cellData === 'Unknown'){
+                    $(td).html('<i class="fa fa-circle text-warning"></i>')
+                } else if (!cellData) {
+                    $(td).html('<i class="fa fa-circle text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-circle text-navy"></i>')
+                }
+            }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                $(td).html(update_btn + del_btn)
+            }}
+        ],
+        ajax_url: '{% url "api-assets:asset-list" %}',
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" },
+            {data: "cpu_cores"}, {data: "is_active", orderable: false },
+            {data: "is_connective", orderable: false}, {data: "id", orderable: false }
+        ],
+        op_html: $('#actions').html()
+    };
+    modal_table = jumpserver.initServerSideDataTable(options);
+    return modal_table;
+}
+
+$(document).ready(function(){
+   initModalTable();
+}).on('click', '#btn_select_assets', function () {
+    var data_table = $('#asset_modal_table').DataTable();
+    var id_list = [];
+    data_table.rows({selected: true}).every(function(){
+        id_list.push(this.data().id);
+    });
+    var current_node;
+    var nodes = zTree.getSelectedNodes();
+    if (nodes && nodes.length === 1) {
+        current_node = nodes[0]
+    } else {
+        return
+    }
+
+    var data = {
+        'assets': id_list
+    };
+
+    var success = function () {
+        modal_table.ajax.reload()
+    };
+
+    APIUpdateAttr({
+        'url': '/api/assets/v1/nodes/' + current_node.id + '/assets/add/',
+        'method': 'PUT',
+        'body': JSON.stringify(data),
+        'success': success
+    })
+})
+</script>
+
+{% endblock %}
+{% block modal_confirm_id %}btn_select_assets{% endblock %}
+
+

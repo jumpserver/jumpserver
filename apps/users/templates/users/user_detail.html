@@ -24,8 +24,9 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
+
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-delete-user">
+                                <a class="btn btn-outline {% if request.user != user_object and user_object.username != "admin" %} btn-danger btn-delete-user {% else %} disabled {% endif %}">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
@@ -128,7 +129,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %} {% if request.user == user_object %} disabled {% endif %} class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -156,7 +157,7 @@
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -164,7 +165,7 @@
                                             <td>{% trans 'Send reset ssh key mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -221,7 +222,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.groups_selected = {};
+jumpserver.nodes_selected = {};
 
 function updateUserGroups(groups) {
     var the_url = "{% url 'api-users:user-update-group' pk=user_object.id %}";
@@ -232,7 +233,7 @@ function updateUserGroups(groups) {
         // remove all the selected groups from select > option and rendered ul element;
         $('.select2-selection__rendered').empty();
         $('#groups_selected').val('');
-        $.map(jumpserver.groups_selected, function(group_name, index) {
+        $.map(jumpserver.nodes_selected, function(group_name, index) {
             $('#opt_' + index).remove();
             // change tr html of user groups.
             $('.group_edit tbody').append(
@@ -243,7 +244,7 @@ function updateUserGroups(groups) {
             )
         });
         // clear jumpserver.groups_selected
-        jumpserver.groups_selected = {};
+        jumpserver.nodes_selected = {};
     };
     APIUpdateAttr({
         url: the_url,
@@ -256,11 +257,11 @@ $(document).ready(function() {
     $('.select2').select2()
         .on('select2:select', function(evt) {
             var data = evt.params.data;
-            jumpserver.groups_selected[data.id] = data.text;
+            jumpserver.nodes_selected[data.id] = data.text;
         })
         .on('select2:unselect', function(evt) {
             var data = evt.params.data;
-            delete jumpserver.groups_selected[data.id];
+            delete jumpserver.nodes_selected[data.id];
         })
 })
 .on('click', '#is_active', function() {
@@ -290,13 +291,13 @@ $(document).ready(function() {
 {#    });#}
 {# });#}
 .on('click', '#btn_join_group', function() {
-    if (Object.keys(jumpserver.groups_selected).length === 0) {
+    if (Object.keys(jumpserver.nodes_selected).length === 0) {
         return false;
     }
     var groups = $('.bdg_group').map(function() {
         return $(this).data('gid');
     }).get();
-    $.map(jumpserver.groups_selected, function(value, index) {
+    $.map(jumpserver.nodes_selected, function(value, index) {
         groups.push(index);
         $('#opt_' + index).remove();
     });
@@ -331,7 +332,7 @@ $(document).ready(function() {
     }
     swal({
         title: "{% trans 'Are you sure?' %}",
-        text: "{% trans "This will reset the user's password. A password-reset email will be sent to the user\'s mailbox." %}",
+        text: "{% trans "This will reset the user password and send a reset mail"%}",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
@@ -356,7 +357,7 @@ $(document).ready(function() {
     }
     swal({
         title: "{% trans 'Are you sure?' %}",
-        text: "{% trans 'This will reset the user\'s public key.' %}",
+        text: "{% trans 'This will reset the user public key and send a reset mail' %}",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",

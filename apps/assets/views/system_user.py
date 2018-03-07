@@ -8,8 +8,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView
 
 from common.const import create_success_msg, update_success_msg
-from ..forms import SystemUserForm, SystemUserUpdateForm
-from ..models import SystemUser, Cluster
+from ..forms import SystemUserForm
+from ..models import SystemUser, Node
 from ..hands import AdminUserRequiredMixin
 
 
@@ -50,7 +50,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 
 class SystemUserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = SystemUser
-    form_class = SystemUserUpdateForm
+    form_class = SystemUserForm
     template_name = 'assets/system_user_update.html'
     success_url = reverse_lazy('assets:system-user-list')
     success_message = update_success_msg
@@ -70,11 +70,10 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
     model = SystemUser
 
     def get_context_data(self, **kwargs):
-        cluster_remain = Cluster.objects.exclude(systemuser=self.object)
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
-            'cluster_remain': cluster_remain,
+            'nodes_remain': Node.objects.exclude(systemuser=self.object)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

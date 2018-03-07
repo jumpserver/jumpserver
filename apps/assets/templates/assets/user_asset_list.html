@@ -19,8 +19,6 @@
             <th class="text-center">{% trans 'Hostname' %}</th>
             <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'Port' %}</th>
-            <th class="text-center">{% trans 'Type' %}</th>
-            <th class="text-center">{% trans 'Env' %}</th>
             <th class="text-center">{% trans 'Hardware' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Connective' %}</th>
@@ -44,14 +42,14 @@ function initTable() {
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
-            {targets: 7, createdCell: function (td, cellData) {
+            {targets: 5, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
             }},
-            {targets: 8, createdCell: function (td, cellData) {
+            {targets: 6, createdCell: function (td, cellData) {
                 if (cellData == 'Unknown'){
                     $(td).html('<i class="fa fa-circle text-warning"></i>')
                 } else if (!cellData) {
@@ -68,8 +66,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:user-asset-list" %}',
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
-            {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
-            {data: "is_active" }, {data: "is_connective"}
+            {data: "hardware_info"}, {data: "is_active" }, {data: "is_connective"}
         ],
         op_html: $('#actions').html()
     };

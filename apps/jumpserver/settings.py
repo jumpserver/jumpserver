@@ -17,7 +17,6 @@ import ldap
 from django_auth_ldap.config import LDAPSearch
 from django.urls import reverse_lazy
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -39,10 +38,8 @@ SECRET_KEY = CONFIG.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG or False
 
-
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL or 'http://localhost'
-
 
 # LOG LEVEL
 LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
@@ -114,7 +111,7 @@ LOGIN_URL = reverse_lazy('users:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -241,7 +238,7 @@ USE_L10N = True
 USE_TZ = True
 
 # I18N translation
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'i18n'), ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -249,7 +246,6 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_DIR, "data", "static")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -265,7 +261,7 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 # BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
-FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'),]
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 
 # Email config
 EMAIL_HOST = CONFIG.EMAIL_HOST
@@ -298,7 +294,7 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
     'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    # 'PAGE_SIZE': 15
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -307,7 +303,6 @@ AUTHENTICATION_BACKENDS = [
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
-
 
 # Auth LDAP settings
 AUTH_LDAP = CONFIG.AUTH_LDAP
@@ -319,7 +314,7 @@ AUTH_LDAP_SEARCH_FILTER = CONFIG.AUTH_LDAP_SEARCH_FILTER
 AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
 AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
-   AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER,
+    AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER,
 )
 AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
 AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
@@ -331,7 +326,6 @@ AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
-
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
@@ -354,7 +348,6 @@ CELERY_REDIRECT_STDOUTS = True
 CELERY_REDIRECT_STDOUTS_LEVEL = "INFO"
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-
 # Cache use redis
 CACHES = {
     'default': {
@@ -373,7 +366,25 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORAGE_BACKEND = 'terminal.backends.command.db'
+COMMAND_STORAGE = {
+    'ENGINE': 'terminal.backends.command.db',
+}
+
+TERMINAL_COMMAND_STORAGE = {
+    "default": {
+        "TYPE": "server",
+    },
+    # 'ali-es': {
+    #     'TYPE': 'elasticsearch',
+    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
+    # },
+}
+
+TERMINAL_REPLAY_STORAGE = {
+    "default": {
+        "TYPE": "server",
+    },
+}
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
@@ -386,6 +397,6 @@ BOOTSTRAP3 = {
 }
 
 TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
-DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
+DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""

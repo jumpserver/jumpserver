@@ -47,9 +47,9 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class CustomFilterMixin(object):
+class IDInFilterMixin(object):
     def filter_queryset(self, queryset):
-        queryset = super(CustomFilterMixin, self).filter_queryset(queryset)
+        queryset = super(IDInFilterMixin, self).filter_queryset(queryset)
         id_list = self.request.query_params.get('id__in')
         if id_list:
             import json
@@ -99,9 +99,8 @@ class DatetimeSearchMixin:
 
         if date_from_s:
             date_from = timezone.datetime.strptime(date_from_s, self.date_format)
-            self.date_from = date_from.replace(
-                tzinfo=timezone.get_current_timezone()
-            )
+            tz = timezone.get_current_timezone()
+            self.date_from = tz.localize(date_from)
         else:
             self.date_from = timezone.now() - timezone.timedelta(7)
 

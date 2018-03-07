@@ -15,13 +15,14 @@ class UserGroup(NoDeleteModelMixin):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True,
                                         verbose_name=_('Date created'))
-    created_by = models.CharField(max_length=100)
+    created_by = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("User group")
 
     @classmethod
     def initial(cls):
