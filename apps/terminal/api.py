@@ -288,8 +288,12 @@ class SessionReplayViewSet(viewsets.ViewSet):
                     if value.get("TYPE", '') == "s3":
                         client, bucket = self.s3Client(value)
                         try:
-                            client.head_object(Bucket=bucket, Key=path)
-                            client.download_file(bucket, path, default_storage.base_location + '/' + path)
+                            date = self.session.date_start.strftime('%Y-%m-%d')
+
+                            client.head_object(Bucket=bucket,
+                                               Key=os.path.join(date, str(self.session.id) + '.replay.gz'))
+                            client.download_file(bucket, os.path.join(date, str(self.session.id) + '.replay.gz'),
+                                                 default_storage.base_location + '/' + path)
                             return redirect(default_storage.url(path))
                         except:
                             pass
