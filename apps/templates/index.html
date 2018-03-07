@@ -168,9 +168,9 @@
                                         </a>
                                         <div class="media-body ">
                                             {% ifequal login.is_finished 0 %}
-                                                <small class="pull-right text-navy">{{ login.date_start|timesince }} ago</small>
+                                                <small class="pull-right text-navy">{{ login.date_start|timesince }} 前</small>
                                             {% else %}
-                                                <small class="pull-right">{{ login.date_start|timesince }} ago</small>
+                                                <small class="pull-right">{{ login.date_start|timesince }} 前</small>
                                             {% endifequal %}
                                             <strong>{{ login.user }}</strong> 登录了{{ login.asset }} <br>
                                             <small class="text-muted">{{ login.date_start }}</small>
