@@ -13,7 +13,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 ```````````````
 使用root命令行输入::
 
-    $ docker run -p 8080:80 -p 2222:2222 jumpserver/jumpserver:0.5.0-beta2
+    $ docker run -d -p 8080:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:latest
 
 访问
 ```````````````
@@ -39,7 +39,7 @@ ssh访问: ssh -p 2222 localhost
 
  ::
 
-   docker run -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  jumpserver/jumpserver:0.5.0-beta2
+   docker run -d -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  registry.jumpserver.org/public/jumpserver:latest
 
 
 仓库地址
