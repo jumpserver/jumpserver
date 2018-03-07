@@ -4,12 +4,15 @@ from collections import OrderedDict
 import logging
 import os
 import uuid
+import boto3  # AWS S3 sdk
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
+from django.conf import settings
+
 from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
@@ -23,7 +26,6 @@ from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
 from .backends import get_command_store, get_multi_command_store, \
     SessionCommandSerializer
-import boto3  # AWS S3 sdk
 
 logger = logging.getLogger(__file__)
 
@@ -280,11 +282,11 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
-            config = self.app.config.get("REPLAY_STORAGE", None)
+            config = settings.TERMINAL_REPLAY_STORAGE.items()
             if config:
-                for name in config.keys():
-                    if config[name].get("TYPE", '') == "s3":
-                        client, bucket = self.s3Client(config[name])
+                for name, value in config:
+                    if value.get("TYPE", '') == "s3":
+                        client, bucket = self.s3Client(value)
                         try:
                             client.head_object(Bucket=bucket, Key=path)
                             client.download_file(bucket, path, default_storage.base_location + '/' + path)
