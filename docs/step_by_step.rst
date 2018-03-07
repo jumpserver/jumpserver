@@ -61,7 +61,7 @@ zip包，我的网速好，我直接clone了
 ::
 
     $ cd /opt/
-    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout dev
+    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
 
 **2.2 安装依赖rpm包**
 
@@ -161,7 +161,7 @@ zip包，我的网速好，我直接clone了
 ::
 
     $ cd /opt
-    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout dev
+    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
 
 **3.2 安装依赖**
 
@@ -187,7 +187,7 @@ zip包，我的网速好，我直接clone了
     $ python run_server.py
 
 这时需要去
-jumpserver管理后台-终端-终端(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册
+jumpserver管理后台-会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册
 
 ::
 
