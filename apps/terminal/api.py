@@ -23,6 +23,7 @@ from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
 from .backends import get_command_store, get_multi_command_store, \
     SessionCommandSerializer
+import boto3  # AWS S3 sdk
 
 logger = logging.getLogger(__file__)
 
@@ -249,7 +250,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
 
     def gen_session_path(self):
         date = self.session.date_start.strftime('%Y-%m-%d')
-        return os.path.join(date, str(self.session.id)+'.gz')
+        return os.path.join(date, str(self.session.id) + '.gz')
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -279,7 +280,32 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
+            config = self.app.config.get("REPLAY_STORAGE", None)
+            if config:
+                for name in config.keys():
+                    if config[name].get("TYPE", '') == "s3":
+                        client, bucket = self.s3Client(config[name])
+                        try:
+                            client.head_object(Bucket=bucket, Key=path)
+                            client.download_file(bucket, path, default_storage.base_location + '/' + path)
+                            return redirect(default_storage.url(path))
+                        except:
+                            pass
             return HttpResponseNotFound()
+
+    def s3Client(self, config):
+        bucket = config.get("BUCKET", "jumpserver")
+        REGION = config.get("REGION", None)
+        ACCESS_KEY = config.get("ACCESS_KEY", None)
+        SECRET_KEY = config.get("SECRET_KEY", None)
+        if self.ACCESS_KEY and REGION and SECRET_KEY:
+            s3 = boto3.client('s3',
+                              region_name=REGION,
+                              aws_access_key_id=ACCESS_KEY,
+                              aws_secret_access_key=SECRET_KEY)
+        else:
+            s3 = boto3.client('s3')
+        return s3, bucket
 
 
 class TerminalConfig(APIView):
