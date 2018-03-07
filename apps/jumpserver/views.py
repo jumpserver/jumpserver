@@ -1,3 +1,5 @@
+import datetime
+
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View
 from django.utils import timezone
@@ -54,8 +56,14 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return month_str
 
     def get_month_login_metrics(self):
-        return [self.session_month.filter(date_start__date=d).count()
-                for d in self.session_month_dates]
+        data = []
+        time_min = datetime.datetime.min.time()
+        time_max = datetime.datetime.max.time()
+        for d in self.session_month_dates:
+            ds = datetime.datetime.combine(d, time_min).replace(tzinfo=timezone.get_current_timezone())
+            de = datetime.datetime.combine(d, time_max).replace(tzinfo=timezone.get_current_timezone())
+            data.append(self.session_month.filter(date_start__range=(ds, de)).count())
+        return data
 
     def get_month_active_user_metrics(self):
         if self.session_month_dates_archive:
@@ -121,10 +129,18 @@ class IndexView(LoginRequiredMixin, TemplateView):
         self.session_week = Session.objects.filter(date_start__gt=week_ago)
         self.session_month = Session.objects.filter(date_start__gt=month_ago)
         self.session_month_dates = self.session_month.dates('date_start', 'day')
-        self.session_month_dates_archive = [
-            self.session_month.filter(date_start__date=d)
-            for d in self.session_month_dates
-        ]
+
+        self.session_month_dates_archive = []
+        time_min = datetime.datetime.min.time()
+        time_max = datetime.datetime.max.time()
+
+        for d in self.session_month_dates:
+            ds = datetime.datetime.combine(d, time_min).replace(
+                tzinfo=timezone.get_current_timezone())
+            de = datetime.datetime.combine(d, time_max).replace(
+                tzinfo=timezone.get_current_timezone())
+            self.session_month_dates_archive.append(
+                self.session_month.filter(date_start__range=(ds, de)))
 
         context = {
             'assets_count': self.get_asset_count(),

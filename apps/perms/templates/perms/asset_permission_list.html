@@ -186,7 +186,7 @@ function initTree() {
             {#if (value["key"] === "0") {#}
             value["open"] = true;
             {# }#}
-            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')'
+            value["name"] = value["value"]
         });
         zNodes = data;
         $.fn.zTree.init($("#assetTree"), setting, zNodes);
