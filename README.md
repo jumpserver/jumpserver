@@ -33,7 +33,7 @@ Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点�
 
    
 ### 截图
-   [访问](http://docs.jumpserver.org/zh/docs/snapshot.html)
+   [访问](http://docs.jumpserver.org/zh/latest/snapshot.html)
 
 ### Demo
    [访问](http://demo.jumpserver.org)
