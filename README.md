@@ -28,20 +28,28 @@ Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点�
   - SSH Server
   - 支持Windows RDP
 
-### 文档
-   [访问](http://docs.jumpserver.org)
+### 开始使用
 
-   
-### 截图
-   [访问](http://docs.jumpserver.org/zh/latest/snapshot.html)
+快速开始文档  [Docker安装](http://docs.jumpserver.org/zh/latest/quickstart.html)
 
-### Demo
-   [访问](http://demo.jumpserver.org)
+一步一步安装文档 [详细部署](http://docs.jumpserver.org/zh/latest/step_by_step.html)
+
+也可以查看我们完整文档包括了使用和开发 [文档](http://docs.jumpserver.org)
+
+
+### Demo 和 截图 
+
+我们提供了DEMO和截图可以让你快速了解Jumpserver
+
+[DEMO](http://demo.jumpserver.org)
+[截图](http://docs.jumpserver.org/zh/docs/snapshot.html)
 
 ### SDK 
 
-- python: https://github.com/jumpserver/jumpserver-python-sdk
-- java: https://github.com/KaiJunYan/jumpserver-java-sdk.git
+我们还编写了一些SDK，供你其它系统快速和Jumpserver APi交互，
+
+- [python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver其它组件使用这个SDK完成交互
+- [java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK
 
 
 ### License & Copyright
