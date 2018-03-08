@@ -2,11 +2,11 @@
 --------------------------
 
 环境
-~~~~
+~~~~~~~
 
 -  系统: CentOS 7
 -  IP: 192.168.244.144
--  关闭 selinux和防火墙
+-  关闭 selinux 和防火墙
 
 ::
 
@@ -19,8 +19,8 @@
     $ setenforce 0
     $ service iptables stop
 
-一. 准备Python3和Python虚拟环境
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+一. 准备 Python3 和 Python 虚拟环境
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **1.1 安装依赖包**
 
@@ -36,10 +36,9 @@
     $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
     $ ./configure && make && make install
 
-**1.3 建立python虚拟环境**
+**1.3 建立 Python 虚拟环境**
 
-因为CentOS
-6/7自带的是Python2，而Yum等工具依赖原来的Python，为了不扰乱原来的环境我们来使用Python虚拟环境
+因为 CentOS 6/7 自带的是 Python2，而 Yum 等工具依赖原来的 Python，为了不扰乱原来的环境我们来使用 Python 虚拟环境
 
 ::
 
@@ -47,45 +46,44 @@
     $ python3 -m venv py3
     $ source /opt/py3/bin/activate
 
-    # 看到下面的提示符代表成功，以后运行jumpserver都要先运行以上source命令，以下所有命令均在该虚拟环境中运行
-    (py3) [root@localhost py3]#
+    # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行
+    (py3) [root@localhost py3]
 
-二. 安装Jumpserver 0.5.0
-~~~~~~~~~~~~~~~~~~~~~~~~
+二. 安装 Jumpserver 0.5.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**2.1 下载或clone项目**
+**2.1 下载或 Clone 项目**
 
-项目提交较多git clone时较大，你可以选择去github项目页面直接下载
-zip包，我的网速好，我直接clone了
+项目提交较多 git clone 时较大，你可以选择去 Github 项目页面直接下载zip包。
 
 ::
 
     $ cd /opt/
     $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
 
-**2.2 安装依赖rpm包**
+**2.2 安装依赖 RPM 包**
 
 ::
 
     $ cd /opt/jumpserver/requirements
     $ yum -y install $(cat rpm_requirements.txt)  # 如果没有任何报错请继续
 
-**2.3 安装python库依赖**
+**2.3 安装 Python 库依赖**
 
 ::
 
     $ pip install -r requirements.txt  # 不要指定-i参数，因为镜像上可能没有最新的包，如果没有任何报错请继续
 
-**2.4 安装Redis, jumpserver使用redis做cache和celery broker**
+**2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
 ::
 
     $ yum -y install redis
     $ service redis start
 
-**2.5 安装MySQL**
+**2.5 安装 MySQL**
 
-本教程使用mysql作为数据库，如果不使用mysql可以跳过相关mysql安装和配置
+本教程使用 Mysql 作为数据库，如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
 
 ::
 
@@ -97,7 +95,7 @@ zip包，我的网速好，我直接clone了
     $ yum -y install mysql mysql-devel mysql-server
     $ service mysqld start
 
-**2.6 创建数据库 jumpserver并授权**
+**2.6 创建数据库 Jumpserver 并授权**
 
 ::
 
@@ -105,7 +103,7 @@ zip包，我的网速好，我直接clone了
     > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'somepassword';
 
-**2.7 修改jumpserver配置文件**
+**2.7 修改 Jumpserver 配置文件**
 
 ::
 
@@ -113,9 +111,7 @@ zip包，我的网速好，我直接clone了
     $ cp config_example.py config.py
     $ vi config.py  # 我们计划修改 DevelopmentConfig中的配置，因为默认jumpserver是使用该配置，它继承自Config
 
-**注意: 配置文件是python格式，不要用tab，而要用空格** **注意:
-配置文件是python格式，不要用tab，而要用空格** **注意:
-配置文件是python格式，不要用tab，而要用空格**
+**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
 ::
 
@@ -139,7 +135,7 @@ zip包，我的网速好，我直接clone了
     $ cd /opt/jumpserver/utils
     $ bash make_migrations.sh
 
-**2.9 运行Jumpserver**
+**2.9 运行 Jumpserver**
 
 ::
 
@@ -147,14 +143,14 @@ zip包，我的网速好，我直接clone了
     $ python run_server.py all
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
-(这里只是jumpserver, 没有web terminal,所以访问web terminal会报错)
+(这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错)
 
-账号:admin 密码: admin
+账号: admin 密码: admin
 
-三. 安装 SSH Server和Web Socket Server: Coco
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+三. 安装 SSH Server 和 WebSocket Server: Coco
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**3.1 下载clone项目**
+**3.1 下载或 Clone 项目**
 
 新开一个终端，连接测试机，别忘了 source /opt/py3/bin/activate
 
@@ -167,7 +163,9 @@ zip包，我的网速好，我直接clone了
 
 ::
 
-    $ cd /opt/coco/requirements $ yum -y install $(cat rpm_requirements.txt) $ pip install requirements.txt
+    $ cd /opt/coco/requirements
+    $ yum -y install $(cat rpm_requirements.txt)
+    $ pip install requirements.txt
 
 
 **3.2 安装依赖**
@@ -186,8 +184,7 @@ zip包，我的网速好，我直接clone了
     $ cp conf_example.py conf.py
     $ python run_server.py
 
-这时需要去
-jumpserver管理后台-会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册
+这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
 ::
 
@@ -202,21 +199,19 @@ jumpserver管理后台-会话管理-终端管理(http://192.168.244.144:8080/ter
     $ ssh -p2222 admin@192.168.244.144
     密码: admin
 
-    如果是用在windows下，Xshell terminal登录语法如下
+    如果是用在 Windows 下，Xshell Terminal 登录语法如下
     $ssh admin@192.168.244.144 2222
     密码: admin
     如果能登陆代表部署成功
 
 四. 安装 Web Terminal 前端: Luna
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Luna已改为纯前端，需要nginx来运行访问
+Luna 已改为纯前端，需要 Nginx 来运行访问
 
-下载 release包，直接解压，不需要编译
+访问（https://github.com/jumpserver/luna/releases）下载对应 release 包，直接解压，不需要编译
 
-访问 https://github.com/jumpserver/luna/releases，下载对应release包
-
-4.1 解压luna
+4.1 解压 Luna
 
 ::
 
@@ -227,10 +222,10 @@ Luna已改为纯前端，需要nginx来运行访问
     $ ls /opt/luna
     ...
 
-五. 安装Windows支持组件
-~~~~~~~~~~~~~~~~~~~~~~~
+五. 安装 Windows 支持组件
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-因为手动安装 guacamole 组件比较复杂，这里提供打包好的docker使用, 启动 guacamole
+因为手动安装 guacamole 组件比较复杂，这里提供打包好的 docker 使用, 启动 guacamole
 
 .. code:: shell
 
@@ -239,16 +234,16 @@ Luna已改为纯前端，需要nginx来运行访问
     docker run -d \
       -p 8081:8080 \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
-      jumpserver/guacamole
+      registry.jumpserver.org/public/guacamole:latest
 
-这里所需要注意的是guacamole暴露出来的端口是8081，若与主机上其他端口冲突请自定义一下。
+这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 
-修改JUMPSERVER_SERVER的配置，填上jumpserver的内网地址
+修改 JUMPSERVER SERVER 的配置，填上 Jumpserver 的内网地址
 
-六. 配置 nginx 整合各组件
+六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-6.1 安装nginx 根据喜好选择安装方式和版本
+6.1 安装 Nginx 根据喜好选择安装方式和版本
 
 6.2 配置文件
 
@@ -298,6 +293,6 @@ Luna已改为纯前端，需要nginx来运行访问
         }
     }
 
-6.3 运行 nginx
+6.3 运行 Nginx
 
 6.4 访问 http://192.168.244.144
