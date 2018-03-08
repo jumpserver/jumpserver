@@ -1,21 +1,21 @@
 REST API规范约定
 ----------------
 
-这里仅考虑REST API的基本情况。参考
+这里仅考虑 REST API 的基本情况。参考
 
 `RESTful API 设计指南`_
 
-`github api文档`_
+`Github API 文档`_
 
 协议
 ~~~~
 
-API与用户的通信协议，总是使用HTTPs协议。
+API 与用户的通信协议，总是使用 HTTPS 协议。
 
 域名
 ~~~~
 
-这版api相对简单, 没有前后端分离, 没有独立app, 所以放在主域名下
+这版 API 相对简单, 没有前后端分离, 没有独立 APP, 所以放在主域名下
 
 ::
 
@@ -24,8 +24,7 @@ API与用户的通信协议，总是使用HTTPs协议。
 版本
 ~~~~
 
-将API的版本号放入URL中, 由于一个项目多个app所以Jumpserver使用以下风格,
-将版本号放到app后面
+将 API 的版本号放入 URL 中，由于一个项目多个 APP 所以 Jumpserver 使用以下风格，将版本号放到 APP 后面
 
 ::
 
@@ -36,9 +35,9 @@ API与用户的通信协议，总是使用HTTPs协议。
 路径
 ~~~~
 
-路径又称“终点”（endpoint），表示API的具体网址。
-在RESTful架构中，每个网址代表一种资源（resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的“集合”（collection），所以API中的名词也应该使用复数。
-举例来说 cmdb中的assets列表, idc列表
+路径又称“终点”（endpoint），表示 API 的具体网址。
+在 RESTful 架构中，每个网址代表一种资源（Resource），所以网址中不能有动词，只能有名词，而且所用的名词往往与数据库的表格名对应。一般来说，数据库中的表都是同种记录的“集合”（Collection），所以 API 中的名词也应该使用复数。
+举例来说 Cmdb 中的 Assets 列表, IDC 列表。
 
 ::
 
@@ -48,18 +47,14 @@ API与用户的通信协议，总是使用HTTPs协议。
     https://example.com/api/assets/v1.0/assets/1 [GET, PUT, DELETE]
     https://example.com/api/assets/v1.0/idcs [GET, POST]
 
-一般性的增删查改(CRUD)API，完全使用HTTP
-method加上url提供的语义，url中的可变部分（比如上面提到的）
-一般用来传递该API操作的核心实体对象的唯一ID，如果有更多的参数需要提供，GET方法请使用url
-parameter
-(例如：“?client_id=xxxxx&app_id=xxxxxx”)，PUT/POST/DELETE方法请使用请求体传递参数。
+一般性的增删查改（CRUD）API，完全使用 HTTP Method 加上 URL 提供的语义，URL 中的可变部分（比如上面提到的），一般用来传递该API操作的核心实体对象的唯一 ID，如果有更多的参数需要提供，GET 方法请使用 URL Parameter（例如：“?client_id=xxxxx&app_id=xxxxxx”)，PUT/POST/DELETE 方法请使用请求体传递参数。
 
 HTTP Method
 ~~~~~~~~~~~
 
-对于资源的具体操作类型，由HTTP动词表示。
+对于资源的具体操作类型，由 HTTP 动词表示。
 
-常用的HTTP动词有下面五个（括号里是对应的SQL命令）。
+常用的HTTP动词有下面五个（括号里是对应的 SQL 命令）。
 
 -  GET（SELECT）：从服务器取出资源（一项或多项）。
 -  POST（CREATE）：在服务器新建一个资源。
@@ -68,7 +63,7 @@ HTTP Method
 -  DELETE（DELETE）：从服务器删除资源。
 
 .. _RESTful API 设计指南: http://www.ruanyifeng.com/blog/2014/05/restful_api.html
-.. _github api文档: https://developer.github.com/v3/
+.. _Github API 文档: https://developer.github.com/v3/
 
 
 过滤信息
@@ -90,8 +85,7 @@ HTTP Method
 
 服务器向用户返回的状态码和提示信息，常见的有以下一些（方括号中是该状态码对应的HTTP动词）。
 
--  200 OK -
-   [GET]：服务器成功返回用户请求的数据，该操作是幂等的（Idempotent）。
+-  200 OK - [GET]：服务器成功返回用户请求的数据，该操作是幂等的（Idempotent）。
 -  201 CREATED - [POST/PUT/PATCH]：用户新建或修改数据成功。
 -  202 Accepted - [*]：表示一个请求已经进入后台排队（异步任务）
 -  204 NO CONTENT - [DELETE]：用户删除数据成功。
@@ -113,7 +107,7 @@ HTTP Method
 错误处理
 ~~~~~~~~
 
-如果状态码是4xx，就应该向用户返回出错信息。一般来说，返回的信息中将error作为键名，出错信息作为键值即可。
+如果状态码是4xx，就应该向用户返回出错信息。一般来说，返回的信息中将 error 作为键名，出错信息作为键值即可。
 
 ::
 
@@ -140,8 +134,8 @@ Hypermedia API
 ~~~~~~~~~~~~~~
 
 RESTful
-API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。
-比如，当用户向api.example.com的根目录发出请求，会得到这样一个文档。
+API 最好做到 Hypermedia，即返回结果中提供链接，连向其他 API 方法，使得用户不查文档，也知道下一步应该做什么。
+比如，当用户向 api.example.com 的根目录发出请求，会得到这样一个文档。
 
 ::
 
@@ -152,15 +146,18 @@ API最好做到Hypermedia，即返回结果中提供链接，连向其他API方�
       "type":  "application/vnd.yourformat+json"
     }}
 
-上面代码表示，文档中有一个link属性，用户读取这个属性就知道下一步该调用什么API了。
+上面代码表示，文档中有一个 Link 属性，用户读取这个属性就知道下一步该调用什么 API 了。
 
-rel表示这个API与当前网址的关系（collection关系，并给出该collection的网址），
+- rel 表示这个 API 与当前网址的关系（Collection 关系，并给出该 Collection 的网址）
+- href 表示 API 的路径
+- title 表示 API 的标题
+- type 表示返回类型
 
-href表示API的路径，title表示API的标题，type表示返回类型。 Hypermedia
-API的设计被称为HATEOAS。 Github的API就是这种设计.
+Hypermedia API 的设计被称为 HATEOAS。 Github API 就是这种设计.
 
 其它
 ~~~~
 
-（1）API的身份认证应该使用OAuth 2.0框架。
-（2）服务器返回的数据格式，应该尽量使用JSON
+（1）API 的身份认证应该使用 OAuth 2.0 框架。
+
+（2）服务器返回的数据格式，应该尽量使用 JSON。
