@@ -1,0 +1,45 @@
+.elfinder-widget {
+	float: left;
+}
+
+.elfinder-wrapper {
+	background-color: #444;
+	background-color: rgba(32, 32, 32, .7);
+	display: none;
+	height: 100%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 2000;
+}
+
+.elfinder-widget .elfinder-info-title {
+	margin: 0 0 20px 0;
+}
+
+.elfinder-close {
+	background: url(../images/close-button.png) 100% 0 no-repeat;
+	cursor: pointer;
+	float: right;
+	height: 32px;
+	margin: 15px 10px 0 0;
+	max-width: 1260px;
+	width: 32px;
+}
+
+.elfinder-root {
+	font-size: 16px;
+	margin: 15px auto 0 auto;
+	max-width: 1260px;
+	z-index: 2100;
+}
+
+.tmb {
+	background-position: 50% 50%;
+	background-repeat: no-repeat no-repeat; 
+}
+
+.clear {
+	clear: both;
+}

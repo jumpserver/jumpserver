@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'elfinder'
 ]
 
 MIDDLEWARE = [
@@ -400,3 +401,5 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
+
+TEMPLATE_DEBUG = True

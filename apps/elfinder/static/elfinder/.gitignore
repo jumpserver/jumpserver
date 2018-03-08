@@ -1,0 +1,12 @@
+*~
+._*
+_*
+.DS_Store
+php-old
+extensions
+build
+files2
+elFinderVolumeSVN.class.php
+connector-svn.php
+node_modules
+connector.php
