@@ -27,7 +27,14 @@ sys.path.append(PROJECT_DIR)
 try:
     from config import config as CONFIG
 except ImportError:
-    CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
+    msg = """
+    
+    Error: No config file found.
+    
+    You can run `cp config_example.py config.py`, and edit it.
+    """
+    raise ImportError(msg)
+    # CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -177,7 +184,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(CONFIG.LOG_DIR, 'jumpserver.log')
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
         },
         'ansible_logs': {
             'level': 'DEBUG',

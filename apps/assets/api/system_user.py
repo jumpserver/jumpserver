@@ -40,23 +40,22 @@ class SystemUserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class SystemUserAuthInfoApi(generics.RetrieveAPIView):
+class SystemUserAuthInfoApi(generics.RetrieveUpdateAPIView):
     """
     Get system user auth info
     """
     queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
+    serializer_class = serializers.SystemUserAuthSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        system_user = self.get_object()
-        data = {
-            'id': system_user.id,
-            'name': system_user.name,
-            'username': system_user.username,
-            'password': system_user.password,
-            'private_key': system_user.private_key,
-        }
-        return Response(data)
+    def update(self, request, *args, **kwargs):
+        password = request.data.pop("password", None)
+        private_key = request.data.pop("private_key", None)
+        instance = self.get_object()
+
+        if password or private_key:
+            instance.set_auth(password=password, private_key=private_key)
+        return super().update(request, *args, **kwargs)
 
 
 class SystemUserPushApi(generics.RetrieveAPIView):
