@@ -20,10 +20,12 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserCreateUpdateForm(forms.ModelForm):
+    role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False, required=False,
     )
+    role = forms.ChoiceField(choices=role_choices, required=True, initial=User.ROLE_USER, label=_("Role"))
 
     class Meta:
         model = User
