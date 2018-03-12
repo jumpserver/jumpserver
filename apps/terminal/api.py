@@ -284,15 +284,18 @@ class SessionReplayViewSet(viewsets.ViewSet):
             return redirect(url)
         else:
             configs = settings.TERMINAL_REPLAY_STORAGE.items()
-            if configs:
-                for name, config in configs:
-                    client = jms_storage.init(config)
-                    date = self.session.date_start.strftime('%Y-%m-%d')
-                    if client and client.has_file(os.path.join(date, str(self.session.id) + '.replay.gz')) \
-                            and \
-                            client.download_file(os.path.join(date, str(self.session.id) + '.replay.gz'),
-                                                 default_storage.base_location + '/' + path):
-                        return redirect(default_storage.url(path))
+            if not configs:
+                return HttpResponseNotFound()
+
+            for name, config in configs:
+                client = jms_storage.init(config)
+                date = self.session.date_start.strftime('%Y-%m-%d')
+                file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
+                target_path = default_storage.base_location + '/' + path
+
+                if client and client.has_file(file_path) and \
+                        client.download_file(file_path, target_path):
+                    return redirect(default_storage.url(path))
         return HttpResponseNotFound()
 
 
