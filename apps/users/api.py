@@ -180,7 +180,7 @@ class UserConnectionTokenApi(APIView):
             'asset': asset_id,
             'system_user': system_user_id
         }
-        cache.set(token, value, timeout=60)
+        cache.set(token, value, timeout=20)
         return Response({"token": token}, status=201)
 
     def get(self, request):
@@ -192,7 +192,6 @@ class UserConnectionTokenApi(APIView):
             return Response('', status=404)
 
         if not user_only:
-            cache.delete(token)
             return Response(value)
         else:
             return Response({'user': value['user']})
