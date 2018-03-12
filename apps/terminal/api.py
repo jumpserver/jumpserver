@@ -288,7 +288,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 for name, config in configs:
                     client = jms_storage.init(config)
                     date = self.session.date_start.strftime('%Y-%m-%d')
-                    if client.has_file(os.path.join(date, str(self.session.id) + '.replay.gz')) \
+                    if client and client.has_file(os.path.join(date, str(self.session.id) + '.replay.gz')) \
                             and \
                             client.download_file(os.path.join(date, str(self.session.id) + '.replay.gz'),
                                                  default_storage.base_location + '/' + path):
