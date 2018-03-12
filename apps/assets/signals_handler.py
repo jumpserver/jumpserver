@@ -21,7 +21,7 @@ def update_asset_hardware_info_on_created(asset):
 
 def test_asset_conn_on_created(asset):
     logger.debug("Test asset `{}` connectability".format(asset))
-    test_asset_connectability_util.delay(asset)
+    test_asset_connectability_util.delay([asset])
 
 
 def set_asset_root_node(asset):

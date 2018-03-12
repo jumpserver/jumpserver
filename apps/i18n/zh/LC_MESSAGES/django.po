@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-07 21:18+0800\n"
+"POT-Creation-Date: 2018-03-12 11:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,9 +17,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/api/node.py:55
+#: assets/api/node.py:58
 msgid "New node {}"
 msgstr "新节点 {}"
+
+#: assets/api/node.py:133
+msgid "Refresh node assets hardware info: {}"
+msgstr "更新一些资产硬件信息: {}"
+
+#: assets/api/node.py:146
+msgid "Test node assets connective: {}"
+msgstr "测试节点资产可连接性"
 
 #: assets/forms/asset.py:23 assets/forms/asset.py:54 assets/forms/user.py:125
 #: assets/models/asset.py:53 assets/models/user.py:218
@@ -52,7 +60,7 @@ msgstr ""
 "不支持ansible, 任意设置一个即可"
 
 #: assets/forms/asset.py:80 assets/forms/asset.py:84 assets/forms/label.py:15
-#: perms/templates/perms/asset_permission_asset.html:88 users/forms.py:242
+#: perms/templates/perms/asset_permission_asset.html:88 users/forms.py:244
 msgid "Select assets"
 msgstr "选择资产"
 
@@ -89,7 +97,7 @@ msgid "Password or private key passphrase"
 msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:25 assets/models/user.py:30 common/forms.py:113
-#: users/forms.py:16 users/forms.py:24 users/templates/users/login.html:59
+#: users/forms.py:16 users/forms.py:25 users/templates/users/login.html:59
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_create.html:11
 #: users/templates/users/user_password_update.html:40
@@ -358,7 +366,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:190
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:192
 #: users/models/user.py:30 users/models/user.py:254
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:333
@@ -424,43 +432,45 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/tasks.py:92
+#: assets/tasks.py:94
 msgid "Update some assets hardware info"
 msgstr "更新一些资产硬件信息"
 
-#: assets/tasks.py:108
+#: assets/tasks.py:110
 msgid "Update asset hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:122
+#: assets/tasks.py:128
 msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
-#: assets/tasks.py:195
+#: assets/tasks.py:205
 msgid "Test admin user connectability period: {}"
 msgstr "定期测试管理用户可连接性: {}"
 
-#: assets/tasks.py:201
+#: assets/tasks.py:211
 msgid "Test admin user connectability: {}"
 msgstr "测试管理用户可连接性: {}"
 
-#: assets/tasks.py:210
-msgid "Test asset connectability"
+#: assets/tasks.py:220
+#, fuzzy
+#| msgid "Test asset connectability"
+msgid "Test assets connectability"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:281
+#: assets/tasks.py:290
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:292
+#: assets/tasks.py:305
 msgid "test system user connectability period: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:369
+#: assets/tasks.py:382
 msgid "Push system user to node: {} => {}"
 msgstr "推送系统用户到节点: {}->{}"
 
-#: assets/tasks.py:407
+#: assets/tasks.py:420
 msgid "Push system users to node: {}"
 msgstr "推送系统用户到节点: {}"
 
@@ -627,7 +637,7 @@ msgstr "提交"
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:84
 #: assets/templates/assets/asset_detail.html:24
-#: assets/templates/assets/asset_list.html:166
+#: assets/templates/assets/asset_list.html:168
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
 #: assets/templates/assets/system_user_list.html:85
@@ -646,7 +656,7 @@ msgstr "更新"
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:85
 #: assets/templates/assets/asset_detail.html:28
-#: assets/templates/assets/asset_list.html:167
+#: assets/templates/assets/asset_list.html:169
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
 #: assets/templates/assets/system_user_list.html:86
@@ -764,7 +774,7 @@ msgstr "替换资产的管理员"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:198
-#: assets/templates/assets/asset_list.html:541
+#: assets/templates/assets/asset_list.html:586
 #: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:135 templates/_modal.html:16
 #: terminal/templates/terminal/session_detail.html:108
@@ -869,27 +879,35 @@ msgstr "从节点移除"
 msgid "Add asset"
 msgstr "添加资产到节点"
 
+#: assets/templates/assets/asset_list.html:122
+msgid "Refresh node hardware info"
+msgstr "更新节点资产硬件信息"
+
 #: assets/templates/assets/asset_list.html:123
+msgid "Test node connective"
+msgstr "测试节点资产可连接性"
+
+#: assets/templates/assets/asset_list.html:125
 msgid "Add node"
 msgstr "新建节点"
 
-#: assets/templates/assets/asset_list.html:124
+#: assets/templates/assets/asset_list.html:126
 msgid "Rename node"
 msgstr "重命名节点"
 
-#: assets/templates/assets/asset_list.html:126
+#: assets/templates/assets/asset_list.html:128
 msgid "Delete node"
 msgstr "删除节点"
 
-#: assets/templates/assets/asset_list.html:201
+#: assets/templates/assets/asset_list.html:203
 msgid "Create node failed"
 msgstr "创建节点失败"
 
-#: assets/templates/assets/asset_list.html:214
+#: assets/templates/assets/asset_list.html:216
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:536
+#: assets/templates/assets/asset_list.html:581
 #: assets/templates/assets/system_user_list.html:130
 #: users/templates/users/user_detail.html:334
 #: users/templates/users/user_detail.html:359
@@ -898,20 +916,20 @@ msgstr "存在子节点，不能删除"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:537
+#: assets/templates/assets/asset_list.html:582
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:545
+#: assets/templates/assets/asset_list.html:590
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:546
-#: assets/templates/assets/asset_list.html:551
+#: assets/templates/assets/asset_list.html:591
+#: assets/templates/assets/asset_list.html:596
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:550
+#: assets/templates/assets/asset_list.html:595
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1598,7 +1616,7 @@ msgstr "添加"
 msgid "Add asset group to this permission"
 msgstr "添加资产组"
 
-#: perms/templates/perms/asset_permission_asset.html:116 users/forms.py:245
+#: perms/templates/perms/asset_permission_asset.html:116 users/forms.py:247
 msgid "Select asset groups"
 msgstr "选择资产组"
 
@@ -1627,7 +1645,7 @@ msgstr "资产组数量"
 msgid "System user count"
 msgstr "系统用户数量"
 
-#: perms/templates/perms/asset_permission_detail.html:144 users/forms.py:248
+#: perms/templates/perms/asset_permission_detail.html:144 users/forms.py:250
 msgid "Select system users"
 msgstr "选择系统用户"
 
@@ -2061,51 +2079,59 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: users/forms.py:43 users/templates/users/user_detail.html:187
+#: users/forms.py:28 users/models/user.py:38
+#: users/templates/users/_select_user_modal.html:15
+#: users/templates/users/user_detail.html:87
+#: users/templates/users/user_list.html:25
+#: users/templates/users/user_profile.html:55
+msgid "Role"
+msgstr "角色"
+
+#: users/forms.py:45 users/templates/users/user_detail.html:187
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:74
+#: users/forms.py:76
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:79
+#: users/forms.py:81
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:84
+#: users/forms.py:86
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:94
+#: users/forms.py:96
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:102
+#: users/forms.py:104
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:114
+#: users/forms.py:116
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:115
+#: users/forms.py:117
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:116
+#: users/forms.py:118
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:129
+#: users/forms.py:131
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:133 users/serializers.py:42
+#: users/forms.py:135 users/serializers.py:42
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:147 users/forms.py:152 users/forms.py:164 users/forms.py:194
+#: users/forms.py:149 users/forms.py:154 users/forms.py:166 users/forms.py:196
 msgid "Select users"
 msgstr "选择用户"
 
@@ -2145,13 +2171,6 @@ msgstr "应用程序"
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
-
-#: users/models/user.py:38 users/templates/users/_select_user_modal.html:15
-#: users/templates/users/user_detail.html:87
-#: users/templates/users/user_list.html:25
-#: users/templates/users/user_profile.html:55
-msgid "Role"
-msgstr "角色"
 
 #: users/models/user.py:39
 msgid "Avatar"

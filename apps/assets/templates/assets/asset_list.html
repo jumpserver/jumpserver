@@ -119,6 +119,8 @@
     <ul class="dropdown-menu">
         <li id="menu_asset_create" class="btn-create-asset" tabindex="-1"><a>{% trans 'Create asset' %}</a></li>
         <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a>{% trans 'Add asset' %}</a></li>
+        <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a>{% trans 'Refresh node hardware info' %}</a></li>
+        <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a>{% trans 'Test node connective' %}</a></li>
         <li class="divider"></li>
         <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a>{% trans 'Add node' %}</a></li>
         <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a>{% trans 'Rename node' %}</a></li>
@@ -475,6 +477,49 @@ $(document).ready(function(){
         url += "?node_id=" + current_node.id;
     }
     window.open(url, '_self');
+})
+.on('click', '.btn-refresh-hardware', function () {
+    var url = "{% url 'api-assets:node-refresh-hardware-info' pk=DEFAULT_PK %}";
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+    } else {
+        return null;
+    }
+
+    var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
+    function success() {
+        rMenu.css({"visibility" : "hidden"});
+    }
+    APIUpdateAttr({
+        url: the_url,
+        method: "GET",
+        success_message: "更新硬件信息任务下发成功",
+        success: success
+    });
+
+})
+.on('click', '.btn-test-connective', function () {
+    var url = "{% url 'api-assets:node-test-connective' pk=DEFAULT_PK %}";
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+    } else {
+        return null;
+    }
+
+    var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
+    function success() {
+        rMenu.css({"visibility" : "hidden"});
+    }
+    APIUpdateAttr({
+        url: the_url,
+        method: "GET",
+        success_message: "测试可连接性任务下发成功",
+        success: success
+    });
 })
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);

@@ -213,12 +213,12 @@ def test_admin_user_connectability_manual(admin_user):
 
 
 @shared_task
-def test_asset_connectability_util(asset, task_name=None):
+def test_asset_connectability_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
-        task_name = _("Test asset connectability")
-    hosts = [asset.hostname]
+        task_name = _("Test assets connectability")
+    hosts = [asset.hostname for asset in assets]
     if not hosts:
         logger.info("No hosts, passed")
         return {}
@@ -229,18 +229,17 @@ def test_asset_connectability_util(asset, task_name=None):
     )
     result = task.run()
     summary = result[1]
-    if summary.get('dark'):
-        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 0,
-                  CACHE_MAX_TIME)
-    else:
-        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 1,
-                  CACHE_MAX_TIME)
+    for k in summary.get('dark'):
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(k), 0, CACHE_MAX_TIME)
+
+    for k in summary.get('contacted'):
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(k), 1, CACHE_MAX_TIME)
     return summary
 
 
 @shared_task
 def test_asset_connectability_manual(asset):
-    summary = test_asset_connectability_util(asset)
+    summary = test_asset_connectability_util([asset])
 
     if summary.get('dark'):
         return False, summary['dark']
