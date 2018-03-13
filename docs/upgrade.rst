@@ -16,3 +16,9 @@
 3. 升级 Luna
 
 重新下载 release 包（https://github.com/jumpserver/luna/releases）
+
+4. 升级 guacamole
+
+:: 
+
+    $ docker pull registry.jumpserver.org/public/guacamole:latest
