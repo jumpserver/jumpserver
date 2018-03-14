@@ -125,9 +125,9 @@
                         {% for data in week_asset_hot_ten %}
                             <div class="timeline-item">
                                 <div class="row">
-                                    <div class="col-xs-5 date">
+                                    <div class="col-xs-5 date ellipsis">
                                         <i class="fa fa-info-circle"></i>
-                                        <strong>{{ data.asset }}</strong>
+                                        <strong data-toggle="tooltip" title="{{ data.asset }}">{{ data.asset }}</strong>
                                         <br/>
                                         <small class="text-navy">{{ data.total }}次</small>
                                     </div>
@@ -213,9 +213,9 @@
                         {% for data in week_user_hot_ten %}
                             <div class="timeline-item">
                                 <div class="row">
-                                    <div class="col-xs-5 date">
+                                    <div class="col-xs-5 date ellipsis">
                                         <i class="fa fa-info-circle"></i>
-                                        <strong>{{ data.user }}</strong>
+                                        <strong data-toggle="tooltip" title="{{ data.user }}">{{ data.user }}</strong>
                                         <br/>
                                         <small class="text-navy">{{ data.total }}次</small>
                                     </div>
@@ -245,7 +245,8 @@ $(document).ready(function(){
     $('#show').click(function(){
         $('#show').css('display', 'none');
         $('#more').css('display', 'block');
-    })
+    });
+    $("[data-toggle='tooltip']").tooltip();
 });
     require.config({
         paths: {
