@@ -332,7 +332,7 @@ AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
 if AUTH_LDAP:
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
+    AUTHENTICATION_BACKENDS.append(AUTH_LDAP_BACKEND)
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {

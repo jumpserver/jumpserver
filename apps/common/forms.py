@@ -118,7 +118,7 @@ class LDAPSettingForm(BaseForm):
     )
     AUTH_LDAP_SEARCH_FILTER = forms.CharField(
         label=_("User search filter"), initial='(cn=%(user)s)',
-        help_text=_("User search filter must contain ([cn,uid,sAMAccountName,...]=%(user)s)")
+        help_text=_("Choice may be (cn|uid|sAMAccountName)=%(user)s)")
     )
     AUTH_LDAP_USER_ATTR_MAP = DictField(
         label=_("User attr map"),

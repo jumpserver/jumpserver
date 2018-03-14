@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-14 18:11+0800\n"
+"POT-Creation-Date: 2018-03-14 19:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1175,9 +1175,8 @@ msgid "User search filter"
 msgstr "用户过滤器"
 
 #: common/forms.py:121
-#, python-format
-msgid "User search filter must contain ([cn,uid,sAMAccountName,...]=%(user)s)"
-msgstr "用户过滤器必须包含([cn,uid,sAMAccountName,...]=%(user)s)"
+msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
+msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
 #: common/forms.py:124
 msgid "User attr map"
