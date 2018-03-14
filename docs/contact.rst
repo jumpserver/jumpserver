@@ -7,7 +7,7 @@
 `阿里云市场购买: <https://market.aliyun.com/products/53690006/cmgj026011.html>`_
 
 
-QQ群
+QQ 群
 ~~~~~~~~
 
 群1: 390139816 (推荐)
