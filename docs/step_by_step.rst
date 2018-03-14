@@ -159,14 +159,6 @@
     $ cd /opt
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
 
-**3.2 安装依赖**
-
-::
-
-    $ cd /opt/coco/requirements
-    $ yum -y install $(cat rpm_requirements.txt)
-    $ pip install requirements.txt
-
 
 **3.2 安装依赖**
 
