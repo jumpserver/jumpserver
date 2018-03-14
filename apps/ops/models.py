@@ -234,7 +234,7 @@ class AdHoc(models.Model):
             result = runner.run(self.tasks, self.pattern, self.task.name)
             return result.results_raw, result.results_summary
         except AnsibleError as e:
-            logger.error("Failed run adhoc {}, {}".format(self.task.name, e))
+            logger.warn("Failed run adhoc {}, {}".format(self.task.name, e))
             pass
 
     @become.setter
