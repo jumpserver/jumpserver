@@ -201,7 +201,7 @@
 
 Luna 已改为纯前端，需要 Nginx 来运行访问
 
-访问（https://github.com/jumpserver/luna/releases）下载 1.0.0 的包，直接解压，不需要编译
+访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
 
 4.1 解压 Luna
 
