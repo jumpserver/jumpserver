@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-14 13:07+0800\n"
+"POT-Creation-Date: 2018-03-14 18:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -26,49 +26,49 @@ msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
 #: assets/api/node.py:147
-msgid "Test node assets connective: {}"
-msgstr "测试节点资产可连接性"
+msgid "测试节点下资产是否可连接: {}"
+msgstr ""
 
-#: assets/forms/asset.py:23 assets/forms/asset.py:55 assets/forms/user.py:125
+#: assets/forms/asset.py:23 assets/forms/asset.py:54 assets/forms/user.py:125
 #: assets/models/asset.py:53 assets/models/user.py:218
-#: assets/templates/assets/asset_detail.html:181
-#: assets/templates/assets/asset_detail.html:189
+#: assets/templates/assets/asset_detail.html:183
+#: assets/templates/assets/asset_detail.html:191
 #: assets/templates/assets/system_user_detail.html:166
 msgid "Nodes"
 msgstr "节点管理"
 
-#: assets/forms/asset.py:26 assets/forms/asset.py:58 assets/forms/asset.py:95
-#: assets/forms/asset.py:99 assets/models/asset.py:57
+#: assets/forms/asset.py:26 assets/forms/asset.py:57 assets/forms/asset.py:93
+#: assets/forms/asset.py:97 assets/models/asset.py:57
 #: assets/models/cluster.py:19 assets/models/user.py:187
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:24
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:29 assets/forms/asset.py:61 assets/models/asset.py:81
+#: assets/forms/asset.py:29 assets/forms/asset.py:60 assets/models/asset.py:81
 #: assets/templates/assets/asset_create.html:32
-#: assets/templates/assets/asset_detail.html:218
+#: assets/templates/assets/asset_detail.html:220
 #: assets/templates/assets/asset_update.html:37 templates/_nav.html:26
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/forms/asset.py:38 assets/forms/asset.py:71
+#: assets/forms/asset.py:38 assets/forms/asset.py:70
 msgid ""
-"Admin user is a privilege user exist on this asset,Example: root or other "
-"NOPASSWD sudo privilege userIf asset not support ansible, set any one"
+"root or other NOPASSWD sudo privilege user existed in asset,If asset is "
+"windows or other set any one, more see admin user left menu"
 msgstr ""
-"管理用户是资产上已经存在的特权用户，如 root或者其它有NOPASSWD的用户, 如果资产"
-"是Windows或交换机, 任意设置一个即可"
+"root或其他拥有NOPASSWD: ALL权限的用户, 如果是windows或其它硬件可以随意设置一"
+"个, 更多信息查看左侧 `管理用户` 菜单"
 
-#: assets/forms/asset.py:42 assets/forms/asset.py:75
+#: assets/forms/asset.py:41 assets/forms/asset.py:73
 msgid "* required Must set exact system platform, Windows, Linux ..."
 msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
 
-#: assets/forms/asset.py:82 assets/forms/asset.py:86 assets/forms/label.py:15
+#: assets/forms/asset.py:80 assets/forms/asset.py:84 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:88 users/forms.py:244
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:91 assets/models/asset.py:52
+#: assets/forms/asset.py:89 assets/models/asset.py:52
 #: assets/templates/assets/admin_user_assets.html:53
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/system_user_asset.html:51
@@ -76,18 +76,18 @@ msgstr "选择资产"
 msgid "Port"
 msgstr "端口"
 
-#: assets/forms/asset.py:111 assets/templates/assets/asset_create.html:36
+#: assets/forms/asset.py:109 assets/templates/assets/asset_create.html:36
 msgid "Select labels"
 msgstr "选择标签"
 
-#: assets/forms/asset.py:114 assets/templates/assets/admin_user_detail.html:91
+#: assets/forms/asset.py:112 assets/templates/assets/admin_user_detail.html:91
 msgid "Select nodes"
 msgstr "选择节点"
 
 #: assets/forms/label.py:13 assets/models/asset.py:153
-#: assets/templates/assets/admin_user_list.html:24
+#: assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/label_list.html:16
-#: assets/templates/assets/system_user_list.html:26 perms/models.py:17
+#: assets/templates/assets/system_user_list.html:28 perms/models.py:17
 #: terminal/backends/command/models.py:11 terminal/models.py:123
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
@@ -125,10 +125,10 @@ msgstr "密码和私钥, 必须输入一个"
 #: assets/forms/user.py:79 assets/forms/user.py:120 assets/models/cluster.py:18
 #: assets/models/group.py:20 assets/models/label.py:17 assets/models/user.py:28
 #: assets/templates/assets/admin_user_detail.html:56
-#: assets/templates/assets/admin_user_list.html:22
+#: assets/templates/assets/admin_user_list.html:23
 #: assets/templates/assets/label_list.html:14
 #: assets/templates/assets/system_user_detail.html:58
-#: assets/templates/assets/system_user_list.html:24 common/models.py:26
+#: assets/templates/assets/system_user_list.html:26 common/models.py:26
 #: common/templates/common/terminal_setting.html:67
 #: common/templates/common/terminal_setting.html:85 ops/models.py:31
 #: ops/templates/ops/task_detail.html:56 ops/templates/ops/task_list.html:34
@@ -148,9 +148,9 @@ msgstr "名称"
 
 #: assets/forms/user.py:80 assets/forms/user.py:121 assets/models/user.py:29
 #: assets/templates/assets/admin_user_detail.html:60
-#: assets/templates/assets/admin_user_list.html:23
+#: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/system_user_detail.html:62
-#: assets/templates/assets/system_user_list.html:25
+#: assets/templates/assets/system_user_list.html:27
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:14
 #: users/models/authentication.py:45 users/models/user.py:34
 #: users/templates/users/_select_user_modal.html:14
@@ -297,10 +297,10 @@ msgstr "创建日期"
 #: assets/models/asset.py:84 assets/models/cluster.py:29
 #: assets/models/group.py:23 assets/models/label.py:21 assets/models/user.py:33
 #: assets/templates/assets/admin_user_detail.html:72
-#: assets/templates/assets/admin_user_list.html:28
+#: assets/templates/assets/admin_user_list.html:29
 #: assets/templates/assets/asset_detail.html:125
 #: assets/templates/assets/system_user_detail.html:100
-#: assets/templates/assets/system_user_list.html:30 common/models.py:30
+#: assets/templates/assets/system_user_list.html:32 common/models.py:30
 #: ops/models.py:37 perms/models.py:24 perms/models.py:81
 #: perms/templates/perms/asset_permission_detail.html:98 terminal/models.py:26
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
@@ -556,21 +556,21 @@ msgstr "激活中"
 
 #: assets/templates/assets/_asset_list_modal.html:24
 #: assets/templates/assets/admin_user_assets.html:54
-#: assets/templates/assets/admin_user_list.html:25
-#: assets/templates/assets/asset_detail.html:357
+#: assets/templates/assets/admin_user_list.html:26
+#: assets/templates/assets/asset_detail.html:359
 #: assets/templates/assets/asset_list.html:90
 #: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/system_user_list.html:27
+#: assets/templates/assets/system_user_list.html:29
 #: users/templates/users/user_granted_asset.html:47
 #: users/templates/users/user_group_granted_asset.html:47
 msgid "Reachable"
 msgstr "可连接"
 
 #: assets/templates/assets/_asset_list_modal.html:25
-#: assets/templates/assets/admin_user_list.html:29
+#: assets/templates/assets/admin_user_list.html:30
 #: assets/templates/assets/asset_list.html:91
 #: assets/templates/assets/label_list.html:17
-#: assets/templates/assets/system_user_list.html:31
+#: assets/templates/assets/system_user_list.html:33
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:61
 #: ops/templates/ops/task_history.html:62 ops/templates/ops/task_list.html:41
 #: perms/templates/perms/asset_permission_list.html:72
@@ -633,12 +633,12 @@ msgstr "提交"
 
 #: assets/templates/assets/_asset_list_modal.html:79
 #: assets/templates/assets/admin_user_detail.html:24
-#: assets/templates/assets/admin_user_list.html:84
+#: assets/templates/assets/admin_user_list.html:85
 #: assets/templates/assets/asset_detail.html:24
 #: assets/templates/assets/asset_list.html:168
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
-#: assets/templates/assets/system_user_list.html:85
+#: assets/templates/assets/system_user_list.html:87
 #: perms/templates/perms/asset_permission_detail.html:30
 #: perms/templates/perms/asset_permission_list.html:121
 #: terminal/templates/terminal/terminal_detail.html:16
@@ -652,12 +652,12 @@ msgstr "更新"
 
 #: assets/templates/assets/_asset_list_modal.html:80
 #: assets/templates/assets/admin_user_detail.html:28
-#: assets/templates/assets/admin_user_list.html:85
+#: assets/templates/assets/admin_user_list.html:86
 #: assets/templates/assets/asset_detail.html:28
 #: assets/templates/assets/asset_list.html:169
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
-#: assets/templates/assets/system_user_list.html:86
+#: assets/templates/assets/system_user_list.html:88
 #: ops/templates/ops/task_list.html:71
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:122
@@ -751,12 +751,12 @@ msgid "Quick update"
 msgstr "快速更新"
 
 #: assets/templates/assets/admin_user_assets.html:72
-#: assets/templates/assets/asset_detail.html:167
+#: assets/templates/assets/asset_detail.html:168
 msgid "Test connective"
 msgstr "测试可连接性"
 
 #: assets/templates/assets/admin_user_assets.html:75
-#: assets/templates/assets/asset_detail.html:170
+#: assets/templates/assets/asset_detail.html:171
 #: assets/templates/assets/system_user_asset.html:81
 #: assets/templates/assets/system_user_detail.html:147
 msgid "Test"
@@ -771,10 +771,10 @@ msgid "Replace node assets admin user with this"
 msgstr "替换资产的管理员"
 
 #: assets/templates/assets/admin_user_detail.html:100
-#: assets/templates/assets/asset_detail.html:198
+#: assets/templates/assets/asset_detail.html:200
 #: assets/templates/assets/asset_list.html:586
 #: assets/templates/assets/system_user_detail.html:183
-#: assets/templates/assets/system_user_list.html:135 templates/_modal.html:16
+#: assets/templates/assets/system_user_list.html:137 templates/_modal.html:16
 #: terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:339
 #: users/templates/users/user_detail.html:364
@@ -786,18 +786,18 @@ msgstr "替换资产的管理员"
 msgid "Confirm"
 msgstr "确认"
 
-#: assets/templates/assets/admin_user_list.html:14
+#: assets/templates/assets/admin_user_list.html:15
 #: assets/views/admin_user.py:48
 msgid "Create admin user"
 msgstr "创建管理用户"
 
-#: assets/templates/assets/admin_user_list.html:26
-#: assets/templates/assets/system_user_list.html:28
+#: assets/templates/assets/admin_user_list.html:27
+#: assets/templates/assets/system_user_list.html:30
 msgid "Unreachable"
 msgstr "不可达"
 
-#: assets/templates/assets/admin_user_list.html:27
-#: assets/templates/assets/system_user_list.html:29
+#: assets/templates/assets/admin_user_list.html:28
+#: assets/templates/assets/system_user_list.html:31
 #: ops/templates/ops/adhoc_history.html:54
 #: ops/templates/ops/task_history.html:57
 msgid "Ratio"
@@ -841,15 +841,15 @@ msgstr "创建日期"
 msgid "Quick modify"
 msgstr "快速修改"
 
-#: assets/templates/assets/asset_detail.html:159
+#: assets/templates/assets/asset_detail.html:160
 msgid "Refresh hardware"
 msgstr "更新硬件信息"
 
-#: assets/templates/assets/asset_detail.html:162
+#: assets/templates/assets/asset_detail.html:163
 msgid "Refresh"
 msgstr "刷新"
 
-#: assets/templates/assets/asset_detail.html:299
+#: assets/templates/assets/asset_detail.html:301
 #: users/templates/users/user_detail.html:273
 msgid "Update successfully!"
 msgstr "更新成功"
@@ -906,7 +906,7 @@ msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
 #: assets/templates/assets/asset_list.html:581
-#: assets/templates/assets/system_user_list.html:130
+#: assets/templates/assets/system_user_list.html:132
 #: users/templates/users/user_detail.html:334
 #: users/templates/users/user_detail.html:359
 #: users/templates/users/user_group_list.html:81
@@ -990,25 +990,25 @@ msgstr "Uid"
 msgid "Add to node"
 msgstr "添加到节点"
 
-#: assets/templates/assets/system_user_list.html:16
+#: assets/templates/assets/system_user_list.html:18
 #: assets/views/system_user.py:45
 msgid "Create system user"
 msgstr "创建系统用户"
 
-#: assets/templates/assets/system_user_list.html:131
+#: assets/templates/assets/system_user_list.html:133
 msgid "This will delete the selected System Users !!!"
 msgstr "删除选择系统用户"
 
-#: assets/templates/assets/system_user_list.html:139
+#: assets/templates/assets/system_user_list.html:141
 msgid "System Users Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/system_user_list.html:140
-#: assets/templates/assets/system_user_list.html:145
+#: assets/templates/assets/system_user_list.html:142
+#: assets/templates/assets/system_user_list.html:147
 msgid "System Users Delete"
 msgstr "删除系统用户"
 
-#: assets/templates/assets/system_user_list.html:144
+#: assets/templates/assets/system_user_list.html:146
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
@@ -1548,7 +1548,7 @@ msgstr "日期"
 msgid "Run"
 msgstr "执行"
 
-#: ops/templates/ops/task_list.html:125
+#: ops/templates/ops/task_list.html:123
 msgid "Task start: "
 msgstr "任务开始: "
 
@@ -2667,6 +2667,16 @@ msgstr "密码更新"
 #: users/views/user.py:374
 msgid "Public key update"
 msgstr "密钥更新"
+
+#~ msgid "Test node assets connective: {}"
+#~ msgstr "测试节点资产可连接性"
+
+#~ msgid ""
+#~ "Admin user is a privilege user exist on this asset,Example: root or other "
+#~ "NOPASSWD sudo privilege userIf asset not support ansible, set any one"
+#~ msgstr ""
+#~ "管理用户是资产上已经存在的特权用户，如 root或者其它有NOPASSWD的用户, 如果"
+#~ "资产是Windows或交换机, 任意设置一个即可"
 
 #~ msgid "Refresh node assets hardware info: {}"
 #~ msgstr "更新一些资产硬件信息: {}"

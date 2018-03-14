@@ -3,8 +3,10 @@
 
 {% block help_message %}
     <div class="alert alert-info help-message">
-    系统用户是 用户登录资产(服务器)时使用的用户，如 web, sa, dba等具有特殊功能的用户。系统用户创建时，如果选择了自动推送
-    Jumpserver会使用ansible自动推送系统用户到资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。
+    系统用户是 Jumpserver跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`);
+    简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。
+    系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。
+    目前还不支持Windows的自动推送
     </div>
 {% endblock %}
 
