@@ -155,6 +155,7 @@
                                               </span>
                                           </td>
                                         </tr>
+                                        {% if asset.is_unixlike %}
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
                                             <td>
@@ -171,6 +172,7 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
