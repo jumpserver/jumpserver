@@ -35,10 +35,10 @@ class AssetCreateForm(forms.ModelForm):
             'ip': '* required',
             'port': '* required',
             'admin_user': _(
-                'Admin user is a privilege user exist on this asset,'
-                'Example: root or other NOPASSWD sudo privilege user'
-                'If asset not support ansible, set any one'
-            )
+                'root or other NOPASSWD sudo privilege user existed in asset,'
+                'If asset is windows or other set any one, more see admin user left menu'
+            ),
+            'platform': _("* required Must set exact system platform, Windows, Linux ...")
         }
 
 
@@ -67,10 +67,10 @@ class AssetUpdateForm(forms.ModelForm):
             'port': '* required',
             'cluster': '* required',
             'admin_user': _(
-                'Admin user is a privilege user exist on this asset,'
-                'Example: root or other NOPASSWD sudo privilege user'
-                'If asset not support ansible, set any one'
-            )
+                'root or other NOPASSWD sudo privilege user existed in asset,'
+                'If asset is windows or other set any one, more see admin user left menu'
+            ),
+            'platform': _("* required Must set exact system platform, Windows, Linux ...")
         }
 
 
@@ -102,7 +102,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port',  'admin_user', 'labels', 'nodes',
+            'assets', 'port',  'admin_user', 'labels', 'nodes', 'platform'
         ]
         widgets = {
             'labels': forms.SelectMultiple(

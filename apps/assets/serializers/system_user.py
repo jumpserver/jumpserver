@@ -36,6 +36,21 @@ class SystemUserSerializer(serializers.ModelSerializer):
         return len(obj.assets)
 
 
+class SystemUserAuthSerializer(serializers.ModelSerializer):
+    """
+    系统用户认证信息
+    """
+    password = serializers.CharField(max_length=1024)
+    private_key = serializers.CharField(max_length=4096)
+
+    class Meta:
+        model = SystemUser
+        fields = [
+            "id", "name", "username", "protocol",
+            "password", "private_key",
+        ]
+
+
 class AssetSystemUserSerializer(serializers.ModelSerializer):
     """
     查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少

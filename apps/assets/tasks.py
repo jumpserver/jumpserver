@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import re
+import os
 
 from celery import shared_task
 from django.core.cache import cache
@@ -20,6 +21,7 @@ TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
 disk_pattern = re.compile(r'^hd|sd|xvd|vd')
+PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
 
 
 @shared_task
@@ -89,7 +91,8 @@ def update_assets_hardware_info_util(assets, task_name=None):
     """
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
-        task_name = _("Update some assets hardware info")
+        # task_name = _("Update some assets hardware info")
+        task_name = _("更新资产硬件信息")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
     hostname_list = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     task, created = update_or_create_ansible_task(
@@ -105,7 +108,8 @@ def update_assets_hardware_info_util(assets, task_name=None):
 
 @shared_task
 def update_asset_hardware_info_manual(asset):
-    task_name = _("Update asset hardware info")
+    # task_name = _("Update asset hardware info")
+    task_name = _("更新资产硬件信息")
     return update_assets_hardware_info_util([asset], task_name=task_name)
 
 
@@ -118,8 +122,13 @@ def update_assets_hardware_info_period():
     Update asset hardware period task
     :return:
     """
+    if PERIOD_TASK != "on":
+        logger.debug("Period task disabled, update assets hardware info pass")
+        return
+
     from ops.utils import update_or_create_ansible_task
-    task_name = _("Update assets hardware info period")
+    # task_name = _("Update assets hardware info period")
+    task_name = _("定期更新资产硬件信息")
     hostname_list = [
         asset.hostname for asset in Asset.objects.all()
         if asset.is_active and asset.is_unixlike()
@@ -190,25 +199,32 @@ def test_admin_user_connectability_period():
     """
     A period task that update the ansible task period
     """
+    if PERIOD_TASK != "on":
+        logger.debug("Period task disabled, test admin user connectability pass")
+        return
+
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
-        task_name = _("Test admin user connectability period: {}".format(admin_user.name))
+        # task_name = _("Test admin user connectability period: {}".format(admin_user.name))
+        task_name = _("定期测试管理账号可连接性: {}".format(admin_user.name))
         test_admin_user_connectability_util(admin_user, task_name)
 
 
 @shared_task
 def test_admin_user_connectability_manual(admin_user):
-    task_name = _("Test admin user connectability: {}").format(admin_user.name)
+    # task_name = _("Test admin user connectability: {}").format(admin_user.name)
+    task_name = _("测试管理行号可连接性: {}").format(admin_user.name)
     return test_admin_user_connectability_util.delay(admin_user, task_name)
 
 
 @shared_task
-def test_asset_connectability_util(asset, task_name=None):
+def test_asset_connectability_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
-        task_name = _("Test asset connectability")
-    hosts = [asset.hostname]
+        # task_name = _("Test assets connectability")
+        task_name = _("测试资产可连接性")
+    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("No hosts, passed")
         return {}
@@ -219,18 +235,17 @@ def test_asset_connectability_util(asset, task_name=None):
     )
     result = task.run()
     summary = result[1]
-    if summary.get('dark'):
-        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 0,
-                  CACHE_MAX_TIME)
-    else:
-        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 1,
-                  CACHE_MAX_TIME)
+    for k in summary.get('dark'):
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(k), 0, CACHE_MAX_TIME)
+
+    for k in summary.get('contacted'):
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(k), 1, CACHE_MAX_TIME)
     return summary
 
 
 @shared_task
 def test_asset_connectability_manual(asset):
-    summary = test_asset_connectability_util(asset)
+    summary = test_asset_connectability_util([asset])
 
     if summary.get('dark'):
         return False, summary['dark']
@@ -287,9 +302,14 @@ def test_system_user_connectability_manual(system_user):
 @after_app_ready_start
 @after_app_shutdown_clean
 def test_system_user_connectability_period():
+    if PERIOD_TASK != "on":
+        logger.debug("Period task disabled, test system user connectability pass")
+        return
+
     system_users = SystemUser.objects.all()
     for system_user in system_users:
-        task_name = _("test system user connectability period: {}".format(system_user))
+        # task_name = _("Test system user connectability period: {}".format(system_user))
+        task_name = _("定期测试系统用户可连接性: {}".format(system_user))
         test_system_user_connectability_util(system_user, task_name)
 
 
@@ -366,7 +386,9 @@ def push_system_user_util(system_users, assets, task_name):
 
 
 def get_node_push_system_user_task_name(system_user, node):
-    return _("Push system user to node: {} => {}").format(
+
+    # return _("Push system user to node: {} => {}").format(
+    return _("推送系统用户到节点资产: {} => {}").format(
         system_user.name,
         node.value
     )
@@ -404,7 +426,8 @@ def push_node_system_users_to_asset(node, assets):
         system_users.extend(list(n.systemuser_set.all()))
 
     if system_users:
-        task_name = _("Push system users to node: {}").format(node.value)
+        # task_name = _("Push system users to node: {}").format(node.value)
+        task_name = _("推送节点系统用户到新加入资产中: {}").format(node.value)
         push_system_user_util.delay(system_users, assets, task_name)
 
 

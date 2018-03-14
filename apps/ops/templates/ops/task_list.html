@@ -112,9 +112,7 @@ $(document).ready(function() {
         alert(data)
     };
     var success = function () {
-        setTimeout(function () {
-            console.log("ok")
-        }, 1000);
+        alert("任务开始执行，重定向到任务详情页面，多刷新几次查看结果")
         window.location = "{% url 'ops:task-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', uid);
     };
     APIUpdateAttr({

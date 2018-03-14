@@ -27,20 +27,20 @@ def get_all_replay_storage():
 class TerminalForm(forms.ModelForm):
     command_storage = forms.ChoiceField(
         choices=get_all_command_storage(),
-        label=_("Command storage")
+        label=_("Command storage"),
+        help_text=_("Command can store in server db or ES, default to server, more see docs"),
     )
     replay_storage = forms.ChoiceField(
         choices=get_all_replay_storage(),
-        label=_("Replay storage")
+        label=_("Replay storage"),
+        help_text=_("Replay file can store in server disk, AWS S3, Aliyun OSS, default to server, more see docs"),
     )
 
     class Meta:
         model = Terminal
         fields = [
-            'name', 'remote_addr', 'ssh_port', 'http_port', 'comment',
+            'name', 'remote_addr', 'comment',
             'command_storage', 'replay_storage',
         ]
         help_texts = {
-            'ssh_port': _("Coco ssh listen port"),
-            'http_port': _("Coco http/ws listen port"),
         }

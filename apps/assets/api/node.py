@@ -18,10 +18,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
 from ..hands import IsSuperUser
 from ..models import Node
+from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
 from .. import serializers
 
 
@@ -29,7 +31,8 @@ logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
-    'NodeAddChildrenApi',
+    'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
+    'TestNodeConnectiveApi'
 ]
 
 
@@ -117,3 +120,31 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         instance = self.get_object()
         if instance != Node.root():
             instance.assets.remove(*tuple(assets))
+
+
+class RefreshNodeHardwareInfoApi(APIView):
+    permission_classes = (IsSuperUser,)
+    model = Node
+
+    def get(self, request, *args, **kwargs):
+        node_id = kwargs.get('pk')
+        node = get_object_or_404(self.model, id=node_id)
+        assets = node.assets.all()
+        # task_name = _("Refresh node assets hardware info: {}".format(node.name))
+        task_name = _("更新节点资产硬件信息: {}".format(node.name))
+        update_assets_hardware_info_util.delay(assets, task_name=task_name)
+        return Response({"msg": "Task created"})
+
+
+class TestNodeConnectiveApi(APIView):
+    permission_classes = (IsSuperUser,)
+    model = Node
+
+    def get(self, request, *args, **kwargs):
+        node_id = kwargs.get('pk')
+        node = get_object_or_404(self.model, id=node_id)
+        assets = node.assets.all()
+        task_name = _("测试节点下资产是否可连接: {}".format(node.name))
+        test_asset_connectability_util.delay(assets, task_name=task_name)
+        return Response({"msg": "Task created"})
+

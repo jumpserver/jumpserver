@@ -47,6 +47,8 @@ urlpatterns = [
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/children/add/$', api.NodeAddChildrenApi.as_view(), name='node-add-children'),
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/assets/add/$', api.NodeAddAssetsApi.as_view(), name='node-add-assets'),
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/assets/remove/$', api.NodeRemoveAssetsApi.as_view(), name='node-remove-assets'),
+    url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/refresh-hardware-info/$', api.RefreshNodeHardwareInfoApi.as_view(), name='node-refresh-hardware-info'),
+    url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/test-connective/$', api.TestNodeConnectiveApi.as_view(), name='node-test-connective'),
 ]
 
 urlpatterns += router.urls

@@ -5,7 +5,8 @@
 
 {% block help_message %}
     <div class="alert alert-info help-message">
-    管理用户是 服务器上已存在的特权用户，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。
+    管理用户是服务器的root，或拥有 NOPASSWD: ALL sudo权限的用户，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。
+    Windows或其它硬件可以随意设置一个
     </div>
 {% endblock %}
 

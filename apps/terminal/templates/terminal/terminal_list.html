@@ -28,8 +28,8 @@
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Addr' %}</th>
-            <th class="text-center">{% trans 'SSH port' %}</th>
-            <th class="text-center">{% trans 'Http port' %}</th>
+{#            <th class="text-center">{% trans 'SSH port' %}</th>#}
+{#            <th class="text-center">{% trans 'Http port' %}</th>#}
             <th class="text-center">{% trans 'Session' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Alive' %}</th>
@@ -53,21 +53,21 @@ function initTable() {
                 var detail_btn = '<a href="{% url "terminal:terminal-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 4, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
              }},
-            {targets: 7, createdCell: function (td, cellData) {
+            {targets: 5, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-circle text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
                 }
             }},
-            {targets: 8, createdCell: function (td, cellData, rowData) {
+            {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "terminal:terminal-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
                         .replace('{{ DEFAULT_PK }}', cellData);
                 var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
@@ -88,7 +88,7 @@ function initTable() {
              }}
         ],
         ajax_url: '{% url "api-terminal:terminal-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" },
                   {data: "session_online"}, {data: "is_active" }, {data: 'is_alive'}, {data: "id"}],
         op_html: $('#actions').html()
     };

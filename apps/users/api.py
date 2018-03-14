@@ -180,15 +180,23 @@ class UserConnectionTokenApi(APIView):
             'asset': asset_id,
             'system_user': system_user_id
         }
-        cache.set(token, value, timeout=3600)
+        cache.set(token, value, timeout=20)
         return Response({"token": token}, status=201)
 
     def get(self, request):
         token = request.query_params.get('token')
+        user_only = request.query_params.get('user-only', None)
         value = cache.get(token, None)
-        if value:
-            cache.delete(token)
-        return Response(value)
 
+        if not value:
+            return Response('', status=404)
 
+        if not user_only:
+            return Response(value)
+        else:
+            return Response({'user': value['user']})
 
+    def get_permissions(self):
+        if self.request.query_params.get('user-only', None):
+            self.permission_classes = (AllowAny,)
+        return super().get_permissions()

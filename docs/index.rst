@@ -19,3 +19,4 @@ Jumpserver 文档
    contributor
    contact
    snapshot
+   faq

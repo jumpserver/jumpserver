@@ -4,7 +4,6 @@ from collections import OrderedDict
 import logging
 import os
 import uuid
-import boto3  # AWS S3 sdk
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
@@ -12,6 +11,8 @@ from django.utils import timezone
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
 from django.conf import settings
+
+import jms_storage
 
 from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
@@ -282,36 +283,20 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
-            config = settings.TERMINAL_REPLAY_STORAGE.items()
-            if config:
-                for name, value in config:
-                    if value.get("TYPE", '') == "s3":
-                        client, bucket = self.s3Client(value)
-                        try:
-                            date = self.session.date_start.strftime('%Y-%m-%d')
+            configs = settings.TERMINAL_REPLAY_STORAGE.items()
+            if not configs:
+                return HttpResponseNotFound()
 
-                            client.head_object(Bucket=bucket,
-                                               Key=os.path.join(date, str(self.session.id) + '.replay.gz'))
-                            client.download_file(bucket, os.path.join(date, str(self.session.id) + '.replay.gz'),
-                                                 default_storage.base_location + '/' + path)
-                            return redirect(default_storage.url(path))
-                        except:
-                            pass
-            return HttpResponseNotFound()
+            for name, config in configs:
+                client = jms_storage.init(config)
+                date = self.session.date_start.strftime('%Y-%m-%d')
+                file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
+                target_path = default_storage.base_location + '/' + path
 
-    def s3Client(self, config):
-        bucket = config.get("BUCKET", "jumpserver")
-        REGION = config.get("REGION", None)
-        ACCESS_KEY = config.get("ACCESS_KEY", None)
-        SECRET_KEY = config.get("SECRET_KEY", None)
-        if ACCESS_KEY and REGION and SECRET_KEY:
-            s3 = boto3.client('s3',
-                              region_name=REGION,
-                              aws_access_key_id=ACCESS_KEY,
-                              aws_secret_access_key=SECRET_KEY)
-        else:
-            s3 = boto3.client('s3')
-        return s3, bucket
+                if client and client.has_file(file_path) and \
+                        client.download_file(file_path, target_path):
+                    return redirect(default_storage.url(path))
+        return HttpResponseNotFound()
 
 
 class TerminalConfig(APIView):
