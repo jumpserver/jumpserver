@@ -432,4 +432,10 @@ div.dataTables_wrapper div.dataTables_filter {
     font-size: 12px !important;
 }
 
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
