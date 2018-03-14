@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-12 11:28+0800\n"
+"POT-Creation-Date: 2018-03-14 13:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:133
-msgid "Refresh node assets hardware info: {}"
-msgstr "更新一些资产硬件信息: {}"
+#: assets/api/node.py:134
+msgid "更新节点资产硬件信息: {}"
+msgstr ""
 
-#: assets/api/node.py:146
+#: assets/api/node.py:147
 msgid "Test node assets connective: {}"
 msgstr "测试节点资产可连接性"
 
-#: assets/forms/asset.py:23 assets/forms/asset.py:54 assets/forms/user.py:125
+#: assets/forms/asset.py:23 assets/forms/asset.py:55 assets/forms/user.py:125
 #: assets/models/asset.py:53 assets/models/user.py:218
 #: assets/templates/assets/asset_detail.html:181
 #: assets/templates/assets/asset_detail.html:189
@@ -37,34 +37,38 @@ msgstr "测试节点资产可连接性"
 msgid "Nodes"
 msgstr "节点管理"
 
-#: assets/forms/asset.py:26 assets/forms/asset.py:57 assets/forms/asset.py:93
-#: assets/forms/asset.py:97 assets/models/asset.py:57
+#: assets/forms/asset.py:26 assets/forms/asset.py:58 assets/forms/asset.py:95
+#: assets/forms/asset.py:99 assets/models/asset.py:57
 #: assets/models/cluster.py:19 assets/models/user.py:187
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:24
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:29 assets/forms/asset.py:60 assets/models/asset.py:81
+#: assets/forms/asset.py:29 assets/forms/asset.py:61 assets/models/asset.py:81
 #: assets/templates/assets/asset_create.html:32
 #: assets/templates/assets/asset_detail.html:218
 #: assets/templates/assets/asset_update.html:37 templates/_nav.html:26
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/forms/asset.py:38 assets/forms/asset.py:70
+#: assets/forms/asset.py:38 assets/forms/asset.py:71
 msgid ""
 "Admin user is a privilege user exist on this asset,Example: root or other "
 "NOPASSWD sudo privilege userIf asset not support ansible, set any one"
 msgstr ""
 "管理用户是资产上已经存在的特权用户，如 root或者其它有NOPASSWD的用户, 如果资产"
-"不支持ansible, 任意设置一个即可"
+"是Windows或交换机, 任意设置一个即可"
 
-#: assets/forms/asset.py:80 assets/forms/asset.py:84 assets/forms/label.py:15
+#: assets/forms/asset.py:42 assets/forms/asset.py:75
+msgid "* required Must set exact system platform, Windows, Linux ..."
+msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
+
+#: assets/forms/asset.py:82 assets/forms/asset.py:86 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:88 users/forms.py:244
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:89 assets/models/asset.py:52
+#: assets/forms/asset.py:91 assets/models/asset.py:52
 #: assets/templates/assets/admin_user_assets.html:53
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/system_user_asset.html:51
@@ -72,11 +76,11 @@ msgstr "选择资产"
 msgid "Port"
 msgstr "端口"
 
-#: assets/forms/asset.py:109 assets/templates/assets/asset_create.html:36
+#: assets/forms/asset.py:111 assets/templates/assets/asset_create.html:36
 msgid "Select labels"
 msgstr "选择标签"
 
-#: assets/forms/asset.py:112 assets/templates/assets/admin_user_detail.html:91
+#: assets/forms/asset.py:114 assets/templates/assets/admin_user_detail.html:91
 msgid "Select nodes"
 msgstr "选择节点"
 
@@ -432,47 +436,41 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/tasks.py:94
-msgid "Update some assets hardware info"
-msgstr "更新一些资产硬件信息"
+#: assets/tasks.py:95 assets/tasks.py:112
+msgid "更新资产硬件信息"
+msgstr ""
 
-#: assets/tasks.py:110
-msgid "Update asset hardware info"
-msgstr "更新资产硬件信息"
+#: assets/tasks.py:131
+msgid "定期更新资产硬件信息"
+msgstr ""
 
-#: assets/tasks.py:128
-msgid "Update assets hardware info period"
-msgstr "定期更新资产硬件信息"
+#: assets/tasks.py:209
+msgid "定期测试管理账号可连接性: {}"
+msgstr ""
 
-#: assets/tasks.py:205
-msgid "Test admin user connectability period: {}"
-msgstr "定期测试管理用户可连接性: {}"
+#: assets/tasks.py:216
+msgid "测试管理行号可连接性: {}"
+msgstr ""
 
-#: assets/tasks.py:211
-msgid "Test admin user connectability: {}"
-msgstr "测试管理用户可连接性: {}"
+#: assets/tasks.py:226
+msgid "测试资产可连接性"
+msgstr ""
 
-#: assets/tasks.py:220
-#, fuzzy
-#| msgid "Test asset connectability"
-msgid "Test assets connectability"
-msgstr "测试资产可连接性"
-
-#: assets/tasks.py:290
+#: assets/tasks.py:296
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:305
-msgid "test system user connectability period: {}"
-msgstr "测试系统用户可连接性: {}"
+#: assets/tasks.py:312
+msgid "定期测试系统用户可连接性: {}"
+msgstr ""
 
-#: assets/tasks.py:382
-msgid "Push system user to node: {} => {}"
-msgstr "推送系统用户到节点: {}->{}"
+#: assets/tasks.py:391
+msgid "推送系统用户到节点资产: {} => {}"
+msgstr ""
 
-#: assets/tasks.py:420
-msgid "Push system users to node: {}"
-msgstr "推送系统用户到节点: {}"
+#: assets/tasks.py:430
+msgid "推送节点系统用户到新加入资产中: {}"
+msgstr ""
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:5
 msgid "Update asset group"
@@ -1229,7 +1227,7 @@ msgid ""
 msgstr "设置终端命令存储，default是默认用的存储方式"
 
 #: common/forms.py:165 common/templates/common/terminal_setting.html:81
-#: terminal/forms.py:34 terminal/models.py:21
+#: terminal/forms.py:35 terminal/models.py:21
 msgid "Replay storage"
 msgstr "录像存储"
 
@@ -1833,13 +1831,18 @@ msgstr "输出"
 msgid "Session"
 msgstr "会话"
 
-#: terminal/forms.py:44
-msgid "Coco ssh listen port"
-msgstr "SSH 监听端口"
+#: terminal/forms.py:31
+msgid "Command can store in server db or ES, default to server, more see docs"
+msgstr ""
+"命令支持存储到服务器端数据库、ES中，默认存储的服务器端数据库，更多查看文档"
 
-#: terminal/forms.py:45
-msgid "Coco http/ws listen port"
-msgstr "Http/Websocket 监听端口"
+#: terminal/forms.py:36
+msgid ""
+"Replay file can store in server disk, AWS S3, Aliyun OSS, default to server, "
+"more see docs"
+msgstr ""
+"录像文件支持存储到服务器端硬盘、AWS S3、 阿里云 OSS 中，默认存储到服务器端硬"
+"盘, 更多查看文档"
 
 #: terminal/models.py:17
 msgid "Remote Address"
@@ -1966,12 +1969,10 @@ msgid "Terminal detail"
 msgstr "终端详情"
 
 #: terminal/templates/terminal/terminal_detail.html:51
-#: terminal/templates/terminal/terminal_list.html:31
 msgid "SSH port"
 msgstr "SSH端口"
 
 #: terminal/templates/terminal/terminal_detail.html:55
-#: terminal/templates/terminal/terminal_list.html:32
 msgid "Http port"
 msgstr "HTTP端口"
 
@@ -2666,6 +2667,44 @@ msgstr "密码更新"
 #: users/views/user.py:374
 msgid "Public key update"
 msgstr "密钥更新"
+
+#~ msgid "Refresh node assets hardware info: {}"
+#~ msgstr "更新一些资产硬件信息: {}"
+
+#~ msgid "Update some assets hardware info"
+#~ msgstr "更新一些资产硬件信息"
+
+#~ msgid "Update asset hardware info"
+#~ msgstr "更新资产硬件信息"
+
+#~ msgid "Update assets hardware info period"
+#~ msgstr "定期更新资产硬件信息"
+
+#~ msgid "Test admin user connectability period: {}"
+#~ msgstr "定期测试管理用户可连接性: {}"
+
+#~ msgid "Test admin user connectability: {}"
+#~ msgstr "测试管理用户可连接性: {}"
+
+#, fuzzy
+#~| msgid "Test asset connectability"
+#~ msgid "Test assets connectability"
+#~ msgstr "测试资产可连接性"
+
+#~ msgid "Test system user connectability period: {}"
+#~ msgstr "测试系统用户可连接性: {}"
+
+#~ msgid "Push system user to node: {} => {}"
+#~ msgstr "推送系统用户到节点: {}->{}"
+
+#~ msgid "Push system users to node: {}"
+#~ msgstr "推送系统用户到节点: {}"
+
+#~ msgid "Coco ssh listen port"
+#~ msgstr "SSH 监听端口"
+
+#~ msgid "Coco http/ws listen port"
+#~ msgstr "Http/Websocket 监听端口"
 
 #~ msgid "Create asset permission "
 #~ msgstr "创建资产权限"
