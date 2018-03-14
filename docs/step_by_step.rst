@@ -26,7 +26,7 @@
 
 ::
 
-    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release
+    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
 
 **1.2 编译安装**
 
