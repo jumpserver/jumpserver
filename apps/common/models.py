@@ -67,7 +67,7 @@ class Setting(models.Model):
 
         if self.name == "AUTH_LDAP":
             if self.cleaned_value and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
-                settings.AUTHENTICATION_BACKENDS.append(settings.AUTH_LDAP_BACKEND)
+                settings.AUTHENTICATION_BACKENDS.insert(0, settings.AUTH_LDAP_BACKEND)
             elif not self.cleaned_value and settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
                 settings.AUTHENTICATION_BACKENDS.remove(settings.AUTH_LDAP_BACKEND)
 
