@@ -17,3 +17,20 @@ FAQ
     用户：每个公司的同事创建一个用户账号，用来登录Jumpserver
     系统用户：使用来登录到服务器的用户，如 web, dba, root等
     管理用户：是服务器上已存在的特权用户，Ansible用来获取硬件信息, 如 root, 或者其它拥有 sudo NOPASSWD: ALL权限的用户
+
+
+3. coco或guacamole 注册失败，或重新注册方法
+
+::
+
+   (1). 停止 coco 或 删掉guacamole的docker
+
+      $ kill <coco的pid>
+      $ docker rm -f <guacamole docker的id>
+
+   (2). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
+
+   (3). 删掉它们曾经注册的key
+
+      $ rm keys/.access_key  # coco
+      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
