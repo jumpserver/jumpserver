@@ -154,9 +154,19 @@
     $ python run_server.py all
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
+注意： 这个运行方式是前台运行的，不要认为是启动出错了 (后台运行可以放到screen中运行，或nohup)
 (这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错)
 
 账号: admin 密码: admin
+
+附上重启的方法(这里待优化)
+
+::
+
+    $ ps axu | egrep '(gunicorn|celery|beat)'
+    $ ps axu | egrep '(gunicorn|celery|beat)' | awk '{ print $2 }' | xargs kill -9
+
+
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
