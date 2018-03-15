@@ -15,6 +15,11 @@
     $ systemctl stop iptables.service
     $ systemctl stop firewalld.service
 
+    # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
+    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+    $ export LC_ALL=zh_CN.UTF-8
+    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
     # CentOS6
     $ setenforce 0
     $ service iptables stop
@@ -38,7 +43,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
     $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
     $ ./configure && make && make install
 
-    # 必须执行编译安装，否则安装 Python 库依赖会出错
+    # 这里必须执行编译安装，否则在安装 Python 库依赖时会有麻烦...
 
 **1.3 建立 Python 虚拟环境**
 
@@ -85,7 +90,11 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ yum -y install redis
+    $ systemctl start redis
+
+    # centos6
     $ service redis start
+
 
 **2.5 安装 MySQL**
 
@@ -95,10 +104,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # centos7
     $ yum -y install mariadb mariadb-devel mariadb-server # centos7下安装的是mariadb
-    $ service mariadb start
+    $ systemctl enable mariadb
+    $ systemctl start mariadb
 
     # centos6
     $ yum -y install mysql mysql-devel mysql-server
+    $ chkconfig mysqld on
     $ service mysqld start
 
 **2.6 创建数据库 Jumpserver 并授权**
@@ -218,6 +229,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ pwd
     /opt/
 
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ ls /opt/luna
     ...
@@ -235,25 +247,42 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 因为手动安装 guacamole 组件比较复杂，这里提供打包好的 docker 使用, 启动 guacamole
 
+5.1 Docker安装 (仅针对CentOS7，CentOS6安装Docker相对比较复杂)
+
+::
+
+    $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
+    $ yum install docker-ce
+    $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
+    $
+    $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+    $ yum-config-manager --enable docker-ce-edge
+    $ yum-config-manager --enable docker-ce-test
+    $ yum-config-manager --disable docker-ce-edge
+    $ yum install docker-ce
+    $
+    $ systemctl status docker
+    $ systemctl start docker
+    $ systemctl status docker
+
+
+5.2 启动 Guacamole
+
+这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
+
+修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 启动成功后去
+Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
+
 .. code:: shell
 
 
-    # 注意：这里一定要改写一下本机的IP地址, 否则会出错
+    # 注意：这里一定要改写一下本机的IP地址, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
 
-    docker run --name jms_guacamole -d \
+    $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
       registry.jumpserver.org/public/guacamole:1.0.0
-
-这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
-
-再次强调：修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 这时
-去 Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/） 接受[Gua]开头的一个注册
-
-Docker 安装请参考 <https://www.cnblogs.com/yufeng218/p/8370670.html>
-
-Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780>
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,18 +291,19 @@ Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780
 
 .. code:: shell
 
-    yum -y install nginx
+    $ yum -y install nginx
 
 
-6.2 准备配置文件
-
-::
-
-    $ vi /etc/nginx/conf.d/jumpserver.conf
+6.2 准备 Nginx 配置文件 修改 /etc/nginx/nginx.conf
 
 内容如下：
 
 ::
+
+    $ vim /etc/nginx/nginx.conf
+
+    ... 省略
+    # 把默认server配置块改成这样
 
     server {
         listen 80;
@@ -297,7 +327,7 @@ Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;
+            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -305,7 +335,7 @@ Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -315,16 +345,27 @@ Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780
         }
 
         location / {
-            proxy_pass http://localhost:8080;
+            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器，请填写它的ip
         }
     }
+
+    ... 省略
 
 6.3 运行 Nginx
 
 ::
 
-    nginx -t
-    service nginx start
+    nginx -t   # 确保配置没有问题, 有问题请先解决
+
+    # CentOS 7
+    $ systemctl start nginx
+    $ systemctl enable nginx
+
+
+    # CentOS 6
+    $ service nginx start
+    $ chkconfig nginx on
+
 
 
 6.4 访问 http://192.168.244.144

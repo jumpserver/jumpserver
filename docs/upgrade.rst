@@ -86,7 +86,7 @@
 ::
 
    $ for app in common users assets ops perms terminal;do
-      cp $jumpserver_backup/${app}_migrations/*.py ${app}/migrations/
+      cp $jumpserver_backup/${app}_migrations/*.py apps/${app}/migrations/
    done
 
 8. 还原录像文件
@@ -98,6 +98,7 @@
 9. 更新依赖或表结构
 
 ::
+
    $ pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
 
 

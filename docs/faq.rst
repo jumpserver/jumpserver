@@ -17,3 +17,44 @@ FAQ
     用户：每个公司的同事创建一个用户账号，用来登录Jumpserver
     系统用户：使用来登录到服务器的用户，如 web, dba, root等
     管理用户：是服务器上已存在的特权用户，Ansible用来获取硬件信息, 如 root, 或者其它拥有 sudo NOPASSWD: ALL权限的用户
+
+
+3. coco或guacamole 注册失败，或重新注册方法
+
+::
+
+   (1). 停止 coco 或 删掉guacamole的docker
+
+      $ kill <coco的pid>
+      $ docker rm -f <guacamole docker的id>
+
+   (2). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
+
+   (3). 删掉它们曾经注册的key
+
+      $ rm keys/.access_key  # coco
+      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
+
+
+4. Ansible报错汇总
+
+::
+
+   (1). 资产是centos5.x Python版本 2.4，
+
+       $ yum -y install python26
+       $ mv /usr/bin/python /usr/bin/python.bak
+       $ ln -s /usr/bin/python2.6 /usr/bin/python
+
+       # 修改 /bin/yum 使用原来的python
+       $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
+
+
+5. input/output error, 通常jumpserver所在服务器字符集问题(一下修改方法仅限 centos7)
+
+::
+
+   $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+   $ export LC_ALL=zh_CN.UTF-8
+   $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
