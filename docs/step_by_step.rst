@@ -79,7 +79,11 @@
 ::
 
     $ yum -y install redis
+    $ systemctl start redis
+
+    # centos6
     $ service redis start
+
 
 **2.5 安装 MySQL**
 
@@ -89,10 +93,12 @@
 
     # centos7
     $ yum -y install mariadb mariadb-devel mariadb-server # centos7下安装的是mariadb
-    $ service mariadb start
+    $ systemctl enable mariadb
+    $ systemctl start mariadb
 
     # centos6
     $ yum -y install mysql mysql-devel mysql-server
+    $ chkconfig mysqld on
     $ service mysqld start
 
 **2.6 创建数据库 Jumpserver 并授权**
@@ -219,22 +225,41 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 因为手动安装 guacamole 组件比较复杂，这里提供打包好的 docker 使用, 启动 guacamole
 
+5.1 Docker安装 (仅针对CentOS7，CentOS6安装Docker相对比较复杂)
+
+..
+
+   $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
+   $ yum install docker-ce
+   $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
+   $
+   $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+   $ yum-config-manager --enable docker-ce-edge
+   $ yum-config-manager --enable docker-ce-test
+   $ yum-config-manager --disable docker-ce-edge
+   $ yum install docker-ce
+   $
+   $ systemctl status docker
+   $ systemctl start docker
+   $ systemctl status docker
+
+5.2 启动 Guacamole
+
+这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
+
+修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 启动成功后去
+Jumpserver-会话管理-终端管理 接受[Gua]开头的一个注册
+
 .. code:: shell
 
 
-    # 注意：这里一定要改写一下本机的IP地址, 否则会出错
+    # 注意：这里一定要改写一下本机的IP地址, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
 
-    docker run --name jms_guacamole -d \
+    $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
       registry.jumpserver.org/public/guacamole:1.0.0
-
-这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
-
-再次强调：修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 这时
-去 Jumpserver-会话管理-终端管理 接受[Gua]开头的一个注册
-
 
 
 六. 配置 Nginx 整合各组件
@@ -244,13 +269,18 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 .. code:: shell
 
-    yum -y install nginx
+    $ yum -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/nginx.conf
+6.2 准备N配置文件 修改 /etc/nginx/nginx.conf
 
 
 ::
+
+    $ vim /etc/nginx/nginx.conf
+
+    ... 省略
+    # 把默认server配置块改成这样
 
     server {
         listen 80;
@@ -274,7 +304,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;
+            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -282,7 +312,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -292,16 +322,27 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location / {
-            proxy_pass http://localhost:8080;
+            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器，请填写它的ip
         }
     }
+
+    ... 省略
 
 6.3 运行 Nginx
 
 ::
 
-    nginx -t
-    service nginx start
+    nginx -t   # 确保配置没有问题, 有问题请先解决
+
+    # CentOS 7
+    $ systemctl start nginx
+    $ systemctl enable nginx
+
+
+    # CentOS 6
+    $ service nginx start
+    $ chkconfig nginx on
+
 
 
 6.4 访问 http://192.168.244.144
