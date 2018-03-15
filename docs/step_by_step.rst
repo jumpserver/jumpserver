@@ -28,6 +28,8 @@
 
     $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
 
+Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
+
 **1.2 编译安装**
 
 ::
@@ -35,6 +37,8 @@
     $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
     $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
     $ ./configure && make && make install
+
+    # 必须执行编译安装，否则安装 Python 库依赖会出错
 
 **1.3 建立 Python 虚拟环境**
 
@@ -74,6 +78,8 @@
 
     $ pip install -r requirements.txt  # 不要指定-i参数，因为镜像上可能没有最新的包，如果没有任何报错请继续
 
+Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
+
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
 ::
@@ -109,7 +115,9 @@
 
     $ cd /opt/jumpserver
     $ cp config_example.py config.py
-    $ vi config.py  # 我们计划修改 DevelopmentConfig中的配置，因为默认jumpserver是使用该配置，它继承自Config
+    $ vi config.py
+
+    # 我们计划修改 DevelopmentConfig 中的配置，因为默认 Jumpserver 使用该配置，它继承自 Config
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
@@ -143,7 +151,7 @@
     $ python run_server.py all
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
-(这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错)
+（这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错。如果不能访问请检查主机8080端口号是否能访问，AWS 的 EC2 的80、8080端口受到限制，需要 ICP 备案才可以开放，遇到这种情况，可到 config.py 文件里修改 Jumpserver 端口为8888。）
 
 账号: admin 密码: admin
 
@@ -214,6 +222,14 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ ls /opt/luna
     ...
 
+或直接 Clone 项目
+
+::
+
+    $ cd /opt
+    $ git clone https://github.com/jumpserver/luna.git
+
+
 五. 安装 Windows 支持组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -233,9 +249,11 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 
 再次强调：修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 这时
-去 Jumpserver-会话管理-终端管理 接受[Gua]开头的一个注册
+去 Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/） 接受[Gua]开头的一个注册
 
+Docker 安装请参考 <https://www.cnblogs.com/yufeng218/p/8370670.html>
 
+Docker 卸载请参考 <http://blog.csdn.net/liujingqiu/article/details/74783780>
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,8 +265,13 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     yum -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/nginx.conf
+6.2 准备配置文件
 
+::
+
+    $ vi /etc/nginx/conf.d/jumpserver.conf
+
+内容如下：
 
 ::
 
