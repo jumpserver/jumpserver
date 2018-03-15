@@ -216,6 +216,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ pwd
     /opt/
 
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ ls /opt/luna
     ...
