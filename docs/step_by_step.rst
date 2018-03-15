@@ -227,7 +227,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 5.1 Docker安装 (仅针对CentOS7，CentOS6安装Docker相对比较复杂)
 
-..
+::
 
    $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
    $ yum install docker-ce
@@ -245,7 +245,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 5.2 启动 Guacamole
 
-这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
+这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
 修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 启动成功后去
 Jumpserver-会话管理-终端管理 接受[Gua]开头的一个注册
