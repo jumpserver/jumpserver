@@ -58,3 +58,13 @@ FAQ
    $ export LC_ALL=zh_CN.UTF-8
    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
 
+
+6. 运行 sh make_migrations.sh 报错，
+   CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
+   这是由于 django-celery-beat老版本有bug引起的
+
+::
+
+   $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
+   $ pip uninstall django-celery-beat
+   $ pip install django-celery-beat
