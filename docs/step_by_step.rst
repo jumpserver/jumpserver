@@ -229,19 +229,20 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
-   $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
-   $ yum install docker-ce
-   $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
-   $
-   $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
-   $ yum-config-manager --enable docker-ce-edge
-   $ yum-config-manager --enable docker-ce-test
-   $ yum-config-manager --disable docker-ce-edge
-   $ yum install docker-ce
-   $
-   $ systemctl status docker
-   $ systemctl start docker
-   $ systemctl status docker
+    $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
+    $ yum install docker-ce
+    $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
+    $
+    $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+    $ yum-config-manager --enable docker-ce-edge
+    $ yum-config-manager --enable docker-ce-test
+    $ yum-config-manager --disable docker-ce-edge
+    $ yum install docker-ce
+    $
+    $ systemctl status docker
+    $ systemctl start docker
+    $ systemctl status docker
+
 
 5.2 启动 Guacamole
 
