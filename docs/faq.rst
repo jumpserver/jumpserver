@@ -34,3 +34,27 @@ FAQ
 
       $ rm keys/.access_key  # coco
       $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
+
+
+4. Ansible报错汇总
+
+::
+
+   (1). 资产是centos5.x Python版本 2.4，
+
+       $ yum -y install python26
+       $ mv /usr/bin/python /usr/bin/python.bak
+       $ ln -s /usr/bin/python2.6 /usr/bin/python
+
+       # 修改 /bin/yum 使用原来的python
+       $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
+
+
+5. input/output error, 通常jumpserver所在服务器字符集问题(一下修改方法仅限 centos7)
+
+::
+
+   $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+   $ export LC_ALL=zh_CN.UTF-8
+   $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
