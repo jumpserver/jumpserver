@@ -67,7 +67,17 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 .. image:: _static/img/coco_check.jpg
 
-使用如下命令：
+鉴于，心态检测存在延迟，您也可以直接在 Jumpserver 主机上执行如下命令检测 Coco 是否存活，Coco 服务默认使用 2222 端口:
+
+::
+
+    $ netstat -ntpl
+
+效果如下：
+
+.. image:: _static/img/coco_check_terminal.jpg
+
+命令行登录 Jumpserver 使用如下命令：
 
 ::
 
