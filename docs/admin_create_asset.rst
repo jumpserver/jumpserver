@@ -87,3 +87,35 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 .. image:: _static/img/coco_success.jpg
 
+三、创建资产
+``````````````````
+
+3.1 创建 Linux 资产
+
+3.1.1 编辑资产树
+
+节点不能重名，右击节点可以添加、删除和重命名节点，以及进行资产相关的操作。
+
+.. image:: _static/img/asset_tree.jpg
+
+3.1.2 创建管理用户
+
+管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来 `推送系统用户`、`获取资产硬件信息`等。
+
+名称可以按资产树来命名。用户名root。密码和 SSH 私钥必填一个。
+
+.. image:: _static/img/create_asset_admin_user.jpg
+
+3.1.3 创建系统用户
+
+系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`); 简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。
+
+系统用户创建时，如果选择了自动推送 Jumpserver 会使用 Ansible 自动推送系统用户到资产中，如果资产(交换机、Windows )不支持 Ansible, 请手动填写账号密码。
+
+Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请去掉自动生成密钥、自动推送勾选。
+
+.. image:: _static/img/create_asset_system_user.jpg
+
+
+
+
