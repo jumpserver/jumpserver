@@ -7,6 +7,7 @@
    :maxdepth: 1
 
    admin_instruction
+   admin_create_asset
    admin_user
    admin_asset
    admin_permission
