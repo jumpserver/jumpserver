@@ -234,14 +234,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ ls /opt/luna
     ...
 
-或直接 Clone 项目
-
-::
-
-    $ cd /opt
-    $ git clone https://github.com/jumpserver/luna.git
-
-
 五. 安装 Windows 支持组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
