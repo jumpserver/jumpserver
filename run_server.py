@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 import os
@@ -38,13 +38,13 @@ except:
 def make_migrations():
     print("Check database change, make migrations")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    subprocess.call('python manage.py migrate', shell=True)
+    subprocess.call('python3 manage.py migrate', shell=True)
 
 
 def collect_static():
     print("Collect static files")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    subprocess.call('python manage.py collectstatic --no-input', shell=True)
+    subprocess.call('python3 manage.py collectstatic --no-input', shell=True)
 
 
 def start_gunicorn():
