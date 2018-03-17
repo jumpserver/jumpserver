@@ -104,7 +104,10 @@ class User(AbstractUser):
 
     @public_key.setter
     def public_key(self, public_key_raw):
-        self._public_key = signer.sign(public_key_raw)
+        if public_key_raw != None:
+            self._public_key = signer.sign(public_key_raw)
+        else:
+            self._public_key = ''
 
     @property
     def public_key_obj(self):
