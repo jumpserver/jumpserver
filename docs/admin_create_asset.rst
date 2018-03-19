@@ -156,3 +156,36 @@ Windows 资产协议务必选择 rdp。
 
 .. image:: _static/img/create_windows_asset.jpg
 
+四、资产节点管理
+
+4.1 为资产树节点分配资产
+
+在资产列表页面，选择要添加资产的节点，右键，选择添加资产到节点。
+
+.. image:: _static/img/add_asset_to_node.jpg
+
+选择要被添加的资产，点击"确认"即可。
+
+.. image:: _static/img/select_asset_to_node.jpg
+
+4.2 删除节点资产
+
+选择要被删除的节点，选择"从节点删除"，点击"提交"即可。
+
+.. image:: _static/img/delete_asset_from_node.jpg
+
+五、创建授权规则
+
+节点，对应的是资产，代表该节点下的所有资产。
+
+用户组，对应的是用户，代表该用户组下所有的用户。
+
+系统用户，及所选的用户组下的用户能通过该系统用户使用所选节点下的资产。
+
+节点，用户组，系统用户是一对一的关系，所以当拥有 Linux、Windows 不同类型资产时，应该分别给 Linux 资产和 Windows 资产创建授权规则。
+
+.. image:: _static/img/create_auth_rules.jpg
+
+创建的授权规节点要与资产所在的节点一致。
+
+.. image:: _static/img/auth_rule_list.jpg
