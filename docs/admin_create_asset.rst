@@ -5,7 +5,7 @@
 ````````````````
 
 - 一台安装好 Jumpserver 系统的可用主机（堡垒机）
-- 一台或多台可用的资产设备（被管理的资产）
+- 一台或多台可用的 Linux、Windows资产设备（被管理的资产）
 
 一、系统设置
 ````````````````````
@@ -126,5 +126,33 @@ IP 地址和管理用户要确保正确，确保所选的管理用户的用户�
 
 .. image:: _static/img/create_asset.jpg
 
+资产创建信息填写好保存之后，可测试资产是否能正确连接。
 
+.. image:: _static/img/check_asset_connect.jpg
+
+如果资产不能连接，请检查管理用户的用户名和密钥是否正确以及该管理用户能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。
+
+3.2 创建 Windows 资产
+
+3.2.1 创建 Windows 系统管理用户
+
+同 Linux 系统的管理用户一样，名称可以按资产树来命名，用户名是管理员用户名，密码是管理员的密码。
+
+.. image:: _static/img/create_windows_admin.jpg
+
+3.2.2 创建 Windows 系统系统用户
+
+由于目前 Windows 不支持自动推送，所以 Windows 的系统用户设置成与管理用户同一个用户。
+
+Windows 资产协议务必选择 rdp。
+
+.. image:: _static/img/create_windows_user.jpg
+
+3.2.3 创建 Windows 资产
+
+同创建 Linux 资产一样。
+
+创建 Windows 资产，系统平台请选择正确的 Windows，端口号为3389，IP 和 管理用户请选择正确，确保管理用户能正确登录到指定 IP 的主机上。
+
+.. image:: _static/img/create_windows_asset.jpg
 
