@@ -29,6 +29,7 @@ HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
 DEBUG = CONFIG.DEBUG
 LOG_LEVEL = CONFIG.LOG_LEVEL
 
+START_TIMEOUT = 15
 WORKERS = 4
 DAEMON = False
 
@@ -214,11 +215,16 @@ def start_service(s):
         p = func()
         processes.append(p)
 
-    time.sleep(5)
+    now = int(time.time())
     for i in services_set:
-        if not is_running(i):
-            print("Error: {} start error".format(i))
-            stop_multi_services(services_set)
+        while not is_running(i):
+            if int(time.time()) - now < START_TIMEOUT:
+                time.sleep(1)
+                continue
+            else:
+                print("Error: {} start error".format(i))
+                stop_multi_services(services_set)
+                return
 
     stop_event = threading.Event()
 
