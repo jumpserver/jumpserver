@@ -114,22 +114,15 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key',
             'password', 'private_key_file', 'auto_push', 'sudo',
-            'comment', 'shell', 'nodes', 'priority',
+            'comment', 'shell', 'priority',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
-            'nodes': forms.SelectMultiple(
-                attrs={
-                    'class': 'select2',
-                    'data-placeholder': _('Nodes')
-                }
-            ),
         }
         help_texts = {
             'name': '* required',
             'username': '* required',
-            'nodes': _('If auto push checked, system user will be create at node assets'),
             'auto_push': _('Auto push system user to asset'),
             'priority': _('High level will be using login asset as default, if user was granted more than 2 system user'),
         }
