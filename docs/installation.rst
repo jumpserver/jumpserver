@@ -6,4 +6,5 @@
 
    quickstart
    step_by_step
+   setup_by_ubuntu
    upgrade
