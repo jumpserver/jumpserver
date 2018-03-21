@@ -16,11 +16,13 @@
 
 1.2 配置邮件发送服务器
 
+点击页面上边的"邮件设置" TAB ，进入邮件设置页面：
+
 .. image:: _static/img/smtp_setting.jpg
 
 配置 QQ 邮箱的 SMTP 服务可参考（http://blog.csdn.net/Aaron133/article/details/78363844）
 
-配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面。
+配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面：
 
 .. image:: _static/img/smtp_test.jpg
 
@@ -67,7 +69,7 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 .. image:: _static/img/coco_check.jpg
 
-鉴于，心态检测存在延迟，您也可以直接在 Jumpserver 主机上执行如下命令检测 Coco 是否存活，Coco 服务默认使用 2222 端口:
+鉴于心态检测存在延迟，您也可以直接在 Jumpserver 主机上执行如下命令检测 Coco 是否存活，Coco 服务默认使用 2222 端口:
 
 ::
 
@@ -100,7 +102,7 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 3.1.2 创建管理用户
 
-管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来 `推送系统用户`、`获取资产硬件信息`等。
+管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。
 
 名称可以按资产树来命名。用户名root。密码和 SSH 私钥必填一个。
 
@@ -122,15 +124,15 @@ Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在，请
 
 点击页面左上角的“创建资产”按钮，进入资产创建页面，填写资产信息。
 
-IP 地址和管理用户要确保正确，确保所选的管理用户的用户名和密码能"牢靠"地登录指定的主机 IP 上。资产的系统平台也务必正确填写。公网 IP 只用于展示信息，可不填，Jumpserver 连接资产主机使用的是 IP 地址。
+IP 地址和管理用户要确保正确，确保所选的管理用户的用户名和密码能"牢靠"地登录指定的 IP 主机上。资产的系统平台也务必正确填写。公网 IP 信息只用于展示，可不填，Jumpserver 连接资产使用的是 IP 信息。
 
 .. image:: _static/img/create_asset.jpg
 
-资产创建信息填写好保存之后，可测试资产是否能正确连接。
+资产创建信息填写好保存之后，可测试资产是否能正确连接：
 
 .. image:: _static/img/check_asset_connect.jpg
 
-如果资产不能连接，请检查管理用户的用户名和密钥是否正确以及该管理用户能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。
+如果资产不能正常连接，请检查管理用户的用户名和密钥是否正确以及该管理用户是否能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。
 
 3.2 创建 Windows 资产
 
@@ -152,7 +154,7 @@ Windows 资产协议务必选择 rdp。
 
 同创建 Linux 资产一样。
 
-创建 Windows 资产，系统平台请选择正确的 Windows，端口号为3389，IP 和 管理用户请选择正确，确保管理用户能正确登录到指定 IP 的主机上。
+创建 Windows 资产，系统平台请选择正确的 Windows，端口号为3389，IP 和 管理用户请正确选择，确保管理用户能正确登录到指定的 IP 主机上。
 
 .. image:: _static/img/create_windows_asset.jpg
 

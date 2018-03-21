@@ -18,7 +18,11 @@
 创建管理用户
 ````````````
 
-点击页面左上角的“创建管理用户“按钮，进入创建管理用户界面，填写名称、用户名、密码、ssh私钥等信息，点击“提交”按钮，完成管理用户创建。
+管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。
+
+名称可以按资产树来命名。用户名 root。密码和 SSH 私钥必填一个。
+
+.. image:: _static/img/create_asset_admin_user.jpg
 
 .. _update_admin_user:
 

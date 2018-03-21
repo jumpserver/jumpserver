@@ -19,12 +19,22 @@
 
 点击页面上边的"基本设置" TAB ，进入基本设置页面，编辑当前站点 URL、用户想到 URL、Email 主题前缀等信息，点击“提交”按钮，基本设置完成。
 
+.. image:: _static/img/basic_setting.jpg
+
 .. _email_settings:
 
 邮件设置
 `````````
 
-点击页面上边的"邮件设置" TAB ，进入邮件设置页面，编辑 SMTP 主机、SMTP 端口、SMTP 账号、SMTP 密码和使用 SSL 或者 TSL 等信息，点击“测试连接”按钮，测试是否正确设置，点击“提交”按钮，邮件设置完成。
+点击页面上边的"邮件设置" TAB ，进入邮件设置页面：
+
+.. image:: _static/img/smtp_setting.jpg
+
+配置 QQ 邮箱的 SMTP 服务可参考（http://blog.csdn.net/Aaron133/article/details/78363844）
+
+配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面：
+
+.. image:: _static/img/smtp_test.jpg
 
 .. _ladp_settings:
 
