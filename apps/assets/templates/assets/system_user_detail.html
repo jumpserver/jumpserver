@@ -206,7 +206,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function updateSystemUserCluster(nodes) {
+function updateSystemUserNode(nodes) {
     var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
     var body = {
         nodes: Object.assign([], nodes)
@@ -267,7 +267,7 @@ $(document).ready(function () {
     $.map(jumpserver.nodes_selected, function(value, index) {
         nodes.push(index);
     });
-    updateSystemUserCluster(nodes);
+    updateSystemUserNode(nodes);
 })
 .on('click', '.btn-remove-from-node', function() {
     var $this = $(this);
@@ -282,7 +282,7 @@ $(document).ready(function () {
     var nodes = $('.bdg_node').map(function () {
         return $(this).data('gid');
     }).get();
-    updateSystemUserCluster(nodes);
+    updateSystemUserNode(nodes);
 }).on('click', '.btn-del', function () {
     var $this = $(this);
     var name = "{{ system_user.name}}";

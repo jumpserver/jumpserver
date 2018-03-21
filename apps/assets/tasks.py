@@ -12,7 +12,7 @@ from common.utils import get_object_or_none, capacity_convert, \
 from common.celery import register_as_period_task, after_app_shutdown_clean, \
     after_app_ready_start, app as celery_app
 
-from .models import SystemUser, AdminUser, Asset, Cluster
+from .models import SystemUser, AdminUser, Asset
 from . import const
 
 

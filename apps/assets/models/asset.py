@@ -10,7 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
 from ..const import ASSET_ADMIN_CONN_CACHE_KEY
-from .cluster import Cluster
 from .group import AssetGroup
 from .user import AdminUser, SystemUser
 
@@ -168,7 +167,6 @@ class Asset(models.Model):
             try:
                 asset.save()
                 asset.system_users = [choice(SystemUser.objects.all()) for i in range(3)]
-                asset.groups = [choice(AssetGroup.objects.all()) for i in range(3)]
                 logger.debug('Generate fake asset : %s' % asset.ip)
             except IntegrityError:
                 print('Error continue')
