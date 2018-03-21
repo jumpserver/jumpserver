@@ -224,7 +224,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     # 注意：这里一定要改写一下本机的IP地址, 否则会出错
 
-    docker run -d \
+    docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
