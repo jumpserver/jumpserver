@@ -94,8 +94,8 @@
         var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
         var shell_id = '#' + '{{ form.shell.id_for_label }}';
 
-        var need_change_field = '.' + 'need_change_field';
-        var rdp_password = '.' +  'rdp_password';
+        var rdp_field = '.' + 'rdp_field';
+        var ssh_field = '.' +  'ssh_field';
 
         function authFieldsDisplay() {
             if ($(auto_generate_key).prop('checked')) {
@@ -121,6 +121,9 @@
             protocolChange();
             $(auto_generate_key).change(function () {
                 authFieldsDisplay();
+            });
+            $(protocol_id).change(function () {
+                protocolChange();
             });
         })
     </script>
