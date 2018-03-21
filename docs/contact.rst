@@ -38,4 +38,4 @@ http://demo.jumpserver.org
 邮件
 ~~~~~~~~
 
-support@fit2cloud.com (#替换为@)
+support@fit2cloud.com
