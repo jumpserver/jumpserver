@@ -26,6 +26,11 @@ class UserCreateUpdateForm(forms.ModelForm):
         max_length=128, strip=False, required=False,
     )
     role = forms.ChoiceField(choices=role_choices, required=True, initial=User.ROLE_USER, label=_("Role"))
+    public_key = forms.CharField(
+        label=_('ssh public key'), max_length=5000,
+        widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
+        help_text=_('Paste user id_rsa.pub here.')
+    )
 
     class Meta:
         model = User
@@ -47,11 +52,25 @@ class UserCreateUpdateForm(forms.ModelForm):
             ),
         }
 
+    def clean_public_key(self):
+        public_key = self.cleaned_data['public_key']
+        if self.instance.public_key and public_key == self.instance.public_key:
+            msg = _('Public key should not be the same as your old one.')
+            raise forms.ValidationError(msg)
+
+        if not validate_ssh_public_key(public_key):
+            raise forms.ValidationError(_('Not a valid ssh public key'))
+        return public_key
+
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
+        public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)
         if password:
             user.set_password(password)
+            user.save()
+        if public_key:
+            user.public_key = public_key
             user.save()
         return user
 
@@ -68,6 +87,9 @@ class UserProfileForm(forms.ModelForm):
             'name': '* required',
             'email': '* required',
         }
+
+
+UserProfileForm.verbose_name = _("Profile")
 
 
 class UserPasswordForm(forms.Form):
@@ -113,7 +135,7 @@ class UserPasswordForm(forms.Form):
 
 class UserPublicKeyForm(forms.Form):
     public_key = forms.CharField(
-        label=_('ssh public key'), max_length=5000,
+        label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste your id_rsa.pub here.')
     )
@@ -131,15 +153,19 @@ class UserPublicKeyForm(forms.Form):
             msg = _('Public key should not be the same as your old one.')
             raise forms.ValidationError(msg)
 
-        if not validate_ssh_public_key(public_key):
+        if public_key and not validate_ssh_public_key(public_key):
             raise forms.ValidationError(_('Not a valid ssh public key'))
         return public_key
 
     def save(self):
         public_key = self.cleaned_data['public_key']
-        self.instance.public_key = public_key
-        self.instance.save()
+        if public_key:
+            self.instance.public_key = public_key
+            self.instance.save()
         return self.instance
+
+
+UserPublicKeyForm.verbose_name = _("Public key")
 
 
 class UserBulkUpdateForm(forms.ModelForm):
