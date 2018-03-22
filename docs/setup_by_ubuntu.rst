@@ -7,7 +7,7 @@
 -  系统: Ubuntu 16.04
 -  IP: 192.168.244.144
 
-推荐硬件
+测试推荐硬件
 ~~~~~~~~~~~~~
 
 -  CPU: 64位双核处理器
@@ -108,10 +108,10 @@
 
     ...
 
+        # 找到如下所示，修改 sqlite3 为 mysql， 请勿直接复制粘贴
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
-        DEBUG = True
         DB_ENGINE = 'mysql'
         DB_HOST = '127.0.0.1'
         DB_PORT = 3306
@@ -119,9 +119,10 @@
         DB_PASSWORD = 'somepassword'
         DB_NAME = 'jumpserver'
 
+        # 到此结束，其他内容如果你不知道用途请勿更改
     ...
 
-    config = DevelopmentConfig()  # 确保使用的是刚才设置的配置文件
+    config = DevelopmentConfig()
 
 **2.8 生成数据库表结构和初始化数据**
 
@@ -170,6 +171,8 @@
     $ cd /opt/coco
     $ cp conf_example.py conf.py
     $ python run_server.py
+
+    # 1.0.0版本中可以使用 jms 脚本让jumpserver在后台运行，使用方式 ./jms start|stop|restart all
 
 这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
@@ -225,7 +228,11 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     $ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-    # 注意：这里一定要改写一下本机的IP地址, 否则会出错
+    ## 如果 docker 官网无法下载可以使用国内其他镜像源（以阿里云为例）
+    # curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+    # add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+
+    # 注意：这里一定要改写一下本机的IP地址, 否则会出错，带宽有限, 下载时间可能有点长，可以喝杯咖啡，别看对面了，你对面不是小姐姐。
 
     $ docker run -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
@@ -261,7 +268,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         listen 80;
         server_name _;
 
-        ## 新增如下内容
+        ## 新增如下内容，以上内容是原文内容，请从这一行开始复制
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -302,7 +309,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         location / {
             proxy_pass http://localhost:8080;
         }
-        ## 到此结束
+        ## 到此结束，请不要继续复制了
 
     }
 

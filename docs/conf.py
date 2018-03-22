@@ -21,7 +21,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'Jumpserver'
-copyright = '北京堆栈科技有限公司 © 2014-2018'
+copyright = u'北京堆栈科技有限公司 © 2014-2018'
 author = 'Jumpserver team'
 
 # The short X.Y version
@@ -110,7 +110,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Jumpserver 文档'
+htmlhelp_basename = u'Jumpserver 文档'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -158,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Jumpserver', 'Jumpserver 文档',
-     author, 'Jumpserver', ' Jumpserver是全球首款完全开源的堡垒机，是符合 4A 的专业运维审计系统',
+    (master_doc, 'Jumpserver', u'Jumpserver 文档',
+     author, 'Jumpserver', u' Jumpserver是全球首款完全开源的堡垒机，是符合 4A 的专业运维审计系统',
      'Miscellaneous'),
 ]
 
