@@ -159,15 +159,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ cd /opt/jumpserver
-    $ ./jms start all  # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all
+    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
+    
+    # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
-<<<<<<< HEAD
-注意： 这个运行方式是前台运行的，不要认为是启动出错了 (后台运行可以放到screen中运行，或nohup)
-(这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错)
-=======
-（这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错。如果不能访问请检查主机8080端口号是否能访问，AWS 的 EC2 的80、8080端口受到限制，需要 ICP 备案才可以开放，遇到这种情况，可到 config.py 文件里修改 Jumpserver 端口为8888。）
->>>>>>> github/docs
+注意：这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错。如果不能访问请检查主机8080端口号是否能访问，AWS 的 EC2 的80、8080端口受到限制，需要 ICP 备案才可以开放，遇到这种情况，可到 config.py 文件里修改 Jumpserver 端口为8888。
 
 账号: admin 密码: admin
 
@@ -208,7 +205,9 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/coco
     $ cp conf_example.py conf.py
-    $ ./cocod start  # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart
+    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
+    
+    # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
 这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
