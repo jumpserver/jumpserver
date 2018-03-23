@@ -184,6 +184,7 @@ Windows 资产协议务必选择 rdp。
 .. image:: _static/img/create_windows_asset.jpg
 
 四、资产节点管理
+``````````````````````
 
 4.1 为资产树节点分配资产
 
@@ -202,6 +203,7 @@ Windows 资产协议务必选择 rdp。
 .. image:: _static/img/delete_asset_from_node.jpg
 
 五、创建授权规则
+`````````````````````
 
 节点，对应的是资产，代表该节点下的所有资产。
 
@@ -218,6 +220,7 @@ Windows 资产协议务必选择 rdp。
 .. image:: _static/img/auth_rule_list.jpg
 
 六、用户使用资产
+`````````````````````
 
 6.1 登录 Jumpserver
 
