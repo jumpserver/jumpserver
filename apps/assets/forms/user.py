@@ -8,7 +8,7 @@ from common.utils import validate_ssh_private_key, ssh_pubkey_gen, get_logger
 
 logger = get_logger(__file__)
 __all__ = [
-    'FileForm', 'SystemUserForm', 'AdminUserForm',
+    'FileForm', 'SystemUserForm', 'AdminUserForm', 'PasswordAndKeyAuthForm',
 ]
 
 

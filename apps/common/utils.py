@@ -359,3 +359,4 @@ def is_uuid(s):
 def get_signer():
     signer = Signer(settings.SECRET_KEY)
     return signer
+

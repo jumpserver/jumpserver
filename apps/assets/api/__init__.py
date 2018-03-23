@@ -3,3 +3,4 @@ from .asset import *
 from .label import *
 from .system_user import *
 from .node import *
+from .domain import *

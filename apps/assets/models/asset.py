@@ -4,13 +4,13 @@
 
 import uuid
 import logging
+import random
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
 from ..const import ASSET_ADMIN_CONN_CACHE_KEY
-from .group import AssetGroup
 from .user import AdminUser, SystemUser
 
 __all__ = ['Asset']
@@ -49,6 +49,7 @@ class Asset(models.Model):
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
+    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"))
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
@@ -121,12 +122,15 @@ class Asset(models.Model):
             return False
 
     def to_json(self):
-        return {
+        info = {
             'id': self.id,
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
         }
+        if self.domain and self.domain.gateway_set.all():
+            info["gateways"] = [d.id for d in self.domain.gateway_set.all()]
+        return info
 
     def _to_secret_json(self):
         """

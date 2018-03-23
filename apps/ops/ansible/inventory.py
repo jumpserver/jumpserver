@@ -29,6 +29,7 @@ class BaseHost(Host):
             }
             "groups": [],
             "vars": {},
+            "other_ansbile_vars":
         }
         """
         self.host_data = host_data
