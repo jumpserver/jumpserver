@@ -18,7 +18,7 @@
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+    $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
 
     # CentOS6
     $ setenforce 0
@@ -159,7 +159,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ cd /opt/jumpserver
-    $ python run_server.py all
+    $ ./jms start all  # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
 <<<<<<< HEAD
@@ -190,6 +190,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ cd /opt
+    $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
 
 
@@ -207,13 +208,13 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/coco
     $ cp conf_example.py conf.py
-    $ python run_server.py
+    $ ./cocod start  # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart
 
 这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
 ::
 
-    Coco version 0.4.0, more see https://www.jumpserver.org
+    Coco version 1.0.0, more see https://www.jumpserver.org
     Starting ssh server at 0.0.0.0:2222
     Quit the server with CONTROL-C.
 
