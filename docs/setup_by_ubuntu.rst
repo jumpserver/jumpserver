@@ -136,7 +136,9 @@
 ::
 
     $ cd /opt/jumpserver
-    $ python run_server.py all
+    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
+    
+    # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/
 (这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错)
@@ -170,9 +172,9 @@
 
     $ cd /opt/coco
     $ cp conf_example.py conf.py
-    $ python run_server.py
-
-    # 1.0.0版本中可以使用 jms 脚本让jumpserver在后台运行，使用方式 ./jms start|stop|restart all
+    $ ./cocod start all  # 后台运行使用 -d 参数./cocod start -d
+    
+    # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart 后台运行请添加 -d 参数
 
 这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
