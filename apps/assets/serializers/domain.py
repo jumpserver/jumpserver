@@ -26,4 +26,25 @@ class GatewaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gateway
+        fields = [
+            'id', 'name', 'ip', 'port', 'protocol', 'username',
+            'domain', 'is_active', 'date_created', 'date_updated',
+            'created_by', 'comment',
+        ]
+
+
+class GatewayWithAuthSerializer(GatewaySerializer):
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields.extend(
+            ['password', 'private_key']
+        )
+        return fields
+
+
+class DomainWithGatewaySerializer(serializers.ModelSerializer):
+    gateways = GatewayWithAuthSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Domain
         fields = '__all__'

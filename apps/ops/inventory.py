@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import random
 
 from .ansible.inventory import BaseInventory
 from assets.utils import get_assets_by_hostname_list, get_system_user_by_name
@@ -11,7 +10,7 @@ __all__ = [
 
 
 def make_proxy_command(asset):
-    gateway = random.choice(asset.domain.gateway_set.filter(is_active=True))
+    gateway = asset.domain.random_gateway()
 
     proxy_command = [
         "ssh", "-p", str(gateway.port),
@@ -49,7 +48,7 @@ class JMSInventory(BaseInventory):
                 info = asset.to_json()
 
             info["vars"] = vars
-            if asset.domain and asset.domain.gateway_set.count():
+            if asset.domain and asset.domain.has_gateway():
                 vars.update(make_proxy_command(asset))
                 info.update(vars)
 

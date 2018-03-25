@@ -2,6 +2,8 @@
 #
 
 import uuid
+import random
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,6 +22,16 @@ class Domain(models.Model):
     def __str__(self):
         return self.name
 
+    def has_gateway(self):
+        return self.gateway_set.filter(is_active=True).exists()
+
+    @property
+    def gateways(self):
+        return self.gateway_set.filter(is_active=True)
+
+    def random_gateway(self):
+        return random.choice(self.gateways)
+
 
 class Gateway(AssetUser):
     SSH_PROTOCOL = 'ssh'
@@ -37,3 +49,4 @@ class Gateway(AssetUser):
 
     def __str__(self):
         return self.name
+

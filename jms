@@ -82,7 +82,10 @@ def get_pid(service):
     pid_file = get_pid_file_path(service)
     if os.path.isfile(pid_file):
         with open(pid_file) as f:
-            return int(f.read().strip())
+            try:
+                return int(f.read().strip())
+            except ValueError:
+                return 0
     return 0
 
 
@@ -282,9 +285,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="""
         Jumpserver service control tools;
-        
-        Example: \r\n 
-        
+
+        Example: \r\n
+
         %(prog)s start all -d;
         """
     )
