@@ -65,7 +65,6 @@ FAQ
    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
 
 
-<<<<<<< HEAD
 6. 运行 sh make_migrations.sh 报错，
    CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
    这是由于 django-celery-beat老版本有bug引起的
@@ -75,8 +74,9 @@ FAQ
    $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
    $ pip uninstall django-celery-beat
    $ pip install django-celery-beat
-=======
-6. 连接测试常见错误
+
+
+7. 连接测试常见错误
 
 ::
 
@@ -101,4 +101,3 @@ FAQ
    (4). "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
 
        # 一般是资产 python 未安装或者 python 异常，此问题多发生在 ubuntu 资产上
->>>>>>> github/docs
