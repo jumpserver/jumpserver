@@ -451,6 +451,14 @@ $(document).ready(function(){
 })
 .on('click', '#btn_asset_import', function () {
     var $form = $('#fm_asset_import');
+    var action = $form.attr("action");
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+        action += "?node_id=" + current_node.id;
+        $form.attr("action", action)
+    }
     $form.find('.help-block').remove();
     function success (data) {
         if (data.valid === false) {

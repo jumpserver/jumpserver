@@ -245,6 +245,8 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
     form_class = forms.FileForm
 
     def form_valid(self, form):
+        node_id = self.request.GET.get("node_id")
+        node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
         f = form.cleaned_data['file']
         det_result = chardet.detect(f.read())
         f.seek(0)  # reset file seek index
@@ -297,6 +299,8 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                         raise Exception(_('already exists'))
                     with transaction.atomic():
                         asset = Asset.objects.create(**asset_dict)
+                        if node:
+                            asset.nodes.set([node])
                         created.append(asset_dict['hostname'])
                         assets.append(asset)
                 except Exception as e:
