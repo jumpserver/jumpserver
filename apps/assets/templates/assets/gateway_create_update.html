@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ action }}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+                            <h3>{% trans 'Basic' %}</h3>
+                            {% bootstrap_field form.name layout="horizontal" %}
+                            {% bootstrap_field form.ip layout="horizontal" %}
+                            {% bootstrap_field form.port layout="horizontal" %}
+                            {% bootstrap_field form.protocol layout="horizontal" %}
+                            {% bootstrap_field form.domain layout="horizontal" %}
+
+                            {% block auth %}
+                            <h3>{% trans 'Auth' %}</h3>
+                            <div class="auth-fields">
+                                {% bootstrap_field form.username layout="horizontal" %}
+                                {% bootstrap_field form.password layout="horizontal" %}
+                                {% bootstrap_field form.private_key_file layout="horizontal" %}
+                            </div>
+                            {% endblock %}
+
+                            <h3>{% trans 'Other' %}</h3>
+                            {% bootstrap_field form.is_active layout="horizontal" %}
+                            {% bootstrap_field form.comment layout="horizontal" %}
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

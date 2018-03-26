@@ -80,14 +80,13 @@ def get_log_file_path(service):
 
 def get_pid(service):
     pid_file = get_pid_file_path(service)
-    pid = 0
     if os.path.isfile(pid_file):
         with open(pid_file) as f:
             try:
                 return int(f.read().strip())
             except ValueError:
-                pass
-    return pid
+                return 0
+    return 0
 
 
 def is_running(s, unlink=True):

@@ -14,6 +14,8 @@ router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 router.register(r'v1/labels', api.LabelViewSet, 'label')
 router.register(r'v1/nodes', api.NodeViewSet, 'node')
+router.register(r'v1/domain', api.DomainViewSet, 'domain')
+router.register(r'v1/gateway', api.GatewayViewSet, 'gateway')
 
 urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
@@ -49,6 +51,8 @@ urlpatterns = [
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/assets/remove/$', api.NodeRemoveAssetsApi.as_view(), name='node-remove-assets'),
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/refresh-hardware-info/$', api.RefreshNodeHardwareInfoApi.as_view(), name='node-refresh-hardware-info'),
     url(r'^v1/nodes/(?P<pk>[0-9a-zA-Z\-]{36})/test-connective/$', api.TestNodeConnectiveApi.as_view(), name='node-test-connective'),
+
+    url(r'^v1/gateway/(?P<pk>[0-9a-zA-Z\-]{36})/test-connective/$', api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
 ]
 
 urlpatterns += router.urls

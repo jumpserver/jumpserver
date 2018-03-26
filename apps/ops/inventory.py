@@ -9,6 +9,23 @@ __all__ = [
 ]
 
 
+def make_proxy_command(asset):
+    gateway = asset.domain.random_gateway()
+
+    proxy_command = [
+        "ssh", "-p", str(gateway.port),
+        "{}@{}".format(gateway.username, gateway.ip),
+        "-W", "%h:%p", "-q",
+    ]
+
+    if gateway.password:
+        proxy_command.insert(0, "sshpass -p {}".format(gateway.password))
+    if gateway.private_key:
+        proxy_command.append("-i {}".format(gateway.private_key_file))
+
+    return {"ansible_ssh_common_args": "'-o ProxyCommand={}'".format(" ".join(proxy_command))}
+
+
 class JMSInventory(BaseInventory):
     """
     JMS Inventory is the manager with jumpserver assets, so you can
@@ -21,17 +38,29 @@ class JMSInventory(BaseInventory):
         self.become_info = become_info
 
         assets = self.get_jms_assets()
-        if run_as_admin:
-            host_list = [asset._to_secret_json() for asset in assets]
-        else:
-            host_list = [asset.to_json() for asset in assets]
-            if run_as:
-                run_user_info = self.get_run_user_info()
-                for host in host_list:
-                    host.update(run_user_info)
-            if become_info:
-                for host in host_list:
-                    host.update(become_info)
+        host_list = []
+
+        for asset in assets:
+            vars = {}
+            if run_as_admin:
+                info = asset._to_secret_json()
+            else:
+                info = asset.to_json()
+
+            info["vars"] = vars
+            if asset.domain and asset.domain.has_gateway():
+                vars.update(make_proxy_command(asset))
+                info.update(vars)
+
+            host_list.append(info)
+
+        if run_as:
+            run_user_info = self.get_run_user_info()
+            for host in host_list:
+                host.update(run_user_info)
+        if become_info:
+            for host in host_list:
+                host.update(become_info)
         super().__init__(host_list=host_list)
 
     def get_jms_assets(self):
