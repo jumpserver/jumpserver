@@ -9,6 +9,7 @@ import chardet
 from io import StringIO
 
 from django.conf import settings
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -294,9 +295,10 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 try:
                     if len(Asset.objects.filter(hostname=asset_dict.get('hostname'))):
                         raise Exception(_('already exists'))
-                    asset = Asset.objects.create(**asset_dict)
-                    created.append(asset_dict['hostname'])
-                    assets.append(asset)
+                    with transaction.atomic():
+                        asset = Asset.objects.create(**asset_dict)
+                        created.append(asset_dict['hostname'])
+                        assets.append(asset)
                 except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
