@@ -27,7 +27,7 @@ class UserCreateUpdateForm(forms.ModelForm):
     )
     role = forms.ChoiceField(choices=role_choices, required=True, initial=User.ROLE_USER, label=_("Role"))
     public_key = forms.CharField(
-        label=_('ssh public key'), max_length=5000,
+        label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
     )
@@ -54,6 +54,8 @@ class UserCreateUpdateForm(forms.ModelForm):
 
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
+        if not public_key:
+            return public_key
         if self.instance.public_key and public_key == self.instance.public_key:
             msg = _('Public key should not be the same as your old one.')
             raise forms.ValidationError(msg)
