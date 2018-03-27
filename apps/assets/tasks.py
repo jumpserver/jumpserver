@@ -396,6 +396,7 @@ def get_node_push_system_user_task_name(system_user, node):
 
 
 def push_system_user_to_node(system_user, node):
+    logger.info("Start push system user node: {} => {}".format(system_user.name, node.value))
     assets = node.get_all_assets()
     task_name = get_node_push_system_user_task_name(system_user, node)
     push_system_user_util.delay([system_user], assets, task_name)
