@@ -14,7 +14,7 @@ signer = get_signer()
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     groups_display = serializers.SerializerMethodField()
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all(), required=False)
 
     class Meta:
         model = User
