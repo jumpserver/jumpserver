@@ -96,7 +96,7 @@ class Asset(models.Model):
         return False, warning
 
     def is_unixlike(self):
-        if self.platform not in ("Windows", "Other"):
+        if self.platform not in ("Windows",):
             return True
         else:
             return False
@@ -131,6 +131,15 @@ class Asset(models.Model):
         if self.domain and self.domain.gateway_set.all():
             info["gateways"] = [d.id for d in self.domain.gateway_set.all()]
         return info
+
+    def get_auth_info(self):
+        if self.admin_user:
+            return {
+                'username': self.admin_user.username,
+                'password': self.admin_user.password,
+                'private_key': self.admin_user.private_key_file,
+                'become': self.admin_user.become_info,
+            }
 
     def _to_secret_json(self):
         """
@@ -175,4 +184,3 @@ class Asset(models.Model):
             except IntegrityError:
                 print('Error continue')
                 continue
-
