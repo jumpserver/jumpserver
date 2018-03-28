@@ -200,7 +200,7 @@ def get_ip_city(ip, timeout=10):
     url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
     try:
         r = requests.get(url, timeout=timeout)
-    except requests.Timeout:
+    except:
         r = None
     city = 'Unknown'
     if r and r.status_code == 200:
