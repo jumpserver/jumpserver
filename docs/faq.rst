@@ -5,12 +5,11 @@ FAQ
 
 ::
 
-    (1). 如果白屏  可能是nginx设置的不对，也可能运行guacamole的docker容器有问题，总之请求到不了guacamole
+    (1). 如果白屏  可能是nginx配置文件的guacamole设置的不对，也可能运行guacamole的docker容器有问题，总之请求到不了guacamole
     (2). 如果显示没有权限 可能是你在 终端管理里没有接受 guacamole的注册，请接受一下，如果还是不行，就删除刚才的注册，重启guacamole的docker重新注册
     (3). 如果显示未知问题 可能是你的资产填写的端口不对，或者授权的系统用户的协议不是rdp
     (4). 提示无法连接服务器，请联系管理员或查看日志 一般情况下是登录的系统账户不正确，可以从Windows的日志查看信息
     (5). 提示网络问题无法连接或者超时，请检查网络连接并重试，或联系管理员 一般情况下是防火墙设置不正确，可以从Windows的日志查看信息
-
 
 2. 用户、系统用户、管理用户的关系
 
@@ -31,14 +30,18 @@ FAQ
 
    (1). 停止 coco 或 删掉 guacamole 的docker
 
-      $ kill <coco的pid>
-      $ docker rm -f <guacamole docker的id>
+      $ cd /opt/coco && ./cocod stop
+
+      $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
+      $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
+
+      # 可以使用docker --help 查询用法
 
    (2). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
 
    (3). 删掉它们曾经注册的key
 
-      $ rm keys/.access_key  # coco
+      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
       $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
 
 
@@ -55,15 +58,19 @@ FAQ
        # 修改 /bin/yum 使用原来的python
        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
 
-
 5. input/output error, 通常jumpserver所在服务器字符集问题(一下修改方法仅限 centos7)
 
 ::
 
+   # Centos7
+   $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+   $ export LC_ALL=zh_CN.UTF-8
+   $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
+
+   # Centos6
    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
    $ export LC_ALL=zh_CN.UTF-8
    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
-
 
 6. 运行 sh make_migrations.sh 报错，
    CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
@@ -74,7 +81,6 @@ FAQ
    $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
    $ pip uninstall django-celery-beat
    $ pip install django-celery-beat
-
 
 7. 连接测试常见错误
 
