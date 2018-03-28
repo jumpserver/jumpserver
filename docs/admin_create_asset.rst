@@ -20,7 +20,7 @@
 
 .. image:: _static/img/smtp_setting.jpg
 
-配置 QQ 邮箱的 SMTP 服务可参考（http://blog.csdn.net/Aaron133/article/details/78363844）
+配置 QQ 邮箱的 SMTP 服务可参考（http://blog.csdn.net/Aaron133/article/details/78363844），仅使用只需要看完第二部分即可。
 
 配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面：
 
@@ -104,6 +104,7 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 管理用户是服务器的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。
 
+
 如果使用ssh私钥，需要先在资产上设置，这里举个例子供参考（本例登录资产使用root为例）
 
 ::
@@ -126,6 +127,9 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
       AuthorizedKeysFile     .ssh/authorized_keys
 
     (4). 重启 ssh 服务
+      $ service sshd restart
+
+    (5). 上传 ~/.ssh 目录下的 id_rsa 私钥到 jumpserver 的管理用户中
 
 这样就可以使用 ssh私钥 进行管理服务器。
 
@@ -136,6 +140,16 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 3.1.3 创建系统用户
 
 系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`); 简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。
+
+系统用户的 Sudo 栏填写允许当前系统用户免sudo密码执行的程序路径，如默认的/sbin/ifconfig，意思是当前系统用户可以直接执行 ifconfig 命令或 sudo ifconfig 而不需要输入当前系统用户的密码，执行其他的命令任然需要密码，以此来达到权限控制的目的。
+
+::
+
+    # 这里简单举几个例子
+    Sudo /bin/su  # 当前系统用户可以免sudo密码执行sudo su命令（也就是可以直接切换到root，生产环境不建议这样操作）
+    Sodu /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail  # 当前系统用户可以免sudo密码执行git php cat more less head tail
+
+    # 此处的权限应该根据使用用户的需求汇总后定制，原则上给予最小权限即可。
 
 系统用户创建时，如果选择了自动推送 Jumpserver 会使用 Ansible 自动推送系统用户到资产中，如果资产(交换机、Windows )不支持 Ansible, 请手动填写账号密码。
 
@@ -169,7 +183,7 @@ IP 地址和管理用户要确保正确，确保所选的管理用户的用户�
 
 3.2.2 创建 Windows 系统系统用户
 
-由于目前 Windows 不支持自动推送，所以 Windows 的系统用户设置成与管理用户同一个用户。
+目前 Windows 暂不支持自动推送，用户必须在系统中存在且有权限使用远程连接，请去掉自动生成密钥、自动推送勾选；请确认 windows 资产的 rdp 防火墙已经开放。
 
 Windows 资产协议务必选择 rdp。
 
