@@ -11,6 +11,6 @@
    admin_user
    admin_asset
    admin_permission
-   admin_work_center
    admin_session
+   admin_work_center
    admin_system_settings
