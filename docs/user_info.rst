@@ -1,34 +1,27 @@
 个人信息
 =========
 
-这里介绍个人信息相关的功能。
+1.1 查看个人信息
 
-.. contents:: Topics
+个人信息页面展示了用户的名称、角色、邮件、所属用户组、SSh 公钥、创建日期、最后登录日期和失效日期等信息：
 
-.. _view_personal_info:
+.. image:: _static/img/user_info.jpg
 
-查看个人信息
-````````````
+1.2 修改密码
 
-点击页面左侧的“个人信息”，查看用户的个人信息、SSH密钥。
+在个人信息页面点击"重置密码"按钮，跳转到修改密码页面，正确输入新旧密码，即可完成密码修改:
 
-.. _modify_personal_info:
+.. image:: _static/img/user_update_password.jpg
 
-修改个人信息
-````````````
+1.3 修改 SSH 公钥
 
-在个人信息页，点击页面右上角的“设置”按钮，进入个人信息修改页面，填写个人信息，点击“提交”按钮，完成个人信息修改。
+点击"重置 SSH 密钥"按钮，跳转到修改 SSH 密钥信息页，复制 SSH 密钥信息到指定框中，即可完成 SSH 密钥修改：
 
-.. _update_password:
+查看 SSH 公钥信息：
 
-更新密码
-`````````
+::
 
-在个人信息页，点击页面右上角的“重置密码“按钮，进入密码更新页面，填写原来密码、新密码等信息，点击“提交”按钮，完成密码更新。
+    $ cat ~/.ssh/id_rsa.pub
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDadDXxxx......
 
-.. _update_ssh_key:
-
-密钥更新
-`````````
-
-在个人信息页，点击页面左上角的“重置SSH密钥“按钮，进入密钥更新页面，填写SSH公钥，点击“提交”按钮，完成密钥更新。
+.. image:: _static/img/user_update_ssh_key.jpg
