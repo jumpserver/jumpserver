@@ -16,13 +16,11 @@ class AuthSerializer(serializers.ModelSerializer):
         return private_key, public_key
 
     def save(self, **kwargs):
-        password = self.validated_data.pop('password') or None
-        private_key = self.validated_data.pop('private_key') or None
+        password = self.validated_data.pop('password', None) or None
+        private_key = self.validated_data.pop('private_key', None) or None
         self.instance = super().save(**kwargs)
         if password or private_key:
             private_key, public_key = self.gen_keys(private_key, password)
             self.instance.set_auth(password=password, private_key=private_key,
                                    public_key=public_key)
         return self.instance
-
-
