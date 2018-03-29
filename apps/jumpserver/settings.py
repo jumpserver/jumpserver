@@ -274,7 +274,7 @@ FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 EMAIL_HOST = CONFIG.EMAIL_HOST
 EMAIL_PORT = CONFIG.EMAIL_PORT
 EMAIL_HOST_USER = CONFIG.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = CONFIG.EMAIL_HOST_PASSWORD
+EMAIL_HOST_PASSWORD = CONFIG.EMAIL_HOST_PASSWORD 
 EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
 EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
 EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX or ''
@@ -407,3 +407,13 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
+
+
+# extends the validity to otp token many counter ticks before and after the current one
+# if set to 1, there 3 otp token is valid (before current after)
+# if set to 2, there 5 otp token is valid (before before current after after)
+OTP_TOKEN_VALID_WINDOW = 1
+
+
+# based on the ssh loging, the token is valid for second
+OTP_SSH_TOKEN_EXPIRATION = 3600

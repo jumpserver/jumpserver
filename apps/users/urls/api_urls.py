@@ -32,6 +32,8 @@ urlpatterns = [
         api.UserUpdateGroupApi.as_view(), name='user-update-group'),
     url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/users/$',
         api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
+    url(r'v1/is-check-otp/', api.UserIsCheckOtp.as_view(), name='is-check-otp'),
+    url(r'v1/verify-token/', api.UserVerifyToken.as_view(), name='verify-token'),
 ]
 
 urlpatterns += router.urls

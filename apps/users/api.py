@@ -16,7 +16,7 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
-from .utils import check_user_valid, generate_token
+from .utils import check_user_valid, generate_token, verity_otp_token, is_chach_ssh_otp_auth, cache_ssh_otp_auth_result
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -200,3 +200,45 @@ class UserConnectionTokenApi(APIView):
         if self.request.query_params.get('user-only', None):
             self.permission_classes = (AllowAny,)
         return super().get_permissions()
+
+
+class UserIsCheckOtp(APIView):
+    permission_classes = (IsValidUser,)
+
+    def post(self, request):
+        remote_addr = request.data.get('remote_addr', '')
+        user = self.request.user
+
+        # 判断缓存中是否有用户保存过的登陆信息
+        if is_chach_ssh_otp_auth(user.username, remote_addr):
+            return Response({'check_otp': False}, status=200)
+
+        return Response({'check_otp': user.enable_otp}, status=200)
+
+
+class UserVerifyToken(APIView):
+    permission_classes = (IsValidUser,)
+
+    def post(self, request):
+        otp_token = request.data.get('otp_token', '')
+        remote_addr = request.data.get('remote_addr', '')
+        secret_key_otp = self.request.user.secret_key_otp
+        user = self.request.user
+
+        if secret_key_otp == '':
+            return Response({
+                'verify_token_result': False,
+                'error': 'Enabled otp login, but this is not secret key!',
+            }, status=200)
+
+        if verity_otp_token(secret_key_otp, otp_token):
+            cache_ssh_otp_auth_result(user.username, remote_addr)
+            return Response({
+                'verify_token_result': True,
+                'error': '',
+            }, status=200)
+        else:
+            return Response({
+                'verify_token_result': False,
+                'error': 'Verified otp token error, please try again!',
+            }, status=200)
