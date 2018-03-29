@@ -45,7 +45,7 @@
 
 点击邮件中的设置密码链接，设置好密码后，您就可以用户名和密码登录 Jumpserver 了。
 
-用户首次登录 Junmpserver，会被要求完善用户信息。基本信息可以不变，但 SSH 密钥信息必须填上。
+用户首次登录 Jumpserver，会被要求完善用户信息。基本信息可以不变，但 SSH 密钥信息必须填上。
 
 Linux/Unix 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/6604104.html)
 
