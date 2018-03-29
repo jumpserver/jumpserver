@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from ..models import SystemUser
+from .base import AuthSerializer
 
 
 class SystemUserSerializer(serializers.ModelSerializer):
@@ -36,12 +37,10 @@ class SystemUserSerializer(serializers.ModelSerializer):
         return len(obj.assets)
 
 
-class SystemUserAuthSerializer(serializers.ModelSerializer):
+class SystemUserAuthSerializer(AuthSerializer):
     """
     系统用户认证信息
     """
-    password = serializers.CharField(max_length=1024)
-    private_key = serializers.CharField(max_length=4096)
 
     class Meta:
         model = SystemUser

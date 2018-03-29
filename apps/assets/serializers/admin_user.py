@@ -2,8 +2,11 @@
 #
 from django.core.cache import cache
 from rest_framework import serializers
+
 from ..models import Node, AdminUser
 from ..const import ADMIN_USER_CONN_CACHE_KEY
+
+from .base import AuthSerializer
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
@@ -17,6 +20,10 @@ class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminUser
         fields = '__all__'
+
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        return [f for f in fields if not f.startswith('_')]
 
     @staticmethod
     def get_unreachable_amount(obj):
@@ -39,6 +46,13 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return obj.assets_amount
 
 
+class AdminUserAuthSerializer(AuthSerializer):
+
+    class Meta:
+        model = AdminUser
+        fields = ['password', 'private_key']
+
+
 class ReplaceNodeAdminUserSerializer(serializers.ModelSerializer):
     """
     管理用户更新关联到的集群
@@ -50,3 +64,6 @@ class ReplaceNodeAdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminUser
         fields = ['id', 'nodes']
+
+
+

@@ -48,15 +48,6 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
 
-    def update(self, request, *args, **kwargs):
-        password = request.data.pop("password", None)
-        private_key = request.data.pop("private_key", None)
-        instance = self.get_object()
-
-        if password or private_key:
-            instance.set_auth(password=password, private_key=private_key)
-        return super().update(request, *args, **kwargs)
-
 
 class SystemUserPushApi(generics.RetrieveAPIView):
     """
