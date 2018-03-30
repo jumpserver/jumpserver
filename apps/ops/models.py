@@ -2,16 +2,21 @@
 
 import json
 import uuid
-
+import os
 import time
+import datetime
+
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule, \
+    PeriodicTask
 
 from common.utils import get_signer, get_logger
-from common.celery import delete_celery_periodic_task, create_or_update_celery_periodic_tasks, \
-     disable_celery_periodic_task
+from common.celery import delete_celery_periodic_task, \
+    create_or_update_celery_periodic_tasks, \
+    disable_celery_periodic_task
 from .ansible import AdHocRunner, AnsibleError
 from .inventory import JMSInventory
 
@@ -209,7 +214,8 @@ class AdHoc(models.Model):
         history = AdHocRunHistory(adhoc=self, task=self.task)
         time_start = time.time()
         try:
-            raw, summary = self._run_only()
+            with open(history.log_path, 'w') as f:
+                raw, summary = self._run_only(file_obj=f)
             history.is_finished = True
             if summary.get('dark'):
                 history.is_success = False
@@ -225,13 +231,15 @@ class AdHoc(models.Model):
             history.timedelta = time.time() - time_start
             history.save()
 
-    def _run_only(self):
-        runner = AdHocRunner(self.inventory)
-        for k, v in self.options.items():
-            runner.set_option(k, v)
-
+    def _run_only(self, file_obj=None):
+        runner = AdHocRunner(self.inventory, options=self.options)
         try:
-            result = runner.run(self.tasks, self.pattern, self.task.name)
+            result = runner.run(
+                self.tasks,
+                self.pattern,
+                self.task.name,
+                file_obj=file_obj,
+            )
             return result.results_raw, result.results_summary
         except AnsibleError as e:
             logger.warn("Failed run adhoc {}, {}".format(self.task.name, e))
@@ -315,6 +323,14 @@ class AdHocRunHistory(models.Model):
     @property
     def short_id(self):
         return str(self.id).split('-')[-1]
+
+    @property
+    def log_path(self):
+        dt = datetime.datetime.now().strftime('%Y-%m-%d')
+        log_dir = os.path.join(settings.PROJECT_DIR, 'data', 'ansible', dt)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        return os.path.join(log_dir, str(self.id) + '.log')
 
     @property
     def result(self):

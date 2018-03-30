@@ -119,3 +119,16 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+class AdHocHistoryOutputView(AdminUserRequiredMixin, DetailView):
+    model = AdHocRunHistory
+    template_name = 'ops/adhoc_history_output.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ops'),
+            'action': _('Run history detail'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

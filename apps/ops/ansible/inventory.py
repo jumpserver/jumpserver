@@ -132,6 +132,8 @@ class BaseInventory(InventoryManager):
                 parent.add_child_group(child)
 
     def parse_hosts(self):
+        group_all = self.get_or_create_group('all')
+        ungrouped = self.get_or_create_group('ungrouped')
         for host_data in self.host_list:
             host = self.host_manager_class(host_data=host_data)
             self.hosts[host_data['hostname']] = host
@@ -140,6 +142,9 @@ class BaseInventory(InventoryManager):
                 for group_name in groups_data:
                     group = self.get_or_create_group(group_name)
                     group.add_host(host)
+            else:
+                ungrouped.add_host(host)
+            group_all.add_host(host)
 
     def parse_sources(self, cache=False):
         self.parse_groups()

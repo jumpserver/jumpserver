@@ -1,0 +1,93 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <title>term.js</title>
+    <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
+    <style>
+      html {
+        background: #000;
+      }
+      h1 {
+        margin-bottom: 20px;
+        font: 20px/1.5 sans-serif;
+      }
+      .terminal {
+        float: left;
+        font-family: 'Monaco', 'Consolas', "DejaVu Sans Mono", "Liberation Mono", monospace;
+        font-size: 14px;
+        color: #f0f0f0;
+        background-color: #555;
+        padding: 20px 20px 20px;
+      }
+      .terminal-cursor {
+        color: #000;
+        background: #f0f0f0;
+      }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="term">
+    </div>
+</div>
+</body>
+
+
+<script src="{% static 'js/term.js' %}"></script>
+<script>
+    var rowHeight = 1;
+    var colWidth = 1;
+    var mark = '';
+    var url = "{% url 'api-ops:history-output' pk=object.id %}";
+    var term;
+    var end = false;
+
+    function calWinSize() {
+        var t = $('.terminal');
+        console.log(t.height());
+        rowHeight = 1.00 * t.height() / 24;
+        colWidth = 1.00 * t.width() / 80;
+    }
+    function resize() {
+       var rows = Math.floor(window.innerHeight / rowHeight) - 2;
+       var cols = Math.floor(window.innerWidth / colWidth) - 5;
+       term.resize(cols, rows);
+    }
+    function requestAndWrite() {
+        if (!end) {
+            $.ajax({
+                url: url + '?mark=' + mark,
+                method: "GET",
+                contentType: "application/json; charset=utf-8"
+            }).done(function(data, textStatue, jqXHR) {
+                term.write(data.data);
+                mark = data.mark;
+                if (data.end){
+                    end = true
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+            });
+        }
+    }
+    $(document).ready(function () {
+        term = new Terminal({
+            cols: 80,
+            rows: 24,
+            useStyle: true,
+            screenKeys: false
+        });
+        term.open();
+        term.on('data', function (data) {
+            term.write(data.replace('\r', '\r\n'))
+        });
+        calWinSize();
+        resize();
+        $('.terminal').detach().appendTo('#term');
+        term.write('\x1b[31mWelcome to term.js!\x1b[m\r\n');
+        setInterval(function () {
+            requestAndWrite()
+        }, 100)
+    });
+</script>
+</html>

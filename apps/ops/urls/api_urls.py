@@ -15,6 +15,7 @@ router.register(r'v1/history', api.AdHocRunHistorySet, 'history')
 
 urlpatterns = [
     url(r'^v1/tasks/(?P<pk>[0-9a-zA-Z\-]{36})/run/$', api.TaskRun.as_view(), name='task-run'),
+    url(r'^v1/history/(?P<pk>[0-9a-zA-Z\-]{36})/output/$', api.AdHocHistoryOutputAPI.as_view(), name='history-output'),
 ]
 
 urlpatterns += router.urls

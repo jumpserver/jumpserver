@@ -1,8 +1,11 @@
 # ~*~ coding: utf-8 ~*~
+import uuid
+import re
 
-
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.views import Response
 
 from .hands import IsSuperUser
@@ -58,3 +61,26 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
             adhoc = get_object_or_404(AdHoc, id=adhoc_id)
             self.queryset = self.queryset.filter(adhoc=adhoc)
         return self.queryset
+
+
+class AdHocHistoryOutputAPI(RetrieveAPIView):
+    queryset = AdHocRunHistory.objects.all()
+    permission_classes = (IsSuperUser,)
+    buff_size = 1024 * 10
+    end = False
+
+    def retrieve(self, request, *args, **kwargs):
+        history = self.get_object()
+        mark = request.query_params.get("mark") or str(uuid.uuid4())
+
+        with open(history.log_path, 'r') as f:
+            offset = cache.get(mark, 0)
+            f.seek(offset)
+            data = f.read(self.buff_size).replace('\n', '\r\n')
+            print(repr(data))
+            mark = str(uuid.uuid4())
+            cache.set(mark, f.tell(), 5)
+
+            if history.is_finished and data == '':
+                self.end = True
+            return Response({"data": data, 'end': self.end, 'mark': mark})
