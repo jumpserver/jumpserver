@@ -22,7 +22,7 @@ FAQ
     (1). 这里解释一下系统用户里面的sudo，比如有个系统用户的权限是这样的：
 
     Sudo: /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail
-    意思是允许这个系统用户使用 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
+    意思是允许这个系统用户免密码执行 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
 
 3. coco或guacamole 注册失败，或重新注册方法
 
@@ -58,7 +58,7 @@ FAQ
        # 修改 /bin/yum 使用原来的python
        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
 
-5. input/output error, 通常jumpserver所在服务器字符集问题(一下修改方法仅限 centos7)
+5. input/output error, 通常jumpserver所在服务器字符集问题
 
 ::
 
@@ -71,6 +71,8 @@ FAQ
    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
    $ export LC_ALL=zh_CN.UTF-8
    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
+   如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
 
 6. 运行 sh make_migrations.sh 报错，
    CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...

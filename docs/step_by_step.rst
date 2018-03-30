@@ -24,6 +24,11 @@
     $ setenforce 0
     $ service iptables stop
 
+    # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
+    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+    $ export LC_ALL=zh_CN.UTF-8
+    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
 一. 准备 Python3 和 Python 虚拟环境
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -160,22 +165,16 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/jumpserver
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
-    
+
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/
-注意：这里只是 Jumpserver, 没有 Web Terminal，所以访问 Web Terminal 会报错。如果不能访问请检查主机8080端口号是否能访问，AWS 的 EC2 的80、8080端口受到限制，需要 ICP 备案才可以开放，遇到这种情况，可到 config.py 文件里修改 Jumpserver 端口为8888。
+运行不报错，请浏览器访问 http://192.168.244.144:8080/ 页面显示不正常先不用处理，需要搭建 nginx 代理就可以正常访问了
 
-账号: admin 密码: admin
-
-附上重启的方法(这里待优化)
+附上重启的方法
 
 ::
 
-    $ ps axu | egrep '(gunicorn|celery|beat)'
-    $ ps axu | egrep '(gunicorn|celery|beat)' | awk '{ print $2 }' | xargs kill -9
-
-
+    $ ./jms restart
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,12 +203,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ cd /opt/coco
-    $ cp conf_example.py conf.py
+    $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
-    
+
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-这时需要去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
+后面设置好 nginx 后，记得去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
 
 ::
 
@@ -248,8 +247,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ ls /opt/luna
     ...
 
-五. 安装 Windows 支持组件
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+五. 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 因为手动安装 guacamole 组件比较复杂，这里提供打包好的 docker 使用, 启动 guacamole
 
@@ -260,14 +259,13 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
     $ yum install docker-ce
     $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
-    $
+
     $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
     $ yum-config-manager --enable docker-ce-edge
     $ yum-config-manager --enable docker-ce-test
     $ yum-config-manager --disable docker-ce-edge
     $ yum install docker-ce
-    $
-    $ systemctl status docker
+
     $ systemctl start docker
     $ systemctl status docker
 
@@ -375,3 +373,10 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
 
 6.4 访问 http://192.168.244.144
+
+默认账号: admin 密码: admin
+
+到管理后台-会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+
+后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+如遇到问题可参考 `FAQ <faq.html>`_
