@@ -15,3 +15,4 @@
 - **ZhangFengyi <张峰毅>** 贡献了 新版文档
 - **Aaron3S <沈晨阳>** 贡献了 新版文档
 - **liqiang-fit2cloud <张立强>** 版本测试，给资产树设计贡献了很多建议
+- **wojiushixiaobai <吴育煌>** 完善文档，测试bug，热心帮助过很多朋友
