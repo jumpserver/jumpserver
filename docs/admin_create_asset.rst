@@ -147,7 +147,7 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
     # 这里简单举几个例子
     Sudo /bin/su  # 当前系统用户可以免sudo密码执行sudo su命令（也就是可以直接切换到root，生产环境不建议这样操作）
-    Sodu /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail  # 当前系统用户可以免sudo密码执行git php cat more less head tail
+    Sudo /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail  # 当前系统用户可以免sudo密码执行git php cat more less head tail
 
     # 此处的权限应该根据使用用户的需求汇总后定制，原则上给予最小权限即可。
 
