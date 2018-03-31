@@ -1,7 +1,7 @@
 FAQ
 ==========
 
-1. Windows 无法连接
+1. Windows 资产连接错误排查思路
 
 ::
 
@@ -11,7 +11,16 @@ FAQ
     (4). 提示无法连接服务器，请联系管理员或查看日志 一般情况下是登录的系统账户不正确，可以从Windows的日志查看信息
     (5). 提示网络问题无法连接或者超时，请检查网络连接并重试，或联系管理员 一般情况下是防火墙设置不正确，可以从Windows的日志查看信息
 
-2. 用户、系统用户、管理用户的关系
+2. Linux 资产连接错误排查思路
+
+::
+
+    (1). 检查管理用户的权限是否正确，权限需要与root权限一致。
+    (2). 检查资产的防火墙策略，可以在资产上面新建个用户，尝试用此用户进行ssh连接。
+    (3). 检查资产的python，确定版本不小于2.6，不高于3.x。
+    (4). 检查资产的ssh策略，确保可以被jumpserver应用访问。
+
+3. 用户、系统用户、管理用户的关系
 
 ::
 
@@ -24,11 +33,11 @@ FAQ
     Sudo: /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail
     意思是允许这个系统用户免密码执行 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
 
-3. coco或guacamole 注册失败，或重新注册方法
+4. coco或guacamole 注册失败，或重新注册方法
 
 ::
 
-   (1). 停止 coco 或 删掉 guacamole 的docker
+    (1). 停止 coco 或 删掉 guacamole 的docker
 
       $ cd /opt/coco && ./cocod stop
 
@@ -45,67 +54,67 @@ FAQ
       $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
 
 
-4. Ansible报错汇总
+5. Ansible报错汇总
 
 ::
 
-   (1). 资产是centos5.x Python版本 2.4，
+    (1). 资产是centos5.x Python版本 2.4，
 
-       $ yum -y install python26
-       $ mv /usr/bin/python /usr/bin/python.bak
-       $ ln -s /usr/bin/python2.6 /usr/bin/python
+        $ yum -y install python26
+        $ mv /usr/bin/python /usr/bin/python.bak
+        $ ln -s /usr/bin/python2.6 /usr/bin/python
 
-       # 修改 /bin/yum 使用原来的python
-       $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
+        # 修改 /bin/yum 使用原来的python
+        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
 
-5. input/output error, 通常jumpserver所在服务器字符集问题
-
-::
-
-   # Centos7
-   $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-   $ export LC_ALL=zh_CN.UTF-8
-   $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
-
-   # Centos6
-   $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-   $ export LC_ALL=zh_CN.UTF-8
-   $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
-
-   如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
-
-6. 运行 sh make_migrations.sh 报错，
-   CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
-   这是由于 django-celery-beat老版本有bug引起的
+6. input/output error, 通常jumpserver所在服务器字符集问题
 
 ::
 
-   $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
-   $ pip uninstall django-celery-beat
-   $ pip install django-celery-beat
+    # Centos7
+    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+    $ export LC_ALL=zh_CN.UTF-8
+    $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
 
-7. 连接测试常见错误
+    # Centos6
+    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+    $ export LC_ALL=zh_CN.UTF-8
+    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+
+    如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
+
+7. 运行 sh make_migrations.sh 报错，
+    CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
+    这是由于 django-celery-beat老版本有bug引起的
 
 ::
 
-   (1). to use the 'ssh' connection type with passwords, you mast install the sshpass program
+    $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
+    $ pip uninstall django-celery-beat
+    $ pip install django-celery-beat
 
-       # Centos
-       $ yum -y install sshpass
+8. 连接测试常见错误
 
-       # Ubuntu
-       $ apt-get -y install sshpass
+::
+
+    (1). to use the 'ssh' connection type with passwords, you mast install the sshpass program
+
+        # Centos
+        $ yum -y install sshpass
+
+        # Ubuntu
+        $ apt-get -y install sshpass
 
     注意，在 coco 服务器上面安装完成后需要重启服务。
 
-   (2). Authentication failure
+    (2). Authentication failure
 
-       # 一般都是资产的管理用户不正确
+        # 一般都是资产的管理用户不正确
 
-   (3). Failed to connect to the host via ssh: ssh_exchange_identification: read: Connection reset by peer\r\n
+    (3). Failed to connect to the host via ssh: ssh_exchange_identification: read: Connection reset by peer\r\n
 
-       # 一般是资产的 ssh 或者 防火墙 做了限制
+        # 一般是资产的 ssh 或者 防火墙 做了限制
 
-   (4). "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
+    (4). "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
 
-       # 一般是资产 python 未安装或者 python 异常，此问题多发生在 ubuntu 资产上
+        # 一般是资产 python 未安装或者 python 异常，此问题多发生在 ubuntu 资产上

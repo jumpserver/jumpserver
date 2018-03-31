@@ -168,7 +168,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/ 页面显示不正常先不用处理，需要搭建 nginx 代理就可以正常访问了
+运行不报错，请浏览器访问 http://192.168.244.144:8080/  页面显示不正常先不用处理，搭建 nginx 代理就可以正常访问了
 
 附上重启的方法
 
@@ -208,25 +208,11 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-后面设置好 nginx 后，记得去 Jumpserver 管理后台-会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受 Coco 的注册
-
 ::
 
     Coco version 1.0.0, more see https://www.jumpserver.org
     Starting ssh server at 0.0.0.0:2222
     Quit the server with CONTROL-C.
-
-**3.4 测试连接**
-
-::
-
-    $ ssh -p2222 admin@192.168.244.144
-    密码: admin
-
-    如果是用在 Windows 下，Xshell Terminal 登录语法如下
-    $ssh admin@192.168.244.144 2222
-    密码: admin
-    如果能登陆代表部署成功
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -339,7 +325,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:8081/;  # 请修改成运行docker服务的服务器IP，windows资产连接白屏的问题多数是出现在这里
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -376,7 +362,19 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
 默认账号: admin 密码: admin
 
-到管理后台-会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+
+** 测试连接**
+
+::
+
+    $ ssh -p2222 admin@192.168.244.144
+    密码: admin
+
+    如果是用在 Windows 下，Xshell Terminal 登录语法如下
+    $ssh admin@192.168.244.144 2222
+    密码: admin
+    如果能登陆代表部署成功
 
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

@@ -79,6 +79,25 @@ Windows 生成 SSH 密钥可以参考（https://www.cnblogs.com/horanly/p/660410
 
 .. image:: _static/img/coco_check_terminal.jpg
 
+如 coco 不在线或者服务不正常，可以尝试重启 coco
+
+::
+
+    $ cd /opt/coco
+    $ ./cocod restart  # 请确保 jumpserver 已经正常运行。
+
+如 guacamole 不在线或者服务不正常，可以尝试重启容器
+
+::
+
+    $ docker ps  # 查询正在运行的容器，记录下容器的 <CONTAINER ID> ，可以附加 -a 参数查询所有容器
+    CONTAINER ID        IMAGE                                             COMMAND             CREATED             STATUS                   PORTS               NAMES
+    6b15fcf0e5f3        registry.jumpserver.org/public/guacamole:latest   "/init"             2 weeks ago         Exited (0) 10 days ago                       gracious_hugle
+
+    $ docker restart 6b15fcf0e5f3  # 6b15fcf0e5f3 是通过docker ps查询到的，请不要直接复制。
+
+    # docker 用法： docker start|stop|restart|rm|rmi <CONTAINER ID>
+
 命令行登录 Jumpserver 使用如下命令：
 
 ::
