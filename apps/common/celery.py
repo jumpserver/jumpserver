@@ -5,7 +5,7 @@ import json
 from functools import wraps
 
 from celery import Celery, subtask
-from celery.signals import worker_ready, worker_shutdown
+from celery.signals import worker_ready, worker_shutdown, task_prerun, task_postrun
 from django.db.utils import ProgrammingError, OperationalError
 
 from .utils import get_logger
@@ -199,3 +199,16 @@ def after_app_shutdown(sender=None, headers=None, body=None, **kwargs):
         ', '.join(__AFTER_APP_SHUTDOWN_CLEAN_TASKS))
     )
     PeriodicTask.objects.filter(name__in=__AFTER_APP_SHUTDOWN_CLEAN_TASKS).delete()
+
+
+@task_prerun.connect
+def pre_run_task_signal_handler(sender, task, *args, **kwargs):
+
+    print("Sender: {}".format(sender))
+    print("Task: {}".format(task))
+
+
+@task_postrun.connect
+def post_run_task_signal_handler(sender, task, *args, **kwargs):
+    print("Sender: {}".format(sender))
+    print("Task: {}".format(task))

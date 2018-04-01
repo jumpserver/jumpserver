@@ -2,7 +2,7 @@
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 from common.mixins import DatetimeSearchMixin
 from .models import Task, AdHoc, AdHocRunHistory
@@ -119,6 +119,11 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+class CeleryTaskOutputView(AdminUserRequiredMixin, TemplateView):
+    model = AdHocRunHistory
+    template_name = 'ops/celery_task_output.html'
 
 
 class AdHocHistoryOutputView(AdminUserRequiredMixin, DetailView):

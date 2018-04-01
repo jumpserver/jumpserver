@@ -1,17 +1,21 @@
 # ~*~ coding: utf-8 ~*~
 import uuid
-import re
+import os
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext as _
 from rest_framework import viewsets, generics
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.views import APIView
 from rest_framework.views import Response
 
 from .hands import IsSuperUser
+from common.const import FILE_END_GUARD
 from .models import Task, AdHoc, AdHocRunHistory
 from .serializers import TaskSerializer, AdHocSerializer, AdHocRunHistorySerializer
 from .tasks import run_ansible_task
+
+
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -27,8 +31,8 @@ class TaskRun(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
-        run_ansible_task.delay(str(task.id))
-        return Response({"msg": "start"})
+        t = run_ansible_task.delay(str(task.id))
+        return Response({"task": t.id})
 
 
 class AdHocViewSet(viewsets.ModelViewSet):
@@ -63,24 +67,28 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class AdHocHistoryOutputAPI(RetrieveAPIView):
-    queryset = AdHocRunHistory.objects.all()
+class LogFileViewApi(APIView):
     permission_classes = (IsSuperUser,)
     buff_size = 1024 * 10
     end = False
 
-    def retrieve(self, request, *args, **kwargs):
-        history = self.get_object()
+    def get(self, request, *args, **kwargs):
+        file_path = request.query_params.get("file")
         mark = request.query_params.get("mark") or str(uuid.uuid4())
 
-        with open(history.log_path, 'r') as f:
+        if not os.path.isfile(file_path):
+            print(file_path)
+            return Response({"error": _("Log file not found")}, status=204)
+
+        with open(file_path, 'r') as f:
             offset = cache.get(mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')
-            print(repr(data))
             mark = str(uuid.uuid4())
             cache.set(mark, f.tell(), 5)
 
-            if history.is_finished and data == '':
+            if FILE_END_GUARD  in data:
+                data.replace(FILE_END_GUARD, '')
                 self.end = True
+
             return Response({"data": data, 'end': self.end, 'mark': mark})

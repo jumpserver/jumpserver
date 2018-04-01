@@ -6,6 +6,7 @@ import os
 import time
 import datetime
 
+from celery import current_task
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -211,11 +212,20 @@ class AdHoc(models.Model):
             return self._run_only()
 
     def _run_and_record(self):
-        history = AdHocRunHistory(adhoc=self, task=self.task)
-        time_start = time.time()
         try:
-            with open(history.log_path, 'w') as f:
-                raw, summary = self._run_only(file_obj=f)
+            hid = current_task.request.id
+        except AttributeError:
+            hid = str(uuid.uuid4())
+        history = AdHocRunHistory(id=hid, adhoc=self, task=self.task)
+        time_start = time.time()
+        # f = open(history.log_path, 'w')
+        try:
+            date_start = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+            # f.write("{} {}\r\n\r\n".format(date_start, self.task.name))
+            raw, summary = self._run_only()
+            # raw, summary = self._run_only(file_obj=f)
+            date_end = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+            # f.write("\r\n{} Task finish\r\n".format(date_end))
             history.is_finished = True
             if summary.get('dark'):
                 history.is_success = False
@@ -227,6 +237,7 @@ class AdHoc(models.Model):
         except Exception as e:
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
+            # f.close()
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start
             history.save()

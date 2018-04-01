@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import os
 import json
+import uuid
 
+from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.views import Response
 from ldap3 import Server, Connection
@@ -11,6 +14,7 @@ from django.conf import settings
 
 from .permissions import IsSuperUser, IsAppUser
 from .serializers import MailTestSerializer, LDAPTestSerializer
+from .const import FILE_END_GUARD
 
 
 class MailTestingAPI(APIView):
@@ -105,3 +109,30 @@ class DjangoSettingsAPI(APIView):
             if i.isupper():
                 configs[i] = str(getattr(settings, i))
         return Response(configs)
+
+
+class FileTailApi(APIView):
+    permission_classes = (IsSuperUser,)
+    default_buff_size = 1024 * 10
+    end = False
+    buff_size = None
+
+    def get(self, request, *args, **kwargs):
+        file_path = request.query_params.get("file")
+        self.buff_size = request.query_params.get('buffer') or self.default_buff_size
+        mark = request.query_params.get("mark") or str(uuid.uuid4())
+
+        if not os.path.isfile(file_path):
+            return Response({"data": _("Waiting ...")}, status=203)
+
+        with open(file_path, 'r') as f:
+            offset = cache.get(mark, 0)
+            f.seek(offset)
+            data = f.read(self.buff_size).replace('\n', '\r\n')
+            mark = str(uuid.uuid4())
+            cache.set(mark, f.tell(), 5)
+
+            if FILE_END_GUARD in data:
+                data = data.replace(FILE_END_GUARD, '')
+                self.end = True
+            return Response({"data": data, 'end': self.end, 'mark': mark})

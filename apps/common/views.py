@@ -1,5 +1,7 @@
-from django.views.generic import TemplateView
-from django.shortcuts import render, redirect
+
+from django.core.cache import cache
+from django.views.generic import TemplateView, View
+from django.shortcuts import render, redirect, Http404, reverse
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -120,3 +122,34 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
             context.update({"form": form})
             return render(request, self.template_name, context)
 
+
+class TailFileView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'common/tail_file.html'
+
+    def get_context_data(self, **kwargs):
+        file_path = self.request.GET.get("file")
+        context = super().get_context_data(**kwargs)
+        context.update({"file_path": file_path})
+        return context
+
+
+class CeleryTaskLogView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'common/tail_file.html'
+    task_log_path = None
+
+    def get(self, request, *args, **kwargs):
+        task = self.request.GET.get('task')
+        if not task:
+            raise Http404("Not found task")
+
+        self.task_log_path = cache.get(task)
+        if not self.task_log_path:
+            raise Http404("Not found task log file")
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'file_path': self.task_log_path
+        })
+        return context

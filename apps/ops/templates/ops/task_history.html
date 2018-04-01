@@ -30,7 +30,7 @@
                         <div class="col-sm-12" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'History of ' %} <b>{{ object.task.name }}:{{ object.short_id }}</b></span>
+                                    <span style="float: left">{% trans 'History of ' %} <b>{{ object.name }}:{{ object.short_id }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -85,7 +85,8 @@ function initTable() {
         select: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                $(td).html(cellData);
+                var d = new Date(cellData);
+                $(td).html(d.toLocaleString());
              }},
             {targets: 2, createdCell: function (td, cellData) {
                 var total = "<span>" + cellData.total + "</span>";

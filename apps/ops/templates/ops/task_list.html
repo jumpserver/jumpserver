@@ -111,9 +111,9 @@ $(document).ready(function() {
     var error = function (data) {
         alert(data)
     };
-    var success = function () {
-        alert("任务开始执行，重定向到任务详情页面，多刷新几次查看结果")
-        window.location = "{% url 'ops:task-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', uid);
+    var success = function(data) {
+        var task_id = data.task;
+        window.location = "{% url 'ops:adhoc-history-output' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", task_id);
     };
     APIUpdateAttr({
         url: the_url,
