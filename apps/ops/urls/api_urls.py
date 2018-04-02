@@ -15,6 +15,7 @@ router.register(r'v1/history', api.AdHocRunHistorySet, 'history')
 
 urlpatterns = [
     url(r'^v1/tasks/(?P<pk>[0-9a-zA-Z\-]{36})/run/$', api.TaskRun.as_view(), name='task-run'),
+    url(r'^v1/celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', api.CeleryTaskLogApi.as_view(), name='celery-task-log'),
 ]
 
 urlpatterns += router.urls

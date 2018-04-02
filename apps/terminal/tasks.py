@@ -6,7 +6,7 @@ import datetime
 from celery import shared_task
 from django.utils import timezone
 
-from common.celery import register_as_period_task, after_app_ready_start, \
+from ops.celery.utils import register_as_period_task, after_app_ready_start, \
     after_app_shutdown_clean
 from .models import Status, Session
 

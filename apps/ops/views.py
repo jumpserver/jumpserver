@@ -2,10 +2,10 @@
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 from common.mixins import DatetimeSearchMixin
-from .models import Task, AdHoc, AdHocRunHistory
+from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
 from .hands import AdminUserRequiredMixin
 
 
@@ -119,3 +119,8 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
+    template_name = 'ops/celery_task_log.html'
+    model = CeleryTask

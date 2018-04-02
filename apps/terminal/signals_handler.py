@@ -5,8 +5,6 @@ from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError
 
 from common.utils import get_logger
-from common.celery import after_app_ready_start, register_as_period_task, \
-    after_app_shutdown_clean
 from .const import ASSETS_CACHE_KEY, USERS_CACHE_KEY, SYSTEM_USER_CACHE_KEY
 
 RUNNING = False

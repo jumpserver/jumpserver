@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import sys
 from collections import OrderedDict
 from six import string_types
 import base64
@@ -360,3 +361,20 @@ def get_signer():
     signer = Signer(settings.SECRET_KEY)
     return signer
 
+
+class TeeObj:
+    origin_stdout = sys.stdout
+
+    def __init__(self, file_obj):
+        self.file_obj = file_obj
+
+    def write(self, msg):
+        self.origin_stdout.write(msg)
+        self.file_obj.write(msg.replace('*', ''))
+
+    def flush(self):
+        self.origin_stdout.flush()
+        self.file_obj.flush()
+
+    def close(self):
+        self.file_obj.close()

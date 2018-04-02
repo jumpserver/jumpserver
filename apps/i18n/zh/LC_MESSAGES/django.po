@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-28 11:13+0800\n"
+"POT-Creation-Date: 2018-04-02 15:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -96,7 +96,7 @@ msgid "Select nodes"
 msgstr "选择节点"
 
 #: assets/forms/domain.py:14 assets/forms/label.py:13
-#: assets/models/asset.py:156 assets/templates/assets/admin_user_list.html:25
+#: assets/models/asset.py:165 assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:15
 #: assets/templates/assets/label_list.html:16
@@ -121,8 +121,8 @@ msgstr "资产"
 #: assets/templates/assets/system_user_detail.html:58
 #: assets/templates/assets/system_user_list.html:26 common/models.py:26
 #: common/templates/common/terminal_setting.html:67
-#: common/templates/common/terminal_setting.html:85 ops/models.py:31
-#: ops/templates/ops/task_detail.html:56 ops/templates/ops/task_list.html:34
+#: common/templates/common/terminal_setting.html:85 ops/models/adhoc.py:36
+#: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:34
 #: perms/models.py:14 perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:16
 #: terminal/models.py:149 terminal/templates/terminal/terminal_detail.html:43
@@ -304,7 +304,7 @@ msgstr "创建者"
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/domain_detail.html:68
 #: assets/templates/assets/system_user_detail.html:92
-#: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:60
+#: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:63
 #: perms/models.py:23 perms/models.py:80
 #: perms/templates/perms/asset_permission_detail.html:90
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
@@ -323,7 +323,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_list.html:17
 #: assets/templates/assets/system_user_detail.html:100
 #: assets/templates/assets/system_user_list.html:33 common/models.py:30
-#: ops/models.py:37 perms/models.py:24 perms/models.py:81
+#: ops/models/adhoc.py:42 perms/models.py:24 perms/models.py:81
 #: perms/templates/perms/asset_permission_detail.html:98 terminal/models.py:26
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
 #: users/models/user.py:47 users/templates/users/user_detail.html:111
@@ -602,8 +602,8 @@ msgstr "可连接"
 #: assets/templates/assets/domain_list.html:18
 #: assets/templates/assets/label_list.html:17
 #: assets/templates/assets/system_user_list.html:34
-#: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:61
-#: ops/templates/ops/task_history.html:62 ops/templates/ops/task_list.html:41
+#: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
+#: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:41
 #: perms/templates/perms/asset_permission_list.html:72
 #: terminal/templates/terminal/session_list.html:80
 #: terminal/templates/terminal/terminal_list.html:36
@@ -774,9 +774,9 @@ msgstr "重置"
 #: assets/templates/assets/domain_gateway_list.html:18
 #: assets/templates/assets/system_user_asset.html:17
 #: assets/templates/assets/system_user_detail.html:18
-#: ops/templates/ops/adhoc_history.html:129
-#: ops/templates/ops/task_adhoc.html:109
-#: ops/templates/ops/task_history.html:132
+#: ops/templates/ops/adhoc_history.html:130
+#: ops/templates/ops/task_adhoc.html:116
+#: ops/templates/ops/task_history.html:136
 #: perms/templates/perms/asset_permission_asset.html:18
 #: perms/templates/perms/asset_permission_detail.html:18
 #: perms/templates/perms/asset_permission_user.html:18
@@ -849,7 +849,7 @@ msgstr "不可达"
 #: assets/templates/assets/admin_user_list.html:28
 #: assets/templates/assets/system_user_list.html:32
 #: ops/templates/ops/adhoc_history.html:54
-#: ops/templates/ops/task_history.html:57
+#: ops/templates/ops/task_history.html:60
 msgid "Ratio"
 msgstr "比例"
 
@@ -1172,15 +1172,15 @@ msgstr "资产管理"
 msgid "System user asset"
 msgstr "系统用户集群资产"
 
-#: common/api.py:19
+#: common/api.py:18
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: common/api.py:53
+#: common/api.py:52
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: common/api.py:91
+#: common/api.py:90
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
@@ -1299,7 +1299,7 @@ msgstr "资产列表排序"
 msgid "Heartbeat interval"
 msgstr "心跳间隔"
 
-#: common/forms.py:150 ops/models.py:32
+#: common/forms.py:150 ops/models/adhoc.py:37
 msgid "Units: seconds"
 msgstr "单位: 秒"
 
@@ -1349,28 +1349,28 @@ msgstr "启用"
 #: common/templates/common/email_setting.html:15
 #: common/templates/common/ldap_setting.html:15
 #: common/templates/common/terminal_setting.html:16
-#: common/templates/common/terminal_setting.html:42 common/views.py:21
+#: common/templates/common/terminal_setting.html:42 common/views.py:22
 msgid "Basic setting"
 msgstr "基本设置"
 
 #: common/templates/common/basic_setting.html:18
 #: common/templates/common/email_setting.html:18
 #: common/templates/common/ldap_setting.html:18
-#: common/templates/common/terminal_setting.html:20 common/views.py:47
+#: common/templates/common/terminal_setting.html:20 common/views.py:48
 msgid "Email setting"
 msgstr "邮件设置"
 
 #: common/templates/common/basic_setting.html:21
 #: common/templates/common/email_setting.html:21
 #: common/templates/common/ldap_setting.html:21
-#: common/templates/common/terminal_setting.html:24 common/views.py:73
+#: common/templates/common/terminal_setting.html:24 common/views.py:74
 msgid "LDAP setting"
 msgstr "LDAP设置"
 
 #: common/templates/common/basic_setting.html:24
 #: common/templates/common/email_setting.html:24
 #: common/templates/common/ldap_setting.html:24
-#: common/templates/common/terminal_setting.html:28 common/views.py:103
+#: common/templates/common/terminal_setting.html:28 common/views.py:104
 msgid "Terminal setting"
 msgstr "终端设置"
 
@@ -1380,97 +1380,101 @@ msgstr "终端设置"
 msgid "Type"
 msgstr "类型"
 
-#: common/views.py:20 common/views.py:46 common/views.py:72 common/views.py:102
+#: common/views.py:21 common/views.py:47 common/views.py:73 common/views.py:103
 #: templates/_nav.html:73
 msgid "Settings"
 msgstr "系统设置"
 
-#: common/views.py:31 common/views.py:57 common/views.py:85 common/views.py:115
+#: common/views.py:32 common/views.py:58 common/views.py:86 common/views.py:116
 msgid "Update setting successfully, please restart program"
 msgstr "更新设置成功, 请手动重启程序"
 
-#: ops/models.py:32
+#: ops/api.py:79
+msgid "Waiting ..."
+msgstr ""
+
+#: ops/models/adhoc.py:37
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/models.py:33
+#: ops/models/adhoc.py:38
 msgid "Crontab"
 msgstr "Crontab"
 
-#: ops/models.py:33
+#: ops/models/adhoc.py:38
 msgid "5 * * * *"
 msgstr ""
 
-#: ops/models.py:35
+#: ops/models/adhoc.py:40
 msgid "Callback"
 msgstr "回调"
 
-#: ops/models.py:149 ops/templates/ops/adhoc_detail.html:114
+#: ops/models/adhoc.py:154 ops/templates/ops/adhoc_detail.html:114
 msgid "Tasks"
 msgstr "任务"
 
-#: ops/models.py:150 ops/templates/ops/adhoc_detail.html:57
-#: ops/templates/ops/task_adhoc.html:57
+#: ops/models/adhoc.py:155 ops/templates/ops/adhoc_detail.html:57
+#: ops/templates/ops/task_adhoc.html:60
 msgid "Pattern"
 msgstr ""
 
-#: ops/models.py:151 ops/templates/ops/adhoc_detail.html:61
+#: ops/models/adhoc.py:156 ops/templates/ops/adhoc_detail.html:61
 msgid "Options"
 msgstr "选项"
 
-#: ops/models.py:152 ops/templates/ops/adhoc_detail.html:53
-#: ops/templates/ops/task_adhoc.html:56 ops/templates/ops/task_list.html:37
+#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:53
+#: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:37
 msgid "Hosts"
 msgstr "主机"
 
-#: ops/models.py:153
+#: ops/models/adhoc.py:158
 msgid "Run as admin"
 msgstr "再次执行"
 
-#: ops/models.py:154 ops/templates/ops/adhoc_detail.html:72
-#: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:58
+#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:72
+#: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
 msgid "Run as"
 msgstr "用户"
 
-#: ops/models.py:155 ops/templates/ops/adhoc_detail.html:82
-#: ops/templates/ops/task_adhoc.html:59
+#: ops/models/adhoc.py:160 ops/templates/ops/adhoc_detail.html:82
+#: ops/templates/ops/task_adhoc.html:62
 msgid "Become"
 msgstr "Become"
 
-#: ops/models.py:156 users/templates/users/user_group_detail.html:59
+#: ops/models/adhoc.py:161 users/templates/users/user_group_detail.html:59
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models.py:307
+#: ops/models/adhoc.py:323
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models.py:308
+#: ops/models/adhoc.py:324
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models.py:309 ops/templates/ops/adhoc_history.html:57
-#: ops/templates/ops/task_history.html:60 ops/templates/ops/task_list.html:40
+#: ops/models/adhoc.py:325 ops/templates/ops/adhoc_history.html:57
+#: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:40
 msgid "Time"
 msgstr "时间"
 
-#: ops/models.py:310 ops/templates/ops/adhoc_detail.html:106
+#: ops/models/adhoc.py:326 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
-#: ops/templates/ops/adhoc_history_detail.html:66
-#: ops/templates/ops/task_detail.html:80 ops/templates/ops/task_history.html:58
+#: ops/templates/ops/adhoc_history_detail.html:69
+#: ops/templates/ops/task_detail.html:83 ops/templates/ops/task_history.html:61
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models.py:311 ops/templates/ops/adhoc_history.html:56
-#: ops/templates/ops/task_history.html:59
+#: ops/models/adhoc.py:327 ops/templates/ops/adhoc_history.html:56
+#: ops/templates/ops/task_history.html:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models.py:312
+#: ops/models/adhoc.py:328
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models.py:313
+#: ops/models/adhoc.py:329
 msgid "Adhoc result summary"
 msgstr "汇总"
 
@@ -1485,8 +1489,8 @@ msgid "Version run history"
 msgstr "执行历史"
 
 #: ops/templates/ops/adhoc_detail.html:49
-#: ops/templates/ops/adhoc_history_detail.html:46
-#: ops/templates/ops/task_detail.html:52
+#: ops/templates/ops/adhoc_history_detail.html:49
+#: ops/templates/ops/task_detail.html:55
 #: terminal/templates/terminal/session_list.html:70
 #: users/templates/users/login_log_list.html:48
 msgid "ID"
@@ -1496,59 +1500,59 @@ msgstr "ID"
 msgid "Run times"
 msgstr "执行次数"
 
-#: ops/templates/ops/adhoc_detail.html:98 ops/templates/ops/task_detail.html:72
+#: ops/templates/ops/adhoc_detail.html:98 ops/templates/ops/task_detail.html:75
 msgid "Last run"
 msgstr "最后运行"
 
 #: ops/templates/ops/adhoc_detail.html:102
-#: ops/templates/ops/adhoc_history_detail.html:62
-#: ops/templates/ops/task_detail.html:76
+#: ops/templates/ops/adhoc_history_detail.html:65
+#: ops/templates/ops/task_detail.html:79
 msgid "Time delta"
 msgstr "运行时间"
 
 #: ops/templates/ops/adhoc_detail.html:110
-#: ops/templates/ops/adhoc_history_detail.html:70
-#: ops/templates/ops/task_detail.html:84
+#: ops/templates/ops/adhoc_history_detail.html:73
+#: ops/templates/ops/task_detail.html:87
 msgid "Is success "
 msgstr "成功"
 
 #: ops/templates/ops/adhoc_detail.html:131
-#: ops/templates/ops/task_detail.html:105
+#: ops/templates/ops/task_detail.html:108
 msgid "Last run failed hosts"
 msgstr "最后运行失败主机"
 
 #: ops/templates/ops/adhoc_detail.html:151
 #: ops/templates/ops/adhoc_detail.html:176
-#: ops/templates/ops/task_detail.html:125
-#: ops/templates/ops/task_detail.html:150
+#: ops/templates/ops/task_detail.html:128
+#: ops/templates/ops/task_detail.html:153
 msgid "No hosts"
 msgstr "没有主机"
 
 #: ops/templates/ops/adhoc_detail.html:161
-#: ops/templates/ops/task_detail.html:135
+#: ops/templates/ops/task_detail.html:138
 msgid "Last run success hosts"
 msgstr "最后运行成功主机"
 
 #: ops/templates/ops/adhoc_history.html:30
-#: ops/templates/ops/task_history.html:33
+#: ops/templates/ops/task_history.html:36
 msgid "History of "
 msgstr "执行历史"
 
 #: ops/templates/ops/adhoc_history.html:52
-#: ops/templates/ops/adhoc_history_detail.html:58
-#: ops/templates/ops/task_history.html:55 terminal/models.py:132
+#: ops/templates/ops/adhoc_history_detail.html:61
+#: ops/templates/ops/task_history.html:58 terminal/models.py:132
 #: terminal/templates/terminal/session_list.html:77
 msgid "Date start"
 msgstr "开始日期"
 
 #: ops/templates/ops/adhoc_history.html:53
-#: ops/templates/ops/task_history.html:56
+#: ops/templates/ops/task_history.html:59
 msgid "F/S/T"
 msgstr "失败/成功/总"
 
 #: ops/templates/ops/adhoc_history.html:58
-#: ops/templates/ops/adhoc_history_detail.html:54
-#: ops/templates/ops/task_adhoc.html:55 ops/templates/ops/task_history.html:61
+#: ops/templates/ops/adhoc_history_detail.html:57
+#: ops/templates/ops/task_adhoc.html:58 ops/templates/ops/task_history.html:64
 msgid "Version"
 msgstr "版本"
 
@@ -1556,24 +1560,29 @@ msgstr "版本"
 msgid "Run history detail"
 msgstr "执行历史详情"
 
-#: ops/templates/ops/adhoc_history_detail.html:27
+#: ops/templates/ops/adhoc_history_detail.html:22
+#: terminal/backends/command/models.py:14
+msgid "Output"
+msgstr "输出"
+
+#: ops/templates/ops/adhoc_history_detail.html:30
 msgid "History detail of"
 msgstr "执行历史详情"
 
-#: ops/templates/ops/adhoc_history_detail.html:50
+#: ops/templates/ops/adhoc_history_detail.html:53
 msgid "Task name"
 msgstr "任务名称"
 
-#: ops/templates/ops/adhoc_history_detail.html:81
+#: ops/templates/ops/adhoc_history_detail.html:84
 msgid "Failed assets"
 msgstr "失败资产"
 
-#: ops/templates/ops/adhoc_history_detail.html:101
-#: ops/templates/ops/adhoc_history_detail.html:126
+#: ops/templates/ops/adhoc_history_detail.html:104
+#: ops/templates/ops/adhoc_history_detail.html:129
 msgid "No assets"
 msgstr "没有资产"
 
-#: ops/templates/ops/adhoc_history_detail.html:111
+#: ops/templates/ops/adhoc_history_detail.html:114
 msgid "Success assets"
 msgstr "成功资产"
 
@@ -1592,25 +1601,30 @@ msgstr "任务各版本"
 msgid "Run history"
 msgstr "执行历史"
 
-#: ops/templates/ops/task_adhoc.html:33
+#: ops/templates/ops/task_adhoc.html:28 ops/templates/ops/task_detail.html:28
+#: ops/templates/ops/task_history.html:28
+msgid "Last run output"
+msgstr "输出"
+
+#: ops/templates/ops/task_adhoc.html:36
 msgid "Versions of "
 msgstr "版本"
 
-#: ops/templates/ops/task_adhoc.html:60
+#: ops/templates/ops/task_adhoc.html:63
 #: terminal/templates/terminal/command_list.html:76
 #: terminal/templates/terminal/session_detail.html:50
 msgid "Datetime"
 msgstr "日期"
 
-#: ops/templates/ops/task_detail.html:64
+#: ops/templates/ops/task_detail.html:67
 msgid "Total versions"
 msgstr "版本数量"
 
-#: ops/templates/ops/task_detail.html:68
+#: ops/templates/ops/task_detail.html:71
 msgid "Latest version"
 msgstr "最新版本"
 
-#: ops/templates/ops/task_detail.html:88
+#: ops/templates/ops/task_detail.html:91
 msgid "Contents"
 msgstr "内容"
 
@@ -1639,7 +1653,7 @@ msgstr "日期"
 msgid "Run"
 msgstr "执行"
 
-#: ops/templates/ops/task_list.html:123
+#: ops/templates/ops/task_list.html:124
 msgid "Task start: "
 msgstr "任务开始: "
 
@@ -1911,10 +1925,6 @@ msgstr "过滤"
 #: terminal/backends/command/models.py:13
 msgid "Input"
 msgstr "输入"
-
-#: terminal/backends/command/models.py:14
-msgid "Output"
-msgstr "输出"
 
 #: terminal/backends/command/models.py:15
 #: terminal/templates/terminal/command_list.html:75

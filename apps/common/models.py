@@ -79,3 +79,4 @@ class Setting(models.Model):
 
     class Meta:
         db_table = "settings"
+

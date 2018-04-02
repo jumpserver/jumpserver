@@ -497,14 +497,17 @@ $(document).ready(function(){
     }
 
     var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
-    function success() {
+    function success(data) {
         rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
     }
     APIUpdateAttr({
         url: the_url,
         method: "GET",
-        success_message: "更新硬件信息任务下发成功",
-        success: success
+        success: success,
+        flash_message: false
     });
 
 })
@@ -519,14 +522,17 @@ $(document).ready(function(){
     }
 
     var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
-    function success() {
+    function success(data) {
         rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
     }
     APIUpdateAttr({
         url: the_url,
         method: "GET",
-        success_message: "测试可连接性任务下发成功",
-        success: success
+        success: success,
+        flash_message: false
     });
 })
 .on('click', '.btn_asset_delete', function () {

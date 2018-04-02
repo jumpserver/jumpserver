@@ -130,10 +130,9 @@ class RefreshNodeHardwareInfoApi(APIView):
         node_id = kwargs.get('pk')
         node = get_object_or_404(self.model, id=node_id)
         assets = node.assets.all()
-        # task_name = _("Refresh node assets hardware info: {}".format(node.name))
         task_name = _("更新节点资产硬件信息: {}".format(node.name))
-        update_assets_hardware_info_util.delay(assets, task_name=task_name)
-        return Response({"msg": "Task created"})
+        task = update_assets_hardware_info_util.delay(assets, task_name=task_name)
+        return Response({"task": task.id})
 
 
 class TestNodeConnectiveApi(APIView):
@@ -145,6 +144,6 @@ class TestNodeConnectiveApi(APIView):
         node = get_object_or_404(self.model, id=node_id)
         assets = node.assets.all()
         task_name = _("测试节点下资产是否可连接: {}".format(node.name))
-        test_asset_connectability_util.delay(assets, task_name=task_name)
-        return Response({"msg": "Task created"})
+        task = test_asset_connectability_util.delay(assets, task_name=task_name)
+        return Response({"task": task.id})
 
