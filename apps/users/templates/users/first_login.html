@@ -45,10 +45,8 @@
                         {{ wizard.form.management_form }}
                         {% for form in wizard.form.forms %}
                             {% bootstrap_form form %}
-{#                            {{ form|bootstrap }}#}
                         {% endfor %}
                     {% else %}
-{#                        {{ wizard.form|bootstrap }}#}
                         {% bootstrap_form wizard.form %}
                     {% endif %}
                   </form>
@@ -56,8 +54,10 @@
                 <div class="actions clearfix">
                   <ul>
                     {% if wizard.steps.prev %}
-                    <li><a class="fl_goto" data-goto="{{ wizard.steps.first }}">{% trans "First step" %}</a></li>
-                    <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "Prev step" %}</a></li>
+                    <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "Previous" %}</a></li>
+                    {% endif %}
+                    {% if wizard.steps.next %}
+                        <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.next }}">{% trans "Next" %}</a></li>
                     {% endif %}
                     <li><a id="fl_submit">{% trans "Submit" %}</a></li>
                   </ul>

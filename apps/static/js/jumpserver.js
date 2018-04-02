@@ -205,6 +205,7 @@ function objectDelete(obj, name, url, redirectTo) {
             url: url,
             body: JSON.stringify(body),
             method: 'DELETE',
+            success_message: "删除成功",
             success: success,
             error: fail
         });

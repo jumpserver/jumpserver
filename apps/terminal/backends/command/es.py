@@ -3,6 +3,7 @@
 
 from jms_es_sdk import ESStore
 from .base import CommandBase
+from .models import AbstractSessionCommand
 
 
 class CommandStore(CommandBase, ESStore):
@@ -25,11 +26,13 @@ class CommandStore(CommandBase, ESStore):
             user=user, asset=asset, system_user=system_user,
             input=input, session=session
         )
-        return [item["_source"] for item in data["hits"] if item]
+        return AbstractSessionCommand.from_multi_dict(
+            [item["_source"] for item in data["hits"] if item]
+        )
 
     def count(self, date_from=None, date_to=None,
-               user=None, asset=None, system_user=None,
-               input=None, session=None):
+              user=None, asset=None, system_user=None,
+              input=None, session=None):
         amount = ESStore.count(
             self, date_from=date_from, date_to=date_to,
             user=user, asset=asset, system_user=system_user,

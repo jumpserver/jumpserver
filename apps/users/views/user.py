@@ -31,7 +31,7 @@ from django.contrib.auth import logout as auth_logout
 
 from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
-from common.utils import get_logger, get_object_or_none, is_uuid
+from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from .. import forms
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
@@ -45,6 +45,7 @@ __all__ = [
     'UserExportView',  'UserBulkImportView', 'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserBulkUpdateView',
+    'UserPublicKeyGenerateView',
 ]
 
 logger = get_logger(__name__)
@@ -375,3 +376,15 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+class UserPublicKeyGenerateView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        private, public = ssh_key_gen(username=request.user.username, hostname='jumpserver')
+        request.user.public_key = public
+        request.user.save()
+        response = HttpResponse(private, content_type='text/plain')
+        filename = "{0}-jumpserver.pem".format(request.user.username)
+        response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
+        return response
+

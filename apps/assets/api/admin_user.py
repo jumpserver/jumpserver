@@ -28,7 +28,8 @@ from ..tasks import test_admin_user_connectability_manual
 
 logger = get_logger(__file__)
 __all__ = [
-    'AdminUserViewSet', 'ReplaceNodesAdminUserApi', 'AdminUserTestConnectiveApi'
+    'AdminUserViewSet', 'ReplaceNodesAdminUserApi',
+    'AdminUserTestConnectiveApi', 'AdminUserAuthApi',
 ]
 
 
@@ -38,6 +39,12 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class AdminUserAuthApi(generics.UpdateAPIView):
+    queryset = AdminUser.objects.all()
+    serializer_class = serializers.AdminUserAuthSerializer
     permission_classes = (IsSuperUser,)
 
 

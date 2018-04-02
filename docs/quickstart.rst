@@ -3,7 +3,7 @@
 
 Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集成了所需要的组件(Windows组件未暂未集成)，也支持使用外置 Database 和 Redis
 
-Tips: 不建议在生产中使用, 生产中请使用 详细安装 `详细安装 <https://docs.docker.com/install/>`_
+Tips: 不建议在生产中使用, 生产中请使用 详细安装 `CentOS <step_by_step.html>`_ `Ubuntu <setup_by_ubuntu.html>`_
 
 
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_

@@ -3,6 +3,7 @@ import json
 import re
 import os
 
+import paramiko
 from celery import shared_task
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
@@ -12,7 +13,7 @@ from common.utils import get_object_or_none, capacity_convert, \
 from common.celery import register_as_period_task, after_app_shutdown_clean, \
     after_app_ready_start, app as celery_app
 
-from .models import SystemUser, AdminUser, Asset, Cluster
+from .models import SystemUser, AdminUser, Asset
 from . import const
 
 
@@ -395,6 +396,7 @@ def get_node_push_system_user_task_name(system_user, node):
 
 
 def push_system_user_to_node(system_user, node):
+    logger.info("Start push system user node: {} => {}".format(system_user.name, node.value))
     assets = node.get_all_assets()
     task_name = get_node_push_system_user_task_name(system_user, node)
     push_system_user_util.delay([system_user], assets, task_name)
@@ -438,3 +440,7 @@ def push_node_system_users_to_asset(node, assets):
 # def push_system_user_period():
 #     for system_user in SystemUser.objects.all():
 #         push_system_user_related_nodes(system_user)
+
+
+
+

@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^profile/update/$', views.UserProfileUpdateView.as_view(), name='user-profile-update'),
     url(r'^profile/password/update/$', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     url(r'^profile/pubkey/update/$', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
+    url(r'^profile/pubkey/generate/$', views.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
