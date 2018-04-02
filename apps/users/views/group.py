@@ -74,7 +74,7 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
     template_name = 'users/user_group_detail.html'
 
     def get_context_data(self, **kwargs):
-        users = User.objects.exclude(id__in=self.object.users.all())
+        users = User.objects.exclude(id__in=self.object.users.all()).exclude(role=User.ROLE_APP)
         context = {
             'app': _('Users'),
             'action': _('User group detail'),

@@ -28,7 +28,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AdminUser, SystemUser, Label, Node
+from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
 from ..hands import AdminUserRequiredMixin
 
 
@@ -279,6 +279,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset_dict = dict(zip(attr, row))
             id_ = asset_dict.pop('id', 0)
             for k, v in asset_dict.items():
+                v = v.strip()
                 if k == 'is_active':
                     v = True if v in ['TRUE', 1, 'true'] else False
                 elif k == 'admin_user':
@@ -288,8 +289,8 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                         v = int(v)
                     except ValueError:
                         v = 0
-                else:
-                    continue
+                elif k == 'domain':
+                    v = get_object_or_none(Domain, name=v)
                 asset_dict[k] = v
 
             asset = get_object_or_none(Asset, id=id_) if is_uuid(id_) else None
