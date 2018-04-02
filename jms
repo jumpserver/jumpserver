@@ -155,7 +155,7 @@ def start_celery():
 
     cmd = [
         'celery', 'worker',
-        '-A',  'common',
+        '-A',  'ops',
         '-l', LOG_LEVEL.lower(),
         '--pidfile', pid_file,
         '-c', str(WORKERS),
@@ -182,7 +182,7 @@ def start_beat():
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
     cmd = [
         'celery',  'beat',
-        '-A', 'common',
+        '-A', 'ops',
         '--pidfile', pid_file,
         '-l', LOG_LEVEL,
         '--scheduler', scheduler,

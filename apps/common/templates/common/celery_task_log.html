@@ -35,7 +35,7 @@
     var rowHeight = 1;
     var colWidth = 1;
     var mark = '';
-    var url = "{% url 'api-common:tail-file' %}?file={{ file_path }}";
+    var url = "{% url 'api-common:celery-task-log' pk=task_id %}";
     var term;
     var end = false;
     var error = false;
@@ -54,7 +54,7 @@
     function requestAndWrite() {
         if (!end) {
             $.ajax({
-                url: url + '&mark=' + mark,
+                url: url + '?mark=' + mark,
                 method: "GET",
                 contentType: "application/json; charset=utf-8"
             }).done(function(data, textStatue, jqXHR) {

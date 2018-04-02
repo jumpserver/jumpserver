@@ -3,15 +3,15 @@ import json
 import re
 import os
 
-import paramiko
 from celery import shared_task
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from common.utils import get_object_or_none, capacity_convert, \
     sum_capacity, encrypt_password, get_logger
-from common.celery import register_as_period_task, after_app_shutdown_clean, \
-    after_app_ready_start, app as celery_app
+from ops.celery.utils import register_as_period_task, after_app_shutdown_clean, \
+    after_app_ready_start
+from ops.celery import app as celery_app
 
 from .models import SystemUser, AdminUser, Asset
 from . import const

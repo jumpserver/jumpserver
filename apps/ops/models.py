@@ -15,7 +15,7 @@ from django_celery_beat.models import CrontabSchedule, IntervalSchedule, \
     PeriodicTask
 
 from common.utils import get_signer, get_logger
-from common.celery import delete_celery_periodic_task, \
+from .celery.utils import delete_celery_periodic_task, \
     create_or_update_celery_periodic_tasks, \
     disable_celery_periodic_task
 from .ansible import AdHocRunner, AnsibleError
@@ -218,14 +218,12 @@ class AdHoc(models.Model):
             hid = str(uuid.uuid4())
         history = AdHocRunHistory(id=hid, adhoc=self, task=self.task)
         time_start = time.time()
-        # f = open(history.log_path, 'w')
         try:
-            date_start = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-            # f.write("{} {}\r\n\r\n".format(date_start, self.task.name))
+            date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("{} Start task: {}\r\n".format(date_start, self.task.name))
             raw, summary = self._run_only()
-            # raw, summary = self._run_only(file_obj=f)
-            date_end = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
-            # f.write("\r\n{} Task finish\r\n".format(date_end))
+            date_end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("\r\n{} Task finished".format(date_end))
             history.is_finished = True
             if summary.get('dark'):
                 history.is_success = False

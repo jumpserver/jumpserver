@@ -1,6 +1,6 @@
 
 from django.core.cache import cache
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, View, DetailView
 from django.shortcuts import render, redirect, Http404, reverse
 from django.contrib import messages
 from django.utils.translation import ugettext as _
@@ -8,7 +8,6 @@ from django.conf import settings
 
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm
-from .models import Setting
 from .mixins import AdminUserRequiredMixin
 from .signals import ldap_auth_enable
 
@@ -123,33 +122,18 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class TailFileView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'common/tail_file.html'
-
-    def get_context_data(self, **kwargs):
-        file_path = self.request.GET.get("file")
-        context = super().get_context_data(**kwargs)
-        context.update({"file_path": file_path})
-        return context
-
-
 class CeleryTaskLogView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'common/tail_file.html'
+    template_name = 'common/celery_task_log.html'
     task_log_path = None
 
-    def get(self, request, *args, **kwargs):
-        task = self.request.GET.get('task')
-        if not task:
-            raise Http404("Not found task")
-
-        self.task_log_path = cache.get(task)
-        if not self.task_log_path:
-            raise Http404("Not found task log file")
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        task_id = self.kwargs.get("pk")
+
+        if cache.get(celery_task_pre_key+task_id) is None:
+            raise Http404()
+
         context.update({
-            'file_path': self.task_log_path
+            "task_id": self.kwargs.get("pk")
         })
         return context
