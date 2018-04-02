@@ -215,7 +215,7 @@ def test_admin_user_connectability_period():
 def test_admin_user_connectability_manual(admin_user):
     # task_name = _("Test admin user connectability: {}").format(admin_user.name)
     task_name = _("测试管理行号可连接性: {}").format(admin_user.name)
-    return test_admin_user_connectability_util.delay(admin_user, task_name)
+    return test_admin_user_connectability_util(admin_user, task_name)
 
 
 @shared_task
@@ -395,11 +395,12 @@ def get_node_push_system_user_task_name(system_user, node):
     )
 
 
+@shared_task
 def push_system_user_to_node(system_user, node):
     logger.info("Start push system user node: {} => {}".format(system_user.name, node.value))
     assets = node.get_all_assets()
     task_name = get_node_push_system_user_task_name(system_user, node)
-    push_system_user_util.delay([system_user], assets, task_name)
+    push_system_user_util([system_user], assets, task_name)
 
 
 @shared_task

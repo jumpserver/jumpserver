@@ -157,7 +157,7 @@ function APIUpdateAttr(props) {
     props = props || {};
     var success_message = props.success_message || '更新成功!';
     var fail_message = props.fail_message || '更新时发生未知错误.';
-    var flash_message = true;
+    var flash_message = props.flash_message || true;
     if (props.flash_message === false){
         flash_message = false;
     }
@@ -170,7 +170,9 @@ function APIUpdateAttr(props) {
         dataType: props.data_type || "json"
     }).done(function(data, textStatue, jqXHR) {
         if (flash_message) {
-            toastr.success(success_message);
+            if (send_message) {
+                toastr.success(success_message);
+            }
         }
         if (typeof props.success === 'function') {
             return props.success(data);

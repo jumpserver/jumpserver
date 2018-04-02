@@ -79,5 +79,5 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()
-        test_admin_user_connectability_manual.delay(admin_user)
-        return Response({"msg": "Task created"})
+        task = test_admin_user_connectability_manual.delay(admin_user)
+        return Response({"task": task.id})
