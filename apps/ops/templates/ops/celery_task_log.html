@@ -35,7 +35,7 @@
     var rowHeight = 1;
     var colWidth = 1;
     var mark = '';
-    var url = "{% url 'api-common:celery-task-log' pk=task_id %}";
+    var url = "{% url 'api-ops:celery-task-log' pk=object.id %}";
     var term;
     var end = false;
     var error = false;

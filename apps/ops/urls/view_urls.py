@@ -18,6 +18,5 @@ urlpatterns = [
     url(r'^adhoc/(?P<pk>[0-9a-zA-Z\-]{36})/$', views.AdHocDetailView.as_view(), name='adhoc-detail'),
     url(r'^adhoc/(?P<pk>[0-9a-zA-Z\-]{36})/history/$', views.AdHocHistoryView.as_view(), name='adhoc-history'),
     url(r'^adhoc/history/(?P<pk>[0-9a-zA-Z\-]{36})/$', views.AdHocHistoryDetailView.as_view(), name='adhoc-history-detail'),
-    url(r'^adhoc/history/(?P<pk>[0-9a-zA-Z\-]{36})/_output/$', views.CeleryTaskOutputView.as_view(), name='adhoc-history-output-alone'),
-    url(r'^adhoc/history/(?P<pk>[0-9a-zA-Z\-]{36})/output/$', views.AdHocHistoryOutputView.as_view(), name='adhoc-history-output'),
+    url(r'^celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
 ]

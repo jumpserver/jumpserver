@@ -11,15 +11,14 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_celery_beat.models import CrontabSchedule, IntervalSchedule, \
-    PeriodicTask
+from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_signer, get_logger
-from .celery.utils import delete_celery_periodic_task, \
+from ..celery.utils import delete_celery_periodic_task, \
     create_or_update_celery_periodic_tasks, \
     disable_celery_periodic_task
-from .ansible import AdHocRunner, AnsibleError
-from .inventory import JMSInventory
+from ..ansible import AdHocRunner, AnsibleError
+from ..inventory import JMSInventory
 
 __all__ = ["Task", "AdHoc", "AdHocRunHistory"]
 
@@ -91,7 +90,7 @@ class Task(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        from .tasks import run_ansible_task
+        from ..tasks import run_ansible_task
         super().save(
             force_insert=force_insert,  force_update=force_update,
             using=using, update_fields=update_fields,

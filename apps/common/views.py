@@ -122,18 +122,3 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class CeleryTaskLogView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'common/celery_task_log.html'
-    task_log_path = None
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        task_id = self.kwargs.get("pk")
-
-        if cache.get(celery_task_pre_key+task_id) is None:
-            raise Http404()
-
-        context.update({
-            "task_id": self.kwargs.get("pk")
-        })
-        return context

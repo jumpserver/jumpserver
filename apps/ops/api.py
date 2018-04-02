@@ -6,16 +6,13 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets, generics
-from rest_framework.views import APIView
 from rest_framework.views import Response
 
 from .hands import IsSuperUser
-from common.const import FILE_END_GUARD
-from .models import Task, AdHoc, AdHocRunHistory
-from .serializers import TaskSerializer, AdHocSerializer, AdHocRunHistorySerializer
+from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
+from .serializers import TaskSerializer, AdHocSerializer, \
+    AdHocRunHistorySerializer
 from .tasks import run_ansible_task
-
-
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -67,28 +64,28 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class LogFileViewApi(APIView):
+class CeleryTaskLogApi(generics.RetrieveAPIView):
     permission_classes = (IsSuperUser,)
     buff_size = 1024 * 10
     end = False
+    queryset = CeleryTask.objects.all()
 
     def get(self, request, *args, **kwargs):
-        file_path = request.query_params.get("file")
         mark = request.query_params.get("mark") or str(uuid.uuid4())
+        task = super().get_object()
+        log_path = task.full_log_path
 
-        if not os.path.isfile(file_path):
-            print(file_path)
-            return Response({"error": _("Log file not found")}, status=204)
+        if not log_path or not os.path.isfile(log_path):
+            return Response({"data": _("Waiting ...")}, status=203)
 
-        with open(file_path, 'r') as f:
+        with open(log_path, 'r') as f:
             offset = cache.get(mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')
             mark = str(uuid.uuid4())
             cache.set(mark, f.tell(), 5)
 
-            if FILE_END_GUARD  in data:
-                data.replace(FILE_END_GUARD, '')
+            if data == '' and task.is_finished():
                 self.end = True
-
             return Response({"data": data, 'end': self.end, 'mark': mark})
+

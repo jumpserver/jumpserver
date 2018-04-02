@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views.generic import ListView, DetailView, TemplateView
 
 from common.mixins import DatetimeSearchMixin
-from .models import Task, AdHoc, AdHocRunHistory
+from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
 from .hands import AdminUserRequiredMixin
 
 
@@ -121,19 +121,6 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class CeleryTaskOutputView(AdminUserRequiredMixin, TemplateView):
-    model = AdHocRunHistory
-    template_name = 'ops/celery_task_output.html'
-
-
-class AdHocHistoryOutputView(AdminUserRequiredMixin, DetailView):
-    model = AdHocRunHistory
-    template_name = 'ops/adhoc_history_output.html'
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': _('Ops'),
-            'action': _('Run history detail'),
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
+    template_name = 'ops/celery_task_log.html'
+    model = CeleryTask

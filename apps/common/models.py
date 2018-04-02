@@ -80,11 +80,3 @@ class Setting(models.Model):
     class Meta:
         db_table = "settings"
 
-
-class CeleryTask(models.Model):
-    id = models.UUIDField()
-    name = models.CharField(max_length=1024)
-    status = models.CharField(max_length=128)
-    date_published = models.DateTimeField(auto_now_add=True)
-    date_start = models.DateTimeField(null=True)
-    date_finished = models.DateTimeField(null=True)

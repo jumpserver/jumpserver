@@ -1,7 +1,6 @@
 # coding: utf-8
 from celery import shared_task, subtask
 
-
 from common.utils import get_logger, get_object_or_none
 from .models import Task
 

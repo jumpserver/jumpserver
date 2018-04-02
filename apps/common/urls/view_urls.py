@@ -11,6 +11,4 @@ urlpatterns = [
     url(r'^email/$', views.EmailSettingView.as_view(), name='email-setting'),
     url(r'^ldap/$', views.LDAPSettingView.as_view(), name='ldap-setting'),
     url(r'^terminal/$', views.TerminalSettingView.as_view(), name='terminal-setting'),
-
-    url(r'^celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
 ]
