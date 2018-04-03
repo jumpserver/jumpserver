@@ -33,4 +33,6 @@ class CeleryTask(models.Model):
 
     @property
     def full_log_path(self):
+        if not self.log_path:
+            return None
         return os.path.join(self.LOG_DIR, self.log_path)
