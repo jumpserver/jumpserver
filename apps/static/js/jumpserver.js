@@ -170,9 +170,7 @@ function APIUpdateAttr(props) {
         dataType: props.data_type || "json"
     }).done(function(data, textStatue, jqXHR) {
         if (flash_message) {
-            if (send_message) {
-                toastr.success(success_message);
-            }
+            toastr.success(success_message);
         }
         if (typeof props.success === 'function') {
             return props.success(data);
