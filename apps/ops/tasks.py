@@ -12,14 +12,13 @@ def rerun_task():
 
 
 @shared_task
-def run_ansible_task(task_id, callback=None, **kwargs):
+def run_ansible_task(tid, callback=None, **kwargs):
     """
-    :param task_id: is the tasks serialized data
+    :param tid: is the tasks serialized data
     :param callback: callback function name
     :return:
     """
-
-    task = get_object_or_none(Task, id=task_id)
+    task = get_object_or_none(Task, id=tid)
     if task:
         result = task.run()
         if callback is not None:

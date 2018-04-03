@@ -33,7 +33,11 @@ function initTable() {
                 var detail_btn = '<a href="{% url "assets:domain-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
-
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                var gateway_list_btn = '<a href="{% url "assets:domain-gateway-list" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                gateway_list_btn = gateway_list_btn.replace("{{ DEFAULT_PK }}", rowData.id);
+                $(td).html(gateway_list_btn);
+             }},
             {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:domain-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);

@@ -95,8 +95,8 @@ function initTable() {
         ],
         ajax_url: '{% url "api-assets:gateway-list" %}?domain={{ object.id }}',
         columns: [
-            {data: "id"}, {data: "name" }, {data: 'ip'}, {data: 'port'}, {data: "username" },
-            {data: "protocol"}, {data: "comment" }, {data: "id"}
+            {data: "id"}, {data: "name" }, {data: 'ip'}, {data: 'port'},
+            {data: "protocol"}, {data: "username" }, {data: "comment" }, {data: "id"}
         ],
         op_html: $('#actions').html()
     };

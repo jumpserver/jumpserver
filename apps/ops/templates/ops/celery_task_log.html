@@ -1,0 +1,96 @@
+{% load static %}
+<head>
+    <title>term.js</title>
+    <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
+    <style>
+      html {
+        background: #000;
+      }
+      h1 {
+        margin-bottom: 20px;
+        font: 20px/1.5 sans-serif;
+      }
+      .terminal {
+        float: left;
+        font-family: 'Monaco', 'Consolas', "DejaVu Sans Mono", "Liberation Mono", monospace;
+        font-size: 12px;
+        color: #f0f0f0;
+        background-color: #555;
+        padding: 20px 20px 20px;
+      }
+      .terminal-cursor {
+        color: #000;
+        background: #f0f0f0;
+      }
+    </style>
+</head>
+<div class="container">
+    <div id="term">
+    </div>
+</div>
+
+
+<script src="{% static 'js/term.js' %}"></script>
+<script>
+    var rowHeight = 1;
+    var colWidth = 1;
+    var mark = '';
+    var url = "{% url 'api-ops:celery-task-log' pk=object.id %}";
+    var term;
+    var end = false;
+    var error = false;
+    var interval = 200;
+
+    function calWinSize() {
+        var t = $('.terminal');
+        rowHeight = 1.00 * t.height() / 24;
+        colWidth = 1.00 * t.width() / 80;
+    }
+    function resize() {
+       var rows = Math.floor(window.innerHeight / rowHeight) - 2;
+       var cols = Math.floor(window.innerWidth / colWidth) - 10;
+       term.resize(cols, rows);
+    }
+    function requestAndWrite() {
+        if (!end) {
+            $.ajax({
+                url: url + '?mark=' + mark,
+                method: "GET",
+                contentType: "application/json; charset=utf-8"
+            }).done(function(data, textStatue, jqXHR) {
+                if (jqXHR.status === 203) {
+                    error = true;
+                    term.write('.');
+                    interval = 500;
+                }
+                if (jqXHR.status === 200){
+                    term.write(data.data);
+                    mark = data.mark;
+                    if (data.end){
+                        end = true
+                    }
+                }
+            })
+        }
+    }
+    $(document).ready(function () {
+        term = new Terminal({
+            cols: 80,
+            rows: 24,
+            useStyle: true,
+            screenKeys: false,
+            convertEol: false,
+            cursorBlink: false
+        });
+        term.open();
+        term.on('data', function (data) {
+            term.write(data.replace('\r', '\r\n'))
+        });
+        calWinSize();
+        resize();
+        $('.terminal').detach().appendTo('#term');
+        setInterval(function () {
+            requestAndWrite()
+        }, interval)
+    });
+</script>

@@ -2,18 +2,23 @@
 
 import json
 import uuid
-
+import os
 import time
+import datetime
+
+from celery import current_task
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
+from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_signer, get_logger
-from common.celery import delete_celery_periodic_task, create_or_update_celery_periodic_tasks, \
-     disable_celery_periodic_task
-from .ansible import AdHocRunner, AnsibleError
-from .inventory import JMSInventory
+from ..celery.utils import delete_celery_periodic_task, \
+    create_or_update_celery_periodic_tasks, \
+    disable_celery_periodic_task
+from ..ansible import AdHocRunner, AnsibleError
+from ..inventory import JMSInventory
 
 __all__ = ["Task", "AdHoc", "AdHocRunHistory"]
 
@@ -85,7 +90,7 @@ class Task(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        from .tasks import run_ansible_task
+        from ..tasks import run_ansible_task
         super().save(
             force_insert=force_insert,  force_update=force_update,
             using=using, update_fields=update_fields,
@@ -206,10 +211,18 @@ class AdHoc(models.Model):
             return self._run_only()
 
     def _run_and_record(self):
-        history = AdHocRunHistory(adhoc=self, task=self.task)
+        try:
+            hid = current_task.request.id
+        except AttributeError:
+            hid = str(uuid.uuid4())
+        history = AdHocRunHistory(id=hid, adhoc=self, task=self.task)
         time_start = time.time()
         try:
+            date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("{} Start task: {}\r\n".format(date_start, self.task.name))
             raw, summary = self._run_only()
+            date_end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("\r\n{} Task finished".format(date_end))
             history.is_finished = True
             if summary.get('dark'):
                 history.is_success = False
@@ -221,17 +234,20 @@ class AdHoc(models.Model):
         except Exception as e:
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
+            # f.close()
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start
             history.save()
 
-    def _run_only(self):
-        runner = AdHocRunner(self.inventory)
-        for k, v in self.options.items():
-            runner.set_option(k, v)
-
+    def _run_only(self, file_obj=None):
+        runner = AdHocRunner(self.inventory, options=self.options)
         try:
-            result = runner.run(self.tasks, self.pattern, self.task.name)
+            result = runner.run(
+                self.tasks,
+                self.pattern,
+                self.task.name,
+                file_obj=file_obj,
+            )
             return result.results_raw, result.results_summary
         except AnsibleError as e:
             logger.warn("Failed run adhoc {}, {}".format(self.task.name, e))
@@ -315,6 +331,14 @@ class AdHocRunHistory(models.Model):
     @property
     def short_id(self):
         return str(self.id).split('-')[-1]
+
+    @property
+    def log_path(self):
+        dt = datetime.datetime.now().strftime('%Y-%m-%d')
+        log_dir = os.path.join(settings.PROJECT_DIR, 'data', 'ansible', dt)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        return os.path.join(log_dir, str(self.id) + '.log')
 
     @property
     def result(self):

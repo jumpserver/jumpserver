@@ -2,14 +2,13 @@
 #
 import json
 
-from rest_framework.views import APIView
-from rest_framework.views import Response
+from rest_framework.views import Response, APIView
 from ldap3 import Server, Connection
 from django.core.mail import get_connection, send_mail
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .permissions import IsSuperUser, IsAppUser
+from .permissions import IsSuperUser
 from .serializers import MailTestSerializer, LDAPTestSerializer
 
 
@@ -105,3 +104,6 @@ class DjangoSettingsAPI(APIView):
             if i.isupper():
                 configs[i] = str(getattr(settings, i))
         return Response(configs)
+
+
+

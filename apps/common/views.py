@@ -1,12 +1,13 @@
-from django.views.generic import TemplateView
-from django.shortcuts import render, redirect
+
+from django.core.cache import cache
+from django.views.generic import TemplateView, View, DetailView
+from django.shortcuts import render, redirect, Http404, reverse
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm
-from .models import Setting
 from .mixins import AdminUserRequiredMixin
 from .signals import ldap_auth_enable
 
@@ -119,4 +120,5 @@ class TerminalSettingView(AdminUserRequiredMixin, TemplateView):
             context = self.get_context_data()
             context.update({"form": form})
             return render(request, self.template_name, context)
+
 
