@@ -6,7 +6,7 @@ Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集
 Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中了，不是Docker最佳实践，
 生产中请使用 详细安装 `CentOS <step_by_step.html>`_ `Ubuntu <setup_by_ubuntu.html>`_
 
-CentOS7 自动安装脚本脚本见 `自动安装 <fool_install.html>`_
+CentOS7 自动安装脚本脚本见: `自动安装 <fool_install.html>`_
 
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
