@@ -3,6 +3,7 @@
 import os
 import datetime
 import sys
+import time
 
 from django.conf import settings
 from django.utils import timezone
@@ -53,10 +54,19 @@ def after_task_publish_signal_handler(sender, headers=None, **kwargs):
     CeleryTask.objects.create(
         id=headers["id"], status=CeleryTask.WAITING, name=headers["task"]
     )
+    cache.set(headers["id"], True, 3600)
 
 
 @task_prerun.connect
 def pre_run_task_signal_handler(sender, task_id=None, task=None, **kwargs):
+    time.sleep(0.1)
+    for i in range(5):
+        if cache.get(task_id, False):
+            break
+        else:
+            time.sleep(0.1)
+            continue
+
     t = get_object_or_none(CeleryTask, id=task_id)
     if t is None:
         logger.warn("Not get the task: {}".format(task_id))
