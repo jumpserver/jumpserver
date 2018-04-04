@@ -28,7 +28,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUser, IsAuthenticated)
+    permission_classes = (IsSuperUserOrAppUser, IsAuthenticated)
     filter_fields = ('username', 'email', 'name', 'id')
 
 
