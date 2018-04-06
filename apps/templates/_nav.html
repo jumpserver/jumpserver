@@ -59,6 +59,14 @@
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
     </ul>
 </li>
+<li id="audits">
+    <a>
+        <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'audits:ftp-log-list' %}">{% trans 'FTP log' %}</a></li>
+    </ul>
+</li>
 {#<li id="">#}
 {#    <a href="#">#}
 {#        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>#}
