@@ -233,8 +233,16 @@ class AssetExportView(View):
     def post(self, request, *args, **kwargs):
         try:
             assets_id = json.loads(request.body).get('assets_id', [])
+            assets_node_id = json.loads(request.body).get('node_id', None)
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
+
+        if not assets_id and assets_node_id:
+            assets_node = get_object_or_none(Node, id=assets_node_id)
+            assets = assets_node.get_all_assets()
+            for asset in assets:
+                assets_id.append(asset.id)
+
         spm = uuid.uuid4().hex
         cache.set(spm, assets_id, 300)
         url = reverse_lazy('assets:asset-export') + '?spm=%s' % spm

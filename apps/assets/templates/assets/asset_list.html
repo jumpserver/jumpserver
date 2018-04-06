@@ -182,7 +182,6 @@ function initTable() {
     return asset_table
 }
 
-
 function addTreeNode() {
 	hideRMenu();
 	var parentNode = zTree.getSelectedNodes()[0];
@@ -237,7 +236,6 @@ function editTreeNode() {
     }
     zTree.editName(current_node);
 }
-
 
 function OnRightClick(event, treeId, treeNode) {
     if (!treeNode && event.target.tagName.toLowerCase() !== "button" && $(event.target).parents("a").length === 0) {
@@ -432,6 +430,11 @@ $(document).ready(function(){
 .on('click', '.btn_export', function () {
     var $data_table = $('#asset_list_table').DataTable();
     var rows = $data_table.rows('.selected').data();
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length === 1) {
+        current_node = nodes[0];
+    }
     var assets = [];
     $.each(rows, function (index, obj) {
         assets.push(obj.id)
@@ -439,7 +442,7 @@ $(document).ready(function(){
     $.ajax({
         url: "{% url "assets:asset-export" %}",
         method: 'POST',
-        data: JSON.stringify({assets_id: assets}),
+        data: JSON.stringify({assets_id: assets, node_id: current_node.id}),
         dataType: "json",
         success: function (data, textStatus) {
             window.open(data.redirect)
