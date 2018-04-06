@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-02 15:49+0800\n"
+"POT-Creation-Date: 2018-04-06 10:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:134
+#: assets/api/node.py:133
 msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
-#: assets/api/node.py:147
+#: assets/api/node.py:146
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
@@ -100,7 +100,9 @@ msgstr "选择节点"
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:15
 #: assets/templates/assets/label_list.html:16
-#: assets/templates/assets/system_user_list.html:29 perms/models.py:17
+#: assets/templates/assets/system_user_list.html:29 audits/models.py:11
+#: audits/templates/audits/ftp_log_list.html:41
+#: audits/templates/audits/ftp_log_list.html:72 perms/models.py:17
 #: terminal/backends/command/models.py:11 terminal/models.py:123
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
@@ -122,7 +124,7 @@ msgstr "资产"
 #: assets/templates/assets/system_user_list.html:26 common/models.py:26
 #: common/templates/common/terminal_setting.html:67
 #: common/templates/common/terminal_setting.html:85 ops/models/adhoc.py:36
-#: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:34
+#: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:35
 #: perms/models.py:14 perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:16
 #: terminal/models.py:149 terminal/templates/terminal/terminal_detail.html:43
@@ -402,7 +404,9 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:14 perms/models.py:15
+#: assets/models/label.py:14 audits/models.py:9
+#: audits/templates/audits/ftp_log_list.html:33
+#: audits/templates/audits/ftp_log_list.html:71 perms/models.py:15
 #: terminal/backends/command/models.py:10 terminal/models.py:122
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
@@ -445,8 +449,11 @@ msgstr "Sudo"
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:150 perms/forms.py:25 perms/models.py:19
-#: perms/models.py:76 perms/templates/perms/asset_permission_detail.html:136
+#: assets/models/user.py:150 audits/models.py:12
+#: audits/templates/audits/ftp_log_list.html:49
+#: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:25
+#: perms/models.py:19 perms/models.py:76
+#: perms/templates/perms/asset_permission_detail.html:136
 #: perms/templates/perms/asset_permission_list.html:69 templates/_nav.html:26
 #: terminal/backends/command/models.py:12 terminal/models.py:124
 #: terminal/templates/terminal/command_list.html:48
@@ -493,7 +500,7 @@ msgstr ""
 msgid "推送系统用户到节点资产: {} => {}"
 msgstr ""
 
-#: assets/tasks.py:432
+#: assets/tasks.py:433
 msgid "推送节点系统用户到新加入资产中: {}"
 msgstr ""
 
@@ -586,7 +593,6 @@ msgstr "激活中"
 #: assets/templates/assets/_asset_list_modal.html:24
 #: assets/templates/assets/admin_user_assets.html:54
 #: assets/templates/assets/admin_user_list.html:26
-#: assets/templates/assets/asset_detail.html:359
 #: assets/templates/assets/asset_list.html:90
 #: assets/templates/assets/system_user_asset.html:52
 #: assets/templates/assets/system_user_list.html:30
@@ -603,7 +609,7 @@ msgstr "可连接"
 #: assets/templates/assets/label_list.html:17
 #: assets/templates/assets/system_user_list.html:34
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
-#: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:41
+#: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:42
 #: perms/templates/perms/asset_permission_list.html:72
 #: terminal/templates/terminal/session_list.html:80
 #: terminal/templates/terminal/terminal_list.html:36
@@ -672,7 +678,7 @@ msgstr "提交"
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
 #: assets/templates/assets/domain_gateway_list.html:90
-#: assets/templates/assets/domain_list.html:38
+#: assets/templates/assets/domain_list.html:42
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
 #: assets/templates/assets/system_user_list.html:88
@@ -697,11 +703,11 @@ msgstr "更新"
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
 #: assets/templates/assets/domain_gateway_list.html:91
-#: assets/templates/assets/domain_list.html:39
+#: assets/templates/assets/domain_list.html:43
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
 #: assets/templates/assets/system_user_list.html:89
-#: ops/templates/ops/task_list.html:71
+#: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:122
 #: terminal/templates/terminal/terminal_list.html:73
@@ -812,17 +818,13 @@ msgstr "测试可连接性"
 msgid "Test"
 msgstr "测试"
 
-#: assets/templates/assets/admin_user_assets.html:131
-msgid "Task has been send, seen left asset status"
-msgstr "任务已下发，查看左侧资产状态"
-
 #: assets/templates/assets/admin_user_detail.html:83
 msgid "Replace node assets admin user with this"
 msgstr "替换资产的管理员"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-#: assets/templates/assets/asset_list.html:594
+#: assets/templates/assets/asset_list.html:600
 #: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:138 templates/_modal.html:16
 #: terminal/templates/terminal/session_detail.html:108
@@ -899,7 +901,7 @@ msgstr "更新硬件信息"
 msgid "Refresh"
 msgstr "刷新"
 
-#: assets/templates/assets/asset_detail.html:301
+#: assets/templates/assets/asset_detail.html:300
 #: users/templates/users/user_detail.html:273
 msgid "Update successfully!"
 msgstr "更新成功"
@@ -955,7 +957,7 @@ msgstr "创建节点失败"
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:589
+#: assets/templates/assets/asset_list.html:595
 #: assets/templates/assets/system_user_list.html:133
 #: users/templates/users/user_detail.html:334
 #: users/templates/users/user_detail.html:359
@@ -964,20 +966,20 @@ msgstr "存在子节点，不能删除"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:590
+#: assets/templates/assets/asset_list.html:596
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:598
+#: assets/templates/assets/asset_list.html:604
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:599
-#: assets/templates/assets/asset_list.html:604
+#: assets/templates/assets/asset_list.html:605
+#: assets/templates/assets/asset_list.html:610
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:603
+#: assets/templates/assets/asset_list.html:609
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1045,12 +1047,10 @@ msgid "Test assets connective"
 msgstr "测试资产可连接性"
 
 #: assets/templates/assets/system_user_asset.html:147
-#: assets/templates/assets/system_user_detail.html:303
 msgid "Task has been send, Go to ops task list seen result"
 msgstr "任务已下发，查看ops任务列表"
 
 #: assets/templates/assets/system_user_asset.html:159
-#: assets/templates/assets/system_user_detail.html:315
 msgid "Task has been send, seen left assets status"
 msgstr "任务已下发，查看左侧资产状态"
 
@@ -1120,7 +1120,7 @@ msgstr "批量更新资产"
 msgid "Update asset"
 msgstr "更新资产"
 
-#: assets/views/asset.py:299
+#: assets/views/asset.py:300
 msgid "already exists"
 msgstr "已经存在"
 
@@ -1171,6 +1171,28 @@ msgstr "资产管理"
 #: assets/views/system_user.py:96
 msgid "System user asset"
 msgstr "系统用户集群资产"
+
+#: audits/models.py:10 audits/templates/audits/ftp_log_list.html:74
+#: terminal/models.py:126 terminal/templates/terminal/session_list.html:74
+#: terminal/templates/terminal/terminal_detail.html:47
+msgid "Remote addr"
+msgstr "远端地址"
+
+#: audits/models.py:13 audits/templates/audits/ftp_log_list.html:75
+msgid "Operate"
+msgstr "操作"
+
+#: audits/models.py:14 audits/templates/audits/ftp_log_list.html:76
+msgid "Filename"
+msgstr "文件名"
+
+#: audits/templates/audits/ftp_log_list.html:77
+#: ops/templates/ops/adhoc_history.html:52
+#: ops/templates/ops/adhoc_history_detail.html:61
+#: ops/templates/ops/task_history.html:58 terminal/models.py:132
+#: terminal/templates/terminal/session_list.html:77
+msgid "Date start"
+msgstr "开始日期"
 
 #: common/api.py:18
 msgid "Test mail sent to {}, please check"
@@ -1381,7 +1403,7 @@ msgid "Type"
 msgstr "类型"
 
 #: common/views.py:21 common/views.py:47 common/views.py:73 common/views.py:103
-#: templates/_nav.html:73
+#: templates/_nav.html:81
 msgid "Settings"
 msgstr "系统设置"
 
@@ -1423,7 +1445,7 @@ msgid "Options"
 msgstr "选项"
 
 #: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:53
-#: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:37
+#: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:38
 msgid "Hosts"
 msgstr "主机"
 
@@ -1454,7 +1476,7 @@ msgid "End time"
 msgstr "完成时间"
 
 #: ops/models/adhoc.py:325 ops/templates/ops/adhoc_history.html:57
-#: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:40
+#: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:41
 msgid "Time"
 msgstr "时间"
 
@@ -1496,7 +1518,7 @@ msgstr "执行历史"
 msgid "ID"
 msgstr "ID"
 
-#: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:35
+#: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:36
 msgid "Run times"
 msgstr "执行次数"
 
@@ -1537,13 +1559,6 @@ msgstr "最后运行成功主机"
 #: ops/templates/ops/task_history.html:36
 msgid "History of "
 msgstr "执行历史"
-
-#: ops/templates/ops/adhoc_history.html:52
-#: ops/templates/ops/adhoc_history_detail.html:61
-#: ops/templates/ops/task_history.html:58 terminal/models.py:132
-#: terminal/templates/terminal/session_list.html:77
-msgid "Date start"
-msgstr "开始日期"
 
 #: ops/templates/ops/adhoc_history.html:53
 #: ops/templates/ops/task_history.html:59
@@ -1628,7 +1643,7 @@ msgstr "最新版本"
 msgid "Contents"
 msgstr "内容"
 
-#: ops/templates/ops/task_list.html:20 ops/templates/ops/task_list.html:25
+#: ops/templates/ops/task_list.html:21 ops/templates/ops/task_list.html:26
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
 #: users/templates/users/login_log_list.html:35
@@ -1636,24 +1651,24 @@ msgstr "内容"
 msgid "Search"
 msgstr "搜索"
 
-#: ops/templates/ops/task_list.html:36
+#: ops/templates/ops/task_list.html:37
 msgid "Versions"
 msgstr "版本"
 
-#: ops/templates/ops/task_list.html:38
+#: ops/templates/ops/task_list.html:39
 msgid "Success"
 msgstr "成功"
 
-#: ops/templates/ops/task_list.html:39
+#: ops/templates/ops/task_list.html:40
 #: users/templates/users/login_log_list.html:54
 msgid "Date"
 msgstr "日期"
 
-#: ops/templates/ops/task_list.html:70
+#: ops/templates/ops/task_list.html:71
 msgid "Run"
 msgstr "执行"
 
-#: ops/templates/ops/task_list.html:124
+#: ops/templates/ops/task_list.html:125
 msgid "Task start: "
 msgstr "任务开始: "
 
@@ -1910,6 +1925,14 @@ msgstr "终端管理"
 msgid "Job Center"
 msgstr "作业中心"
 
+#: templates/_nav.html:64
+msgid "Audits"
+msgstr "日志审计"
+
+#: templates/_nav.html:67
+msgid "FTP log"
+msgstr "FTP日志"
+
 #: templates/captcha/image.html:3
 msgid "Play CAPTCHA as audio file"
 msgstr "语言播放验证码"
@@ -1980,11 +2003,6 @@ msgstr "线程数"
 #: terminal/models.py:103
 msgid "Boot Time"
 msgstr "运行时间"
-
-#: terminal/models.py:126 terminal/templates/terminal/session_list.html:74
-#: terminal/templates/terminal/terminal_detail.html:47
-msgid "Remote addr"
-msgstr "远端地址"
 
 #: terminal/models.py:128 terminal/templates/terminal/session_list.html:102
 msgid "Replay"
@@ -2787,3 +2805,6 @@ msgstr "密码更新"
 #: users/views/user.py:375
 msgid "Public key update"
 msgstr "密钥更新"
+
+#~ msgid "Task has been send, seen left asset status"
+#~ msgstr "任务已下发，查看左侧资产状态"
