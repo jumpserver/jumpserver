@@ -1927,7 +1927,7 @@ msgstr "作业中心"
 
 #: templates/_nav.html:64
 msgid "Audits"
-msgstr "审计"
+msgstr "日志审计"
 
 #: templates/_nav.html:67
 msgid "FTP log"

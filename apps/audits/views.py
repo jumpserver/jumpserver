@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.views.generic import ListView
+from django.utils.translation import ugettext as _
 
 from common.mixins import AdminUserRequiredMixin, DatetimeSearchMixin
 
@@ -46,6 +47,8 @@ class FTPLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             'asset': self.asset,
             'system_user': self.system_user,
             'filename': self.filename,
+            "app": _("Audits"),
+            "action": _("FTP log"),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
