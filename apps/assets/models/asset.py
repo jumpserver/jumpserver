@@ -101,6 +101,10 @@ class Asset(models.Model):
         else:
             return False
 
+    def get_nodes(self):
+        from .node import Node
+        return self.nodes.all() or [Node.root()]
+
     @property
     def hardware_info(self):
         if self.cpu_count:

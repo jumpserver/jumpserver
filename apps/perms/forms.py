@@ -4,27 +4,32 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import NodePermission
+from .models import AssetPermission
 
 
 class AssetPermissionForm(forms.ModelForm):
     class Meta:
-        model = NodePermission
-        fields = [
-            'node', 'user_group', 'system_user', 'is_active',
-            'date_expired', 'comment',
-        ]
+        model = AssetPermission
+        exclude = (
+            'id', 'date_created', 'created_by'
+        )
         widgets = {
-            'node': forms.Select(
-                attrs={'style': 'display:none'}
+            'users': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _("User")}
             ),
-            'user_group': forms.Select(
+            'user_groups': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _("User group")}
             ),
-            'system_user': forms.Select(
+            'assets': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _("Asset")}
+            ),
+            'nodes': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _("Node")}
+            ),
+            'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
         }
-
-    def clean_system_user(self):
-        return self.cleaned_data['system_user']
+        labels = {
+            'nodes': _("Node"),
+        }

@@ -232,6 +232,14 @@ def setattr_bulk(seq, key, value):
     return map(set_attr, seq)
 
 
+def set_or_append_attr_bulk(seq, key, value):
+    for obj in seq:
+        ori = getattr(obj, key, None)
+        if ori:
+            value += " " + ori
+        setattr(obj, key, value)
+
+
 def content_md5(data):
     """计算data的MD5值，经过Base64编码并返回str类型。
 

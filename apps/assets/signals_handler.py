@@ -31,7 +31,7 @@ def set_asset_root_node(asset):
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
 def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
-    set_asset_root_node(instance)
+    # set_asset_root_node(instance)
     if created:
         logger.info("Asset `{}` create signal received".format(instance))
         update_asset_hardware_info_on_created(instance)
