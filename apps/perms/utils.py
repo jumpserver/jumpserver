@@ -12,7 +12,7 @@ from .models import AssetPermission
 logger = get_logger(__file__)
 
 
-class AssetPermissionUtils:
+class AssetPermissionUtil:
 
     @staticmethod
     def get_user_permissions(user):
@@ -82,6 +82,23 @@ class AssetPermissionUtils:
         return assets
 
     @classmethod
+    def get_user_group_nodes_with_assets(cls, user):
+        """
+        :param user:
+        :return: {node: {asset: set(su1, su2)}}
+        """
+        nodes = defaultdict(dict)
+        _assets = cls.get_user_group_assets(user)
+        for asset, _system_users in _assets.items():
+            _nodes = asset.get_nodes()
+            for node in _nodes:
+                if asset in nodes[node]:
+                    nodes[node][asset].update(_system_users)
+                else:
+                    nodes[node][asset] = _system_users
+        return nodes
+
+    @classmethod
     def get_user_assets_direct(cls, user):
         assets = defaultdict(set)
         permissions = list(cls.get_user_permissions(user))
@@ -142,7 +159,7 @@ class AssetPermissionUtils:
         return assets
 
     @classmethod
-    def get_user_node_with_assets(cls, user):
+    def get_user_nodes_with_assets(cls, user):
         """
         :param user:
         :return: {node: {asset: set(su1, su2)}}
@@ -178,8 +195,11 @@ class AssetPermissionUtils:
         return system_users
 
 
-
+# Abandon
 class NodePermissionUtil:
+    """
+
+    """
 
     @staticmethod
     def get_user_group_permissions(user_group):

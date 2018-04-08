@@ -34,7 +34,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return len(obj.assets)
+        return len(obj.get_assets())
 
 
 class SystemUserAuthSerializer(AuthSerializer):

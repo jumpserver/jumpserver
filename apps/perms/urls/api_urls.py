@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^v1/user/assets/$', api.UserGrantedAssetsApi.as_view(), name='my-assets'),
     url(r'^v1/user/(?P<pk>[0-9a-zA-Z\-]{36})/nodes/$', api.UserGrantedNodesApi.as_view(), name='user-nodes'),
     url(r'^v1/user/nodes/$', api.UserGrantedNodesApi.as_view(), name='my-nodes'),
+    url(r'^v1/user/(?P<pk>[0-9a-zA-Z\-]{36})/nodes/(?P<node_id>[0-9a-zA-Z\-]{36})/assets/$', api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
+    url(r'^v1/user/nodes/(?P<node_id>[0-9a-zA-Z\-]{36})/assets/$', api.UserGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
     url(r'^v1/user/(?P<pk>[0-9a-zA-Z\-]{36})/nodes-assets/$', api.UserGrantedNodesWithAssetsApi.as_view(), name='user-nodes-assets'),
     url(r'^v1/user/nodes-assets/$', api.UserGrantedNodesWithAssetsApi.as_view(), name='my-nodes-assets'),
 
@@ -22,6 +24,7 @@ urlpatterns = [
     url(r'^v1/user-group/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
     url(r'^v1/user-group/(?P<pk>[0-9a-zA-Z\-]{36})/nodes/$', api.UserGroupGrantedNodesApi.as_view(), name='user-group-nodes'),
     url(r'^v1/user-group/(?P<pk>[0-9a-zA-Z\-]{36})/nodes-assets/$', api.UserGroupGrantedNodesWithAssetsApi.as_view(), name='user-group-nodes-assets'),
+    url(r'^v1/user-group/(?P<pk>[0-9a-zA-Z\-]{36})/nodes/(?P<node_id>[0-9a-zA-Z\-]{36})/assets/$', api.UserGroupGrantedNodeAssetsApi.as_view(), name='user-group-node-assets'),
 
     # 验证用户是否有某个资产和系统用户的权限
     url(r'v1/asset-permission/user/validate/$', api.ValidateUserAssetPermissionView.as_view(), name='validate-user-asset-permission'),

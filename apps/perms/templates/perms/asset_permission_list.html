@@ -116,7 +116,7 @@
                 </td>
                 <td class="text-center">
                     <a href="{% url 'perms:asset-permission-update' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>
-                    <a href="" class="btn btn-xs btn-danger m-l-xs">{% trans "Delete" %}</a>
+                    <a data-uid="{{ object.id }}" class="btn btn-xs btn-danger m-l-xs btn-delete">{% trans "Delete" %}</a>
                 </td>
                 <td>{{ object.users_detail }}</td>
                 <td>{{ object.user_groups_detail }}</td>
@@ -147,6 +147,15 @@
             calendarWeeks: true,
             autoclose: true
         });
+    }).on('click', '.btn-delete', function () {
+        var $this = $(this);
+        var uid = $this.data('uid');
+        var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+        objectDelete($this, name, the_url);
+        setTimeout( function () {
+            window.reload();
+        }, 1000);
     });
 </script>
 {% endblock %}

@@ -3,6 +3,7 @@
 #
 
 import logging
+import uuid
 
 from django.core.cache import cache
 from django.db import models
@@ -100,10 +101,11 @@ class SystemUser(AssetUser):
     )
 
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
+    assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
-    sudo = models.TextField(default='/sbin/ifconfig', verbose_name=_('Sudo'))
+    sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
 
     def __str__(self):
@@ -119,9 +121,8 @@ class SystemUser(AssetUser):
             'auto_push': self.auto_push,
         }
 
-    @property
-    def assets(self):
-        assets = set()
+    def get_assets(self):
+        assets = set(self.assets.all())
         for node in self.nodes.all():
             assets.update(set(node.get_all_assets()))
         return assets
@@ -168,6 +169,3 @@ class SystemUser(AssetUser):
             except IntegrityError:
                 print('Error continue')
                 continue
-
-
-
