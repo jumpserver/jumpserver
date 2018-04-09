@@ -78,7 +78,7 @@ class BaseInventory(InventoryManager):
     variable_manager_class = VariableManager
     host_manager_class = BaseHost
 
-    def __init__(self, host_list=None):
+    def __init__(self, host_list=None, group_list=None):
         """
         用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
         host_list: [{
@@ -97,11 +97,14 @@ class BaseInventory(InventoryManager):
             "vars": {},
           },
         ]
+        group_list: [
+          {"name: "", children: [""]},
+        ]
         :param host_list:
+        :param group_list
         """
-        if host_list is None:
-            host_list = []
-        self.host_list = host_list
+        self.host_list = host_list or []
+        self.group_list = group_list or []
         assert isinstance(host_list, list)
         self.loader = self.loader_class()
         self.variable_manager = self.variable_manager_class()
@@ -113,24 +116,39 @@ class BaseInventory(InventoryManager):
     def get_group(self, name):
         return self._inventory.groups.get(name, None)
 
-    def parse_sources(self, cache=False):
-        group_all = self.get_group('all')
-        ungrouped = self.get_group('ungrouped')
+    def get_or_create_group(self, name):
+        group = self.get_group(name)
+        if not group:
+            self.add_group(name)
+            return self.get_or_create_group(name)
+        else:
+            return group
 
+    def parse_groups(self):
+        for g in self.group_list:
+            parent = self.get_or_create_group(g.get("name"))
+            children = [self.get_or_create_group(n) for n in g.get('children', [])]
+            for child in children:
+                parent.add_child_group(child)
+
+    def parse_hosts(self):
+        group_all = self.get_or_create_group('all')
+        ungrouped = self.get_or_create_group('ungrouped')
         for host_data in self.host_list:
             host = self.host_manager_class(host_data=host_data)
             self.hosts[host_data['hostname']] = host
             groups_data = host_data.get('groups')
             if groups_data:
                 for group_name in groups_data:
-                    group = self.get_group(group_name)
-                    if group is None:
-                        self.add_group(group_name)
-                        group = self.get_group(group_name)
+                    group = self.get_or_create_group(group_name)
                     group.add_host(host)
             else:
                 ungrouped.add_host(host)
             group_all.add_host(host)
+
+    def parse_sources(self, cache=False):
+        self.parse_groups()
+        self.parse_hosts()
 
     def get_matched_hosts(self, pattern):
         return self.get_hosts(pattern)

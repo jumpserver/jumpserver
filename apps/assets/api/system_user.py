@@ -48,15 +48,6 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
 
-    def update(self, request, *args, **kwargs):
-        password = request.data.pop("password", None)
-        private_key = request.data.pop("private_key", None)
-        instance = self.get_object()
-
-        if password or private_key:
-            instance.set_auth(password=password, private_key=private_key)
-        return super().update(request, *args, **kwargs)
-
 
 class SystemUserPushApi(generics.RetrieveAPIView):
     """
@@ -67,8 +58,8 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        push_system_user_to_assets_manual.delay(system_user)
-        return Response({"msg": "Task created"})
+        task = push_system_user_to_assets_manual.delay(system_user)
+        return Response({"task": task.id})
 
 
 class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
@@ -80,5 +71,5 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        test_system_user_connectability_manual.delay(system_user)
-        return Response({"msg": "Task created"})
+        task = test_system_user_connectability_manual.delay(system_user)
+        return Response({"task": task.id})

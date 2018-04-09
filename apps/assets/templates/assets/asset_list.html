@@ -182,7 +182,6 @@ function initTable() {
     return asset_table
 }
 
-
 function addTreeNode() {
 	hideRMenu();
 	var parentNode = zTree.getSelectedNodes()[0];
@@ -237,7 +236,6 @@ function editTreeNode() {
     }
     zTree.editName(current_node);
 }
-
 
 function OnRightClick(event, treeId, treeNode) {
     if (!treeNode && event.target.tagName.toLowerCase() !== "button" && $(event.target).parents("a").length === 0) {
@@ -432,6 +430,11 @@ $(document).ready(function(){
 .on('click', '.btn_export', function () {
     var $data_table = $('#asset_list_table').DataTable();
     var rows = $data_table.rows('.selected').data();
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length === 1) {
+        current_node = nodes[0];
+    }
     var assets = [];
     $.each(rows, function (index, obj) {
         assets.push(obj.id)
@@ -439,7 +442,7 @@ $(document).ready(function(){
     $.ajax({
         url: "{% url "assets:asset-export" %}",
         method: 'POST',
-        data: JSON.stringify({assets_id: assets}),
+        data: JSON.stringify({assets_id: assets, node_id: current_node.id}),
         dataType: "json",
         success: function (data, textStatus) {
             window.open(data.redirect)
@@ -451,6 +454,14 @@ $(document).ready(function(){
 })
 .on('click', '#btn_asset_import', function () {
     var $form = $('#fm_asset_import');
+    var action = $form.attr("action");
+    var nodes = zTree.getSelectedNodes();
+    var current_node;
+    if (nodes && nodes.length ===1 ){
+        current_node = nodes[0];
+        action += "?node_id=" + current_node.id;
+        $form.attr("action", action)
+    }
     $form.find('.help-block').remove();
     function success (data) {
         if (data.valid === false) {
@@ -489,14 +500,17 @@ $(document).ready(function(){
     }
 
     var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
-    function success() {
+    function success(data) {
         rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
     }
     APIUpdateAttr({
         url: the_url,
         method: "GET",
-        success_message: "更新硬件信息任务下发成功",
-        success: success
+        success: success,
+        flash_message: false
     });
 
 })
@@ -511,14 +525,17 @@ $(document).ready(function(){
     }
 
     var the_url = url.replace("{{ DEFAULT_PK }}", current_node.id);
-    function success() {
+    function success(data) {
         rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
     }
     APIUpdateAttr({
         url: the_url,
         method: "GET",
-        success_message: "测试可连接性任务下发成功",
-        success: success
+        success: success,
+        flash_message: false
     });
 })
 .on('click', '.btn_asset_delete', function () {

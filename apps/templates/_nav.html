@@ -21,6 +21,7 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset list' %}</a></li>
+        <li id="domain"><a href="{% url 'assets:domain-list' %}">{% trans 'Domain list' %}</a></li>
         <li id="admin-user"><a href="{% url 'assets:admin-user-list' %}">{% trans 'Admin user' %}</a></li>
         <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
         <li id="label"><a href="{% url 'assets:label-list' %}">{% trans 'Labels' %}</a></li>
@@ -56,6 +57,14 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
+    </ul>
+</li>
+<li id="audits">
+    <a>
+        <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="ftp-log"><a href="{% url 'audits:ftp-log-list' %}">{% trans 'FTP log' %}</a></li>
     </ul>
 </li>
 {#<li id="">#}

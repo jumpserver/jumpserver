@@ -115,7 +115,7 @@ class User(AbstractUser):
             import sshpubkeys
             try:
                 return sshpubkeys.SSHKey(self.public_key)
-            except TabError:
+            except (TabError, TypeError):
                 pass
         return PubKey()
 

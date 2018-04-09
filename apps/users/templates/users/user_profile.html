@@ -22,7 +22,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label label-primary"><b>{{ user.name }}</b></span>
@@ -120,7 +120,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                    <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                         <div class="panel panel-primary">
                             <div class="panel-heading">
                                 <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
@@ -129,18 +129,26 @@
                                 <table class="table">
                                     <tbody>
                                     <tr class="no-borders-tr">
-                                        <td>{% trans 'Reset password' %}:</td>
+                                        <td>{% trans 'Update password' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Reset' %}</a>
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Update' %}</a>
                                             </span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>{% trans 'Reset SSH public key' %}:</td>
+                                        <td>{% trans 'Update SSH public key' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-pubkey-update' %}">{% trans 'Reset' %}</a>
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-pubkey-update' %}">{% trans 'Update' %}</a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Reset public key and download' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <a type="button" class="btn btn-primary btn-xs btn-reset-pubkey" style="width: 54px">{% trans 'Reset' %}</a>
                                             </span>
                                         </td>
                                     </tr>
@@ -180,8 +188,11 @@ $(document).on('click', '#btn_update_pk', function() {
               $('#txt_pk').focus();
             }
         );
-    }
+    };
     APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
+}).on('click', '.btn-reset-pubkey', function () {
+    var the_url = '{% url "users:user-pubkey-generate" %}';
+    window.open(the_url, "_blank")
 })
 </script>
 {% endblock %}

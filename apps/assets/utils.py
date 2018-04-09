@@ -1,10 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
-from collections import defaultdict
-from functools import reduce
-import operator
 
-from django.db.models import Q
+import paramiko
 
 from common.utils import get_object_or_none
 from .models import Asset, SystemUser, Label
@@ -44,5 +41,41 @@ class LabelFilter:
         return queryset
 
 
+def test_gateway_connectability(gateway):
+    """
+    Test system cant connect his assets or not.
+    :param gateway:
+    :return:
+    """
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+    proxy_command = [
+        "ssh", "{}@{}".format(gateway.username, gateway.ip),
+        "-p", str(gateway.port), "-W", "127.0.0.1:{}".format(gateway.port),
+    ]
 
+    if gateway.password:
+        proxy_command.insert(0, "sshpass -p '{}'".format(gateway.password))
+    if gateway.private_key:
+        proxy_command.append("-i {}".format(gateway.private_key_file))
+
+    try:
+        sock = paramiko.ProxyCommand(" ".join(proxy_command))
+    except paramiko.ProxyCommandFailure as e:
+        return False, str(e)
+
+    try:
+        client.connect("127.0.0.1", port=gateway.port,
+                       username=gateway.username,
+                       password=gateway.password,
+                       key_filename=gateway.private_key_file,
+                       sock=sock,
+                       timeout=5
+                       )
+    except (paramiko.SSHException, paramiko.ssh_exception.SSHException,
+            paramiko.AuthenticationException, TimeoutError) as e:
+        return False, str(e)
+    finally:
+        client.close()
+    return True, None

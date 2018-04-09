@@ -1,8 +1,9 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
 {% load static %}
+
 {% block content_left_head %}
-    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+{#    <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create task" %} </a></div>#}
 {% endblock %}
 
 
@@ -111,9 +112,10 @@ $(document).ready(function() {
     var error = function (data) {
         alert(data)
     };
-    var success = function () {
-        alert("任务开始执行，重定向到任务详情页面，多刷新几次查看结果")
-        window.location = "{% url 'ops:task-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', uid);
+    var success = function(data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
     };
     APIUpdateAttr({
         url: the_url,
