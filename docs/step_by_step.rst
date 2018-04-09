@@ -168,7 +168,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/  页面显示不正常先不用处理，搭建 nginx 代理就可以正常访问了
+运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，搭建 nginx 代理就可以正常访问了
 
 附上重启的方法
 
@@ -208,11 +208,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-::
-
-    Coco version 1.0.0, more see https://www.jumpserver.org
-    Starting ssh server at 0.0.0.0:2222
-    Quit the server with CONTROL-C.
+启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受coco的注册，如果页面不正常可以等部署完成后再处理
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,7 +257,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
 修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 启动成功后去
-Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
+Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册，如果页面显示不正常可以等部署完成后再处理
 
 .. code:: shell
 
@@ -356,13 +352,27 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     $ service nginx start
     $ chkconfig nginx on
 
+6.4 开始使用 Jumpserver
 
+检查应用是否已经正常运行
 
-6.4 访问 http://192.168.244.144
+::
+
+    # 如果是新开的终端，别忘了 source /opt/py3/bin/activate
+    $ cd /opt/jumpserver
+    $ ./jms status  # 确定jumpserver已经运行，如果没有运行请重新启动jumpserver
+
+    $ cd /opt/coco
+    $ ./cocod status  # 确定jumpserver已经运行，如果没有运行请重新启动coco
+
+    # 如果安装了 Guacamole
+    $ docker ps  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
+
+服务全部启动后，访问 http://192.168.244.144
 
 默认账号: admin 密码: admin
 
-到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+如果部署过程中没有接受应用的注册，需要到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
 
 ** 测试连接**
 
