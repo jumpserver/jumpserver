@@ -37,22 +37,30 @@ FAQ
 
 ::
 
-    (1). 停止 coco 或 删掉 guacamole 的docker
+    (1). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
+
+    (2). coco 重新注册
 
       $ cd /opt/coco && ./cocod stop
+      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
+      $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
+   (3). guacamole重新注册
+
+      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
       $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
       $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
+      $ rm /opt/guacamole/key/*
+      $ systemctl stop docker
+      $ systemctl start docker
+      $ docker run —name jms_guacamole -d \
+         -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+         -e JUMPSERVER_SERVER=http://<填写jumpserver的IP地址>:8080 \
+         registry.jumpserver.org/public/guacamole:1.0.0
 
-      # 可以使用docker --help 查询用法
-
-   (2). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
-
-   (3). 删掉它们曾经注册的key
-
-      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
-      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
-
+      # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
+      $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
 
 5. Ansible报错汇总
 
