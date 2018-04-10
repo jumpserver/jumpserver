@@ -211,6 +211,12 @@ class User(AbstractUser):
     def otp_enabled(self):
         return self.otp_level > 0
 
+    def enabled_otp(self):
+        self.otp_level = 1
+
+    def force_enable_otp(self):
+        self.otp_level = 2
+
     @property
     def otp_force_enabled(self):
         return self.otp_level == 2
