@@ -36,6 +36,7 @@ __all__ = [
     'AssetListView', 'AssetCreateView', 'AssetUpdateView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
     'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
+    'AssetMoreDetailView',
 ]
 logger = get_logger(__file__)
 
@@ -189,6 +190,22 @@ class AssetDetailView(DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
+
+    def get_context_data(self, **kwargs):
+        nodes_remain = Node.objects.exclude(assets=self.object)
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset detail'),
+            'nodes_remain': nodes_remain,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class AssetMoreDetailView(DetailView):
+    model = Asset
+    context_object_name = 'asset'
+    template_name = 'assets/asset_more_detail1.html'
 
     def get_context_data(self, **kwargs):
         nodes_remain = Node.objects.exclude(assets=self.object)
