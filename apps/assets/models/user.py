@@ -123,8 +123,6 @@ class SystemUser(AssetUser):
 
     def get_assets(self):
         assets = set(self.assets.all())
-        for node in self.nodes.all():
-            assets.update(set(node.get_all_assets()))
         return assets
 
     @property

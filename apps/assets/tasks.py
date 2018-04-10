@@ -276,7 +276,7 @@ def test_system_user_connectability_util(system_user, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    assets = system_user.assets
+    assets = system_user.get_assets()
     hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     if not hosts:

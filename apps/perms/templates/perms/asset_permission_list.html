@@ -1,163 +1,324 @@
-{% extends '_base_list.html' %}
-{% load i18n %}
+{% extends 'base.html' %}
 {% load static %}
-{% load common_tags %}
+{% load i18n %}
+
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <link href="{% static 'css/plugins/jstree/style.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
     <style>
-        #search_btn {
-            margin-bottom: 0;
+        .toggle {
+            cursor: pointer;
+        }
+        .detail-key {
+            width: 70px;
         }
     </style>
 {% endblock %}
 
-{% block content_left_head %}
-
-{% endblock %}
-
-{% block table_search %}
-    <div class="uc pull-left m-r-5">
-        <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary ">
-            {% trans "Create permission" %}
-        </a>
-    </div>
-    <form id="search_form" method="get" action="" class="pull-right form-inline" style="padding-bottom: 8px">
-        <div class="input-group">
-            <select class="select2 form-control" name="user">
-                <option value="">{% trans 'User' %}</option>
-                {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="user_group">
-                <option value="">{% trans 'User group' %}</option>
-                {% for g in user_group_list %}
-                    <option value="{{ g }}" {% if g == user_group %} selected {% endif %}>{{ g }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="asset">
-                <option value="">{% trans 'Asset' %}</option>
-                {% for a in asset_list %}
-                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="node">
-                <option value="">{% trans 'Node' %}</option>
-                {% for n in node_list %}
-                    <option value="{{ n }}" {% if n == node %} selected {% endif %}>{{ n }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="system_user">
-                <option value="">{% trans 'System user' %}</option>
-                {% for s in system_user_list %}
-                    <option value="{{ s }}" {% if s == system_user %} selected {% endif %}>{{ s }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <input type="text" class="form-control input-sm" name="q" placeholder="{% trans 'Search' %}" value="{{ q }}">
-        </div>
-        <div class="input-group">
-            <div class="input-group-btn">
-                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    {% trans 'Search' %}
-                </button>
-            </div>
-        </div>
-    </form>
-{% endblock %}
-{% block table_container %}
-    <table class="footable table table-stripped table-bordered toggle-arrow-tiny" data-page="false">
-        <thead>
-        <tr>
-            <th data-sorted="true" data-toggle="true">ID</th>
-            <th>{% trans 'Name' %}</th>
-            <th class="text-center">{% trans 'User' %}</th>
-            <th class="text-center">{% trans 'User group' %}</th>
-            <th class="text-center">{% trans 'Asset' %}</th>
-            <th class="text-center">{% trans 'Node'%}</th>
-            <th class="text-center">{% trans 'System user' %}</th>
-            <th class="text-center">{% trans 'Active' %}</th>
-            <th class="text-center" >{% trans 'Action' %}</th>
-            <th data-hide="all">{% trans 'User' %}</th>
-            <th data-hide="all">{% trans 'User group' %}</th>
-            <th data-hide="all">{% trans 'Asset' %}</th>
-            <th data-hide="all">{% trans 'Node' %}</th>
-            <th data-hide="all">{% trans 'System user' %}</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for object in object_list %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td><a href="#">{{ object.name }}</a></td>
-                <td class="text-center">{{ object.users.count }}</td>
-                <td class="text-center">{{ object.user_groups.count }}</td>
-                <td class="text-center">{{ object.assets.count }}</td>
-                <td class="text-center">{{ object.nodes.count }}</td>
-                <td class="text-center">{{ object.system_users.count }}</td>
-                <td class="text-center">
-                    {% if object.is_valid %}
-                        <i class="fa fa-check text-navy"></i>
-                    {% else %}
-                        <i class="fa fa-times text-danger"></i>
-                    {% endif %}
-                </td>
-                <td class="text-center">
-                    <a href="{% url 'perms:asset-permission-update' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>
-                    <a data-uid="{{ object.id }}" class="btn btn-xs btn-danger m-l-xs btn-delete">{% trans "Delete" %}</a>
-                </td>
-                <td>{{ object.users_detail }}</td>
-                <td>{{ object.user_groups_detail }}</td>
-                <td>{{ object.assets_detail }}</td>
-                <td>{{ object.nodes_detail }}</td>
-                <td>{{ object.system_users_detail }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% block content %}
+<div class="wrapper wrapper-content">
+   <div class="row">
+       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
+           <div class="ibox float-e-margins">
+               <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
+                   <div class="file-manager ">
+                       <div id="assetTree" class="ztree">
+                       </div>
+                       <div class="clearfix"></div>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div class="col-lg-9 animated fadeInRight" id="split-right">
+           <div class="tree-toggle">
+               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
+               </div>
+           </div>
+          <div class="mail-box-header">
+              <div class="uc pull-left m-r-5">
+                   <a class="btn btn-sm btn-primary btn-create-permission">
+                       {% trans "Create permission" %}
+                   </a>
+              </div>
+              <table class="table table-striped table-bordered table-hover" id="permission_list_table" style="width: 100%">
+                  <thead>
+                  <tr>
+                       <th></th>
+                       <th>{% trans 'Name' %}</th>
+                       <th class="text-center">{% trans 'User' %}</th>
+                       <th class="text-center">{% trans 'User group' %}</th>
+                       <th class="text-center">{% trans 'Asset' %}</th>
+                       <th class="text-center">{% trans 'Node'%}</th>
+                       <th class="text-center">{% trans 'System user' %}</th>
+                       <th class="text-center">{% trans 'Active' %}</th>
+                       <th class="text-center" >{% trans 'Action' %}</th>
+                   </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+              </table>
+          </div>
+       </div>
+   </div>
+</div>
 {% endblock %}
 
 {% block custom_foot_js %}
 <script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
 <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
 <script>
-    $(document).ready(function () {
-        $('.footable').footable();
-        $('.select2').select2({
-            dropdownAutoWidth : true,
-            width: 'auto'
-        });
-        $('#date .input-daterange').datepicker({
-            format: "yyyy-mm-dd",
-            todayBtn: "linked",
-            keyboardNavigation: false,
-            forceParse: false,
-            calendarWeeks: true,
-            autoclose: true
-        });
-    }).on('click', '.btn-delete', function () {
-        var $this = $(this);
-        var uid = $this.data('uid');
-        var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
-        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
-        objectDelete($this, name, the_url);
-        setTimeout( function () {
-            window.reload();
-        }, 1000);
+var zTree, table, show = 0;
+
+function onSelected(event, treeNode) {
+    setCookie('node_selected', treeNode.id);
+    var url = table.ajax.url();
+    if (treeNode.is_asset) {
+        url = setUrlParam(url, 'node', "");
+        url = setUrlParam(url, 'asset', treeNode.id)
+    } else {
+        url = setUrlParam(url, 'asset', "");
+        url = setUrlParam(url, 'node', treeNode.id)
+    }
+    setCookie('node_selected', treeNode.id);
+    table.ajax.url(url);
+    table.ajax.reload();
+}
+
+function selectQueryNode() {
+    var query_node_id = $.getUrlParam("node");
+    var cookie_node_id = getCookie('node_selected');
+    var node;
+    var node_id;
+
+    if (query_node_id !== null) {
+        node_id = query_node_id
+    } else if (cookie_node_id !== null) {
+        node_id = cookie_node_id;
+    }
+
+    node = zTree.getNodesByParam("id", node_id, null);
+    if (node){
+        zTree.selectNode(node[0]);
+        node.open = true;
+    }
+}
+
+function filter(treeId, parentNode, childNodes) {
+    $.each(childNodes, function (index, value) {
+        value["pId"] = value["parent"];
+        value["name"] = value["value"];
+        value["isParent"] = value["assets_amount"] !== 0;
+        value["iconSkin"] = value["is_asset"] ? "file" : null;
     });
+    return childNodes;
+}
+
+function beforeAsync(treeId, treeNode) {
+	return true;
+}
+
+function makeLabel(data) {
+    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
+}
+
+function format(d) {
+    var data = "";
+    if (d.users.length > 0 ) {
+        data += makeLabel(["{% trans 'User' %}", d.users.join(", ")])
+    }
+    if (d.user_groups.length > 0) {
+        data += makeLabel(["{% trans 'User group' %}", d.user_groups.join(", ")])
+    }
+    if (d.assets.length > 0) {
+       data += makeLabel(["{% trans 'Asset' %}", d.assets.join(", ")])
+    }
+    if (d.nodes.length > 0) {
+        data += makeLabel(["{% trans 'Node' %}", d.nodes.join(", ")])
+    }
+    if (d.system_users.length > 0) {
+        data += makeLabel(["{% trans 'System user' %}", d.system_users.join(", ")])
+    }
+    return data
+}
+
+function initTable() {
+    var options = {
+        ele: $('#permission_list_table'),
+        toggle: true,
+        columnDefs: [
+            {targets: 0, createdCell: function (td, cellData, rowData) {
+                $(td).addClass("toggle");
+                $(td).html("<i class='fa fa-angle-right'></i>");
+            }},
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "perms:asset-permission-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 2, createdCell: function (td, cellData) {
+                var num = cellData.length;
+                $(td).html(num);
+            }},
+            {targets: 3, createdCell: function (td, cellData) {
+                var num = cellData.length;
+                $(td).html(num);
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                var num = cellData.length;
+                $(td).html(num);
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                var num = cellData.length;
+                $(td).html(num);
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
+                var num = cellData.length;
+                $(td).html(num);
+            }},
+            {targets: 7, createdCell: function (td, cellData) {
+                if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+            }},
+            {targets: 8, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "perms:asset-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                    .replace('{{ DEFAULT_PK }}', cellData)
+                    .replace('99991938', rowData.name);
+                if (rowData.inherit) {
+                    del_btn = del_btn.replace("mark", "disabled")
+                }
+				$(td).html(update_btn + del_btn);
+            }}
+        ],
+        ajax_url: '{% url "api-perms:asset-permission-list" %}',
+        columns: [
+            {data: "id"}, {data: "name"}, {data: "users"},
+            {data: "user_groups"}, {data: "assets"},
+            {data: "nodes"}, {data: "system_users"},
+            {data: "is_active", orderable: false}, {data: "id", orderable: false}
+        ],
+        select: {},
+        op_html: $('#actions').html()
+    };
+    table = jumpserver.initDataTable(options);
+    return table
+}
+
+
+function initTree() {
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            showLine: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        async: {
+			enable: true,
+			url: "{% url 'api-assets:node-children-2' %}?assets=1",
+			autoParam:["id", "name=n", "level=lv"],
+			dataFilter: filter,
+            type: 'get'
+		},
+        callback: {
+            onSelected: onSelected,
+            beforeAsync: beforeAsync
+        }
+    };
+
+    var zNodes = [];
+    $.get("{% url 'api-assets:node-children-2' %}", function(data, status){
+        $.each(data, function (index, value) {
+            value["pId"] = value["parent"];
+            value["isParent"] = value["assets_amount"] !== 0;
+            value["name"] = value["value"];
+            value["open"] = value["key"] === "0";
+        });
+        zNodes = data;
+        {#$.fn.zTree.init($("#assetTree"), setting);#}
+        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+        zTree = $.fn.zTree.getZTreeObj("assetTree");
+        selectQueryNode();
+    });
+}
+
+function toggle() {
+    if (show === 0) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+}
+
+$(document).ready(function(){
+    initTable();
+    initTree();
+})
+.on('click', '.btn-del', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var name = $this.data('name');
+    var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
+            .replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+})
+.on('click', '.btn-create-permission', function () {
+    var url = "{% url 'perms:asset-permission-create' %}";
+    var nodes = zTree.getSelectedNodes();
+    var _nodes = [];
+    var _assets = [];
+    $.each(nodes, function (id, node) {
+        if (node.is_asset) {
+            _assets.push(node.id)
+        } else {
+            _nodes.push(node.id)
+        }
+    });
+    url += "?assets=" + _assets.join(",") + "&nodes=" + _nodes.join(",");
+    window.open(url, '_self');
+}).on('click', '.toggle', function (e) {
+    e.preventDefault();
+    var detailRows = [];
+    var tr = $(this).closest('tr');
+    var row = table.row(tr);
+    var idx = $.inArray(tr.attr('id'), detailRows);
+
+    if (row.child.isShown()) {
+        tr.removeClass('details');
+        row.child.hide();
+
+        // Remove from the 'open' array
+        detailRows.splice(idx, 1);
+    }
+    else {
+        tr.addClass('details');
+        $('.toggle i').removeClass('fa-angle-right').addClass('fa-angle-down');
+        row.child(format(row.data())).show();
+        // Add to the 'open' array
+        if ( idx === -1 ) {
+            detailRows.push(tr.attr('id'));
+        }
+    }
+
+})
+
 </script>
 {% endblock %}
-
-

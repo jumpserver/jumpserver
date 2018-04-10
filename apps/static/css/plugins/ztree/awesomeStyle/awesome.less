@@ -39,11 +39,11 @@ website:    http://code.google.com/p/jquerytree/
     margin:0; padding:5px; color:@color-normal; background-color: @color-bg;
     li {
         padding:0; margin:0; list-style:none; line-height:17px; text-align:left; white-space:nowrap; outline:0;
-        ul { 
+        ul {
             margin: 0px; padding:0 0 0 18px;
         }
         ul.line { }
-        a {padding-right:3px; margin:0; cursor:pointer; height:@h; color:@color-normal; background-color: transparent; 
+        a {padding-right:3px; margin:0; cursor:pointer; height:@h; color:@color-normal; background-color: transparent;
             text-decoration:none; vertical-align:top; display: inline-block;
             input.rename {height:14px; width:80px; padding:0; margin:0;
                           color: @color-bg; background-color: @color-normal;
@@ -64,11 +64,11 @@ website:    http://code.google.com/p/jquerytree/
         span.button {line-height:0; margin:0; padding: 0; width:@w; height:@h; display: inline-block; vertical-align:top;
           border:0px solid; cursor: pointer;outline:none;
           background-color:transparent; background-repeat:no-repeat; background-attachment: scroll;
- 
+
             &::before{color: @color-normal; font-family: FontAwesome; padding-top:@pad-top;}
             &.chk { margin:0px; cursor: auto; width: 12px;
                 display: inline-block;padding-top:@pad-top;padding-left:@pad-left;
-                
+
                 &.checkbox_false_full::before {content: @fa-square-o;}
                 &.checkbox_false_full_focus::before {content: @fa-square-o; color:@color-highlight;}
                 &.checkbox_false_part::before {content: @fa-square-o;color: @color-partial;}
@@ -82,7 +82,7 @@ website:    http://code.google.com/p/jquerytree/
                 &.checkbox_true_part::before {content: @fa-check-square-o;color: @color-partial}
                 &.checkbox_true_part_focus::before {content: @fa-check-square-o;color: @color-partfocus;}
                 &.checkbox_true_disable::before {content: @fa-check-square-o;color: @color-disabled}
-                 
+
                 &.radio_false_full::before {content: @fa-circle-o;}
                 &.radio_false_full_focus::before {content: @fa-circle-o;color: @color-highlight}
                 &.radio_false_part::before {content: @fa-circle-o;color: @color-partial}
@@ -93,17 +93,17 @@ website:    http://code.google.com/p/jquerytree/
                 &.radio_true_part::before {content: @fa-dot-circle-o;color: @color-partial}
                 &.radio_true_part_focus::before {content: @fa-dot-circle-o;color: @color-partial;}
                 &.radio_true_disable::before {content: @fa-circle-thin;color: @color-disabled}
-                
+
             }
             &.switch  {width:@w; height:@h}
-            &.root_open::before{content: @fa-chevron-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.root_close::before{content: @fa-chevron-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.roots_open::before{content: @fa-chevron-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.roots_close::before{content: @fa-chevron-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.center_open::before{content: @fa-chevron-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.center_close::before{content: @fa-chevron-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.bottom_open::before{content: @fa-chevron-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
-            &.bottom_close::before{content: @fa-chevron-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}  
+            &.root_open::before{content: @fa-angle-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.root_close::before{content: @fa-angle-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.roots_open::before{content: @fa-angle-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.roots_close::before{content: @fa-angle-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.center_open::before{content: @fa-angle-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.center_close::before{content: @fa-angle-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.bottom_open::before{content: @fa-angle-down;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
+            &.bottom_close::before{content: @fa-angle-right;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;}
             &.noline_open{}
             &.noline_close{}
             &.root_docu{ background:none;}
@@ -111,11 +111,15 @@ website:    http://code.google.com/p/jquerytree/
             &.center_docu::before{padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
             &.bottom_docu::before{padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
             &.noline_docu{ background:none;}
-    
+
             &.ico_open::before {content: @fa-folder-open;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
             &.ico_close::before {content: @fa-folder;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
-            &.ico_docu::before{content: @fa-folder-o;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
-            
+            &.ico_docu::before{content: @fa-folder;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
+
+            &.file_ico_docu::before{content: @fa-list-alt;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
+            &.linux_ico_docu::before{content: @fa-linux;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
+            &.windows_ico_docu::before{content: @fa-windows;font-family: FontAwesome;padding-top:@pad-top;padding-left:@pad-left;display: inline-block;color:@color-normal;}
+
             &.edit {margin-left:4px; margin-right: -1px;  vertical-align:top; *vertical-align:middle;padding-top:@pad-top;}
             &.edit::before{content: @fa-pencil-square-o;font-family: FontAwesome;}
     

@@ -33,3 +33,22 @@ class AssetPermissionForm(forms.ModelForm):
         labels = {
             'nodes': _("Node"),
         }
+
+    def clean_user_groups(self):
+        users = self.cleaned_data.get('users')
+        user_groups = self.cleaned_data.get('user_groups')
+
+        if not users and not user_groups:
+            raise forms.ValidationError(
+                _("User or group at least one required"))
+        return self.cleaned_data["user_groups"]
+
+    def clean_asset_groups(self):
+        assets = self.cleaned_data.get('assets')
+        asset_groups = self.cleaned_data.get('asset_groups')
+
+        if not assets and not asset_groups:
+            raise forms.ValidationError(
+                _("Asset or group at least one required"))
+
+        return self.cleaned_data["asset_groups"]
