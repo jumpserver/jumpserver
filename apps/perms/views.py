@@ -8,7 +8,7 @@ from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 from django.conf import settings
 
-from common.utils import get_object_or_none
+from common.utils import is_uuid
 from .hands import AdminUserRequiredMixin, Node, Asset
 from .models import AssetPermission
 from .forms import AssetPermissionForm
@@ -37,13 +37,15 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
-        nodes_id = self.request.GET.get("nodes").split(",")
-        assets_id = self.request.GET.get("assets").split(",")
+        nodes_id = self.request.GET.get("nodes")
+        assets_id = self.request.GET.get("assets")
 
         if nodes_id:
+            nodes_id = nodes_id.split(",")
             nodes = Node.objects.filter(id__in=nodes_id)
             form['nodes'].initial = nodes
         if assets_id:
+            assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
             form['assets'].initial = assets
         return form

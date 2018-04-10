@@ -358,11 +358,17 @@ def get_short_uuid_str():
     return str(uuid.uuid4()).split('-')[-1]
 
 
-def is_uuid(s):
-    if UUID_PATTERN.match(s):
-        return True
+def is_uuid(seq):
+    if isinstance(seq, str):
+        if UUID_PATTERN.match(seq):
+            return True
+        else:
+            return False
     else:
-        return False
+        for s in seq:
+            if not is_uuid(s):
+                return False
+        return True
 
 
 def get_signer():
@@ -386,3 +392,4 @@ class TeeObj:
 
     def close(self):
         self.file_obj.close()
+
