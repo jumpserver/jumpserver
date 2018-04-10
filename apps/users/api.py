@@ -26,10 +26,14 @@ logger = get_logger(__name__)
 
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
-    # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUserOrAppUser, IsAuthenticated)
+    permission_classes = (IsSuperUser,)
     filter_fields = ('username', 'email', 'name', 'id')
+
+    def get_permissions(self):
+        if self.action == "retrieve":
+            self.permission_classes = (IsSuperUserOrAppUser,)
+        return super().get_permissions()
 
 
 class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
@@ -57,7 +61,6 @@ class UserResetPasswordApi(generics.UpdateAPIView):
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
         # We just do the reset-password stuff.
-        import uuid
         from .utils import send_reset_password_mail
         user = self.get_object()
         user.password_raw = str(uuid.uuid4())
@@ -68,6 +71,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_update(self, serializer):
         from .utils import send_reset_ssh_key_mail
@@ -91,6 +95,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
