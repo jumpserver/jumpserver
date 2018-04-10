@@ -38,7 +38,7 @@ class Node(models.Model):
         mark = self.child_mark
         self.child_mark += 1
         self.save()
-        return "{}:{}".format(self.key, mark)
+        return "{}:[{}]".format(self.key, mark)
 
     def create_child(self, value):
         child_key = self.get_next_child_key()
@@ -46,7 +46,7 @@ class Node(models.Model):
         return child
 
     def get_children(self):
-        return self.__class__.objects.filter(key__regex=r'{}:[0-9]+$'.format(self.key))
+        return self.__class__.objects.filter(key__regex=r'{}:[\[\]0-9]+$'.format(self.key))
 
     def get_all_children(self):
         return self.__class__.objects.filter(key__startswith='{}:'.format(self.key))
@@ -77,13 +77,13 @@ class Node(models.Model):
         return self.get_all_assets().filter(is_active=True)
 
     def is_root(self):
-        return self.key == '0'
+        return self.key == '[0]'
 
     @property
     def parent(self):
-        if self.key == "0":
+        if self.key == "[0]":
             return self.__class__.root()
-        elif not self.key.startswith("0"):
+        elif not self.key.startswith("[0]"):
             return self.__class__.root()
 
         parent_key = ":".join(self.key.split(":")[:-1])
@@ -114,6 +114,7 @@ class Node(models.Model):
     @classmethod
     def root(cls):
         obj, created = cls.objects.get_or_create(
-            key='0', defaults={"key": '0', 'value': "ROOT"}
+            key='[0]', defaults={"key": '[0]', 'value': "ROOT"}
         )
         return obj
+
