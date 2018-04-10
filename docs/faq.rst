@@ -39,7 +39,7 @@ FAQ
 
     (1). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
 
-    (2). coco 重新注册
+    (2). coco 重新注册（注意虚拟环境 source /opt/py3/bin/activate）
 
       $ cd /opt/coco && ./cocod stop
       $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
