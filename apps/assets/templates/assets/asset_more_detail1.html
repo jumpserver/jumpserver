@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load bootstrap3 %}
 {% load i18n %}
+{% load asset_tags %}
+{% load common_tags %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 
 {% block custom_head_css_js %}
     <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
@@ -54,17 +60,19 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    {% bootstrap_field form.project layout="horizontal" %}
-                                    {% bootstrap_field form.manage layout="horizontal" %}
-                                    {% bootstrap_field form.app_path layout="horizontal" %}
-                                    {% bootstrap_field form.app_name layout="horizontal" %}
-                                    {% bootstrap_field form.app_data_path layout="horizontal" %}
-                                    {% bootstrap_field form.app_port layout="horizontal" %}
-                                    {% bootstrap_field form.broadband layout="horizontal" %}
-                                    {% bootstrap_field form.public_ip layout="horizontal" %}
-                                    {% bootstrap_field form.intranet_ip layout="horizontal" %}
-                                    {% bootstrap_field form.use_date layout="horizontal" %}
-                                    {% bootstrap_field form.status layout="horizontal" %}
+                                    <form action="/url/to/submit/" method="post" class="form">
+                                        {% bootstrap_field form.project layout="horizontal" %}
+                                        {% bootstrap_field form.manage layout="horizontal" %}
+                                        {% bootstrap_field form.app_path layout="horizontal" %}
+                                        {% bootstrap_field form.app_name layout="horizontal" %}
+                                        {% bootstrap_field form.app_data_path layout="horizontal" %}
+                                        {% bootstrap_field form.app_port layout="horizontal" %}
+                                        {% bootstrap_field form.broadband layout="horizontal" %}
+                                        {% bootstrap_field form.public_ip layout="horizontal" %}
+                                        {% bootstrap_field form.intranet_ip layout="horizontal" %}
+                                        {% bootstrap_field form.use_date layout="horizontal" %}
+                                        {% bootstrap_field form.status layout="horizontal" %}
+                                    </form>
                                 </div>
                             </div>
                         </div>
