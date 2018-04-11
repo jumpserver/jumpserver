@@ -20,7 +20,7 @@
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
                             <li class="active">
-                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset more_details' %} </a>
+                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> 项目细节 </a>
                             </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
@@ -54,53 +54,17 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <form>
-                                        <table class="table">
-                                            <tbody>
-                                            <tr>
-                                                <td>项目:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>负责人:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>应用地址:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>应用程序名:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>应用存储数据位置:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>程序占用对应端口:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>占用带宽:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>公网IP:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>使用期限:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>状态:</td>
-                                                <td><input type="text"></td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                        <button type="submit">保存</button>
-                                    </form>
+                                    {% bootstrap_field form.project layout="horizontal" %}
+                                    {% bootstrap_field form.manage layout="horizontal" %}
+                                    {% bootstrap_field form.app_path layout="horizontal" %}
+                                    {% bootstrap_field form.app_name layout="horizontal" %}
+                                    {% bootstrap_field form.app_data_path layout="horizontal" %}
+                                    {% bootstrap_field form.app_port layout="horizontal" %}
+                                    {% bootstrap_field form.broadband layout="horizontal" %}
+                                    {% bootstrap_field form.public_ip layout="horizontal" %}
+                                    {% bootstrap_field form.intranet_ip layout="horizontal" %}
+                                    {% bootstrap_field form.use_date layout="horizontal" %}
+                                    {% bootstrap_field form.status layout="horizontal" %}
                                 </div>
                             </div>
                         </div>
