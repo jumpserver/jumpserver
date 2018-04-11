@@ -114,8 +114,12 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
         for node, _assets in nodes.items():
             assets = _assets.keys()
-            for asset, system_users in _assets.items():
-                asset.system_users_granted = system_users
+            for k, v in _assets.items():
+                if k.is_unixlike():
+                    system_users_granted = [s for s in v if s.protocol == 'ssh']
+                else:
+                    system_users_granted = [s for s in v if s.protocol == 'rdp']
+                k.system_users_granted = system_users_granted
             node.assets_granted = assets
             queryset.append(node)
         return queryset
