@@ -280,7 +280,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     $ yum -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf
+6.2 准备配置文件 修改 /etc/nginx/nginx.conf
 
 内容如下：
 
