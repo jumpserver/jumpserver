@@ -55,7 +55,7 @@ class User(AbstractUser):
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
     def __str__(self):
-        return self.username
+        return '{0.name}({0.username})'.format(self)
 
     @property
     def password_raw(self):
