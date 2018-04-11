@@ -84,7 +84,7 @@ class Asset(models.Model):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
-        return self.hostname
+        return '{0.hostname}({0.ip})'.format(self)
 
     @property
     def is_valid(self):
@@ -100,6 +100,10 @@ class Asset(models.Model):
             return True
         else:
             return False
+
+    def get_nodes(self):
+        from .node import Node
+        return self.nodes.all() or [Node.root()]
 
     @property
     def hardware_info(self):

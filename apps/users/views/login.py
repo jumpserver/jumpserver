@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals
 import os
-from django import forms
 from django.shortcuts import render
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -20,10 +19,9 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.conf import settings
-from django.utils import timezone
 
 from common.utils import get_object_or_none
-from common.mixins import DatetimeSearchMixin
+from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail
 from ..tasks import write_login_log_async
@@ -194,8 +192,6 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
             for field in form:
                 if field.value():
                     setattr(user, field.name, field.value())
-                if field.name == 'enable_otp':
-                    user.enable_otp = field.value()
         user.is_first_login = False
         user.is_public_key_valid = True
         user.save()
@@ -228,7 +224,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         return form
 
 
-class LoginLogListView(DatetimeSearchMixin, ListView):
+class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     template_name = 'users/login_log_list.html'
     model = LoginLog
     paginate_by = settings.DISPLAY_PER_PAGE

@@ -42,7 +42,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount']
+        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_asset']
         list_serializer_class = BulkListSerializer
 
     @staticmethod

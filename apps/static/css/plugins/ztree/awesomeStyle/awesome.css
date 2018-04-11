@@ -212,49 +212,49 @@ website:    http://code.google.com/p/jquerytree/
   height: 20px;
 }
 .ztree li span.button.root_open::before {
-  content: "\f078";
+  content: "\f107";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.root_close::before {
-  content: "\f054";
+  content: "\f105";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.roots_open::before {
-  content: "\f078";
+  content: "\f107";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.roots_close::before {
-  content: "\f054";
+  content: "\f105";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.center_open::before {
-  content: "\f078";
+  content: "\f107";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.center_close::before {
-  content: "\f054";
+  content: "\f105";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.bottom_open::before {
-  content: "\f078";
+  content: "\f107";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
 }
 .ztree li span.button.bottom_close::before {
-  content: "\f054";
+  content: "\f105";
   padding-top: 10px;
   padding-left: 2px;
   display: inline-block;
@@ -300,7 +300,31 @@ website:    http://code.google.com/p/jquerytree/
   color: #676a6c;
 }
 .ztree li span.button.ico_docu::before {
-  content: "\f114";
+  content: "\f07b";
+  font-family: FontAwesome;
+  padding-top: 10px;
+  padding-left: 2px;
+  display: inline-block;
+  color: #676a6c;
+}
+.ztree li span.button.file_ico_docu::before {
+  content: "\f022";
+  font-family: FontAwesome;
+  padding-top: 10px;
+  padding-left: 2px;
+  display: inline-block;
+  color: #676a6c;
+}
+.ztree li span.button.linux_ico_docu::before {
+  content: "\f17c";
+  font-family: FontAwesome;
+  padding-top: 10px;
+  padding-left: 2px;
+  display: inline-block;
+  color: #676a6c;
+}
+.ztree li span.button.windows_ico_docu::before {
+  content: "\f17a";
   font-family: FontAwesome;
   padding-top: 10px;
   padding-left: 2px;

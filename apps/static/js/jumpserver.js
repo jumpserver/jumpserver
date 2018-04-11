@@ -62,7 +62,6 @@ function GetTableDataBox() {
          }
         }
     for (i in id_list) {
-        console.log(tabProduct);
         tableData.push(GetRowData(tabProduct.rows[id_list[i]]));
     }
 
@@ -240,6 +239,13 @@ $.fn.serializeObject = function()
     });
     return o;
 };
+
+function makeLabel(data) {
+    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
+}
+
+
+
 var jumpserver = {};
 jumpserver.checked = false;
 jumpserver.selected = {};
@@ -281,7 +287,7 @@ jumpserver.initDataTable = function (options) {
         buttons: [],
         columnDefs: columnDefs,
         ajax: {
-            url: options.ajax_url ,
+            url: options.ajax_url,
             dataSrc: ""
         },
         columns: options.columns || [],
