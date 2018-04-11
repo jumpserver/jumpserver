@@ -1,12 +1,9 @@
-{% extends 'base.html' %}
+{% extends '_base_create_update.html' %}
 {% load static %}
 {% load bootstrap3 %}
 {% load i18n %}
 {% load asset_tags %}
 {% load common_tags %}
-
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
 {% block custom_head_css_js %}
     <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
@@ -60,7 +57,10 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
+
+                                    {% block form %}
                                     <form action="/url/to/submit/" method="post" class="form">
+                                        {% csrf_token %}
                                         {% bootstrap_field form.project layout="horizontal" %}
                                         {% bootstrap_field form.manage layout="horizontal" %}
                                         {% bootstrap_field form.app_path layout="horizontal" %}
@@ -73,6 +73,8 @@
                                         {% bootstrap_field form.use_date layout="horizontal" %}
                                         {% bootstrap_field form.status layout="horizontal" %}
                                     </form>
+                                    {% endblock %}
+
                                 </div>
                             </div>
                         </div>
