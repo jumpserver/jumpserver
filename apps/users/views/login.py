@@ -192,8 +192,6 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
             for field in form:
                 if field.value():
                     setattr(user, field.name, field.value())
-                if field.name == 'enable_otp':
-                    user.enable_otp = field.value()
         user.is_first_login = False
         user.is_public_key_valid = True
         user.save()

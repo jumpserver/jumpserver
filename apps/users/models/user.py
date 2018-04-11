@@ -241,7 +241,7 @@ class User(AbstractUser):
     def create_app_user(cls, name, comment):
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, role='App', enable_otp=False, comment=comment,
+            is_active=False, role='App', comment=comment,
             is_first_login=False, created_by='System'
         )
         access_key = app.create_access_key()

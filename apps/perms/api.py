@@ -100,33 +100,6 @@ class UserGrantedNodesApi(ListAPIView):
 
 
 class UserGrantedNodesWithAssetsApi(ListAPIView):
-    """
-    授权用户的资产组，注：这里的资产组并非是授权列表中授权的，
-    而是把所有资产取出来，然后反查出所有节点，然后合并得到，
-    结果里也包含资产组下授权的资产
-    数据结构如下：
-    [
-      {
-        "id": 1,
-        "value": "node",
-        ... 其它属性
-        "assets_granted": [
-          {
-            "id": 1,
-            "hostname": "testserver",
-            "ip": "192.168.1.1",
-            "port": 22,
-            "system_users_granted": [
-              "id": 1,
-              "name": "web",
-              "username": "web",
-              "protocol": "ssh",
-            ]
-          }
-        ]
-      }
-    ]
-    """
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = NodeGrantedSerializer
 
@@ -171,6 +144,11 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
         return assets
+
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
