@@ -16,10 +16,10 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
+                            <li>
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
-                            <li>
+                            <li  class="active">
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset more_details' %} </a>
                             </li>
                             {% if user.is_superuser %}
@@ -58,75 +58,47 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td width="20%">{% trans 'Hostname' %}:</td>
-                                            <td><b>{{ asset.hostname }}</b></td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'IP' %}:</td>
-                                            <td><b>{{ asset.ip }}</b></td>
+                                            <td>项目:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Public IP' %}:</td>
-                                            <td><b>{{ asset.public_ip|default:"" }}</b></td>
+                                            <td>负责人:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Port' %}:</td>
-                                            <td><b>{{ asset.port }}</b></td>
+                                            <td>应用地址:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Admin user' %}:</td>
-                                            <td><b>{{ asset.admin_user }}</b></td>
+                                            <td>应用程序名:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Vendor' %}:</td>
-                                            <td><b>{{ asset.vendor|default:"" }}</b></td>
+                                            <td>应用存储数据位置:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Model' %}:</td>
-                                            <td><b>{{ asset.model|default:"" }}</b></td>
+                                            <td>程序占用对应端口:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'CPU' %}:</td>
-                                            <td><b>{{ asset.cpu_model|default:"" }} {{ asset.cpu_count|default:"" }}*{{ asset.cpu_cores|default:"" }}</b></td>
+                                            <td>占用带宽:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Memory' %}:</td>
-                                            <td><b>{{ asset.memory|default:"" }}</b></td>
+                                            <td>公网IP:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Disk' %}:</td>
-                                            <td><b>{{ asset.disk_total|default:"" }}</b></td>
+                                            <td>使用期限:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Platform' %}:</td>
-                                            <td><b>{{ asset.platform|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'OS' %}:</td>
-                                            <td><b>{{ asset.os|default:"" }} {{ asset.os_version|default:"" }} {{ asset.os_arch|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Is active' %}:</td>
-                                            <td><b>{{ asset.is_active|yesno:"Yes,No" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Serial number' %}:</td>
-                                            <td><b>{{ asset.sn|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Asset number' %}:</td>
-                                            <td><b>{{ asset.number|default:"" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ asset.created_by }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Date joined' %}:</td>
-                                            <td><b>{{ asset.date_joined|date:"Y-m-j H:i:s" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ asset.comment }}</b></td>
+                                            <td>状态:</td>
+                                            <td><input type="text"></td>
                                         </tr>
                                         </tbody>
                                     </table>
