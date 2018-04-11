@@ -1,13 +1,13 @@
 更新升级
 -------------
 
-1. 升级 Jumpserver
+1. 升级 Jumpserver（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
 
     $ git pull && pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
 
-2. 升级 Coco
+2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
 
@@ -36,7 +36,7 @@
 
 **Jumpserver**
 
-说明: 以下操作，都在jumpserver所在目录运行
+说明: 以下操作，都在jumpserver所在目录运行（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 1. 备份配置文件
 
@@ -115,7 +115,7 @@ coco是无状态的，备份 keys 目录即可
    $ cp -r keys $jumpserver_backup/
 
 
-2. 离线更新升级coco
+2. 离线更新升级coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 3. 还原 keys目录
 
