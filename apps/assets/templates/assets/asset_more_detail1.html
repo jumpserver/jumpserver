@@ -19,7 +19,7 @@
                             <li>
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
-                            <li  class="active">
+                            <li class="active">
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset more_details' %} </a>
                             </li>
                             {% if user.is_superuser %}
@@ -54,54 +54,53 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr class="no-borders-tr">
-                                            <td width="20%">{% trans 'Hostname' %}:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>项目:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>负责人:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>应用地址:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>应用程序名:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>应用存储数据位置:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>程序占用对应端口:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>占用带宽:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>公网IP:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>使用期限:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>状态:</td>
-                                            <td><input type="text"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <form>
+                                        <table class="table">
+                                            <tbody>
+                                            <tr>
+                                                <td>项目:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>负责人:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>应用地址:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>应用程序名:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>应用存储数据位置:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>程序占用对应端口:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>占用带宽:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>公网IP:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>使用期限:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>状态:</td>
+                                                <td><input type="text"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <button type="submit">保存</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
