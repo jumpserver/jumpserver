@@ -45,7 +45,7 @@ class User(AbstractUser):
     wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
     otp_level = models.SmallIntegerField(default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('Enable OTP'))
-    otp_secret_key = models.CharField(max_length=16, blank=True)
+    otp_secret_key = models.CharField(max_length=16, blank=True, null=True)
     # Todo: Auto generate key, let user download
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Private key'))
     _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Public key'))
