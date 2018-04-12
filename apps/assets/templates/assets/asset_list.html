@@ -459,7 +459,8 @@ $(document).ready(function(){
     var current_node;
     if (nodes && nodes.length ===1 ){
         current_node = nodes[0];
-        action += "?node_id=" + current_node.id;
+        action = setUrlParam(action, 'node_id', current_node.id)
+        {#action += "?node_id=" + current_node.id;#}
         $form.attr("action", action)
     }
     $form.find('.help-block').remove();
