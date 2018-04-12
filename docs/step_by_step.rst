@@ -321,7 +321,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;  # 请修改成运行docker服务的服务器IP，windows资产连接白屏的问题多数是出现在这里
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

@@ -277,8 +277,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;
-            ## 请手动修改 localhost:8081 为运行 docker 服务的服务器地址, windows资产连接白屏的问题多数是出现在这里
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
