@@ -72,7 +72,7 @@ class Node(models.Model):
             assets = Asset.objects.all()
         else:
             nodes = self.get_family()
-            assets = Asset.objects.filter(nodes__in=nodes)
+            assets = Asset.objects.filter(nodes__in=nodes).distinct()
         return assets
 
     def has_assets(self):
