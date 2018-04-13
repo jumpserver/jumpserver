@@ -20,3 +20,4 @@ Jumpserver 文档
    contact
    snapshot
    faq
+   change_log
