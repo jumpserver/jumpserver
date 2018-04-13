@@ -5,11 +5,11 @@ FAQ
 
 ::
 
-    (1). 如果白屏  可能是nginx配置文件的guacamole设置的不对，也可能运行guacamole的docker容器有问题，总之请求到不了guacamole
-    (2). 如果显示没有权限 可能是你在 终端管理里没有接受 guacamole的注册，请接受一下，如果还是不行，就删除刚才的注册，重启guacamole的docker重新注册
+    (1). 如果白屏  检查nginx配置文件的guacamole设置ip是否正确，检查终端管理的gua状态是否在线，检查资产设置及系统用户是否正确；
+    (2). 如果显示没有权限 可能是你在 终端管理里没有接受 guacamole的注册，请接受一下，然后重启guacamole
     (3). 如果显示未知问题 可能是你的资产填写的端口不对，或者授权的系统用户的协议不是rdp
-    (4). 提示无法连接服务器，请联系管理员或查看日志 一般情况下是登录的系统账户不正确，可以从Windows的日志查看信息
-    (5). 提示网络问题无法连接或者超时，请检查网络连接并重试，或联系管理员 一般情况下是防火墙设置不正确，可以从Windows的日志查看信息
+    (4). 提示无法连接服务器，请联系管理员或查看日志 一般情况下是登录的系统账户不正确，可以从Windows的日志查看信息（资产的信息填写不正确也会报这个错误）
+    (5). 提示网络问题无法连接或者超时，请检查网络连接并重试，或联系管理员 一般情况下是防火墙设置不正确，可以从Windows的日志查看信息（资产的信息填写不正确也会报这个错误）
 
 2. Linux 资产连接错误排查思路
 
@@ -33,26 +33,34 @@ FAQ
     Sudo: /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail
     意思是允许这个系统用户免密码执行 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
 
-4. coco或guacamole 注册失败，或重新注册方法
+4. coco或guacamole注册失败，或重新注册方法
 
 ::
 
-    (1). 停止 coco 或 删掉 guacamole 的docker
+    (1). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
+
+    (2). coco 重新注册（注意虚拟环境 source /opt/py3/bin/activate）
 
       $ cd /opt/coco && ./cocod stop
+      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
+      $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
+   (3). guacamole重新注册
+
+      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
       $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
       $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
+      $ rm /opt/guacamole/key/*
+      $ systemctl stop docker
+      $ systemctl start docker
+      $ docker run —name jms_guacamole -d \
+         -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+         -e JUMPSERVER_SERVER=http://<填写jumpserver的IP地址>:8080 \
+         registry.jumpserver.org/public/guacamole:1.0.0
 
-      # 可以使用docker --help 查询用法
-
-   (2). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
-
-   (3). 删掉它们曾经注册的key
-
-      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里
-      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
-
+      # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
+      $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
 
 5. Ansible报错汇总
 
@@ -113,8 +121,25 @@ FAQ
 
     (3). Failed to connect to the host via ssh: ssh_exchange_identification: read: Connection reset by peer\r\n
 
-        # 一般是资产的 ssh 或者 防火墙 做了限制
+        # 一般是资产的 ssh 或者 防火墙 做了限制，无法连接资产（资产信息填错也可能会报这个错误）
 
     (4). "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
 
-        # 一般是资产 python 未安装或者 python 异常，此问题多发生在 ubuntu 资产上
+        # 一般是资产 python 未安装或者 python 异常
+
+9. 其他问题
+
+::
+
+    (1). 邮箱设置 新建用户无法收到邮件需要重启一次jumpserver（系统设置修改需要重启的问题后面会修正）
+
+    (2). 收到的邮件链接地址是 localhost 可以到 系统设置-基本设置 里面修改url，保存后重启即可
+
+    (3). coco 提示[service ERROR] Failed register terminal jzsas exist already
+        # 参考上面的coco重新注册方法
+
+    (4). guacamole 不在线
+        # 尝试重启一下guacamole，然后再看看，如果任然不在线，参考上面gua重新注册的方法
+        $ docker restart jms_guacamole  # 如果容器的名称不对，请用docker ps查询
+
+    (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，如果使用用户cn作为登录用户名，请确认用户的cn属性不是中文

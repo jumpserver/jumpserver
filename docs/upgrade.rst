@@ -1,13 +1,16 @@
 更新升级
 -------------
 
-1. 升级 Jumpserver
+1. 升级 Jumpserver（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
 
     $ git pull && pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
-
-2. 升级 Coco
+    
+    # 1.0.x 升级 1.2.0 需要执行迁移脚本（新版本授权管理更新）
+    $ sh 2018_04_11_migrate_permissions.sh
+ 
+2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
 
@@ -23,7 +26,8 @@
 
     $ docker pull registry.jumpserver.org/public/guacamole:latest
     $ docker stop jms_guacamole  # 或者写guacamole的容器ID
-    $ docker run --name jms_guacamole -d \
+    $ docker rename jms_guacamole jms_guacamole_bak  # 如果名称不正确请手动修改
+    $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
@@ -36,7 +40,7 @@
 
 **Jumpserver**
 
-说明: 以下操作，都在jumpserver所在目录运行
+说明: 以下操作，都在jumpserver所在目录运行（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 1. 备份配置文件
 
@@ -115,7 +119,7 @@ coco是无状态的，备份 keys 目录即可
    $ cp -r keys $jumpserver_backup/
 
 
-2. 离线更新升级coco
+2. 离线更新升级coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 3. 还原 keys目录
 
