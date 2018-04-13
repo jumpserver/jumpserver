@@ -14,6 +14,7 @@
     padding: 10px 10px;
     text-align: center;
 }
+
 #assetTree2.ztree * {
     background-color: #f8fafb;
 }
@@ -97,9 +98,7 @@ function initTree2() {
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
-            {#if (value["key"] === "0") {#}
             value["open"] = true;
-            {# }#}
             value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
             value['value'] = value['value'];
         });
