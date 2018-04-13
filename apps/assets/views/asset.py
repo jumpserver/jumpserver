@@ -49,6 +49,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
             'app': _('Assets'),
             'action': _('Asset list'),
             'labels': Label.objects.all().order_by('name'),
+            'nodes': Node.objects.all().order_by('-key'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

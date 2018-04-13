@@ -130,7 +130,7 @@
 </div>
 
 {% include 'assets/_asset_import_modal.html' %}
-{% include 'assets/_asset_list_modal.html' %}
+{% include 'assets/_add_assets_to_node_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -210,10 +210,11 @@ function removeTreeNode() {
 	if (!current_node){
 	    return
     }
-
 	if (current_node.children && current_node.children.length > 0) {
-		alert("{% trans 'Have child node, cancel' %}")
-	} else {
+		toastr.error("{% trans 'Have child node, cancel' %}");
+	 } else if (current_node.assets_amount !== 0) {
+        toastr.error("{% trans 'Have assets, cancel' %}");
+    } else {
         var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id );
 		$.ajax({
             url: url,
@@ -249,13 +250,6 @@ function OnRightClick(event, treeId, treeNode) {
 
 function showRMenu(type, x, y) {
 	$("#rMenu ul").show();
-	{#if (type === "root") {#}
-	{#	return#}
-	{# } else {#}
-	{#	$("#m_del").show();#}
-	{#	$("#m_check").show();#}
-	{#	$("#m_unCheck").show();#}
-	{# }#}
     x -= 220;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 
@@ -459,7 +453,7 @@ $(document).ready(function(){
     var current_node;
     if (nodes && nodes.length ===1 ){
         current_node = nodes[0];
-        action = setUrlParam(action, 'node_id', current_node.id)
+        action = setUrlParam(action, 'node_id', current_node.id);
         {#action += "?node_id=" + current_node.id;#}
         $form.attr("action", action)
     }
@@ -674,7 +668,42 @@ $(document).ready(function(){
             break;
     }
     $(".ipt_check_all").prop("checked", false)
-});
+})
+.on('click', '.btn-node-update', function () {
+    var assets_selected = asset_table2.selected;
+    var current_node;
+    var nodes = zTree.getSelectedNodes();
+    if (nodes && nodes.length === 1) {
+        current_node = nodes[0]
+    } else {
+        return
+    }
+
+    var data = {
+        'assets': assets_selected
+    };
+    var success = function () {
+        asset_table2.selected = [];
+        asset_table2.ajax.reload()
+    };
+
+    var btn_id = $(this).attr('id');
+    var url = '';
+    if (btn_id === "btn_move") {
+        url = "{% url 'api-assets:node-replace-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id);
+    } else {
+        url = "{% url 'api-assets:node-add-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id);
+    }
+
+    APIUpdateAttr({
+        'url': url,
+        'method': 'PUT',
+        'body': JSON.stringify(data),
+        'success': success
+    })
+}).on('hidden.bs.modal', '#asset_list_modal', function () {
+    window.location.reload();
+})
 </script>
 
 {% endblock %}

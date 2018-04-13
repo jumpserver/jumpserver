@@ -1,0 +1,7 @@
+{% extends 'assets/_asset_list_modal.html' %}
+{% load i18n %}
+
+{% block modal_button %}
+    <button class="btn btn-white btn-node-update" type="button" id="btn_move">{% trans "Move to" %}</button>
+    <button class="btn btn-primary btn-node-update" type="button" id="btn_copy">{% trans 'Copy to' %}</button>
+{% endblock %}
