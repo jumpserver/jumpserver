@@ -147,7 +147,7 @@
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system users' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_remain %}
-                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -161,7 +161,7 @@
 
                                         {% for system_user in object.system_users.all %}
                                         <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
-                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user.name }}</b></td>
+                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn-remove-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
