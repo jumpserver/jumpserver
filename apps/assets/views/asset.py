@@ -36,7 +36,7 @@ __all__ = [
     'AssetListView', 'AssetCreateView', 'AssetUpdateView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
     'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
-    'asset_more_detail_view','asset_more_detail_update',
+    'asset_more_detail_view', 'asset_more_detail_update',
 ]
 logger = get_logger(__file__)
 
