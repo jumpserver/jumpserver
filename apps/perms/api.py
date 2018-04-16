@@ -98,6 +98,11 @@ class UserGrantedNodesApi(ListAPIView):
         nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
         return nodes.keys()
 
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
+
 
 class UserGrantedNodesWithAssetsApi(ListAPIView):
     permission_classes = (IsSuperUserOrAppUser,)
