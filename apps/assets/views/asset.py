@@ -219,6 +219,7 @@ def asset_more_detail_update(request, asset_id):
     app_path = request.POST['app_path']
     app_name = request.POST['app_name']
     app_data_path = request.POST['app_data_path']
+    app_port = request.POST['app_port']
     broadband = request.POST['broadband']
     public_ip = request.POST['public_ip']
     use_date = request.POST['use_date']
@@ -231,18 +232,20 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.app_path = app_path
         asset_detail.aapp_name = app_name
         asset_detail.app_data_path = app_data_path
+        asset_detail.app_port = app_port
         asset_detail.broadband = broadband
         asset_detail.public_ip = public_ip
         asset_detail.use_date = use_date
         asset_detail.status = status
     else:
         asset_detail = AssetMoreDetail(asset_id=asset_id, node=node, project=project, manage=manage, app_path=app_path,
-                                       app_name=app_name,app_data_path=app_data_path, broadband=broadband,
-                                       public_ip=public_ip,use_date=use_date, status=status)
+                                       app_name=app_name, app_data_path=app_data_path, app_port=app_port,
+                                       broadband=broadband, public_ip=public_ip, use_date=use_date, status=status)
     try:
         asset_detail.save()
     except Exception as e:
         print(str(e))
+    return r
 
 
 @method_decorator(csrf_exempt, name='dispatch')
