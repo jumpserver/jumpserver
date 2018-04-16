@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
+    <link href='{% static "css/plugins/sweetalert/sweetalert.css" %}' rel="stylesheet">
+    <script src='{% static "js/plugins/select2/select2.full.min.js" %}'></script>
+    <script src='{% static "js/plugins/sweetalert/sweetalert.min.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' pk=asset.id node=1%}" class="text-center"><i class="fa fa-laptop"></i>项目细节1</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' pk=asset.id node=2%}" class="text-center"><i class="fa fa-laptop"></i>项目细节2</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' pk=asset.id node=3%}" class="text-center"><i class="fa fa-laptop"></i>项目细节3</a>
+                            </li>
+                            {% if user.is_superuser %}
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-asset">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ asset.hostname }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+
+                                    <form action="{% url 'asset:asset-more-detail1-update' asset.id%}" method="post">
+                                        {% csrf_token %}
+                                        <input type="text" name="node" id="node" value="{{ asset_more_detail.node }}">
+                                        <table class="table">
+                                            <tbody>
+                                            <tr>
+                                                <td><label for="project">项目:</label></td>
+                                                <td><input type="text" name="project" id="project" value="{{ asset_more_detail.project }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="manage">负责人:</label></td>
+                                                <td><input type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="app_path">应用地址:</label></td>
+                                                <td><input type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="app_name">应用程序名:</label></td>
+                                                <td><input type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="app_data_path">应用存储数据位置:</label></td>
+                                                <td><input type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="app_port">程序占用对应端口:</label></td>
+                                                <td><input type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="broadband">占用带宽:</label></td>
+                                                <td><input type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="public_ip">公网IP:</label></td>
+                                                <td><input type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="use_date">使用期限:</label></td>
+                                                <td><input type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="status">状态:</label></td>
+                                                <td><input type="text" name="status" id="status" value="{{ asset_more_detail.status }}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <button type="submit">保存</button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+jumpserver.nodes_selected = {};
+function updateAssetNodes(nodes) {
+    var the_url = "{% url 'api-assets:asset-detail' pk=asset.id %}";
+    var body = {
+        nodes: Object.assign([], nodes)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.nodes_selected, function(group_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('#add-asset2group tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_node" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-leave-node" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.groups_selected
+        jumpserver.nodes_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function refreshAssetHardware() {
+    var the_url = "{% url 'api-assets:asset-refresh' pk=asset.id %}";
+    var success = function(data) {
+        console.log(data);
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        success: success,
+        method: 'GET'
+    });
+}
+
+
+$(document).ready(function () {
+    $('.select2.groups').select2().on('select2:select', function(evt) {
+        var data = evt.params.data;
+        jumpserver.nodes_selected[data.id] = data.text;
+    }).on('select2:unselect', function(evt) {
+        var data = evt.params.data;
+        delete jumpserver.nodes_selected[data.id]
+    });
+}).on('click', '#is_active', function () {
+    var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
+    var checked = $(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    var success = '{% trans "Update successfully!" %}';
+    var status = $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").text();
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+    if (status === "False") {
+            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
+    }else{
+            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
+    }
+}).on('click', '#btn-update-nodes', function () {
+    if (Object.keys(jumpserver.nodes_selected).length === 0) {
+       return false;
+    }
+    var nodes = $('.bdg_node').map(function() {
+        return $(this).data('gid');
+    }).get();
+    $.map(jumpserver.nodes_selected, function(value, index) {
+        nodes.push(index);
+        $('#opt_' + index).remove();
+    });
+    updateAssetNodes(nodes)
+}).on('click', '.btn-leave-node', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_node');
+    var gid = $badge.data('gid');
+    var group_name = $badge.html() || $badge.text();
+    $('#groups_selected').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    );
+    $tr.remove();
+    var groups = $('.bdg_node').map(function () {
+        return $(this).data('gid');
+    }).get();
+    updateAssetNodes(groups)
+}).on('click', '.btn-delete-asset', function () {
+    var $this = $(this);
+    var name = "{{ asset.hostname }}";
+    var uid = "{{ asset.id }}";
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:asset-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+}).on('click', '#btn_refresh_asset', function () {
+    refreshAssetHardware()
+}).on('click', '#btn-test-is-alive', function () {
+    var the_url = "{% url 'api-assets:asset-alive-test' pk=asset.id %}";
+
+    var success = function(data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
+    };
+
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success
+    });
+})
+
+</script>
+{% endblock %}

@@ -9,3 +9,4 @@ from .domain import *
 from .node import *
 from .asset import *
 from .utils import *
+from .asset_more_detail import *
