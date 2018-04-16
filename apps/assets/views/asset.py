@@ -212,7 +212,6 @@ def asset_more_detail_view(request, asset_id, node):
 
 def asset_more_detail_update(request, asset_id):
     node = request.POST['node']
-    asset_detail = get_object_or_404(AssetMoreDetail, asset_id=asset_id, node=node)
     project = request.POST['project']
     manage = request.POST['manage']
     app_path = request.POST['app_path']
@@ -222,6 +221,8 @@ def asset_more_detail_update(request, asset_id):
     public_ip = request.POST['public_ip']
     use_date = request.POST['use_date']
     status = request.POST['status']
+
+    asset_detail = AssetMoreDetail.objects.filter(asset_id=asset_id, node=node)
     if asset_detail:
         asset_detail.project = project
         asset_detail.manage = manage
