@@ -143,3 +143,7 @@ FAQ
         $ docker restart jms_guacamole  # 如果容器的名称不对，请用docker ps查询
 
     (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，如果使用用户cn作为登录用户名，请确认用户的cn属性不是中文
+
+    (6). Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
+
+    (7). Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
