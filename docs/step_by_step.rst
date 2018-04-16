@@ -49,7 +49,7 @@
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-二. 安装 Jumpserver 0.5.0
+二. 安装 Jumpserver 1.0.0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **2.1 下载或 Clone 项目**
@@ -201,7 +201,7 @@
 
 Luna 已改为纯前端，需要 Nginx 来运行访问
 
-访问（https://github.com/jumpserver/luna/releases）下载对应 release 包，直接解压，不需要编译
+访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
 
 4.1 解压 Luna
 
@@ -228,7 +228,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
-      registry.jumpserver.org/public/guacamole:latest
+      registry.jumpserver.org/public/guacamole:1.0.0
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 
