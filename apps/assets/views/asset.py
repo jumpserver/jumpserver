@@ -204,7 +204,7 @@ class AssetDetailView(DetailView):
 
 def asset_more_detail_view(request, asset_id, node):
     lists = {
-        'asset': get_object_or_404(Asset, asset_id=asset_id),
+        'asset': get_object_or_404(Asset, id=asset_id),
         'asset_more_detail': AssetMoreDetail.object.filter(asset_id=asset_id, node=node)
     }
     return render(request, 'assets/asset-more-detail.html', lists)
