@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="ibox-content">
 
-                                    <form action="{% url 'assets:asset-more-detail-update' asset.id node %}" method="post">
+                                    <form action="{% url 'assets:asset-more-detail-update' asset_id=asset.id node=node %}" method="post">
                                         {% csrf_token %}
                                         <label type="text" name="node" id="node" >{{ asset_more_detail.node }}</label>
                                         <table class="table">
