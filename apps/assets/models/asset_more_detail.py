@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class AssetMoreDetail(models.Model):
-    asset_id = models.ForeignKey("assets.Asset", on_delete=models.CASCADE, null=True)
-    node = models.IntegerField(default=0, null=True)
+    asset_id = models.ForeignKey("assets.Asset", on_delete=models.CASCADE)
+    node = models.IntegerField(default=0)
     project = models.CharField(max_length=100, default='')
     manage = models.CharField(max_length=100, default='')
     app_path = models.CharField(max_length=100, default='')

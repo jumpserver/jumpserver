@@ -211,6 +211,8 @@ def asset_more_detail_view(request, asset_id, node):
 
 
 def asset_more_detail_update(request, asset_id):
+    asset_id = asset_id.replace('-', '')
+
     node = request.POST['node']
     project = request.POST['project']
     manage = request.POST['manage']
