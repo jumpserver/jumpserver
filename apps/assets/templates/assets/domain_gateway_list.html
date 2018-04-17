@@ -81,11 +81,6 @@ function initTable() {
     var options = {
         ele: $('#domain_list_table'),
         columnDefs: [
-            {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "assets:domain-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-             }},
-
             {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:domain-gateway-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
