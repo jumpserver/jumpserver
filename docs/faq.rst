@@ -160,3 +160,8 @@ FAQ
         }
 
         还需要在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储
+
+    (10). 管理密码忘记了或者重置管理员密码
+        $ source /opt/py3/bin/activate
+        $ cd /opt/jumpserver/apps
+        $ python manage.py changepassword  <user_name>
