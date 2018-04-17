@@ -210,7 +210,8 @@ def asset_more_detail_view(request, asset_id, node):
         asset_more_detail = ''
     lists = {
         'asset': asset,
-        'asset_more_detail': asset_more_detail
+        'asset_more_detail': asset_more_detail,
+        'node': node,
     }
     return render(request, 'assets/asset_more_detail.html', lists)
 
