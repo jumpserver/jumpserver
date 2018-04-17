@@ -28,6 +28,12 @@
                             <li>
                                 <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=3 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节3</a>
                             </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=4 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节4</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=5 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节5</a>
+                            </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
@@ -67,47 +73,47 @@
                                             <tbody>
                                             <tr>
                                                 <td><label for="project">编号:</label></td>
-                                                <td><input type="text" name="node" id="node" value="{{ node }}"></td>
+                                                <td><input type="text" name="node" id="node" value="{{ node }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="project">项目:</label></td>
-                                                <td><input type="text" name="project" id="project" value="{{ asset_more_detail.project }}"></td>
+                                                <td><input type="text" name="project" id="project" value="{{ asset_more_detail.project }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="manage">负责人:</label></td>
-                                                <td><input type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}"></td>
+                                                <td><input type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="app_path">应用地址:</label></td>
-                                                <td><input type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}"></td>
+                                                <td><input type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="app_name">应用程序名:</label></td>
-                                                <td><input type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}"></td>
+                                                <td><input type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="app_data_path">应用存储数据位置:</label></td>
-                                                <td><input type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}"></td>
+                                                <td><input type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="app_port">程序占用对应端口:</label></td>
-                                                <td><input type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}"></td>
+                                                <td><input type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="broadband">占用带宽:</label></td>
-                                                <td><input type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}"></td>
+                                                <td><input type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="public_ip">公网IP:</label></td>
-                                                <td><input type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}"></td>
+                                                <td><input type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="use_date">使用期限:</label></td>
-                                                <td><input type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}"></td>
+                                                <td><input type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}" size="100"></td>
                                             </tr>
                                             <tr>
                                                 <td><label for="status">状态:</label></td>
-                                                <td><input type="text" name="status" id="status" value="{{ asset_more_detail.status }}"></td>
+                                                <td><input type="text" name="status" id="status" value="{{ asset_more_detail.status }}" size="100"></td>
                                             </tr>
                                             </tbody>
                                         </table>
