@@ -57,12 +57,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for user in page_obj %}
+                                            {% for user in object_list %}
                                             <tr>
                                                 <td>{{ user.name }}</td>
                                                 <td>{{ user.username }}</td>
                                                 <td>
-                                                    <button class="btn btn-danger btn-xs btn-remove-user {% if user.is_inherit_from_user_groups %} disabled {% endif %}" data-gid="{{ user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button class="btn btn-danger btn-xs btn-remove-user {% if user.inherit %} disabled {% endif %}" data-gid="{{ user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -127,7 +127,7 @@
                                             </tr>
                                         </form>
 
-                                        {% for user_group in user_groups %}
+                                        {% for user_group in asset_permission.user_groups.all %}
                                         <tr>
                                           <td ><b class="bdg_group" data-gid={{ user_group.id }}>{{ user_group.name }}</b></td>
                                           <td>

@@ -1,30 +1,35 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
-from common.utils import get_object_or_none
-from common.fields import StringIDField
-from .models import AssetPermission, NodePermission
+from .models import AssetPermission
+from common.fields import StringManyToManyField
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NodePermission
-        fields = [
-            'id', 'node', 'user_group', 'system_user',
-            'is_active', 'date_expired'
-        ]
+        model = AssetPermission
+        exclude = ('id', 'created_by', 'date_created')
 
 
 class AssetPermissionListSerializer(serializers.ModelSerializer):
-    node = StringIDField(read_only=True)
-    user_group = StringIDField(read_only=True)
-    system_user = StringIDField(read_only=True)
+    users = StringManyToManyField(many=True, read_only=True)
+    user_groups = StringManyToManyField(many=True, read_only=True)
+    assets = StringManyToManyField(many=True, read_only=True)
+    nodes = StringManyToManyField(many=True, read_only=True)
+    system_users = StringManyToManyField(many=True, read_only=True)
+    inherit = serializers.SerializerMethodField()
 
     class Meta:
-        model = NodePermission
+        model = AssetPermission
         fields = '__all__'
+
+    @staticmethod
+    def get_inherit(obj):
+        if hasattr(obj, 'inherit'):
+            return obj.inherit
+        else:
+            return None
 
 
 class AssetPermissionUpdateUserSerializer(serializers.ModelSerializer):
@@ -39,15 +44,4 @@ class AssetPermissionUpdateAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetPermission
         fields = ['id', 'assets']
-
-
-class UserAssetPermissionCreateUpdateSerializer(AssetPermissionCreateUpdateSerializer):
-    is_inherited = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_is_inherited(obj):
-        if getattr(obj, 'inherited', ''):
-            return True
-        else:
-            return False
 

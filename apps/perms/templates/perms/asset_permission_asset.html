@@ -57,12 +57,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset in page_obj %}
+                                            {% for asset in object_list %}
                                             <tr>
                                                 <td>{{ asset.hostname }}</td>
                                                 <td>{{ asset.ip }}</td>
                                                 <td>
-                                                    <button title="{{ asset.inherit_from_asset_groups }}" data-gid="{{ asset.id }}" class="btn btn-danger btn-xs btn-remove-asset {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button title="{{ asset.inherit }}" data-gid="{{ asset.id }}" class="btn btn-danger btn-xs btn-remove-asset {% if asset.inherit %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -105,7 +105,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset group to this permission' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add node to this permission' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit">
@@ -113,25 +113,25 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select asset groups' %}" class="select2 group" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for asset_group in asset_groups_remain %}
-                                                        <option value="{{ asset_group.id }}" id="opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                    <select data-placeholder="{% trans 'Select nodes' %}" class="select2 group" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for node in nodes_remain %}
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}">{{ node.value }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-group">{% trans 'Join' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-node">{% trans 'Join' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
-                                        {% for asset_group in asset_groups %}
+                                        {% for node in asset_permission.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_user_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td ><b class="bdg_user_group" data-gid={{ node.id }}>{{ node.value }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn-remove-group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-xs btn-remove-node" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -179,10 +179,10 @@ function removeAssets(assets) {
     });
 }
 
-function updateGroup(groups) {
+function updateNodes(nodes) {
     var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
     var body = {
-        asset_groups: groups
+        nodes: nodes
     };
     APIUpdateAttr({
         url: the_url,
@@ -231,17 +231,17 @@ $(document).ready(function () {
     var assets = [asset_id];
     removeAssets(assets)
 })
-.on('click', '#btn-add-group', function () {
+.on('click', '#btn-add-node', function () {
     if (Object.keys(jumpserver.nodes_selected).length === 0) {
 		return false;
 	}
 
-    var groups = $('.bdg_group').map(function() {
+    var nodes = $('.bdg_group').map(function() {
         return $(this).data('gid');
     }).get();
 
     $.map(jumpserver.nodes_selected, function(group_name, index) {
-        groups.push(index);
+        nodes.push(index);
         $('#opt_' + index).remove();
         $('.group_edit tbody').append(
            '<tr>' +
@@ -251,17 +251,17 @@ $(document).ready(function () {
         )
     });
 
-    updateGroup(groups);
+    updateNodes(nodes);
 })
-.on('click', '.btn-remove-group', function () {
+.on('click', '.btn-remove-node', function () {
     var $this = $(this);
     var $tr = $this.closest('tr');
-    var groups = $('.bdg_group').map(function() {
+    var nodes = $('.bdg_group').map(function() {
         if ($(this).data('gid') !== $this.data('gid')){
             return $(this).data('gid');
         }
     }).get();
-    updateGroup(groups);
+    updateNodes(nodes);
     $tr.remove()
 })
 </script>

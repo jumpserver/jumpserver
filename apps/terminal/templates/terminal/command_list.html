@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block table_search %}
-    <form id="search_form" method="get" action="" class="pull-right form-inline">
+    <form id="search_form" method="get" action="" class="pull-right form-inline" style="padding-bottom: 8px">
         <div class="form-group" id="date">
             <div class="input-daterange input-group" id="datepicker">
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -64,7 +64,7 @@
     </form>
 {% endblock %}
 {% block table_container %}
-    <table class="footable table table-stripped toggle-arrow-tiny" data-page="false">
+    <table class="footable table table-stripped table-bordered toggle-arrow-tiny" data-page="false" >
         <thead>
         <tr>
             <th data-toggle="true">ID</th>

@@ -65,7 +65,7 @@
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'OTP' %}</td>
-                                                <td>{{ user.enable_otp|yesno:"Yes,No,Unkown" }}</td>
+                                                <td>{{ user.otp_enabled|yesno:"Yes,No,Unkown" }}</td>
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'Public key' %}</td>

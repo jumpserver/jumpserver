@@ -63,6 +63,7 @@
 <script>
 var zTree;
 var inited = false;
+var url;
 
 function initTable() {
     if (inited){
@@ -86,31 +87,29 @@ function initTable() {
                 }
             }},
             {targets: 4, createdCell: function (td, cellData) {
-                if (cellData === 'Unknown'){
-                    $(td).html('<i class="fa fa-circle text-warning"></i>')
-                } else if (!cellData) {
-                    $(td).html('<i class="fa fa-circle text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-circle text-navy"></i>')
-                }
+                var users = [];
+                $.each(cellData, function (id, data) {
+                    users.push(data.name);
+                });
+                $(td).html(users.join(', '))
             }}
         ],
-        ajax_url: '{% url "api-assets:asset-list" %}',
+        ajax_url: url,
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
             {data: "is_active", orderable: false },
-            {data: "is_connective", orderable: false}
+            {data: "system_users_granted", orderable: false}
         ]
     };
-    asset_table = jumpserver.initServerSideDataTable(options);
+    asset_table = jumpserver.initDataTable(options);
     return asset_table
 }
 
 function onSelected(event, treeNode) {
-    initTable();
-    var url = asset_table.ajax.url();
-    url = setUrlParam(url, "node_id", treeNode.id);
+    url = '{% url "api-perms:user-group-node-assets" pk=object.id node_id=DEFAULT_PK %}';
+    url = url.replace("{{ DEFAULT_PK }}", treeNode.id);
     setCookie('node_selected', treeNode.id);
+    asset_table = initTable();
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
 }

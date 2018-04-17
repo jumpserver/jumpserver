@@ -50,7 +50,9 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         if node_id:
             node = get_object_or_404(Node, id=node_id)
             if not node.is_root():
-                queryset = queryset.filter(nodes__key__startswith=node.key).distinct()
+                queryset = queryset.filter(
+                    nodes__key__regex='{}(:[0-9]+)*$'.format(node.key),
+                ).distinct()
         return queryset
 
 

@@ -27,12 +27,15 @@ class AssetCreateForm(forms.ModelForm):
                 'class': 'select2', 'data-placeholder': _('Admin user')
             }),
             'labels': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Labels')
+                'class': 'select2', 'data-placeholder': _('Label')
             }),
             'port': forms.TextInput(),
             'domain': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Domain')
             }),
+        }
+        labels = {
+            'nodes': _("Node"),
         }
         help_texts = {
             'hostname': '* required',
@@ -57,18 +60,21 @@ class AssetUpdateForm(forms.ModelForm):
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Nodes')
+                'class': 'select2', 'data-placeholder': _('Node')
             }),
             'admin_user': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Admin user')
             }),
             'labels': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Labels')
+                'class': 'select2', 'data-placeholder': _('Label')
             }),
             'port': forms.TextInput(),
             'domain': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Domain')
             }),
+        }
+        labels = {
+            'nodes': _("Node"),
         }
         help_texts = {
             'hostname': '* required',
@@ -116,10 +122,10 @@ class AssetBulkUpdateForm(forms.ModelForm):
         ]
         widgets = {
             'labels': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Select labels')}
+                attrs={'class': 'select2', 'data-placeholder': _('Label')}
             ),
             'nodes': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Select nodes')}
+                attrs={'class': 'select2', 'data-placeholder': _('Node')}
             ),
         }
 

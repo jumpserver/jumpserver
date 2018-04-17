@@ -43,3 +43,7 @@ class StringIDField(serializers.Field):
     def to_representation(self, value):
         return {"pk": value.pk, "name": value.__str__()}
 
+
+class StringManyToManyField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.__str__()

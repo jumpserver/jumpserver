@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
-from perms.models import AssetPermission
 from .models import User, UserGroup
 
 
@@ -253,30 +252,30 @@ class UserGroupForm(forms.ModelForm):
         }
 
 
-class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
-    def save(self, commit=True):
-        self.instance = super(UserGroupPrivateAssetPermissionForm, self)\
-            .save(commit=commit)
-        self.instance.user_groups = [self.user_group]
-        self.instance.save()
-        return self.instance
-
-    class Meta:
-        model = AssetPermission
-        fields = [
-            'assets', 'asset_groups', 'system_users', 'name',
-        ]
-        widgets = {
-            'assets': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select assets')}),
-            'asset_groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset groups')}),
-            'system_users': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select system users')}),
-        }
+# class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
+#     def save(self, commit=True):
+#         self.instance = super(UserGroupPrivateAssetPermissionForm, self)\
+#             .save(commit=commit)
+#         self.instance.user_groups = [self.user_group]
+#         self.instance.save()
+#         return self.instance
+#
+#     class Meta:
+#         model = AssetPermission
+#         fields = [
+#             'assets', 'asset_groups', 'system_users', 'name',
+#         ]
+#         widgets = {
+#             'assets': forms.SelectMultiple(
+#                 attrs={'class': 'select2',
+#                        'data-placeholder': _('Select assets')}),
+#             'asset_groups': forms.SelectMultiple(
+#                 attrs={'class': 'select2',
+#                        'data-placeholder': _('Select asset groups')}),
+#             'system_users': forms.SelectMultiple(
+#                 attrs={'class': 'select2',
+#                        'data-placeholder': _('Select system users')}),
+#         }
 
 
 class FileForm(forms.Form):
