@@ -69,87 +69,62 @@
 
                                     <form action="{% url 'assets:asset-more-detail-update' asset.id %}" method="post">
                                         {% csrf_token %}
-                                        <table class="table">
-                                            <tbody>
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="project">编号:</label></td>
-                                                    <td><input class="form-control" type="text" name="node" id="node" value="{{ node }}" maxlength="100" size="120" required></td>
-                                                </tr>
-                                            </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="project">项目:</label></td>
-                                                    <td><input class="form-control" type="text" name="project" id="project" value="{{ asset_more_detail.project }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="project">编号:</label>
+                                            <input class="form-control" type="text" name="node" id="node" value="{{ node }}" maxlength="100" size="120" d>
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="manage">负责人:</label></td>
-                                                    <td><input class="form-control" type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="project">项目:</label>
+                                            <input class="form-control" type="text" name="project" id="project" value="{{ asset_more_detail.project }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="app_path">应用地址:</label></td>
-                                                    <td><input class="form-control" type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="manage">负责人:</label>
+                                            <input class="form-control" type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="app_name">应用程序名:</label></td>
-                                                    <td><input class="form-control" type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="app_path">应用地址:</label>
+                                            <input class="form-control" type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="app_data_path">应用存储数据位置:</label></td>
-                                                    <td><input class="form-control" type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="app_name">应用程序名:</label>
+                                            <input class="form-control" type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="app_port">程序占用对应端口:</label></td>
-                                                    <td><input class="form-control" type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="app_data_path">应用存储数据位置:</label>
+                                            <input class="form-control" type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="broadband">占用带宽:</label></td>
-                                                    <td><input class="form-control" type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="app_port">程序占用对应端口:</label>
+                                            <input class="form-control" type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="public_ip">公网IP:</label></td>
-                                                    <td><input class="form-control" type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="broadband">占用带宽:</label>
+                                            <input class="form-control" type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="use_date">使用期限:</label></td>
-                                                    <td><input class="form-control" type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="public_ip">公网IP:</label>
+                                            <input class="form-control" type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}" maxlength="100" size="120">
+                                        </div>
 
-                                            <div class="form-group">
-                                                <tr>
-                                                    <td><label for="status">状态:</label></td>
-                                                    <td><input class="form-control" type="text" name="status" id="status" value="{{ asset_more_detail.status }}" maxlength="100" size="120"></td>
-                                                </tr>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="use_date">使用期限:</label>
+                                            <input class="form-control" type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}" maxlength="100" size="120">
+                                        </div>
 
-                                            </tbody>
-                                        </table>
+                                        <div class="form-group">
+                                            <label for="status">状态:</label>
+                                            <input class="form-control" type="text" name="status" id="status" value="{{ asset_more_detail.status }}" maxlength="100" size="120">
+                                        </div>
+                                        
                                         <button type="submit" class="btn btn-success btn-lg">保存</button>
                                     </form>
 
