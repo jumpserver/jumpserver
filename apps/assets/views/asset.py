@@ -216,7 +216,7 @@ def asset_more_detail_view(request, asset_id, node):
 
 
 def asset_more_detail_update(request, asset_id):
-    asset_id = asset_id.replace('-', '')
+    asset = get_object_or_404(Asset, id=asset_id)
 
     node = request.POST['node']
     project = request.POST['project']
@@ -243,7 +243,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.use_date = use_date
         asset_detail.status = status
     else:
-        asset_detail = AssetMoreDetail(asset_id=asset_id, node=node, project=project, manage=manage, app_path=app_path,
+        asset_detail = AssetMoreDetail(asset_id=asset, node=node, project=project, manage=manage, app_path=app_path,
                                        app_name=app_name, app_data_path=app_data_path, app_port=app_port,
                                        broadband=broadband, public_ip=public_ip, use_date=use_date, status=status)
     try:
