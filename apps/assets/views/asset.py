@@ -216,7 +216,7 @@ def asset_more_detail_view(request, asset_id, node):
 
 
 def asset_more_detail_update(request, asset_id):
-    asset_id = get_object_or_404(Asset, id=asset_id)
+    asset_id = get_object_or_404(Asset, id=asset_id).id
 
     node = request.POST['node']
     project = request.POST['project']
