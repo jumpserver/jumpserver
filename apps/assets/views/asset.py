@@ -215,10 +215,9 @@ def asset_more_detail_view(request, asset_id, node):
     return render(request, 'assets/asset_more_detail.html', lists)
 
 
-def asset_more_detail_update(request, asset_id):
+def asset_more_detail_update(request, asset_id, node):
     asset = get_object_or_404(Asset, id=asset_id)
 
-    node = request.POST['node']
     project = request.POST['project']
     manage = request.POST['manage']
     app_path = request.POST['app_path']
@@ -230,7 +229,10 @@ def asset_more_detail_update(request, asset_id):
     use_date = request.POST['use_date']
     status = request.POST['status']
 
-    asset_detail = AssetMoreDetail.objects.filter(asset_id=asset_id, node=node)
+    try:
+        asset_detail = AssetMoreDetail.objects.get(asset_id=asset_id, node=node)
+    except AssetMoreDetail.DoesNotExist:
+        asset_detail = ''
     if asset_detail:
         asset_detail.project = project
         asset_detail.manage = manage
@@ -250,7 +252,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.save()
     except Exception as e:
         print(str(e))
-    return asset_more_detail_view(request, asset_id, node)
+    return redirect('assets:asset-more-detail', arg=(asset_id, node))
 
 
 @method_decorator(csrf_exempt, name='dispatch')
