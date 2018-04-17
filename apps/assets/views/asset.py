@@ -209,7 +209,7 @@ def asset_more_detail_view(request, asset_id, node):
     except Exception as e:
         asset_more_detail = ''
     lists = {
-        'asset':asset,
+        'asset': asset,
         'asset_more_detail': asset_more_detail
     }
     return render(request, 'assets/asset_more_detail.html', lists)
@@ -250,7 +250,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.save()
     except Exception as e:
         print(str(e))
-    return HttpResponseRedirect(reverse('assets:asset-detail', args=(asset_id, )))
+    return asset_more_detail_view(request, asset_id, node)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
