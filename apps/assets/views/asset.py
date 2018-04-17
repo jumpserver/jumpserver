@@ -254,7 +254,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.save()
     except Exception as e:
         print(str(e))
-    return redirect('assets:asset-more-detail', arg=(asset_id, node))
+    return redirect('assets:asset-more-detail', asset_id, node)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
