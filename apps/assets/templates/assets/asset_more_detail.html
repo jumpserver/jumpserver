@@ -63,9 +63,12 @@
 
                                     <form action="{% url 'assets:asset-more-detail-update' asset.id %}" method="post">
                                         {% csrf_token %}
-                                        <input type="text" name="node" id="node" >{{ node }}</input>
                                         <table class="table">
                                             <tbody>
+                                            <tr>
+                                                <td><label for="project">编号:</label></td>
+                                                <td><input type="text" name="node" id="node" value="{{ node }}"></td>
+                                            </tr>
                                             <tr>
                                                 <td><label for="project">项目:</label></td>
                                                 <td><input type="text" name="project" id="project" value="{{ asset_more_detail.project }}"></td>
