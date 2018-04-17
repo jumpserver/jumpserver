@@ -19,8 +19,14 @@
                             <li>
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
-                            <li class="active">
-                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset more_details' %} </a>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=1 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节1</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=2 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节2</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=3 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节3</a>
                             </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
@@ -54,154 +60,62 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <form>
+
+                                    <form action="{% url 'assets:asset-more-detail-update' asset.id %}" method="post">
+                                        {% csrf_token %}
                                         <table class="table">
                                             <tbody>
                                             <tr>
-                                                <td>项目:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="project">编号:</label></td>
+                                                <td><input type="text" name="node" id="node" value="{{ node }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>负责人:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="project">项目:</label></td>
+                                                <td><input type="text" name="project" id="project" value="{{ asset_more_detail.project }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>应用地址:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="manage">负责人:</label></td>
+                                                <td><input type="text" name="manage" id="manage" value="{{ asset_more_detail.manage }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>应用程序名:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="app_path">应用地址:</label></td>
+                                                <td><input type="text" name="app_path" id="app_path" value="{{ asset_more_detail.app_path }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>应用存储数据位置:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="app_name">应用程序名:</label></td>
+                                                <td><input type="text" name="app_name" id="app_name" value="{{ asset_more_detail.app_name }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>程序占用对应端口:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="app_data_path">应用存储数据位置:</label></td>
+                                                <td><input type="text" name="app_data_path" id="app_data_path" value="{{ asset_more_detail.app_data_path }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>占用带宽:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="app_port">程序占用对应端口:</label></td>
+                                                <td><input type="text" name="app_port" id="app_port" value="{{ asset_more_detail.app_port }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>公网IP:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="broadband">占用带宽:</label></td>
+                                                <td><input type="text" name="broadband" id="broadband" value="{{ asset_more_detail.broadband }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>使用期限:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="public_ip">公网IP:</label></td>
+                                                <td><input type="text" name="public_ip" id="public_ip" value="{{ asset_more_detail.public_ip }}"></td>
                                             </tr>
                                             <tr>
-                                                <td>状态:</td>
-                                                <td><input type="text"></td>
+                                                <td><label for="use_date">使用期限:</label></td>
+                                                <td><input type="text" name="use_date" id="use_date" value="{{ asset_more_detail.use_date }}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label for="status">状态:</label></td>
+                                                <td><input type="text" name="status" id="status" value="{{ asset_more_detail.status }}"></td>
                                             </tr>
                                             </tbody>
                                         </table>
                                         <button type="submit">保存</button>
                                     </form>
-                                </div>
-                            </div>
-                        </div>
-                        {% if user.is_superuser %}
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr class="no-borders-tr">
-                                          <td width="50%">{% trans 'Active' %}:</td>
-                                            <td>
-                                              <span class="pull-right">
-                                                  <div class="switch">
-                                                      <div class="onoffswitch">
-                                                          <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
-                                                          <label class="onoffswitch-label" for="is_active">
-                                                              <span class="onoffswitch-inner"></span>
-                                                              <span class="onoffswitch-switch"></span>
-                                                          </label>
-                                                      </div>
-                                                  </div>
-                                              </span>
-                                          </td>
-                                        </tr>
-                                        {% if asset.is_unixlike %}
-                                        <tr>
-                                            <td>{% trans 'Refresh hardware' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_refresh_asset" style="width: 54px">{% trans 'Refresh' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Test connective' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-test-is-alive" style="width: 54px">{% trans 'Test' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
 
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Nodes' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2group">
-                                        <tbody>
-                                        <form>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Nodes' %}" id="groups_selected" class="select2 groups" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn-update-nodes">{% trans 'Confirm' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-
-                                        {% for node in asset.nodes.all %}
-                                        <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.name }}</b></td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-leave-node" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
-
-                            <div class="panel panel-warning">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Labels' %}
-                                </div>
-                                <div class="panel-body">
-                                    <ul class="tag-list" style="padding: 0">
-                                        {% for label in asset.labels.all %}
-                                            <li ><a href=""><i class="fa fa-tag"></i> {{ label.name }}:{{ label.value }}</a></li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                        {% endif %}
                         </div>
                     </div>
                 </div>

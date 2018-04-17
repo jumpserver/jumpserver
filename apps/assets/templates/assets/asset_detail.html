@@ -16,11 +16,17 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
+                            <li>
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
                             <li>
-                                <a href="{% url 'assets:asset-more-detail1' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i>项目细节1</a>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=1 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节1</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=2 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节2</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:asset-more-detail' asset_id=asset.id node=3 %}" class="text-center"><i class="fa fa-laptop"></i>项目细节3</a>
                             </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
