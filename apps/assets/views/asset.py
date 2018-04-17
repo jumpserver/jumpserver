@@ -13,9 +13,9 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
@@ -203,9 +203,14 @@ class AssetDetailView(DetailView):
 
 
 def asset_more_detail_view(request, asset_id, node):
+    asset = get_object_or_404(Asset, id=asset_id)
+    try:
+        asset_more_detail = AssetMoreDetail.objects.get(asset_id=asset_id, node=node)
+    except Exception as e:
+        asset_more_detail = ''
     lists = {
-        'asset': get_object_or_404(Asset, id=asset_id),
-        'asset_more_detail': AssetMoreDetail.objects.filter(asset_id=asset_id, node=node)
+        'asset':asset,
+        'asset_more_detail': asset_more_detail
     }
     return render(request, 'assets/asset_more_detail.html', lists)
 
@@ -245,7 +250,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.save()
     except Exception as e:
         print(str(e))
-    return r
+    return HttpResponseRedirect(reverse('assets:asset-more-detail', args=(asset_id, node)))
 
 
 @method_decorator(csrf_exempt, name='dispatch')
