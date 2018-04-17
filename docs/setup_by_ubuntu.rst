@@ -213,6 +213,9 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     # curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
     # add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 
+    $ apt-get update
+    $ apt-get install docker-ce
+
     # 注意：这里一定要改写一下本机的IP地址, 否则会出错，带宽有限, 下载时间可能有点长，可以喝杯咖啡，别看对面了，你对面不是小姐姐。
 
     $ docker run -d \

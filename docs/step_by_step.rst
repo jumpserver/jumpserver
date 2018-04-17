@@ -239,18 +239,22 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 ::
 
     $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
-    $ yum install docker-ce
     $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
 
+    # 添加docker官方源
     $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
-    $ yum-config-manager --enable docker-ce-edge
-    $ yum-config-manager --enable docker-ce-test
-    $ yum-config-manager --disable docker-ce-edge
+    $ yum makecache fast 
     $ yum install docker-ce
+
+
+    # 国内部分用户可能无法连接docker官网提供的源，这里提供阿里云的镜像节点供测试使用
+    $ yum-config-manager —add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+    $ rpm —import http://mirrors.aliyun.com/docker-ce/linux/centos/gpg
+    $ yum makecache fast
+    $ yum -y install docker-ce
 
     $ systemctl start docker
     $ systemctl status docker
-
 
 5.2 启动 Guacamole
 
