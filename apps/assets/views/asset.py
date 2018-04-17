@@ -223,7 +223,7 @@ def asset_more_detail_update(request, asset_id):
     project = request.POST['project']
     manage = request.POST['manage']
     app_path = request.POST['app_path']
-    app_name = request.POST['app_name']
+    app_names = request.POST['app_name']
     app_data_path = request.POST['app_data_path']
     app_port = request.POST['app_port']
     broadband = request.POST['broadband']
@@ -239,7 +239,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.project = project
         asset_detail.manage = manage
         asset_detail.app_path = app_path
-        asset_detail.aapp_name = app_name
+        asset_detail.aapp_name = app_names
         asset_detail.app_data_path = app_data_path
         asset_detail.app_port = app_port
         asset_detail.broadband = broadband
@@ -248,7 +248,7 @@ def asset_more_detail_update(request, asset_id):
         asset_detail.status = status
     else:
         asset_detail = AssetMoreDetail(asset_id=asset, node=node, project=project, manage=manage, app_path=app_path,
-                                       app_name=app_name, app_data_path=app_data_path, app_port=app_port,
+                                       app_name=app_names, app_data_path=app_data_path, app_port=app_port,
                                        broadband=broadband, public_ip=public_ip, use_date=use_date, status=status)
     try:
         asset_detail.save()
