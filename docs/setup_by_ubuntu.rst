@@ -213,6 +213,9 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     # curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
     # add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 
+    $ apt-get update
+    $ apt-get install docker-ce
+
     # 注意：这里一定要改写一下本机的IP地址, 否则会出错，带宽有限, 下载时间可能有点长，可以喝杯咖啡，别看对面了，你对面不是小姐姐。
 
     $ docker run -d \
@@ -327,11 +330,14 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
+    如果登录客户端是 macOS 或 Linux ，登录语法如下
     $ ssh -p2222 admin@192.168.244.144
+    $ sftp -p2222 admin@192.168.244.144
     密码: admin
 
-    如果是用在 Windows 下，Xshell Terminal 登录语法如下
-    $ssh admin@192.168.244.144 2222
+    如果登录客户端是 Windows ，Xshell Terminal 登录语法如下
+    $ ssh admin@192.168.244.144 2222
+    $ sftp admin@192.168.244.144 2222
     密码: admin
     如果能登陆代表部署成功
 

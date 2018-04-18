@@ -143,3 +143,25 @@ FAQ
         $ docker restart jms_guacamole  # 如果容器的名称不对，请用docker ps查询
 
     (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，如果使用用户cn作为登录用户名，请确认用户的cn属性不是中文
+
+    (6). Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
+
+    (7). Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
+
+    (8). 默认录像存储位置在jumpserver/data/media
+
+    (9). 录像存储在阿里云oss的规则，Jumpserver 系统设置-终端设置 录像存储
+        {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
+
+        修改后，需要修改nginx配置文件
+        location /media/ {
+        add_header Content-Encoding gzip;
+        proxy_pass http://oss-cn-hangzhou.aliyuncs.com;
+        }
+
+        还需要在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储
+
+    (10). 管理密码忘记了或者重置管理员密码
+        $ source /opt/py3/bin/activate
+        $ cd /opt/jumpserver/apps
+        $ python manage.py changepassword  <user_name>
