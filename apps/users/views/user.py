@@ -11,6 +11,7 @@ from io import StringIO
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
@@ -34,9 +35,9 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin
+from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user, is_login
 from ..signals import post_user_create
-
+from ..tasks import write_login_log_async
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
@@ -46,6 +47,9 @@ __all__ = [
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserBulkUpdateView',
     'UserPublicKeyGenerateView',
+    'UserOtpEnableAuthenticationView', 'UserOtpEnableInstallAppView',
+    'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
+    'UserOtpDisableAuthenticationView',
 ]
 
 logger = get_logger(__name__)
@@ -380,6 +384,7 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class UserPublicKeyGenerateView(LoginRequiredMixin, View):
+
     def get(self, request, *args, **kwargs):
         private, public = ssh_key_gen(username=request.user.username, hostname='jumpserver')
         request.user.public_key = public
@@ -389,3 +394,125 @@ class UserPublicKeyGenerateView(LoginRequiredMixin, View):
         response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
         return response
 
+
+class UserOtpEnableAuthenticationView(FormView):
+    template_name = 'users/user_password_authentication.html'
+    form_class = forms.UserCheckPasswordForm
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form['username'].initial = get_user(self.request).username
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'user': get_user(self.request)
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        password = form.cleaned_data.get('password')
+        user = get_user(self.request)
+        user = authenticate(username=user.username, password=password)
+        if not user:
+            form.add_error("password", _("Password invalid"))
+            return self.form_invalid(form)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('users:user-otp-enable-install-app')
+
+
+class UserOtpEnableInstallAppView(TemplateView):
+    template_name = 'users/user_otp_enable_install_app.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'user': get_user(self.request)
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserOtpEnableBindView(TemplateView, FormView):
+    template_name = 'users/user_otp_enable_bind.html'
+    form_class = forms.UserCheckOtpCodeForm
+    success_url = reverse_lazy('users:user-otp-settings-success')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'otp_uri': generate_otp_uri(user=get_user(self.request)),
+            'user': get_user(self.request)
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        otp_code = form.cleaned_data.get('otp_code')
+        otp_secret_key = cache.get('otp_secret_key')
+
+        if check_otp_code(otp_secret_key, otp_code):
+            self.save_otp(otp_secret_key)
+            return super().form_valid(form)
+
+        else:
+            form.add_error("otp_code", _("Otp code invalid"))
+            return self.form_invalid(form)
+
+    def save_otp(self, otp_secret_key):
+        user = get_user(self.request)
+        user.enable_otp()
+        user.otp_secret_key = otp_secret_key
+        user.save()
+
+
+class UserOtpDisableAuthenticationView(FormView):
+    template_name = 'users/user_otp_authentication.html'
+    form_class = forms.UserCheckOtpCodeForm
+    success_url = reverse_lazy('users:user-otp-settings-success')
+
+    def form_valid(self, form):
+        user = self.request.user
+        otp_code = form.cleaned_data.get('otp_code')
+        otp_secret_key = user.otp_secret_key
+
+        if check_otp_code(otp_secret_key, otp_code):
+            user.disable_otp()
+            user.save()
+            return super().form_valid(form)
+        else:
+            form.add_error('otp_code', _('Otp code invalid'))
+            return super().form_invalid(form)
+
+
+class UserOtpSettingsSuccessView(TemplateView):
+    template_name = 'flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        if is_login(request):
+            auth_logout(request)
+        return response
+
+    def get_context_data(self, **kwargs):
+        title, describe = self.get_title_describe()
+        context = {
+            'title': title,
+            'messages': describe,
+            'interval': 1,
+            'redirect_url': reverse('users:login'),
+            'auto_redirect': True,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def get_title_describe(self):
+        user = get_user(self.request)
+        title = _('OTP enable success')
+        describe = _('OTP enable success, return login page')
+        if not user.otp_enabled:
+            title = _('OTP disable success')
+            describe = _('OTP disable success, return login page')
+
+        return title, describe

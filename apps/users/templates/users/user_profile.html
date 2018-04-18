@@ -65,7 +65,15 @@
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'OTP' %}</td>
-                                                <td>{{ user.otp_enabled|yesno:"Yes,No,Unkown" }}</td>
+                                                <td>
+                                                    {% if user.otp_force_enabled %}
+                                                        {% trans 'Force enable' %}
+                                                    {% elif  user.otp_enabled%}
+                                                        {% trans 'Enable' %}
+                                                    {% else %}
+                                                        {% trans 'Disable' %}
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'Public key' %}</td>
@@ -133,6 +141,28 @@
                                         <td>
                                             <span class="pull-right">
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Update' %}</a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="no-borders-tr">
+                                        <td>{% trans 'Update otp' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
+                                                   href="
+                                                        {% if request.user.otp_enabled and request.user.otp_secret_key %}
+                                                            {% if request.user.otp_force_enabled %}
+                                                                javascript:void(0)
+                                                                "><span style="color:#ed5565">{% trans 'Disable' %}</span>
+                                                            {% else %}
+                                                                {% url 'users:user-otp-disable-authentication' %}
+                                                                ">{% trans 'Disable' %}
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% url 'users:user-otp-enable-authentication' %}
+                                                            ">{% trans 'Enable' %}
+                                                        {% endif %}
+                                                </a>
                                             </span>
                                         </td>
                                     </tr>

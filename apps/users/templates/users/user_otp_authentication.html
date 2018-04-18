@@ -1,0 +1,37 @@
+{% extends 'users/_base_otp.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="verify">
+        <p style="margin: 20px auto;"><strong style="color: #000000">账号保护已开启，请根据提示完成以下操作</strong></p>
+        <img src="{% static 'img/otp_auth.png' %}" alt="" width="72px" height="117">
+        <p style="margin: 20px auto;">请在手机中打开Google Authenticator应用，输入6为动态码</p>
+    </div>
+
+    <form class="" role="form" method="post" action="">
+        {% csrf_token %}
+        {% if 'otp_code' in form.errors %}
+            <p class="red-fonts">{{ form.otp_code.errors.as_text }}</p>
+        {% endif %}
+
+        <div class="form-input">
+            <input type="text" class="" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
+        </div>
+
+        <button type="submit" class="next">{% trans 'Next' %}</button>
+    </form>
+
+
+    <script>
+        $(function(){
+            $('.change-color li').eq(2).remove();
+            $('.change-color li:eq(1) div').eq(1).html('解绑MFA')
+
+            })
+
+
+    </script>
+{% endblock %}
+
+

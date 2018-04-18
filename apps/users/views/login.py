@@ -19,17 +19,18 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.conf import settings
+from django.core.cache import cache
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from ..models import User, LoginLog
-from ..utils import send_reset_password_mail
+from ..utils import send_reset_password_mail, check_otp_code , get_login_ip, redirect_user_first_login_or_index
 from ..tasks import write_login_log_async
 from .. import forms
 
 
 __all__ = [
-    'UserLoginView', 'UserLogoutView',
+    'UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
     'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
     'UserResetPasswordView', 'UserResetPasswordSuccessView',
     'UserFirstLoginView', 'LoginLogListView'
@@ -53,27 +54,23 @@ class UserLoginView(FormView):
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
-        auth_login(self.request, form.get_user())
-        x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-
-        if x_forwarded_for and x_forwarded_for[0]:
-            login_ip = x_forwarded_for[0]
-        else:
-            login_ip = self.request.META.get('REMOTE_ADDR', '')
-        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(
-            self.request.user.username, type='W',
-            ip=login_ip, user_agent=user_agent
-        )
+        cache.set(self.request.session.session_key, form.get_user(), 600)
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        if self.request.user.is_first_login:
-            return reverse('users:user-first-login')
+        user = cache.get(self.request.session.session_key)
 
-        return self.request.POST.get(
-            self.redirect_field_name,
-            self.request.GET.get(self.redirect_field_name, reverse('index')))
+        if user.otp_enabled and user.otp_secret_key:
+            # 1,2 & T
+            return reverse('users:login-otp')
+        elif user.otp_enabled and not user.otp_secret_key:
+            # 1,2 & F
+            return reverse('users:user-otp-enable-authentication')
+        elif not user.otp_enabled:
+            # 0 & T,F
+            auth_login(self.request, user)
+            self.write_login_log()
+            return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -81,6 +78,44 @@ class UserLoginView(FormView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def write_login_log(self):
+        login_ip = get_login_ip(self.request)
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        write_login_log_async.delay(
+            self.request.user.username, type='W',
+            ip=login_ip, user_agent=user_agent
+        )
+
+
+class UserLoginOtpView(FormView):
+    template_name = 'users/login_otp.html'
+    form_class = forms.UserCheckOtpCodeForm
+    redirect_field_name = 'next'
+
+    def form_valid(self, form):
+        user = cache.get(self.request.session.session_key)
+        otp_code = form.cleaned_data.get('otp_code')
+        otp_secret_key = user.otp_secret_key
+
+        if check_otp_code(otp_secret_key, otp_code):
+            auth_login(self.request, user)
+            self.write_login_log()
+            return redirect(self.get_success_url())
+        else:
+            form.add_error('otp_code', _('Otp code invalid'))
+            return super().form_invalid(form)
+
+    def get_success_url(self):
+        return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
+
+    def write_login_log(self):
+        login_ip = get_login_ip(self.request)
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        write_login_log_async.delay(
+            self.request.user.username, type='W',
+            ip=login_ip, user_agent=user_agent
+        )
 
 
 @method_decorator(never_cache, name='dispatch')
