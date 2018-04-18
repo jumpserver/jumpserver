@@ -13,6 +13,7 @@ Jumpserver 文档
 
    introduce
    installation
+   installation_Lazy
    admin_guide
    user_guide
    development

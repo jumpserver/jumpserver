@@ -165,3 +165,7 @@ FAQ
         $ source /opt/py3/bin/activate
         $ cd /opt/jumpserver/apps
         $ python manage.py changepassword  <user_name>
+
+    (11). 清理celery产生的数据(无法正常推送及连接资产是可以使用)
+        $ from celery.task.control import discard_all
+        $ discard_all()
