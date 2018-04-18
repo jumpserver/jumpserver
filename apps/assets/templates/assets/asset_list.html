@@ -59,57 +59,57 @@
                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
                </div>
            </div>
-               <div class="mail-box-header">
-                   <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
-                    <div class="html5buttons">
-                        <div class="dt-buttons btn-group">
-                            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                            </a>
-                            <a class="btn btn-default btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                            </a>
-                        </div>
-                    </div>
-                   <div class="btn-group" style="float: right">
-                       <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
-                       <ul class="dropdown-menu labels">
-                           {% for label in labels %}
-                               <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
-                           {% endfor %}
-                       </ul>
+           <div class="mail-box-header">
+               <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
+               <div class="html5buttons">
+                   <div class="dt-buttons btn-group">
+                       <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
+                           <span>{% trans "Import" %}</span>
+                       </a>
+                       <a class="btn btn-default btn_export" tabindex="0">
+                           <span>{% trans "Export" %}</span>
+                       </a>
                    </div>
-                   <table class="table table-striped table-bordered table-hover " id="asset_list_table" style="width: 100%">
-                       <thead>
-                           <tr>
-                               <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                               <th class="text-center">{% trans 'Hostname' %}</th>
-                               <th class="text-center">{% trans 'IP' %}</th>
-                               <th class="text-center">{% trans 'Hardware' %}</th>
-                               <th class="text-center">{% trans 'Active' %}</th>
-                               <th class="text-center">{% trans 'Reachable' %}</th>
-                               <th class="text-center">{% trans 'Action' %}</th>
-                           </tr>
-                       </thead>
-                       <tbody>
-                       </tbody>
-                   </table>
-                   <div id="actions" class="hide">
-                       <div class="input-group">
-                           <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-                               <option value="delete">{% trans 'Delete selected' %}</option>
-                               <option value="update">{% trans 'Update selected' %}</option>
-                               <option value="remove">{% trans 'Remove from this node' %}</option>
-                               <option value="deactive">{% trans 'Deactive selected' %}</option>
-                               <option value="active">{% trans 'Active selected' %}</option>
-                           </select>
-                           <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                               <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-                                {% trans 'Submit' %}
-                               </button>
-                           </div>
+               </div>
+               <div class="btn-group" style="float: right">
+                  <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
+                  <ul class="dropdown-menu labels">
+                      {% for label in labels %}
+                          <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
+                      {% endfor %}
+                  </ul>
+               </div>
+               <table class="table table-striped table-bordered table-hover " id="asset_list_table" style="width: 100%">
+                   <thead>
+                       <tr>
+                           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                           <th class="text-center">{% trans 'Hostname' %}</th>
+                           <th class="text-center">{% trans 'IP' %}</th>
+                           <th class="text-center">{% trans 'Hardware' %}</th>
+                           <th class="text-center">{% trans 'Active' %}</th>
+                           <th class="text-center">{% trans 'Reachable' %}</th>
+                           <th class="text-center">{% trans 'Action' %}</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                   </tbody>
+               </table>
+               <div id="actions" class="hide">
+                   <div class="input-group">
+                       <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                           <option value="delete">{% trans 'Delete selected' %}</option>
+                           <option value="update">{% trans 'Update selected' %}</option>
+                           <option value="remove">{% trans 'Remove from this node' %}</option>
+                           <option value="deactive">{% trans 'Deactive selected' %}</option>
+                           <option value="active">{% trans 'Active selected' %}</option>
+                       </select>
+                       <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                           <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                            {% trans 'Submit' %}
+                           </button>
                        </div>
                    </div>
+               </div>
            </div>
        </div>
    </div>
@@ -117,15 +117,16 @@
 
 <div id="rMenu">
     <ul class="dropdown-menu">
-        <li id="menu_asset_create" class="btn-create-asset" tabindex="-1"><a>{% trans 'Create asset' %}</a></li>
-        <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a>{% trans 'Add asset' %}</a></li>
-        <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a>{% trans 'Refresh node hardware info' %}</a></li>
-        <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a>{% trans 'Test node connective' %}</a></li>
         <li class="divider"></li>
-        <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a>{% trans 'Add node' %}</a></li>
-        <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a>{% trans 'Rename node' %}</a></li>
+        <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a><i class="fa fa-plus-square-o"></i> {% trans 'Add node' %}</a></li>
+        <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a><i class="fa fa-pencil-square-o"></i> {% trans 'Rename node' %}</a></li>
+        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a><i class="fa fa-minus-square"></i> {% trans 'Delete node' %}</a></li>
         <li class="divider"></li>
-        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a>{% trans 'Delete node' %}</a></li>
+        <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-copy"></i> {% trans 'Add assets to node' %}</a></li>
+        <li id="menu_asset_move" class="btn-move-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-cut"></i> {% trans 'Move assets to node' %}</a></li>
+        <li class="divider"></li>
+        <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
+        <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
     </ul>
 </div>
 
@@ -136,6 +137,7 @@
 {% block custom_foot_js %}
 <script>
 var zTree, rMenu, asset_table, show = 0;
+var update_node_action = "";
 function initTable() {
     var options = {
         ele: $('#asset_list_table'),
@@ -210,10 +212,11 @@ function removeTreeNode() {
 	if (!current_node){
 	    return
     }
-
 	if (current_node.children && current_node.children.length > 0) {
-		alert("{% trans 'Have child node, cancel' %}")
-	} else {
+		toastr.error("{% trans 'Have child node, cancel' %}");
+	 } else if (current_node.assets_amount !== 0) {
+        toastr.error("{% trans 'Have assets, cancel' %}");
+    } else {
         var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id );
 		$.ajax({
             url: url,
@@ -249,13 +252,6 @@ function OnRightClick(event, treeId, treeNode) {
 
 function showRMenu(type, x, y) {
 	$("#rMenu ul").show();
-	{#if (type === "root") {#}
-	{#	return#}
-	{# } else {#}
-	{#	$("#m_del").show();#}
-	{#	$("#m_check").show();#}
-	{#	$("#m_unCheck").show();#}
-	{# }#}
     x -= 220;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 
@@ -459,7 +455,8 @@ $(document).ready(function(){
     var current_node;
     if (nodes && nodes.length ===1 ){
         current_node = nodes[0];
-        action += "?node_id=" + current_node.id;
+        action = setUrlParam(action, 'node_id', current_node.id);
+        {#action += "?node_id=" + current_node.id;#}
         $form.attr("action", action)
     }
     $form.find('.help-block').remove();
@@ -673,7 +670,45 @@ $(document).ready(function(){
             break;
     }
     $(".ipt_check_all").prop("checked", false)
-});
+})
+.on('click', '#btn_asset_modal_confirm', function () {
+    var assets_selected = asset_table2.selected;
+    var current_node;
+    var nodes = zTree.getSelectedNodes();
+    if (nodes && nodes.length === 1) {
+        current_node = nodes[0]
+    } else {
+        return
+    }
+
+    var data = {
+        'assets': assets_selected
+    };
+    var success = function () {
+        asset_table2.selected = [];
+        asset_table2.ajax.reload()
+    };
+
+    var url = '';
+    if (update_node_action === "move") {
+        url = "{% url 'api-assets:node-replace-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id);
+    } else {
+        url = "{% url 'api-assets:node-add-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node.id);
+    }
+
+    APIUpdateAttr({
+        'url': url,
+        'method': 'PUT',
+        'body': JSON.stringify(data),
+        'success': success
+    })
+}).on('hidden.bs.modal', '#asset_list_modal', function () {
+    window.location.reload();
+}).on('click', '#menu_asset_add', function () {
+    update_node_action = "add"
+}).on('click', '#menu_asset_move', function () {
+    update_node_action = "move"
+})
 </script>
 
 {% endblock %}

@@ -109,7 +109,7 @@ class SystemUser(AssetUser):
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
 
     def __str__(self):
-        return self.name
+        return '{0.name}({0.username})'.format(self)
 
     def to_json(self):
         return {

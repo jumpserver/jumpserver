@@ -15,19 +15,19 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                                <a href="{% url 'perms:asset-permission-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
                             <li>
-                                <a href="{% url 'perms:asset-permission-user-list' pk=asset_permission.id %}" class="text-center">
+                                <a href="{% url 'perms:asset-permission-user-list' pk=object.id %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Users and user groups' %}
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
+                                <a href="{% url 'perms:asset-permission-asset-list' pk=object.id %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-perm">
@@ -40,7 +40,7 @@
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ asset_permission.name }}</b></span>
+                                    <span class="label"><b>{{ object.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -60,43 +60,47 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td>{% trans 'Name' %}:</td>
-                                            <td><b>{{ asset_permission.name }}</b></td>
+                                            <td><b>{{ object.name }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'User count' %}:</td>
-                                            <td><b>{{ asset_permission.users.count }}</b></td>
+                                            <td><b>{{ object.users.count }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'User group count' %}:</td>
-                                            <td><b>{{ asset_permission.users.count }}</b></td>
+                                            <td><b>{{ object.users.count }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset count' %}:</td>
-                                            <td><b>{{ asset_permission.assets.count }}</b></td>
+                                            <td><b>{{ object.assets.count }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Asset group count' %}:</td>
-                                            <td><b>{{ asset_permission.asset_groups.count }}</b></td>
+                                            <td>{% trans 'Node count' %}:</td>
+                                            <td><b>{{ object.nodes.count }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'System user count' %}:</td>
-                                            <td><b>{{ asset_permission.system_users.count }}</b></td>
+                                            <td><b>{{ object.system_users.count }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date start' %}:</td>
+                                            <td><b>{{ object.date_start }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>
-                                            <td><b>{{ asset_permission.date_expired }}</b></td>
+                                            <td><b>{{ object.date_expired }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date created' %}:</td>
-                                            <td><b>{{ asset_permission.date_created }}</b></td>
+                                            <td><b>{{ object.date_created }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ asset_permission.created_by  }}</b></td>
+                                            <td><b>{{ object.created_by  }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ asset_permission.comment }}</b></td>
+                                            <td><b>{{ object.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -117,7 +121,7 @@
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if asset_permission.is_active %} checked {% endif %} class="onoffswitch-checkbox" id="is_active">
+                                                        <input type="checkbox" {% if object.is_active %} checked {% endif %} class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -143,7 +147,7 @@
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system users' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_remain %}
-                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -155,9 +159,9 @@
                                             </tr>
                                         </form>
 
-                                        {% for system_user in system_users %}
+                                        {% for system_user in object.system_users.all %}
                                         <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
-                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user.name }}</b></td>
+                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn-remove-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
@@ -179,7 +183,7 @@
 jumpserver.system_users_selected = {};
 
 function updateSystemUser(system_users) {
-    var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
+    var the_url = "{% url 'api-perms:asset-permission-detail' pk=object.id %}";
     var body = {
         system_users: Object.assign([], system_users)
     };
@@ -203,7 +207,7 @@ $(document).ready(function () {
 .on('click', '.btn-delete-perm', function () {
     var $this = $(this);
     var name = "{{ asset_permission.name }}";
-    var uid = "{{ asset_permission.id }}";
+    var uid = "{{ object.id }}";
     var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'perms:asset-permission-list' %}";
     objectDelete($this, name, the_url, redirect_url);
@@ -238,7 +242,7 @@ $(document).ready(function () {
     updateSystemUser(system_users);
     $tr.remove()
 }).on('click', '#is_active', function () {
-    var the_url = '{% url "api-perms:asset-permission-detail" pk=asset_permission.id %}';
+    var the_url = '{% url "api-perms:asset-permission-detail" pk=object.id %}';
     var checked = $(this).prop('checked');
     var body = {
         'is_active': checked

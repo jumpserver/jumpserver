@@ -3,6 +3,8 @@
 {% load bootstrap3 %}
 {% load i18n %}
 
+
+
 {% block form %}
 <form id="groupForm" method="post" class="form-horizontal">
     {% csrf_token %}
@@ -18,14 +20,28 @@
         </div>
     </div>
 </form>
+{% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('.select2').select2({
-            closeOnSelect: false
-        });
+$(document).ready(function () {
+    $('.select2').select2({
+        closeOnSelect: false
+    })
+}).on('click', '.select2-selection__rendered', function (e) {
+    e.preventDefault();
+    $("#asset_list_modal").modal();
+})
+.on('click', '#btn_asset_modal_confirm', function () {
+    var assets = asset_table2.selected;
+    $('.select2 option:selected').each(function (i, data) {
+        assets.push($(data).attr('value'))
     });
+    $.each(assets, function (id, data) {
+        $('.select2').val(assets).trigger('change');
+    });
+    $("#asset_list_modal").modal('hide');
+})
 </script>
 {% endblock %}

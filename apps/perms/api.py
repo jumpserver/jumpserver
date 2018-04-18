@@ -3,7 +3,7 @@
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.generics import ListAPIView, get_object_or_404
+from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
 
 from common.utils import set_or_append_attr_bulk
@@ -97,6 +97,11 @@ class UserGrantedNodesApi(ListAPIView):
             user = self.request.user
         nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
         return nodes.keys()
+
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
 
 
 class UserGrantedNodesWithAssetsApi(ListAPIView):
@@ -246,3 +251,77 @@ class ValidateUserAssetPermissionView(APIView):
             return Response({'msg': True}, status=200)
         else:
             return Response({'msg': False}, status=403)
+
+
+class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
+    """
+    将用户从授权中移除，Detail页面会调用
+    """
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateUserSerializer
+    queryset = AssetPermission.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            users = serializer.validated_data.get('users')
+            if users:
+                perm.users.remove(*tuple(users))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
+
+
+class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateUserSerializer
+    queryset = AssetPermission.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            users = serializer.validated_data.get('users')
+            if users:
+                perm.users.add(*tuple(users))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
+
+
+class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
+    """
+    将用户从授权中移除，Detail页面会调用
+    """
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
+    queryset = AssetPermission.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data.get('assets')
+            if assets:
+                perm.assets.remove(*tuple(assets))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
+
+
+class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
+    queryset = AssetPermission.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data.get('assets')
+            if assets:
+                perm.assets.add(*tuple(assets))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})

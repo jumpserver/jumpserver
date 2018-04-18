@@ -32,6 +32,7 @@ __all__ = [
     'NodeViewSet', 'NodeChildrenApi',
     'NodeAssetsApi', 'NodeWithAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
+    'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
     'TestNodeConnectiveApi'
 ]
@@ -189,6 +190,19 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         instance = self.get_object()
         if instance != Node.root():
             instance.assets.remove(*tuple(assets))
+
+
+class NodeReplaceAssetsApi(generics.UpdateAPIView):
+    serializer_class = serializers.NodeAssetsSerializer
+    queryset = Node.objects.all()
+    permission_classes = (IsSuperUser,)
+    instance = None
+
+    def perform_update(self, serializer):
+        assets = serializer.validated_data.get('assets')
+        instance = self.get_object()
+        for asset in assets:
+            asset.nodes.set([instance])
 
 
 class RefreshNodeHardwareInfoApi(APIView):

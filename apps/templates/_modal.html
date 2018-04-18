@@ -1,4 +1,9 @@
 {% load i18n %}
+<style>
+.modal-body {
+    padding: 0px 20px 0px 20px;
+}
+</style>
 <div aria-hidden="true" role="dialog" id="{% block modal_id %}{% endblock %}" class="modal inmodal">
     <div class="modal-dialog {% block modal_class %}{% endblock %}">
         <div class="modal-content animated fadeIn">
@@ -12,8 +17,10 @@
               {% endblock %}
             </div>
             <div class="modal-footer">
+              {% block modal_button %}
               <button data-dismiss="modal" class="btn btn-white" type="button">{% trans "Close" %}</button>
               <button class="btn btn-primary" type="button" id="{% block modal_confirm_id %}{% endblock %}">{% trans 'Confirm' %}</button>
+              {% endblock %}
             </div>
         </div>
     </div>

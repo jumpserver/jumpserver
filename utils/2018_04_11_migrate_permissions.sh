@@ -3,9 +3,10 @@
 
 python ../apps/manage.py shell << EOF
 from perms.models import *
+from assets.models import SystemUser
 
 for old in NodePermission.objects.all():
-    perm = asset_perm_model.objects.using(db_alias).create(
+    perm = AssetPermission.objects.create(
             name="{}-{}-{}".format(
                 old.node.value,
                 old.user_group.name,
@@ -20,5 +21,10 @@ for old in NodePermission.objects.all():
     perm.user_groups.add(old.user_group)
     perm.nodes.add(old.node)
     perm.system_users.add(old.system_user)
+
+    for s in SystemUser.objects.all():
+        nodes = list(s.nodes.all())
+        s.nodes.set([])
+        s.nodes.set(nodes)
 EOF
 

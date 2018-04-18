@@ -4,10 +4,23 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from .hands import User
 from .models import AssetPermission
 
 
 class AssetPermissionForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.exclude(role=User.ROLE_APP),
+        label=_("User"),
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'select2',
+                'data-placeholder': _('Select users')
+            }
+        ),
+        required=False,
+    )
+
     class Meta:
         model = AssetPermission
         exclude = (

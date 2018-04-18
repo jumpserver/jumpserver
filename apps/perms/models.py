@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from common.utils import date_expired_default
+from common.utils import date_expired_default, set_or_append_attr_bulk
 
 
 class ValidManager(models.Manager):
@@ -44,6 +44,22 @@ class AssetPermission(models.Model):
         if self.date_expired > timezone.now() > self.date_start and self.is_active:
             return True
         return False
+
+    def get_all_users(self):
+        users = set(self.users.all())
+        for group in self.user_groups.all():
+            _users = group.users.all()
+            set_or_append_attr_bulk(_users, 'inherit', group.name)
+            users.update(set(_users))
+        return users
+
+    def get_all_assets(self):
+        assets = set(self.assets.all())
+        for node in self.nodes.all():
+            _assets = node.get_all_assets()
+            set_or_append_attr_bulk(_assets, 'inherit', node.value)
+            assets.update(set(_assets))
+        return assets
 
 
 class NodePermission(models.Model):

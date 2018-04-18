@@ -45,7 +45,7 @@ class User(AbstractUser):
     wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
     otp_level = models.SmallIntegerField(default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('Enable OTP'))
-    otp_secret_key = models.CharField(max_length=16, blank=True, null=True)
+    _otp_secret_key = models.CharField(max_length=128, blank=True, null=True)
     # Todo: Auto generate key, let user download
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Private key'))
     _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Public key'))
@@ -55,7 +55,7 @@ class User(AbstractUser):
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
     def __str__(self):
-        return self.username
+        return '{0.name}({0.username})'.format(self)
 
     @property
     def password_raw(self):
@@ -69,6 +69,14 @@ class User(AbstractUser):
     @password_raw.setter
     def password_raw(self, password_raw_):
         self.set_password(password_raw_)
+
+    @property
+    def otp_secret_key(self):
+        return signer.unsign(self._otp_secret_key)
+
+    @otp_secret_key.setter
+    def otp_secret_key(self, item):
+        self._otp_secret_key = signer.sign(item).decode('utf-8')
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

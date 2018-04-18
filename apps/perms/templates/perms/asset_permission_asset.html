@@ -57,12 +57,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset in page_obj %}
+                                            {% for asset in object_list %}
                                             <tr>
                                                 <td>{{ asset.hostname }}</td>
                                                 <td>{{ asset.ip }}</td>
                                                 <td>
-                                                    <button title="{{ asset.inherit_from_asset_groups }}" data-gid="{{ asset.id }}" class="btn btn-danger btn-xs btn-remove-asset {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button title="{{ asset.inherit }}" data-gid="{{ asset.id }}" class="btn btn-danger btn-xs btn-remove-asset {% if asset.inherit %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -85,9 +85,9 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 asset" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2" id="asset_select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for asset in assets_remain %}
-                                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                                            <option value="{{ asset.id }}">{{ asset }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -105,7 +105,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset group to this permission' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add node to this permission' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit">
@@ -113,25 +113,25 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select asset groups' %}" class="select2 group" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for asset_group in asset_groups_remain %}
-                                                        <option value="{{ asset_group.id }}" id="opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                    <select data-placeholder="{% trans 'Select nodes' %}" class="select2" id="node_select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for node in nodes_remain %}
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}">{{ node }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-group">{% trans 'Join' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-node">{% trans 'Join' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
-                                        {% for asset_group in asset_groups %}
+                                        {% for node in asset_permission.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_user_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td ><b class="bdg_group" data-gid={{ node.id }}>{{ node }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn-remove-group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-xs btn-remove-node" type="button" data-gid="{{ node.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -179,49 +179,30 @@ function removeAssets(assets) {
     });
 }
 
-function updateGroup(groups) {
+function updateNodes(nodes, success) {
     var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
     var body = {
-        asset_groups: groups
+        nodes: nodes
     };
     APIUpdateAttr({
         url: the_url,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        success: success
     });
 }
 
-jumpserver.assets_selected = {};
-jumpserver.nodes_selected = {};
 
 $(document).ready(function () {
-     $('.select2.asset').select2()
-        .on('select2:select', function(evt) {
-             var data = evt.params.data;
-             jumpserver.assets_selected[data.id] = data.text;
-        })
-        .on('select2:unselect', function(evt) {
-            var data = evt.params.data;
-            delete jumpserver.assets_selected[data.id]
-        });
-    $('.select2.group').select2()
-        .on('select2:select', function(evt) {
-             var data = evt.params.data;
-             jumpserver.nodes_selected[data.id] = data.text;
-        })
-        .on('select2:unselect', function(evt) {
-            var data = evt.params.data;
-            delete jumpserver.nodes_selected[data.id]
-        })
+     $('.select2').select2();
 })
 .on('click', '.btn-add-assets', function () {
-    if (Object.keys(jumpserver.assets_selected).length === 0) {
+    var assets_selected = $("#asset_select2 option:selected").map(function () {
+        return $(this).attr('value');
+    }).get();
+    if (assets_selected.length === 0) {
 		return false;
 	}
-	var assets = [];
-    $.map(jumpserver.assets_selected, function(value, index) {
-        assets.push(index);
-    });
-    addAssets(assets);
+    addAssets(assets_selected);
 })
 .on('click', '.btn-remove-asset', function () {
     var asset_id = $(this).data("gid");
@@ -231,38 +212,44 @@ $(document).ready(function () {
     var assets = [asset_id];
     removeAssets(assets)
 })
-.on('click', '#btn-add-group', function () {
-    if (Object.keys(jumpserver.nodes_selected).length === 0) {
+.on('click', '#btn-add-node', function () {
+    var nodes_selected = {};
+    $("#node_select2 option:selected").each(function (i, data) {
+        nodes_selected[$(data).attr('value')] = $(data).text();
+    });
+    if (Object.keys(nodes_selected).length === 0) {
 		return false;
 	}
-
-    var groups = $('.bdg_group').map(function() {
+    var nodes_origin = $('.bdg_group').map(function() {
         return $(this).data('gid');
     }).get();
 
-    $.map(jumpserver.nodes_selected, function(group_name, index) {
-        groups.push(index);
-        $('#opt_' + index).remove();
-        $('.group_edit tbody').append(
-           '<tr>' +
-           '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-           '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
-           '</tr>'
-        )
-    });
-
-    updateGroup(groups);
+    var nodes = nodes_origin.concat(Object.keys(nodes_selected));
+    var success = function () {
+        $.map(nodes_selected, function(name, id) {
+            $('#opt_' + id).remove();
+            $('.group_edit tbody').append(
+               '<tr>' +
+               '<td><b class="bdg_group" data-gid="' + id + '">' + name + '</b></td>' +
+               '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
+               '</tr>'
+            )
+        });
+    };
+    updateNodes(nodes, success);
 })
-.on('click', '.btn-remove-group', function () {
+.on('click', '.btn-remove-node', function () {
     var $this = $(this);
     var $tr = $this.closest('tr');
-    var groups = $('.bdg_group').map(function() {
+    var nodes = $('.bdg_group').map(function() {
         if ($(this).data('gid') !== $this.data('gid')){
             return $(this).data('gid');
         }
     }).get();
-    updateGroup(groups);
-    $tr.remove()
+    var success = function () {
+        $tr.remove()
+    };
+    updateNodes(nodes, success);
 })
 </script>
 {% endblock %}
