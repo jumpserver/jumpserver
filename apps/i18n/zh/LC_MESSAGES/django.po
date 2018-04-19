@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-19 12:44+0800\n"
+"POT-Creation-Date: 2018-04-19 17:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -788,9 +788,9 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:138 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
-#: users/templates/users/user_detail.html:357
-#: users/templates/users/user_detail.html:382
-#: users/templates/users/user_detail.html:405
+#: users/templates/users/user_detail.html:362
+#: users/templates/users/user_detail.html:387
+#: users/templates/users/user_detail.html:410
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:196
@@ -883,7 +883,7 @@ msgstr "刷新"
 
 #: assets/templates/assets/asset_detail.html:300
 #: users/templates/users/user_detail.html:282
-#: users/templates/users/user_detail.html:304
+#: users/templates/users/user_detail.html:309
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -971,8 +971,8 @@ msgstr "存在资产，不能删除"
 
 #: assets/templates/assets/asset_list.html:595
 #: assets/templates/assets/system_user_list.html:133
-#: users/templates/users/user_detail.html:352
-#: users/templates/users/user_detail.html:377
+#: users/templates/users/user_detail.html:357
+#: users/templates/users/user_detail.html:382
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:191
 msgid "Are you sure?"
@@ -2471,7 +2471,7 @@ msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供OTP验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:45
-#: users/templates/users/user_detail.html:343 users/utils.py:72
+#: users/templates/users/user_detail.html:348 users/utils.py:73
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2535,35 +2535,39 @@ msgstr "发送"
 msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
-#: users/templates/users/user_detail.html:342
+#: users/templates/users/user_detail.html:291
+msgid "Goto profile page enable otp"
+msgstr "请去个人信息页面启用自己的OTP"
+
+#: users/templates/users/user_detail.html:347
 msgid "An e-mail has been sent to the user`s mailbox."
 msgstr "已发送邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:353
+#: users/templates/users/user_detail.html:358
 msgid "This will reset the user password and send a reset mail"
 msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:367
+#: users/templates/users/user_detail.html:372
 msgid ""
 "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
 "the user to update his new ssh public key."
 msgstr "重设密钥邮件将会发送到用户邮箱"
 
-#: users/templates/users/user_detail.html:368
+#: users/templates/users/user_detail.html:373
 msgid "Reset SSH public key"
 msgstr "重置SSH密钥"
 
-#: users/templates/users/user_detail.html:378
+#: users/templates/users/user_detail.html:383
 msgid "This will reset the user public key and send a reset mail"
 msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:395
+#: users/templates/users/user_detail.html:400
 #: users/templates/users/user_profile.html:203
 msgid "Successfully updated the SSH public key."
 msgstr "更新ssh密钥成功"
 
-#: users/templates/users/user_detail.html:396
-#: users/templates/users/user_detail.html:400
+#: users/templates/users/user_detail.html:401
+#: users/templates/users/user_detail.html:405
 #: users/templates/users/user_profile.html:204
 #: users/templates/users/user_profile.html:209
 msgid "User SSH public key update"
@@ -2670,11 +2674,11 @@ msgstr "或者重置并下载密钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:36
+#: users/utils.py:37
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:38
+#: users/utils.py:39
 #, python-format
 msgid ""
 "\n"
@@ -2715,7 +2719,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:74
+#: users/utils.py:75
 #, python-format
 msgid ""
 "\n"
@@ -2759,11 +2763,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:105
+#: users/utils.py:106
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:107
+#: users/utils.py:108
 #, python-format
 msgid ""
 "\n"
@@ -2788,15 +2792,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:140
+#: users/utils.py:141
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:142
+#: users/utils.py:143
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:155
+#: users/utils.py:156
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
@@ -2816,7 +2820,7 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:107 users/views/user.py:479 users/views/user.py:507
+#: users/views/login.py:107 users/views/user.py:464 users/views/user.py:489
 msgid "Otp code invalid"
 msgstr "otp码认证失败"
 
@@ -2889,23 +2893,23 @@ msgstr "密码更新"
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:430
+#: users/views/user.py:421
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:535
+#: users/views/user.py:515
 msgid "OTP enable success"
 msgstr "OTP 绑定成功"
 
-#: users/views/user.py:536
+#: users/views/user.py:516
 msgid "OTP enable success, return login page"
 msgstr "OTP 绑定成功，返回到登录页面"
 
-#: users/views/user.py:538
+#: users/views/user.py:518
 msgid "OTP disable success"
 msgstr "OTP 解绑成功"
 
-#: users/views/user.py:539
+#: users/views/user.py:519
 msgid "OTP disable success, return login page"
 msgstr "OTP 解绑成功，返回登录页面"
 

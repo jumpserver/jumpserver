@@ -152,7 +152,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.otp_force_enabled%} checked {% endif %}{% if request.user == user_object %} disabled {% endif %}
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.otp_force_enabled %} checked {% endif %}
                                                                id="force_enable_otp">
                                                         <label class="onoffswitch-label" for="force_enable_otp">
                                                             <span class="onoffswitch-inner"></span>
@@ -287,6 +287,11 @@ $(document).ready(function() {
     });
 })
 .on('click', '#force_enable_otp', function() {
+    {% if request.user == user_object %}
+        toastr.error("{% trans 'Goto profile page enable otp' %}");
+        return
+    {% endif %}
+
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
     var checked = $(this).prop('checked');
     var otp_level;
