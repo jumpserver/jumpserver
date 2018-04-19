@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-18 20:14+0800\n"
+"POT-Creation-Date: 2018-04-19 12:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -173,7 +173,7 @@ msgstr "密码或密钥密码"
 #: users/templates/users/login.html:59
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_create.html:11
-#: users/templates/users/user_password_authentication.html:13
+#: users/templates/users/user_password_authentication.html:14
 #: users/templates/users/user_password_update.html:40
 #: users/templates/users/user_profile_update.html:40
 #: users/templates/users/user_pubkey_update.html:40
@@ -1916,7 +1916,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:240 users/views/login.py:289 users/views/user.py:64
+#: users/views/login.py:241 users/views/login.py:290 users/views/user.py:64
 #: users/views/user.py:79 users/views/user.py:99 users/views/user.py:155
 #: users/views/user.py:310 users/views/user.py:357 users/views/user.py:379
 msgid "Users"
@@ -2417,9 +2417,9 @@ msgstr "上一步"
 #: users/templates/users/first_login.html:60
 #: users/templates/users/login_otp.html:66
 #: users/templates/users/user_otp_authentication.html:22
-#: users/templates/users/user_otp_enable_bind.html:25
+#: users/templates/users/user_otp_enable_bind.html:19
 #: users/templates/users/user_otp_enable_install_app.html:22
-#: users/templates/users/user_password_authentication.html:21
+#: users/templates/users/user_password_authentication.html:17
 msgid "Next"
 msgstr "下一步"
 
@@ -2462,13 +2462,13 @@ msgstr ""
 
 #: users/templates/users/login_otp.html:64
 #: users/templates/users/user_otp_authentication.html:19
-#: users/templates/users/user_otp_enable_bind.html:18
+#: users/templates/users/user_otp_enable_bind.html:16
 msgid "Six figures"
 msgstr "6位数字"
 
 #: users/templates/users/login_otp.html:69
-msgid "Can't provide security? Please contact the administrator"
-msgstr "如果不能提供OTP码，请联系管理员"
+msgid "Can't provide security? Please contact the administrator!"
+msgstr "如果不能提供OTP验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:45
 #: users/templates/users/user_detail.html:343 users/utils.py:72
@@ -2816,52 +2816,52 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:106 users/views/user.py:460 users/views/user.py:485
+#: users/views/login.py:107 users/views/user.py:479 users/views/user.py:507
 msgid "Otp code invalid"
 msgstr "otp码认证失败"
 
-#: users/views/login.py:132
+#: users/views/login.py:133
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:133
+#: users/views/login.py:134
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:149
+#: users/views/login.py:150
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:162
+#: users/views/login.py:163
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:163
+#: users/views/login.py:164
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:177
+#: users/views/login.py:178
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:178
+#: users/views/login.py:179
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:195 users/views/login.py:208
+#: users/views/login.py:196 users/views/login.py:209
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:204
+#: users/views/login.py:205
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:240
+#: users/views/login.py:241
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:290
+#: users/views/login.py:291
 msgid "Login log list"
 msgstr "登录日志"
 
@@ -2889,23 +2889,23 @@ msgstr "密码更新"
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:419
+#: users/views/user.py:430
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:512
+#: users/views/user.py:535
 msgid "OTP enable success"
 msgstr "OTP 绑定成功"
 
-#: users/views/user.py:513
+#: users/views/user.py:536
 msgid "OTP enable success, return login page"
 msgstr "OTP 绑定成功，返回到登录页面"
 
-#: users/views/user.py:515
+#: users/views/user.py:538
 msgid "OTP disable success"
 msgstr "OTP 解绑成功"
 
-#: users/views/user.py:516
+#: users/views/user.py:539
 msgid "OTP disable success, return login page"
 msgstr "OTP 解绑成功，返回登录页面"
 
