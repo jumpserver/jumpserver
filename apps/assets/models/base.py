@@ -106,7 +106,7 @@ class AssetUser(models.Model):
     def auto_gen_auth(self):
         password = str(uuid.uuid4())
         private_key, public_key = ssh_key_gen(
-            username=self.name, password=password
+            username=self.username, password=password
         )
         self.set_auth(password=password,
                       private_key=private_key,
