@@ -112,7 +112,7 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = self.object.get_all_users()
+        queryset = list(self.object.get_all_users())
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -142,7 +142,7 @@ class AssetPermissionAssetView(AdminUserRequiredMixin,
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = self.object.get_all_assets()
+        queryset = list(self.object.get_all_assets())
         return queryset
 
     def get_context_data(self, **kwargs):
