@@ -72,6 +72,8 @@ class Signer(metaclass=Singleton):
         return s.dumps(value)
 
     def unsign(self, value):
+        if value is None:
+            return value
         s = JSONWebSignatureSerializer(self.secret_key)
         try:
             return s.loads(value)
