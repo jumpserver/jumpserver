@@ -305,9 +305,9 @@ $(document).ready(function () {
         success_message: success
     });
     if (status === "False") {
-            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
+        $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
     }else{
-            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
+        $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
     }
 }).on('click', '#btn-update-nodes', function () {
     if (Object.keys(jumpserver.nodes_selected).length === 0) {

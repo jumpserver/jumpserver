@@ -2,11 +2,15 @@
 #
 import json
 
+from django.db import models
 from django import forms
 from django.utils import six
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
+from .utils import get_signer
+
+signer = get_signer()
 
 
 class DictField(forms.Field):
@@ -47,3 +51,26 @@ class StringIDField(serializers.Field):
 class StringManyToManyField(serializers.RelatedField):
     def to_representation(self, value):
         return value.__str__()
+
+
+class EncryptMixin:
+    def from_db_value(self, value, expression, connection, context):
+        if value is not None:
+            return signer.unsign(value)
+        return super().from_db_value(self, value, expression, connection, context)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return signer.sign(value).decode('utf-8')
+
+
+class EncryptTextField(EncryptMixin, models.TextField):
+    description = _("Encrypt field using Secret Key")
+
+
+class EncryptCharField(EncryptMixin, models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 2048
+        super().__init__(*args, **kwargs)
+

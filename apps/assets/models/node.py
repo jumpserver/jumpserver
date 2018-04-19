@@ -19,7 +19,7 @@ class Node(models.Model):
     is_asset = False
 
     def __str__(self):
-        return self.value
+        return self.full_value
 
     @property
     def name(self):
@@ -30,7 +30,7 @@ class Node(models.Model):
         if self == self.__class__.root():
             return self.value
         else:
-            return '{}/{}'.format(self.value, self.parent.full_value)
+            return '{} / {}'.format(self.parent.full_value, self.value)
 
     @property
     def level(self):

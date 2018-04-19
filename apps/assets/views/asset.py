@@ -49,6 +49,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
             'app': _('Assets'),
             'action': _('Asset list'),
             'labels': Label.objects.all().order_by('name'),
+            'nodes': Node.objects.all().order_by('-key'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -284,24 +285,26 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             if set(row) == {''}:
                 continue
 
-            asset_dict = dict(zip(attr, row))
-            id_ = asset_dict.pop('id', 0)
-            for k, v in asset_dict.items():
+            asset_dict_raw = dict(zip(attr, row))
+            asset_dict = dict()
+            for k, v in asset_dict_raw.items():
                 v = v.strip()
                 if k == 'is_active':
-                    v = True if v in ['TRUE', 1, 'true'] else False
+                    v = False if v in ['False', 0, 'false'] else True
                 elif k == 'admin_user':
                     v = get_object_or_none(AdminUser, name=v)
                 elif k in ['port', 'cpu_count', 'cpu_cores']:
                     try:
                         v = int(v)
                     except ValueError:
-                        v = 0
+                        v = ''
                 elif k == 'domain':
                     v = get_object_or_none(Domain, name=v)
-                asset_dict[k] = v
 
-            asset = get_object_or_none(Asset, id=id_) if is_uuid(id_) else None
+                if v != '':
+                    asset_dict[k] = v
+
+            asset = get_object_or_none(Asset, id=asset_dict.pop('id', 0))
             if not asset:
                 try:
                     if len(Asset.objects.filter(hostname=asset_dict.get('hostname'))):
@@ -316,7 +319,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
                 for k, v in asset_dict.items():
-                    if v:
+                    if v != '':
                         setattr(asset, k, v)
                 try:
                     asset.save()

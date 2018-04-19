@@ -248,7 +248,7 @@ class CommandViewSet(viewsets.ViewSet):
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = ReplaySerializer
-    permission_classes = ()
+    permission_classes = (IsSuperUserOrAppUser,)
     session = None
 
     def gen_session_path(self):

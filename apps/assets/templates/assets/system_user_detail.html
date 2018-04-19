@@ -173,7 +173,7 @@
                                                 <td colspan="2" class="no-borders">
                                                     <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.name }}</option>
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -187,7 +187,7 @@
 
                                         {% for node in system_user.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.name }}</b></td>
+                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
