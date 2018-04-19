@@ -9,6 +9,7 @@ import uuid
 
 import requests
 import ipaddress
+from django.http import Http404
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import authenticate, login as auth_login
@@ -224,14 +225,26 @@ def get_ip_city(ip, timeout=10):
     return city
 
 
-def get_tmp_user_from_session(request):
-    user_id = request.session.get('tmp_user_id')
-    user = get_object_or_none(User, pk=user_id)
+def get_user_or_tmp_user(request):
+    user = request.user
+    tmp_user = get_tmp_user_from_cache(request)
+    if user.is_authenticated:
+        return user
+    elif tmp_user:
+        return tmp_user
+    else:
+        raise Http404("Not found this user")
+
+
+def get_tmp_user_from_cache(request):
+    if not request.session.session_key:
+        return None
+    user = cache.get(request.session.session_key+'user')
     return user
 
 
-def set_tmp_user_to_session(request, user):
-    request.session['tmp_user_id'] = str(user.id)
+def set_tmp_user_to_cache(request, user):
+    cache.set(request.session.session_key+'user', user, 600)
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
@@ -243,10 +256,7 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
 
 
 def generate_otp_uri(request, issuer="Jumpserver"):
-    if request.user.is_authenticated:
-        user = request.user
-    else:
-        user = get_tmp_user_from_session(request)
+    user = get_user_or_tmp_user(request)
     otp_secret_key = cache.get(request.session.session_key+'otp_key', '')
     if not otp_secret_key:
         otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
