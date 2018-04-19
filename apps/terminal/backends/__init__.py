@@ -22,9 +22,7 @@ def get_terminal_command_store():
             storage = get_command_store()
         else:
             if not TYPE_ENGINE_MAPPING.get(tp):
-                raise AssertionError("Command storage type should in {}".format(
-                    ', '.join(TYPE_ENGINE_MAPPING.keys()))
-                )
+                continue
             engine_class = import_module(TYPE_ENGINE_MAPPING[tp])
             storage = engine_class.CommandStore(params)
         storage_list[name] = storage
