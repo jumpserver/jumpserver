@@ -87,10 +87,18 @@
                                             <td>{% trans 'Role' %}:</td>
                                             <td><b>{{ user_object.get_role_display }}</b></td>
                                         </tr>
-{#                                        <tr>#}
-{#                                            <td>{% trans 'Enable OTP' %}:</td>#}
-{#                                            <td><b>{{ user_object.enable_otp|yesno:"Yes,No,Unknown"}}</b></td>#}
-{#                                        </tr>#}
+                                        <tr>
+                                            <td>{% trans 'Enable OTP' %}:</td>
+                                            <td><b>
+                                                {% if user_object.otp_force_enabled %}
+                                                    {% trans 'Force enabled' %}
+                                                {% elif  user_object.otp_enabled%}
+                                                    {% trans 'Enabled' %}
+                                                {% else %}
+                                                    {% trans 'Disabled' %}
+                                                {% endif %}
+                                            </b></td>
+                                        </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>
                                             <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
@@ -137,22 +145,23 @@
                                                     </div>
                                                 </div>
                                             </span></td>
+
                                         </tr>
-{#                                        <tr>#}
-{#                                          <td>{% trans 'Enable OTP' %}:</td>#}
-{#                                            <td><span class="pull-right">#}
-{#                                                <div class="switch">#}
-{#                                                    <div class="onoffswitch">#}
-{#                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}#}
-{#                                                               id="enable_otp">#}
-{#                                                        <label class="onoffswitch-label" for="enable_otp">#}
-{#                                                            <span class="onoffswitch-inner"></span>#}
-{#                                                            <span class="onoffswitch-switch"></span>#}
-{#                                                        </label>#}
-{#                                                    </div>#}
-{#                                                </div>#}
-{#                                            </span></td>#}
-{#                                        </tr>#}
+                                        <tr>
+                                          <td>{% trans 'Force enabled OTP' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.otp_force_enabled%} checked {% endif %}{% if request.user == user_object %} disabled {% endif %}
+                                                               id="force_enable_otp">
+                                                        <label class="onoffswitch-label" for="force_enable_otp">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
                                         <tr>
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
@@ -277,19 +286,28 @@ $(document).ready(function() {
         success_message: success
     });
 })
-{#.on('click', '#enable_otp', function() {#}
-{#    var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";#}
-{#    var checked = $(this).prop('checked');#}
-{#    var body = {#}
-{#        'enable_otp': checked#}
-{#    };#}
-{#    var success = '{% trans "Update successfully!" %}';#}
-{#    APIUpdateAttr({#}
-{#        url: the_url,#}
-{#        body: JSON.stringify(body),#}
-{#        success_message: success#}
-{#    });#}
-{# });#}
+.on('click', '#force_enable_otp', function() {
+    var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
+    var checked = $(this).prop('checked');
+    var otp_level;
+    var otp_secret_key;
+    if(checked){
+        otp_level = 2
+    }else{
+        otp_level = 0;
+        otp_secret_key = '';
+    }
+    var body = {
+        'otp_level': otp_level,
+        'otp_secret_key': otp_secret_key
+    };
+    var success = '{% trans "Update successfully!" %}';
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+ })
 .on('click', '#btn_join_group', function() {
     if (Object.keys(jumpserver.nodes_selected).length === 0) {
         return false;

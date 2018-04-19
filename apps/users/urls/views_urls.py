@@ -10,6 +10,7 @@ urlpatterns = [
     # Login view
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
+    url(r'^login/otp$', views.UserLoginOtpView.as_view(), name='login-otp'),
     url(r'^password/forgot$', views.UserForgotPasswordView.as_view(), name='forgot-password'),
     url(r'^password/forgot/sendmail-success$', views.UserForgotPasswordSendmailSuccessView.as_view(), name='forgot-password-sendmail-success'),
     url(r'^password/reset$', views.UserResetPasswordView.as_view(), name='reset-password'),
@@ -21,6 +22,11 @@ urlpatterns = [
     url(r'^profile/password/update/$', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     url(r'^profile/pubkey/update/$', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
     url(r'^profile/pubkey/generate/$', views.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
+    url(r'^profile/otp/enable/authentication/$', views.UserOtpEnableAuthenticationView.as_view(), name='user-otp-enable-authentication'),
+    url(r'^profile/otp/enable/install-app/$', views.UserOtpEnableInstallAppView.as_view(), name='user-otp-enable-install-app'),
+    url(r'^profile/otp/enable/bind/$', views.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
+    url(r'^profile/otp/disable/authentication/$', views.UserOtpDisableAuthenticationView.as_view(), name='user-otp-disable-authentication'),
+    url(r'^profile/otp/settings-success/$', views.UserOtpSettingsSuccessView.as_view(), name='user-otp-settings-success'),
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
@@ -33,7 +39,6 @@ urlpatterns = [
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/assets', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/login-history', views.UserDetailView.as_view(), name='user-login-history'),
-
 
     # User group view
     url(r'^user-group$', views.UserGroupListView.as_view(), name='user-group-list'),

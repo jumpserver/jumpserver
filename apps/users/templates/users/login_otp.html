@@ -1,0 +1,87 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Jumpserver </title>
+    <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script src="{% static "js/jumpserver.js" %}"></script>
+    <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
+    <style>
+        .captcha {
+             float: right;
+         }
+    </style>
+</head>
+
+<body class="gray-bg">
+    <div class="loginColumns animated fadeInDown">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="font-bold">欢迎使用Jumpserver开源堡垒机</h2>
+                <p>
+                    全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计系统。
+                </p>
+                <p>
+                    使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
+                </p>
+                <p>
+                    采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发访问限制。
+                </p>
+                <p>
+                    改变世界，从一点点开始。
+                </p>
+
+            </div>
+            <div class="col-md-6">
+                <div class="ibox-content">
+                    <div>
+                        <img src="{% static 'img/logo.png' %}" width="60" height="60">
+                        <span class="font-bold text-center" style="font-size: 24px; font-family: inherit; margin-left: 20px">{% trans '二次认证' %}</span>
+                    </div>
+                    <div  class="m-t">
+
+                        <div class="form-group">
+                            <p style="margin:30px auto;" class="text-center"><strong style="color:#000000">账号保护已开启，请根据提示完成以下操作</strong></p>
+                            <div class="text-center">
+                                <img src="{% static 'img/otp_auth.png' %}" alt="" width="72px" height="117">
+                            </div>
+                            <p style="margin: 30px auto">请在手机中打开Google Authenticator应用，输入6位动态码</p>
+                        </div>
+
+                        <form class="m-t" role="form" method="post" action="">
+
+                            {% csrf_token %}
+                            {% if 'otp_code' in form.errors %}
+                                <p class="red-fonts">{{ form.otp_code.errors.as_text }}</p>
+                            {% endif %}
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
+                            </div>
+                            <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
+
+                            <a href="#">
+                                <small>{% trans "Can't provide otp code? Please contact the administrator" %}</small>
+                            </a>
+
+                        </form>
+                    </div>
+                    <p class="m-t">
+                    </p>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-12">
+                 {% include '_copyright.html' %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

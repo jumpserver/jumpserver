@@ -1,0 +1,146 @@
+/*公共样式*/
+*{
+	margin:0;
+	padding: 0;
+	outline: none;
+}
+a{
+	text-decoration: none;
+	color:black
+}
+li{
+	list-style:none;
+}
+button{
+	outline: none;
+}
+.red-fonts{
+	color: #ed5565;
+    font-size: 15px;
+    text-align: center;
+}
+
+/*header样式*/
+header{
+	overflow:hidden ;
+	background: #dedede;
+	padding:15px 200px;
+}
+header .logo a{
+	float:left;
+}
+header .logo a:nth-child(2){
+	padding-top: 13px;
+}
+header div:nth-child(1){
+	float:left;
+}
+header div:nth-child(2){
+	float:right;
+	font-size: 12px;
+	padding-top: 20px;
+}
+header div:nth-child(2) a:hover{
+	color:#1ab394;
+}
+
+/*article样式*/
+article{
+	padding-top: 50px;
+	padding:50px 370px
+}
+article ul{	
+	float: left;
+	position: relative;
+	left: 50%;
+	margin-bottom: 50px;
+}
+article ul li{
+	float: left;
+	position: relative;
+	right: 50%;
+}
+article ul li span,article ul li i{
+	display: block;
+	float: left;
+}
+article ul li span{
+	width: 150px;
+	height: 4px;
+	margin: 15px 0;
+	background: black;
+}
+article ul li:last-child{
+	padding-left: 2px;
+}
+.iconfont{
+	font-size: 30px;
+	color: grey;
+}
+.back{
+	margin-left:-15px;
+}
+.active{
+	color:#1ab394;
+}
+.clearfix:after {
+	  content:""; 
+	  height:0; 
+	  visibility:hidden; 
+	  display:block; 
+	  clear:both; 
+}
+.verify{
+	text-align: center;
+	font-size: 14px;
+	/*padding-left:70px;*/
+	color: grey;
+}
+.verify span{
+	color:red;
+}
+.line{
+	width: 500px;
+	height:1px;
+	margin-left:100px;
+	margin-top:10px ;
+	background: grey;
+}
+
+/*输入框样式*/
+.form-input{
+    text-align: center;
+    margin: 20px auto;
+}
+.form-input input{
+    width: 200px;
+    height: 30px;
+    padding-left: 10px;
+	outline: none;
+}
+/*身份验证*/
+/*安装应用*/
+.verify div{
+	display: inline-block;
+}
+.verify div:nth-child(3){
+	margin-left: 58px;
+}
+.next{
+	margin: 20px auto;
+    display: block;
+    width: 214px;
+    line-height: 34px;
+    background: #1ab394;
+    text-align: center;
+    border-radius: 6px;
+    color: white;
+}
+/*绑定TOTP*/
+
+/*版权信息*/
+footer{
+    text-align:center;
+	font-size: 14px;
+	color: #1a1a1a;
+}

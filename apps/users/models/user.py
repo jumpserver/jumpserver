@@ -219,15 +219,20 @@ class User(AbstractUser):
     def otp_enabled(self):
         return self.otp_level > 0
 
-    def enabled_otp(self):
-        self.otp_level = 1
+    @property
+    def otp_force_enabled(self):
+        return self.otp_level == 2
+
+    def enable_otp(self):
+        if not self.otp_force_enabled:
+            self.otp_level = 1
 
     def force_enable_otp(self):
         self.otp_level = 2
 
-    @property
-    def otp_force_enabled(self):
-        return self.otp_level == 2
+    def disable_otp(self):
+        self.otp_level = 0
+        self.otp_secret_key = None
 
     def to_json(self):
         return OrderedDict({
@@ -241,6 +246,7 @@ class User(AbstractUser):
             'groups': [group.name for group in self.groups.all()],
             'wechat': self.wechat,
             'phone': self.phone,
+            'otp_level': self.otp_level,
             'comment': self.comment,
             'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S') if self.date_expired is not None else None
         })

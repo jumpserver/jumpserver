@@ -19,7 +19,10 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = User
         list_serializer_class = BulkListSerializer
-        exclude = ['first_name', 'last_name', 'password', '_private_key', '_public_key']
+        exclude = [
+            'first_name', 'last_name', 'password', '_private_key',
+            '_public_key', '_otp_secret_key', 'user_permissions'
+        ]
 
     def get_field_names(self, declared_fields, info):
         fields = super(UserSerializer, self).get_field_names(declared_fields, info)
