@@ -1,10 +1,11 @@
-安装文档-详细版
+安装文档
 ++++++++++++++++++++++++
 
 .. toctree::
    :maxdepth: 1
 
-   quickstart
+   dockerinstall
+   quickinstall
    step_by_step
    setup_by_ubuntu
    upgrade

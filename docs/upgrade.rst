@@ -6,7 +6,7 @@
 ::
 
     $ git pull && pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
-    
+
     # 1.0.x 升级 1.2.0 需要执行迁移脚本（新版本授权管理更新）
     $ sh 2018_04_11_migrate_permissions.sh
  
@@ -14,7 +14,7 @@
 
 ::
 
-    $ git pull && cd requirements && pip install -r requirements.txt   # 不要指定 -i参数
+    $ git pull && pip install -r requirements/requirements.txt   # 不要指定 -i参数
 
 3. 升级 Luna
 
@@ -22,7 +22,7 @@
 
 4. 升级 guacamole
 
-:: 
+::
 
     $ docker pull registry.jumpserver.org/public/guacamole:latest
     $ docker stop jms_guacamole  # 或者写guacamole的容器ID
@@ -30,8 +30,11 @@
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
+      -e JUMPSERVER_SERVER=http://<填写Jumpserver服务器的IP地址>:8080 \
       registry.jumpserver.org/public/guacamole:latest
+
+    # 确定升级完成后，可以删除备份容器
+    $ docker rm jms_guacamole_bak
 
 
 切换分支或离线升级
@@ -143,5 +146,3 @@ coco是无状态的，备份 keys 目录即可
 **Guacamole**
 
 直接参考上面的升级即可, 需要注意的是如果更换机器，请备份
-
-

@@ -1,4 +1,4 @@
-安装文档(CentOS7)
+CentOS 7 安装文档
 --------------------------
 
 说明
@@ -8,13 +8,6 @@
 -  $ 开头的行表示需要执行的命令
 
 本文档适用于有一定web运维经验的管理员或者工程师，文中不会对安装的软件做过多的解释，仅对需要执行的内容注部分注释，更详细的内容请参考一步一步安装。
-
-组件解释
-~~~~~~~~~~~~~~
-- Jumpserver 为管理后台，管理员可以通过Web页面进行资产管理、用户管理、资产授权等操作
-- Coco 为 SSH Server 和 Web Terminal Server 。用户可以通过使用自己的账户登录 SSH 或者 Web Terminal 直接访问被授权资产。不需要知道服务器的账户密码
-- Luna 为 Web Terminal Server 前端页面，用户使用 Web Terminal 方式登录所需要的组件
-- Guacamole 为 Windows 组件，用户可以通过 Web Terminal 来连接 Windows 资产 （暂时只能通过 Web Terminal 来访问）
 
 环境
 ~~~~~~~
@@ -333,6 +326,8 @@
     $ sftp admin@192.168.244.144 2222
       密码: admin
       如果能登陆代表部署成功
+
+    # sftp默认上传的位置在 /tmp 目录下
 
     # 其他的ssh及sftp客户端这里就不多做说明，自行搜索使用
 

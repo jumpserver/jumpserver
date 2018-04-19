@@ -63,7 +63,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-二. 安装 Jumpserver 1.0.0
+二. 安装 Jumpserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **2.1 下载或 Clone 项目**

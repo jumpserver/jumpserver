@@ -1,4 +1,4 @@
-快速安装
+Docker安装
 ==========================
 
 Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集成了所需要的组件(Windows组件未暂未集成)，也支持使用外置 Database 和 Redis
