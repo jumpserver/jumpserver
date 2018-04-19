@@ -18,6 +18,18 @@ class UserLoginForm(AuthenticationForm):
     captcha = CaptchaField()
 
 
+class UserCheckPasswordForm(forms.Form):
+    username = forms.CharField(label=_('Username'), max_length=100)
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput,
+        max_length=128, strip=False
+    )
+
+
+class UserCheckOtpCodeForm(forms.Form):
+    otp_code = forms.CharField(label=_('Otp_code'), max_length=6)
+
+
 class UserCreateUpdateForm(forms.ModelForm):
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(

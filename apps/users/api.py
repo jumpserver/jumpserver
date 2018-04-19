@@ -2,6 +2,7 @@
 import uuid
 
 from django.core.cache import cache
+from django.urls import reverse
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,7 +17,7 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
-from .utils import check_user_valid, generate_token
+from .utils import check_user_valid, generate_token, get_login_ip, check_otp_code
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -129,47 +130,110 @@ class UserToken(APIView):
 
 class UserProfile(APIView):
     permission_classes = (IsValidUser,)
+    serializer_class = UserSerializer
 
     def get(self, request):
-        return Response(request.user.to_json())
+        # return Response(request.user.to_json())
+        return Response(self.serializer_class(request.user).data)
 
     def post(self, request):
-        return Response(request.user.to_json())
+        return Response(self.serializer_class(request.user).data)
+
+
+class UserOtpAuthApi(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
+
+    def post(self, request):
+        otp_code = request.data.get('otp_code', '')
+        seed = request.data.get('seed', '')
+
+        user = cache.get(seed, None)
+        if not user:
+            return Response({'msg': '请先进行用户名和密码验证'}, status=401)
+
+        if not check_otp_code(user.otp_secret_key, otp_code):
+            return Response({'msg': 'otp认证失败'}, status=401)
+
+        token = generate_token(request, user)
+        self.write_login_log(request, user)
+        return Response(
+            {
+                'token': token,
+                'user': self.serializer_class(user).data
+             }
+        )
+
+    @staticmethod
+    def write_login_log(request, user):
+        login_ip = request.data.get('remote_addr', None)
+        login_type = request.data.get('login_type', '')
+        user_agent = request.data.get('HTTP_USER_AGENT', '')
+
+        if not login_ip:
+            login_ip = get_login_ip(request)
+
+        write_login_log_async.delay(
+            user.username, ip=login_ip,
+            type=login_type, user_agent=user_agent,
+        )
 
 
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
+    serializer_class = UserSerializer
 
     def post(self, request):
+        user, msg = self.check_user_valid(request)
+
+        if not user:
+            return Response({'msg': msg}, status=401)
+
+        if not user.otp_enabled:
+            token = generate_token(request, user)
+            self.write_login_log(request, user)
+            return Response(
+                {
+                    'token': token,
+                    'user': self.serializer_class(user).data
+                }
+            )
+
+        seed = uuid.uuid4().hex
+        cache.set(seed, user, 300)
+        return Response(
+            {
+                'code': 101,
+                'msg': '请携带seed值,进行OTP二次认证',
+                'otp_url': reverse('api-users:user-otp-auth'),
+                'seed': seed,
+                'user': self.serializer_class(user).data
+            }, status=300)
+
+    @staticmethod
+    def check_user_valid(request):
         username = request.data.get('username', '')
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
-        login_type = request.data.get('login_type', '')
-        login_ip = request.data.get('remote_addr', None)
-        user_agent = request.data.get('HTTP_USER_AGENT', '')
-
-        if not login_ip:
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-
-            if x_forwarded_for and x_forwarded_for[0]:
-                login_ip = x_forwarded_for[0]
-            else:
-                login_ip = request.META.get("REMOTE_ADDR")
-
         user, msg = check_user_valid(
             username=username, password=password,
             public_key=public_key
         )
+        return user, msg
 
-        if user:
-            token = generate_token(request, user)
-            write_login_log_async.delay(
-                user.username, ip=login_ip,
-                type=login_type, user_agent=user_agent,
-            )
-            return Response({'token': token, 'user': user.to_json()})
-        else:
-            return Response({'msg': msg}, status=401)
+    @staticmethod
+    def write_login_log(request, user):
+        login_ip = request.data.get('remote_addr', None)
+        login_type = request.data.get('login_type', '')
+        user_agent = request.data.get('HTTP_USER_AGENT', '')
+
+        if not login_ip:
+            login_ip = get_login_ip(request)
+
+        write_login_log_async.delay(
+            user.username, ip=login_ip,
+            type=login_type, user_agent=user_agent,
+        )
 
 
 class UserConnectionTokenApi(APIView):

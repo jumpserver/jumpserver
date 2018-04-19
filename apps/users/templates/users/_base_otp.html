@@ -1,0 +1,87 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Jumpserver </title>
+        <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
+		<link rel="stylesheet" href="{% static 'fonts/font_otp/iconfont.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/otp.css' %}" />
+        <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
+        <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
+	</head>
+
+	<body>
+		<!--头部-->
+		 <header>
+		 	<div class="logo">
+		 		<a href="{% url 'index' %}">
+		 			<img src="{% static 'img/logo.png' %}" alt="" width="50px" height="50px"/>
+		 		</a>
+		 		<a href="{% url 'index' %}">Jumpserver</a>
+		 	</div>
+		 	<div>
+		 		<a href="{% url 'index' %}">首页</a>
+		 		<b>丨</b>
+		 		<a href="http://docs.jumpserver.org/zh/docs/">文档</a>
+		 		<b>丨</b>
+		 		<a href="https://www.github.com/jumpserver/">GitHub</a>
+		 	</div>
+		 </header>
+
+		 <!--内容-->
+		 <article>
+		 	<div class="clearfix">		 		
+			 	<ul class="change-color">
+			 		<li>
+			 			<div>		 				
+			 				<i class="iconfont icon-step active"></i>
+			 				<span></span>
+			 			</div>
+			 			<div class="back">验证身份</div>
+			 		</li>
+			 		<li>
+			 			<div>
+			 				<i class="iconfont icon-step2"></i>
+			 				<span></span>
+			 			</div>
+			 			<div class="back">安装应用</div>
+			 		</li>
+			 		<li>
+			 			<div>
+			 				<i class="iconfont icon-step1"></i>
+			 				<span></span>
+			 			</div>		 			
+			 			<div class="back">绑定TOTP</div>
+			 		</li>           
+			 		<li>
+			 			<div>
+			 				<i class="iconfont icon-duigou"></i>
+			 			</div>
+			 			<div>完成</div>
+			 		</li>
+			 	</ul>
+		 	</div>
+		 	<div >
+		 		<div class="verify">安全令牌验证&nbsp;&nbsp;账户&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;请按照以下步骤完成绑定操作</div>
+		 		<div class="line"></div>
+
+                {% block content %}
+                {% endblock %}
+		 	</div>
+		 </article>
+
+
+    <footer>
+
+        <div class="" style="margin-top: 100px;">
+            {% include '_copyright.html' %}
+        </div>
+
+    </footer>
+
+	</body>
+</html>
+

@@ -54,6 +54,7 @@ pyasn1==0.4.2
 pycparser==2.18
 pycrypto==2.6.1
 pyldap==2.4.45
+pyotp==2.2.6
 PyNaCl==1.2.1
 python-dateutil==2.6.1
 python-gssapi==0.6.4

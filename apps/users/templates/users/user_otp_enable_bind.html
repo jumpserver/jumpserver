@@ -1,0 +1,53 @@
+{% extends 'users/_base_otp.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+
+    <div class="verify">
+        <p style="margin:20px auto;"><strong style="color: #000000">使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码</strong></p>
+
+        <div id="qr_code"></div>
+
+        <form class="" role="form" method="post" action="">
+            {% csrf_token %}
+
+            <div class="form-input">
+                <input type="text" class="" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
+            </div>
+
+            <button type="submit" class="next">{% trans 'Next' %}</button>
+
+
+            {% if 'otp_code' in form.errors %}
+                <p style="color: #ed5565">{{ form.otp_code.errors.as_text }}</p>
+            {% endif %}
+
+        </form>
+    </div>
+
+
+    <script>
+        $('.change-color li:eq(1) i').css('color', '#1ab394');
+        $('.change-color li:eq(2) i').css('color', '#1ab394');
+
+        $(document).ready(function() {
+            // 生成用户绑定otp的二维码
+            var qrcode = new QRCode(document.getElementById('qr_code'), {
+                text: "{{ otp_uri|safe}}",
+                width: 180 ,
+                height: 180,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctlevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qr_code').removeAttribute("title");
+        })
+
+    </script>
+
+
+
+{% endblock %}
+

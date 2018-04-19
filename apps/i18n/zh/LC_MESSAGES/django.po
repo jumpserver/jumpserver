@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-13 17:27+0800\n"
+"POT-Creation-Date: 2018-04-18 20:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -154,7 +154,7 @@ msgstr "名称"
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:27
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:13
-#: users/models/authentication.py:45 users/models/user.py:39
+#: users/forms.py:22 users/models/authentication.py:45 users/models/user.py:39
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/login.html:56
 #: users/templates/users/login_log_list.html:49
@@ -169,9 +169,11 @@ msgid "Password or private key passphrase"
 msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:25 assets/models/base.py:22 common/forms.py:113
-#: users/forms.py:15 users/forms.py:24 users/templates/users/login.html:59
+#: users/forms.py:15 users/forms.py:24 users/forms.py:36
+#: users/templates/users/login.html:59
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_create.html:11
+#: users/templates/users/user_password_authentication.html:13
 #: users/templates/users/user_password_update.html:40
 #: users/templates/users/user_profile_update.html:40
 #: users/templates/users/user_pubkey_update.html:40
@@ -310,7 +312,7 @@ msgstr "标签管理"
 #: assets/templates/assets/system_user_detail.html:96
 #: ops/templates/ops/adhoc_detail.html:86 perms/models.py:28 perms/models.py:72
 #: perms/templates/perms/asset_permission_detail.html:98
-#: users/models/user.py:55 users/templates/users/user_detail.html:99
+#: users/models/user.py:55 users/templates/users/user_detail.html:107
 msgid "Created by"
 msgstr "创建者"
 
@@ -341,10 +343,10 @@ msgstr "创建日期"
 #: ops/models/adhoc.py:42 perms/models.py:30 perms/models.py:74
 #: perms/templates/perms/asset_permission_detail.html:102 terminal/models.py:26
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
-#: users/models/user.py:52 users/templates/users/user_detail.html:111
+#: users/models/user.py:52 users/templates/users/user_detail.html:119
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_profile.html:114
+#: users/templates/users/user_profile.html:122
 msgid "Comment"
 msgstr "备注"
 
@@ -390,7 +392,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:13
-#: users/models/user.py:285
+#: users/models/user.py:299
 msgid "System"
 msgstr "系统"
 
@@ -428,10 +430,10 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:219
-#: users/models/user.py:30 users/models/user.py:273
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:231
+#: users/models/user.py:30 users/models/user.py:287
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:335
+#: users/templates/users/user_group_list.html:13 users/views/user.py:339
 msgid "User"
 msgstr "用户"
 
@@ -536,34 +538,6 @@ msgstr ""
 msgid "推送系统用户到入资产: {}"
 msgstr ""
 
-#: assets/templates/assets/_admin_user_setting_modal.html:4
-#: users/templates/users/reset_password.html:57
-#: users/templates/users/user_profile.html:20
-msgid "Setting"
-msgstr "设置"
-
-#: assets/templates/assets/_admin_user_setting_modal.html:9
-#: assets/templates/assets/_asset_import_modal.html:9
-#: users/templates/users/_user_import_modal.html:10
-msgid "Template"
-msgstr "模板"
-
-#: assets/templates/assets/_admin_user_setting_modal.html:10
-#: assets/templates/assets/_asset_import_modal.html:10
-#: users/templates/users/_user_import_modal.html:11
-msgid "Download"
-msgstr "下载"
-
-#: assets/templates/assets/_admin_user_setting_modal.html:13
-#: assets/templates/assets/_asset_import_modal.html:13
-msgid "Asset csv file"
-msgstr "资产csv文件"
-
-#: assets/templates/assets/_admin_user_setting_modal.html:16
-#: assets/templates/assets/_asset_import_modal.html:16
-msgid "If set id, will use this id update asset existed"
-msgstr "如果设置了id，则会使用该行信息更新该id的资产"
-
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:5
 msgid "Update asset group"
 msgstr "更新用户组"
@@ -593,6 +567,24 @@ msgstr "二次验证"
 #: assets/templates/assets/_asset_import_modal.html:4
 msgid "Import asset"
 msgstr "导入资产"
+
+#: assets/templates/assets/_asset_import_modal.html:9
+#: users/templates/users/_user_import_modal.html:10
+msgid "Template"
+msgstr "模板"
+
+#: assets/templates/assets/_asset_import_modal.html:10
+#: users/templates/users/_user_import_modal.html:11
+msgid "Download"
+msgstr "下载"
+
+#: assets/templates/assets/_asset_import_modal.html:13
+msgid "Asset csv file"
+msgstr "资产csv文件"
+
+#: assets/templates/assets/_asset_import_modal.html:16
+msgid "If set id, will use this id update asset existed"
+msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
 #: assets/templates/assets/_asset_list_modal.html:7 assets/views/asset.py:50
 #: templates/_nav.html:23
@@ -637,7 +629,7 @@ msgstr "其它"
 #: assets/templates/assets/asset_update.html:70
 #: assets/templates/assets/domain_create_update.html:16
 #: assets/templates/assets/gateway_create_update.html:58
-#: assets/templates/assets/label_create_update.html:16
+#: assets/templates/assets/label_create_update.html:18
 #: common/templates/common/basic_setting.html:58
 #: common/templates/common/email_setting.html:59
 #: common/templates/common/ldap_setting.html:59
@@ -647,7 +639,7 @@ msgstr "其它"
 #: users/templates/users/_user.html:43
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_password_update.html:58
-#: users/templates/users/user_profile.html:151
+#: users/templates/users/user_profile.html:180
 #: users/templates/users/user_profile_update.html:63
 #: users/templates/users/user_pubkey_update.html:70
 #: users/templates/users/user_pubkey_update.html:76
@@ -662,7 +654,7 @@ msgstr "重置"
 #: assets/templates/assets/asset_update.html:71
 #: assets/templates/assets/domain_create_update.html:17
 #: assets/templates/assets/gateway_create_update.html:59
-#: assets/templates/assets/label_create_update.html:17
+#: assets/templates/assets/label_create_update.html:19
 #: common/templates/common/basic_setting.html:59
 #: common/templates/common/email_setting.html:60
 #: common/templates/common/ldap_setting.html:60
@@ -740,7 +732,7 @@ msgstr "测试"
 #: assets/templates/assets/asset_list.html:170
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
-#: assets/templates/assets/domain_gateway_list.html:90
+#: assets/templates/assets/domain_gateway_list.html:85
 #: assets/templates/assets/domain_list.html:42
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
@@ -753,8 +745,8 @@ msgstr "测试"
 #: users/templates/users/user_group_detail.html:28
 #: users/templates/users/user_group_list.html:43
 #: users/templates/users/user_list.html:76
-#: users/templates/users/user_profile.html:135
 #: users/templates/users/user_profile.html:143
+#: users/templates/users/user_profile.html:172
 msgid "Update"
 msgstr "更新"
 
@@ -764,7 +756,7 @@ msgstr "更新"
 #: assets/templates/assets/asset_list.html:171
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
-#: assets/templates/assets/domain_gateway_list.html:91
+#: assets/templates/assets/domain_gateway_list.html:86
 #: assets/templates/assets/domain_list.html:43
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
@@ -796,13 +788,13 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:138 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
-#: users/templates/users/user_detail.html:339
-#: users/templates/users/user_detail.html:364
-#: users/templates/users/user_detail.html:387
+#: users/templates/users/user_detail.html:357
+#: users/templates/users/user_detail.html:382
+#: users/templates/users/user_detail.html:405
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:196
-#: users/templates/users/user_profile.html:185
+#: users/templates/users/user_profile.html:214
 msgid "Confirm"
 msgstr "确认"
 
@@ -852,15 +844,15 @@ msgid "Disk"
 msgstr "硬盘"
 
 #: assets/templates/assets/asset_detail.html:121
-#: users/templates/users/user_detail.html:103
-#: users/templates/users/user_profile.html:88
+#: users/templates/users/user_detail.html:111
+#: users/templates/users/user_profile.html:96
 msgid "Date joined"
 msgstr "创建日期"
 
 #: assets/templates/assets/asset_detail.html:137
 #: terminal/templates/terminal/session_detail.html:81
-#: users/templates/users/user_detail.html:122
-#: users/templates/users/user_profile.html:126
+#: users/templates/users/user_detail.html:130
+#: users/templates/users/user_profile.html:134
 msgid "Quick modify"
 msgstr "快速修改"
 
@@ -873,7 +865,7 @@ msgstr "快速修改"
 #: perms/templates/perms/asset_permission_list.html:59
 #: terminal/templates/terminal/terminal_list.html:34
 #: users/templates/users/_select_user_modal.html:18
-#: users/templates/users/user_detail.html:128
+#: users/templates/users/user_detail.html:136
 #: users/templates/users/user_granted_asset.html:46
 #: users/templates/users/user_group_granted_asset.html:46
 #: users/templates/users/user_list.html:27
@@ -890,7 +882,8 @@ msgid "Refresh"
 msgstr "刷新"
 
 #: assets/templates/assets/asset_detail.html:300
-#: users/templates/users/user_detail.html:273
+#: users/templates/users/user_detail.html:282
+#: users/templates/users/user_detail.html:304
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -978,8 +971,8 @@ msgstr "存在资产，不能删除"
 
 #: assets/templates/assets/asset_list.html:595
 #: assets/templates/assets/system_user_list.html:133
-#: users/templates/users/user_detail.html:334
-#: users/templates/users/user_detail.html:359
+#: users/templates/users/user_detail.html:352
+#: users/templates/users/user_detail.html:377
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:191
 msgid "Are you sure?"
@@ -1032,7 +1025,7 @@ msgstr "网关列表"
 msgid "Create gateway"
 msgstr "创建网关"
 
-#: assets/templates/assets/domain_gateway_list.html:92
+#: assets/templates/assets/domain_gateway_list.html:87
 #: common/templates/common/email_setting.html:58
 #: common/templates/common/ldap_setting.html:58
 msgid "Test connection"
@@ -1242,13 +1235,17 @@ msgstr "<b>%(name)s</b> 创建成功"
 msgid "<b>%(name)s</b> was updated successfully"
 msgstr "<b>%(name)s</b> 更新成功"
 
-#: common/fields.py:26
+#: common/fields.py:30
 msgid "Not a valid json"
 msgstr "不是合法json"
 
-#: common/fields.py:28
+#: common/fields.py:32
 msgid "Not a string type"
 msgstr "不是字符类型"
+
+#: common/fields.py:69
+msgid "Encrypt field using Secret Key"
+msgstr ""
 
 #: common/forms.py:70
 msgid "Current SITE URL"
@@ -1389,7 +1386,7 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: common/models.py:29
+#: common/models.py:29 users/templates/users/user_detail.html:96
 msgid "Enabled"
 msgstr "启用"
 
@@ -1707,8 +1704,8 @@ msgstr "任务列表"
 msgid "Task run history"
 msgstr "执行历史"
 
-#: perms/forms.py:18 users/forms.py:176 users/forms.py:181 users/forms.py:193
-#: users/forms.py:223
+#: perms/forms.py:18 users/forms.py:188 users/forms.py:193 users/forms.py:205
+#: users/forms.py:235
 msgid "Select users"
 msgstr "选择用户"
 
@@ -1717,7 +1714,7 @@ msgstr "选择用户"
 #: perms/templates/perms/asset_permission_list.html:136 templates/_nav.html:14
 #: users/models/group.py:25 users/models/user.py:42
 #: users/templates/users/_select_user_modal.html:16
-#: users/templates/users/user_detail.html:179
+#: users/templates/users/user_detail.html:188
 #: users/templates/users/user_list.html:26
 msgid "User group"
 msgstr "用户组"
@@ -1732,8 +1729,8 @@ msgstr ""
 
 #: perms/models.py:27 perms/models.py:71
 #: perms/templates/perms/asset_permission_detail.html:90
-#: users/models/user.py:54 users/templates/users/user_detail.html:95
-#: users/templates/users/user_profile.html:96
+#: users/models/user.py:54 users/templates/users/user_detail.html:103
+#: users/templates/users/user_profile.html:104
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -1770,7 +1767,7 @@ msgid "Add node to this permission"
 msgstr "添加节点"
 
 #: perms/templates/perms/asset_permission_asset.html:125
-#: users/templates/users/user_detail.html:196
+#: users/templates/users/user_detail.html:205
 msgid "Join"
 msgstr "加入"
 
@@ -1856,13 +1853,13 @@ msgstr "商业支持"
 msgid "Docs"
 msgstr "文档"
 
-#: templates/_header_bar.html:37 templates/_nav_user.html:9 users/forms.py:93
+#: templates/_header_bar.html:37 templates/_nav_user.html:9 users/forms.py:105
 #: users/templates/users/_user.html:36
 #: users/templates/users/user_password_update.html:37
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:318
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:322
 msgid "Profile"
 msgstr "个人信息"
 
@@ -1919,13 +1916,13 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:205 users/views/login.py:254 users/views/user.py:60
-#: users/views/user.py:75 users/views/user.py:95 users/views/user.py:151
-#: users/views/user.py:306 users/views/user.py:353 users/views/user.py:375
+#: users/views/login.py:240 users/views/login.py:289 users/views/user.py:64
+#: users/views/user.py:79 users/views/user.py:99 users/views/user.py:155
+#: users/views/user.py:310 users/views/user.py:357 users/views/user.py:379
 msgid "Users"
 msgstr "用户管理"
 
-#: templates/_nav.html:13 users/views/user.py:61
+#: templates/_nav.html:13 users/views/user.py:65
 msgid "User list"
 msgstr "用户列表"
 
@@ -2231,7 +2228,11 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: users/forms.py:27 users/models/user.py:43
+#: users/forms.py:30
+msgid "Otp_code"
+msgstr ""
+
+#: users/forms.py:39 users/models/user.py:43
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:25
@@ -2239,57 +2240,57 @@ msgstr ""
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:29 users/forms.py:139
+#: users/forms.py:41 users/forms.py:151
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:30 users/forms.py:140
+#: users/forms.py:42 users/forms.py:152
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:31
+#: users/forms.py:43
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:49 users/templates/users/user_detail.html:187
+#: users/forms.py:61 users/templates/users/user_detail.html:196
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:59 users/forms.py:154
+#: users/forms.py:71 users/forms.py:166
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:63 users/forms.py:158 users/serializers.py:42
+#: users/forms.py:75 users/forms.py:170 users/serializers.py:45
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:99
+#: users/forms.py:111
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:104
+#: users/forms.py:116
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:109
+#: users/forms.py:121
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:119
+#: users/forms.py:131
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:127
+#: users/forms.py:139
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:141
+#: users/forms.py:153
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:169 users/models/user.py:51
+#: users/forms.py:181 users/models/user.py:51
 #: users/templates/users/user_password_update.html:43
-#: users/templates/users/user_profile.html:71
+#: users/templates/users/user_profile.html:79
 #: users/templates/users/user_profile_update.html:43
 #: users/templates/users/user_pubkey_update.html:43
 msgid "Public key"
@@ -2319,7 +2320,7 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:29 users/models/user.py:281
+#: users/models/user.py:29 users/models/user.py:295
 msgid "Administrator"
 msgstr "管理员"
 
@@ -2327,15 +2328,18 @@ msgstr "管理员"
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:34
+#: users/models/user.py:34 users/templates/users/user_profile.html:74
+#: users/templates/users/user_profile.html:155
+#: users/templates/users/user_profile.html:158
 msgid "Disable"
 msgstr "禁用"
 
-#: users/models/user.py:35
+#: users/models/user.py:35 users/templates/users/user_profile.html:72
+#: users/templates/users/user_profile.html:162
 msgid "Enable"
 msgstr "启用"
 
-#: users/models/user.py:36
+#: users/models/user.py:36 users/templates/users/user_profile.html:70
 msgid "Force enable"
 msgstr "强制启用"
 
@@ -2352,11 +2356,11 @@ msgstr "头像"
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:47
+#: users/models/user.py:47 users/templates/users/user_detail.html:91
 msgid "Enable OTP"
 msgstr "二次验证"
 
-#: users/models/user.py:284
+#: users/models/user.py:298
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -2408,11 +2412,16 @@ msgstr "Step"
 
 #: users/templates/users/first_login.html:57
 msgid "Previous"
-msgstr ""
+msgstr "上一步"
 
 #: users/templates/users/first_login.html:60
+#: users/templates/users/login_otp.html:66
+#: users/templates/users/user_otp_authentication.html:22
+#: users/templates/users/user_otp_enable_bind.html:25
+#: users/templates/users/user_otp_enable_install_app.html:22
+#: users/templates/users/user_password_authentication.html:21
 msgid "Next"
-msgstr ""
+msgstr "下一步"
 
 #: users/templates/users/first_login_done.html:30
 msgid "Welcome to use jumpserver, visit "
@@ -2447,8 +2456,22 @@ msgstr "Agent"
 msgid "City"
 msgstr "城市"
 
+#: users/templates/users/login_otp.html:45
+msgid "二次认证"
+msgstr ""
+
+#: users/templates/users/login_otp.html:64
+#: users/templates/users/user_otp_authentication.html:19
+#: users/templates/users/user_otp_enable_bind.html:18
+msgid "Six figures"
+msgstr "6位数字"
+
+#: users/templates/users/login_otp.html:69
+msgid "Can't provide security? Please contact the administrator"
+msgstr "如果不能提供OTP码，请联系管理员"
+
 #: users/templates/users/reset_password.html:45
-#: users/templates/users/user_detail.html:325 users/utils.py:71
+#: users/templates/users/user_detail.html:343 users/utils.py:72
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2456,8 +2479,13 @@ msgstr "重置密码"
 msgid "Password again"
 msgstr "再次输入密码"
 
+#: users/templates/users/reset_password.html:57
+#: users/templates/users/user_profile.html:20
+msgid "Setting"
+msgstr "设置"
+
 #: users/templates/users/user_create.html:4
-#: users/templates/users/user_list.html:16 users/views/user.py:75
+#: users/templates/users/user_list.html:16 users/views/user.py:79
 msgid "Create user"
 msgstr "创建用户"
 
@@ -2466,7 +2494,7 @@ msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
-#: users/templates/users/user_granted_asset.html:18 users/views/user.py:152
+#: users/templates/users/user_granted_asset.html:18 users/views/user.py:156
 msgid "User detail"
 msgstr "用户详情"
 
@@ -2477,55 +2505,67 @@ msgstr "用户详情"
 msgid "Asset granted"
 msgstr "授权的资产"
 
-#: users/templates/users/user_detail.html:107
-#: users/templates/users/user_profile.html:92
+#: users/templates/users/user_detail.html:94
+msgid "Force enabled"
+msgstr "强制启用"
+
+#: users/templates/users/user_detail.html:98
+msgid "Disabled"
+msgstr "禁用"
+
+#: users/templates/users/user_detail.html:115
+#: users/templates/users/user_profile.html:100
 msgid "Last login"
 msgstr "最后登录"
 
-#: users/templates/users/user_detail.html:157
+#: users/templates/users/user_detail.html:151
+msgid "Force enabled OTP"
+msgstr "强制启用OTP"
+
+#: users/templates/users/user_detail.html:166
 msgid "Send reset password mail"
 msgstr "发送重置密码邮件"
 
-#: users/templates/users/user_detail.html:160
-#: users/templates/users/user_detail.html:168
+#: users/templates/users/user_detail.html:169
+#: users/templates/users/user_detail.html:177
 msgid "Send"
 msgstr "发送"
 
-#: users/templates/users/user_detail.html:165
+#: users/templates/users/user_detail.html:174
 msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
-#: users/templates/users/user_detail.html:324
+#: users/templates/users/user_detail.html:342
 msgid "An e-mail has been sent to the user`s mailbox."
 msgstr "已发送邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:335
+#: users/templates/users/user_detail.html:353
 msgid "This will reset the user password and send a reset mail"
 msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:349
+#: users/templates/users/user_detail.html:367
 msgid ""
 "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
 "the user to update his new ssh public key."
 msgstr "重设密钥邮件将会发送到用户邮箱"
 
-#: users/templates/users/user_detail.html:350
+#: users/templates/users/user_detail.html:368
 msgid "Reset SSH public key"
 msgstr "重置SSH密钥"
 
-#: users/templates/users/user_detail.html:360
+#: users/templates/users/user_detail.html:378
 msgid "This will reset the user public key and send a reset mail"
 msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:377
-#: users/templates/users/user_profile.html:174
+#: users/templates/users/user_detail.html:395
+#: users/templates/users/user_profile.html:203
 msgid "Successfully updated the SSH public key."
 msgstr "更新ssh密钥成功"
 
-#: users/templates/users/user_detail.html:378
-#: users/templates/users/user_detail.html:382
-#: users/templates/users/user_profile.html:175
-#: users/templates/users/user_profile.html:180
+#: users/templates/users/user_detail.html:396
+#: users/templates/users/user_detail.html:400
+#: users/templates/users/user_profile.html:204
+#: users/templates/users/user_profile.html:209
 msgid "User SSH public key update"
 msgstr "ssh密钥"
 
@@ -2585,24 +2625,28 @@ msgstr "用户删除失败"
 msgid "OTP"
 msgstr ""
 
-#: users/templates/users/user_profile.html:100 users/views/user.py:181
-#: users/views/user.py:235
+#: users/templates/users/user_profile.html:108 users/views/user.py:185
+#: users/views/user.py:239
 msgid "User groups"
 msgstr "用户组"
 
-#: users/templates/users/user_profile.html:132
+#: users/templates/users/user_profile.html:140
 msgid "Update password"
 msgstr "更改密码"
 
-#: users/templates/users/user_profile.html:140
+#: users/templates/users/user_profile.html:148
+msgid "Update otp"
+msgstr "更改OTP设置"
+
+#: users/templates/users/user_profile.html:169
 msgid "Update SSH public key"
 msgstr "更改SSH密钥"
 
-#: users/templates/users/user_profile.html:148
+#: users/templates/users/user_profile.html:177
 msgid "Reset public key and download"
 msgstr "重置并下载SSH密钥"
 
-#: users/templates/users/user_profile.html:178
+#: users/templates/users/user_profile.html:207
 msgid "Failed to update SSH public key."
 msgstr "更新密钥失败"
 
@@ -2622,15 +2666,15 @@ msgstr "更新密钥"
 msgid "Or reset by server"
 msgstr "或者重置并下载密钥"
 
-#: users/templates/users/user_update.html:4 users/views/user.py:95
+#: users/templates/users/user_update.html:4 users/views/user.py:99
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:35
+#: users/utils.py:36
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:37
+#: users/utils.py:38
 #, python-format
 msgid ""
 "\n"
@@ -2671,7 +2715,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:73
+#: users/utils.py:74
 #, python-format
 msgid ""
 "\n"
@@ -2715,11 +2759,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:104
+#: users/utils.py:105
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:106
+#: users/utils.py:107
 #, python-format
 msgid ""
 "\n"
@@ -2744,15 +2788,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:139
+#: users/utils.py:140
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:141
+#: users/utils.py:142
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:154
+#: users/utils.py:155
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
@@ -2768,78 +2812,102 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:55
+#: users/views/login.py:56
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:97
+#: users/views/login.py:106 users/views/user.py:460 users/views/user.py:485
+msgid "Otp code invalid"
+msgstr "otp码认证失败"
+
+#: users/views/login.py:132
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:98
+#: users/views/login.py:133
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:114
+#: users/views/login.py:149
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:127
+#: users/views/login.py:162
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:128
+#: users/views/login.py:163
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:142
+#: users/views/login.py:177
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:143
+#: users/views/login.py:178
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:160 users/views/login.py:173
+#: users/views/login.py:195 users/views/login.py:208
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:169
+#: users/views/login.py:204
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:205
+#: users/views/login.py:240
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:255
+#: users/views/login.py:290
 msgid "Login log list"
 msgstr "登录日志"
 
-#: users/views/user.py:105
+#: users/views/user.py:109
 msgid "Bulk update user success"
 msgstr "批量更新用户成功"
 
-#: users/views/user.py:210
+#: users/views/user.py:214
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:307
+#: users/views/user.py:311
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:336
+#: users/views/user.py:340
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:354
+#: users/views/user.py:358
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:376
+#: users/views/user.py:380
 msgid "Public key update"
 msgstr "密钥更新"
+
+#: users/views/user.py:419
+msgid "Password invalid"
+msgstr "用户名或密码无效"
+
+#: users/views/user.py:512
+msgid "OTP enable success"
+msgstr "OTP 绑定成功"
+
+#: users/views/user.py:513
+msgid "OTP enable success, return login page"
+msgstr "OTP 绑定成功，返回到登录页面"
+
+#: users/views/user.py:515
+msgid "OTP disable success"
+msgstr "OTP 解绑成功"
+
+#: users/views/user.py:516
+msgid "OTP disable success, return login page"
+msgstr "OTP 解绑成功，返回登录页面"
 
 #~ msgid "Add asset"
 #~ msgstr "添加资产到节点"
