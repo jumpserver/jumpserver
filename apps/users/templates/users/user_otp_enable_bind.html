@@ -7,9 +7,7 @@
     <div class="verify">
         <p style="margin:20px auto;"><strong style="color: #000000">使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码</strong></p>
 
-
         <div id="qr_code"></div>
-
 
         <form class="" role="form" method="post" action="">
             {% csrf_token %}
@@ -18,11 +16,12 @@
                 <input type="text" class="" name="otp_code" placeholder="{% trans 'Six figures' %}" required="">
             </div>
 
+            <button type="submit" class="next">{% trans 'Next' %}</button>
+
+
             {% if 'otp_code' in form.errors %}
                 <p style="color: #ed5565">{{ form.otp_code.errors.as_text }}</p>
             {% endif %}
-
-            <button type="submit" class="next">{% trans 'Next' %}</button>
 
         </form>
     </div>

@@ -232,7 +232,7 @@ class User(AbstractUser):
 
     def disable_otp(self):
         self.otp_level = 0
-        self.otp_secret_key = ''
+        self.otp_secret_key = None
 
     def to_json(self):
         return OrderedDict({

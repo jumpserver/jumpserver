@@ -152,8 +152,7 @@
                                                    href="
                                                         {% if request.user.otp_enabled and request.user.otp_secret_key %}
                                                             {% if request.user.otp_force_enabled %}
-                                                                javascript:void(0)
-                                                                "><span style="color:#ed5565">{% trans 'Disable' %}</span>
+                                                                " disabled >{% trans 'Disable' %}
                                                             {% else %}
                                                                 {% url 'users:user-otp-disable-authentication' %}
                                                                 ">{% trans 'Disable' %}

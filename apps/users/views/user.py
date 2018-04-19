@@ -35,7 +35,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user, is_login
+from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_tmp_user_from_session
 from ..signals import post_user_create
 from ..tasks import write_login_log_async
 
@@ -400,20 +400,31 @@ class UserOtpEnableAuthenticationView(FormView):
     form_class = forms.UserCheckPasswordForm
 
     def get_form(self, form_class=None):
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         form = super().get_form(form_class=form_class)
-        form['username'].initial = get_user(self.request).username
+        form['username'].initial = user.username
         return form
 
     def get_context_data(self, **kwargs):
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         context = {
-            'user': get_user(self.request)
+            'user': user
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         password = form.cleaned_data.get('password')
-        user = get_user(self.request)
         user = authenticate(username=user.username, password=password)
         if not user:
             form.add_error("password", _("Password invalid"))
@@ -428,8 +439,12 @@ class UserOtpEnableInstallAppView(TemplateView):
     template_name = 'users/user_otp_enable_install_app.html'
 
     def get_context_data(self, **kwargs):
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         context = {
-            'user': get_user(self.request)
+            'user': user
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -441,16 +456,20 @@ class UserOtpEnableBindView(TemplateView, FormView):
     success_url = reverse_lazy('users:user-otp-settings-success')
 
     def get_context_data(self, **kwargs):
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         context = {
-            'otp_uri': generate_otp_uri(user=get_user(self.request)),
-            'user': get_user(self.request)
+            'otp_uri': generate_otp_uri(self.request),
+            'user': user
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         otp_code = form.cleaned_data.get('otp_code')
-        otp_secret_key = cache.get('otp_secret_key')
+        otp_secret_key = cache.get(self.request.session.session_key+'otp_key', '')
 
         if check_otp_code(otp_secret_key, otp_code):
             self.save_otp(otp_secret_key)
@@ -461,7 +480,10 @@ class UserOtpEnableBindView(TemplateView, FormView):
             return self.form_invalid(form)
 
     def save_otp(self, otp_secret_key):
-        user = get_user(self.request)
+        if self.request.user.is_authenticated:
+            user = self.request.user
+        else:
+            user = get_tmp_user_from_session(self.request)
         user.enable_otp()
         user.otp_secret_key = otp_secret_key
         user.save()
@@ -489,11 +511,8 @@ class UserOtpDisableAuthenticationView(FormView):
 class UserOtpSettingsSuccessView(TemplateView):
     template_name = 'flash_message_standalone.html'
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        if is_login(request):
-            auth_logout(request)
-        return response
+    # def get(self, request, *args, **kwargs):
+    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         title, describe = self.get_title_describe()
@@ -508,7 +527,11 @@ class UserOtpSettingsSuccessView(TemplateView):
         return super().get_context_data(**kwargs)
 
     def get_title_describe(self):
-        user = get_user(self.request)
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            auth_logout(self.request)
+        else:
+            user = get_tmp_user_from_session(self.request)
         title = _('OTP enable success')
         describe = _('OTP enable success, return login page')
         if not user.otp_enabled:

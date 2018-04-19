@@ -224,16 +224,14 @@ def get_ip_city(ip, timeout=10):
     return city
 
 
-def get_user(request):
-    if is_login(request):
-        user = request.user
-    else:
-        user = cache.get(request.session.session_key)
+def get_tmp_user_from_session(request):
+    user_id = request.session.get('tmp_user_id')
+    user = get_object_or_none(User, pk=user_id)
     return user
 
 
-def is_login(request):
-    return isinstance(request.user, User)
+def set_tmp_user_to_session(request, user):
+    request.session['tmp_user_id'] = str(user.id)
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
@@ -244,9 +242,15 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
         request.GET.get(redirect_field_name, reverse('index')))
 
 
-def generate_otp_uri(user, issuer="Jumpserver"):
-    otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
-    cache.set('otp_secret_key', otp_secret_key, 300)
+def generate_otp_uri(request, issuer="Jumpserver"):
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        user = get_tmp_user_from_session(request)
+    otp_secret_key = cache.get(request.session.session_key+'otp_key', '')
+    if not otp_secret_key:
+        otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
+    cache.set(request.session.session_key+'otp_key', otp_secret_key, 600)
     totp = pyotp.TOTP(otp_secret_key)
     return totp.provisioning_uri(name=user.username, issuer_name=issuer)
 

@@ -19,12 +19,12 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.conf import settings
-from django.core.cache import cache
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from ..models import User, LoginLog
-from ..utils import send_reset_password_mail, check_otp_code , get_login_ip, redirect_user_first_login_or_index
+from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, redirect_user_first_login_or_index, \
+    get_tmp_user_from_session, set_tmp_user_to_session
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -54,11 +54,12 @@ class UserLoginView(FormView):
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
-        cache.set(self.request.session.session_key, form.get_user(), 600)
+
+        set_tmp_user_to_session(self.request, form.get_user())
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        user = cache.get(self.request.session.session_key)
+        user = get_tmp_user_from_session(self.request)
 
         if user.otp_enabled and user.otp_secret_key:
             # 1,2 & T
@@ -94,7 +95,7 @@ class UserLoginOtpView(FormView):
     redirect_field_name = 'next'
 
     def form_valid(self, form):
-        user = cache.get(self.request.session.session_key)
+        user = get_tmp_user_from_session(self.request)
         otp_code = form.cleaned_data.get('otp_code')
         otp_secret_key = user.otp_secret_key
 
