@@ -196,7 +196,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/coco/requirements
     $ yum -y  install $(cat rpm_requirements.txt)
-    $ pip install -r requirements.txt
+    $ pip install -r requirements.txt -i https://pypi.org/simple
 
 **3.3 查看配置文件并运行**
 
