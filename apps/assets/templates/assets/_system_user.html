@@ -108,14 +108,12 @@
         function protocolChange() {
             if ($(protocol_id).val() === 'rdp') {
                 $(ssh_field).addClass('hidden');
-                $(ssh_field).attr('disabled', true);
                 $(rdp_field).removeClass('hidden');
-                $(rdp_field).attr('disabled', false);
+                $('.auth-fields').addClass('hidden');
             } else {
                 $(rdp_field).addClass('hidden');
-                $(rdp_field).attr('disabled', true);
                 $(ssh_field).removeClass('hidden');
-                $(ssh_field).attr('disabled', false);
+                $('.auth-fields').removeClass('hidden');
             }
         }
 
