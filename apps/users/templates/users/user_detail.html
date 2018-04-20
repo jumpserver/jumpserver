@@ -88,7 +88,7 @@
                                             <td><b>{{ user_object.get_role_display }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Enable OTP' %}:</td>
+                                            <td>{% trans 'MFA certification' %}:</td>
                                             <td><b>
                                                 {% if user_object.otp_force_enabled %}
                                                     {% trans 'Force enabled' %}
@@ -148,7 +148,7 @@
 
                                         </tr>
                                         <tr>
-                                          <td>{% trans 'Force enabled OTP' %}:</td>
+                                          <td>{% trans 'Force enabled MFA' %}:</td>
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
@@ -288,7 +288,7 @@ $(document).ready(function() {
 })
 .on('click', '#force_enable_otp', function() {
     {% if request.user == user_object %}
-        toastr.error("{% trans 'Goto profile page enable otp' %}");
+        toastr.error("{% trans 'Goto profile page enable MFA' %}");
         return
     {% endif %}
 

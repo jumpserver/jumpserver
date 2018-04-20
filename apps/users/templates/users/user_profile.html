@@ -63,18 +63,7 @@
                                                 <td class="text-navy">{% trans 'Active' %}</td>
                                                 <td>{{ user.is_active|yesno:"Yes,No,Unkown" }}</td>
                                             </tr>
-                                            <tr>
-                                                <td class="text-navy">{% trans 'OTP' %}</td>
-                                                <td>
-                                                    {% if user.otp_force_enabled %}
-                                                        {% trans 'Force enable' %}
-                                                    {% elif  user.otp_enabled%}
-                                                        {% trans 'Enable' %}
-                                                    {% else %}
-                                                        {% trans 'Disable' %}
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
+
                                             <tr>
                                                 <td class="text-navy">{% trans 'Public key' %}</td>
                                                 <td>
@@ -90,6 +79,18 @@
                                                             </td>
                                                         </tr>
                                                     </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-navy">{% trans 'MFA certification' %}</td>
+                                                <td>
+                                                    {% if user.otp_force_enabled %}
+                                                        {% trans 'Force enable' %}
+                                                    {% elif  user.otp_enabled%}
+                                                        {% trans 'Enable' %}
+                                                    {% else %}
+                                                        {% trans 'Disable' %}
+                                                    {% endif %}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -145,7 +146,7 @@
                                         </td>
                                     </tr>
                                     <tr class="no-borders-tr">
-                                        <td>{% trans 'Update otp' %}:</td>
+                                        <td>{% trans 'Update MFA settings' %}:</td>
                                         <td>
                                             <span class="pull-right">
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""

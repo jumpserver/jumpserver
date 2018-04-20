@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-19 17:48+0800\n"
+"POT-Creation-Date: 2018-04-20 11:17+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -346,7 +346,7 @@ msgstr "创建日期"
 #: users/models/user.py:52 users/templates/users/user_detail.html:119
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_profile.html:122
+#: users/templates/users/user_profile.html:123
 msgid "Comment"
 msgstr "备注"
 
@@ -561,8 +561,9 @@ msgid "Select System Users"
 msgstr "选择系统用户"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:34
-msgid "Enable-OTP"
-msgstr "二次验证"
+#, fuzzy
+msgid "Enable-MFA"
+msgstr "启用MFA"
 
 #: assets/templates/assets/_asset_import_modal.html:4
 msgid "Import asset"
@@ -639,7 +640,7 @@ msgstr "其它"
 #: users/templates/users/_user.html:43
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_password_update.html:58
-#: users/templates/users/user_profile.html:180
+#: users/templates/users/user_profile.html:181
 #: users/templates/users/user_profile_update.html:63
 #: users/templates/users/user_pubkey_update.html:70
 #: users/templates/users/user_pubkey_update.html:76
@@ -745,8 +746,8 @@ msgstr "测试"
 #: users/templates/users/user_group_detail.html:28
 #: users/templates/users/user_group_list.html:43
 #: users/templates/users/user_list.html:76
-#: users/templates/users/user_profile.html:143
-#: users/templates/users/user_profile.html:172
+#: users/templates/users/user_profile.html:144
+#: users/templates/users/user_profile.html:173
 msgid "Update"
 msgstr "更新"
 
@@ -794,7 +795,7 @@ msgstr "选择节点"
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:196
-#: users/templates/users/user_profile.html:214
+#: users/templates/users/user_profile.html:215
 msgid "Confirm"
 msgstr "确认"
 
@@ -845,14 +846,14 @@ msgstr "硬盘"
 
 #: assets/templates/assets/asset_detail.html:121
 #: users/templates/users/user_detail.html:111
-#: users/templates/users/user_profile.html:96
+#: users/templates/users/user_profile.html:97
 msgid "Date joined"
 msgstr "创建日期"
 
 #: assets/templates/assets/asset_detail.html:137
 #: terminal/templates/terminal/session_detail.html:81
 #: users/templates/users/user_detail.html:130
-#: users/templates/users/user_profile.html:134
+#: users/templates/users/user_profile.html:135
 msgid "Quick modify"
 msgstr "快速修改"
 
@@ -1730,7 +1731,7 @@ msgstr ""
 #: perms/models.py:27 perms/models.py:71
 #: perms/templates/perms/asset_permission_detail.html:90
 #: users/models/user.py:54 users/templates/users/user_detail.html:103
-#: users/templates/users/user_profile.html:104
+#: users/templates/users/user_profile.html:105
 msgid "Date expired"
 msgstr "失效日期"
 
@@ -2229,7 +2230,7 @@ msgid "Invalid token or cache refreshed."
 msgstr ""
 
 #: users/forms.py:30
-msgid "Otp_code"
+msgid "MFA_code"
 msgstr ""
 
 #: users/forms.py:39 users/models/user.py:43
@@ -2290,7 +2291,7 @@ msgstr "复制你的公钥到这里"
 
 #: users/forms.py:181 users/models/user.py:51
 #: users/templates/users/user_password_update.html:43
-#: users/templates/users/user_profile.html:79
+#: users/templates/users/user_profile.html:68
 #: users/templates/users/user_profile_update.html:43
 #: users/templates/users/user_pubkey_update.html:43
 msgid "Public key"
@@ -2328,18 +2329,18 @@ msgstr "管理员"
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:34 users/templates/users/user_profile.html:74
-#: users/templates/users/user_profile.html:155
-#: users/templates/users/user_profile.html:158
+#: users/models/user.py:34 users/templates/users/user_profile.html:92
+#: users/templates/users/user_profile.html:156
+#: users/templates/users/user_profile.html:159
 msgid "Disable"
 msgstr "禁用"
 
-#: users/models/user.py:35 users/templates/users/user_profile.html:72
-#: users/templates/users/user_profile.html:162
+#: users/models/user.py:35 users/templates/users/user_profile.html:90
+#: users/templates/users/user_profile.html:163
 msgid "Enable"
 msgstr "启用"
 
-#: users/models/user.py:36 users/templates/users/user_profile.html:70
+#: users/models/user.py:36 users/templates/users/user_profile.html:88
 msgid "Force enable"
 msgstr "强制启用"
 
@@ -2356,7 +2357,7 @@ msgstr "头像"
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:47 users/templates/users/user_detail.html:91
+#: users/models/user.py:47
 msgid "Enable OTP"
 msgstr "二次验证"
 
@@ -2457,8 +2458,10 @@ msgid "City"
 msgstr "城市"
 
 #: users/templates/users/login_otp.html:45
-msgid "二次认证"
-msgstr ""
+#: users/templates/users/user_detail.html:91
+#: users/templates/users/user_profile.html:85
+msgid "MFA certification"
+msgstr "MFA认证"
 
 #: users/templates/users/login_otp.html:64
 #: users/templates/users/user_otp_authentication.html:19
@@ -2468,7 +2471,7 @@ msgstr "6位数字"
 
 #: users/templates/users/login_otp.html:69
 msgid "Can't provide security? Please contact the administrator!"
-msgstr "如果不能提供OTP验证码，请联系管理员!"
+msgstr "如果不能提供MFA验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:45
 #: users/templates/users/user_detail.html:348 users/utils.py:73
@@ -2514,13 +2517,13 @@ msgid "Disabled"
 msgstr "禁用"
 
 #: users/templates/users/user_detail.html:115
-#: users/templates/users/user_profile.html:100
+#: users/templates/users/user_profile.html:101
 msgid "Last login"
 msgstr "最后登录"
 
 #: users/templates/users/user_detail.html:151
-msgid "Force enabled OTP"
-msgstr "强制启用OTP"
+msgid "Force enabled MFA"
+msgstr "强制启用MFA"
 
 #: users/templates/users/user_detail.html:166
 msgid "Send reset password mail"
@@ -2536,8 +2539,8 @@ msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
 #: users/templates/users/user_detail.html:291
-msgid "Goto profile page enable otp"
-msgstr "请去个人信息页面启用自己的OTP"
+msgid "Goto profile page enable MFA"
+msgstr "请去个人信息页面启用自己的MFA"
 
 #: users/templates/users/user_detail.html:347
 msgid "An e-mail has been sent to the user`s mailbox."
@@ -2562,14 +2565,14 @@ msgid "This will reset the user public key and send a reset mail"
 msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
 #: users/templates/users/user_detail.html:400
-#: users/templates/users/user_profile.html:203
+#: users/templates/users/user_profile.html:204
 msgid "Successfully updated the SSH public key."
 msgstr "更新ssh密钥成功"
 
 #: users/templates/users/user_detail.html:401
 #: users/templates/users/user_detail.html:405
-#: users/templates/users/user_profile.html:204
-#: users/templates/users/user_profile.html:209
+#: users/templates/users/user_profile.html:205
+#: users/templates/users/user_profile.html:210
 msgid "User SSH public key update"
 msgstr "ssh密钥"
 
@@ -2625,32 +2628,28 @@ msgstr "删除"
 msgid "User Deleting failed."
 msgstr "用户删除失败"
 
-#: users/templates/users/user_profile.html:67
-msgid "OTP"
-msgstr ""
-
-#: users/templates/users/user_profile.html:108 users/views/user.py:185
+#: users/templates/users/user_profile.html:109 users/views/user.py:185
 #: users/views/user.py:239
 msgid "User groups"
 msgstr "用户组"
 
-#: users/templates/users/user_profile.html:140
+#: users/templates/users/user_profile.html:141
 msgid "Update password"
 msgstr "更改密码"
 
-#: users/templates/users/user_profile.html:148
-msgid "Update otp"
-msgstr "更改OTP设置"
+#: users/templates/users/user_profile.html:149
+msgid "Update MFA settings"
+msgstr "更改MFA设置"
 
-#: users/templates/users/user_profile.html:169
+#: users/templates/users/user_profile.html:170
 msgid "Update SSH public key"
 msgstr "更改SSH密钥"
 
-#: users/templates/users/user_profile.html:177
+#: users/templates/users/user_profile.html:178
 msgid "Reset public key and download"
 msgstr "重置并下载SSH密钥"
 
-#: users/templates/users/user_profile.html:207
+#: users/templates/users/user_profile.html:208
 msgid "Failed to update SSH public key."
 msgstr "更新密钥失败"
 
@@ -2821,8 +2820,8 @@ msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
 #: users/views/login.py:107 users/views/user.py:464 users/views/user.py:489
-msgid "Otp code invalid"
-msgstr "otp码认证失败"
+msgid "MFA code invalid"
+msgstr "MFA码认证失败"
 
 #: users/views/login.py:133
 msgid "Logout success"
@@ -2898,20 +2897,20 @@ msgid "Password invalid"
 msgstr "用户名或密码无效"
 
 #: users/views/user.py:515
-msgid "OTP enable success"
-msgstr "OTP 绑定成功"
+msgid "MFA enable success"
+msgstr "MFA 绑定成功"
 
 #: users/views/user.py:516
-msgid "OTP enable success, return login page"
-msgstr "OTP 绑定成功，返回到登录页面"
+msgid "MFA enable success, return login page"
+msgstr "MFA 绑定成功，返回到登录页面"
 
 #: users/views/user.py:518
-msgid "OTP disable success"
-msgstr "OTP 解绑成功"
+msgid "MFA disable success"
+msgstr "MFA 解绑成功"
 
 #: users/views/user.py:519
-msgid "OTP disable success, return login page"
-msgstr "OTP 解绑成功，返回登录页面"
+msgid "MFA disable success, return login page"
+msgstr "MFA 解绑成功，返回登录页面"
 
 #~ msgid "Add asset"
 #~ msgstr "添加资产到节点"
