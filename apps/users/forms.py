@@ -27,7 +27,7 @@ class UserCheckPasswordForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    otp_code = forms.CharField(label=_('Otp_code'), max_length=6)
+    otp_code = forms.CharField(label=_('MFA_code'), max_length=6)
 
 
 class UserCreateUpdateForm(forms.ModelForm):

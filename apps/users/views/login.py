@@ -104,7 +104,7 @@ class UserLoginOtpView(FormView):
             self.write_login_log()
             return redirect(self.get_success_url())
         else:
-            form.add_error('otp_code', _('Otp code invalid'))
+            form.add_error('otp_code', _('MFA code invalid'))
             return super().form_invalid(form)
 
     def get_success_url(self):
