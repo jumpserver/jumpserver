@@ -14,7 +14,7 @@
 
 ::
 
-    $ git pull && cd requirements && pip install -r requirements.txt   # 不要指定 -i参数
+    $ git pull && cd requirements && pip install -r requirements.txt -i https://pypi.org/simple
 
 3. 升级 Luna
 
