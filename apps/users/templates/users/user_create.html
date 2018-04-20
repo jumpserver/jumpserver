@@ -6,11 +6,11 @@
 {#    {% bootstrap_field form.username layout="horizontal" %}#}
 {#{% endblock %}#}
 {% block password %}
-    <h3>{% trans 'Auth' %}</h3>
     <div class="form-group">
         <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
-        <div class="col-sm-8 controls" >
+        <div class="col-sm-8 controls" style="margin-top: 8px;">
             {% trans 'Reset link will be generated and sent to the user. ' %}
         </div>
     </div>
 {% endblock %}
+

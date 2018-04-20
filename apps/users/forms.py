@@ -27,7 +27,7 @@ class UserCheckPasswordForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    otp_code = forms.CharField(label=_('MFA_code'), max_length=6)
+    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
 class UserCreateUpdateForm(forms.ModelForm):
@@ -47,7 +47,7 @@ class UserCreateUpdateForm(forms.ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'role', 'date_expired', 'comment',
+            'phone', 'role', 'date_expired', 'comment', 'otp_level'
         ]
         help_texts = {
             'username': '* required',
@@ -61,6 +61,7 @@ class UserCreateUpdateForm(forms.ModelForm):
                     'data-placeholder': _('Join user groups')
                 }
             ),
+            'otp_level': forms.RadioSelect()
         }
 
     def clean_public_key(self):
@@ -77,10 +78,14 @@ class UserCreateUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
+        otp_level = self.cleaned_data.get('otp_level')
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)
         if password:
             user.set_password(password)
+            user.save()
+        if otp_level:
+            user.otp_level = otp_level
             user.save()
         if public_key:
             user.public_key = public_key
