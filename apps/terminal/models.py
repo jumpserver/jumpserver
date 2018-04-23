@@ -132,9 +132,9 @@ class Session(models.Model):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
-    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh')
+    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh', max_length=8)
     date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
-    date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True)
+    date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
     class Meta:
