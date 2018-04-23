@@ -182,6 +182,11 @@ class SessionViewSet(viewsets.ModelViewSet):
             self.queryset = terminal.session_set.all()
         return self.queryset
 
+    def perform_create(self, serializer):
+        if self.request.user.terminal:
+            serializer.validated_data["terminal"] = self.request.user.terminal
+        return super().perform_create(serializer)
+
 
 class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()

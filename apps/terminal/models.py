@@ -117,6 +117,10 @@ class Session(models.Model):
         ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal'),
     )
+    PROTOCOL_CHOICES = (
+        ('ssh', 'ssh'),
+        ('rdp', 'rdp')
+    )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
@@ -128,6 +132,7 @@ class Session(models.Model):
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
+    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh')
     date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
