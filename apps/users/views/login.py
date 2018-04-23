@@ -166,8 +166,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
             'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
-        return super()\
-            .get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserResetPasswordSuccessView(TemplateView):
@@ -214,7 +213,12 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm]
+    form_list = [
+        forms.UserProfileForm,
+        forms.UserPublicKeyForm,
+        forms.UserMFAForm,
+        forms.UserFirstLoginFinishForm
+    ]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
@@ -255,7 +259,6 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
 
     def get_form(self, step=None, data=None, files=None):
         form = super().get_form(step, data, files)
-
         form.instance = self.request.user
         return form
 
@@ -293,7 +296,9 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             'date_to': self.date_to,
             'user': self.user,
             'keyword': self.keyword,
-            'user_list': set(LoginLog.objects.all().values_list('username', flat=True))
+            'user_list': set(
+                LoginLog.objects.all().values_list('username', flat=True)
+            )
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
