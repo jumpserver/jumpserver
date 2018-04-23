@@ -175,6 +175,9 @@ FAQ
         $ cd /opt/jumpserver/apps
         $ python manage.py changepassword  <user_name>
 
+        # 新建超级用户的命令如下命令
+        $ python manage.py createsuperuser --username=user --email=user@domain.com
+
     (11). 清理celery产生的数据(无法正常推送及连接资产可以使用)
         $ source /opt/py3/bin/activate
         $ cd /opt/jumpserver/apps
