@@ -14,11 +14,11 @@
 
 ::
 
-
-    $ git pull && pip install -r requirements/requirements.txt
-
-    # 如果使用其他源下载失败可以使用 -i 参数指定源
-    $ git pull && pip install -r requirements/requirements.txt -i https://pypi.org/simple
+<<<<<<< HEAD
+    $ git pull && pip install -r requirements/requirements.txt   # 不要指定 -i参数
+=======
+    $ git pull && cd requirements && pip install -r requirements.txt -i https://pypi.org/simple
+>>>>>>> upstream/docs
 
 3. 升级 Luna
 

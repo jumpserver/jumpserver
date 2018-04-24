@@ -1,5 +1,15 @@
 FAQ
 ==========
+.. toctree::
+   :maxdepth: 1
+
+   Windows 资产连接说明 <faq_windows.rst>
+   Windows sftp使用说明 <faq_sftp.rst>
+   二次认证（Google Auth）入口说明 <faq_googleauth.rst>
+
+
+常见问题
+~~~~~~~~~~~~~~~~~~~~~
 
 1. Windows 资产连接错误排查思路
 
@@ -47,10 +57,9 @@ FAQ
 
    (3). guacamole重新注册
 
-      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
       $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
       $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
-      $ rm /opt/guacamole/key/*
+      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
       $ systemctl stop docker
       $ systemctl start docker
       $ docker run —name jms_guacamole -d \
@@ -165,3 +174,16 @@ FAQ
         $ source /opt/py3/bin/activate
         $ cd /opt/jumpserver/apps
         $ python manage.py changepassword  <user_name>
+
+        # 新建超级用户的命令如下命令
+        $ python manage.py createsuperuser --username=user --email=user@domain.com
+
+    (11). 清理celery产生的数据(无法正常推送及连接资产可以使用)
+        $ source /opt/py3/bin/activate
+        $ cd /opt/jumpserver/apps
+        $ python manage.py shell
+        $ from celery.task.control import discard_all
+        $ discard_all()
+        $ exit()
+        $ cd /opt/jumpserver
+        $ ./jms restart celery

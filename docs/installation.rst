@@ -4,7 +4,8 @@
 .. toctree::
    :maxdepth: 1
 
-   quickstart
+   dockerinstall
+   quickinstall
    step_by_step
    setup_by_ubuntu
    upgrade
