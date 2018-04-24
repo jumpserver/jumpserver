@@ -43,66 +43,39 @@
 
 **Jumpserver**
 
-说明: 以下操作，都在jumpserver所在目录运行（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
+说明: 如果是新开的终端，别忘了 source /opt/py3/bin/activate
 
-1. 备份配置文件
+1. 备份jumpserver
 
 ::
 
     $ jumpserver_backup=/tmp/jumpserver_backup
     $ mkdir -p $jumpserver_backup
-    $ cp config.py $jumpserver_backup
+    $ cd /opt/jumpservrer
+    $ cp -r ./ $jumpserver_backup
 
-2. 备份migrations migrations中存的是数据库表结构的变更，切换分支会丢失
-
-::
-
-   $ for app in common users assets ops perms terminal;do
-      mkdir -p $jumpserver_backup/${app}_migrations
-      cp apps/${app}/migrations/*.py $jumpserver_backup/${app}_migrations
-   done
-
-
-3. 备份数据库，已被不时之需
+2. 备份数据库，已被不时之需
 
 ::
 
   $ mysqldump -u你的数据库账号 -h数据库地址 -p 数据库名称 > $jumpserver_backup/db_backup.sql
 
-4. 备份录像文件
+3. 切换分支或下载离线包, 更新代码
 
 ::
+   $ cd /opt
+   $ mv jumpserver jumpserver_bak
+   $ git clone https://github.com/jumpserver/jumpserver.git
+   $ cd jumpserver && git checkout master  # or other branch
+   $ git pull
 
-   $ cp -r data/media $jumpserver_backup/
-
-5. 切换分支或下载离线包, 更新代码
-
-::
-
-   $ git checkout master  # or other branch
-
-
-6. 还原配置文件
-
-::
-
-   $ cp $jumpserver_backup/config.py .
-
-7. 还原数据库表结构记录
-
-::
-
-   $ for app in common users assets ops perms terminal;do
-      cp $jumpserver_backup/${app}_migrations/*.py apps/${app}/migrations/
-   done
-
-8. 还原录像文件
+4. 还原录像文件
 
 ::
 
    $ cp -r $jumpserver_backup/media/* data/media/
 
-9. 更新依赖或表结构
+5. 更新依赖或表结构
 
 ::
 
