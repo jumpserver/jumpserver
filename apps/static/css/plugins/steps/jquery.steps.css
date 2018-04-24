@@ -220,7 +220,6 @@
     position: relative;
     display: block;
     text-align: right;
-    width: 100%;
 }
 
 .wizard.vertical > .actions

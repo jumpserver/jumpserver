@@ -36,23 +36,52 @@ class User(AbstractUser):
         (2, _("Force enable")),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))
+    username = models.CharField(
+        max_length=128, unique=True, verbose_name=_('Username')
+    )
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    email = models.EmailField(max_length=128, unique=True, verbose_name=_('Email'))
-    groups = models.ManyToManyField('users.UserGroup', related_name='users', blank=True, verbose_name=_('User group'))
-    role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
-    avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
-    wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))
-    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
-    otp_level = models.SmallIntegerField(default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('Enable OTP'))
+    email = models.EmailField(
+        max_length=128, unique=True, verbose_name=_('Email')
+    )
+    groups = models.ManyToManyField(
+        'users.UserGroup', related_name='users',
+        blank=True, verbose_name=_('User group')
+    )
+    role = models.CharField(
+        choices=ROLE_CHOICES, default='User', max_length=10,
+        blank=True, verbose_name=_('Role')
+    )
+    avatar = models.ImageField(
+        upload_to="avatar", null=True, verbose_name=_('Avatar')
+    )
+    wechat = models.CharField(
+        max_length=128, blank=True, verbose_name=_('Wechat')
+    )
+    phone = models.CharField(
+        max_length=20, blank=True, null=True, verbose_name=_('Phone')
+    )
+    otp_level = models.SmallIntegerField(
+        default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('MFA')
+    )
     _otp_secret_key = models.CharField(max_length=128, blank=True, null=True)
     # Todo: Auto generate key, let user download
-    _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Private key'))
-    _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Public key'))
-    comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
+    _private_key = models.CharField(
+        max_length=5000, blank=True, verbose_name=_('Private key')
+    )
+    _public_key = models.CharField(
+        max_length=5000, blank=True, verbose_name=_('Public key')
+    )
+    comment = models.TextField(
+        max_length=200, blank=True, verbose_name=_('Comment')
+    )
     is_first_login = models.BooleanField(default=True)
-    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
+    date_expired = models.DateTimeField(
+        default=date_expired_default, blank=True, null=True,
+        verbose_name=_('Date expired')
+    )
+    created_by = models.CharField(
+        max_length=30, default='', verbose_name=_('Created by')
+    )
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -213,7 +242,9 @@ class User(AbstractUser):
             return user_default
 
     def generate_reset_token(self):
-        return signer.sign_t({'reset': str(self.id), 'email': self.email}, expires_in=3600)
+        return signer.sign_t(
+            {'reset': str(self.id), 'email': self.email}, expires_in=3600
+        )
 
     @property
     def otp_enabled(self):
