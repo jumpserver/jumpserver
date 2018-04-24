@@ -63,6 +63,7 @@
 3. 切换分支或下载离线包, 更新代码
 
 ::
+
    $ cd /opt
    $ mv jumpserver jumpserver_bak
    $ git clone https://github.com/jumpserver/jumpserver.git
