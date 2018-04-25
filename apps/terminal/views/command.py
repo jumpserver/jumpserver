@@ -38,7 +38,7 @@ class CommandListView(DatetimeSearchMixin, AdminUserRequiredMixin, ListView):
         if self.system_user:
             filter_kwargs['system_user'] = self.system_user
         if self.command:
-            filter_kwargs['input__contains'] = self.command
+            filter_kwargs['input'] = self.command
         queryset = common_storage.filter(**filter_kwargs)
         return queryset
 
