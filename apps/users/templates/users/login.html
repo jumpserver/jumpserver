@@ -53,7 +53,7 @@
                             {% endif %}
                         {% endif %}
                         <div class="form-group">
-                            <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="">
+                            <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
                         </div>
                         <div class="form-group">
                             <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">

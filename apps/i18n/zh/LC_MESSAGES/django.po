@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-20 11:17+0800\n"
+"POT-Creation-Date: 2018-04-23 19:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -137,7 +137,7 @@ msgstr "资产"
 #: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:16
 #: terminal/models.py:149 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
-#: users/models/user.py:40 users/templates/users/_select_user_modal.html:13
+#: users/models/user.py:42 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
 #: users/templates/users/user_group_detail.html:55
 #: users/templates/users/user_group_list.html:12
@@ -154,7 +154,7 @@ msgstr "名称"
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:27
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:13
-#: users/forms.py:22 users/models/authentication.py:45 users/models/user.py:39
+#: users/forms.py:22 users/models/authentication.py:45 users/models/user.py:40
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/login.html:56
 #: users/templates/users/login_log_list.html:49
@@ -172,7 +172,7 @@ msgstr "密码或密钥密码"
 #: users/forms.py:15 users/forms.py:24 users/forms.py:36
 #: users/templates/users/login.html:59
 #: users/templates/users/reset_password.html:52
-#: users/templates/users/user_create.html:11
+#: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:14
 #: users/templates/users/user_password_update.html:40
 #: users/templates/users/user_profile_update.html:40
@@ -180,7 +180,7 @@ msgstr "密码或密钥密码"
 msgid "Password"
 msgstr "密码"
 
-#: assets/forms/user.py:28 users/models/user.py:50
+#: assets/forms/user.py:28 users/models/user.py:69
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -312,7 +312,7 @@ msgstr "标签管理"
 #: assets/templates/assets/system_user_detail.html:96
 #: ops/templates/ops/adhoc_detail.html:86 perms/models.py:28 perms/models.py:72
 #: perms/templates/perms/asset_permission_detail.html:98
-#: users/models/user.py:55 users/templates/users/user_detail.html:107
+#: users/models/user.py:83 users/templates/users/user_detail.html:107
 msgid "Created by"
 msgstr "创建者"
 
@@ -343,7 +343,7 @@ msgstr "创建日期"
 #: ops/models/adhoc.py:42 perms/models.py:30 perms/models.py:74
 #: perms/templates/perms/asset_permission_detail.html:102 terminal/models.py:26
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
-#: users/models/user.py:52 users/templates/users/user_detail.html:119
+#: users/models/user.py:75 users/templates/users/user_detail.html:119
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
 #: users/templates/users/user_profile.html:123
@@ -366,7 +366,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:46
+#: assets/models/cluster.py:22 users/models/user.py:61
 #: users/templates/users/user_detail.html:76
 msgid "Phone"
 msgstr "手机"
@@ -392,7 +392,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:13
-#: users/models/user.py:299
+#: users/models/user.py:330
 msgid "System"
 msgstr "系统"
 
@@ -430,8 +430,8 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:231
-#: users/models/user.py:30 users/models/user.py:287
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:273
+#: users/models/user.py:30 users/models/user.py:318
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:339
 msgid "User"
@@ -605,8 +605,7 @@ msgstr "基本"
 #: assets/templates/assets/asset_update.html:30
 #: assets/templates/assets/gateway_create_update.html:45
 #: assets/templates/assets/system_user_update.html:7
-#: users/templates/users/user_create.html:9
-#: users/templates/users/user_update.html:6
+#: users/templates/users/_user.html:21
 msgid "Auth"
 msgstr "认证"
 
@@ -637,7 +636,7 @@ msgstr "其它"
 #: common/templates/common/terminal_setting.html:101
 #: perms/templates/perms/asset_permission_create_update.html:69
 #: terminal/templates/terminal/terminal_update.html:47
-#: users/templates/users/_user.html:43
+#: users/templates/users/_user.html:46
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_password_update.html:58
 #: users/templates/users/user_profile.html:181
@@ -663,8 +662,7 @@ msgstr "重置"
 #: perms/templates/perms/asset_permission_create_update.html:70
 #: terminal/templates/terminal/session_list.html:120
 #: terminal/templates/terminal/terminal_update.html:48
-#: users/templates/users/_user.html:44
-#: users/templates/users/first_login.html:62
+#: users/templates/users/_user.html:47
 #: users/templates/users/forgot_password.html:44
 #: users/templates/users/user_bulk_update.html:24
 #: users/templates/users/user_list.html:44
@@ -1705,15 +1703,15 @@ msgstr "任务列表"
 msgid "Task run history"
 msgstr "执行历史"
 
-#: perms/forms.py:18 users/forms.py:188 users/forms.py:193 users/forms.py:205
-#: users/forms.py:235
+#: perms/forms.py:18 users/forms.py:230 users/forms.py:235 users/forms.py:247
+#: users/forms.py:277
 msgid "Select users"
 msgstr "选择用户"
 
 #: perms/forms.py:34 perms/models.py:21 perms/models.py:68
 #: perms/templates/perms/asset_permission_list.html:55
 #: perms/templates/perms/asset_permission_list.html:136 templates/_nav.html:14
-#: users/models/group.py:25 users/models/user.py:42
+#: users/models/group.py:25 users/models/user.py:48
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:188
 #: users/templates/users/user_list.html:26
@@ -1730,7 +1728,7 @@ msgstr ""
 
 #: perms/models.py:27 perms/models.py:71
 #: perms/templates/perms/asset_permission_detail.html:90
-#: users/models/user.py:54 users/templates/users/user_detail.html:103
+#: users/models/user.py:80 users/templates/users/user_detail.html:103
 #: users/templates/users/user_profile.html:105
 msgid "Date expired"
 msgstr "失效日期"
@@ -1854,8 +1852,9 @@ msgstr "商业支持"
 msgid "Docs"
 msgstr "文档"
 
-#: templates/_header_bar.html:37 templates/_nav_user.html:9 users/forms.py:105
-#: users/templates/users/_user.html:36
+#: templates/_header_bar.html:37 templates/_nav_user.html:9 users/forms.py:113
+#: users/templates/users/_user.html:39
+#: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:37
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
@@ -1898,7 +1897,7 @@ msgstr ""
 "</a> 补充完整\n"
 "                "
 
-#: templates/_message.html:17
+#: templates/_message.html:20
 #, python-format
 msgid ""
 "\n"
@@ -1917,7 +1916,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:241 users/views/login.py:290 users/views/user.py:64
+#: users/views/login.py:241 users/views/login.py:289 users/views/user.py:64
 #: users/views/user.py:79 users/views/user.py:99 users/views/user.py:155
 #: users/views/user.py:310 users/views/user.py:357 users/views/user.py:379
 msgid "Users"
@@ -2230,10 +2229,10 @@ msgid "Invalid token or cache refreshed."
 msgstr ""
 
 #: users/forms.py:30
-msgid "MFA_code"
-msgstr ""
+msgid "MFA code"
+msgstr "MFA 验证码"
 
-#: users/forms.py:39 users/models/user.py:43
+#: users/forms.py:41 users/models/user.py:52
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:25
@@ -2241,55 +2240,92 @@ msgstr ""
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:41 users/forms.py:151
+#: users/forms.py:44 users/forms.py:193
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:42 users/forms.py:152
+#: users/forms.py:45 users/forms.py:194
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:43
+#: users/forms.py:46
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:61 users/templates/users/user_detail.html:196
+#: users/forms.py:64 users/templates/users/user_detail.html:196
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:71 users/forms.py:166
+#: users/forms.py:75 users/forms.py:208
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:75 users/forms.py:170 users/serializers.py:45
+#: users/forms.py:79 users/forms.py:212 users/serializers.py:45
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:111
+#: users/forms.py:119
+msgid ""
+"Tip: when enabled, you will enter the MFA binding process the next time you "
+"log in. you can also directly bind in \"personal information -> quick "
+"modification -> change MFA Settings\"!"
+msgstr ""
+"提示：启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修"
+"改->更改MFA设置）中直接绑定!"
+
+#: users/forms.py:129
+msgid "* Enable MFA authentication to make the account more secure."
+msgstr "* 启用MFA认证，使账号更加安全."
+
+#: users/forms.py:134 users/models/user.py:64
+#: users/templates/users/first_login.html:45
+msgid "MFA"
+msgstr "MFA"
+
+#: users/forms.py:139
+msgid ""
+"In order to protect you and your company, please keep your account, password "
+"and key sensitive information properly. (for example: setting complex "
+"password, enabling MFA authentication)"
+msgstr ""
+"为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
+"设置复杂密码，启用MFA认证）"
+
+#: users/forms.py:146 users/templates/users/first_login.html:48
+#: users/templates/users/first_login.html:110
+msgid "Finish"
+msgstr "完成"
+
+#: users/forms.py:152
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:116
+#: users/forms.py:157
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:121
+#: users/forms.py:162
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:131
+#: users/forms.py:172
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:139
+#: users/forms.py:180
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:153
+#: users/forms.py:191
+msgid "Automatically configure and download the SSH key"
+msgstr "自动配置并下载SSH密钥"
+
+#: users/forms.py:195
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:181 users/models/user.py:51
+#: users/forms.py:223 users/models/user.py:72
+#: users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_profile.html:68
 #: users/templates/users/user_profile_update.html:43
@@ -2321,7 +2357,7 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:29 users/models/user.py:295
+#: users/models/user.py:29 users/models/user.py:326
 msgid "Administrator"
 msgstr "管理员"
 
@@ -2344,24 +2380,20 @@ msgstr "启用"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:41 users/templates/users/user_detail.html:71
+#: users/models/user.py:44 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
 
-#: users/models/user.py:44
+#: users/models/user.py:55
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:45 users/templates/users/user_detail.html:82
+#: users/models/user.py:58 users/templates/users/user_detail.html:82
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:47
-msgid "Enable OTP"
-msgstr "二次验证"
-
-#: users/models/user.py:298
+#: users/models/user.py:329
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -2378,7 +2410,7 @@ msgstr "资产数量"
 msgid "Account"
 msgstr "账户"
 
-#: users/templates/users/_user.html:23
+#: users/templates/users/_user.html:26
 msgid "Security and Role"
 msgstr "角色安全"
 
@@ -2402,20 +2434,20 @@ msgstr "如果设置了id，则会使用该行信息更新该id的用户"
 msgid "Update User SSH Public Key"
 msgstr "更新ssh密钥"
 
-#: users/templates/users/first_login.html:18
-#: users/templates/users/first_login_done.html:18
+#: users/templates/users/first_login.html:19
+#: users/templates/users/first_login_done.html:19
 msgid "First Login"
 msgstr "首次登陆"
 
-#: users/templates/users/first_login.html:35
-msgid "Step"
-msgstr "Step"
+#: users/templates/users/first_login.html:72
+msgid "I agree with the terms and conditions."
+msgstr "我同意条款和条件"
 
-#: users/templates/users/first_login.html:57
+#: users/templates/users/first_login.html:100
 msgid "Previous"
 msgstr "上一步"
 
-#: users/templates/users/first_login.html:60
+#: users/templates/users/first_login.html:108
 #: users/templates/users/login_otp.html:66
 #: users/templates/users/user_otp_authentication.html:22
 #: users/templates/users/user_otp_enable_bind.html:19
@@ -2424,15 +2456,15 @@ msgstr "上一步"
 msgid "Next"
 msgstr "下一步"
 
-#: users/templates/users/first_login_done.html:30
+#: users/templates/users/first_login_done.html:31
 msgid "Welcome to use jumpserver, visit "
 msgstr "欢迎使用Jumpserver开源跳板机系统"
 
-#: users/templates/users/first_login_done.html:31
+#: users/templates/users/first_login_done.html:32
 msgid "Use guide"
 msgstr "向导"
 
-#: users/templates/users/first_login_done.html:31
+#: users/templates/users/first_login_done.html:32
 msgid " for more information"
 msgstr "获取更多信息"
 
@@ -2492,7 +2524,7 @@ msgstr "设置"
 msgid "Create user"
 msgstr "创建用户"
 
-#: users/templates/users/user_create.html:13
+#: users/templates/users/user_create.html:12
 msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
@@ -2844,19 +2876,19 @@ msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:178
+#: users/views/login.py:177
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:179
+#: users/views/login.py:178
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:196 users/views/login.py:209
+#: users/views/login.py:195 users/views/login.py:208
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:205
+#: users/views/login.py:204
 msgid "Password not same"
 msgstr "密码不一致"
 
@@ -2864,7 +2896,7 @@ msgstr "密码不一致"
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:291
+#: users/views/login.py:290
 msgid "Login log list"
 msgstr "登录日志"
 
@@ -2911,6 +2943,9 @@ msgstr "MFA 解绑成功"
 #: users/views/user.py:519
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
+
+#~ msgid "Step"
+#~ msgstr "Step"
 
 #~ msgid "Add asset"
 #~ msgstr "添加资产到节点"
