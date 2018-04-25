@@ -384,7 +384,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
     如果登录客户端是 macOS 或 Linux ，登录语法如下
     $ ssh -p2222 admin@192.168.244.144
-    $ sftp -p2222 admin@192.168.244.144
+    $ sftp -P2222 admin@192.168.244.144
     密码: admin
 
     如果登录客户端是 Windows ，Xshell Terminal 登录语法如下

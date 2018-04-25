@@ -318,7 +318,7 @@ CentOS 7 安装文档
     # 访问 http://192.168.244.144 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
     # 测试连接
     $ ssh -p2222 admin@192.168.244.144
-    $ sftp -p2222 admin@192.168.244.144
+    $ sftp -P2222 admin@192.168.244.144
       密码: admin
 
     # 如果是用在 Windows 下，Xshell Terminal 登录语法如下
