@@ -7,7 +7,7 @@
         Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
         {% endblocktrans %}
 
-        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+        <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
     </div>
     {% endif %}
 {% endblock %}
@@ -28,7 +28,9 @@
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }} help-message" >
             {{ message|safe }}
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
         </div>
+
     {% endfor %}
 {% endif %}
 

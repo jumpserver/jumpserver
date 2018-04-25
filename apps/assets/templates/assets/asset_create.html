@@ -15,9 +15,9 @@
     {% csrf_token %}
     <h3>{% trans 'Basic' %}</h3>
     {% bootstrap_field form.hostname layout="horizontal" %}
+    {% bootstrap_field form.platform layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
     {% bootstrap_field form.port layout="horizontal" %}
-    {% bootstrap_field form.platform layout="horizontal" %}
     {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.domain layout="horizontal" %}
 
@@ -84,6 +84,17 @@ $(document).ready(function () {
     $(".labels").select2({
         allowClear: true,
         templateSelection: format
+    });
+    $("#id_platform").change(function (){
+        var platform = $("#id_platform option:selected").text();
+        var port = 22;
+        if(platform === 'Windows'){
+            port = 3389;
+        }
+        if(platform === 'Other'){
+            port = null;
+        }
+        $("#id_port").val(port);
     });
 })
 </script>

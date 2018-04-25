@@ -15,6 +15,14 @@ class UserLoginForm(AuthenticationForm):
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False
     )
+
+
+class UserLoginCaptchaForm(AuthenticationForm):
+    username = forms.CharField(label=_('Username'), max_length=100)
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput,
+        max_length=128, strip=False
+    )
     captcha = CaptchaField()
 
 
