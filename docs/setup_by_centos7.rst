@@ -79,7 +79,7 @@ CentOS 7 安装文档
     $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)

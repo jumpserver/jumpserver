@@ -168,7 +168,7 @@
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 首次进入 coco 文件夹会有提示，按 y 即可
     # Are you sure you want to allow this? (y/N) y
