@@ -182,6 +182,11 @@ class SessionViewSet(viewsets.ModelViewSet):
             self.queryset = terminal.session_set.all()
         return self.queryset
 
+    def perform_create(self, serializer):
+        if self.request.user.terminal:
+            serializer.validated_data["terminal"] = self.request.user.terminal
+        return super().perform_create(serializer)
+
 
 class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
@@ -296,6 +301,57 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 if client and client.has_file(file_path) and \
                         client.download_file(file_path, target_path):
                     return redirect(default_storage.url(path))
+        return HttpResponseNotFound()
+
+
+class SessionReplayV2ViewSet(viewsets.ViewSet):
+    serializer_class = ReplaySerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+    session = None
+
+    def gen_session_path(self):
+        date = self.session.date_start.strftime('%Y-%m-%d')
+        replay = {
+            "id": self.session.id,
+            # "width": 100,
+            # "heith": 100
+        }
+        if self.session.protocol == "ssh":
+            replay['type'] = "json"
+            replay['path'] = os.path.join(date, str(self.session.id) + '.gz')
+            return replay
+        elif self.session.protocol == "rdp":
+            replay['type'] = "mp4"
+            replay['path'] = os.path.join(date, str(self.session.id) + '.mp4')
+            return replay
+        else:
+            return replay
+
+    def retrieve(self, request, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        self.session = get_object_or_404(Session, id=session_id)
+        replay = self.gen_session_path()
+
+        if replay.get("path", "") == "":
+            return HttpResponseNotFound()
+
+        if default_storage.exists(replay["path"]):
+            replay["src"] = default_storage.url(replay["path"])
+            return Response(replay)
+        else:
+            configs = settings.TERMINAL_REPLAY_STORAGE.items()
+            if not configs:
+                return HttpResponseNotFound()
+
+            for name, config in configs:
+                client = jms_storage.init(config)
+
+                target_path = default_storage.base_location + '/' + replay["path"]
+
+                if client and client.has_file(replay["path"]) and \
+                        client.download_file(replay["path"], target_path):
+                    replay["src"] = default_storage.url(replay["path"])
+                    return Response(replay)
         return HttpResponseNotFound()
 
 

@@ -7,6 +7,12 @@ from ..models import Asset, Node
 from .asset import AssetGrantedSerializer
 
 
+__all__ = [
+    'NodeSerializer', "NodeGrantedSerializer", "NodeAddChildrenSerializer",
+    "NodeAssetsSerializer",
+]
+
+
 class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     授权资产组
