@@ -44,6 +44,16 @@
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
+**1.4 自动载入 Python 虚拟环境配置**
+
+此项仅为懒癌晚期的人员使用，防止运行 Jumpserver 时忘记载入 Python 虚拟环境导致程序无法运行。使用autoenv
+
+::
+
+    $ git clone git://github.com/kennethreitz/autoenv.git ~/.autoenv
+    $ echo 'source ~/.autoenv/activate.sh' >> ~/.bashrc
+    $ source ~/.bashrc
+
 二. 安装 Jumpserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,6 +65,10 @@
 
     $ cd /opt/
     $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
+
+    # 首次进入 jumpserver 文件夹会有提示，按 y 即可
+    # Are you sure you want to allow this? (y/N) y
 
 **2.2 安装依赖 RPM 包**
 
@@ -154,7 +168,10 @@
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
+    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
+    # 首次进入 coco 文件夹会有提示，按 y 即可
+    # Are you sure you want to allow this? (y/N) y
 
 **3.2 安装依赖**
 
@@ -310,7 +327,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
-    # 如果是新开的终端，别忘了 source /opt/py3/bin/activate
+
     $ cd /opt/jumpserver
     $ ./jms status  # 确定jumpserver已经运行，如果没有运行请重新启动jumpserver
 
@@ -332,7 +349,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     如果登录客户端是 macOS 或 Linux ，登录语法如下
     $ ssh -p2222 admin@192.168.244.144
-    $ sftp -p2222 admin@192.168.244.144
+    $ sftp -P2222 admin@192.168.244.144
     密码: admin
 
     如果登录客户端是 Windows ，Xshell Terminal 登录语法如下
@@ -340,6 +357,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ sftp admin@192.168.244.144 2222
     密码: admin
     如果能登陆代表部署成功
+
+    # sftp默认上传的位置在资产的 /tmp 目录下
 
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

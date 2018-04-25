@@ -52,16 +52,16 @@ CentOS 7 安装文档
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'somepassword';
     > flush privileges;
 
-    # 安装nginx，用作代理服务器整合jumpserver与各个组件
+    # 安装 Nginx ，用作代理服务器整合 Jumpserver 与各个组件
     $ yum -y install redis
     $ systemctl enable nginx
 
-    # 下载编译Python3.6.1
+    # 下载编译 Python3.6.1
     $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
     $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
     $ ./configure && make && make install
 
-    # 配置并载入python3虚拟环境
+    # 配置并载入 Python3 虚拟环境
     $ cd /opt
     $ python3 -m venv py3  # py3 为虚拟环境名称，可自定义
     $ source /opt/py3/bin/activate  # 退出虚拟环境可以使用 deactivate 命令
@@ -69,10 +69,17 @@ CentOS 7 安装文档
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，载入环境后默认以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-    # 下载jumpserver与coco
+    # 自动载入 Python3 虚拟环境
+    $ git clone git://github.com/kennethreitz/autoenv.git ~/.autoenv
+    $ echo 'source ~/.autoenv/activate.sh' >> ~/.bashrc
+    $ source ~/.bashrc
+
+    # 下载 Jumpserver 与 Coco
     $ cd /opt/
     $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
+    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
@@ -151,7 +158,7 @@ CentOS 7 安装文档
 ::
 
 
-    # 修改 coco 配置文件
+    # 修改 Coco 配置文件
     $ cd /opt/coco
     $ cp conf_example.py conf.py
     $ vi conf.py
@@ -304,7 +311,7 @@ CentOS 7 安装文档
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-    # 运行 coco
+    # 运行 Coco
     $ cd /opt/coco
     $ cp conf_example.py conf.py
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
@@ -318,7 +325,7 @@ CentOS 7 安装文档
     # 访问 http://192.168.244.144 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
     # 测试连接
     $ ssh -p2222 admin@192.168.244.144
-    $ sftp -p2222 admin@192.168.244.144
+    $ sftp -P2222 admin@192.168.244.144
       密码: admin
 
     # 如果是用在 Windows 下，Xshell Terminal 登录语法如下
@@ -327,7 +334,7 @@ CentOS 7 安装文档
       密码: admin
       如果能登陆代表部署成功
 
-    # sftp默认上传的位置在 /tmp 目录下
+    # sftp默认上传的位置在资产的 /tmp 目录下
 
     # 其他的ssh及sftp客户端这里就不多做说明，自行搜索使用
 
