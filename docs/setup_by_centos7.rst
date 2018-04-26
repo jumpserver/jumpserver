@@ -98,7 +98,7 @@ CentOS 7 安装文档
     $ cp config_example.py config.py
     $ vi config.py
 
-    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对其，不要直接复制本文内容
+    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对齐，不要直接复制本文内容
 
     ...
     class Config:
