@@ -76,7 +76,7 @@ class Setting(models.Model):
                 LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, settings.AUTH_LDAP_SEARCH_FILTER)
                 for USER_SEARCH in str(settings.AUTH_LDAP_SEARCH_OU).split("|")
             ]
-            settings.AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(tuple(settings.AUTH_LDAP_USER_SEARCH_UNION))
+            settings.AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*settings.AUTH_LDAP_USER_SEARCH_UNION)
 
     class Meta:
         db_table = "settings"
