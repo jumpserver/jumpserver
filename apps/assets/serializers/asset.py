@@ -18,8 +18,7 @@ class NodeTMPSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount',
-                  'is_asset']
+        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
         list_serializer_class = BulkListSerializer
 
     @staticmethod
