@@ -108,18 +108,18 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         return node
 
     def get_queryset(self):
-        queryset = set()
+        queryset = []
         query_all = self.request.query_params.get("all")
         query_assets = self.request.query_params.get('assets')
         node = self.get_object()
         if node == Node.root():
-            queryset.add(node)
+            queryset.append(node)
         if query_all:
             children = node.get_all_children()
         else:
             children = node.get_children()
 
-        queryset.update(set(children))
+        queryset.extend(list(children))
         if query_assets:
             assets = node.get_assets()
             for asset in assets:
@@ -128,7 +128,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
                 node_fake.parent = node
                 node_fake.value = asset.hostname
                 node_fake.is_node = False
-                queryset.add(node_fake)
+                queryset.append(node_fake)
         queryset = sorted(queryset, key=lambda x: x.is_node, reverse=True)
         return queryset
 
