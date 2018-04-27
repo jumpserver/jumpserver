@@ -47,7 +47,8 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             filter_kwargs['system_user'] = self.system_user
         if filter_kwargs:
             self.queryset = self.queryset.filter(**filter_kwargs)
-        return self.queryset
+        # Todo: 暂时隐藏rdp
+        return self.queryset.filter(protocol='ssh')
 
     def get_context_data(self, **kwargs):
         context = {
