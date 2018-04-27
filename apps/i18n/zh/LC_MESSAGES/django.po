@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-27 09:43+0800\n"
+"POT-Creation-Date: 2018-04-27 10:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1774,6 +1774,10 @@ msgstr "添加节点"
 #: users/templates/users/user_detail.html:205
 msgid "Join"
 msgstr "加入"
+
+#: perms/templates/perms/asset_permission_create_update.html:53
+msgid "Validity period"
+msgstr "有效期"
 
 #: perms/templates/perms/asset_permission_detail.html:66
 msgid "User count"
