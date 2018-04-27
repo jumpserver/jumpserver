@@ -297,6 +297,10 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 date = self.session.date_start.strftime('%Y-%m-%d')
                 file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
                 target_path = default_storage.base_location + '/' + path
+                folder_path = default_storage.base_location + date
+                
+                if not default_storage.exists(folder_path):
+                    os.mkdir(folder_path)
 
                 if client and client.has_file(file_path) and \
                         client.download_file(file_path, target_path):
