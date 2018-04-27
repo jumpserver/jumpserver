@@ -16,23 +16,23 @@ class AssetPermissionUtil:
 
     @staticmethod
     def get_user_permissions(user):
-        return AssetPermission.valid.all().filter(users=user)
+        return AssetPermission.objects.all().valid().filter(users=user)
 
     @staticmethod
     def get_user_group_permissions(user_group):
-        return AssetPermission.valid.all().filter(user_groups=user_group)
+        return AssetPermission.objects.all().valid().filter(user_groups=user_group)
 
     @staticmethod
     def get_asset_permissions(asset):
-        return AssetPermission.valid.all().filter(assets=asset)
+        return AssetPermission.objects.all().valid().filter(assets=asset)
 
     @staticmethod
     def get_node_permissions(node):
-        return AssetPermission.valid.all().filter(nodes=node)
+        return AssetPermission.objects.all().valid().filter(nodes=node)
 
     @staticmethod
     def get_system_user_permissions(system_user):
-        return AssetPermission.objects.all().filter(system_users=system_user)
+        return AssetPermission.objects.valid().all().filter(system_users=system_user)
 
     @classmethod
     def get_user_group_nodes(cls, group):
@@ -51,7 +51,7 @@ class AssetPermissionUtil:
         assets = defaultdict(set)
         permissions = cls.get_user_group_permissions(group)
         for perm in permissions:
-            _assets = perm.assets.all()
+            _assets = perm.assets.all().valid()
             _system_users = perm.system_users.all()
             set_or_append_attr_bulk(_assets, 'permission', perm.id)
             for asset in _assets:
@@ -63,7 +63,7 @@ class AssetPermissionUtil:
         assets = defaultdict(set)
         nodes = cls.get_user_group_nodes(group)
         for node, _system_users in nodes.items():
-            _assets = node.get_all_assets()
+            _assets = node.get_all_valid_assets()
             set_or_append_attr_bulk(_assets, 'inherit_node', node.id)
             set_or_append_attr_bulk(_assets, 'permission', getattr(node, 'permission', None))
             for asset in _assets:
@@ -103,7 +103,7 @@ class AssetPermissionUtil:
         assets = defaultdict(set)
         permissions = list(cls.get_user_permissions(user))
         for perm in permissions:
-            _assets = perm.assets.all()
+            _assets = perm.assets.all().valid()
             _system_users = perm.system_users.all()
             set_or_append_attr_bulk(_assets, 'permission', perm.id)
             for asset in _assets:
@@ -127,7 +127,7 @@ class AssetPermissionUtil:
         assets = defaultdict(set)
         nodes = cls.get_user_nodes_direct(user)
         for node, _system_users in nodes.items():
-            _assets = node.get_all_assets()
+            _assets = node.get_all_valid_assets()
             set_or_append_attr_bulk(_assets, 'inherit_node', node.id)
             set_or_append_attr_bulk(_assets, 'permission', getattr(node, 'permission', None))
             for asset in _assets:
@@ -180,10 +180,10 @@ class AssetPermissionUtil:
         assets = set()
         permissions = cls.get_system_user_permissions(system_user)
         for perm in permissions:
-            assets.update(set(perm.assets.all()))
+            assets.update(set(perm.assets.all().valid()))
             nodes = perm.nodes.all()
             for node in nodes:
-                assets.update(set(node.get_all_assets()))
+                assets.update(set(node.get_all_valid_assets()))
         return assets
 
     @classmethod
@@ -243,7 +243,7 @@ class NodePermissionUtil:
         nodes_with_assets = dict()
         for node, system_users in nodes.items():
             nodes_with_assets[node] = {
-                'assets': node.get_active_assets(),
+                'assets': node.get_valid_assets(),
                 'system_users': system_users
             }
         return nodes_with_assets
@@ -274,7 +274,7 @@ class NodePermissionUtil:
         nodes_with_assets = dict()
         for node, system_users in nodes.items():
             nodes_with_assets[node] = {
-                'assets': node.get_active_assets(),
+                'assets': node.get_valid_assets(),
                 'system_users': system_users
             }
         return nodes_with_assets
