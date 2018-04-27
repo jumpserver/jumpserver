@@ -62,11 +62,13 @@ FAQ
       $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
       $ systemctl stop docker
       $ systemctl start docker
-      $ docker run —name jms_guacamole -d \
-         -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-         -e JUMPSERVER_SERVER=http://<填写jumpserver的IP地址>:8080 \
-         registry.jumpserver.org/public/guacamole:1.0.0
+      $ docker run --name jms_guacamole -d \
+        -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+        -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+        -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+        registry.jumpserver.org/public/guacamole:latest
+
+      # 如果registry.jumpserver.org/public/guacamole:latest下载很慢，可以换成jumpserver/guacamole:latest
 
       # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
       $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了

@@ -168,7 +168,7 @@
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 首次进入 coco 文件夹会有提示，按 y 即可
     # Are you sure you want to allow this? (y/N) y
@@ -235,11 +235,11 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     # 注意：这里一定要改写一下本机的IP地址, 否则会出错，带宽有限, 下载时间可能有点长，可以喝杯咖啡，别看对面了，你对面不是小姐姐。
 
-    $ docker run -d \
+    $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
-      registry.jumpserver.org/public/guacamole:1.0.0
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+      registry.jumpserver.org/public/guacamole:latest
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 

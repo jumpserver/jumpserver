@@ -202,7 +202,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 首次进入 coco 文件夹会有提示，按 y 即可
     # Are you sure you want to allow this? (y/N) y
@@ -288,7 +288,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写本机的IP地址>:8080 \
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
       registry.jumpserver.org/public/guacamole:1.0.0
 
 六. 配置 Nginx 整合各组件

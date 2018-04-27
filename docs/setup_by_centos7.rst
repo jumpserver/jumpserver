@@ -76,10 +76,10 @@ CentOS 7 安装文档
 
     # 下载 Jumpserver 与 Coco
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master && git pull
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
-    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master && git pull
+    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
@@ -98,7 +98,7 @@ CentOS 7 安装文档
     $ cp config_example.py config.py
     $ vi config.py
 
-    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对其，不要直接复制本文内容
+    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对齐，不要直接复制本文内容
 
     ...
     class Config:
@@ -246,8 +246,8 @@ CentOS 7 安装文档
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的地址> \
-      registry.jumpserver.org/public/guacamole:1.0.0
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+      registry.jumpserver.org/public/guacamole:latest
 
 ::
 
