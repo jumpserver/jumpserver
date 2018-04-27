@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from common.utils import get_signer, ssh_key_string_to_obj, ssh_key_gen
+from common.validators import alphanumeric
 from .utils import private_key_validator
 
 signer = get_signer()
@@ -18,7 +19,7 @@ signer = get_signer()
 class AssetUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=128, verbose_name=_('Username'))
+    username = models.CharField(max_length=32, verbose_name=_('Username'), validators=[alphanumeric])
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
