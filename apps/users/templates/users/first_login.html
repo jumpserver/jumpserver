@@ -70,6 +70,7 @@
                                   <br>
                                   <input type="checkbox" id="acceptTerms">
                                   <label for="acceptTerms" style="margin-top:20px">{% trans "I agree with the terms and conditions." %}</label>
+                                  <p id="noTerms" class="red-fonts" style="visibility: hidden; font-size: 10px; margin-top: 10px;">* {% trans 'Please choose the terms and conditions.' %}</p>
                               {% endif %}
 
                               {% bootstrap_form wizard.form %}
@@ -99,11 +100,7 @@
                         {% if wizard.steps.prev %}
                             <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "Previous" %}</a></li>
                         {% endif %}
-                        {#{% if wizard.steps.next %}#}
-                        {#<li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.next }}">{% trans "Next" %}</a></li>#}
-                        {#{% endif %}#}
-                        {#<li><a id="fl_submit">{% trans "Submit" %}</a></li>#}
-                        {#将原来的下一页-替换为提交；修复 每页都提交，最后才能成功问题#}
+
                         {% if wizard.steps.next %}
                             <li><a id="fl_submit" >{% trans "Next" %}</a></li>
                         {% else %}
@@ -124,16 +121,21 @@
 
 {% block custom_foot_js %}
 <script>
-    $('#id_2-otp_level div').eq(2).css('display', 'none');
-
     $(document).on('click', ".fl_goto", function(){
       var $form = $('#fl_form');
       $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
       $form.submit();
       return false;
     }).on('click', '#fl_submit', function(){
-      $('#fl_form').submit();
-      return false;
+        var isFinish = $('#fl_submit').html() === "{% trans 'Finish' %}";
+        var noChecked = !$('#acceptTerms').prop('checked');
+        if ( isFinish && noChecked){
+            $('#noTerms').css('visibility', 'visible');
+        }
+        else{
+            $('#fl_form').submit();
+            return false;
+        }
     }).on('click', '#btn-reset-pubkey', function () {
     var the_url = '{% url "users:user-pubkey-generate" %}';
     window.open(the_url, "_blank")

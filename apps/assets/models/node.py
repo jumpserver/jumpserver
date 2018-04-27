@@ -16,7 +16,7 @@ class Node(models.Model):
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
 
-    is_asset = False
+    is_node = True
 
     def __str__(self):
         return self.full_value

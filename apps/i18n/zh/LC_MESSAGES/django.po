@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-27 09:43+0800\n"
+"POT-Creation-Date: 2018-04-27 11:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:216
+#: assets/api/node.py:217
 msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
-#: assets/api/node.py:229
+#: assets/api/node.py:230
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
@@ -562,7 +562,6 @@ msgid "Select System Users"
 msgstr "选择系统用户"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:34
-#, fuzzy
 msgid "Enable-MFA"
 msgstr "启用MFA"
 
@@ -1921,7 +1920,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:263 users/views/login.py:311 users/views/user.py:64
+#: users/views/login.py:263 users/views/login.py:321 users/views/user.py:64
 #: users/views/user.py:79 users/views/user.py:99 users/views/user.py:155
 #: users/views/user.py:310 users/views/user.py:357 users/views/user.py:379
 msgid "Users"
@@ -2296,7 +2295,8 @@ msgstr ""
 "设置复杂密码，启用MFA认证）"
 
 #: users/forms.py:154 users/templates/users/first_login.html:48
-#: users/templates/users/first_login.html:110
+#: users/templates/users/first_login.html:107
+#: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
 
@@ -2447,11 +2447,15 @@ msgstr "首次登陆"
 msgid "I agree with the terms and conditions."
 msgstr "我同意条款和条件"
 
-#: users/templates/users/first_login.html:100
+#: users/templates/users/first_login.html:73
+msgid "Please choose the terms and conditions."
+msgstr "请选择同意条款和条件"
+
+#: users/templates/users/first_login.html:101
 msgid "Previous"
 msgstr "上一步"
 
-#: users/templates/users/first_login.html:108
+#: users/templates/users/first_login.html:105
 #: users/templates/users/login_otp.html:66
 #: users/templates/users/user_otp_authentication.html:22
 #: users/templates/users/user_otp_enable_bind.html:19
@@ -2900,7 +2904,7 @@ msgstr "密码不一致"
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:312
+#: users/views/login.py:322
 msgid "Login log list"
 msgstr "登录日志"
 
@@ -2948,8 +2952,4 @@ msgstr "MFA 解绑成功"
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
-#~ msgid "Step"
-#~ msgstr "Step"
 
-#~ msgid "Add asset"
-#~ msgstr "添加资产到节点"
