@@ -1774,6 +1774,10 @@ msgstr "添加节点"
 msgid "Join"
 msgstr "加入"
 
+#: perms/templates/perms/asset_permission_create_update.html:53
+msgid "Validity period"
+msgstr "有效期"
+
 #: perms/templates/perms/asset_permission_detail.html:66
 msgid "User count"
 msgstr "用户数量"
@@ -2295,7 +2299,6 @@ msgstr ""
 "设置复杂密码，启用MFA认证）"
 
 #: users/forms.py:154 users/templates/users/first_login.html:48
-#: users/templates/users/first_login.html:107
 #: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
