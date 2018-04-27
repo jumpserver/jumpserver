@@ -246,8 +246,8 @@ CentOS 7 安装文档
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的地址> \
-      registry.jumpserver.org/public/guacamole:1.0.0
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+      registry.jumpserver.org/public/guacamole:latest
 
 ::
 
