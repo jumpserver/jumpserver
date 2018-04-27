@@ -189,3 +189,10 @@ FAQ
         $ exit()
         $ cd /opt/jumpserver
         $ ./jms restart celery
+
+    (12). 修改登录超时时间（默认 10 秒）
+        $ vim /opt/coco/coco/proxy.py
+        $ vim /opt/coco/coco/connection.py
+
+        # 把 TIMEOUT = 10 修改成你想要的数字，两个文件都需要修改，单位为：秒
+        # TIMEOUT = 10 表示超时时间为10秒，可以自行修改。
