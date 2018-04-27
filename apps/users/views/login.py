@@ -278,6 +278,16 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     def get_form(self, step=None, data=None, files=None):
         form = super().get_form(step, data, files)
         form.instance = self.request.user
+
+        if isinstance(form, forms.UserMFAForm):
+            choices = form.fields["otp_level"].choices
+            if self.request.user.otp_force_enabled:
+                choices = [(k, v) for k, v in choices if k == 2]
+            else:
+                choices = [(k, v) for k, v in choices if k in [0, 1]]
+            form.fields["otp_level"].choices = choices
+            form.fields["otp_level"].initial = self.request.user.otp_level
+
         return form
 
 
