@@ -53,7 +53,7 @@ CentOS 7 安装文档
     > flush privileges;
 
     # 安装 Nginx ，用作代理服务器整合 Jumpserver 与各个组件
-    $ yum -y install redis
+    $ yum -y install nginx
     $ systemctl enable nginx
 
     # 下载编译 Python3.6.1
