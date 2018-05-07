@@ -265,8 +265,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 
     # 国内部分用户可能无法连接docker官网提供的源，这里提供阿里云的镜像节点供测试使用
-    $ yum-config-manager —add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-    $ rpm —import http://mirrors.aliyun.com/docker-ce/linux/centos/gpg
+    $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+    $ rpm --import http://mirrors.aliyun.com/docker-ce/linux/centos/gpg
     $ yum makecache fast
     $ yum -y install docker-ce
 

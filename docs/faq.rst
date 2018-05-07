@@ -189,3 +189,23 @@ FAQ
         $ exit()
         $ cd /opt/jumpserver
         $ ./jms restart celery
+
+    (12). 修改登录超时时间（默认 10 秒）
+        $ vim /opt/coco/coco/proxy.py
+        $ vim /opt/coco/coco/connection.py
+
+        # 把 TIMEOUT = 10 修改成你想要的数字，两个文件都需要修改，单位为：秒
+        # TIMEOUT = 10 表示超时时间为10秒，可以自行修改。
+
+    (13). 升级提示 Table 'xxx' already exists（可用以下命令检查，如果显示内容不一致则无法升级）
+        # cd /opt/jumpserver/apps
+        # python manage.py makemigrations
+        # python manage.py migrate --fake
+        # find . | grep migrations | grep apps | grep -v 'pyc' | grep -v '__init__'
+        # 把这里的内容和下面数据库查询的内容对比
+
+        # mysql -uroot
+        > use jumpserver;
+        > select * from django_migrations;
+        # 如果对比结果不一样则无法升级
+        > quit;
