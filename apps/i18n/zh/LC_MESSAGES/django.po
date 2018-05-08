@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-27 11:39+0800\n"
+"POT-Creation-Date: 2018-05-08 17:24+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/api/node.py:88
+#: assets/api/node.py:96
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:217
+#: assets/api/node.py:225
 msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
-#: assets/api/node.py:230
+#: assets/api/node.py:238
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
@@ -46,7 +46,7 @@ msgstr "管理用户"
 #: assets/forms/asset.py:30 assets/forms/asset.py:69 assets/forms/asset.py:125
 #: assets/templates/assets/asset_create.html:35
 #: assets/templates/assets/asset_create.html:37
-#: assets/templates/assets/asset_list.html:75
+#: assets/templates/assets/asset_list.html:74
 #: assets/templates/assets/asset_update.html:40
 #: assets/templates/assets/asset_update.html:42
 #: assets/templates/assets/user_asset_list.html:34
@@ -206,7 +206,7 @@ msgstr "高优先级的系统用户将会作为默认登录用户"
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/admin_user_assets.html:52
 #: assets/templates/assets/asset_detail.html:61
-#: assets/templates/assets/asset_list.html:87
+#: assets/templates/assets/asset_list.html:86
 #: assets/templates/assets/domain_gateway_list.html:57
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:46 common/forms.py:144
@@ -220,7 +220,7 @@ msgstr "IP"
 #: assets/models/asset.py:62 assets/templates/assets/_asset_list_modal.html:45
 #: assets/templates/assets/admin_user_assets.html:51
 #: assets/templates/assets/asset_detail.html:57
-#: assets/templates/assets/asset_list.html:86
+#: assets/templates/assets/asset_list.html:85
 #: assets/templates/assets/system_user_asset.html:49
 #: assets/templates/assets/user_asset_list.html:45 common/forms.py:143
 #: perms/templates/perms/asset_permission_asset.html:54
@@ -650,7 +650,7 @@ msgstr "重置"
 #: assets/templates/assets/admin_user_create_update.html:46
 #: assets/templates/assets/asset_bulk_update.html:24
 #: assets/templates/assets/asset_create.html:67
-#: assets/templates/assets/asset_list.html:108
+#: assets/templates/assets/asset_list.html:107
 #: assets/templates/assets/asset_update.html:71
 #: assets/templates/assets/domain_create_update.html:17
 #: assets/templates/assets/gateway_create_update.html:59
@@ -699,7 +699,6 @@ msgstr "资产列表"
 
 #: assets/templates/assets/admin_user_assets.html:54
 #: assets/templates/assets/admin_user_list.html:26
-#: assets/templates/assets/asset_list.html:90
 #: assets/templates/assets/system_user_asset.html:52
 #: assets/templates/assets/system_user_list.html:30
 #: users/templates/users/user_group_granted_asset.html:47
@@ -728,7 +727,7 @@ msgstr "测试"
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:85
 #: assets/templates/assets/asset_detail.html:24
-#: assets/templates/assets/asset_list.html:170
+#: assets/templates/assets/asset_list.html:174
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
 #: assets/templates/assets/domain_gateway_list.html:85
@@ -752,7 +751,7 @@ msgstr "更新"
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:86
 #: assets/templates/assets/asset_detail.html:28
-#: assets/templates/assets/asset_list.html:171
+#: assets/templates/assets/asset_list.html:175
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
 #: assets/templates/assets/domain_gateway_list.html:86
@@ -783,7 +782,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-#: assets/templates/assets/asset_list.html:600
+#: assets/templates/assets/asset_list.html:634
 #: assets/templates/assets/system_user_detail.html:183
 #: assets/templates/assets/system_user_list.html:138 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
@@ -815,7 +814,7 @@ msgid "Ratio"
 msgstr "比例"
 
 #: assets/templates/assets/admin_user_list.html:30
-#: assets/templates/assets/asset_list.html:91
+#: assets/templates/assets/asset_list.html:90
 #: assets/templates/assets/domain_gateway_list.html:62
 #: assets/templates/assets/domain_list.html:18
 #: assets/templates/assets/label_list.html:17
@@ -856,7 +855,7 @@ msgid "Quick modify"
 msgstr "快速修改"
 
 #: assets/templates/assets/asset_detail.html:143
-#: assets/templates/assets/asset_list.html:89
+#: assets/templates/assets/asset_list.html:88
 #: assets/templates/assets/user_asset_list.html:47 perms/models.py:35
 #: perms/models.py:79
 #: perms/templates/perms/asset_permission_create_update.html:47
@@ -886,89 +885,97 @@ msgstr "刷新"
 msgid "Update successfully!"
 msgstr "更新成功"
 
-#: assets/templates/assets/asset_list.html:63 assets/views/asset.py:97
+#: assets/templates/assets/asset_list.html:62 assets/views/asset.py:97
 msgid "Create asset"
 msgstr "创建资产"
 
-#: assets/templates/assets/asset_list.html:67
+#: assets/templates/assets/asset_list.html:66
 #: users/templates/users/user_list.html:7
 msgid "Import"
 msgstr "导入"
 
-#: assets/templates/assets/asset_list.html:70
+#: assets/templates/assets/asset_list.html:69
 #: users/templates/users/user_list.html:10
 msgid "Export"
 msgstr "导出"
 
-#: assets/templates/assets/asset_list.html:88
+#: assets/templates/assets/asset_list.html:87
 msgid "Hardware"
 msgstr "硬件"
 
-#: assets/templates/assets/asset_list.html:100
+#: assets/templates/assets/asset_list.html:99
 #: users/templates/users/user_list.html:37
 msgid "Delete selected"
 msgstr "批量删除"
 
-#: assets/templates/assets/asset_list.html:101
+#: assets/templates/assets/asset_list.html:100
 #: users/templates/users/user_list.html:38
 msgid "Update selected"
 msgstr "批量更新"
 
-#: assets/templates/assets/asset_list.html:102
+#: assets/templates/assets/asset_list.html:101
 msgid "Remove from this node"
 msgstr "从节点移除"
 
-#: assets/templates/assets/asset_list.html:103
+#: assets/templates/assets/asset_list.html:102
 #: users/templates/users/user_list.html:39
 msgid "Deactive selected"
 msgstr "禁用所选"
 
-#: assets/templates/assets/asset_list.html:104
+#: assets/templates/assets/asset_list.html:103
 #: users/templates/users/user_list.html:40
 msgid "Active selected"
 msgstr "激活所选"
 
-#: assets/templates/assets/asset_list.html:121
+#: assets/templates/assets/asset_list.html:120
 msgid "Add node"
 msgstr "新建节点"
 
-#: assets/templates/assets/asset_list.html:122
+#: assets/templates/assets/asset_list.html:121
 msgid "Rename node"
 msgstr "重命名节点"
 
-#: assets/templates/assets/asset_list.html:123
+#: assets/templates/assets/asset_list.html:122
 msgid "Delete node"
 msgstr "删除节点"
 
-#: assets/templates/assets/asset_list.html:125
+#: assets/templates/assets/asset_list.html:124
 msgid "Add assets to node"
 msgstr "添加资产到节点"
 
-#: assets/templates/assets/asset_list.html:126
+#: assets/templates/assets/asset_list.html:125
 msgid "Move assets to node"
 msgstr "移动资产到节点"
 
-#: assets/templates/assets/asset_list.html:128
+#: assets/templates/assets/asset_list.html:127
 msgid "Refresh node hardware info"
 msgstr "更新节点资产硬件信息"
 
-#: assets/templates/assets/asset_list.html:129
+#: assets/templates/assets/asset_list.html:128
 msgid "Test node connective"
 msgstr "测试节点资产可连接性"
 
-#: assets/templates/assets/asset_list.html:204
+#: assets/templates/assets/asset_list.html:130
+msgid "Display only current node assets"
+msgstr "仅显示当前节点资产"
+
+#: assets/templates/assets/asset_list.html:131
+msgid "Displays all child node assets"
+msgstr "显示所有子节点资产"
+
+#: assets/templates/assets/asset_list.html:215
 msgid "Create node failed"
 msgstr "创建节点失败"
 
-#: assets/templates/assets/asset_list.html:216
+#: assets/templates/assets/asset_list.html:227
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:218
+#: assets/templates/assets/asset_list.html:229
 msgid "Have assets, cancel"
 msgstr "存在资产，不能删除"
 
-#: assets/templates/assets/asset_list.html:595
+#: assets/templates/assets/asset_list.html:629
 #: assets/templates/assets/system_user_list.html:133
 #: users/templates/users/user_detail.html:357
 #: users/templates/users/user_detail.html:382
@@ -977,20 +984,20 @@ msgstr "存在资产，不能删除"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:596
+#: assets/templates/assets/asset_list.html:630
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:604
+#: assets/templates/assets/asset_list.html:638
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:605
-#: assets/templates/assets/asset_list.html:610
+#: assets/templates/assets/asset_list.html:639
+#: assets/templates/assets/asset_list.html:644
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:609
+#: assets/templates/assets/asset_list.html:643
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
