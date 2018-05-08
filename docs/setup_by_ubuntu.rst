@@ -203,9 +203,10 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
-    $ /opt/
-    $ wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ cd /opt/
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.0/dist.tar.gz
+    $ tar xvf dist.tar.gz
+    $ mv dist luna
     $ chown -R root:root luna/
     $ ls /opt/luna
     ...
@@ -233,7 +234,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get update
     $ apt-get install docker-ce
 
-    # 注意：这里一定要改写一下本机的IP地址, 否则会出错，带宽有限, 下载时间可能有点长，可以喝杯咖啡，别看对面了，你对面不是小姐姐。
+    # 注意：这里一定要改下面命令的 jumpserver url 地址
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \

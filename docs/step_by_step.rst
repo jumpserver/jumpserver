@@ -241,8 +241,9 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ pwd
     /opt/
 
-    $ wget https://github.com/jumpserver/luna/releases/download/v1.0.0/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.0/dist.tar.gz
+    $ tar xvf dist.tar.gz
+    $ mv dist luna
     $ ls /opt/luna
     ...
 
@@ -277,7 +278,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
-修改 JUMPSERVER_SERVER 环境变量的配置，填上 Jumpserver 的内网地址, 启动成功后去
+修改下面 docker run 里的 JUMPSERVER_SERVER 参数，填上 Jumpserver 的 url 地址, 启动成功后去
 Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册，如果页面显示不正常可以等部署完成后再处理
 
 .. code:: shell
