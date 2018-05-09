@@ -96,7 +96,7 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
-        if auto_generate_key:
+        if auto_generate_key and not password:
             logger.info('Auto generate key and set system user auth')
             system_user.auto_gen_auth()
         else:

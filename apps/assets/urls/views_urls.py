@@ -16,6 +16,10 @@ urlpatterns = [
     url(r'^asset/(?P<pk>[0-9a-zA-Z\-]{36})/delete/$', views.AssetDeleteView.as_view(), name='asset-delete'),
     url(r'^asset/update/$', views.AssetBulkUpdateView.as_view(), name='asset-bulk-update'),
 
+    # asset more details by litian 20180409
+    url(r'^asset/(?P<asset_id>[0-9a-zA-Z\-]{36})/more_detail/(?P<node>[0-9]+)$', views.asset_more_detail_view, name='asset-more-detail'),
+    url(r'^asset/(?P<asset_id>[0-9a-zA-Z\-]{36})/more_detail/update$', views.asset_more_detail_update, name='asset-more-detail-update'),
+
     # User asset view
     url(r'^user-asset/$', views.UserAssetListView.as_view(), name='user-asset-list'),
 

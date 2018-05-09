@@ -13,22 +13,22 @@ from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib.messages.views import SuccessMessageMixin
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
+from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain, AssetMoreDetail
 from ..hands import AdminUserRequiredMixin
 
 
@@ -36,6 +36,7 @@ __all__ = [
     'AssetListView', 'AssetCreateView', 'AssetUpdateView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
     'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
+    'asset_more_detail_view', 'asset_more_detail_update',
 ]
 logger = get_logger(__file__)
 
@@ -200,6 +201,61 @@ class AssetDetailView(DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+def asset_more_detail_view(request, asset_id, node):
+    asset = get_object_or_404(Asset, id=asset_id)
+    try:
+        asset_more_detail = AssetMoreDetail.objects.get(asset_id=asset_id, node=node)
+    except Exception as e:
+        asset_more_detail = ''
+    lists = {
+        'asset': asset,
+        'asset_more_detail': asset_more_detail,
+        'node': node,
+    }
+    return render(request, 'assets/asset_more_detail.html', lists)
+
+
+def asset_more_detail_update(request, asset_id):
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    node = request.POST['node']
+    project = request.POST['project']
+    manage = request.POST['manage']
+    app_path = request.POST['app_path']
+    app_name = request.POST['app_name']
+    app_data_path = request.POST['app_data_path']
+    app_port = request.POST['app_port']
+    broadband = request.POST['broadband']
+    public_ip = request.POST['public_ip']
+    use_date = request.POST['use_date']
+    status = request.POST['status']
+
+    try:
+        asset_detail = AssetMoreDetail.objects.get(asset_id=asset_id, node=node)
+    except AssetMoreDetail.DoesNotExist:
+        asset_detail = ''
+    if asset_detail:
+        asset_detail.project = project
+        asset_detail.manage = manage
+        asset_detail.app_path = app_path
+        asset_detail.app_name = app_name
+        asset_detail.app_data_path = app_data_path
+        asset_detail.app_port = app_port
+        asset_detail.broadband = broadband
+        asset_detail.public_ip = public_ip
+        asset_detail.use_date = use_date
+        asset_detail.status = status
+    else:
+        asset_detail = AssetMoreDetail(asset_id=asset, node=node, project=project, manage=manage, app_path=app_path,
+                                       app_name=app_name, app_data_path=app_data_path, app_port=app_port,
+                                       broadband=broadband, public_ip=public_ip, use_date=use_date, status=status)
+    try:
+        asset_detail.save()
+    except Exception as e:
+        print(str(e))
+    return redirect('assets:asset-more-detail', asset_id, node)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
