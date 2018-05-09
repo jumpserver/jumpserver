@@ -290,7 +290,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      registry.jumpserver.org/public/guacamole:1.0.0
+      registry.jumpserver.org/public/guacamole:latest
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
