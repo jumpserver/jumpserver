@@ -104,6 +104,11 @@ class AssetUser(models.Model):
         if update_fields:
             self.save(update_fields=update_fields)
 
+    def clear_auth(self):
+        self._password = ''
+        self._private_key = ''
+        self.save()
+
     def auto_gen_auth(self):
         password = str(uuid.uuid4())
         private_key, public_key = ssh_key_gen(
