@@ -211,6 +211,8 @@ function addTreeNode() {
             };
             newNode.checked = zTree.getSelectedNodes()[0].checked;
             zTree.addNodes(parentNode, 0, newNode);
+            var node = zTree.getNodeByParam('id', newNode.id, parentNode)
+            zTree.editName(node);
         } else {
             alert("{% trans 'Create node failed' %}")
         }
@@ -241,9 +243,9 @@ function removeTreeNode() {
 
 function editTreeNode() {
     hideRMenu();
-	var current_node = zTree.getSelectedNodes()[0];
-	if (!current_node){
-	    return
+    var current_node = zTree.getSelectedNodes()[0];
+    if (!current_node){
+        return
     }
     if (current_node.value) {
         current_node.name = current_node.value;
@@ -398,9 +400,9 @@ function initTree() {
     $.get("{% url 'api-assets:node-list' %}", query_params, function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
-            {#if (value["key"] === "0") {#}
-            value["open"] = true;
-            {# }#}
+            if (value["key"] === "0") {
+                value["open"] = true;
+             }
             value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
             value['value'] = value['value'];
         });

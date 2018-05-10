@@ -45,16 +45,15 @@ class NodeViewSet(BulkModelViewSet):
 
     def get_serializer_class(self):
         show_current_asset = self.request.query_params.get('show_current_asset')
-        print(show_current_asset)
         if show_current_asset:
             return serializers.NodeCurrentSerializer
         else:
             return serializers.NodeSerializer
 
-    def perform_create(self, serializer):
-        child_key = Node.root().get_next_child_key()
-        serializer.validated_data["key"] = child_key
-        serializer.save()
+    # def perform_create(self, serializer):
+    #     child_key = Node.root().get_next_child_key()
+    #     serializer.validated_data["key"] = child_key
+    #     serializer.save()
 
 
 class NodeWithAssetsApi(generics.ListAPIView):
@@ -91,16 +90,27 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     serializer_class = serializers.NodeSerializer
     instance = None
 
+    def counter(self):
+        values = [
+            child.value[child.value.rfind(' '):]
+            for child in self.get_object().get_children()
+            if child.value.startswith("新节点 ")
+        ]
+        values = [int(value) for value in values if value.strip().isdigit()]
+        count = max(values)+1 if values else 1
+        return count
+
     def post(self, request, *args, **kwargs):
         if not request.data.get("value"):
-            request.data["value"] = _("New node {}").format(
-                Node.root().get_next_child_key().split(":")[-1]
-            )
+            request.data["value"] = _("New node {}").format(self.counter())
         return super().post(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         instance = self.get_object()
         value = request.data.get("value")
+        values = [child.value for child in instance.get_children()]
+        if value in values:
+            raise AssertionError('The same level node name cannot be the same')
         node = instance.create_child(value=value)
         return Response(
             {"id": node.id, "key": node.key, "value": node.value},
@@ -198,6 +208,9 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         assets = serializer.validated_data.get('assets')
         instance = self.get_object()
         if instance != Node.root():
+            instance.assets.remove(*tuple(assets))
+        else:
+            assets = [asset for asset in assets if asset.nodes.count() > 1]
             instance.assets.remove(*tuple(assets))
 
 
