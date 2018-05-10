@@ -12,7 +12,10 @@ __all__ = ['Node']
 class Node(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
-    value = models.CharField(max_length=128, unique=True, verbose_name=_("Value"))
+    # value = models.CharField(
+    #     max_length=128, unique=True, verbose_name=_("Value")
+    # )
+    value = models.CharField(max_length=128, verbose_name=_("Value"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
 
@@ -48,7 +51,7 @@ class Node(models.Model):
         return child
 
     def get_children(self):
-        return self.__class__.objects.filter(key__regex=r'{}:[0-9]+$'.format(self.key))
+        return self.__class__.objects.filter(key__regex=r'^{}:[0-9]+$'.format(self.key))
 
     def get_all_children(self):
         return self.__class__.objects.filter(key__startswith='{}:'.format(self.key))
@@ -73,6 +76,11 @@ class Node(models.Model):
         else:
             nodes = self.get_family()
             assets = Asset.objects.filter(nodes__in=nodes).distinct()
+        return assets
+
+    def get_current_assets(self):
+        from .asset import Asset
+        assets = Asset.objects.filter(nodes=self).distinct()
         return assets
 
     def has_assets(self):
