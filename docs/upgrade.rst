@@ -5,7 +5,10 @@
 
 ::
 
-    $ git pull && pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
+    # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可
+    $ git pull
+    $ pip install -r requirements/requirements.txt  # 如果使用其他源下载失败可以使用 -i 参数指定源
+    $ cd utils && sh make_migrations.sh
 
     # 1.0.x 升级 1.2.0 需要执行迁移脚本（新版本授权管理更新）
     $ sh 2018_04_11_migrate_permissions.sh
@@ -14,15 +17,21 @@
 
 ::
 
-
+    # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可
     $ git pull && pip install -r requirements/requirements.txt
 
     # 如果使用其他源下载失败可以使用 -i 参数指定源
-    $ git pull && pip install -r requirements/requirements.txt -i https://pypi.org/simple
+    $ pip install -r requirements/requirements.txt -i https://pypi.org/simple
 
 3. 升级 Luna
 
 重新下载 release 包（https://github.com/jumpserver/luna/releases）
+
+::
+
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.0/dist.tar.gz
+    $ tar xvf dist.tar.gz
+    $ mv dist luna
 
 4. 升级 guacamole
 
@@ -62,11 +71,13 @@
 
 ::
 
+
   $ mysqldump -u你的数据库账号 -h数据库地址 -p 数据库名称 > $jumpserver_backup/db_backup.sql
 
 3. 切换分支或下载离线包, 更新代码
 
 ::
+
 
    $ cd /opt
    $ mv jumpserver jumpserver_bak
@@ -77,6 +88,7 @@
 4. 还原录像文件
 
 ::
+
 
    $ cp -r $jumpserver_backup/media/* data/media/
 

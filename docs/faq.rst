@@ -209,3 +209,11 @@ FAQ
         > select * from django_migrations;
         # 如果对比结果不一样则无法升级
         > quit;
+
+    (14). 设置浏览器过期
+        $ vim /opt/jumpserver/apps/jumpserver/settings.py
+
+        # 找到如下行，注释（可参考 django 设置 session 过期时间）
+        # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+        # 如下，设置关闭浏览器 cookie 失效
+        # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
