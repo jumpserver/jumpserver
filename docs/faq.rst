@@ -217,3 +217,11 @@ FAQ
         # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
         # 如下，设置关闭浏览器 cookie 失效
         # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    (15.) 测试连接、推送、硬件刷新一直显示.....................
+        # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
+        $ cat /etc/locale.conf
+        # 如果不是，请修改
+        $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+        $ export LC_ALL=zh_CN.UTF-8
+        $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
