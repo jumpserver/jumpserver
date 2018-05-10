@@ -124,3 +124,6 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
 class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
     template_name = 'ops/celery_task_log.html'
     model = CeleryTask
+
+    def get_object(self, queryset=None):
+        return CeleryTask(id="4cae9ad8-1116-45e7-b019-9b1856696fd7")
