@@ -19,14 +19,8 @@ Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点�
 ----
 
 ### 功能
-  - 统一认证
-  - 资产管理
-  - 统一授权
-  - 审计
-  - 支持LDAP认证
-  - Web terminal
-  - SSH Server
-  - 支持Windows RDP
+  
+ ![Jumpserver功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver13.jpg "Jumpserver功能")
 
 ### 开始使用
 
