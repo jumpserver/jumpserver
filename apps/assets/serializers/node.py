@@ -51,14 +51,17 @@ class NodeSerializer(serializers.ModelSerializer):
         fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
         list_serializer_class = BulkListSerializer
 
-    def update(self, instance, validated_data):
-        value = validated_data.get('value')
+    def validate(self, data):
+        value = data.get('value')
+        instance = self.instance
         if not instance.is_root():
             children = instance.parent.get_children().exclude(key=instance.key)
             values = [child.value for child in children]
             if value in values:
-                raise AssertionError('The same level node name cannot be the same')
-        return super().update(instance, validated_data)
+                raise serializers.ValidationError(
+                    'The same level node name cannot be the same'
+                )
+        return data
 
     @staticmethod
     def get_parent(obj):

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from rest_framework import generics, mixins
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -110,7 +111,9 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         value = request.data.get("value")
         values = [child.value for child in instance.get_children()]
         if value in values:
-            raise AssertionError('The same level node name cannot be the same')
+            raise ValidationError(
+                'The same level node name cannot be the same'
+            )
         node = instance.create_child(value=value)
         return Response(
             {"id": node.id, "key": node.key, "value": node.value},
