@@ -70,13 +70,6 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
     end = False
     queryset = CeleryTask.objects.all()
 
-    def get_object(self):
-        return CeleryTask(
-            id="4cae9ad8-1116-45e7-b019-9b1856696fd7",
-            log_path="2018-05-10/ca77e6db-9ac6-4970-80d1-eecdbcc3fcc5.log",
-            status="finished"
-        )
-
     def get(self, request, *args, **kwargs):
         mark = request.query_params.get("mark") or str(uuid.uuid4())
         task = self.get_object()
