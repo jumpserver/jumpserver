@@ -190,7 +190,7 @@
                                                 <td colspan="2" class="no-borders">
                                                     <select data-placeholder="{% trans 'Nodes' %}" id="groups_selected" class="select2 groups" style="width: 100%" multiple="" tabindex="4">
                                                         {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.name }}</option>
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -204,7 +204,7 @@
 
                                         {% for node in asset.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.name }}</b></td>
+                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn-leave-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
