@@ -184,8 +184,9 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         for node in children:
             if not node:
                 continue
-            node.parent = instance
-            node.save()
+            # node.parent = instance
+            # node.save()
+            node.move(instance)
         return Response("OK")
 
 
