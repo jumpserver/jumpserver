@@ -18,7 +18,7 @@
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # CentOS6
     $ setenforce 0
@@ -138,6 +138,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ mysql
     > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'somepassword';
+    > flush privileges;
 
 **2.7 修改 Jumpserver 配置文件**
 

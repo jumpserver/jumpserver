@@ -23,6 +23,10 @@
     $ apt-get update && apt-get -y upgrade
     $ apt-get -y install wget libkrb5-dev libsqlite3-dev gcc make automake libssl-dev zlib1g-dev libmysqlclient-dev libffi-dev git
 
+    # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
+    $ apt-get install language-pack-zh-hans
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
+
 **1.2 编译安装**
 
 ::
