@@ -93,12 +93,16 @@ FAQ
     # Centos7
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # Centos6
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/sysconfig/i18n
+
+    # Ubuntu
+    $ apt-get install language-pack-zh-hanscd
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
 
     如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
 
@@ -213,10 +217,12 @@ FAQ
     (14). 设置浏览器过期
         $ vim /opt/jumpserver/apps/jumpserver/settings.py
 
-        # 找到如下行，注释（可参考 django 设置 session 过期时间）
+        # 找到如下行，注释（可参考 django 设置 session 过期时间），修改或者新增你要的设置即可
         # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
-        # 如下，设置关闭浏览器 cookie 失效
-        # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+        # 如下，设置关闭浏览器 cookie 失效，则修改为
+        # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
     (15.) 测试连接、推送、硬件刷新一直显示.....................
         # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
