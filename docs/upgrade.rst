@@ -43,7 +43,7 @@
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写Jumpserver服务器的IP地址>:8080 \
+      -e JUMPSERVER_SERVER=http://<填写Jumpserver的url地址> \
       registry.jumpserver.org/public/guacamole:latest
 
     # 确定升级完成后，可以删除备份容器
@@ -58,19 +58,24 @@
 
 说明: 如果是新开的终端，别忘了 source /opt/py3/bin/activate
 
-1. 备份jumpserver
+1. 备份jumpserver数据库表结构及录像文件
 
 ::
 
     $ jumpserver_backup=/tmp/jumpserver_backup
     $ mkdir -p $jumpserver_backup
     $ cd /opt/jumpservrer
-    $ cp -r ./ $jumpserver_backup
+    $ cp config.py $jumpserver_backup
+    $ cp -r data/media $jumpserver_backup/
+
+    $ for app in audits common users assets ops perms terminal;do
+        mkdir -p $jumpserver_backup/${app}_migrations
+        cp apps/${app}/migrations/*.py $jumpserver_backup/${app}_migrations
+      done
 
 2. 备份数据库，已被不时之需
 
 ::
-
 
   $ mysqldump -u你的数据库账号 -h数据库地址 -p 数据库名称 > $jumpserver_backup/db_backup.sql
 
@@ -78,18 +83,21 @@
 
 ::
 
-
    $ cd /opt
    $ mv jumpserver jumpserver_bak
    $ git clone https://github.com/jumpserver/jumpserver.git
    $ cd jumpserver && git checkout master  # or other branch
    $ git pull
 
-4. 还原录像文件
+4. 还原数据库表结构文件及录像文件
 
 ::
 
+   $ for app in audits common users assets ops perms terminal;do
+       cp $jumpserver_backup/${app}_migrations/*.py apps/${app}/migrations/
+     done
 
+   $ cp $jumpserver_backup/config.py .
    $ cp -r $jumpserver_backup/media/* data/media/
 
 5. 更新依赖或表结构
