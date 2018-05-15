@@ -51,10 +51,10 @@ class NodeViewSet(BulkModelViewSet):
         else:
             return serializers.NodeSerializer
 
-    # def perform_create(self, serializer):
-    #     child_key = Node.root().get_next_child_key()
-    #     serializer.validated_data["key"] = child_key
-    #     serializer.save()
+    def perform_create(self, serializer):
+        child_key = Node.root().get_next_child_key()
+        serializer.validated_data["key"] = child_key
+        serializer.save()
 
 
 class NodeWithAssetsApi(generics.ListAPIView):
