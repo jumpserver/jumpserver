@@ -186,7 +186,7 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
                 continue
             # node.parent = instance
             # node.save()
-            node.move(instance)
+            node.set_parent(instance)
         return Response("OK")
 
 

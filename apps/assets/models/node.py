@@ -39,7 +39,7 @@ class Node(models.Model):
     def level(self):
         return len(self.key.split(':'))
 
-    def move(self, instance):
+    def set_parent(self, instance):
         children = self.get_all_children()
         old_key = self.key
         with transaction.atomic():

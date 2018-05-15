@@ -87,6 +87,16 @@
         var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
         var shell_id = '#' + '{{ form.shell.id_for_label }}';
 
+        var div_auto_generate_key = $(auto_generate_key).parent().parent();
+        var div_ssh_private_key = $(private_key_id).parent().parent().parent().parent();
+        var div_auto_push = $(auto_push_id).parent().parent();
+        var div_sudo = $(sudo_id).parent().parent();
+        var div_shell = $(shell_id).parent().parent();
+        var need_change_div = [
+            div_auto_generate_key, div_ssh_private_key,
+            div_auto_push, div_sudo, div_shell
+        ];
+
         function authFieldsDisplay() {
             if ($(auto_generate_key).prop('checked')) {
                 $('.auth-fields').addClass('hidden');
@@ -96,16 +106,6 @@
         }
 
         function protocolChange() {
-            var div_auto_generate_key = $(auto_generate_key).parent().parent();
-            var div_ssh_private_key = $(private_key_id).parent().parent().parent().parent();
-            var div_auto_push = $(auto_push_id).parent().parent();
-            var div_sudo = $(sudo_id).parent().parent();
-            var div_shell = $(shell_id).parent().parent();
-            var need_change_div = [
-                div_auto_generate_key, div_ssh_private_key,
-                div_auto_push, div_sudo, div_shell
-            ];
-
             if ($(protocol_id + " option:selected").text() === 'rdp') {
                 $('.auth-fields').removeClass('hidden');
                 $.each(need_change_div, function (index, value) {
