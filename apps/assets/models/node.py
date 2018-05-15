@@ -2,7 +2,7 @@
 #
 import uuid
 
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -38,6 +38,16 @@ class Node(models.Model):
     @property
     def level(self):
         return len(self.key.split(':'))
+
+    def set_parent(self, instance):
+        children = self.get_all_children()
+        old_key = self.key
+        with transaction.atomic():
+            self.parent = instance
+            for child in children:
+                child.key = child.key.replace(old_key, self.key, 1)
+                child.save()
+            self.save()
 
     def get_next_child_key(self):
         mark = self.child_mark
