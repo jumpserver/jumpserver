@@ -53,14 +53,13 @@ class NodeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         value = data.get('value')
-        instance = self.instance
-        if not instance.is_root():
-            children = instance.parent.get_children().exclude(key=instance.key)
-            values = [child.value for child in children]
-            if value in values:
-                raise serializers.ValidationError(
-                    'The same level node name cannot be the same'
-                )
+        instance = self.instance if self.instance else Node.root()
+        children = instance.parent.get_children().exclude(key=instance.key)
+        values = [child.value for child in children]
+        if value in values:
+            raise serializers.ValidationError(
+                'The same level node name cannot be the same'
+            )
         return data
 
     @staticmethod
