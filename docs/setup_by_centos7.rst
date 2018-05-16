@@ -70,14 +70,17 @@ CentOS 7 安装文档
     (py3) [root@localhost py3]
 
     # 自动载入 Python3 虚拟环境
-    $ git clone git://github.com/kennethreitz/autoenv.git ~/.autoenv
-    $ echo 'source ~/.autoenv/activate.sh' >> ~/.bashrc
+    $ cd /opt
+    $ git clone git://github.com/kennethreitz/autoenv.git
+    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
     $ source ~/.bashrc
 
     # 下载 Jumpserver 与 Coco
     $ cd /opt/
     $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master && git pull
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
+
+    $ cd /opt/
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master && git pull
     $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 

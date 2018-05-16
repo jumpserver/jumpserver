@@ -24,3 +24,12 @@
    :maxdepth: 1
 
    CentOS 7 安装文档 <setup_by_centos7.rst>
+
+进阶文档
+~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   CentOS 7 之分布式部署 Jumpserver 文档
+   01 环境准备 <distributed_01.rst>
