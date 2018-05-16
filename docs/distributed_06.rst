@@ -1,0 +1,39 @@
+分布式部署文档 - guacamole 部署
+----------------------------------------------------
+
+说明
+~~~~~~~
+-  # 开头的行表示注释
+-  $ 开头的行表示需要执行的命令
+
+本文档适用于有一定web运维经验的管理员或者工程师，文中不会对安装的软件做过多的解释，仅对需要执行的内容注部分注释，更详细的内容请参考一步一步安装。
+
+环境
+~~~~~~~
+
+-  系统: CentOS 7
+-  IP: 192.168.100.13
+
+开始安装
+~~~~~~~~~~~~
+
+::
+
+    # 升级系统
+    $ yum upgrade -y
+
+    # 安装依赖包
+    $ yum install -y yum-utils device-mapper-persistent-data lvm2
+
+    # 安装 docker（192.168.100.100 是 jumpserver 的 url 地址）
+    $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    $ yum makecache fast
+    $ yum install docker-ce
+    $ systemctl start docker
+    $ docker run --name jms_guacamole -d \
+      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+      -e JUMPSERVER_SERVER=http://192.168.100.100 \
+      jumpserver/guacamole:latest
+
+    # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册

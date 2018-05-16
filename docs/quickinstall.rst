@@ -25,11 +25,15 @@
 
    CentOS 7 安装文档 <setup_by_centos7.rst>
 
-进阶文档
+分布式部署文档
 ~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
 
-   CentOS 7 之分布式部署 Jumpserver 文档
-   01 环境准备 <distributed_01.rst>
+   1. 环境说明 <distributed_01.rst>
+   2. 数据库 部署 <distributed_02.rst>
+   3. nginx 代理部署 <distributed_03.rst>
+   4. jumpserver 部署 <distributed_04.rst>
+   5. coco 部署 <distributed_05.rst>
+   6. guacamole 部署 <distributed_06.rst>
