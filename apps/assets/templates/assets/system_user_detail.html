@@ -66,12 +66,12 @@
                                             <td>{% trans 'Protocol' %}:</td>
                                             <td><b id="id_protocol_type">{{ system_user.protocol }}</b></td>
                                         </tr>
-                                        <tr id="id_sudo">
+                                        <tr class="only-ssh">
                                             <td>{% trans 'Sudo' %}:</td>
                                             <td><b>{{ system_user.sudo }}</b></td>
                                         </tr>
                                         {% if system_user.shell %}
-                                        <tr id="id_shell">
+                                        <tr class="only-ssh">
                                             <td>{% trans 'Shell' %}:</td>
                                             <td><b>{{ system_user.shell }}</b></td>
                                         </tr>
@@ -107,7 +107,7 @@
                         </div>
 
                         <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-primary" id="id_quick_update">
+                            <div class="panel panel-primary only-ssh">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
                                 </div>
@@ -237,11 +237,8 @@ function updateSystemUserNode(nodes) {
 jumpserver.nodes_selected = {};
 $(document).ready(function () {
     if($('#id_protocol_type').text() === 'rdp'){
-        $('#id_quick_update').addClass('hidden');
-        $('#id_sudo').addClass('hidden');
-        $('#id_shell').addClass('hidden');
+        $('.only-ssh').addClass('hidden')
     }
-
     $('.select2').select2()
     .on('select2:select', function(evt) {
             var data = evt.params.data;

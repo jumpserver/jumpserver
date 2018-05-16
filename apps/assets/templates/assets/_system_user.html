@@ -79,59 +79,50 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
-        var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
-        var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
-        var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
-        var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
-        var shell_id = '#' + '{{ form.shell.id_for_label }}';
+<script>
+var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
+var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
+var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
+var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
+var shell_id = '#' + '{{ form.shell.id_for_label }}';
+var need_change_field = [
+    auto_generate_key, private_key_id, auto_push_id, sudo_id, shell_id
+];
 
-        var div_auto_generate_key = $(auto_generate_key).parent().parent();
-        var div_ssh_private_key = $(private_key_id).parent().parent().parent().parent();
-        var div_auto_push = $(auto_push_id).parent().parent();
-        var div_sudo = $(sudo_id).parent().parent();
-        var div_shell = $(shell_id).parent().parent();
-        var need_change_div = [
-            div_auto_generate_key, div_ssh_private_key,
-            div_auto_push, div_sudo, div_shell
-        ];
-
-        function authFieldsDisplay() {
-            if ($(auto_generate_key).prop('checked')) {
-                $('.auth-fields').addClass('hidden');
-            } else {
-                $('.auth-fields').removeClass('hidden');
-            }
-        }
-
-        function protocolChange() {
-            if ($(protocol_id + " option:selected").text() === 'rdp') {
-                $('.auth-fields').removeClass('hidden');
-                $.each(need_change_div, function (index, value) {
-                    $(value).addClass('hidden')
-                });
-            } else {
-                authFieldsDisplay();
-                $.each(need_change_div, function (index, value) {
-                    $(value).removeClass('hidden')
-                });
-            }
-        }
-
-        {% block document_ready %}
-            $(document).ready(function () {
-                $('.select2').select2();
-                authFieldsDisplay();
-                protocolChange();
-            });
-        {% endblock %}
-
-        $(protocol_id).change(function (){
-            protocolChange();
+function protocolChange() {
+    if ($(protocol_id + " option:selected").text() === 'rdp') {
+        $('.auth-fields').removeClass('hidden');
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').addClass('hidden')
         });
-        $(auto_generate_key).change(function () {
-            authFieldsDisplay();
+    } else {
+        authFieldsDisplay();
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').removeClass('hidden')
         });
-    </script>
+    }
+}
+
+function authFieldsDisplay() {
+    if ($(auto_generate_key).prop('checked')) {
+        $('.auth-fields').addClass('hidden');
+    } else {
+        $('.auth-fields').removeClass('hidden');
+    }
+}
+
+$(document).ready(function () {
+    $('.select2').select2();
+    authFieldsDisplay();
+    protocolChange();
+})
+.on('change', protocol_id, function(){
+    protocolChange();
+})
+.on('change', auto_generate_key, function(){
+    authFieldsDisplay();
+});
+
+</script>
 {% endblock %}
