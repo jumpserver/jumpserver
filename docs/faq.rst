@@ -168,13 +168,7 @@ FAQ
     (9). 录像存储在阿里云oss的规则，Jumpserver 系统设置-终端设置 录像存储
         {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
 
-        修改后，需要修改nginx配置文件
-        location /media/ {
-        add_header Content-Encoding gzip;
-        proxy_pass http://oss-cn-hangzhou.aliyuncs.com;
-        }
-
-        还需要在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储
+         修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储
 
     (10). 管理密码忘记了或者重置管理员密码
         $ source /opt/py3/bin/activate
