@@ -17,19 +17,23 @@
 - Guacamole 默认端口为 8081/tcp 在 docker run 时指定
 - Nginx 默认端口为 80/tcp
 
-安装文档
-~~~~~~~~~~~~~~
+一体化部署文档（基于CentOS 7）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
 
-   CentOS 7 安装文档 <setup_by_centos7.rst>
+   安装文档 <setup_by_centos7.rst>
 
-进阶文档
-~~~~~~~~~~~~~~
+分布式部署文档（基于CentOS 7）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
    :maxdepth: 1
 
-   CentOS 7 之分布式部署 Jumpserver 文档
-   01 环境准备 <distributed_01.rst>
+   环境说明 <distributed_01.rst>
+   数据库 部署 <distributed_02.rst>
+   nginx 代理部署 <distributed_03.rst>
+   jumpserver 部署 <distributed_04.rst>
+   coco 部署 <distributed_05.rst>
+   guacamole 部署 <distributed_06.rst>
