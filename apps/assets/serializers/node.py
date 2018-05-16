@@ -9,7 +9,7 @@ from .asset import AssetGrantedSerializer
 
 __all__ = [
     'NodeSerializer', "NodeGrantedSerializer", "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer",
+    "NodeAssetsSerializer", "NodeCurrentSerializer",
 ]
 
 
@@ -51,6 +51,17 @@ class NodeSerializer(serializers.ModelSerializer):
         fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
         list_serializer_class = BulkListSerializer
 
+    def validate(self, data):
+        value = data.get('value')
+        instance = self.instance if self.instance else Node.root()
+        children = instance.parent.get_children().exclude(key=instance.key)
+        values = [child.value for child in children]
+        if value in values:
+            raise serializers.ValidationError(
+                'The same level node name cannot be the same'
+            )
+        return data
+
     @staticmethod
     def get_parent(obj):
         return obj.parent.id
@@ -64,6 +75,12 @@ class NodeSerializer(serializers.ModelSerializer):
         field = fields["key"]
         field.required = False
         return fields
+
+
+class NodeCurrentSerializer(NodeSerializer):
+    @staticmethod
+    def get_assets_amount(obj):
+        return obj.get_current_assets().count()
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):

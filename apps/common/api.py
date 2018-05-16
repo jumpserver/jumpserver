@@ -96,14 +96,7 @@ class LDAPTestingAPI(APIView):
 
 class DjangoSettingsAPI(APIView):
     def get(self, request):
-        if not settings.DEBUG:
-            return Response('Only debug mode support')
-
-        configs = {}
-        for i in dir(settings):
-            if i.isupper():
-                configs[i] = str(getattr(settings, i))
-        return Response(configs)
+        return Response('Danger, Close now')
 
 
 

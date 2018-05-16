@@ -58,6 +58,9 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
+        nodes = system_user.nodes.all()
+        for node in nodes:
+            system_user.assets.add(*tuple(node.get_all_assets()))
         task = push_system_user_to_assets_manual.delay(system_user)
         return Response({"task": task.id})
 

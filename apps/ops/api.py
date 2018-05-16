@@ -72,7 +72,7 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         mark = request.query_params.get("mark") or str(uuid.uuid4())
-        task = super().get_object()
+        task = self.get_object()
         log_path = task.full_log_path
 
         if not log_path or not os.path.isfile(log_path):
