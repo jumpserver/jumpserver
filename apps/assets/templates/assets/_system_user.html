@@ -55,7 +55,7 @@
                                 {% bootstrap_field form.private_key_file layout="horizontal" %}
                             </div>
                             <div class="form-group">
-                                <label for="{{ form.as_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
+                                <label for="{{ form.auto_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
                                 <div class="col-sm-8">
                                     {{ form.auto_push}}
                                 </div>
@@ -79,43 +79,50 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
-        var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
-        var password_id = '#' + '{{ form.password.id_for_label }}';
-        var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
-        var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
-        var shell_id = '#' + '{{ form.shell.id_for_label }}';
+<script>
+var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
+var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
+var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
+var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
+var shell_id = '#' + '{{ form.shell.id_for_label }}';
+var need_change_field = [
+    auto_generate_key, private_key_id, auto_push_id, sudo_id, shell_id
+];
 
-        var need_change_field = [auto_generate_key, private_key_id, sudo_id, shell_id] ;
+function protocolChange() {
+    if ($(protocol_id + " option:selected").text() === 'rdp') {
+        $('.auth-fields').removeClass('hidden');
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').addClass('hidden')
+        });
+    } else {
+        authFieldsDisplay();
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').removeClass('hidden')
+        });
+    }
+}
 
-        function authFieldsDisplay() {
-            if ($(auto_generate_key).prop('checked')) {
-                $('.auth-fields').addClass('hidden');
-            } else {
-                $('.auth-fields').removeClass('hidden');
-            }
-        }
+function authFieldsDisplay() {
+    if ($(auto_generate_key).prop('checked')) {
+        $('.auth-fields').addClass('hidden');
+    } else {
+        $('.auth-fields').removeClass('hidden');
+    }
+}
 
-        function protocolChange() {
-            if ($(protocol_id).attr('value') === 'rdp') {
-                $.each(need_change_field, function (index, value) {
-                    $(value).addClass('hidden')
-                });
-                $(password_id).removeClass('hidden')
-            } else {
-                $.each(need_change_field, function (index, value) {
-                    $(value).removeClass('hidden')
-                });
-            }
-        }
-        $(document).ready(function () {
-            $('.select2').select2();
-            authFieldsDisplay();
-            protocolChange();
-            $(auto_generate_key).change(function () {
-                authFieldsDisplay();
-            });
-        })
-    </script>
+$(document).ready(function () {
+    $('.select2').select2();
+    authFieldsDisplay();
+    protocolChange();
+})
+.on('change', protocol_id, function(){
+    protocolChange();
+})
+.on('change', auto_generate_key, function(){
+    authFieldsDisplay();
+});
+
+</script>
 {% endblock %}

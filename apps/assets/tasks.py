@@ -22,7 +22,7 @@ TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
 disk_pattern = re.compile(r'^hd|sd|xvd|vd')
-PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
+PERIOD_TASK = os.environ.get("PERIOD_TASK", "off")
 
 
 @shared_task

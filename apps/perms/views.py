@@ -42,7 +42,7 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
 
         if nodes_id:
             nodes_id = nodes_id.split(",")
-            nodes = Node.objects.filter(id__in=nodes_id)
+            nodes = Node.objects.filter(id__in=nodes_id).exclude(id=Node.root().id)
             form['nodes'].initial = nodes
         if assets_id:
             assets_id = assets_id.split(",")

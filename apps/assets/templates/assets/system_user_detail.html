@@ -64,14 +64,14 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Protocol' %}:</td>
-                                            <td><b>{{ system_user.protocol }}</b></td>
+                                            <td><b id="id_protocol_type">{{ system_user.protocol }}</b></td>
                                         </tr>
-                                        <tr>
+                                        <tr class="only-ssh">
                                             <td>{% trans 'Sudo' %}:</td>
                                             <td><b>{{ system_user.sudo }}</b></td>
                                         </tr>
                                         {% if system_user.shell %}
-                                        <tr>
+                                        <tr class="only-ssh">
                                             <td>{% trans 'Shell' %}:</td>
                                             <td><b>{{ system_user.shell }}</b></td>
                                         </tr>
@@ -107,7 +107,7 @@
                         </div>
 
                         <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-primary">
+                            <div class="panel panel-primary only-ssh">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
                                 </div>
@@ -236,6 +236,9 @@ function updateSystemUserNode(nodes) {
 }
 jumpserver.nodes_selected = {};
 $(document).ready(function () {
+    if($('#id_protocol_type').text() === 'rdp'){
+        $('.only-ssh').addClass('hidden')
+    }
     $('.select2').select2()
     .on('select2:select', function(evt) {
             var data = evt.params.data;
@@ -296,7 +299,7 @@ $(document).ready(function () {
     var success = function (data) {
         var task_id = data.task;
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
     };
     APIUpdateAttr({
         url: the_url,

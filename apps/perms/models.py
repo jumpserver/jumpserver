@@ -7,11 +7,21 @@ from django.utils import timezone
 from common.utils import date_expired_default, set_or_append_attr_bulk
 
 
-class ValidManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_active=True) \
-            .filter(date_start__lt=timezone.now())\
+class AssetPermissionQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def valid(self):
+        return self.active().filter(date_start__lt=timezone.now())\
             .filter(date_expired__gt=timezone.now())
+
+
+class AssetPermissionManager(models.Manager):
+    def get_queryset(self):
+        return AssetPermissionQuerySet(self.model, using=self._db)
+
+    def valid(self):
+        return self.get_queryset().valid()
 
 
 class AssetPermission(models.Model):
@@ -29,8 +39,7 @@ class AssetPermission(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
-    objects = models.Manager()
-    valid = ValidManager()
+    objects = AssetPermissionManager()
 
     def __str__(self):
         return self.name
