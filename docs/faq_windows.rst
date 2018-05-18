@@ -40,6 +40,7 @@ Windows 资产连接说明
 
 ::
 
+    # 注：因为 windows 暂时不支持推送，所以必须使用资产上面已经存在的账户进行登录，如 administrator 账户
     # 不带域的用户直接输入用户名即可，如 administrator
     # 域用户的用户名格式为 user@domain.com，如 administrator@jumpserver.org
 
@@ -60,3 +61,11 @@ Windows 资产连接说明
 7. 使用web terminal登录（如果登录报错，检查防火墙的设置，可以参考FAQ）
 
 .. image:: _static/img/faq_windows_07.jpg
+
+8. 上传文件到 windows
+
+::
+
+    # 直接拖拽文件到 windows 窗口即可，文件上传后在 Guacamole RDP上的 G 目录查看
+
+.. image:: _static/img/faq_windows_08.jpg
