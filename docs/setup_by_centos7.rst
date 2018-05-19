@@ -23,11 +23,18 @@ CentOS 7 安装文档
 
 ::
 
+    # 防火墙 与 selinux 设置说明
+    $ systemctl start firewalld
+    $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
+    $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
+    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent  # 用户HTTP/WS登录端口 coco
+    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent  # guacamole端口 docker
+      --permanent  永久生效，没有此参数重启后失效
 
-    # 关闭 selinux 与 防火墙 仅为了能正常安装，安装完成后需要配置并重新打开
-    $ setenforce 0  # 临时关闭 selinux
-    $ systemctl stop iptables.service
-    $ systemctl stop firewalld.service
+    $ firewall-cmd --reload  # 重新载入规则
+
+    # selinux 设置 http 访问权限
+    $ setsebool -P httpd_can_network_connect 1
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -342,18 +349,6 @@ CentOS 7 安装文档
 
     # 其他的ssh及sftp客户端这里就不多做说明，自行搜索使用
 
-    # 防火墙 与 selinux 设置说明
-    $ systemctl start firewalld
-    $ firewall-cmd --zone=public --add-port=8080/tcp --permanent  # jumpserver 端口
-    $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
-    $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
-    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent  # 用户HTTP/WS登录端口 coco
-    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent  # guacamole端口 docker
-      --permanent  永久生效，没有此参数重启后失效
-
-    $ firewall-cmd --reload
-
-    # selinux 的白名单规则正在研究中，稍后如果确定开启selinux不影响服务的正常使用会把相关文档补上来
 
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_
