@@ -74,7 +74,7 @@
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
     # Are you sure you want to allow this? (y/N) y
 
-**2.2 安装依赖 RPM 包**
+**2.2 安装依赖包**
 
 ::
 
