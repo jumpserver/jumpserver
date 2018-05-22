@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.files.storage import default_storage
+from django.http.response import HttpResponseRedirectBase
 from django.http import HttpResponseNotFound
 from django.conf import settings
 
@@ -25,7 +26,7 @@ from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
-from .backends import get_command_store, get_multi_command_store, \
+from .backends import get_command_storage, get_multi_command_storage, \
     SessionCommandSerializer
 
 logger = logging.getLogger(__file__)
@@ -227,8 +228,8 @@ class CommandViewSet(viewsets.ViewSet):
     }
 
     """
-    command_store = get_command_store()
-    multi_command_storage = get_multi_command_store()
+    command_store = get_command_storage()
+    multi_command_storage = get_multi_command_storage()
     serializer_class = SessionCommandSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -291,19 +292,20 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
-            configs = settings.TERMINAL_REPLAY_STORAGE.items()
+            configs = settings.TERMINAL_REPLAY_STORAGE
+            configs = [cfg for cfg in configs if cfg['TYPE'] != 'server']
             if not configs:
                 return HttpResponseNotFound()
 
-            for name, config in configs:
-                client = jms_storage.init(config)
-                date = self.session.date_start.strftime('%Y-%m-%d')
-                file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
-                target_path = default_storage.base_location + '/' + path
-
-                if client and client.has_file(file_path) and \
-                        client.download_file(file_path, target_path):
-                    return redirect(default_storage.url(path))
+            date = self.session.date_start.strftime('%Y-%m-%d')
+            file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
+            target_path = default_storage.base_location + '/' + path
+            storage = jms_storage.get_multi_object_storage(configs)
+            ok, err = storage.download(file_path, target_path)
+            if ok:
+                return redirect(default_storage.url(path))
+            else:
+                logger.error("Failed download replay file: {}".format(err))
         return HttpResponseNotFound()
 
 
@@ -313,34 +315,14 @@ class SessionReplayV2ViewSet(SessionReplayViewSet):
     session = None
 
     def retrieve(self, request, *args, **kwargs):
-        session_id = kwargs.get('pk')
-        self.session = get_object_or_404(Session, id=session_id)
-        path = self.gen_session_path()
+        response = super().retrieve(request, *args, **kwargs)
         data = {
             'type': 'guacamole' if self.session.protocol == 'rdp' else 'json',
             'src': '',
         }
-
-        if default_storage.exists(path):
-            url = default_storage.url(path)
-            data['src'] = url
+        if isinstance(response, HttpResponseRedirectBase):
+            data['src'] = response.url
             return Response(data)
-        else:
-            configs = settings.TERMINAL_REPLAY_STORAGE.items()
-            if not configs:
-                return HttpResponseNotFound()
-
-            for name, config in configs:
-                client = jms_storage.init(config)
-                date = self.session.date_start.strftime('%Y-%m-%d')
-                file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
-                target_path = default_storage.base_location + '/' + path
-
-                if client and client.has_file(file_path) and \
-                        client.download_file(file_path, target_path):
-                    url = default_storage.url(path)
-                    data['src'] = url
-                    return Response(data)
         return HttpResponseNotFound()
 
 

@@ -9,10 +9,10 @@ from django.utils.translation import ugettext as _
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from ..models import Command
 from .. import utils
-from ..backends import get_multi_command_store
+from ..backends import get_multi_command_storage
 
 __all__ = ['CommandListView']
-common_storage = get_multi_command_store()
+common_storage = get_multi_command_storage()
 
 
 class CommandListView(DatetimeSearchMixin, AdminUserRequiredMixin, ListView):
