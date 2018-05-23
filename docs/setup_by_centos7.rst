@@ -120,12 +120,12 @@ CentOS 7 安装文档
         ALLOWED_HOSTS = ['*']
 
         # Development env open this, when error occur display the full process track, Production disable it
-        # DEBUG 模式 True为开启 False为关闭，默认开启
-        DEBUG = True
+        # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
+        DEBUG = False
 
         # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
-        # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL
-        LOG_LEVEL = 'DEBUG'
+        # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
+        LOG_LEVEL = 'WARNING'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
         # Database setting, Support sqlite3, mysql, postgres ....
@@ -141,14 +141,14 @@ CentOS 7 安装文档
         DB_ENGINE = 'mysql'
         DB_HOST = '127.0.0.1'
         DB_PORT = 3306
-        DB_USER = 'root'
+        DB_USER = 'jumpserver'
         DB_PASSWORD = 'somepassword'
         DB_NAME = 'jumpserver'
 
         # When Django start it will bind this host and port
-        # Django 运行的端口和容器，部署代理服务器后应该把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
+        # Django 运行的端口和容器，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
         # ./manage.py runserver 127.0.0.1:8080
-        HTTP_BIND_HOST = '0.0.0.0'
+        HTTP_BIND_HOST = '127.0.0.1'
         HTTP_LISTEN_PORT = 8080
 
         # Use Redis as broker for celery and web socket
@@ -206,7 +206,7 @@ CentOS 7 安装文档
         # SECRET_KEY = None
 
         # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
-        # LOG_LEVEL = 'INFO'
+        # LOG_LEVEL = 'WARN'
 
         # 日志存放的目录
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
