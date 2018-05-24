@@ -40,7 +40,6 @@ itsdangerous==0.24
 itypes==1.1.0
 Jinja2==2.10
 jmespath==0.9.3
-jms-es-sdk
 kombu==4.0.2
 ldap3==2.4
 MarkupSafe==1.0
@@ -62,7 +61,7 @@ pytz==2017.3
 PyYAML==3.12
 redis==2.10.6
 requests==2.18.4
-jms-storage==0.0.13
+jms-storage==0.0.17
 s3transfer==0.1.13
 simplejson==3.13.2
 six==1.11.0

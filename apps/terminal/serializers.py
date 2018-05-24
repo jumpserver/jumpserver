@@ -9,7 +9,7 @@ from rest_framework_bulk.serializers import BulkListSerializer
 from common.mixins import BulkSerializerMixin
 from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
-from .backends import get_multi_command_store
+from .backends import get_multi_command_storage
 
 
 class TerminalSerializer(serializers.ModelSerializer):
@@ -47,7 +47,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(serializers.ModelSerializer):
     command_amount = serializers.SerializerMethodField()
-    command_store = get_multi_command_store()
+    command_store = get_multi_command_storage()
 
     class Meta:
         model = Session

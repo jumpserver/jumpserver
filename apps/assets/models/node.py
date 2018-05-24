@@ -61,10 +61,14 @@ class Node(models.Model):
         return child
 
     def get_children(self):
-        return self.__class__.objects.filter(key__regex=r'^{}:[0-9]+$'.format(self.key))
+        return self.__class__.objects.filter(
+            key__regex=r'^{}:[0-9]+$'.format(self.key)
+        )
 
     def get_all_children(self):
-        return self.__class__.objects.filter(key__startswith='{}:'.format(self.key))
+        return self.__class__.objects.filter(
+            key__startswith='{}:'.format(self.key)
+        )
 
     def get_family(self):
         children = list(self.get_all_children())

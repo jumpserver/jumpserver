@@ -40,13 +40,18 @@ class SystemUserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class SystemUserAuthInfoApi(generics.RetrieveUpdateAPIView):
+class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     Get system user auth info
     """
     queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.clear_auth()
+        return Response(status=204)
 
 
 class SystemUserPushApi(generics.RetrieveAPIView):

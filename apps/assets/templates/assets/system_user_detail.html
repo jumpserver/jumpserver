@@ -107,14 +107,14 @@
                         </div>
 
                         <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-primary only-ssh">
+                            <div class="panel panel-primary ">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        <tr class="no-borders-tr">
+                                        <tr class="only-ssh">
                                             <td width="50%">{% trans 'Auto push' %}:</td>
                                             <td>
                                                 <span class="pull-right">
@@ -130,8 +130,8 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr class="no-borders-tr">
                                         {% if system_user.auto_push %}
+                                        <tr class="only-ssh">
                                             <td width="50%">{% trans 'Push system user now' %}:</td>
                                             <td>
                                                 <span style="float: right">
@@ -139,12 +139,21 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
                                         {% endif %}
+                                        <tr class="only-ssh">
                                             <td width="50%">{% trans 'Test assets connective' %}:</td>
                                             <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs btn-test-connective" style="width: 54px">{% trans 'Test' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="50%">{% trans 'Clear auth' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs btn-clear-auth" style="width: 54px">{% trans 'Clear' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -239,6 +248,7 @@ $(document).ready(function () {
     if($('#id_protocol_type').text() === 'rdp'){
         $('.only-ssh').addClass('hidden')
     }
+    $(".panel-body .table tr:visible:first").addClass('no-borders-tr');
     $('.select2').select2()
     .on('select2:select', function(evt) {
             var data = evt.params.data;
@@ -320,6 +330,13 @@ $(document).ready(function () {
         method: 'GET',
         success: success,
         flash_message: false
+    });
+}).on('click', '.btn-clear-auth', function () {
+    var the_url = '{% url "api-assets:system-user-auth-info" pk=system_user.id %}';
+    APIUpdateAttr({
+        url: the_url,
+        method: 'DELETE',
+        success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
     });
 })
 </script>
