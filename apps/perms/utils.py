@@ -188,6 +188,7 @@ class AssetPermissionUtil:
             children = _node.get_family()
             for node in children:
                 nodes[node] = defaultdict(set)
+        nodes[unnode] = defaultdict(set)
         _assets = cls.get_user_assets(user)
         for asset, _system_users in _assets.items():
             _nodes = asset.get_nodes()
@@ -197,7 +198,6 @@ class AssetPermissionUtil:
                     in_node = True
                     nodes[node][asset].update(_system_users)
             if not in_node:
-                nodes[unnode] = defaultdict(set)
                 nodes[unnode][asset].update(_system_users)
         return nodes
 
