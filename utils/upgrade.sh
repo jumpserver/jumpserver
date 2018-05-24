@@ -40,5 +40,6 @@ git pull && pip install -r requirements/requirements.txt && cd utils && sh make_
 cd .. && ./jms start all -d
 echo -e "\033[31m 请检查jumpserver是否启动成功 \033[0m"
 echo -e "\033[31m 备份文件存放于$jumpserver_backup目录 \033[0m"
+stty erase ^?
 
 exit 0
