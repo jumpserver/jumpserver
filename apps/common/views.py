@@ -82,7 +82,7 @@ class LDAPSettingView(AdminUserRequiredMixin, TemplateView):
         if form.is_valid():
             form.save()
             if "AUTH_LDAP" in form.cleaned_data:
-                ldap_auth_enable.send(form.cleaned_data["AUTH_LDAP"])
+                ldap_auth_enable.send(sender=self.__class__, enabled=form.cleaned_data["AUTH_LDAP"])
             msg = _("Update setting successfully, please restart program")
             messages.success(request, msg)
             return redirect('settings:ldap-setting')
