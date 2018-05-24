@@ -197,10 +197,8 @@ class AssetPermissionUtil:
                     in_node = True
                     nodes[node][asset].update(_system_users)
             if not in_node:
-                if unnode in nodes:
-                    nodes[unnode][asset].update(_system_users)
-                else:
-                    nodes[unnode][asset] = _system_users
+                nodes[unnode] = defaultdict(set)
+                nodes[unnode][asset].update(_system_users)
         return nodes
 
     @classmethod
