@@ -109,10 +109,9 @@ class StatusViewSet(viewsets.ModelViewSet):
     task_serializer_class = TaskSerializer
 
     def create(self, request, *args, **kwargs):
-        if self.request.query_params.get("from_guacamole", None):
-            return Response({"msg": "From guacamole, not support now"})
-
-        self.handle_sessions()
+        from_gua = self.request.query_params.get("from_guacamole", None)
+        if not from_gua:
+            self.handle_sessions()
         super().create(request, *args, **kwargs)
         tasks = self.request.user.terminal.task_set.filter(is_finished=False)
         serializer = self.task_serializer_class(tasks, many=True)
