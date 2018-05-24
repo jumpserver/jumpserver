@@ -10,7 +10,7 @@ from django.conf import settings
 from users.utils import AdminUserRequiredMixin
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
-from ..backends import get_multi_command_store
+from ..backends import get_multi_command_storage
 from .. import utils
 
 
@@ -19,7 +19,7 @@ __all__ = [
     'SessionDetailView',
 ]
 
-command_store = get_multi_command_store()
+command_store = get_multi_command_storage()
 
 
 class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):

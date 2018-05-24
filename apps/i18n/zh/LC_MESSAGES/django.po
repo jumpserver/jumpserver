@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-08 17:24+0800\n"
+"POT-Creation-Date: 2018-05-17 11:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,22 +17,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/api/node.py:96
+#: assets/api/node.py:106
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:225
+#: assets/api/node.py:242
 msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
-#: assets/api/node.py:238
+#: assets/api/node.py:255
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
 #: assets/forms/asset.py:24 assets/models/asset.py:66 assets/models/user.py:103
 #: assets/templates/assets/asset_detail.html:183
 #: assets/templates/assets/asset_detail.html:191
-#: assets/templates/assets/system_user_detail.html:166 perms/models.py:33
+#: assets/templates/assets/system_user_detail.html:175 perms/models.py:33
 msgid "Nodes"
 msgstr "节点管理"
 
@@ -438,7 +438,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:18 assets/models/node.py:15
+#: assets/models/label.py:18 assets/models/node.py:18
 #: assets/templates/assets/label_list.html:15 common/models.py:27
 msgid "Value"
 msgstr "值"
@@ -535,7 +535,7 @@ msgstr "测试系统用户可连接性: {}"
 msgid "定期测试系统用户可连接性: {}"
 msgstr ""
 
-#: assets/tasks.py:401
+#: assets/tasks.py:402
 msgid "推送系统用户到入资产: {}"
 msgstr ""
 
@@ -660,7 +660,7 @@ msgstr "重置"
 #: common/templates/common/ldap_setting.html:60
 #: common/templates/common/terminal_setting.html:103
 #: perms/templates/perms/asset_permission_create_update.html:70
-#: terminal/templates/terminal/session_list.html:120
+#: terminal/templates/terminal/session_list.html:124
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:47
 #: users/templates/users/forgot_password.html:44
@@ -782,8 +782,8 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-#: assets/templates/assets/asset_list.html:634
-#: assets/templates/assets/system_user_detail.html:183
+#: assets/templates/assets/asset_list.html:636
+#: assets/templates/assets/system_user_detail.html:192
 #: assets/templates/assets/system_user_list.html:138 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:362
@@ -963,19 +963,19 @@ msgstr "仅显示当前节点资产"
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-#: assets/templates/assets/asset_list.html:215
+#: assets/templates/assets/asset_list.html:217
 msgid "Create node failed"
 msgstr "创建节点失败"
 
-#: assets/templates/assets/asset_list.html:227
+#: assets/templates/assets/asset_list.html:229
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:229
+#: assets/templates/assets/asset_list.html:231
 msgid "Have assets, cancel"
 msgstr "存在资产，不能删除"
 
-#: assets/templates/assets/asset_list.html:629
+#: assets/templates/assets/asset_list.html:631
 #: assets/templates/assets/system_user_list.html:133
 #: users/templates/users/user_detail.html:357
 #: users/templates/users/user_detail.html:382
@@ -984,20 +984,20 @@ msgstr "存在资产，不能删除"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:630
+#: assets/templates/assets/asset_list.html:632
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:638
+#: assets/templates/assets/asset_list.html:640
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:639
-#: assets/templates/assets/asset_list.html:644
+#: assets/templates/assets/asset_list.html:641
+#: assets/templates/assets/asset_list.html:646
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:643
+#: assets/templates/assets/asset_list.html:645
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1032,6 +1032,7 @@ msgid "Create gateway"
 msgstr "创建网关"
 
 #: assets/templates/assets/domain_gateway_list.html:87
+#: assets/templates/assets/domain_gateway_list.html:89
 #: common/templates/common/email_setting.html:58
 #: common/templates/common/ldap_setting.html:58
 msgid "Test connection"
@@ -1080,9 +1081,22 @@ msgstr "家目录"
 msgid "Uid"
 msgstr "Uid"
 
-#: assets/templates/assets/system_user_detail.html:174
+#: assets/templates/assets/system_user_detail.html:153
+#: assets/templates/assets/system_user_detail.html:339
+msgid "Clear auth"
+msgstr "清除认证信息"
+
+#: assets/templates/assets/system_user_detail.html:156
+msgid "Clear"
+msgstr "清除"
+
+#: assets/templates/assets/system_user_detail.html:183
 msgid "Add to node"
 msgstr "添加到节点"
+
+#: assets/templates/assets/system_user_detail.html:339
+msgid "success"
+msgstr "成功"
 
 #: assets/templates/assets/system_user_list.html:18
 #: assets/views/system_user.py:45
@@ -2113,15 +2127,16 @@ msgstr "时长"
 msgid "Monitor"
 msgstr "监控"
 
-#: terminal/templates/terminal/session_list.html:105
+#: terminal/templates/terminal/session_list.html:106
+#: terminal/templates/terminal/session_list.html:108
 msgid "Terminate"
 msgstr "终断"
 
-#: terminal/templates/terminal/session_list.html:116
+#: terminal/templates/terminal/session_list.html:120
 msgid "Terminate selected"
 msgstr "终断所选"
 
-#: terminal/templates/terminal/session_list.html:136
+#: terminal/templates/terminal/session_list.html:140
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
 

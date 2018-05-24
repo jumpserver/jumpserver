@@ -107,6 +107,7 @@ class AssetUser(models.Model):
     def clear_auth(self):
         self._password = ''
         self._private_key = ''
+        self._public_key = ''
         self.save()
 
     def auto_gen_auth(self):

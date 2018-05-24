@@ -13,7 +13,6 @@ logger = get_logger(__file__)
 
 
 class AssetPermissionUtil:
-
     @staticmethod
     def get_user_permissions(user):
         return AssetPermission.objects.all().valid().filter(users=user)
@@ -123,6 +122,24 @@ class AssetPermissionUtil:
         return nodes
 
     @classmethod
+    def get_user_nodes_inherit_group(cls, user):
+        nodes = defaultdict(set)
+        groups = user.groups.all()
+        for group in groups:
+            _nodes = cls.get_user_group_nodes(group)
+            for node, system_users in _nodes.items():
+                nodes[node].update(set(system_users))
+        return nodes
+
+    @classmethod
+    def get_user_nodes(cls, user):
+        nodes = cls.get_user_nodes_direct(user)
+        nodes_inherit = cls.get_user_nodes_inherit_group(user)
+        for node, system_users in nodes_inherit.items():
+            nodes[node].update(set(system_users))
+        return nodes
+
+    @classmethod
     def get_user_nodes_assets_direct(cls, user):
         assets = defaultdict(set)
         nodes = cls.get_user_nodes_direct(user)
@@ -164,15 +181,24 @@ class AssetPermissionUtil:
         :param user:
         :return: {node: {asset: set(su1, su2)}}
         """
+        from assets.models import Node
+        unnode = Node(value='Unnode')
         nodes = defaultdict(dict)
+        for _node in cls.get_user_nodes(user):
+            children = _node.get_family()
+            for node in children:
+                nodes[node] = defaultdict(set)
+        nodes[unnode] = defaultdict(set)
         _assets = cls.get_user_assets(user)
         for asset, _system_users in _assets.items():
             _nodes = asset.get_nodes()
+            in_node = False
             for node in _nodes:
-                if asset in nodes[node]:
+                if node in nodes:
+                    in_node = True
                     nodes[node][asset].update(_system_users)
-                else:
-                    nodes[node][asset] = _system_users
+            if not in_node:
+                nodes[unnode][asset].update(_system_users)
         return nodes
 
     @classmethod
