@@ -17,20 +17,21 @@
             position:absolute;
             visibility:hidden;
             text-align: left;
-            top: 100%;
+            {#top: 100%;#}
+            top: 0;
             left: 0;
             z-index: 1000;
-            float: left;
-            padding: 5px 0;
+            {#float: left;#}
+            padding: 0 0;
             margin: 2px 0 0;
             list-style: none;
             background-clip: padding-box;
-        }
+         }
         div#rMenu li{
         	margin: 1px 0;
         	cursor: pointer;
-        	{#list-style: none outside none;#}
-        }
+        	list-style: none outside none;
+         }
         .dropdown a:hover {
             background-color: #f1f1f1
         }
@@ -266,6 +267,8 @@ function OnRightClick(event, treeId, treeNode) {
 function showRMenu(type, x, y) {
 	$("#rMenu ul").show();
     x -= 220;
+    x += document.body.scrollLeft;
+    y += document.body.scrollTop+document.documentElement.scrollTop;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 
 	$("body").bind("mousedown", onBodyMouseDown);
