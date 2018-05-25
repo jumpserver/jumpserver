@@ -229,7 +229,11 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'ansible_logs'],
             'level': "INFO",
-        }
+        },
+        # 'django.db': {
+        #     'handlers': ['console', 'file'],
+        #     'level': 'DEBUG'
+        # }
     }
 }
 
