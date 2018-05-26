@@ -106,21 +106,19 @@ class AssetPermissionUtil:
         return assets
 
     @classmethod
-    def get_user_group_nodes_with_assets(cls, user):
+    def get_user_group_nodes_with_assets(cls, group):
         """
-        :param user:
+        :param group:
         :return: {node: {asset: set(su1, su2)}}
         """
-        nodes = defaultdict(dict)
-        _assets = cls.get_user_group_assets(user)
+        _assets = cls.get_user_group_assets(group)
+        tree = Tree()
         for asset, _system_users in _assets.items():
             _nodes = asset.get_nodes()
+            tree.add_nodes(_nodes)
             for node in _nodes:
-                if asset in nodes[node]:
-                    nodes[node][asset].update(_system_users)
-                else:
-                    nodes[node][asset] = _system_users
-        return nodes
+                tree.nodes[node][asset].update(_system_users)
+        return tree.nodes
 
     @classmethod
     def get_user_assets_direct(cls, user):
