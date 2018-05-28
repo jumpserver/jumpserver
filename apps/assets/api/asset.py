@@ -13,7 +13,7 @@ from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     NodePermissionUtil
-from ..models import  Asset, SystemUser, AdminUser, Node
+from ..models import Asset, SystemUser, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
     test_asset_connectability_manual
@@ -48,14 +48,22 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
             queryset = queryset.filter(admin_user=admin_user)
-        if node_id:
+
+        if node_id and show_current_asset:
+            queryset = queryset.filter(
+                Q(nodes=node_id) | Q(nodes__isnull=True)
+            ).distinct()
+        if node_id and not show_current_asset:
             node = get_object_or_404(Node, id=node_id)
             if not node.is_root():
                 queryset = queryset.filter(
+                    Q(nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key)) |
+                    Q(nodes__isnull=True),
+                ).distinct()
+            else:
+                queryset = queryset.filter(
                     nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
                 ).distinct()
-        if show_current_asset and node_id:
-            queryset = queryset.filter(nodes=node_id).distinct()
 
         return queryset
 

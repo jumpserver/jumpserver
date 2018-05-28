@@ -108,14 +108,6 @@ class Node(models.Model):
             assets = Asset.objects.filter(nodes__in=nodes).distinct()
         return assets
 
-    def get_current_assets(self):
-        from .asset import Asset
-        assets = Asset.objects.filter(nodes=self).distinct()
-        return assets
-
-    def has_assets(self):
-        return self.get_all_assets()
-
     def get_all_valid_assets(self):
         return self.get_all_assets().valid()
 

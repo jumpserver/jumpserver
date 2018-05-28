@@ -4,6 +4,7 @@
 
 import uuid
 import logging
+import random
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -191,7 +192,8 @@ class Asset(models.Model):
 
         seed()
         for i in range(count):
-            asset = cls(ip='%s.%s.%s.%s' % (i, i, i, i),
+            ip = [str(i) for i in random.sample(range(255), 4)]
+            asset = cls(ip='.'.join(ip),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
                         port=22,
