@@ -64,7 +64,7 @@
 
     $ jumpserver_backup=/tmp/jumpserver_backup
     $ mkdir -p $jumpserver_backup
-    $ cd /opt/jumpservrer
+    $ cd /opt/jumpserver
     $ cp config.py $jumpserver_backup
     $ cp -r data/media $jumpserver_backup/
 

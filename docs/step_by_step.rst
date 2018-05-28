@@ -285,7 +285,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 .. code:: shell
 
 
-    # 注意：这里一定要改写一下本机的IP地址, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \

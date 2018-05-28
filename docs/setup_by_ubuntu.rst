@@ -74,7 +74,7 @@
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
     # Are you sure you want to allow this? (y/N) y
 
-**2.2 安装依赖 RPM 包**
+**2.2 安装依赖包**
 
 ::
 
@@ -238,7 +238,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get update
     $ apt-get install docker-ce
 
-    # 注意：这里一定要改下面命令的 jumpserver url 地址
+    # 注意：这里一定要改下面命令的 jumpserver url 地址 例: http://192.168.244.144
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
