@@ -61,13 +61,13 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
-    nodes = NodeTMPSerializer(many=True, read_only=True)
+    # nodes = NodeTMPSerializer(many=True, read_only=True)
 
     class Meta:
         model = Asset
         fields = (
             "id", "hostname", "ip", "port", "system_users_granted",
-            "is_active", "system_users_join", "os", 'domain', "nodes",
+            "is_active", "system_users_join", "os", 'domain',
             "platform", "comment"
         )
 
