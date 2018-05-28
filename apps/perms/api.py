@@ -147,13 +147,8 @@ class UserGrantedNodeAssetsApi(ListAPIView):
             user = get_object_or_404(User, id=user_id)
         else:
             user = self.request.user
+        node = get_object_or_404(Node, id=node_id)
         nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
-        node = get_object_or_none(Node, id=node_id)
-
-        if not node:
-            unnode = [node for node in nodes if node.name == 'Unnode']
-            node = unnode[0] if unnode else None
-
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
