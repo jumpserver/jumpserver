@@ -117,7 +117,8 @@ class Asset(models.Model):
 
     def get_nodes(self):
         from .node import Node
-        return self.nodes.all() or [Node.root()]
+        nodes = self.nodes.all() or [Node.root()]
+        return nodes
 
     @property
     def hardware_info(self):

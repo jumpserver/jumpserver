@@ -3,6 +3,7 @@
 import uuid
 
 from django.db import models, transaction
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -87,7 +88,12 @@ class Node(models.Model):
 
     def get_assets(self):
         from .asset import Asset
-        assets = Asset.objects.filter(nodes__id=self.id)
+        if self.is_root():
+            assets = Asset.objects.filter(
+                Q(nodes__id=self.id) | Q(nodes__isnull=True)
+            )
+        else:
+            assets = Asset.objects.filter(nodes__id=self.id)
         return assets
 
     def get_valid_assets(self):
