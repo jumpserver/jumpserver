@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:32+0800\n"
+"POT-Creation-Date: 2018-05-25 18:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -535,7 +535,7 @@ msgstr "测试系统用户可连接性: {}"
 msgid "定期测试系统用户可连接性: {}"
 msgstr ""
 
-#: assets/tasks.py:402
+#: assets/tasks.py:401
 msgid "推送系统用户到入资产: {}"
 msgstr ""
 
@@ -2540,7 +2540,7 @@ msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:45
-#: users/templates/users/user_detail.html:348 users/utils.py:73
+#: users/templates/users/user_detail.html:348 users/utils.py:76
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2744,12 +2744,14 @@ msgid "Create account successfully"
 msgstr "创建账户成功"
 
 #: users/utils.py:39
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "\n"
 "    Hello %(name)s:\n"
 "    </br>\n"
 "    Your account has been created successfully\n"
+"    </br>\n"
+"    Username: %(username)s\n"
 "    </br>\n"
 "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
 "here to set your password</a>\n"
@@ -2770,6 +2772,8 @@ msgstr ""
 "    你好 %(name)s:\n"
 "    </br>\n"
 "    恭喜您，您的账号已经创建成功    </br>\n"
+"    用户名: %(username)s\n"
+"    </br>\n"
 "     <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点击这"
 "里设置密码</a>    </br>\n"
 "    这个链接有效期1小时, 超过时间您可以 <a href=\"%(forget_password_url)s?"
@@ -2784,7 +2788,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:75
+#: users/utils.py:78
 #, python-format
 msgid ""
 "\n"
@@ -2828,11 +2832,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:106
+#: users/utils.py:109
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:108
+#: users/utils.py:111
 #, python-format
 msgid ""
 "\n"
@@ -2857,15 +2861,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:141
+#: users/utils.py:144
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:143
+#: users/utils.py:146
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:156
+#: users/utils.py:159
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
