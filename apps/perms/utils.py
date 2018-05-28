@@ -16,8 +16,22 @@ logger = get_logger(__file__)
 class Tree:
     def __init__(self):
         self.__all_nodes = list(Node.objects.all())
+        self.__node_asset_map = defaultdict(set)
         self.nodes = defaultdict(dict)
         self.root = Node.root()
+        self.init_node_asset_map()
+
+    def init_node_asset_map(self):
+        for node in self.__all_nodes:
+            assets = node.get_assets().values_list('id', flat=True)
+            for asset in assets:
+                self.__node_asset_map[str(asset)].add(node)
+
+    def add_asset(self, asset, system_users):
+        nodes = self.__node_asset_map.get(str(asset.id), [])
+        self.add_nodes(nodes)
+        for node in nodes:
+            self.nodes[node][asset].update(system_users)
 
     def add_node(self, node):
         if node in self.nodes:
@@ -44,11 +58,15 @@ class AssetPermissionUtil:
 
     @staticmethod
     def get_user_group_permissions(user_group):
-        return AssetPermission.objects.all().valid().filter(user_groups=user_group)
+        return AssetPermission.objects.all().valid().filter(
+            user_groups=user_group
+        )
 
     @staticmethod
     def get_asset_permissions(asset):
-        return AssetPermission.objects.all().valid().filter(assets=asset)
+        return AssetPermission.objects.all().valid().filter(
+            assets=asset
+        )
 
     @staticmethod
     def get_node_permissions(node):
@@ -56,7 +74,9 @@ class AssetPermissionUtil:
 
     @staticmethod
     def get_system_user_permissions(system_user):
-        return AssetPermission.objects.valid().all().filter(system_users=system_user)
+        return AssetPermission.objects.valid().all().filter(
+            system_users=system_user
+        )
 
     @classmethod
     def get_user_group_nodes(cls, group):
@@ -209,11 +229,11 @@ class AssetPermissionUtil:
         tree = Tree()
         _assets = cls.get_user_assets(user)
         for asset, _system_users in _assets.items():
-            _nodes = asset.get_nodes()
-            tree.add_nodes(_nodes)
-
-            for node in _nodes:
-                tree.nodes[node][asset].update(_system_users)
+            tree.add_asset(asset, _system_users)
+            # _nodes = asset.get_nodes()
+            # tree.add_nodes(_nodes)
+            # for node in _nodes:
+            #     tree.nodes[node][asset].update(_system_users)
         return tree.nodes
 
     @classmethod
