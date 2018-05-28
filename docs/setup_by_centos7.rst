@@ -23,7 +23,7 @@ CentOS 7 安装文档
 
 ::
 
-    # 防火墙 与 selinux 设置说明
+    # 防火墙 与 selinux 设置说明，如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置 
     $ systemctl start firewalld
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
