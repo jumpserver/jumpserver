@@ -43,6 +43,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         queryset = super().get_queryset()
         admin_user_id = self.request.query_params.get('admin_user_id')
         node_id = self.request.query_params.get("node_id")
+        show_current_asset = self.request.query_params.get("show_current_asset")
 
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
@@ -51,8 +52,11 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             node = get_object_or_404(Node, id=node_id)
             if not node.is_root():
                 queryset = queryset.filter(
-                    nodes__key__regex='{}(:[0-9]+)*$'.format(node.key),
+                    nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
                 ).distinct()
+        if show_current_asset and node_id:
+            queryset = queryset.filter(nodes=node_id).distinct()
+
         return queryset
 
 

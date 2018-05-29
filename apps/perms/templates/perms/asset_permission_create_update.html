@@ -50,7 +50,7 @@
                                 </div>
                             </div>
                             <div class="form-group {% if form.date_expired.errors or form.date_start.errors %} has-error {% endif %}" id="date_5">
-                                <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{{ form.date_expired.label }}</label>
+                                <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{% trans 'Validity period' %}</label>
                                 <div class="col-sm-9">
                                     <div class="input-daterange input-group" id="datepicker">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>

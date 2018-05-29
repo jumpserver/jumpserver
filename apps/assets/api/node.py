@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from rest_framework import generics, mixins
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -41,7 +42,14 @@ __all__ = [
 class NodeViewSet(BulkModelViewSet):
     queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
-    serializer_class = serializers.NodeSerializer
+    # serializer_class = serializers.NodeSerializer
+
+    def get_serializer_class(self):
+        show_current_asset = self.request.query_params.get('show_current_asset')
+        if show_current_asset:
+            return serializers.NodeCurrentSerializer
+        else:
+            return serializers.NodeSerializer
 
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()
@@ -83,16 +91,29 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     serializer_class = serializers.NodeSerializer
     instance = None
 
+    def counter(self):
+        values = [
+            child.value[child.value.rfind(' '):]
+            for child in self.get_object().get_children()
+            if child.value.startswith("新节点 ")
+        ]
+        values = [int(value) for value in values if value.strip().isdigit()]
+        count = max(values)+1 if values else 1
+        return count
+
     def post(self, request, *args, **kwargs):
         if not request.data.get("value"):
-            request.data["value"] = _("New node {}").format(
-                Node.root().get_next_child_key().split(":")[-1]
-            )
+            request.data["value"] = _("New node {}").format(self.counter())
         return super().post(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         instance = self.get_object()
         value = request.data.get("value")
+        values = [child.value for child in instance.get_children()]
+        if value in values:
+            raise ValidationError(
+                'The same level node name cannot be the same'
+            )
         node = instance.create_child(value=value)
         return Response(
             {"id": node.id, "key": node.key, "value": node.value},
@@ -127,8 +148,9 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
                 node_fake.id = asset.id
                 node_fake.parent = node
                 node_fake.value = asset.hostname
-                node_fake.is_asset = True
+                node_fake.is_node = False
                 queryset.append(node_fake)
+        queryset = sorted(queryset, key=lambda x: x.is_node, reverse=True)
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -162,8 +184,9 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         for node in children:
             if not node:
                 continue
-            node.parent = instance
-            node.save()
+            # node.parent = instance
+            # node.save()
+            node.set_parent(instance)
         return Response("OK")
 
 
@@ -189,6 +212,9 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
         assets = serializer.validated_data.get('assets')
         instance = self.get_object()
         if instance != Node.root():
+            instance.assets.remove(*tuple(assets))
+        else:
+            assets = [asset for asset in assets if asset.nodes.count() > 1]
             instance.assets.remove(*tuple(assets))
 
 

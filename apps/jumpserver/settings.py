@@ -229,7 +229,11 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'ansible_logs'],
             'level': "INFO",
-        }
+        },
+        # 'django.db': {
+        #     'handlers': ['console', 'file'],
+        #     'level': 'DEBUG'
+        # }
     }
 }
 
@@ -329,6 +333,9 @@ AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
     AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
 )
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_TIMEOUT: 5
+}
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
