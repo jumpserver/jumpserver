@@ -15,7 +15,7 @@ logger = get_logger(__file__)
 
 class Tree:
     def __init__(self):
-        self.__all_nodes = list(Node.objects.all())
+        self.__all_nodes = list(Node.objects.all().prefetch_related('assets'))
         self.__node_asset_map = defaultdict(set)
         self.nodes = defaultdict(dict)
         self.root = Node.root()
@@ -134,7 +134,7 @@ class AssetPermissionUtil:
         _assets = cls.get_user_group_assets(group)
         tree = Tree()
         for asset, _system_users in _assets.items():
-            _nodes = asset.get_nodes()
+            _nodes = asset.get_nodes_or_cache()
             tree.add_nodes(_nodes)
             for node in _nodes:
                 tree.nodes[node][asset].update(_system_users)

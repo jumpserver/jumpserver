@@ -40,7 +40,9 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset()\
+            .prefetch_related('labels', 'nodes')\
+            .select_related('admin_user')
         admin_user_id = self.request.query_params.get('admin_user_id')
         node_id = self.request.query_params.get("node_id")
         show_current_asset = self.request.query_params.get("show_current_asset")
@@ -66,7 +68,6 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
                 queryset = queryset.filter(
                     nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
                 ).distinct()
-
         return queryset
 
 
