@@ -13,9 +13,6 @@ __all__ = ['Node']
 class Node(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
-    # value = models.CharField(
-    #     max_length=128, unique=True, verbose_name=_("Value")
-    # )
     value = models.CharField(max_length=128, verbose_name=_("Value"))
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
@@ -31,10 +28,11 @@ class Node(models.Model):
 
     @property
     def full_value(self):
-        if self == self.__class__.root():
+        ancestor = [a.value for a in self.ancestor]
+        if self.is_root():
             return self.value
-        else:
-            return '{} / {}'.format(self.parent.full_value, self.value)
+        ancestor.append(self.value)
+        return ' / '.join(ancestor)
 
     @property
     def level(self):
@@ -108,7 +106,6 @@ class Node(models.Model):
     def parent(self):
         if self.key == "0" or not self.key.startswith("0"):
             return self.__class__.root()
-
         parent_key = ":".join(self.key.split(":")[:-1])
         try:
             parent = self.__class__.objects.get(key=parent_key)
@@ -132,16 +129,17 @@ class Node(models.Model):
 
     @property
     def ancestor(self):
-        _key = self.key.split(':')
-        ancestor_keys = []
-
         if self.is_root():
-            return [self.__class__.root()]
-
-        for i in range(len(_key)-1):
-            _key.pop()
-            ancestor_keys.append(':'.join(_key))
-        return self.__class__.objects.filter(key__in=ancestor_keys)
+            ancestor = self.__class__.objects.filter(key='0')
+        else:
+            _key = self.key.split(':')
+            ancestor_keys = []
+            for i in range(len(_key)-1):
+                _key.pop()
+                ancestor_keys.append(':'.join(_key))
+            ancestor = self.__class__.objects.filter(key__in=ancestor_keys)
+        ancestor = list(ancestor)
+        return ancestor
 
     @property
     def ancestor_with_self(self):
