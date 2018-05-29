@@ -80,7 +80,7 @@ class NodeSerializer(serializers.ModelSerializer):
 class NodeCurrentSerializer(NodeSerializer):
     @staticmethod
     def get_assets_amount(obj):
-        return obj.get_current_assets().count()
+        return obj.get_assets().count()
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):

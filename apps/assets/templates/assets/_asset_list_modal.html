@@ -59,7 +59,7 @@ var zTree2, asset_table2 = 0;
 function initTable2() {
     var options = {
         ele: $('#asset_list_modal_table'),
-        ajax_url: '{% url "api-assets:asset-list" %}',
+        ajax_url: '{% url "api-assets:asset-list" %}?show_current_asset=1',
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" }
         ],
@@ -95,7 +95,7 @@ function initTree2() {
     };
 
     var zNodes = [];
-    $.get("{% url 'api-assets:node-list' %}", function(data, status){
+    $.get("{% url 'api-assets:node-list' %}?show_current_asset=1", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
             {#value["open"] = true;#}
