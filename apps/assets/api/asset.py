@@ -50,16 +50,18 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             queryset = queryset.filter(admin_user=admin_user)
 
         if node_id and show_current_asset:
-            queryset = queryset.filter(
-                Q(nodes=node_id) | Q(nodes__isnull=True)
-            ).distinct()
+            node = get_object_or_404(Node, id=node_id)
+            if node.is_root():
+                queryset = queryset.filter(
+                    Q(nodes=node_id) | Q(nodes__isnull=True)
+                ).distinct()
+            else:
+                queryset = queryset.filter(nodes=node).distinct()
+
         if node_id and not show_current_asset:
             node = get_object_or_404(Node, id=node_id)
-            if not node.is_root():
-                queryset = queryset.filter(
-                    Q(nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key)) |
-                    Q(nodes__isnull=True),
-                ).distinct()
+            if node.is_root():
+                queryset = Asset.objects.all()
             else:
                 queryset = queryset.filter(
                     nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
