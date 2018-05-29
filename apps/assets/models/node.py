@@ -40,16 +40,6 @@ class Node(models.Model):
     def level(self):
         return len(self.key.split(':'))
 
-    def set_parent(self, instance):
-        children = self.get_all_children()
-        old_key = self.key
-        with transaction.atomic():
-            self.parent = instance
-            for child in children:
-                child.key = child.key.replace(old_key, self.key, 1)
-                child.save()
-            self.save()
-
     def get_next_child_key(self):
         mark = self.child_mark
         self.child_mark += 1
@@ -128,7 +118,17 @@ class Node(models.Model):
 
     @parent.setter
     def parent(self, parent):
-        self.key = parent.get_next_child_key()
+        if self.is_node:
+            children = self.get_all_children()
+            old_key = self.key
+            with transaction.atomic():
+                self.key = parent.get_next_child_key()
+                for child in children:
+                    child.key = child.key.replace(old_key, self.key, 1)
+                    child.save()
+                self.save()
+        else:
+            self.key = parent.key+':fake'
 
     @property
     def ancestor(self):
