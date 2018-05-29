@@ -42,14 +42,7 @@ __all__ = [
 class NodeViewSet(BulkModelViewSet):
     queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
-    # serializer_class = serializers.NodeSerializer
-
-    def get_serializer_class(self):
-        show_current_asset = self.request.query_params.get('show_current_asset')
-        if show_current_asset:
-            return serializers.NodeCurrentSerializer
-        else:
-            return serializers.NodeSerializer
+    serializer_class = serializers.NodeSerializer
 
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()

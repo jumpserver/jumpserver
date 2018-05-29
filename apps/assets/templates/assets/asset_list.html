@@ -399,8 +399,7 @@ function initTree() {
     };
 
     var zNodes = [];
-    var query_params = {'show_current_asset': getCookie('show_current_asset')};
-    $.get("{% url 'api-assets:node-list' %}", query_params, function(data, status){
+    $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
             if (value["key"] === "0") {
@@ -436,7 +435,7 @@ $(document).ready(function(){
     initTable();
     initTree();
 
-    if(getCookie('show_current_asset') === 'yes'){
+    if(getCookie('show_current_asset') === '1'){
         $('#show_all_asset').css('display', 'inline-block');
     }
     else{
@@ -564,7 +563,7 @@ $(document).ready(function(){
     hideRMenu();
     $(this).css('display', 'none');
     $('#show_all_asset').css('display', 'inline-block');
-    setCookie('show_current_asset', 'yes');
+    setCookie('show_current_asset', '1');
     location.reload();
 })
 .on('click', '.btn-show-all-asset', function(){
