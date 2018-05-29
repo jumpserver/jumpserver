@@ -29,9 +29,9 @@
 
 ::
 
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.0/dist.tar.gz
-    $ tar xvf dist.tar.gz
-    $ mv dist luna
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.1/luna.tar.gz
+    $ tar xvf luna.tar.gz
+    $ chown -R root:root luna
 
 4. 升级 guacamole
 
