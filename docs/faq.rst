@@ -178,7 +178,14 @@ FAQ
         # 新建超级用户的命令如下命令
         $ python manage.py createsuperuser --username=user --email=user@domain.com
 
-    (11). 清理celery产生的数据(无法正常推送及连接资产可以使用)
+    (11). 清理celery产生的数据(无法正常推送及连接资产，一直显示........等可以使用，请确定字符集是zh_CN.UTF-8)
+        # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
+        $ cat /etc/locale.conf
+        # 如果不是，请修改，注，本例只是以CentOS 7举例，其他的linux请更换路径
+        $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+        $ export LC_ALL=zh_CN.UTF-8
+        $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
+
         $ source /opt/py3/bin/activate
         $ cd /opt/jumpserver/apps
         $ python manage.py shell
@@ -217,11 +224,3 @@ FAQ
         # 如下，设置关闭浏览器 cookie 失效，则修改为
         # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
         SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-    (15.) 测试连接、推送、硬件刷新一直显示.....................
-        # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
-        $ cat /etc/locale.conf
-        # 如果不是，请修改
-        $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-        $ export LC_ALL=zh_CN.UTF-8
-        $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
