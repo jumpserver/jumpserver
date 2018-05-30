@@ -10,7 +10,7 @@
     $ pip install -r requirements/requirements.txt  # 如果使用其他源下载失败可以使用 -i 参数指定源
     $ cd utils && sh make_migrations.sh
 
-    # 1.0.x 升级 1.2.0 需要执行迁移脚本（新版本授权管理更新）
+    # 1.0.x 升级 1.2.0及以后的版本 需要执行迁移脚本（新版本授权管理更新）
     $ sh 2018_04_11_migrate_permissions.sh
  
 2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）

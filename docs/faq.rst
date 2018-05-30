@@ -3,6 +3,7 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
+   Linux 资产连接说明 <faq_linux.rst>
    Windows 资产连接说明 <faq_windows.rst>
    Windows sftp使用说明 <faq_sftp.rst>
    二次认证（Google Auth）入口说明 <faq_googleauth.rst>
