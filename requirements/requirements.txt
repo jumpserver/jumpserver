@@ -33,7 +33,7 @@ enum-compat==0.0.2
 ephem==3.7.6.0
 eventlet==0.22.1
 ForgeryPy==0.1
-greenlet==0.4.12
+greenlet==0.4.13
 gunicorn==19.7.1
 idna==2.6
 itsdangerous==0.24
