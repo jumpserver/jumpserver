@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if grep -q 'source ~/.autoenv/activate.sh' ~/.bashrc; then
+if grep -q 'source /opt/autoenv/activate.sh' ~/.bashrc; then
     echo -e "\033[31m 正在自动载入 python 环境 \033[0m"
 else
     echo -e "\033[31m 不支持自动升级，请参考 http://docs.jumpserver.org/zh/docs/upgrade.html 手动升级 \033[0m"
