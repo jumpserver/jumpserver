@@ -54,8 +54,9 @@
 
 ::
 
-    $ git clone git://github.com/kennethreitz/autoenv.git ~/.autoenv
-    $ echo 'source ~/.autoenv/activate.sh' >> ~/.bashrc
+    $ cd /opt
+    $ git clone git://github.com/kennethreitz/autoenv.git
+    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
     $ source ~/.bashrc
 
 二. 安装 Jumpserver
