@@ -95,7 +95,7 @@ function initTree2() {
     };
 
     var zNodes = [];
-    $.get("{% url 'api-assets:node-list' %}?show_current_asset=1", function(data, status){
+    $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
             {#value["open"] = true;#}
