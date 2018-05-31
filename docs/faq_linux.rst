@@ -74,4 +74,32 @@ Linux 资产连接说明
     # NAME = "localhost"
     NAME = "localhost"
 
+7. 测试可连接性 及 更新硬件信息
+
+::
+
+    # 注意不要拦截窗口
+
+.. image:: _static/img/faq_linux_05.jpg
+.. image:: _static/img/faq_linux_06.jpg
+
+8. 管理用户 测试可连接性
+
+::
+
+    # 注意不要拦截窗口
+
+.. image:: _static/img/faq_linux_07.jpg
+.. image:: _static/img/faq_linux_08.jpg
+
+9. 系统用户 推送 测试资产可连接性
+
+::
+
+    # 注意不要拦截窗口
+
+.. image:: _static/img/faq_linux_09.jpg
+.. image:: _static/img/faq_linux_10.jpg
+
+
 其他问题可参考 `FAQ <faq.html>`_
