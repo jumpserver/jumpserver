@@ -11,10 +11,21 @@ Windows 资产连接说明
     # 如果已经正常运行，但是终端没有 guacamole 的注册请求
     $ systemctl status firewalld  # 检查防火墙是否运行，如果防火墙运行请开放 guacamole 端口
 
-    # 如果之前删除过 guacamole 容器，请检查 key 是否已经删除
-    $ rm -rf /opt/guacamole/key/*  # 默认在这里
+    $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
+    $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
+    $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
+    $ systemctl stop docker
+    $ systemctl start docker
+    $ docker run --name jms_guacamole -d \
+      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+      registry.jumpserver.org/public/guacamole:latest
 
-    # 如果未安装 guacamole 请参照安装文档的 windows 组件部分进行处理
+    # 如果registry.jumpserver.org/public/guacamole:latest下载很慢，可以换成jumpserver/guacamole:latest
+
+    # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
+    $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
 
 .. image:: _static/img/faq_windows_01.jpg
 
@@ -69,3 +80,5 @@ Windows 资产连接说明
     # 直接拖拽文件到 windows 窗口即可，文件上传后在 Guacamole RDP上的 G 目录查看
 
 .. image:: _static/img/faq_windows_08.jpg
+
+其他问题可参考 `FAQ <faq.html>`_
