@@ -30,7 +30,7 @@ Linux 资产连接说明
 ::
 
     # 确定已经授权资产给当前登录用户
-    # 确定 umpserver 的版本与 luna 的版本一致，如不一致请参考升级文档进行处理
+    # 确定 Jumpserver 的版本与 luna 的版本一致，如不一致请参考升级文档进行处理
 
     # Jumpserver 版本可在 jumpserver页面右下角 看到
     # Luna 版本可在 luna页面左下角 看到
