@@ -5,6 +5,7 @@
 import uuid
 import logging
 import random
+from functools import reduce
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -147,6 +148,15 @@ class Asset(models.Model):
     def get_nodes(self):
         from .node import Node
         nodes = self.nodes.all() or [Node.root()]
+        return nodes
+
+    def get_all_nodes(self, flat=False):
+        nodes = []
+        for node in self.get_nodes_or_cache():
+            _nodes = node.get_ancestor(with_self=True)
+            _nodes.append(_nodes)
+        if flat:
+            nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
     @property

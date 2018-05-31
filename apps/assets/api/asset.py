@@ -11,8 +11,7 @@ from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
-    NodePermissionUtil
+from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser
 from ..models import Asset, SystemUser, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
@@ -22,7 +21,7 @@ from ..utils import LabelFilter
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet', 'UserAssetListView', 'AssetListUpdateApi',
+    'AssetViewSet', 'AssetListUpdateApi',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi'
 ]
 
@@ -68,19 +67,6 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
                 queryset = queryset.filter(
                     nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
                 ).distinct()
-        return queryset
-
-
-class UserAssetListView(generics.ListAPIView):
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetSerializer
-    permission_classes = (IsValidUser,)
-
-    def get_queryset(self):
-        assets_granted = NodePermissionUtil.get_user_assets(self.request.user).keys()
-        queryset = self.queryset.filter(
-            id__in=[asset.id for asset in assets_granted]
-        )
         return queryset
 
 

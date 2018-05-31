@@ -28,10 +28,9 @@ class Node(models.Model):
 
     @property
     def full_value(self):
-        ancestor = [a.value for a in self.ancestor]
+        ancestor = [a.value for a in self.get_ancestor(with_self=True)]
         if self.is_root():
             return self.value
-        ancestor.append(self.value)
         return ' / '.join(ancestor)
 
     @property
@@ -55,32 +54,35 @@ class Node(models.Model):
         return "{}:{}".format(self.key, mark)
 
     def create_child(self, value):
-        child_key = self.get_next_child_key()
-        child = self.__class__.objects.create(key=child_key, value=value)
-        return child
+        with transaction.atomic():
+            child_key = self.get_next_child_key()
+            child = self.__class__.objects.create(key=child_key, value=value)
+            return child
 
-    def get_children(self):
+    def get_children(self, with_self=False):
+        pattern = r'^{0}$|^{}:[0-9]+$' if with_self else r'^{}:[0-9]+$'
         return self.__class__.objects.filter(
-            key__regex=r'^{}:[0-9]+$'.format(self.key)
+            key__regex=pattern.format(self.key)
         )
 
-    def get_children_with_self(self):
+    def get_all_children(self, with_self=False):
+        pattern = r'^{0}$|^{0}:' if with_self else r'^{0}'
         return self.__class__.objects.filter(
-            key__regex=r'^{0}$|^{0}:[0-9]+$'.format(self.key)
+            key__regex=pattern.format(self.key)
         )
 
-    def get_all_children(self):
-        return self.__class__.objects.filter(
-            key__startswith='{}:'.format(self.key)
+    def get_sibling(self, with_self=False):
+        key = ':'.join(self.key.split(':')[:-1])
+        pattern = r'^{}:[0-9]+$'.format(key)
+        sibling = self.__class__.objects.filter(
+            key__regex=pattern.format(self.key)
         )
-
-    def get_all_children_with_self(self):
-        return self.__class__.objects.filter(
-            key__regex=r'^{0}$|^{0}:'.format(self.key)
-        )
+        if not with_self:
+            sibling = sibling.exclude(key=self.key)
+        return sibling
 
     def get_family(self):
-        ancestor = self.ancestor
+        ancestor = self.get_ancestor()
         children = self.get_all_children()
         return [*tuple(ancestor), self, *tuple(children)]
 
@@ -102,7 +104,7 @@ class Node(models.Model):
         if self.is_root():
             assets = Asset.objects.all()
         else:
-            nodes = self.get_all_children_with_self()
+            nodes = self.get_all_children(with_self=True)
             assets = Asset.objects.filter(nodes__in=nodes).distinct()
         return assets
 
@@ -127,24 +129,21 @@ class Node(models.Model):
     def parent(self, parent):
         self.key = parent.get_next_child_key()
 
-    @property
-    def ancestor(self):
+    def get_ancestor(self, with_self=False):
         if self.is_root():
             ancestor = self.__class__.objects.filter(key='0')
-        else:
-            _key = self.key.split(':')
-            ancestor_keys = []
-            for i in range(len(_key)-1):
-                _key.pop()
-                ancestor_keys.append(':'.join(_key))
-            ancestor = self.__class__.objects.filter(key__in=ancestor_keys)
-        ancestor = list(ancestor)
-        return ancestor
+            return ancestor
 
-    @property
-    def ancestor_with_self(self):
-        ancestor = list(self.ancestor)
-        ancestor.insert(0, self)
+        _key = self.key.split(':')
+        if not with_self:
+            _key.pop()
+        ancestor_keys = []
+        for i in range(len(_key)):
+            ancestor_keys.append(':'.join(_key))
+            _key.pop()
+        ancestor = self.__class__.objects.filter(
+            key__in=ancestor_keys
+        ).order_by('key')
         return ancestor
 
     @classmethod
@@ -153,3 +152,12 @@ class Node(models.Model):
             key='0', defaults={"key": '0', 'value': "ROOT"}
         )
         return obj
+
+
+class Tree:
+    def __init__(self, root):
+        self.root = root
+        self.nodes = []
+
+    def add_node(self, node):
+        pass

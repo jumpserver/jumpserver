@@ -41,11 +41,11 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             asset = get_object_or_404(Asset, pk=asset_id)
             permissions = set(queryset.filter(assets=asset))
             for node in asset.nodes.all():
-                inherit_nodes.update(set(node.ancestor_with_self))
+                inherit_nodes.update(set(node.get_ancestor(with_self=True)))
         elif node_id:
             node = get_object_or_404(Node, pk=node_id)
             permissions = set(queryset.filter(nodes=node))
-            inherit_nodes = node.ancestor
+            inherit_nodes = node.get_ancestor()
 
         for n in inherit_nodes:
             _permissions = queryset.filter(nodes=n)
