@@ -23,7 +23,7 @@ CentOS 7 安装文档
 
 ::
 
-    # 防火墙 与 selinux 设置说明，如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置 
+    # 防火墙 与 selinux 设置说明，如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置
     $ systemctl start firewalld
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
@@ -243,9 +243,9 @@ CentOS 7 安装文档
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.0/dist.tar.gz
-    $ tar xvf dist.tar.gz
-    $ mv dist luna
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.1/luna.tar.gz
+    $ tar xvf luna.tar.gz
+    $ chown -R root:root luna
 
     # 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
     $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
