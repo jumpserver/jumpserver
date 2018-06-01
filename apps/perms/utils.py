@@ -1,301 +1,118 @@
 # coding: utf-8
 
 from __future__ import absolute_import, unicode_literals
-import collections
 from collections import defaultdict
 from django.db.models import Q
-from django.utils import timezone
-import copy
 
-from common.utils import set_or_append_attr_bulk, get_logger
+from common.utils import get_logger
 from .models import AssetPermission
-from .hands import Node, User, UserGroup, Asset, SystemUser
+from .hands import Node
 
 logger = get_logger(__file__)
 
 
-class Tree:
-    def __init__(self):
-        self.__all_nodes = list(Node.objects.all().prefetch_related('assets'))
-        self.__node_asset_map = defaultdict(set)
-        self.nodes = defaultdict(dict)
-        self.root = Node.root()
-        self.init_node_asset_map()
+def get_user_permissions(user, include_group=True):
+    if include_group:
+        groups = user.groups.all()
+        arg = Q(users=user) | Q(user_groups=groups)
+    else:
+        arg = Q(users=user)
+    return AssetPermission.objects.all().valid().filter(arg)
 
-    def init_node_asset_map(self):
-        for node in self.__all_nodes:
-            assets = node.get_assets().values_list('id', flat=True)
-            for asset in assets:
-                self.__node_asset_map[str(asset)].add(node)
 
-    def add_asset(self, asset, system_users):
-        nodes = self.__node_asset_map.get(str(asset.id), [])
-        self.add_nodes(nodes)
-        for node in nodes:
-            self.nodes[node][asset].update(system_users)
+def get_user_group_permissions(user_group):
+    return AssetPermission.objects.all().valid().filter(
+        user_groups=user_group
+    )
 
-    def add_node(self, node):
-        if node in self.nodes:
-            return
-        else:
-            self.nodes[node] = defaultdict(set)
-        if node.key == self.root.key:
-            return
-        parent_key = ':'.join(node.key.split(':')[:-1])
-        for n in self.__all_nodes:
-            if n.key == parent_key:
-                self.add_node(n)
-                break
 
-    def add_nodes(self, nodes):
-        for node in nodes:
-            self.add_node(node)
+def get_asset_permissions(asset, include_node=True):
+    if include_node:
+        nodes = asset.get_all_nodes(flat=True)
+        arg = Q(assets=asset) | Q(nodes=nodes)
+    else:
+        arg = Q(assets=asset)
+    return AssetPermission.objects.all().valid().filter(arg)
+
+
+def get_node_permissions(node):
+    return AssetPermission.objects.all().valid().filter(nodes=node)
+
+
+def get_system_user_permissions(system_user):
+    return AssetPermission.objects.valid().all().filter(
+        system_users=system_user
+    )
 
 
 class AssetPermissionUtil:
-    @staticmethod
-    def get_user_permissions(user):
-        return AssetPermission.objects.all().valid().filter(users=user)
+    get_permissions_map = {
+        "User": get_user_permissions,
+        "UserGroup": get_user_group_permissions,
+        "Asset": get_asset_permissions,
+        "Node": get_node_permissions,
+        "SystemUser": get_node_permissions,
+    }
 
-    @staticmethod
-    def get_user_group_permissions(user_group):
-        return AssetPermission.objects.all().valid().filter(
-            user_groups=user_group
-        )
-
-    @staticmethod
-    def get_asset_permissions(asset):
-        return AssetPermission.objects.all().valid().filter(
-            assets=asset
-        )
-
-    @staticmethod
-    def get_node_permissions(node):
-        return AssetPermission.objects.all().valid().filter(nodes=node)
-
-    @staticmethod
-    def get_system_user_permissions(system_user):
-        return AssetPermission.objects.valid().all().filter(
-            system_users=system_user
-        )
-
-    @classmethod
-    def get_user_group_nodes(cls, group):
-        nodes = defaultdict(set)
-        permissions = cls.get_user_group_permissions(group)
-        for perm in permissions:
-            _nodes = perm.nodes.all()
-            _system_users = perm.system_users.all()
-            set_or_append_attr_bulk(_nodes, 'permission', perm.id)
-            for node in _nodes:
-                nodes[node].update(set(_system_users))
-        return nodes
-
-    @classmethod
-    def get_user_group_assets_direct(cls, group):
-        assets = defaultdict(set)
-        permissions = cls.get_user_group_permissions(group)
-        for perm in permissions:
-            _assets = perm.assets.all().valid()
-            _system_users = perm.system_users.all()
-            set_or_append_attr_bulk(_assets, 'permission', perm.id)
-            for asset in _assets:
-                assets[asset].update(set(_system_users))
-        return assets
-
-    @classmethod
-    def get_user_group_nodes_assets(cls, group):
-        assets = defaultdict(set)
-        nodes = cls.get_user_group_nodes(group)
-        for node, _system_users in nodes.items():
-            _assets = node.get_all_valid_assets()
-            set_or_append_attr_bulk(_assets, 'inherit_node', node.id)
-            set_or_append_attr_bulk(_assets, 'permission', getattr(node, 'permission', None))
-            for asset in _assets:
-                assets[asset].update(set(_system_users))
-        return assets
-
-    @classmethod
-    def get_user_group_assets(cls, group):
-        assets = defaultdict(set)
-        _assets = cls.get_user_group_assets_direct(group)
-        _nodes_assets = cls.get_user_group_nodes_assets(group)
-        for asset, _system_users in _assets.items():
-            assets[asset].update(set(_system_users))
-        for asset, _system_users in _nodes_assets.items():
-            assets[asset].update(set(_system_users))
-        return assets
-
-    @classmethod
-    def get_user_group_nodes_with_assets(cls, group):
-        """
-        :param group:
-        :return: {node: {asset: set(su1, su2)}}
-        """
-        _assets = cls.get_user_group_assets(group)
-        tree = Tree()
-        for asset, _system_users in _assets.items():
-            _nodes = asset.get_nodes_or_cache()
-            tree.add_nodes(_nodes)
-            for node in _nodes:
-                tree.nodes[node][asset].update(_system_users)
-        return tree.nodes
-
-    @classmethod
-    def get_user_assets_direct(cls, user):
-        assets = defaultdict(set)
-        permissions = list(cls.get_user_permissions(user))
-        for perm in permissions:
-            _assets = perm.assets.all().valid()
-            _system_users = perm.system_users.all()
-            set_or_append_attr_bulk(_assets, 'permission', perm.id)
-            for asset in _assets:
-                assets[asset].update(set(_system_users))
-        return assets
-
-    @classmethod
-    def get_user_nodes_direct(cls, user):
-        nodes = defaultdict(set)
-        permissions = cls.get_user_permissions(user)
-        for perm in permissions:
-            _nodes = perm.nodes.all()
-            _system_users = perm.system_users.all()
-            set_or_append_attr_bulk(_nodes, 'permission', perm.id)
-            for node in _nodes:
-                nodes[node].update(set(_system_users))
-        return nodes
-
-    @classmethod
-    def get_user_nodes_inherit_group(cls, user):
-        nodes = defaultdict(set)
-        groups = user.groups.all()
-        for group in groups:
-            _nodes = cls.get_user_group_nodes(group)
-            for node, system_users in _nodes.items():
-                nodes[node].update(set(system_users))
-        return nodes
-
-    @classmethod
-    def get_user_nodes(cls, user):
-        nodes = cls.get_user_nodes_direct(user)
-        nodes_inherit = cls.get_user_nodes_inherit_group(user)
-        for node, system_users in nodes_inherit.items():
-            nodes[node].update(set(system_users))
-        return nodes
-
-    @classmethod
-    def get_user_nodes_assets_direct(cls, user):
-        assets = defaultdict(set)
-        nodes = cls.get_user_nodes_direct(user)
-        for node, _system_users in nodes.items():
-            _assets = node.get_all_valid_assets()
-            set_or_append_attr_bulk(_assets, 'inherit_node', node.id)
-            set_or_append_attr_bulk(_assets, 'permission', getattr(node, 'permission', None))
-            for asset in _assets:
-                assets[asset].update(set(_system_users))
-        return assets
-
-    @classmethod
-    def get_user_assets_inherit_group(cls, user):
-        assets = defaultdict(set)
-        for group in user.groups.all():
-            _assets = cls.get_user_group_assets(group)
-            set_or_append_attr_bulk(_assets, 'inherit_group', group.id)
-            for asset, _system_users in _assets.items():
-                assets[asset].update(_system_users)
-        return assets
-
-    @classmethod
-    def get_user_assets(cls, user):
-        assets = defaultdict(set)
-        _assets_direct = cls.get_user_assets_direct(user)
-        _nodes_assets_direct = cls.get_user_nodes_assets_direct(user)
-        _assets_inherit_group = cls.get_user_assets_inherit_group(user)
-        for asset, _system_users in _assets_direct.items():
-            assets[asset].update(_system_users)
-        for asset, _system_users in _nodes_assets_direct.items():
-            assets[asset].update(_system_users)
-        for asset, _system_users in _assets_inherit_group.items():
-            assets[asset].update(_system_users)
-        return assets
-
-    @classmethod
-    def get_user_nodes_with_assets(cls, user):
-        """
-        :param user:
-        :return: {node: {asset: set(su1, su2)}}
-        """
-        tree = Tree()
-        _assets = cls.get_user_assets(user)
-        for asset, _system_users in _assets.items():
-            tree.add_asset(asset, _system_users)
-            # _nodes = asset.get_nodes()
-            # tree.add_nodes(_nodes)
-            # for node in _nodes:
-            #     tree.nodes[node][asset].update(_system_users)
-        return tree.nodes
-
-    @classmethod
-    def get_system_user_assets(cls, system_user):
-        assets = set()
-        permissions = cls.get_system_user_permissions(system_user)
-        for perm in permissions:
-            assets.update(set(perm.assets.all().valid()))
-            nodes = perm.nodes.all()
-            for node in nodes:
-                assets.update(set(node.get_all_valid_assets()))
-        return assets
-
-    @classmethod
-    def get_node_system_users(cls, node):
-        system_users = set()
-        permissions = cls.get_node_permissions(node)
-        for perm in permissions:
-            system_users.update(perm.system_users.all())
-        return system_users
-
-
-class AssetPermissionUtilsV2:
     def __init__(self, obj):
         self.object = obj
         self._permissions = None
-
-    @staticmethod
-    def get_user_permissions(user):
-        groups = user.groups.all()
-        return AssetPermission.objects.all().valid().filter(
-            Q(users=user) | Q(user_groups=groups)
-        )
-
-    @staticmethod
-    def get_user_group_permissions(user_group):
-        return AssetPermission.objects.all().valid().filter(
-            user_groups=user_group
-        )
-
-    @staticmethod
-    def get_asset_permissions(asset):
-        direct_nodes = asset.get_nodes_or_cache()
-
-        return AssetPermission.objects.all().valid().filter(
-            Q(assets=asset) | Q(nodes=direct_nodes)
-        )
-
-    @staticmethod
-    def get_node_permissions(node):
-        return AssetPermission.objects.all().valid().filter(nodes=node)
-
-    @staticmethod
-    def get_system_user_permissions(system_user):
-        return AssetPermission.objects.valid().all().filter(
-            system_users=system_user
-        )
 
     @property
     def permissions(self):
         if self._permissions:
             return self._permissions
-        if isinstance(self.object, User):
-            pass
+        object_cls = self.object.__class__.__name__
+        func = self.get_permissions_map[object_cls]
+        permissions = func(self.object)
+        self._permissions = permissions
+        return permissions
+
+    def get_nodes_direct(self):
+        """
+        返回用户/组授权规则直接关联的节点
+        :return: {node1: set(system_user1,)}
+        """
+        nodes = defaultdict(set)
+        permissions = self.permissions.prefetch_related('nodes', 'system_users')
+        for perm in permissions:
+            for node in perm.nodes.all():
+                nodes[node].update(perm.system_users.all())
+        return nodes
+
+    def get_assets_direct(self):
+        """
+        返回用户授权规则直接关联的资产
+        :return: {asset1: set(system_user1,)}
+        """
+        assets = defaultdict(set)
+        permissions = self.permissions.prefetch_related('assets', 'system_users')
+        for perm in permissions:
+            for asset in perm.assets.all().valid().prefetch_related('nodes'):
+                assets[asset].update(perm.system_users.all())
+        return assets
+
+    def get_assets(self):
+        assets = self.get_assets_direct()
+        nodes = self.get_nodes_direct()
+        for node, system_users in nodes.items():
+            _assets = node.get_all_assets().valid().prefetch_related('nodes')
+            for asset in _assets:
+                if isinstance(asset, Node):
+                    print(_assets)
+                assets[asset].update(system_users)
+        return assets
+
+    def get_nodes_with_assets(self):
+        assets = self.get_assets()
+        nodes = defaultdict(dict)
+        for asset, system_users in assets.items():
+            _nodes = asset.nodes.all()
+            for node in _nodes:
+                if asset in nodes[node]:
+                    nodes[node][asset].update(system_users)
+                else:
+                    nodes[node] = {asset: system_users}
+        return nodes
 
 

@@ -64,7 +64,6 @@ def on_system_user_assets_change(sender, instance=None, **kwargs):
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_changed(sender, instance=None, **kwargs):
     if isinstance(instance, Asset):
-        instance.expire_nodes_cache()
         if kwargs['action'] == 'post_add':
             logger.debug("Asset node change signal received")
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
@@ -81,10 +80,6 @@ def on_asset_node_changed(sender, instance=None, **kwargs):
 def on_node_assets_changed(sender, instance=None, **kwargs):
     if isinstance(instance, Node):
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        # 清理资产节点缓存
-        for asset in assets:
-            asset.expire_nodes_cache()
-
         if kwargs['action'] == 'post_add':
             logger.debug("Node assets change signal received")
             # 重新关联系统用户和资产的关系

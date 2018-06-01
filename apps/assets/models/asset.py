@@ -152,28 +152,12 @@ class Asset(models.Model):
 
     def get_all_nodes(self, flat=False):
         nodes = []
-        for node in self.get_nodes_or_cache():
+        for node in self.get_nodes():
             _nodes = node.get_ancestor(with_self=True)
             _nodes.append(_nodes)
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
-
-    @property
-    def nodes_cache_key(self):
-        key = "NODES_OF_{}".format(str(self.id))
-        return key
-
-    def get_nodes_or_cache(self):
-        cached = cache.get(self.nodes_cache_key)
-        if cached is not None:
-            return cached
-        nodes = list(self.get_nodes())
-        cache.set(self.nodes_cache_key, nodes, 3600)
-        return nodes
-
-    def expire_nodes_cache(self):
-        cache.delete(self.nodes_cache_key)
 
     @property
     def hardware_info(self):

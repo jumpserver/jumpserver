@@ -22,6 +22,21 @@ class Node(models.Model):
     def __str__(self):
         return self.full_value
 
+    def __eq__(self, other):
+        return self.key == other.key
+
+    def __gt__(self, other):
+        if self.is_root():
+            return True
+        self_key = [int(k) for k in self.key.split(':')]
+        other_key = [int(k) for k in other.key.split(':')]
+        if len(self_key) < len(other_key):
+            return True
+        elif len(self_key) > len(other_key):
+            return False
+        else:
+            return self_key[-1] < other_key[-1]
+
     @property
     def name(self):
         return self.value
@@ -93,7 +108,7 @@ class Node(models.Model):
                 Q(nodes__id=self.id) | Q(nodes__isnull=True)
             )
         else:
-            assets = Asset.objects.filter(nodes__id=self.id)
+            assets = self.assets.all()
         return assets
 
     def get_valid_assets(self):
@@ -104,8 +119,8 @@ class Node(models.Model):
         if self.is_root():
             assets = Asset.objects.all()
         else:
-            nodes = self.get_all_children(with_self=True)
-            assets = Asset.objects.filter(nodes__in=nodes).distinct()
+            pattern = r'^{0}$|^{0}:'.format(self.key)
+            assets = Asset.objects.filter(nodes__key__regex=pattern)
         return assets
 
     def get_all_valid_assets(self):
@@ -154,10 +169,3 @@ class Node(models.Model):
         return obj
 
 
-class Tree:
-    def __init__(self, root):
-        self.root = root
-        self.nodes = []
-
-    def add_node(self, node):
-        pass

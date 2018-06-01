@@ -68,7 +68,10 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.get_all_assets().count()
+        if obj.is_node:
+            return obj.get_all_assets().count()
+        else:
+            return 0
 
     def get_fields(self):
         fields = super().get_fields()

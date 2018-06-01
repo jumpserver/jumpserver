@@ -16,8 +16,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     资产的数据结构
     """
-    nodes = serializers.SerializerMethodField()
-
     class Meta:
         model = Asset
         list_serializer_class = BulkListSerializer
@@ -30,10 +28,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'hardware_info', 'is_connective',
         ])
         return fields
-
-    @staticmethod
-    def get_nodes(obj):
-        return [n.id for n in obj.get_nodes_or_cache()]
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
