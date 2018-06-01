@@ -104,6 +104,11 @@ class AssetPermissionUtil:
         return assets
 
     def get_nodes_with_assets(self):
+        """
+        返回节点并且包含资产
+        {"node": {"assets": set("system_user")}}
+        :return:
+        """
         assets = self.get_assets()
         nodes = defaultdict(dict)
         for asset, system_users in assets.items():
@@ -112,7 +117,7 @@ class AssetPermissionUtil:
                 if asset in nodes[node]:
                     nodes[node][asset].update(system_users)
                 else:
-                    nodes[node] = {asset: system_users}
+                    nodes[node][asset] = system_users
         return nodes
 
 

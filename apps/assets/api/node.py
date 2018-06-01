@@ -140,7 +140,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
                 node_fake = Node()
                 node_fake.id = asset.id
                 node_fake.is_node = False
-                node_fake.parent = node
+                node_fake.parent_id = node.id
                 node_fake.value = asset.hostname
                 queryset.append(node_fake)
         queryset = sorted(queryset, key=lambda x: x.is_node, reverse=True)

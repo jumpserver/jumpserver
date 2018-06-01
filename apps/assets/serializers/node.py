@@ -64,14 +64,11 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parent(obj):
-        return obj.parent.id
+        return obj.parent.id if obj.is_node else obj.parent_id
 
     @staticmethod
     def get_assets_amount(obj):
-        if obj.is_node:
-            return obj.get_all_assets().count()
-        else:
-            return 0
+        return obj.get_all_assets().count() if obj.is_node else 0
 
     def get_fields(self):
         fields = super().get_fields()

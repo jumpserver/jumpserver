@@ -5,7 +5,7 @@ import uuid
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-
+from common.utils import with_cache
 
 __all__ = ['Node']
 
@@ -166,6 +166,6 @@ class Node(models.Model):
         obj, created = cls.objects.get_or_create(
             key='0', defaults={"key": '0', 'value': "ROOT"}
         )
+        print(obj)
         return obj
-
 
