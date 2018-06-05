@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.conf import settings
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -20,6 +21,7 @@ from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
 from .utils import check_user_valid, generate_token, get_login_ip, check_otp_code
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
+from common.const import OTP_CACHE_KEY_FMT
 
 
 logger = get_logger(__name__)
@@ -149,12 +151,14 @@ class UserOtpAuthApi(APIView):
         seed = request.data.get('seed', '')
 
         user = cache.get(seed, None)
+        OTP_CACHE_KEY = OTP_CACHE_KEY_FMT.format(user.username)
         if not user:
             return Response({'msg': '请先进行用户名和密码验证'}, status=401)
 
         if not check_otp_code(user.otp_secret_key, otp_code):
             return Response({'msg': 'MFA认证失败'}, status=401)
 
+        cache.set(OTP_CACHE_KEY, 1, settings.OTP_CACHE_EXPIRATION_SECOND)
         token = generate_token(request, user)
         self.write_login_log(request, user)
         return Response(
@@ -189,7 +193,9 @@ class UserAuthApi(APIView):
         if not user:
             return Response({'msg': msg}, status=401)
 
-        if not user.otp_enabled:
+        OTP_CACHE_KEY = OTP_CACHE_KEY_FMT.format(user.username)
+        OTP_CACHE = cache.get(OTP_CACHE_KEY)
+        if (not user.otp_enabled) or OTP_CACHE:
             token = generate_token(request, user)
             self.write_login_log(request, user)
             return Response(
