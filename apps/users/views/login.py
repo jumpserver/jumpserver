@@ -23,6 +23,7 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
+from common.const import OTP_CACHE_KEY_FMT
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, redirect_user_first_login_or_index, \
     get_user_or_tmp_user, set_tmp_user_to_cache
@@ -80,8 +81,14 @@ class UserLoginView(FormView):
 
     def get_success_url(self):
         user = get_user_or_tmp_user(self.request)
+        OTP_CACHE_KEY = OTP_CACHE_KEY_FMT.format(user.username)
+        OTP_CACHE = cache.get(OTP_CACHE_KEY)
 
         if user.otp_enabled and user.otp_secret_key:
+            if OTP_CACHE:
+                auth_login(self.request, user)
+                self.write_login_log()
+                return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
             # 1,2 & T
             return reverse('users:login-otp')
         elif user.otp_enabled and not user.otp_secret_key:
@@ -118,6 +125,10 @@ class UserLoginOtpView(FormView):
         user = get_user_or_tmp_user(self.request)
         otp_code = form.cleaned_data.get('otp_code')
         otp_secret_key = user.otp_secret_key
+
+        OTP_CACHE_KEY = OTP_CACHE_KEY_FMT.format(user.username)
+        if not cache.get(OTP_CACHE_KEY):
+            cache.set(OTP_CACHE_KEY, 1, settings.OTP_CACHE_EXPIRATION_SECOND)
 
         if check_otp_code(otp_secret_key, otp_code):
             auth_login(self.request, user)
