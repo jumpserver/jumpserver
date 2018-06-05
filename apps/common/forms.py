@@ -182,6 +182,7 @@ class SecuritySettingForm(BaseForm):
     # 最小长度
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
         initial=6, label=_("Password minimum length"),
+        min_value=6
     )
     # 大写字母
     SECURITY_PASSWORD_UPPER_CASE = forms.BooleanField(
