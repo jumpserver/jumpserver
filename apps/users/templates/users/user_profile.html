@@ -91,6 +91,9 @@
                                                     {% else %}
                                                         {% trans 'Disable' %}
                                                     {% endif %}
+                                                    {% if mfa_setting %}
+                                                        ( {% trans 'Administrator Settings force MFA login' %} )
+                                                    {% endif %}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -152,7 +155,7 @@
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
                                                    href="
                                                         {% if request.user.otp_enabled and request.user.otp_secret_key %}
-                                                            {% if request.user.otp_force_enabled %}
+                                                            {% if request.user.otp_force_enabled or mfa_setting %}
                                                                 " disabled >{% trans 'Disable' %}
                                                             {% else %}
                                                                 {% url 'users:user-otp-disable-authentication' %}
