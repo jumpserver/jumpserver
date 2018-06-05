@@ -9,7 +9,7 @@ from .asset import AssetGrantedSerializer
 
 __all__ = [
     'NodeSerializer', "NodeGrantedSerializer", "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer", "NodeCurrentSerializer",
+    "NodeAssetsSerializer",
 ]
 
 
@@ -64,23 +64,17 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_parent(obj):
-        return obj.parent.id
+        return obj.parent.id if obj.is_node else obj.parent_id
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.get_all_assets().count()
+        return obj.get_all_assets().count() if obj.is_node else 0
 
     def get_fields(self):
         fields = super().get_fields()
         field = fields["key"]
         field.required = False
         return fields
-
-
-class NodeCurrentSerializer(NodeSerializer):
-    @staticmethod
-    def get_assets_amount(obj):
-        return obj.get_assets().count()
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):
