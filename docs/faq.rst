@@ -147,9 +147,9 @@ FAQ
 
 ::
 
-    (1). 邮箱设置 新建用户无法收到邮件需要重启一次jumpserver（系统设置修改需要重启的问题后面会修正）
+    (1). 邮箱设置 新建用户无法收到邮件请更新 jumpserver 版本到最新版本
 
-    (2). 收到的邮件链接地址是 localhost 可以到 系统设置-基本设置 里面修改url，保存后重启即可
+    (2). 收到的邮件链接地址是 localhost 可以到 系统设置-基本设置 里面修改 url 地址
 
     (3). coco 提示[service ERROR] Failed register terminal jzsas exist already
         # 参考上面的coco重新注册方法
@@ -166,10 +166,12 @@ FAQ
 
     (8). 默认录像存储位置在jumpserver/data/media
 
-    (9). 录像存储在阿里云oss的规则，Jumpserver 系统设置-终端设置 录像存储
+    (9). 录像存储在云的规则，Jumpserver 系统设置-终端设置 录像存储
         {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
 
-         修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储
+         命令记录保存到 elastic
+        {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
+         修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
 
     (10). 管理密码忘记了或者重置管理员密码
         $ source /opt/py3/bin/activate
