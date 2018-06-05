@@ -123,6 +123,7 @@ def start_gunicorn():
         'gunicorn', 'jumpserver.wsgi',
         '-b', bind,
         '-w', str(WORKERS),
+        '-k', 'eventlet',
         '--access-logformat', log_format,
         '-p', pid_file,
     ]

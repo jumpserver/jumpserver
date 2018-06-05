@@ -50,7 +50,9 @@ class UserLoginView(FormView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return redirect(self.get_success_url())
+            return redirect(redirect_user_first_login_or_index(
+                request, self.redirect_field_name)
+            )
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
