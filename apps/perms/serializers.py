@@ -9,7 +9,7 @@ from common.fields import StringManyToManyField
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetPermission
-        exclude = ('id', 'created_by', 'date_created')
+        exclude = ('created_by', 'date_created')
 
 
 class AssetPermissionListSerializer(serializers.ModelSerializer):

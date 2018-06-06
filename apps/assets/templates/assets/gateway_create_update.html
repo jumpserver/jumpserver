@@ -66,3 +66,28 @@
         </div>
     </div>
 {% endblock %}
+
+{% block custom_foot_js %}
+<script>
+var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
+var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+var port = '#' + '{{ form.port.id_for_label }}';
+
+function protocolChange() {
+    if ($(protocol_id + " option:selected").text() === 'rdp') {
+        $(port).val(3389);
+        $(private_key_id).closest('.form-group').addClass('hidden')
+    } else {
+        $(port).val(22);
+        $(private_key_id).closest('.form-group').removeClass('hidden')
+    }
+}
+
+$(document).ready(function(){
+    protocolChange();
+})
+.on('change', protocol_id, function(){
+    protocolChange();
+});
+</script>
+{% endblock %}

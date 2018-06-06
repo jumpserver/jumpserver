@@ -15,6 +15,14 @@ class UserLoginForm(AuthenticationForm):
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False
     )
+
+
+class UserLoginCaptchaForm(AuthenticationForm):
+    username = forms.CharField(label=_('Username'), max_length=100)
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput,
+        max_length=128, strip=False
+    )
     captcha = CaptchaField()
 
 
@@ -27,7 +35,7 @@ class UserCheckPasswordForm(forms.Form):
 
 
 class UserCheckOtpCodeForm(forms.Form):
-    otp_code = forms.CharField(label=_('MFA_code'), max_length=6)
+    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
 class UserCreateUpdateForm(forms.ModelForm):
@@ -36,7 +44,10 @@ class UserCreateUpdateForm(forms.ModelForm):
         label=_('Password'), widget=forms.PasswordInput,
         max_length=128, strip=False, required=False,
     )
-    role = forms.ChoiceField(choices=role_choices, required=True, initial=User.ROLE_USER, label=_("Role"))
+    role = forms.ChoiceField(
+        choices=role_choices, required=True,
+        initial=User.ROLE_USER, label=_("Role")
+    )
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
@@ -47,7 +58,7 @@ class UserCreateUpdateForm(forms.ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'role', 'date_expired', 'comment',
+            'phone', 'role', 'date_expired', 'comment', 'otp_level'
         ]
         help_texts = {
             'username': '* required',
@@ -61,6 +72,7 @@ class UserCreateUpdateForm(forms.ModelForm):
                     'data-placeholder': _('Join user groups')
                 }
             ),
+            'otp_level': forms.RadioSelect()
         }
 
     def clean_public_key(self):
@@ -77,10 +89,14 @@ class UserCreateUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
+        otp_level = self.cleaned_data.get('otp_level')
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)
         if password:
             user.set_password(password)
+            user.save()
+        if otp_level:
+            user.otp_level = otp_level
             user.save()
         if public_key:
             user.public_key = public_key
@@ -103,6 +119,39 @@ class UserProfileForm(forms.ModelForm):
 
 
 UserProfileForm.verbose_name = _("Profile")
+
+
+class UserMFAForm(forms.ModelForm):
+
+    mfa_description = _(
+        'Tip: when enabled, '
+        'you will enter the MFA binding process the next time you log in. '
+        'you can also directly bind in '
+        '"personal information -> quick modification -> change MFA Settings"!')
+
+    class Meta:
+        model = User
+        fields = ['otp_level']
+        widgets = {'otp_level': forms.RadioSelect()}
+        help_texts = {
+            'otp_level': _('* Enable MFA authentication '
+                           'to make the account more secure.'),
+        }
+
+
+UserMFAForm.verbose_name = _("MFA")
+
+
+class UserFirstLoginFinishForm(forms.Form):
+    finish_description = _(
+        'In order to protect you and your company, '
+        'please keep your account, '
+        'password and key sensitive information properly. '
+        '(for example: setting complex password, enabling MFA authentication)'
+    )
+
+
+UserFirstLoginFinishForm.verbose_name = _("Finish")
 
 
 class UserPasswordForm(forms.Form):
@@ -147,6 +196,7 @@ class UserPasswordForm(forms.Form):
 
 
 class UserPublicKeyForm(forms.Form):
+    pubkey_description = _('Automatically configure and download the SSH key')
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),

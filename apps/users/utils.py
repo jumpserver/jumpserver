@@ -41,6 +41,8 @@ def send_user_created_mail(user):
     </br>
     Your account has been created successfully
     </br>
+    Username: %(username)s
+    </br>
     <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
     </br>
     This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
@@ -54,6 +56,7 @@ def send_user_created_mail(user):
     </br>
     """) % {
         'name': user.name,
+        'username': user.username,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),

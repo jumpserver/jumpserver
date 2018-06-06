@@ -7,19 +7,19 @@ TYPE_ENGINE_MAPPING = {
 }
 
 
-def get_command_store():
-    params = settings.COMMAND_STORAGE
-    engine_class = import_module(params['ENGINE'])
-    storage = engine_class.CommandStore(params)
+def get_command_storage():
+    config = settings.COMMAND_STORAGE
+    engine_class = import_module(config['ENGINE'])
+    storage = engine_class.CommandStore(config)
     return storage
 
 
-def get_terminal_command_store():
+def get_terminal_command_storages():
     storage_list = {}
     for name, params in settings.TERMINAL_COMMAND_STORAGE.items():
         tp = params['TYPE']
         if tp == 'server':
-            storage = get_command_store()
+            storage = get_command_storage()
         else:
             if not TYPE_ENGINE_MAPPING.get(tp):
                 continue
@@ -29,9 +29,9 @@ def get_terminal_command_store():
     return storage_list
 
 
-def get_multi_command_store():
+def get_multi_command_storage():
     from .command.multi import CommandStore
-    storage_list = get_terminal_command_store().values()
+    storage_list = get_terminal_command_storages().values()
     storage = CommandStore(storage_list)
     return storage
 

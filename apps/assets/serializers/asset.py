@@ -4,15 +4,18 @@ from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
-from ..models import Asset
+from ..models import Asset, Node
 from .system_user import AssetSystemUserSerializer
+
+__all__ = [
+    'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
+]
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     资产的数据结构
     """
-
     class Meta:
         model = Asset
         list_serializer_class = BulkListSerializer
@@ -33,6 +36,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
+    # nodes = NodeTMPSerializer(many=True, read_only=True)
 
     class Meta:
         model = Asset

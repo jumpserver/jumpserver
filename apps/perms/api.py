@@ -6,7 +6,7 @@ from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
 
-from common.utils import set_or_append_attr_bulk
+from common.utils import set_or_append_attr_bulk, get_object_or_none
 from users.permissions import IsValidUser, IsSuperUser, IsSuperUserOrAppUser
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
@@ -41,11 +41,11 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             asset = get_object_or_404(Asset, pk=asset_id)
             permissions = set(queryset.filter(assets=asset))
             for node in asset.nodes.all():
-                inherit_nodes.update(set(node.ancestor_with_node))
+                inherit_nodes.update(set(node.get_ancestor(with_self=True)))
         elif node_id:
             node = get_object_or_404(Node, pk=node_id)
             permissions = set(queryset.filter(nodes=node))
-            inherit_nodes = node.ancestor
+            inherit_nodes = node.get_ancestor()
 
         for n in inherit_nodes:
             _permissions = queryset.filter(nodes=n)
@@ -70,7 +70,8 @@ class UserGrantedAssetsApi(ListAPIView):
         else:
             user = self.request.user
 
-        for k, v in AssetPermissionUtil.get_user_assets(user).items():
+        util = AssetPermissionUtil(user)
+        for k, v in util.get_assets().items():
             if k.is_unixlike():
                 system_users_granted = [s for s in v if s.protocol == 'ssh']
             else:
@@ -95,7 +96,8 @@ class UserGrantedNodesApi(ListAPIView):
             user = get_object_or_404(User, id=user_id)
         else:
             user = self.request.user
-        nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
+        util = AssetPermissionUtil(user)
+        nodes = util.get_nodes_with_assets()
         return nodes.keys()
 
     def get_permissions(self):
@@ -116,7 +118,8 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         else:
             user = get_object_or_404(User, id=user_id)
 
-        nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
+        util = AssetPermissionUtil(user)
+        nodes = util.get_nodes_with_assets()
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
@@ -147,8 +150,9 @@ class UserGrantedNodeAssetsApi(ListAPIView):
             user = get_object_or_404(User, id=user_id)
         else:
             user = self.request.user
+        util = AssetPermissionUtil(user)
         node = get_object_or_404(Node, id=node_id)
-        nodes = AssetPermissionUtil.get_user_nodes_with_assets(user)
+        nodes = util.get_nodes_with_assets()
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
@@ -172,7 +176,8 @@ class UserGroupGrantedAssetsApi(ListAPIView):
             return queryset
 
         user_group = get_object_or_404(UserGroup, id=user_group_id)
-        assets = AssetPermissionUtil.get_user_group_assets(user_group)
+        util = AssetPermissionUtil(user_group)
+        assets = util.get_assets()
         for k, v in assets.items():
             k.system_users_granted = v
             queryset.append(k)
@@ -189,7 +194,8 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
         if group_id:
             group = get_object_or_404(UserGroup, id=group_id)
-            nodes = AssetPermissionUtil.get_user_group_nodes_with_assets(group)
+            util = AssetPermissionUtil(group)
+            nodes = util.get_nodes_with_assets()
             return nodes.keys()
         return queryset
 
@@ -206,7 +212,8 @@ class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
             return queryset
 
         user_group = get_object_or_404(UserGroup, id=user_group_id)
-        nodes = AssetPermissionUtil.get_user_group_nodes_with_assets(user_group)
+        util = AssetPermissionUtil(user_group)
+        nodes = util.get_nodes_with_assets()
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for asset, system_users in _assets.items():
@@ -226,7 +233,8 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
 
         user_group = get_object_or_404(UserGroup, id=user_group_id)
         node = get_object_or_404(Node, id=node_id)
-        nodes = AssetPermissionUtil.get_user_group_nodes_with_assets(user_group)
+        util = AssetPermissionUtil(user_group)
+        nodes = util.get_nodes_with_assets()
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
@@ -246,7 +254,8 @@ class ValidateUserAssetPermissionView(APIView):
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        assets_granted = AssetPermissionUtil.get_user_assets(user)
+        util = AssetPermissionUtil(user)
+        assets_granted = util.get_assets()
         if system_user in assets_granted.get(asset, []):
             return Response({'msg': True}, status=200)
         else:

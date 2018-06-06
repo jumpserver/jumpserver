@@ -153,7 +153,7 @@ class UserOtpAuthApi(APIView):
             return Response({'msg': '请先进行用户名和密码验证'}, status=401)
 
         if not check_otp_code(user.otp_secret_key, otp_code):
-            return Response({'msg': 'otp认证失败'}, status=401)
+            return Response({'msg': 'MFA认证失败'}, status=401)
 
         token = generate_token(request, user)
         self.write_login_log(request, user)
@@ -204,7 +204,7 @@ class UserAuthApi(APIView):
         return Response(
             {
                 'code': 101,
-                'msg': '请携带seed值,进行OTP二次认证',
+                'msg': '请携带seed值,进行MFA二次认证',
                 'otp_url': reverse('api-users:user-otp-auth'),
                 'seed': seed,
                 'user': self.serializer_class(user).data

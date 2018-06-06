@@ -17,20 +17,21 @@
             position:absolute;
             visibility:hidden;
             text-align: left;
-            top: 100%;
+            {#top: 100%;#}
+            top: 0;
             left: 0;
             z-index: 1000;
-            float: left;
-            padding: 5px 0;
+            {#float: left;#}
+            padding: 0 0;
             margin: 2px 0 0;
             list-style: none;
             background-clip: padding-box;
-        }
+         }
         div#rMenu li{
         	margin: 1px 0;
         	cursor: pointer;
-        	{#list-style: none outside none;#}
-        }
+        	list-style: none outside none;
+         }
         .dropdown a:hover {
             background-color: #f1f1f1
         }
@@ -47,7 +48,6 @@
                    <div class="file-manager ">
                        <div id="assetTree" class="ztree">
                        </div>
-
                        <div class="clearfix"></div>
                    </div>
                </div>
@@ -87,7 +87,7 @@
                            <th class="text-center">{% trans 'IP' %}</th>
                            <th class="text-center">{% trans 'Hardware' %}</th>
                            <th class="text-center">{% trans 'Active' %}</th>
-                           <th class="text-center">{% trans 'Reachable' %}</th>
+{#                           <th class="text-center">{% trans 'Reachable' %}</th>#}
                            <th class="text-center">{% trans 'Action' %}</th>
                        </tr>
                    </thead>
@@ -127,6 +127,9 @@
         <li class="divider"></li>
         <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
         <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
+        <li class="divider"></li>
+        <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
+        <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
     </ul>
 </div>
 
@@ -157,26 +160,35 @@ function initTable() {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
             }},
-            {targets: 5, createdCell: function (td, cellData) {
-                if (cellData === 'Unknown'){
-                    $(td).html('<i class="fa fa-circle text-warning"></i>')
-                } else if (!cellData) {
-                    $(td).html('<i class="fa fa-circle text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-circle text-navy"></i>')
-                }
-            }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
+
+            {#{targets: 5, createdCell: function (td, cellData) {#}
+            {#    if (cellData === 'Unknown'){#}
+            {#        $(td).html('<i class="fa fa-circle text-warning"></i>')#}
+            {#    } else if (!cellData) {#}
+            {#        $(td).html('<i class="fa fa-circle text-danger"></i>')#}
+            {#    } else {#}
+            {#        $(td).html('<i class="fa fa-circle text-navy"></i>')#}
+            {#    }#}
+            {# }},#}
+
+            {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
+
+        {#columns: [#}
+        {#    {data: "id"}, {data: "hostname" }, {data: "ip" },#}
+        {#    {data: "cpu_cores"}, {data: "is_active", orderable: false },#}
+        {#    {data: "is_connective", orderable: false}, {data: "id", orderable: false }#}
+        {#],#}
+
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
             {data: "cpu_cores"}, {data: "is_active", orderable: false },
-            {data: "is_connective", orderable: false}, {data: "id", orderable: false }
+            {data: "id", orderable: false }
         ],
         op_html: $('#actions').html()
     };
@@ -200,6 +212,8 @@ function addTreeNode() {
             };
             newNode.checked = zTree.getSelectedNodes()[0].checked;
             zTree.addNodes(parentNode, 0, newNode);
+            var node = zTree.getNodeByParam('id', newNode.id, parentNode)
+            zTree.editName(node);
         } else {
             alert("{% trans 'Create node failed' %}")
         }
@@ -230,9 +244,9 @@ function removeTreeNode() {
 
 function editTreeNode() {
     hideRMenu();
-	var current_node = zTree.getSelectedNodes()[0];
-	if (!current_node){
-	    return
+    var current_node = zTree.getSelectedNodes()[0];
+    if (!current_node){
+        return
     }
     if (current_node.value) {
         current_node.name = current_node.value;
@@ -253,6 +267,8 @@ function OnRightClick(event, treeId, treeNode) {
 function showRMenu(type, x, y) {
 	$("#rMenu ul").show();
     x -= 220;
+    x += document.body.scrollLeft;
+    y += document.body.scrollTop+document.documentElement.scrollTop;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
 
 	$("body").bind("mousedown", onBodyMouseDown);
@@ -290,6 +306,7 @@ function onRename(event, treeId, treeNode, isCancel){
 function onSelected(event, treeNode) {
     var url = asset_table.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.id);
+    url = setUrlParam(url, "show_current_asset", getCookie('show_current_asset'));
     setCookie('node_selected', treeNode.id);
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
@@ -385,9 +402,9 @@ function initTree() {
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["pId"] = value["parent"];
-            {#if (value["key"] === "0") {#}
-            value["open"] = true;
-            {# }#}
+            if (value["key"] === "0") {
+                value["open"] = true;
+             }
             value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
             value['value'] = value['value'];
         });
@@ -417,6 +434,13 @@ function toggle() {
 $(document).ready(function(){
     initTable();
     initTree();
+
+    if(getCookie('show_current_asset') === '1'){
+        $('#show_all_asset').css('display', 'inline-block');
+    }
+    else{
+        $('#show_current_asset').css('display', 'inline-block');
+    }
 })
 .on('click', '.labels li', function () {
     var val = $(this).text();
@@ -534,6 +558,20 @@ $(document).ready(function(){
         success: success,
         flash_message: false
     });
+})
+.on('click', '.btn-show-current-asset', function(){
+    hideRMenu();
+    $(this).css('display', 'none');
+    $('#show_all_asset').css('display', 'inline-block');
+    setCookie('show_current_asset', '1');
+    location.reload();
+})
+.on('click', '.btn-show-all-asset', function(){
+    hideRMenu();
+    $(this).css('display', 'none');
+    $('#show_current_asset').css('display', 'inline-block');
+    setCookie('show_current_asset', '');
+    location.reload();
 })
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);

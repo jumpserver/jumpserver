@@ -9,6 +9,7 @@
 <link href="{% static 'css/plugins/steps/jquery.steps.css' %}" rel="stylesheet">
 {% endblock %}
 {% block first_login_message %}{% endblock %}
+
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
   <div class="row">
@@ -36,6 +37,8 @@
   </div>
 </div>
 {% endblock %}
+
+
 {% block custom_foot_js %}
 <script>
 $(document).on('click', ".fl_goto", function(){

@@ -107,6 +107,9 @@ $(document).ready(function(){
     $('.btn_export').click(function () {
         var users = [];
         var rows = table.rows('.selected').data();
+        if(rows.length===0){
+            rows = table.rows().data();
+        }
         $.each(rows, function (index, obj) {
             users.push(obj.id)
         });
