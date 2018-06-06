@@ -36,7 +36,7 @@
 
     # 创建数据库及授权，192.168.100.11 是 jumpserver 服务器的 ip
     $ mysql -uroot
-    > create database jumpserver default charset 'utf8
+    > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'192.168.100.11' identified by 'somepassword';
     > flush privileges;
     > quit
