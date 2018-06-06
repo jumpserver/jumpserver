@@ -337,7 +337,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
-
         context = {
             'action': _('Profile'),
             'mfa_setting': mfa_setting.cleaned_value if mfa_setting else False,

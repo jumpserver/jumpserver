@@ -155,7 +155,7 @@
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
                                                    href="
                                                         {% if request.user.otp_enabled and request.user.otp_secret_key %}
-                                                            {% if request.user.otp_force_enabled or mfa_setting %}
+                                                            {% if request.user.otp_force_enabled %}
                                                                 " disabled >{% trans 'Disable' %}
                                                             {% else %}
                                                                 {% url 'users:user-otp-disable-authentication' %}

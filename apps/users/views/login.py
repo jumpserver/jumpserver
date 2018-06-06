@@ -82,24 +82,17 @@ class UserLoginView(FormView):
     def get_success_url(self):
         user = get_user_or_tmp_user(self.request)
 
-        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
-        if mfa_setting and mfa_setting.cleaned_value:
-            if user.otp_enabled and user.otp_secret_key:
-                return reverse('users:login-otp')
-            else:
-                return reverse('users:user-otp-enable-authentication')
-        else:
-            if user.otp_enabled and user.otp_secret_key:
-                # 1,2 & T
-                return reverse('users:login-otp')
-            elif user.otp_enabled and not user.otp_secret_key:
-                # 1,2 & F
-                return reverse('users:user-otp-enable-authentication')
-            elif not user.otp_enabled:
-                # 0 & T,F
-                auth_login(self.request, user)
-                self.write_login_log()
-                return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
+        if user.otp_enabled and user.otp_secret_key:
+            # 1,2 & T
+            return reverse('users:login-otp')
+        elif user.otp_enabled and not user.otp_secret_key:
+            # 1,2 & F
+            return reverse('users:user-otp-enable-authentication')
+        elif not user.otp_enabled:
+            # 0 & T,F
+            auth_login(self.request, user)
+            self.write_login_log()
+            return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
         context = {
