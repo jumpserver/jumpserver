@@ -38,8 +38,8 @@
 ::
 
    # 注意下面的 testuser对应的是你ldap server上存在的用户，填写到配置中需要改为 %(user)s
-   ldapsearch -x -W -h ldap://127.0.0.1:389 -b "ou=People,dc=xxx,dc=com" -D "cn=admin,dc=xxx,dc=com" "(cn=testuser)"
-   ldapsearch -x -W -h ldap://127.0.0.1:389 -b "dc=xxx,dc=com" -D "cn=admin,dc=xxx,dc=com" "(&(cn=testuser)(objectClass=account))"
+   ldapsearch -x -W -H ldap://127.0.0.1:389 -b "ou=People,dc=xxx,dc=com" -D "cn=admin,dc=xxx,dc=com" "(cn=testuser)"
+   ldapsearch -x -W -H ldap://127.0.0.1:389 -b "dc=xxx,dc=com" -D "cn=admin,dc=xxx,dc=com" "(&(cn=testuser)(objectClass=account))"
 
    # extended LDIF
    #
