@@ -11,6 +11,44 @@ from .hands import Node
 logger = get_logger(__file__)
 
 
+class Tree:
+    def __init__(self):
+        self.__all_nodes = list(Node.objects.all().prefetch_related('assets'))
+        self.__node_asset_map = defaultdict(set)
+        self.nodes = defaultdict(dict)
+        self.root = Node.root()
+        self.init_node_asset_map()
+
+    def init_node_asset_map(self):
+        for node in self.__all_nodes:
+            assets = node.get_assets().values_list('id', flat=True)
+            for asset in assets:
+                self.__node_asset_map[str(asset)].add(node)
+
+    def add_asset(self, asset, system_users):
+        nodes = self.__node_asset_map.get(str(asset.id), [])
+        self.add_nodes(nodes)
+        for node in nodes:
+            self.nodes[node][asset].update(system_users)
+
+    def add_node(self, node):
+        if node in self.nodes:
+            return
+        else:
+            self.nodes[node] = defaultdict(set)
+        if node.key == self.root.key:
+            return
+        parent_key = ':'.join(node.key.split(':')[:-1])
+        for n in self.__all_nodes:
+            if n.key == parent_key:
+                self.add_node(n)
+                break
+
+    def add_nodes(self, nodes):
+        for node in nodes:
+            self.add_node(node)
+
+
 def get_user_permissions(user, include_group=True):
     if include_group:
         groups = user.groups.all()
@@ -57,6 +95,7 @@ class AssetPermissionUtil:
     def __init__(self, obj):
         self.object = obj
         self._permissions = None
+        self._assets = None
 
     @property
     def permissions(self):
@@ -93,6 +132,8 @@ class AssetPermissionUtil:
         return assets
 
     def get_assets(self):
+        if self._assets:
+            return self._assets
         assets = self.get_assets_direct()
         nodes = self.get_nodes_direct()
         for node, system_users in nodes.items():
@@ -101,7 +142,8 @@ class AssetPermissionUtil:
                 if isinstance(asset, Node):
                     print(_assets)
                 assets[asset].update(system_users)
-        return assets
+        self._assets = assets
+        return self._assets
 
     def get_nodes_with_assets(self):
         """
@@ -110,14 +152,9 @@ class AssetPermissionUtil:
         :return:
         """
         assets = self.get_assets()
-        nodes = defaultdict(dict)
+        tree = Tree()
         for asset, system_users in assets.items():
-            _nodes = asset.nodes.all()
-            for node in _nodes:
-                if asset in nodes[node]:
-                    nodes[node][asset].update(system_users)
-                else:
-                    nodes[node][asset] = system_users
-        return nodes
+            tree.add_asset(asset, system_users)
+        return tree.nodes
 
 
