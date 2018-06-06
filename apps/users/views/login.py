@@ -83,10 +83,10 @@ class UserLoginView(FormView):
         user = get_user_or_tmp_user(self.request)
 
         if user.otp_enabled and user.otp_secret_key:
-            # 1,2 & T
+            # 1,2,mfa_setting & T
             return reverse('users:login-otp')
         elif user.otp_enabled and not user.otp_secret_key:
-            # 1,2 & F
+            # 1,2,mfa_setting & F
             return reverse('users:user-otp-enable-authentication')
         elif not user.otp_enabled:
             # 0 & T,F

@@ -97,6 +97,10 @@
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td class="text-navy">{% trans 'Source' %}</td>
+                                                <td>{{ user.get_source_display }}</td>
+                                            </tr>
+                                            <tr>
                                                 <td class="text-navy">{% trans 'Date joined' %}</td>
                                                 <td>{{ user.date_joined|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
