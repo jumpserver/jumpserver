@@ -14,7 +14,7 @@ logger = get_logger(__file__)
 def get_user_permissions(user, include_group=True):
     if include_group:
         groups = user.groups.all()
-        arg = Q(users=user) | Q(user_groups=groups)
+        arg = Q(users=user) | Q(user_groups__in=groups)
     else:
         arg = Q(users=user)
     return AssetPermission.objects.all().valid().filter(arg)
@@ -29,7 +29,7 @@ def get_user_group_permissions(user_group):
 def get_asset_permissions(asset, include_node=True):
     if include_node:
         nodes = asset.get_all_nodes(flat=True)
-        arg = Q(assets=asset) | Q(nodes=nodes)
+        arg = Q(assets=asset) | Q(nodes__in=nodes)
     else:
         arg = Q(assets=asset)
     return AssetPermission.objects.all().valid().filter(arg)
