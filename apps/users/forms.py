@@ -72,7 +72,7 @@ class UserCreateUpdateForm(forms.ModelForm):
                     'data-placeholder': _('Join user groups')
                 }
             ),
-            'otp_level': forms.RadioSelect()
+            'otp_level': forms.RadioSelect(),
         }
 
     def clean_public_key(self):
