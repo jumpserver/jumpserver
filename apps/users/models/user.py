@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
+from common.models import Setting
 
 
 __all__ = ['User']
@@ -34,6 +35,12 @@ class User(AbstractUser):
         (0, _('Disable')),
         (1, _('Enable')),
         (2, _("Force enable")),
+    )
+    SOURCE_LOCAL = 'local'
+    SOURCE_LDAP = 'ldap'
+    SOURCE_CHOICES = (
+        (SOURCE_LOCAL, 'Local'),
+        (SOURCE_LDAP, 'LDAP/AD'),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
@@ -81,6 +88,10 @@ class User(AbstractUser):
     )
     created_by = models.CharField(
         max_length=30, default='', verbose_name=_('Created by')
+    )
+    source = models.CharField(
+        max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
+        verbose_name=_('Source')
     )
 
     def __str__(self):
@@ -248,14 +259,17 @@ class User(AbstractUser):
 
     @property
     def otp_enabled(self):
-        return self.otp_level > 0
+        return self.otp_force_enabled or self.otp_level > 0
 
     @property
     def otp_force_enabled(self):
+        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
+        if mfa_setting and mfa_setting.cleaned_value:
+            return True
         return self.otp_level == 2
 
     def enable_otp(self):
-        if not self.otp_force_enabled:
+        if not self.otp_level == 2:
             self.otp_level = 1
 
     def force_enable_otp(self):
@@ -275,6 +289,7 @@ class User(AbstractUser):
             'is_superuser': self.is_superuser,
             'role': self.get_role_display(),
             'groups': [group.name for group in self.groups.all()],
+            'source': self.get_source_display(),
             'wechat': self.wechat,
             'phone': self.phone,
             'otp_level': self.otp_level,

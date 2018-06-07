@@ -122,10 +122,10 @@
 {% block custom_foot_js %}
 <script>
     $(document).on('click', ".fl_goto", function(){
-      var $form = $('#fl_form');
-      $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
-      $form.submit();
-      return false;
+        var $form = $('#fl_form');
+        $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
+        $form.submit();
+        return false;
     }).on('click', '#fl_submit', function(){
         var isFinish = $('#fl_submit').html() === "{% trans 'Finish' %}";
         var noChecked = !$('#acceptTerms').prop('checked');
@@ -137,9 +137,10 @@
             return false;
         }
     }).on('click', '#btn-reset-pubkey', function () {
-    var the_url = '{% url "users:user-pubkey-generate" %}';
-    window.open(the_url, "_blank")
-})
+        var the_url = '{% url "users:user-pubkey-generate" %}';
+        window.open(the_url, "_blank");
+        $('#fl_form').submit();
+    })
 
 </script>
 {% endblock %}

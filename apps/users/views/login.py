@@ -23,9 +23,10 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
+from common.models import Setting
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, redirect_user_first_login_or_index, \
-    get_user_or_tmp_user, set_tmp_user_to_cache
+    get_user_or_tmp_user, set_tmp_user_to_cache, get_password_check_rules, check_password_rules
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -82,10 +83,10 @@ class UserLoginView(FormView):
         user = get_user_or_tmp_user(self.request)
 
         if user.otp_enabled and user.otp_secret_key:
-            # 1,2 & T
+            # 1,2,mfa_setting & T
             return reverse('users:login-otp')
         elif user.otp_enabled and not user.otp_secret_key:
-            # 1,2 & F
+            # 1,2,mfa_setting & F
             return reverse('users:user-otp-enable-authentication')
         elif not user.otp_enabled:
             # 0 & T,F
@@ -211,6 +212,10 @@ class UserResetPasswordView(TemplateView):
         token = request.GET.get('token')
         user = User.validate_reset_token(token)
 
+        check_rules, min_length = get_password_check_rules()
+        password_rules = {'password_check_rules': check_rules, 'min_length': min_length}
+        kwargs.update(password_rules)
+
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
         return super().get(request, *args, **kwargs)
@@ -226,6 +231,13 @@ class UserResetPasswordView(TemplateView):
         user = User.validate_reset_token(token)
         if not user:
             return self.get(request, errors=_('Token invalid or expired'))
+
+        is_ok = check_password_rules(password)
+        if not is_ok:
+            return self.get(
+                request,
+                errors=_('* Your password does not meet the requirements')
+            )
 
         user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
