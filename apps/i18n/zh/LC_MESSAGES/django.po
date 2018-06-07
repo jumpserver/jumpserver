@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-06 16:53+0800\n"
+"POT-Creation-Date: 2018-06-07 11:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -392,7 +392,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:13
-#: users/models/user.py:347
+#: users/models/user.py:343
 msgid "System"
 msgstr "系统"
 
@@ -432,9 +432,9 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:281
-#: users/models/user.py:31 users/models/user.py:335
+#: users/models/user.py:31 users/models/user.py:331
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:359
+#: users/templates/users/user_group_list.html:13 users/views/user.py:362
 msgid "User"
 msgstr "用户"
 
@@ -1965,7 +1965,7 @@ msgstr "文档"
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:341
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:344
 msgid "Profile"
 msgstr "个人信息"
 
@@ -2022,13 +2022,13 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:277 users/views/login.py:335 users/views/user.py:65
-#: users/views/user.py:80 users/views/user.py:102 users/views/user.py:173
-#: users/views/user.py:328 users/views/user.py:378 users/views/user.py:413
+#: users/views/login.py:277 users/views/login.py:335 users/views/user.py:66
+#: users/views/user.py:81 users/views/user.py:103 users/views/user.py:174
+#: users/views/user.py:329 users/views/user.py:381 users/views/user.py:416
 msgid "Users"
 msgstr "用户管理"
 
-#: templates/_nav.html:13 users/views/user.py:66
+#: templates/_nav.html:13 users/views/user.py:67
 msgid "User list"
 msgstr "用户列表"
 
@@ -2464,7 +2464,7 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:30 users/models/user.py:343
+#: users/models/user.py:30 users/models/user.py:339
 msgid "Administrator"
 msgstr "管理员"
 
@@ -2506,7 +2506,7 @@ msgstr "微信"
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:346
+#: users/models/user.py:342
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -2649,7 +2649,7 @@ msgid "Setting"
 msgstr "设置"
 
 #: users/templates/users/user_create.html:4
-#: users/templates/users/user_list.html:16 users/views/user.py:80
+#: users/templates/users/user_list.html:16 users/views/user.py:81
 msgid "Create user"
 msgstr "创建用户"
 
@@ -2658,7 +2658,7 @@ msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
-#: users/templates/users/user_granted_asset.html:18 users/views/user.py:174
+#: users/templates/users/user_granted_asset.html:18 users/views/user.py:175
 msgid "User detail"
 msgstr "用户详情"
 
@@ -2793,8 +2793,8 @@ msgstr "用户删除失败"
 msgid "Administrator Settings force MFA login"
 msgstr "管理员设置强制使用MFA登录"
 
-#: users/templates/users/user_profile.html:116 users/views/user.py:203
-#: users/views/user.py:257
+#: users/templates/users/user_profile.html:116 users/views/user.py:204
+#: users/views/user.py:258
 msgid "User groups"
 msgstr "用户组"
 
@@ -2834,7 +2834,13 @@ msgstr "更新密钥"
 msgid "Or reset by server"
 msgstr "或者重置并下载密钥"
 
-#: users/templates/users/user_update.html:4 users/views/user.py:103
+#: users/templates/users/user_pubkey_update.html:94
+msgid ""
+"The new public key has been set successfully, Please download the "
+"corresponding private key."
+msgstr "新的公钥已设置成功，请下载对应的私钥"
+
+#: users/templates/users/user_update.html:4 users/views/user.py:104
 msgid "Update user"
 msgstr "更新用户"
 
@@ -2992,7 +2998,7 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:128 users/views/user.py:498 users/views/user.py:523
+#: users/views/login.py:128 users/views/user.py:501 users/views/user.py:526
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
@@ -3033,7 +3039,7 @@ msgstr "Token错误或失效"
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:239 users/views/user.py:115 users/views/user.py:396
+#: users/views/login.py:239 users/views/user.py:116 users/views/user.py:399
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -3045,46 +3051,46 @@ msgstr "首次登陆"
 msgid "Login log list"
 msgstr "登录日志"
 
-#: users/views/user.py:127
+#: users/views/user.py:128
 msgid "Bulk update user success"
 msgstr "批量更新用户成功"
 
-#: users/views/user.py:232
+#: users/views/user.py:233
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:329
+#: users/views/user.py:330
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:360
+#: users/views/user.py:363
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:379
+#: users/views/user.py:382
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:414
+#: users/views/user.py:417
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:455
+#: users/views/user.py:458
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:549
+#: users/views/user.py:552
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:550
+#: users/views/user.py:553
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:552
+#: users/views/user.py:555
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:553
+#: users/views/user.py:556
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
