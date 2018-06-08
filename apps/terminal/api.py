@@ -4,6 +4,7 @@ from collections import OrderedDict
 import logging
 import os
 import uuid
+import copy
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
@@ -291,8 +292,12 @@ class SessionReplayViewSet(viewsets.ViewSet):
             url = default_storage.url(path)
             return redirect(url)
         else:
-            configs = settings.TERMINAL_REPLAY_STORAGE
-            configs = [cfg for cfg in configs if cfg['TYPE'] != 'server']
+            config = settings.TERMINAL_REPLAY_STORAGE
+            configs = copy.deepcopy(config)
+            for cfg in config:
+                if config[cfg]['TYPE'] == 'server':
+                    configs.__delitem__(cfg)
+
             if not configs:
                 return HttpResponseNotFound()
 
