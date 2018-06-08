@@ -109,12 +109,13 @@ class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def form_valid(self, form):
         password = form.cleaned_data.get('password')
-        is_ok = check_password_rules(password)
-        if not is_ok:
-            form.add_error(
-                "password", _("* Your password does not meet the requirements")
-            )
-            return self.form_invalid(form)
+        if password:
+            is_ok = check_password_rules(password)
+            if not is_ok:
+                form.add_error(
+                    "password", _("* Your password does not meet the requirements")
+                )
+                return self.form_invalid(form)
 
         return super().form_valid(form)
 
