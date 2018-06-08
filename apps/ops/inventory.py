@@ -86,6 +86,7 @@ class JMSInventory(BaseInventory):
         gateway = asset.domain.random_gateway()
         proxy_command_list = [
             "ssh", "-p", str(gateway.port),
+            "-o", "StrictHostKeyChecking=no",
             "{}@{}".format(gateway.username, gateway.ip),
             "-W", "%h:%p", "-q",
         ]
@@ -97,7 +98,7 @@ class JMSInventory(BaseInventory):
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_file))
 
-        proxy_command = "'-o ProxyCommand={}'".format(
+        proxy_command = "'-o ProxyCommand={}".format(
             " ".join(proxy_command_list)
         )
         return {"ansible_ssh_common_args": proxy_command}
