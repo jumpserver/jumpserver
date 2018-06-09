@@ -158,7 +158,7 @@ FAQ
         # 尝试重启一下guacamole，然后再看看，如果任然不在线，参考上面gua重新注册的方法
         $ docker restart jms_guacamole  # 如果容器的名称不对，请用docker ps查询
 
-    (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，如果使用用户cn作为登录用户名，请确认用户的cn属性不是中文
+    (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，确认使用了映射的用户属性进行登陆
 
     (6). Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
 
@@ -166,11 +166,12 @@ FAQ
 
     (8). 默认录像存储位置在jumpserver/data/media
 
-    (9). 录像存储在云的规则，Jumpserver 系统设置-终端设置 录像存储
+    (9). 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
         {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
 
          命令记录保存到 elastic
         {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
+
          修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
 
     (10). 管理密码忘记了或者重置管理员密码
