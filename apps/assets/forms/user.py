@@ -93,14 +93,20 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         # Because we define custom field, so we need rewrite :method: `save`
         system_user = super().save()
         password = self.cleaned_data.get('password', '') or None
+        login_mode = self.cleaned_data.get('login_mode', '') or None
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
+
+        if login_mode == SystemUser.MANUAL_LOGIN:
+            system_user.auto_push = 0
+            system_user.save()
 
         if auto_generate_key:
             logger.info('Auto generate key and set system user auth')
             system_user.auto_gen_auth()
         else:
             system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
+
         return system_user
 
     def clean(self):
