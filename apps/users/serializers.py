@@ -26,7 +26,10 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super(UserSerializer, self).get_field_names(declared_fields, info)
-        fields.extend(['groups_display', 'get_role_display', 'is_valid'])
+        fields.extend([
+            'groups_display', 'get_role_display',
+            'get_source_display', 'is_valid'
+        ])
         return fields
 
     @staticmethod

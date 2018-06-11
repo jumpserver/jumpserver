@@ -27,6 +27,9 @@
                                 <a href="{% url 'settings:terminal-setting' %}" class="text-center"><i
                                         class="fa fa-hdd-o"></i> {% trans 'Terminal setting' %} </a>
                             </li>
+                            <li>
+                                <a href="{% url 'settings:security-setting' %}" class="text-center"><i class="fa fa-lock"></i> {% trans 'Security setting' %} </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -39,6 +42,7 @@
                                         </div>
                                     {% endif %}
                                     {% csrf_token %}
+
                                     <h3>{% trans "Basic setting" %}</h3>
                                     {% for field in form %}
                                         {% if not field.field|is_bool_field %}
@@ -60,6 +64,7 @@
                                     {% endfor %}
 
                                     <div class="hr-line-dashed"></div>
+
                                     <h3>{% trans "Command storage" %}</h3>
                                     <table class="table table-hover " id="task-history-list-table">
                                         <thead>

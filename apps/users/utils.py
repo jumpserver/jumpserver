@@ -2,6 +2,7 @@
 #
 from __future__ import unicode_literals
 import os
+import re
 import pyotp
 import base64
 import logging
@@ -18,7 +19,10 @@ from django.core.cache import cache
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
+from common.models import Setting
+from common.forms import SecuritySettingForm
 from .models import User, LoginLog
+
 
 logger = logging.getLogger('jumpserver')
 
@@ -271,3 +275,60 @@ def generate_otp_uri(request, issuer="Jumpserver"):
 def check_otp_code(otp_secret_key, otp_code):
     totp = pyotp.TOTP(otp_secret_key)
     return totp.verify(otp_code)
+
+
+def get_password_check_rules():
+    check_rules = []
+    min_length = settings.DEFAULT_PASSWORD_MIN_LENGTH
+    min_name = 'SECURITY_PASSWORD_MIN_LENGTH'
+    base_filed = SecuritySettingForm.base_fields
+    password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
+
+    if not password_setting:
+        # 用户还没有设置过密码校验规则
+        label = base_filed.get(min_name).label
+        label += ' ' + str(min_length) + _('Bit')
+        id = 'rule_' + min_name
+        rules = {'id': id, 'label': label}
+        check_rules.append(rules)
+
+    for setting in password_setting:
+        if setting.cleaned_value:
+            id = 'rule_' + setting.name
+            label = base_filed.get(setting.name).label
+            if setting.name == min_name:
+                label += str(setting.cleaned_value) + _('Bit')
+                min_length = setting.cleaned_value
+            rules = {'id': id, 'label': label}
+            check_rules.append(rules)
+
+    return check_rules, min_length
+
+
+def check_password_rules(password):
+    min_field_name = 'SECURITY_PASSWORD_MIN_LENGTH'
+    upper_field_name = 'SECURITY_PASSWORD_UPPER_CASE'
+    lower_field_name = 'SECURITY_PASSWORD_LOWER_CASE'
+    number_field_name = 'SECURITY_PASSWORD_NUMBER'
+    special_field_name = 'SECURITY_PASSWORD_SPECIAL_CHAR'
+    min_length_setting = Setting.objects.filter(name=min_field_name).first()
+    min_length = min_length_setting.value if min_length_setting else settings.DEFAULT_PASSWORD_MIN_LENGTH
+
+    password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
+    if not password_setting:
+        pattern = r"^.{" + str(min_length) + ",}$"
+    else:
+        pattern = r"^"
+        for setting in password_setting:
+            if setting.cleaned_value and setting.name == upper_field_name:
+                pattern += '(?=.*[A-Z])'
+            elif setting.cleaned_value and setting.name == lower_field_name:
+                pattern += '(?=.*[a-z])'
+            elif setting.cleaned_value and setting.name == number_field_name:
+                pattern += '(?=.*\d)'
+            elif setting.cleaned_value and setting.name == special_field_name:
+                pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'",\.<>\/\?])'
+        pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'",\.<>\/\?]'
+
+    match_obj = re.match(pattern, password)
+    return bool(match_obj)

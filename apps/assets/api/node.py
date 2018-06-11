@@ -116,7 +116,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         if not pk:
-            node = Node.root()
+            node = None
         else:
             node = get_object_or_404(Node, pk=pk)
         return node
@@ -126,7 +126,8 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         query_all = self.request.query_params.get("all")
         query_assets = self.request.query_params.get('assets')
         node = self.get_object()
-        if node == Node.root():
+        if node is None:
+            node = Node.root()
             queryset.append(node)
         if query_all:
             children = node.get_all_children()
