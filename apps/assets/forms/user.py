@@ -109,12 +109,24 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         if not self.instance and not auto_generate:
             super().validate_password_key()
 
+    def is_valid(self):
+        validated = super().is_valid()
+        username = self.cleaned_data.get('username')
+        login_mode = self.cleaned_data.get('login_mode')
+        if login_mode == SystemUser.AUTO_LOGIN and not username:
+            self.add_error(
+                "username", _('* Automatic login mode,'
+                              ' must fill in the username.')
+            )
+            return False
+        return validated
+
     class Meta:
         model = SystemUser
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key',
             'password', 'private_key_file', 'auto_push', 'sudo',
-            'comment', 'shell', 'priority',
+            'comment', 'shell', 'priority', 'login_mode',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -124,5 +136,8 @@ class SystemUserForm(PasswordAndKeyAuthForm):
             'name': '* required',
             'username': '* required',
             'auto_push': _('Auto push system user to asset'),
-            'priority': _('High level will be using login asset as default, if user was granted more than 2 system user'),
+            'priority': _('High level will be using login asset as default, '
+                          'if user was granted more than 2 system user'),
+            'login_mode': _('If you choose manual login mode, you do not '
+                            'need to fill in the username and password.')
         }

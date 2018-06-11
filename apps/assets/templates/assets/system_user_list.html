@@ -26,6 +26,7 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
         <th class="text-center">{% trans 'Protocol' %}</th>
+        <th class="text-center">{% trans 'Login mode' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
         <th class="text-center">{% trans 'Reachable' %}</th>
         <th class="text-center">{% trans 'Unreachable' %}</th>
@@ -48,7 +49,7 @@ function initTable() {
                 var detail_btn = '<a href="{% url "assets:system-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
-            {targets: 5, createdCell: function (td, cellData) {
+            {targets: 6, createdCell: function (td, cellData) {
                 var innerHtml = "";
                 if (cellData !== 0) {
                     innerHtml = "<span class='text-navy'>" + cellData + "</span>";
@@ -57,7 +58,7 @@ function initTable() {
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData +'">' + innerHtml + '</span>');
             }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 7, createdCell: function (td, cellData) {
                 var innerHtml = "";
                 if (cellData !== 0) {
                     innerHtml = "<span class='text-danger'>" + cellData + "</span>";
@@ -66,7 +67,7 @@ function initTable() {
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
             }},
-            {targets: 7, createdCell: function (td, cellData, rowData) {
+            {targets: 8, createdCell: function (td, cellData, rowData) {
                 var val = 0;
                 var innerHtml = "";
                 var total = rowData.assets_amount;
@@ -84,14 +85,14 @@ function initTable() {
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
 
             }},
-            {targets: 9, createdCell: function (td, cellData, rowData) {
+            {targets: 10, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}],
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
-            {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "assets_amount" },
+            {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "get_login_mode_display"}, {data: "assets_amount" },
             {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }
         ],
         op_html: $('#actions').html()
