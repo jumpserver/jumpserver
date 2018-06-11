@@ -86,6 +86,7 @@ class JMSInventory(BaseInventory):
         gateway = asset.domain.random_gateway()
         proxy_command_list = [
             "ssh", "-p", str(gateway.port),
+            "-o", "StrictHostKeyChecking=no",
             "{}@{}".format(gateway.username, gateway.ip),
             "-W", "%h:%p", "-q",
         ]
