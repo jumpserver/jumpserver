@@ -8,14 +8,25 @@
     :license: GPL v2, see LICENSE for more details.
 """
 import os
+from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+TMP_SECRET_KEY_FILE = os.path.join(BASE_DIR, 'tmp', '.secret_key')
+try:
+    f = open(TMP_SECRET_KEY_FILE, 'r')
+    TMP_SECRET_KEY = f.read()
+except FileNotFoundError as e:
+    TMP_SECRET_KEY = get_random_secret_key()
+    f = open(TMP_SECRET_KEY_FILE, 'w')
+    f.write(TMP_SECRET_KEY)
+finally:
+    f.close()
 
 class Config:
     # Use it to encrypt or decrypt data
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or TMP_SECRET_KEY
 
     # Django security setting, if your disable debug model, you should setting that
     ALLOWED_HOSTS = ['*']
