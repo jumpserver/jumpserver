@@ -146,7 +146,7 @@ CentOS 7 安装文档
         DB_NAME = 'jumpserver'
 
         # When Django start it will bind this host and port
-        # Django 运行的端口和容器，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
+        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
         # ./manage.py runserver 127.0.0.1:8080
         HTTP_BIND_HOST = '127.0.0.1'
         HTTP_LISTEN_PORT = 8080
@@ -243,7 +243,7 @@ CentOS 7 安装文档
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.1/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 

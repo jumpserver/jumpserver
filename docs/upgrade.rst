@@ -6,6 +6,7 @@
 ::
 
     # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可，请做好备份
+    $ cd /opt/jumpserver
     $ git pull
     $ pip install -r requirements/requirements.txt  # 如果使用其他源下载失败可以使用 -i 参数指定源
     $ cd utils && sh make_migrations.sh
@@ -18,6 +19,7 @@
 ::
 
     # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可
+    $ cd /opt/coco
     $ git pull && pip install -r requirements/requirements.txt
 
     # 如果使用其他源下载失败可以使用 -i 参数指定源
@@ -29,7 +31,8 @@
 
 ::
 
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.1/luna.tar.gz
+    $ cd /opt
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 

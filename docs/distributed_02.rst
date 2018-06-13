@@ -37,7 +37,7 @@
 
     # 下载 luna
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.1/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 

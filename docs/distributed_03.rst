@@ -31,7 +31,7 @@
     $ systemctl enable mariadb
     $ systemctl start mariadb
 
-    # 推荐使用该命令进行一些安装设置（可跳过）
+    # 推荐使用该命令进行一些安全设置（可跳过）
     $ mysql_secure_installation
 
     # 创建数据库及授权，192.168.100.11 是 jumpserver 服务器的 ip
