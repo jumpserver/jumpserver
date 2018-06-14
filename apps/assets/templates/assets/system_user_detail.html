@@ -63,6 +63,10 @@
                                             <td><b>{{ system_user.username }}</b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Login mode' %}:</td>
+                                            <td><b>{{ system_user.get_login_mode_display }}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Protocol' %}:</td>
                                             <td><b id="id_protocol_type">{{ system_user.protocol }}</b></td>
                                         </tr>
