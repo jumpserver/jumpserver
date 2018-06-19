@@ -249,9 +249,9 @@ CentOS 7 安装文档
     $ chown -R root:root luna
 
     # 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
-    $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
-    $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
-    $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+    $ yum remove docker-latest-logrotate docker-logrotate docker-selinux dockdocker-engine
+    $ yum install -y yum-utils device-mapper-persistent-data lvm2
+    $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     $ yum makecache fast
     $ yum install docker-ce
     $ systemctl start docker
@@ -334,7 +334,8 @@ CentOS 7 安装文档
     $ nginx -t   # 确保配置没有问题, 有问题请先解决
     $ systemctl start nginx
 
-    # 访问 http://192.168.244.144 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+    # 访问 http://192.168.244.144 (注意，没有 :8080，通过 nginx 代理端口进行访问)
+    # 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
     # 测试连接
     $ ssh -p2222 admin@192.168.244.144
     $ sftp -P2222 admin@192.168.244.144
