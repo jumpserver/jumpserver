@@ -69,8 +69,10 @@
     ...
     class Config:
         # Use it to encrypt or decrypt data
-        # SECURITY WARNING: keep the secret key used in production secret!
-        SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+
+        # Jumpserver 使用 SECRET_KEY 进行加密
+        # SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+        SECRET_KEY = os.environ.get('SECRET_KEY') or '请随意输入随机字符串（推荐字符大于等于 50位）'
 
         # Django security setting, if your disable debug model, you should setting that
         ALLOWED_HOSTS = ['*']

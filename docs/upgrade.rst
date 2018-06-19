@@ -5,7 +5,7 @@
 
 ::
 
-    # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可，请做好备份
+    # 升级前请做好 jumpserver 与 数据库 备份，谨防意外，具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
     $ git pull
     $ pip install -r requirements/requirements.txt  # 如果使用其他源下载失败可以使用 -i 参数指定源
@@ -18,7 +18,7 @@
 
 ::
 
-    # 新版本更新了自动升级脚本，升级只需要到 utils 目录下执行 sh upgrade.sh 即可
+    # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
     $ git pull && pip install -r requirements/requirements.txt
 
