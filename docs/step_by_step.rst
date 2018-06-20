@@ -391,6 +391,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $http_connection;
             access_log off;
+            client_max_body_size 100m;  # Windows 文件上传大小限制
         }
 
         location / {
@@ -453,6 +454,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     如果能登陆代表部署成功
 
     # sftp默认上传的位置在资产的 /tmp 目录下
+    # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
 
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

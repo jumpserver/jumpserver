@@ -304,6 +304,7 @@ CentOS 7 安装文档
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $http_connection;
             access_log off;
+            client_max_body_size 100m;  # Windows 文件上传大小限制
         }
 
         location / {
@@ -348,6 +349,7 @@ CentOS 7 安装文档
       如果能登陆代表部署成功
 
     # sftp默认上传的位置在资产的 /tmp 目录下
+    # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
 
     # 其他的ssh及sftp客户端这里就不多做说明，自行搜索使用
 
