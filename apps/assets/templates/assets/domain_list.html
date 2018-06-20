@@ -1,6 +1,14 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
 {% block table_search %}{% endblock %}
+
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登
+录。
+    </div>
+{% endblock %}
+
 {% block table_container %}
 <div class="uc pull-left  m-r-5">
     <a href="{% url 'assets:domain-create' %}" class="btn btn-sm btn-primary"> {% trans "Create domain" %} </a>
@@ -69,6 +77,3 @@ $(document).ready(function(){
 });
 </script>
 {% endblock %}
-
-
-
