@@ -56,7 +56,8 @@ def test_gateway_connectability(gateway):
     try:
         proxy.connect(gateway.ip, username=gateway.username,
                       password=gateway.password,
-                      pkey=gateway.private_key_obj)
+                      pkey=gateway.private_key_obj,
+                      port=gateway.port)
     except(paramiko.AuthenticationException,
            paramiko.BadAuthenticationType,
            SSHException) as e:
