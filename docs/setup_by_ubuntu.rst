@@ -117,7 +117,9 @@
 
     $ cd /opt/jumpserver
     $ cp config_example.py config.py
-    $ vi config.py  # 我们计划修改 DevelopmentConfig中的配置，因为默认jumpserver是使用该配置，它继承自Config
+    $ vi config.py
+
+    # 注意对齐，不要直接复制本文档的内容
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
