@@ -128,16 +128,12 @@ class UserToken(APIView):
             return Response({'error': msg}, status=406)
 
 
-class UserProfile(APIView):
-    permission_classes = (IsValidUser,)
+class UserProfile(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
-    def get(self, request):
-        # return Response(request.user.to_json())
-        return Response(self.serializer_class(request.user).data)
-
-    def post(self, request):
-        return Response(self.serializer_class(request.user).data)
+    def get_object(self):
+        return self.request.user
 
 
 class UserOtpAuthApi(APIView):
