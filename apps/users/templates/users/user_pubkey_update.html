@@ -67,7 +67,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-sm-2 col-lg-2" style="padding-top: 0">{% trans 'Or reset by server' %}</label>
                                         <div class=" col-sm-9 col-lg-9 ">
-                                            <a href="{% url 'users:user-pubkey-generate' %}">{% trans 'Reset' %}</a>
+                                            <a id="reset_pubkey" href="{% url 'users:user-pubkey-generate' %}">{% trans 'Reset' %}</a>
                                         </div>
                                     </div>
                                     <div class="hr-line-dashed"></div>
@@ -89,5 +89,10 @@
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/cropper/cropper.min.js' %}"></script>
     <script>
+    $(document).ready(function () {
+    }).on('click', '#reset_pubkey', function () {
+        var message = "{% trans 'The new public key has been set successfully, Please download the corresponding private key.' %}";
+        toastr.success(message)
+    })
     </script>
 {% endblock %}

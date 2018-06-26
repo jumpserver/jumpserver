@@ -91,7 +91,14 @@
                                                     {% else %}
                                                         {% trans 'Disable' %}
                                                     {% endif %}
+                                                    {% if mfa_setting %}
+                                                        ( {% trans 'Administrator Settings force MFA login' %} )
+                                                    {% endif %}
                                                 </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-navy">{% trans 'Source' %}</td>
+                                                <td>{{ user.get_source_display }}</td>
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'Date joined' %}</td>

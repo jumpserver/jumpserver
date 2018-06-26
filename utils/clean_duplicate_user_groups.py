@@ -17,9 +17,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
 django.setup()
 
 from users.models import UserGroup
+from django.core.exceptions import FieldError
 
 
 def clean_group(interactive=True):
+    try:
+        UserGroup.objects.all().filter(is_discard=True).delete()
+    except FieldError:
+        pass
     groups = UserGroup.objects.all()
     groups_name_list = groups.values_list('name', flat=True)
     groups_with_info = groups.annotate(Count('users'))\
@@ -50,7 +55,7 @@ def clean_group(interactive=True):
                             "Delete user group <{}>, create at {}? ([y]/n)".format(
                                 name, group.date_created)
                         )
-                        if confirm.lower() == "y":
+                        if confirm.lower() in ["y", ""]:
                             confirm = True
                             break
                         elif confirm.lower() == "n":
