@@ -84,7 +84,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 ::
 
     $ cd /opt/
-    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
@@ -155,35 +155,45 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
 ::
 
-    ...
+    """
+        jumpserver.config
+        ~~~~~~~~~~~~~~~~~
+
+        Jumpserver project setting file
+
+        :copyright: (c) 2014-2017 by Jumpserver Team
+        :license: GPL v2, see LICENSE for more details.
+    """
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
     class Config:
         # Use it to encrypt or decrypt data
-        # Jumpserver 使用 SECRET_KEY 进行加密
+
+        # Jumpserver 使用 SECRET_KEY 进行加密，请务必修改以下设置
         # SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
-        SECRET_KEY = os.environ.get('SECRET_KEY') or '请随意输入随机字符串（推荐字符大于等于 50位）'
+        SECRET_KEY = '请随意输入随机字符串（推荐字符大于等于 50位）'
 
         # Django security setting, if your disable debug model, you should setting that
         ALLOWED_HOSTS = ['*']
 
-        # Development env open this, when error occur display the full process track, Production disable it
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
         DEBUG = False
 
-        # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
-        LOG_LEVEL = 'WARNING'
+        LOG_LEVEL = 'ERROR'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
-        # Database setting, Support sqlite3, mysql, postgres ....
-        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
         # 使用的数据库配置，支持sqlite3, mysql, postgres等，默认使用sqlite3
+        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # SQLite setting:
         # 默认使用SQLite，如果使用其他数据库请注释下面两行
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
-        # MySQL or postgres setting like:
-        # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
+
+        # # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
         DB_ENGINE = 'mysql'
         DB_HOST = '127.0.0.1'
         DB_PORT = 3306
@@ -191,24 +201,36 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         DB_PASSWORD = 'somepassword'
         DB_NAME = 'jumpserver'
 
-        # When Django start it will bind this host and port
-        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
+        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
         HTTP_BIND_HOST = '127.0.0.1'
         HTTP_LISTEN_PORT = 8080
 
-        # Use Redis as broker for celery and web socket
         # Redis 相关设置
         REDIS_HOST = '127.0.0.1'
         REDIS_PORT = 6379
         REDIS_PASSWORD = ''
-        BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
-            'password': REDIS_PASSWORD,
-            'host': REDIS_HOST,
-            'port': REDIS_PORT,
-        }
-    ...
 
+        def __init__(self):
+            pass
+
+        def __getattr__(self, item):
+            return None
+
+
+        class DevelopmentConfig(Config):
+            pass
+
+
+        class TestConfig(Config):
+            pass
+
+
+        class ProductionConfig(Config):
+            pass
+
+
+    # Default using Config settings, you can write if/else for different env
     config = DevelopmentConfig()
 
 **2.8 生成数据库表结构和初始化数据**
@@ -228,12 +250,6 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，搭建 nginx 代理就可以正常访问了
-
-附上重启的方法
-
-::
-
-    $ ./jms restart
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,12 +276,95 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ yum -y  install $(cat rpm_requirements.txt)
     $ pip install -r requirements.txt -i https://pypi.org/simple
 
-**3.3 查看配置文件并运行**
+**3.3 修改配置文件并运行**
 
 ::
 
     $ cd /opt/coco
     $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
+    $ vi conf.py
+
+    # 注意对齐，不要直接复制本文档的内容
+
+**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+
+::
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+    #
+
+    import os
+
+    BASE_DIR = os.path.dirname(__file__)
+
+
+    class Config:
+        """
+        Coco config file, coco also load config from server update setting below
+        """
+        # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
+        # NAME = "localhost"
+        NAME = "coco"
+
+        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
+        # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
+        CORE_HOST = 'http://127.0.0.1:8080'
+
+        # 启动时绑定的ip, 默认 0.0.0.0
+        # BIND_HOST = '0.0.0.0'
+
+        # 监听的SSH端口号, 默认2222
+        # SSHD_PORT = 2222
+
+        # 监听的HTTP/WS端口号，默认5000
+        # HTTPD_PORT = 5000
+
+        # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
+        # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
+        # ACCESS_KEY = None
+
+        # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
+        # ACCESS_KEY_STORE = os.path.join(BASE_DIR, 'keys', '.access_key')
+
+        # 加密密钥
+        # SECRET_KEY = None
+
+        # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+        # LOG_LEVEL = 'INFO'
+
+        # 日志存放的目录
+        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
+        # Session录像存放目录
+        # SESSION_DIR = os.path.join(BASE_DIR, 'sessions')
+
+        # 资产显示排序方式, ['ip', 'hostname']
+        # ASSET_LIST_SORT_BY = 'ip'
+
+        # 登录是否支持密码认证
+        # PASSWORD_AUTH = True
+
+        # 登录是否支持秘钥认证
+        # PUBLIC_KEY_AUTH = True
+
+        # 和Jumpserver 保持心跳时间间隔
+        # HEARTBEAT_INTERVAL = 5
+
+        # Admin的名字，出问题会提示给用户
+        # ADMINS = ''
+        COMMAND_STORAGE = {
+            "TYPE": "server"
+        }
+        REPLAY_STORAGE = {
+            "TYPE": "server"
+        }
+
+
+    config = Config()
+
+::
+
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
 
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
@@ -355,7 +454,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     # 把默认server配置块改成这样
 
     server {
-        listen 80;
+        listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
 
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $host;
@@ -432,7 +531,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     # 如果安装了 Guacamole
     $ docker ps  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
 
-服务全部启动后，访问 http://192.168.244.144
+服务全部启动后，访问 http://192.168.244.144，访问nginx代理的端口，不要再通过8080端口访问
 
 默认账号: admin 密码: admin
 
