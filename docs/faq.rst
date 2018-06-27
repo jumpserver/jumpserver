@@ -230,5 +230,5 @@ FAQ
         SESSION_EXPIRE_AT_BROWSER_CLOSE = True
         
     (15). MFA遗失无法登陆
-        a) 普通用户可以找管理员
+        a) 普通用户联系管理员关闭MFA，登录成功后用户在个人信息里面重新绑定.
         b) 如果管理员遗失无法登陆, 修改user_user表对应用户的otp_level为0, 重新登陆绑定即可
