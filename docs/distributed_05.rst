@@ -55,19 +55,32 @@
     $ cp conf_example.py conf.py
     $ vi conf.py
 
-    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对其，不要直接复制本文内容
+    # 注意对齐，不要直接复制本文档的内容
 
-    ...
+**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+
+::
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+    #
+
+    import os
+
+    BASE_DIR = os.path.dirname(__file__)
+
+
     class Config:
-    """
-    Coco config file, coco also load config from server update setting below
-    """
+        """
+        Coco config file, coco also load config from server update setting below
+        """
         # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
         # NAME = "localhost"
+        NAME = "coco"
 
-        # Jumpserver项目的url, api请求注册会使用
+        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
-        CORE_HOST = 'http://192.168.100.100'
+        CORE_HOST = 'http://127.0.0.1:8080'
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -90,7 +103,6 @@
 
         # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
         # LOG_LEVEL = 'INFO'
-        LOG_LEVEL = 'WARN'
 
         # 日志存放的目录
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -117,10 +129,10 @@
         }
         REPLAY_STORAGE = {
             "TYPE": "server"
-            }
+        }
 
 
-        config = Config()
+    config = Config()
 
 ::
 

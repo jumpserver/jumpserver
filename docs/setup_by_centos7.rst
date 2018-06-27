@@ -108,37 +108,51 @@ CentOS 7 安装文档
     $ cp config_example.py config.py
     $ vi config.py
 
-    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对齐，不要直接复制本文内容
+    # 注意对齐，不要直接复制本文档的内容
 
-    ...
+**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+
+::
+
+    """
+        jumpserver.config
+        ~~~~~~~~~~~~~~~~~
+
+        Jumpserver project setting file
+
+        :copyright: (c) 2014-2017 by Jumpserver Team
+        :license: GPL v2, see LICENSE for more details.
+    """
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
     class Config:
         # Use it to encrypt or decrypt data
-        # Jumpserver 使用 SECRET_KEY 进行加密
+
+        # Jumpserver 使用 SECRET_KEY 进行加密，请务必修改以下设置
         # SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
-        SECRET_KEY = os.environ.get('SECRET_KEY') or '请随意输入随机字符串（推荐字符大于等于 50位）'
+        SECRET_KEY = '请随意输入随机字符串（推荐字符大于等于 50位）'
 
         # Django security setting, if your disable debug model, you should setting that
         ALLOWED_HOSTS = ['*']
 
-        # Development env open this, when error occur display the full process track, Production disable it
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
         DEBUG = False
 
-        # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
-        LOG_LEVEL = 'WARNING'
+        LOG_LEVEL = 'ERROR'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
-        # Database setting, Support sqlite3, mysql, postgres ....
-        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
         # 使用的数据库配置，支持sqlite3, mysql, postgres等，默认使用sqlite3
+        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # SQLite setting:
         # 默认使用SQLite，如果使用其他数据库请注释下面两行
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
-        # MySQL or postgres setting like:
-        # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
+
+        # # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
         DB_ENGINE = 'mysql'
         DB_HOST = '127.0.0.1'
         DB_PORT = 3306
@@ -146,24 +160,36 @@ CentOS 7 安装文档
         DB_PASSWORD = 'somepassword'
         DB_NAME = 'jumpserver'
 
-        # When Django start it will bind this host and port
-        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问。
+        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
         HTTP_BIND_HOST = '127.0.0.1'
         HTTP_LISTEN_PORT = 8080
 
-        # Use Redis as broker for celery and web socket
         # Redis 相关设置
         REDIS_HOST = '127.0.0.1'
         REDIS_PORT = 6379
         REDIS_PASSWORD = ''
-        BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
-            'password': REDIS_PASSWORD,
-            'host': REDIS_HOST,
-            'port': REDIS_PORT,
-        }
-    ...
 
+        def __init__(self):
+            pass
+
+        def __getattr__(self, item):
+            return None
+
+
+        class DevelopmentConfig(Config):
+            pass
+
+
+        class TestConfig(Config):
+            pass
+
+
+        class ProductionConfig(Config):
+            pass
+
+
+    # Default using Config settings, you can write if/else for different env
     config = DevelopmentConfig()
 
 ::
@@ -174,18 +200,32 @@ CentOS 7 安装文档
     $ cp conf_example.py conf.py
     $ vi conf.py
 
-    #注意: 配置文件是 Python 格式，不要用 TAB，而要用空格，请手动修改，注意对其，不要直接复制本文内容
+    # 注意对齐，不要直接复制本文档的内容
 
-    ...
+**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+
+::
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+    #
+
+    import os
+
+    BASE_DIR = os.path.dirname(__file__)
+
+
     class Config:
-    """
-    Coco config file, coco also load config from server update setting below
-    """
+        """
+        Coco config file, coco also load config from server update setting below
+        """
         # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
         # NAME = "localhost"
+        NAME = "coco"
 
-        # Jumpserver项目的url, api请求注册会使用
+        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
+        CORE_HOST = 'http://127.0.0.1:8080'
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -207,7 +247,7 @@ CentOS 7 安装文档
         # SECRET_KEY = None
 
         # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
-        # LOG_LEVEL = 'WARN'
+        # LOG_LEVEL = 'INFO'
 
         # 日志存放的目录
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -234,10 +274,10 @@ CentOS 7 安装文档
         }
         REPLAY_STORAGE = {
             "TYPE": "server"
-            }
+        }
 
 
-        config = Config()
+    config = Config()
 
 ::
 
@@ -289,7 +329,7 @@ CentOS 7 安装文档
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器, 请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -297,7 +337,7 @@ CentOS 7 安装文档
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;  # 如果docker安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:8081/;  # 如果docker安装在别的服务器, 请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -308,7 +348,7 @@ CentOS 7 安装文档
         }
 
         location / {
-            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器，请填写它的ip
+            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器, 请填写它的ip
         }
     }
 
