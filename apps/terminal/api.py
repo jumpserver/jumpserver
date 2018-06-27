@@ -317,7 +317,6 @@ class SessionReplayViewSet(viewsets.ViewSet):
 
         # 去default storage中查找
         for _local_path in (local_path, local_path_v1, session_path):
-            print("Check {}".format(_local_path))
             if default_storage.exists(_local_path):
                 url = default_storage.url(_local_path)
                 return redirect(url)
@@ -329,6 +328,9 @@ class SessionReplayViewSet(viewsets.ViewSet):
             return HttpResponseNotFound()
 
         target_path = os.path.join(default_storage.base_location, local_path)   # 保存到storage的路径
+        target_dir = os.path.dirname(target_path)
+        if not os.path.isdir(target_dir):
+            os.makedirs(target_dir, exist_ok=True)
         storage = jms_storage.get_multi_object_storage(configs)
         ok, err = storage.download(session_path, target_path)
         if not ok:
