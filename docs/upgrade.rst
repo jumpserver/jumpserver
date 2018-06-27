@@ -96,6 +96,7 @@
 
 ::
 
+   $ cd /opt/jumpserver
    $ for app in audits common users assets ops perms terminal;do
        cp $jumpserver_backup/${app}_migrations/*.py apps/${app}/migrations/
      done
