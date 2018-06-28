@@ -15,7 +15,7 @@ from celery.signals import worker_ready, worker_shutdown, task_prerun, \
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, TeeObj, get_object_or_none
-from common.const import celery_task_pre_key
+from common.const import celery_task_pre_key, tee_cache_key_fmt
 from .utils import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
 from ..models import CeleryTask
 
@@ -74,6 +74,7 @@ def pre_run_task_signal_handler(sender, task_id=None, task=None, **kwargs):
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     log_path = os.path.join(now, task_id + '.log')
     full_path = os.path.join(CeleryTask.LOG_DIR, log_path)
+    tee_cache_key = tee_cache_key_fmt.format(task_id)
 
     if not os.path.exists(os.path.dirname(full_path)):
         os.makedirs(os.path.dirname(full_path))
@@ -83,7 +84,7 @@ def pre_run_task_signal_handler(sender, task_id=None, task=None, **kwargs):
         t.log_path = log_path
         t.save()
     f = open(full_path, 'w')
-    tee = TeeObj(f)
+    tee = TeeObj(f, tee_cache_key=tee_cache_key)
     sys.stdout = tee
     task.log_f = tee
 

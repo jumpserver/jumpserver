@@ -8,11 +8,13 @@ from django.utils.translation import ugettext as _
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
+from common.const import tee_cache_key_fmt
 from .hands import IsSuperUser
 from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
 from .serializers import TaskSerializer, AdHocSerializer, \
     AdHocRunHistorySerializer
 from .tasks import run_ansible_task
+from .celery import app
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -69,23 +71,31 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
     buff_size = 1024 * 10
     end = False
     queryset = CeleryTask.objects.all()
+    _redis = app.backend.client
 
     def get(self, request, *args, **kwargs):
         mark = request.query_params.get("mark") or str(uuid.uuid4())
         task = self.get_object()
-        log_path = task.full_log_path
+        task_id = kwargs.get('pk')
+        tee_cache_key = tee_cache_key_fmt.format(task_id)
+        tee_cache_key_len = self._redis.strlen(tee_cache_key)
 
-        if not log_path or not os.path.isfile(log_path):
+        if tee_cache_key_len == 0:
             return Response({"data": _("Waiting ...")}, status=203)
 
-        with open(log_path, 'r') as f:
-            offset = cache.get(mark, 0)
-            f.seek(offset)
-            data = f.read(self.buff_size).replace('\n', '\r\n')
-            mark = str(uuid.uuid4())
-            cache.set(mark, f.tell(), 5)
+        offset = cache.get(mark, 0)
+        diff_size = tee_cache_key_len - offset
+        buff_size = self.buff_size if diff_size > self.buff_size else diff_size
+        end_pos = offset + buff_size
+        data = app.backend.client.getrange(
+            tee_cache_key, offset, end_pos).replace(b'\n', b'\r\n')
+        mark = str(uuid.uuid4())
 
-            if data == '' and task.is_finished():
+        if data == b'':
+            end_pos = offset
+            if task.is_finished():
                 self.end = True
-            return Response({"data": data, 'end': self.end, 'mark': mark})
+
+        cache.set(mark, end_pos, 5)
+        return Response({"data": data, 'end': self.end, 'mark': mark})
 

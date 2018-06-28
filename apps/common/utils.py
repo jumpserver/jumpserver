@@ -26,6 +26,8 @@ from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.utils import timezone
 
+from ops.celery import app
+from .const import tee_cache_expiration
 
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
@@ -382,12 +384,18 @@ def get_signer():
 class TeeObj:
     origin_stdout = sys.stdout
 
-    def __init__(self, file_obj):
+    def __init__(self, file_obj, tee_cache_key=None):
         self.file_obj = file_obj
+        self.tee_cache_key = tee_cache_key
+        self._redis = app.backend.client
+        if self.tee_cache_key:
+            self._redis.setex(tee_cache_key, tee_cache_expiration, "")
 
     def write(self, msg):
         self.origin_stdout.write(msg)
         self.file_obj.write(msg.replace('*', ''))
+        if self.tee_cache_key:
+            self._redis.append(self.tee_cache_key, msg.replace('*', ''))
 
     def flush(self):
         self.origin_stdout.flush()
