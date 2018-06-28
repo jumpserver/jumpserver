@@ -180,6 +180,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         ALLOWED_HOSTS = ['*']
 
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
+        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问了
         DEBUG = False
 
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
@@ -249,7 +250,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，搭建 nginx 代理就可以正常访问了
+运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，跟着教程继续操作就行，后面搭建 nginx 代理就可以正常访问了
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
