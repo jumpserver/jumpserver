@@ -57,13 +57,27 @@ class Asset(models.Model):
         ('MacOS', 'MacOS'),
         ('BSD', 'BSD'),
         ('Windows', 'Windows'),
+        ('Windows2016', 'Windows(2016)'),
         ('Other', 'Other'),
     )
+
+    SSH_PROTOCOL = 'ssh'
+    RDP_PROTOCOL = 'rdp'
+    TELNET_PROTOCOL = 'telnet'
+    PROTOCOL_CHOICES = (
+        (SSH_PROTOCOL, 'ssh'),
+        (RDP_PROTOCOL, 'rdp'),
+        (TELNET_PROTOCOL, 'telnet (beta)'),
+    )
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'),
                                       db_index=True)
     hostname = models.CharField(max_length=128, unique=True,
                                 verbose_name=_('Hostname'))
+    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL,
+                                choices=PROTOCOL_CHOICES,
+                                verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES,
                                 default='Linux', verbose_name=_('Platform'))
