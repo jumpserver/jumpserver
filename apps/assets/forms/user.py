@@ -94,10 +94,11 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         system_user = super().save()
         password = self.cleaned_data.get('password', '') or None
         login_mode = self.cleaned_data.get('login_mode', '') or None
+        protocol = self.cleaned_data.get('protocol') or None
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
-        if login_mode == SystemUser.MANUAL_LOGIN:
+        if login_mode == SystemUser.MANUAL_LOGIN or protocol == SystemUser.TELNET_PROTOCOL:
             system_user.auto_push = 0
             system_user.save()
 

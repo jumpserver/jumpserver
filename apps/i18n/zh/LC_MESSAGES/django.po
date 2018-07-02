@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-11 13:36+0800\n"
+"POT-Creation-Date: 2018-06-25 12:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
-#: assets/forms/asset.py:24 assets/models/asset.py:75 assets/models/user.py:110
+#: assets/forms/asset.py:24 assets/models/asset.py:89 assets/models/user.py:112
 #: assets/templates/assets/asset_detail.html:183
 #: assets/templates/assets/asset_detail.html:191
 #: assets/templates/assets/system_user_detail.html:179 perms/models.py:33
@@ -37,30 +37,30 @@ msgid "Nodes"
 msgstr "节点管理"
 
 #: assets/forms/asset.py:27 assets/forms/asset.py:66 assets/forms/asset.py:109
-#: assets/forms/asset.py:113 assets/models/asset.py:80
+#: assets/forms/asset.py:113 assets/models/asset.py:94
 #: assets/models/cluster.py:19 assets/models/user.py:72
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:25
 msgid "Admin user"
 msgstr "管理用户"
 
 #: assets/forms/asset.py:30 assets/forms/asset.py:69 assets/forms/asset.py:125
-#: assets/templates/assets/asset_create.html:35
-#: assets/templates/assets/asset_create.html:37
+#: assets/templates/assets/asset_create.html:36
+#: assets/templates/assets/asset_create.html:38
 #: assets/templates/assets/asset_list.html:75
-#: assets/templates/assets/asset_update.html:40
-#: assets/templates/assets/asset_update.html:42
+#: assets/templates/assets/asset_update.html:41
+#: assets/templates/assets/asset_update.html:43
 #: assets/templates/assets/user_asset_list.html:34
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:34 assets/forms/asset.py:73 assets/models/asset.py:71
+#: assets/forms/asset.py:34 assets/forms/asset.py:73 assets/models/asset.py:85
 #: assets/models/domain.py:46
 msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:38 assets/forms/asset.py:63 assets/forms/asset.py:77
-#: assets/forms/asset.py:128 assets/templates/assets/asset_create.html:29
-#: assets/templates/assets/asset_update.html:34 perms/forms.py:40
+#: assets/forms/asset.py:128 assets/templates/assets/asset_create.html:30
+#: assets/templates/assets/asset_update.html:35 perms/forms.py:40
 #: perms/forms.py:47 perms/models.py:76
 #: perms/templates/perms/asset_permission_list.html:57
 #: perms/templates/perms/asset_permission_list.html:142
@@ -90,7 +90,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:105 assets/models/asset.py:67
+#: assets/forms/asset.py:105 assets/models/asset.py:81
 #: assets/models/domain.py:44 assets/templates/assets/admin_user_assets.html:53
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/domain_gateway_list.html:58
@@ -99,7 +99,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:14 assets/forms/label.py:13
-#: assets/models/asset.py:223 assets/templates/assets/admin_user_list.html:25
+#: assets/models/asset.py:237 assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:15
 #: assets/templates/assets/label_list.html:16
@@ -118,7 +118,7 @@ msgstr "端口"
 msgid "Asset"
 msgstr "资产"
 
-#: assets/forms/domain.py:54 assets/forms/user.py:79 assets/forms/user.py:131
+#: assets/forms/domain.py:54 assets/forms/user.py:79 assets/forms/user.py:138
 #: assets/models/base.py:21 assets/models/cluster.py:18
 #: assets/models/domain.py:17 assets/models/group.py:20
 #: assets/models/label.py:17 assets/templates/assets/admin_user_detail.html:56
@@ -147,7 +147,7 @@ msgstr "资产"
 msgid "Name"
 msgstr "名称"
 
-#: assets/forms/domain.py:55 assets/forms/user.py:80 assets/forms/user.py:132
+#: assets/forms/domain.py:55 assets/forms/user.py:80 assets/forms/user.py:139
 #: assets/models/base.py:22 assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/domain_gateway_list.html:60
@@ -192,27 +192,27 @@ msgstr "ssh密钥不合法"
 msgid "Password and private key file must be input one"
 msgstr "密码和私钥, 必须输入一个"
 
-#: assets/forms/user.py:118
+#: assets/forms/user.py:124
 msgid "* Automatic login mode, must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/forms/user.py:137
+#: assets/forms/user.py:144
 msgid "Auto push system user to asset"
 msgstr "自动推送系统用户到资产"
 
-#: assets/forms/user.py:138
+#: assets/forms/user.py:145
 msgid ""
 "High level will be using login asset as default, if user was granted more "
 "than 2 system user"
 msgstr "高优先级的系统用户将会作为默认登录用户"
 
-#: assets/forms/user.py:139
+#: assets/forms/user.py:147
 msgid ""
 "If you choose manual login mode, you do not need to fill in the username and "
 "password."
 msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 
-#: assets/models/asset.py:63 assets/models/domain.py:43
+#: assets/models/asset.py:74 assets/models/domain.py:43
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/admin_user_assets.html:52
 #: assets/templates/assets/asset_detail.html:61
@@ -227,7 +227,7 @@ msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:66 assets/templates/assets/_asset_list_modal.html:45
+#: assets/models/asset.py:77 assets/templates/assets/_asset_list_modal.html:45
 #: assets/templates/assets/admin_user_assets.html:51
 #: assets/templates/assets/asset_detail.html:57
 #: assets/templates/assets/asset_list.html:86
@@ -239,82 +239,91 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:69 assets/templates/assets/asset_detail.html:97
+#: assets/models/asset.py:80 assets/models/domain.py:45
+#: assets/models/user.py:115
+#: assets/templates/assets/domain_gateway_list.html:59
+#: assets/templates/assets/system_user_detail.html:70
+#: assets/templates/assets/system_user_list.html:28
+#: terminal/templates/terminal/session_list.html:75
+msgid "Protocol"
+msgstr "协议"
+
+#: assets/models/asset.py:83 assets/templates/assets/asset_detail.html:97
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:76 assets/models/domain.py:48
+#: assets/models/asset.py:90 assets/models/domain.py:48
 #: assets/models/label.py:20 assets/templates/assets/asset_detail.html:105
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:85 assets/templates/assets/asset_detail.html:65
+#: assets/models/asset.py:99 assets/templates/assets/asset_detail.html:65
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:87 assets/templates/assets/asset_detail.html:113
+#: assets/models/asset.py:101 assets/templates/assets/asset_detail.html:113
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:91 assets/templates/assets/asset_detail.html:77
+#: assets/models/asset.py:105 assets/templates/assets/asset_detail.html:77
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:93 assets/templates/assets/asset_detail.html:81
+#: assets/models/asset.py:107 assets/templates/assets/asset_detail.html:81
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:95 assets/templates/assets/asset_detail.html:109
+#: assets/models/asset.py:109 assets/templates/assets/asset_detail.html:109
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:98
+#: assets/models/asset.py:112
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:99
+#: assets/models/asset.py:113
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:100
+#: assets/models/asset.py:114
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:102 assets/templates/assets/asset_detail.html:89
+#: assets/models/asset.py:116 assets/templates/assets/asset_detail.html:89
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:104
+#: assets/models/asset.py:118
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:106
+#: assets/models/asset.py:120
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:109 assets/templates/assets/asset_detail.html:101
+#: assets/models/asset.py:123 assets/templates/assets/asset_detail.html:101
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:111
+#: assets/models/asset.py:125
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:113
+#: assets/models/asset.py:127
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:115
+#: assets/models/asset.py:129
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:119 assets/templates/assets/asset_create.html:33
+#: assets/models/asset.py:133 assets/templates/assets/asset_create.html:34
 #: assets/templates/assets/asset_detail.html:220
-#: assets/templates/assets/asset_update.html:38 templates/_nav.html:27
+#: assets/templates/assets/asset_update.html:39 templates/_nav.html:27
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset.py:121 assets/models/base.py:29
+#: assets/models/asset.py:135 assets/models/base.py:29
 #: assets/models/cluster.py:28 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:117
@@ -326,7 +335,7 @@ msgstr "标签管理"
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:124 assets/models/cluster.py:26
+#: assets/models/asset.py:138 assets/models/cluster.py:26
 #: assets/models/domain.py:20 assets/models/group.py:22
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/domain_detail.html:68
@@ -339,7 +348,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/asset.py:126 assets/models/base.py:26
+#: assets/models/asset.py:140 assets/models/base.py:26
 #: assets/models/cluster.py:29 assets/models/domain.py:18
 #: assets/models/domain.py:47 assets/models/group.py:23
 #: assets/models/label.py:21 assets/templates/assets/admin_user_detail.html:72
@@ -414,14 +423,6 @@ msgstr "默认Cluster"
 msgid "Cluster"
 msgstr "集群"
 
-#: assets/models/domain.py:45 assets/models/user.py:113
-#: assets/templates/assets/domain_gateway_list.html:59
-#: assets/templates/assets/system_user_detail.html:70
-#: assets/templates/assets/system_user_list.html:28
-#: terminal/templates/terminal/session_list.html:75
-msgid "Protocol"
-msgstr "协议"
-
 #: assets/models/group.py:30
 msgid "Asset group"
 msgstr "资产组"
@@ -444,7 +445,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:282
 #: users/models/user.py:31 users/models/user.py:333
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:359
+#: users/templates/users/user_group_list.html:13 users/views/user.py:361
 msgid "User"
 msgstr "用户"
 
@@ -461,15 +462,15 @@ msgstr "分类"
 msgid "Key"
 msgstr ""
 
-#: assets/models/user.py:106
+#: assets/models/user.py:108
 msgid "Automatic login"
 msgstr "自动登录"
 
-#: assets/models/user.py:107
+#: assets/models/user.py:109
 msgid "Manually login"
 msgstr "手动登录"
 
-#: assets/models/user.py:111
+#: assets/models/user.py:113
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:11
 #: assets/templates/assets/system_user_asset.html:21
 #: assets/views/admin_user.py:29 assets/views/admin_user.py:47
@@ -487,30 +488,30 @@ msgstr "手动登录"
 msgid "Assets"
 msgstr "资产管理"
 
-#: assets/models/user.py:112
+#: assets/models/user.py:114
 msgid "Priority"
 msgstr "优先级"
 
-#: assets/models/user.py:114 assets/templates/assets/_system_user.html:59
+#: assets/models/user.py:116 assets/templates/assets/_system_user.html:59
 #: assets/templates/assets/system_user_detail.html:122
 #: assets/templates/assets/system_user_update.html:10
 msgid "Auto push"
 msgstr "自动推送"
 
-#: assets/models/user.py:115 assets/templates/assets/system_user_detail.html:74
+#: assets/models/user.py:117 assets/templates/assets/system_user_detail.html:74
 msgid "Sudo"
 msgstr "Sudo"
 
-#: assets/models/user.py:116 assets/templates/assets/system_user_detail.html:79
+#: assets/models/user.py:118 assets/templates/assets/system_user_detail.html:79
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models/user.py:117 assets/templates/assets/system_user_detail.html:66
+#: assets/models/user.py:119 assets/templates/assets/system_user_detail.html:66
 #: assets/templates/assets/system_user_list.html:29
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:157 audits/models.py:12
+#: assets/models/user.py:159 audits/models.py:12
 #: audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:43
 #: perms/models.py:34 perms/models.py:78
@@ -624,8 +625,8 @@ msgid "Basic"
 msgstr "基本"
 
 #: assets/templates/assets/_system_user.html:44
-#: assets/templates/assets/asset_create.html:25
-#: assets/templates/assets/asset_update.html:30
+#: assets/templates/assets/asset_create.html:26
+#: assets/templates/assets/asset_update.html:31
 #: assets/templates/assets/gateway_create_update.html:45
 #: users/templates/users/_user.html:21
 msgid "Auth"
@@ -636,8 +637,8 @@ msgid "Auto generate key"
 msgstr "自动生成密钥"
 
 #: assets/templates/assets/_system_user.html:65
-#: assets/templates/assets/asset_create.html:59
-#: assets/templates/assets/asset_update.html:63
+#: assets/templates/assets/asset_create.html:60
+#: assets/templates/assets/asset_update.html:64
 #: assets/templates/assets/gateway_create_update.html:53
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: terminal/templates/terminal/terminal_update.html:42
@@ -647,8 +648,8 @@ msgstr "其它"
 #: assets/templates/assets/_system_user.html:71
 #: assets/templates/assets/admin_user_create_update.html:45
 #: assets/templates/assets/asset_bulk_update.html:23
-#: assets/templates/assets/asset_create.html:66
-#: assets/templates/assets/asset_update.html:70
+#: assets/templates/assets/asset_create.html:67
+#: assets/templates/assets/asset_update.html:71
 #: assets/templates/assets/domain_create_update.html:16
 #: assets/templates/assets/gateway_create_update.html:58
 #: assets/templates/assets/label_create_update.html:18
@@ -672,9 +673,9 @@ msgstr "重置"
 #: assets/templates/assets/_system_user.html:72
 #: assets/templates/assets/admin_user_create_update.html:46
 #: assets/templates/assets/asset_bulk_update.html:24
-#: assets/templates/assets/asset_create.html:67
+#: assets/templates/assets/asset_create.html:68
 #: assets/templates/assets/asset_list.html:108
-#: assets/templates/assets/asset_update.html:71
+#: assets/templates/assets/asset_update.html:72
 #: assets/templates/assets/domain_create_update.html:17
 #: assets/templates/assets/gateway_create_update.html:59
 #: assets/templates/assets/label_create_update.html:19
@@ -1025,7 +1026,7 @@ msgstr "删除"
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
-#: assets/templates/assets/asset_update.html:59
+#: assets/templates/assets/asset_update.html:60
 msgid "Configuration"
 msgstr "配置"
 
@@ -1987,7 +1988,7 @@ msgstr "文档"
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:341
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:343
 msgid "Profile"
 msgstr "个人信息"
 
@@ -2045,8 +2046,8 @@ msgstr "关闭"
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
 #: users/views/login.py:277 users/views/login.py:335 users/views/user.py:65
-#: users/views/user.py:80 users/views/user.py:102 users/views/user.py:173
-#: users/views/user.py:328 users/views/user.py:378 users/views/user.py:413
+#: users/views/user.py:80 users/views/user.py:102 users/views/user.py:175
+#: users/views/user.py:330 users/views/user.py:380 users/views/user.py:415
 msgid "Users"
 msgstr "用户管理"
 
@@ -2680,7 +2681,7 @@ msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
-#: users/templates/users/user_granted_asset.html:18 users/views/user.py:174
+#: users/templates/users/user_granted_asset.html:18 users/views/user.py:176
 msgid "User detail"
 msgstr "用户详情"
 
@@ -2815,8 +2816,8 @@ msgstr "用户删除失败"
 msgid "Administrator Settings force MFA login"
 msgstr "管理员设置强制使用MFA登录"
 
-#: users/templates/users/user_profile.html:116 users/views/user.py:203
-#: users/views/user.py:257
+#: users/templates/users/user_profile.html:116 users/views/user.py:205
+#: users/views/user.py:259
 msgid "User groups"
 msgstr "用户组"
 
@@ -2871,7 +2872,7 @@ msgid "Create account successfully"
 msgstr "创建账户成功"
 
 #: users/utils.py:43
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
 "    Hello %(name)s:\n"
@@ -3020,7 +3021,7 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:128 users/views/user.py:498 users/views/user.py:523
+#: users/views/login.py:128 users/views/user.py:500 users/views/user.py:525
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
@@ -3061,7 +3062,7 @@ msgstr "Token错误或失效"
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:239 users/views/user.py:115 users/views/user.py:396
+#: users/views/login.py:239 users/views/user.py:118 users/views/user.py:398
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -3073,46 +3074,46 @@ msgstr "首次登陆"
 msgid "Login log list"
 msgstr "登录日志"
 
-#: users/views/user.py:127
+#: users/views/user.py:129
 msgid "Bulk update user success"
 msgstr "批量更新用户成功"
 
-#: users/views/user.py:232
+#: users/views/user.py:234
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:329
+#: users/views/user.py:331
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:360
+#: users/views/user.py:362
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:379
+#: users/views/user.py:381
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:414
+#: users/views/user.py:416
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:455
+#: users/views/user.py:457
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:549
+#: users/views/user.py:551
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:550
+#: users/views/user.py:552
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:552
+#: users/views/user.py:554
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:553
+#: users/views/user.py:555
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"

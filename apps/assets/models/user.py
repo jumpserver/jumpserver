@@ -95,9 +95,11 @@ class AdminUser(AssetUser):
 class SystemUser(AssetUser):
     SSH_PROTOCOL = 'ssh'
     RDP_PROTOCOL = 'rdp'
+    TELNET_PROTOCOL = 'telnet'
     PROTOCOL_CHOICES = (
         (SSH_PROTOCOL, 'ssh'),
         (RDP_PROTOCOL, 'rdp'),
+        (TELNET_PROTOCOL, 'telnet (beta)'),
     )
 
     AUTO_LOGIN = 'auto'

@@ -17,6 +17,7 @@
     {% bootstrap_field form.hostname layout="horizontal" %}
     {% bootstrap_field form.platform layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
+    {% bootstrap_field form.protocol layout="horizontal" %}
     {% bootstrap_field form.port layout="horizontal" %}
     {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.domain layout="horizontal" %}
@@ -85,14 +86,14 @@ $(document).ready(function () {
         allowClear: true,
         templateSelection: format
     });
-    $("#id_platform").change(function (){
-        var platform = $("#id_platform option:selected").text();
+    $("#id_protocol").change(function (){
+        var protocol = $("#id_protocol option:selected").text();
         var port = 22;
-        if(platform === 'Windows'){
+        if(protocol === 'rdp'){
             port = 3389;
         }
-        if(platform === 'Other'){
-            port = null;
+        if(protocol === 'telnet (beta)'){
+            port = 23;
         }
         $("#id_port").val(port);
     });
