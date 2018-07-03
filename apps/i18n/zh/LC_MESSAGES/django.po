@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-25 12:19+0800\n"
+"POT-Creation-Date: 2018-07-03 16:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -118,7 +118,7 @@ msgstr "端口"
 msgid "Asset"
 msgstr "资产"
 
-#: assets/forms/domain.py:54 assets/forms/user.py:79 assets/forms/user.py:138
+#: assets/forms/domain.py:54 assets/forms/user.py:79 assets/forms/user.py:139
 #: assets/models/base.py:21 assets/models/cluster.py:18
 #: assets/models/domain.py:17 assets/models/group.py:20
 #: assets/models/label.py:17 assets/templates/assets/admin_user_detail.html:56
@@ -147,14 +147,14 @@ msgstr "资产"
 msgid "Name"
 msgstr "名称"
 
-#: assets/forms/domain.py:55 assets/forms/user.py:80 assets/forms/user.py:139
+#: assets/forms/domain.py:55 assets/forms/user.py:80 assets/forms/user.py:140
 #: assets/models/base.py:22 assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/domain_gateway_list.html:60
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:27
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:13
-#: users/forms.py:31 users/models/authentication.py:45 users/models/user.py:47
+#: users/forms.py:31 users/models/authentication.py:70 users/models/user.py:47
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/login.html:56
 #: users/templates/users/login_log_list.html:49
@@ -192,21 +192,21 @@ msgstr "ssh密钥不合法"
 msgid "Password and private key file must be input one"
 msgstr "密码和私钥, 必须输入一个"
 
-#: assets/forms/user.py:124
+#: assets/forms/user.py:125
 msgid "* Automatic login mode, must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/forms/user.py:144
+#: assets/forms/user.py:145
 msgid "Auto push system user to asset"
 msgstr "自动推送系统用户到资产"
 
-#: assets/forms/user.py:145
+#: assets/forms/user.py:146
 msgid ""
 "High level will be using login asset as default, if user was granted more "
 "than 2 system user"
 msgstr "高优先级的系统用户将会作为默认登录用户"
 
-#: assets/forms/user.py:147
+#: assets/forms/user.py:148
 msgid ""
 "If you choose manual login mode, you do not need to fill in the username and "
 "password."
@@ -1237,7 +1237,7 @@ msgid "Filename"
 msgstr "文件名"
 
 #: audits/models.py:15 audits/templates/audits/ftp_log_list.html:77
-#: ops/templates/ops/task_list.html:39
+#: ops/templates/ops/task_list.html:39 users/models/authentication.py:66
 msgid "Success"
 msgstr "成功"
 
@@ -1485,7 +1485,8 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: common/models.py:29 users/templates/users/user_detail.html:96
+#: common/models.py:29 users/models/authentication.py:51
+#: users/templates/users/user_detail.html:96
 msgid "Enabled"
 msgstr "启用"
 
@@ -1803,7 +1804,7 @@ msgid "Versions"
 msgstr "版本"
 
 #: ops/templates/ops/task_list.html:40
-#: users/templates/users/login_log_list.html:54
+#: users/templates/users/login_log_list.html:57
 msgid "Date"
 msgstr "日期"
 
@@ -2045,7 +2046,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:277 users/views/login.py:335 users/views/user.py:65
+#: users/views/login.py:311 users/views/login.py:369 users/views/user.py:65
 #: users/views/user.py:80 users/views/user.py:102 users/views/user.py:175
 #: users/views/user.py:330 users/views/user.py:380 users/views/user.py:415
 msgid "Users"
@@ -2406,8 +2407,9 @@ msgstr ""
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全."
 
-#: users/forms.py:143 users/models/user.py:71
+#: users/forms.py:143 users/models/authentication.py:75 users/models/user.py:71
 #: users/templates/users/first_login.html:45
+#: users/templates/users/login_log_list.html:54
 msgid "MFA"
 msgstr "MFA"
 
@@ -2467,23 +2469,53 @@ msgstr "ssh公钥"
 msgid "Private Token"
 msgstr "ssh密钥"
 
-#: users/models/authentication.py:46
+#: users/models/authentication.py:50 users/templates/users/user_detail.html:98
+msgid "Disabled"
+msgstr "禁用"
+
+#: users/models/authentication.py:52 users/models/authentication.py:60
+msgid "-"
+msgstr ""
+
+#: users/models/authentication.py:61
+msgid "Username/password check failed"
+msgstr "用户名/密码 校验失败"
+
+#: users/models/authentication.py:62
+msgid "MFA authentication failed"
+msgstr "MFA 认证失败"
+
+#: users/models/authentication.py:67
+msgid "Failed"
+msgstr "失败"
+
+#: users/models/authentication.py:71
 msgid "Login type"
 msgstr "登录方式"
 
-#: users/models/authentication.py:47
+#: users/models/authentication.py:72
 msgid "Login ip"
 msgstr "登录IP"
 
-#: users/models/authentication.py:48
+#: users/models/authentication.py:73
 msgid "Login city"
 msgstr "登录城市"
 
-#: users/models/authentication.py:49
+#: users/models/authentication.py:74
 msgid "User agent"
 msgstr "Agent"
 
-#: users/models/authentication.py:50
+#: users/models/authentication.py:76
+#: users/templates/users/login_log_list.html:55
+msgid "Reason"
+msgstr "原因"
+
+#: users/models/authentication.py:77
+#: users/templates/users/login_log_list.html:56
+msgid "Status"
+msgstr "状态"
+
+#: users/models/authentication.py:78
 msgid "Date login"
 msgstr "登录日期"
 
@@ -2646,7 +2678,7 @@ msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:352 users/utils.py:80
+#: users/templates/users/user_detail.html:352 users/utils.py:81
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2695,10 +2727,6 @@ msgstr "授权的资产"
 #: users/templates/users/user_detail.html:94
 msgid "Force enabled"
 msgstr "强制启用"
-
-#: users/templates/users/user_detail.html:98
-msgid "Disabled"
-msgstr "禁用"
 
 #: users/templates/users/user_detail.html:119
 #: users/templates/users/user_profile.html:108
@@ -2867,11 +2895,11 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:41
+#: users/utils.py:42
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:43
+#: users/utils.py:44
 #, python-format
 msgid ""
 "\n"
@@ -2916,7 +2944,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:82
+#: users/utils.py:83
 #, python-format
 msgid ""
 "\n"
@@ -2960,11 +2988,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:113
+#: users/utils.py:114
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:115
+#: users/utils.py:116
 #, python-format
 msgid ""
 "\n"
@@ -2989,15 +3017,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:148
+#: users/utils.py:149
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:150
+#: users/utils.py:151
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:163
+#: users/utils.py:164
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
@@ -3017,60 +3045,60 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:62
+#: users/views/login.py:63
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:128 users/views/user.py:500 users/views/user.py:525
+#: users/views/login.py:159 users/views/user.py:500 users/views/user.py:525
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
-#: users/views/login.py:154
+#: users/views/login.py:188
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:155
+#: users/views/login.py:189
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:171
+#: users/views/login.py:205
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:184
+#: users/views/login.py:218
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:185
+#: users/views/login.py:219
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:198
+#: users/views/login.py:232
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:199
+#: users/views/login.py:233
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:220 users/views/login.py:233
+#: users/views/login.py:254 users/views/login.py:267
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:229
+#: users/views/login.py:263
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:239 users/views/user.py:118 users/views/user.py:398
+#: users/views/login.py:273 users/views/user.py:118 users/views/user.py:398
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:277
+#: users/views/login.py:311
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:336
+#: users/views/login.py:370
 msgid "Login log list"
 msgstr "登录日志"
 

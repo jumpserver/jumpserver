@@ -25,8 +25,9 @@ from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
 from common.models import Setting
 from ..models import User, LoginLog
-from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, redirect_user_first_login_or_index, \
-    get_user_or_tmp_user, set_tmp_user_to_cache, get_password_check_rules, check_password_rules
+from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
+    redirect_user_first_login_or_index, get_user_or_tmp_user, \
+    set_tmp_user_to_cache, get_password_check_rules, check_password_rules
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -65,6 +66,15 @@ class UserLoginView(FormView):
         return redirect(self.get_success_url())
 
     def form_invalid(self, form):
+        # Write login failed log
+        kwargs = {
+            'username': form.cleaned_data.get('username'),
+            'mfa': LoginLog.MFA_UNKNOWN,
+            'reason': LoginLog.REASON_PASSWORD,
+            'status': False
+        }
+        self.write_login_log(**kwargs)
+
         ip = get_login_ip(self.request)
         cache.set(self.key_prefix.format(ip), 1, 3600)
         old_form = form
@@ -91,7 +101,14 @@ class UserLoginView(FormView):
         elif not user.otp_enabled:
             # 0 & T,F
             auth_login(self.request, user)
-            self.write_login_log()
+            # Write login success log
+            kwargs = {
+                'username': self.request.user.username,
+                'mfa': int(self.request.user.otp_enabled),
+                'reason': LoginLog.REASON_NOTHING,
+                'status': True
+            }
+            self.write_login_log(**kwargs)
             return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
@@ -101,13 +118,16 @@ class UserLoginView(FormView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def write_login_log(self):
+    def write_login_log(self, **kwargs):
         login_ip = get_login_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(
-            self.request.user.username, type='W',
-            ip=login_ip, user_agent=user_agent
-        )
+        data = {
+            'ip': login_ip,
+            'type': 'W',
+            'user_agent': user_agent
+        }
+        kwargs.update(data)
+        write_login_log_async.delay(**kwargs)
 
 
 class UserLoginOtpView(FormView):
@@ -122,22 +142,40 @@ class UserLoginOtpView(FormView):
 
         if check_otp_code(otp_secret_key, otp_code):
             auth_login(self.request, user)
-            self.write_login_log()
+            # Write login success log
+            kwargs = {
+                'username': self.request.user.username,
+                'mfa': int(self.request.user.otp_enabled),
+                'reason': LoginLog.REASON_NOTHING,
+                'status': True
+            }
+            self.write_login_log(**kwargs)
             return redirect(self.get_success_url())
         else:
+            # Write login failed log
+            kwargs = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_MFA,
+                'status': False
+            }
+            self.write_login_log(**kwargs)
             form.add_error('otp_code', _('MFA code invalid'))
             return super().form_invalid(form)
 
     def get_success_url(self):
         return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
-    def write_login_log(self):
+    def write_login_log(self, **kwargs):
         login_ip = get_login_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(
-            self.request.user.username, type='W',
-            ip=login_ip, user_agent=user_agent
-        )
+        data = {
+            'ip': login_ip,
+            'type': 'W',
+            'user_agent': user_agent
+        }
+        kwargs.update(data)
+        write_login_log_async.delay(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')

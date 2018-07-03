@@ -51,6 +51,9 @@
     <th class="text-center">{% trans 'UA' %}</th>
     <th class="text-center">{% trans 'IP' %}</th>
     <th class="text-center">{% trans 'City' %}</th>
+    <th class="text-center">{% trans 'MFA' %}</th>
+    <th class="text-center">{% trans 'Reason' %}</th>
+    <th class="text-center">{% trans 'Status' %}</th>
     <th class="text-center">{% trans 'Date' %}</th>
 {% endblock %}
 
@@ -65,6 +68,9 @@
             </td>
             <td class="text-center">{{ login_log.ip }}</td>
             <td class="text-center">{{ login_log.city }}</td>
+            <td class="text-center">{{ login_log.get_mfa_display }}</td>
+            <td class="text-center">{{ login_log.get_reason_display }}</td>
+            <td class="text-center">{{ login_log.get_status_display }}</td>
             <td class="text-center">{{ login_log.datetime }}</td>
         </tr>
     {% endfor %}

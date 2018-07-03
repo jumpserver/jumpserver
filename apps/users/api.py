@@ -14,7 +14,7 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserGroupUpdateMemeberSerializer, UserPKUpdateSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
-from .models import User, UserGroup
+from .models import User, UserGroup, LoginLog
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token, get_login_ip, check_otp_code
@@ -153,10 +153,25 @@ class UserOtpAuthApi(APIView):
             return Response({'msg': '请先进行用户名和密码验证'}, status=401)
 
         if not check_otp_code(user.otp_secret_key, otp_code):
+            # Write login failed log
+            kwargs = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_MFA,
+                'status': False
+            }
+            self.write_login_log(request, **kwargs)
             return Response({'msg': 'MFA认证失败'}, status=401)
 
+        # Write login success log
+        kwargs = {
+            'username': user.username,
+            'mfa': int(user.otp_enabled),
+            'reason': LoginLog.REASON_NOTHING,
+            'status': True
+        }
+        self.write_login_log(request, **kwargs)
         token = generate_token(request, user)
-        self.write_login_log(request, user)
         return Response(
             {
                 'token': token,
@@ -165,7 +180,7 @@ class UserOtpAuthApi(APIView):
         )
 
     @staticmethod
-    def write_login_log(request, user):
+    def write_login_log(request, **kwargs):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -173,10 +188,13 @@ class UserOtpAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        write_login_log_async.delay(
-            user.username, ip=login_ip,
-            type=login_type, user_agent=user_agent,
-        )
+        data = {
+            'ip': login_ip,
+            'type': login_type,
+            'user_agent': user_agent
+        }
+        kwargs.update(data)
+        write_login_log_async.delay(**kwargs)
 
 
 class UserAuthApi(APIView):
@@ -187,11 +205,26 @@ class UserAuthApi(APIView):
         user, msg = self.check_user_valid(request)
 
         if not user:
+            # Write login failed log
+            kwargs = {
+                'username': request.data.get('username', ''),
+                'mfa': LoginLog.MFA_UNKNOWN,
+                'reason': LoginLog.REASON_PASSWORD,
+                'status': False
+            }
+            self.write_login_log(request, **kwargs)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
+            # Write login success log
+            kwargs = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_NOTHING,
+                'status': True
+            }
+            self.write_login_log(request, **kwargs)
             token = generate_token(request, user)
-            self.write_login_log(request, user)
             return Response(
                 {
                     'token': token,
@@ -208,7 +241,8 @@ class UserAuthApi(APIView):
                 'otp_url': reverse('api-users:user-otp-auth'),
                 'seed': seed,
                 'user': self.serializer_class(user).data
-            }, status=300)
+            }, status=300
+        )
 
     @staticmethod
     def check_user_valid(request):
@@ -222,7 +256,7 @@ class UserAuthApi(APIView):
         return user, msg
 
     @staticmethod
-    def write_login_log(request, user):
+    def write_login_log(request, **kwargs):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -230,10 +264,14 @@ class UserAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        write_login_log_async.delay(
-            user.username, ip=login_ip,
-            type=login_type, user_agent=user_agent,
-        )
+        data = {
+            'ip': login_ip,
+            'type': login_type,
+            'user_agent': user_agent,
+        }
+        kwargs.update(data)
+
+        write_login_log_async.delay(**kwargs)
 
 
 class UserConnectionTokenApi(APIView):

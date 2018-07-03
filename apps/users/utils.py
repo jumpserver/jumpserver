@@ -13,7 +13,7 @@ import ipaddress
 from django.http import Http404
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
@@ -22,6 +22,7 @@ from common.utils import reverse, get_object_or_none
 from common.models import Setting
 from common.forms import SecuritySettingForm
 from .models import User, LoginLog
+# from .tasks import write_login_log_async
 
 
 logger = logging.getLogger('jumpserver')
@@ -200,16 +201,15 @@ def get_login_ip(request):
     return login_ip
 
 
-def write_login_log(username, type='', ip='', user_agent=''):
+def write_login_log(*args, **kwargs):
+    ip = kwargs.get('ip', '')
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
         city = "Unknown"
     else:
         city = get_ip_city(ip)
-    LoginLog.objects.create(
-        username=username, type=type,
-        ip=ip, city=city, user_agent=user_agent
-    )
+    kwargs.update({'ip': ip, 'city': city})
+    LoginLog.objects.create(**kwargs)
 
 
 def get_ip_city(ip, timeout=10):
