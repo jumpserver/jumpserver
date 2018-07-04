@@ -48,7 +48,8 @@ class UserLoginView(FormView):
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
     redirect_field_name = 'next'
-    key_prefix = "_LOGIN_INVALID_{}"
+    key_prefix_captcha = "_LOGIN_INVALID_{}"
+    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -58,6 +59,16 @@ class UserLoginView(FormView):
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        # limit login authentication
+        ip = get_login_ip(request)
+        username = self.request.POST.get('username')
+        count = cache.get(self.key_prefix_limit.format(ip, username))
+        if count and count >= 3:
+            return self.render_to_response(self.get_context_data(login_limit=True))
+
+        return super().post(request, *args, **kwargs)
+
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
@@ -66,17 +77,24 @@ class UserLoginView(FormView):
         return redirect(self.get_success_url())
 
     def form_invalid(self, form):
-        # Write login failed log
+        # write login failed log
+        username = form.cleaned_data.get('username')
         data = {
-            'username': form.cleaned_data.get('username'),
+            'username': username,
             'mfa': LoginLog.MFA_UNKNOWN,
             'reason': LoginLog.REASON_PASSWORD,
             'status': False
         }
         self.write_login_log(data)
 
+        # limit user login failed times
         ip = get_login_ip(self.request)
-        cache.set(self.key_prefix.format(ip), 1, 3600)
+        key_limit = self.key_prefix_limit.format(ip, username)
+        count = cache.get(key_limit)
+        count = count + 1 if count else 1
+        cache.set(key_limit, count, 1800)
+
+        cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
         old_form = form
         form = self.form_class_captcha(data=form.data)
         form._errors = old_form.errors
@@ -84,7 +102,7 @@ class UserLoginView(FormView):
 
     def get_form_class(self):
         ip = get_login_ip(self.request)
-        if cache.get(self.key_prefix.format(ip)):
+        if cache.get(self.key_prefix_captcha.format(ip)):
             return self.form_class_captcha
         else:
             return self.form_class
@@ -101,7 +119,6 @@ class UserLoginView(FormView):
         elif not user.otp_enabled:
             # 0 & T,F
             auth_login(self.request, user)
-            # Write login success log
             data = {
                 'username': self.request.user.username,
                 'mfa': int(self.request.user.otp_enabled),
@@ -142,7 +159,6 @@ class UserLoginOtpView(FormView):
 
         if check_otp_code(otp_secret_key, otp_code):
             auth_login(self.request, user)
-            # Write login success log
             data = {
                 'username': self.request.user.username,
                 'mfa': int(self.request.user.otp_enabled),
@@ -152,7 +168,6 @@ class UserLoginOtpView(FormView):
             self.write_login_log(data)
             return redirect(self.get_success_url())
         else:
-            # Write login failed log
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),

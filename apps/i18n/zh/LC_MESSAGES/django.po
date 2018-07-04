@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-03 16:48+0800\n"
+"POT-Creation-Date: 2018-07-04 16:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -156,7 +156,7 @@ msgstr "名称"
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:13
 #: users/forms.py:31 users/models/authentication.py:70 users/models/user.py:47
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:56
+#: users/templates/users/login.html:60
 #: users/templates/users/login_log_list.html:49
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
@@ -170,7 +170,7 @@ msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:25 assets/models/base.py:23 common/forms.py:113
 #: users/forms.py:15 users/forms.py:33 users/forms.py:45
-#: users/templates/users/login.html:59
+#: users/templates/users/login.html:63
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:14
@@ -2006,7 +2006,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:49 users/templates/users/login.html:44
-#: users/templates/users/login.html:64
+#: users/templates/users/login.html:68
 msgid "Login"
 msgstr "登录"
 
@@ -2046,7 +2046,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:311 users/views/login.py:369 users/views/user.py:65
+#: users/views/login.py:330 users/views/login.py:388 users/views/user.py:65
 #: users/views/user.py:80 users/views/user.py:102 users/views/user.py:175
 #: users/views/user.py:330 users/views/user.py:380 users/views/user.py:415
 msgid "Users"
@@ -2641,7 +2641,7 @@ msgid " for more information"
 msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:26
-#: users/templates/users/login.html:73
+#: users/templates/users/login.html:77
 msgid "Forgot password"
 msgstr "忘记密码"
 
@@ -2650,6 +2650,10 @@ msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
 #: users/templates/users/login.html:50
+msgid "Log in frequently and try again later"
+msgstr "登录频繁, 稍后重试"
+
+#: users/templates/users/login.html:53
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3045,60 +3049,60 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:63
+#: users/views/login.py:74
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:159 users/views/user.py:500 users/views/user.py:525
+#: users/views/login.py:178 users/views/user.py:500 users/views/user.py:525
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
-#: users/views/login.py:188
+#: users/views/login.py:207
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:189
+#: users/views/login.py:208
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:205
+#: users/views/login.py:224
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:218
+#: users/views/login.py:237
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:219
+#: users/views/login.py:238
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:232
+#: users/views/login.py:251
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:233
+#: users/views/login.py:252
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:254 users/views/login.py:267
+#: users/views/login.py:273 users/views/login.py:286
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:263
+#: users/views/login.py:282
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:273 users/views/user.py:118 users/views/user.py:398
+#: users/views/login.py:292 users/views/user.py:118 users/views/user.py:398
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:311
+#: users/views/login.py:330
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:370
+#: users/views/login.py:389
 msgid "Login log list"
 msgstr "登录日志"
 
