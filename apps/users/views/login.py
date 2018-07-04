@@ -67,13 +67,13 @@ class UserLoginView(FormView):
 
     def form_invalid(self, form):
         # Write login failed log
-        kwargs = {
+        data = {
             'username': form.cleaned_data.get('username'),
             'mfa': LoginLog.MFA_UNKNOWN,
             'reason': LoginLog.REASON_PASSWORD,
             'status': False
         }
-        self.write_login_log(**kwargs)
+        self.write_login_log(data)
 
         ip = get_login_ip(self.request)
         cache.set(self.key_prefix.format(ip), 1, 3600)
@@ -102,13 +102,13 @@ class UserLoginView(FormView):
             # 0 & T,F
             auth_login(self.request, user)
             # Write login success log
-            kwargs = {
+            data = {
                 'username': self.request.user.username,
                 'mfa': int(self.request.user.otp_enabled),
                 'reason': LoginLog.REASON_NOTHING,
                 'status': True
             }
-            self.write_login_log(**kwargs)
+            self.write_login_log(data)
             return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
@@ -118,16 +118,16 @@ class UserLoginView(FormView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def write_login_log(self, **kwargs):
+    def write_login_log(self, data):
         login_ip = get_login_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        data = {
+        tmp_data = {
             'ip': login_ip,
             'type': 'W',
             'user_agent': user_agent
         }
-        kwargs.update(data)
-        write_login_log_async.delay(**kwargs)
+        data.update(tmp_data)
+        write_login_log_async.delay(**data)
 
 
 class UserLoginOtpView(FormView):
@@ -143,39 +143,39 @@ class UserLoginOtpView(FormView):
         if check_otp_code(otp_secret_key, otp_code):
             auth_login(self.request, user)
             # Write login success log
-            kwargs = {
+            data = {
                 'username': self.request.user.username,
                 'mfa': int(self.request.user.otp_enabled),
                 'reason': LoginLog.REASON_NOTHING,
                 'status': True
             }
-            self.write_login_log(**kwargs)
+            self.write_login_log(data)
             return redirect(self.get_success_url())
         else:
             # Write login failed log
-            kwargs = {
+            data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
                 'reason': LoginLog.REASON_MFA,
                 'status': False
             }
-            self.write_login_log(**kwargs)
+            self.write_login_log(data)
             form.add_error('otp_code', _('MFA code invalid'))
             return super().form_invalid(form)
 
     def get_success_url(self):
         return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
-    def write_login_log(self, **kwargs):
+    def write_login_log(self, data):
         login_ip = get_login_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        data = {
+        tmp_data = {
             'ip': login_ip,
             'type': 'W',
             'user_agent': user_agent
         }
-        kwargs.update(data)
-        write_login_log_async.delay(**kwargs)
+        data.update(tmp_data)
+        write_login_log_async.delay(**data)
 
 
 @method_decorator(never_cache, name='dispatch')

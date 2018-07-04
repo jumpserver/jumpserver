@@ -150,23 +150,23 @@ class UserOtpAuthApi(APIView):
 
         if not check_otp_code(user.otp_secret_key, otp_code):
             # Write login failed log
-            kwargs = {
+            data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
                 'reason': LoginLog.REASON_MFA,
                 'status': False
             }
-            self.write_login_log(request, **kwargs)
+            self.write_login_log(request, data)
             return Response({'msg': 'MFA认证失败'}, status=401)
 
         # Write login success log
-        kwargs = {
+        data = {
             'username': user.username,
             'mfa': int(user.otp_enabled),
             'reason': LoginLog.REASON_NOTHING,
             'status': True
         }
-        self.write_login_log(request, **kwargs)
+        self.write_login_log(request, data)
         token = generate_token(request, user)
         return Response(
             {
@@ -176,7 +176,7 @@ class UserOtpAuthApi(APIView):
         )
 
     @staticmethod
-    def write_login_log(request, **kwargs):
+    def write_login_log(request, data):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -184,13 +184,13 @@ class UserOtpAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        data = {
+        tmp_data = {
             'ip': login_ip,
             'type': login_type,
             'user_agent': user_agent
         }
-        kwargs.update(data)
-        write_login_log_async.delay(**kwargs)
+        data.update(tmp_data)
+        write_login_log_async.delay(**data)
 
 
 class UserAuthApi(APIView):
@@ -202,24 +202,24 @@ class UserAuthApi(APIView):
 
         if not user:
             # Write login failed log
-            kwargs = {
+            data = {
                 'username': request.data.get('username', ''),
                 'mfa': LoginLog.MFA_UNKNOWN,
                 'reason': LoginLog.REASON_PASSWORD,
                 'status': False
             }
-            self.write_login_log(request, **kwargs)
+            self.write_login_log(request, data)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
             # Write login success log
-            kwargs = {
+            data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
                 'reason': LoginLog.REASON_NOTHING,
                 'status': True
             }
-            self.write_login_log(request, **kwargs)
+            self.write_login_log(request, data)
             token = generate_token(request, user)
             return Response(
                 {
@@ -252,7 +252,7 @@ class UserAuthApi(APIView):
         return user, msg
 
     @staticmethod
-    def write_login_log(request, **kwargs):
+    def write_login_log(request, data):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -260,14 +260,14 @@ class UserAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        data = {
+        tmp_data = {
             'ip': login_ip,
             'type': login_type,
             'user_agent': user_agent,
         }
-        kwargs.update(data)
+        data.update(tmp_data)
 
-        write_login_log_async.delay(**kwargs)
+        write_login_log_async.delay(**data)
 
 
 class UserConnectionTokenApi(APIView):
