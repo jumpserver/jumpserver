@@ -61,7 +61,7 @@
 
 说明: 如果是新开的终端，别忘了 source /opt/py3/bin/activate
 
-1. 备份jumpserver数据库表结构及录像文件
+1. 备份jumpserver配置文件、数据库表结构及录像文件
 
 ::
 
@@ -92,7 +92,7 @@
    $ cd jumpserver && git checkout master  # or other branch
    $ git pull
 
-4. 还原数据库表结构文件及录像文件
+4. 还原配置文件、数据库表结构文件及录像文件
 
 ::
 
@@ -117,21 +117,32 @@
 
 coco是无状态的，备份 keys 目录即可
 
-1. 备份keys
+1. 备份配置文件及keys
 
 ::
 
+   $ cd /opt/coco
+   $ cp conf.py $jumpserver_backup/
    $ cp -r keys $jumpserver_backup/
 
 
 2. 离线更新升级coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
+::
+
+   $ cd /opt
+   $ mv coco coco_bak
+   $ git clone https://github.com/jumpserver/coco.git
+   $ cd coco && git checkout master  # or other branch
+   $ git pull
+
 3. 还原 keys目录
 
 ::
 
-   $ mv keys keys_backup
-   $ cp -r  $jumpserver_backup/keys .
+   $ cd /opt/coco
+   $ cp $jumpserver_backup/conf.py .
+   $ cp -r $jumpserver_backup/keys .
 
 4. 升级依赖
 
