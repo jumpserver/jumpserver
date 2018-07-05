@@ -72,7 +72,7 @@ class LoginLog(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('User agent'))
-    mfa = models.SmallIntegerField(default=MFA_DISABLED, choices=MFA_CHOICE, verbose_name=_('MFA'))
+    mfa = models.SmallIntegerField(default=MFA_UNKNOWN, choices=MFA_CHOICE, verbose_name=_('MFA'))
     reason = models.SmallIntegerField(default=REASON_NOTHING, choices=REASON_CHOICE, verbose_name=_('Reason'))
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
     datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))

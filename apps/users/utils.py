@@ -22,7 +22,6 @@ from common.utils import reverse, get_object_or_none
 from common.models import Setting
 from common.forms import SecuritySettingForm
 from .models import User, LoginLog
-# from .tasks import write_login_log_async
 
 
 logger = logging.getLogger('jumpserver')
