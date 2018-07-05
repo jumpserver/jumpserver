@@ -332,3 +332,29 @@ def check_password_rules(password):
 
     match_obj = re.match(pattern, password)
     return bool(match_obj)
+
+
+def set_user_login_failed_count_to_cache(key_limit):
+    count = cache.get(key_limit)
+    count = count + 1 if count else 1
+
+    setting_limit_time = Setting.objects.filter(
+        name='SECURITY_LOGIN_LIMIT_TIME'
+    ).first()
+    limit_time = setting_limit_time.cleaned_value if setting_limit_time \
+        else settings.DEFAULT_LOGIN_LIMIT_TIME
+
+    cache.set(key_limit, count, int(limit_time)*60)
+
+
+def is_block_login(key_limit):
+    count = cache.get(key_limit)
+
+    setting_limit_count = Setting.objects.filter(
+        name='SECURITY_LOGIN_LIMIT_COUNT'
+    ).first()
+    limit_count = setting_limit_count.cleaned_value if setting_limit_count \
+        else settings.DEFAULT_LOGIN_LIMIT_COUNT
+
+    if count and count >= limit_count:
+        return True

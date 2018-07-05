@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-04 16:46+0800\n"
+"POT-Creation-Date: 2018-07-05 14:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1433,45 +1433,60 @@ msgid ""
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: common/forms.py:184
+#: common/forms.py:186
+msgid "Limit the number of login failures"
+msgstr "限制登录失败次数"
+
+#: common/forms.py:193
+msgid "No logon interval"
+msgstr "禁止登录时间间隔"
+
+#: common/forms.py:195
+msgid ""
+"Tip :(unit/minute) if the user has failed to log in for a limited number of "
+"times, no login is allowed during this time interval."
+msgstr ""
+"提示:（单位 / 分钟）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
+
+#: common/forms.py:201
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:191
+#: common/forms.py:208
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:193
+#: common/forms.py:210
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:199
+#: common/forms.py:216
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:200
+#: common/forms.py:217
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:206
+#: common/forms.py:223
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:207
+#: common/forms.py:224
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:213
+#: common/forms.py:230
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:214
+#: common/forms.py:231
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -1532,8 +1547,8 @@ msgid "Security setting"
 msgstr "安全设置"
 
 #: common/templates/common/security_setting.html:42
-msgid "MFA setting"
-msgstr "MFA 设置"
+msgid "User login settings"
+msgstr "用户登录设置"
 
 #: common/templates/common/security_setting.html:46
 msgid "Password check rule"
@@ -2307,6 +2322,10 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
+#: users/api.py:210 users/templates/users/login.html:50
+msgid "Log in frequently and try again later"
+msgstr "登录频繁, 稍后重试"
+
 #: users/authentication.py:56
 msgid "Invalid signature header. No credentials provided."
 msgstr ""
@@ -2648,10 +2667,6 @@ msgstr "忘记密码"
 #: users/templates/users/forgot_password.html:33
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
-
-#: users/templates/users/login.html:50
-msgid "Log in frequently and try again later"
-msgstr "登录频繁, 稍后重试"
 
 #: users/templates/users/login.html:53
 msgid "Captcha invalid"
@@ -3049,7 +3064,7 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:74
+#: users/views/login.py:75
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
@@ -3149,3 +3164,6 @@ msgstr "MFA 解绑成功"
 #: users/views/user.py:555
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
+
+#~ msgid "MFA setting"
+#~ msgstr "MFA 设置"

@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,7 +18,8 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
-from .utils import check_user_valid, generate_token, get_login_ip, check_otp_code
+from .utils import check_user_valid, generate_token, get_login_ip, \
+    check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -149,7 +151,6 @@ class UserOtpAuthApi(APIView):
             return Response({'msg': '请先进行用户名和密码验证'}, status=401)
 
         if not check_otp_code(user.otp_secret_key, otp_code):
-            # Write login failed log
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
@@ -159,7 +160,6 @@ class UserOtpAuthApi(APIView):
             self.write_login_log(request, data)
             return Response({'msg': 'MFA认证失败'}, status=401)
 
-        # Write login success log
         data = {
             'username': user.username,
             'mfa': int(user.otp_enabled),
@@ -196,12 +196,21 @@ class UserOtpAuthApi(APIView):
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
+    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
 
     def post(self, request):
         user, msg = self.check_user_valid(request)
 
+        username = request.data.get('username')
+        ip = request.data.get('remote_addr', None)
+        if not ip:
+            ip = get_login_ip(request)
+        key_limit = self.key_prefix_limit.format(ip, username)
+        if is_block_login(key_limit):
+            msg = _("Log in frequently and try again later")
+            return Response({'msg': msg}, status=401)
+
         if not user:
-            # Write login failed log
             data = {
                 'username': request.data.get('username', ''),
                 'mfa': LoginLog.MFA_UNKNOWN,
@@ -209,10 +218,11 @@ class UserAuthApi(APIView):
                 'status': False
             }
             self.write_login_log(request, data)
+
+            set_user_login_failed_count_to_cache(key_limit)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
-            # Write login success log
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),

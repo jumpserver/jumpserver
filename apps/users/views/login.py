@@ -27,7 +27,8 @@ from common.models import Setting
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
-    set_tmp_user_to_cache, get_password_check_rules, check_password_rules
+    set_tmp_user_to_cache, get_password_check_rules, check_password_rules, \
+    is_block_login, set_user_login_failed_count_to_cache
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -63,9 +64,9 @@ class UserLoginView(FormView):
         # limit login authentication
         ip = get_login_ip(request)
         username = self.request.POST.get('username')
-        count = cache.get(self.key_prefix_limit.format(ip, username))
-        if count and count >= 3:
-            return self.render_to_response(self.get_context_data(login_limit=True))
+        key_limit = self.key_prefix_limit.format(ip, username)
+        if is_block_login(key_limit):
+            return self.render_to_response(self.get_context_data(block_login=True))
 
         return super().post(request, *args, **kwargs)
 
@@ -87,13 +88,12 @@ class UserLoginView(FormView):
         }
         self.write_login_log(data)
 
-        # limit user login failed times
+        # limit user login failed count
         ip = get_login_ip(self.request)
         key_limit = self.key_prefix_limit.format(ip, username)
-        count = cache.get(key_limit)
-        count = count + 1 if count else 1
-        cache.set(key_limit, count, 1800)
+        set_user_login_failed_count_to_cache(key_limit)
 
+        # show captcha
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
         old_form = form
         form = self.form_class_captcha(data=form.data)
