@@ -199,17 +199,16 @@ class UserAuthApi(APIView):
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
 
     def post(self, request):
-        user, msg = self.check_user_valid(request)
-
+        # limit login
         username = request.data.get('username')
         ip = request.data.get('remote_addr', None)
-        if not ip:
-            ip = get_login_ip(request)
+        ip = ip if ip else get_login_ip(request)
         key_limit = self.key_prefix_limit.format(ip, username)
         if is_block_login(key_limit):
             msg = _("Log in frequently and try again later")
             return Response({'msg': msg}, status=401)
 
+        user, msg = self.check_user_valid(request)
         if not user:
             data = {
                 'username': request.data.get('username', ''),
