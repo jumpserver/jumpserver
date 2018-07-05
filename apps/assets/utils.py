@@ -54,7 +54,8 @@ def test_gateway_connectability(gateway):
     proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        proxy.connect(gateway.ip, username=gateway.username,
+        proxy.connect(gateway.ip, gateway.port,
+                      username=gateway.username,
                       password=gateway.password,
                       pkey=gateway.private_key_obj)
     except(paramiko.AuthenticationException,
