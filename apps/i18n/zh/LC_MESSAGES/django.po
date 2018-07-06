@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-05 14:58+0800\n"
+"POT-Creation-Date: 2018-07-06 13:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -480,7 +480,7 @@ msgstr "手动登录"
 #: assets/views/asset.py:197 assets/views/domain.py:29
 #: assets/views/domain.py:45 assets/views/domain.py:61
 #: assets/views/domain.py:74 assets/views/domain.py:98
-#: assets/views/domain.py:126 assets/views/domain.py:150
+#: assets/views/domain.py:126 assets/views/domain.py:145
 #: assets/views/label.py:26 assets/views/label.py:42 assets/views/label.py:58
 #: assets/views/system_user.py:28 assets/views/system_user.py:44
 #: assets/views/system_user.py:60 assets/views/system_user.py:74
@@ -685,7 +685,7 @@ msgstr "重置"
 #: common/templates/common/security_setting.html:71
 #: common/templates/common/terminal_setting.html:108
 #: perms/templates/perms/asset_permission_create_update.html:70
-#: terminal/templates/terminal/session_list.html:124
+#: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:47
 #: users/templates/users/forgot_password.html:44
@@ -847,7 +847,7 @@ msgstr "比例"
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:42
 #: perms/templates/perms/asset_permission_list.html:60
-#: terminal/templates/terminal/session_list.html:80
+#: terminal/templates/terminal/session_list.html:81
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:29
@@ -1189,7 +1189,7 @@ msgstr "网域详情"
 msgid "Domain gateway list"
 msgstr "域网关列表"
 
-#: assets/views/domain.py:151
+#: assets/views/domain.py:146
 msgid "Update gateway"
 msgstr "创建网关"
 
@@ -1246,7 +1246,7 @@ msgstr "成功"
 #: ops/templates/ops/adhoc_history_detail.html:61
 #: ops/templates/ops/task_history.html:58 perms/models.py:36
 #: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:137
-#: terminal/templates/terminal/session_list.html:77
+#: terminal/templates/terminal/session_list.html:78
 msgid "Date start"
 msgstr "开始日期"
 
@@ -1433,60 +1433,60 @@ msgid ""
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: common/forms.py:186
+#: common/forms.py:185
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: common/forms.py:193
+#: common/forms.py:190
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: common/forms.py:195
+#: common/forms.py:192
 msgid ""
 "Tip :(unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示:（单位 / 分钟）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
 
-#: common/forms.py:201
+#: common/forms.py:198
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:208
+#: common/forms.py:205
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:210
+#: common/forms.py:207
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:216
+#: common/forms.py:213
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:217
+#: common/forms.py:214
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:223
+#: common/forms.py:220
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:224
+#: common/forms.py:221
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:230
+#: common/forms.py:227
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:231
+#: common/forms.py:228
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -2177,14 +2177,14 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models.py:132 terminal/templates/terminal/session_list.html:102
+#: terminal/models.py:132 terminal/templates/terminal/session_list.html:104
 msgid "Replay"
 msgstr "回放"
 
 #: terminal/models.py:133 terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
 #: terminal/templates/terminal/session_detail.html:48
-#: terminal/templates/terminal/session_list.html:76
+#: terminal/templates/terminal/session_list.html:77
 msgid "Command"
 msgstr "命令"
 
@@ -2235,24 +2235,28 @@ msgstr "监控"
 msgid "Terminate session"
 msgstr "终止会话"
 
-#: terminal/templates/terminal/session_list.html:79
+#: terminal/templates/terminal/session_list.html:76
+msgid "Login from"
+msgstr "登录来源"
+
+#: terminal/templates/terminal/session_list.html:80
 msgid "Duration"
 msgstr "时长"
 
-#: terminal/templates/terminal/session_list.html:104
+#: terminal/templates/terminal/session_list.html:106
 msgid "Monitor"
 msgstr "监控"
 
-#: terminal/templates/terminal/session_list.html:106
 #: terminal/templates/terminal/session_list.html:108
+#: terminal/templates/terminal/session_list.html:110
 msgid "Terminate"
 msgstr "终断"
 
-#: terminal/templates/terminal/session_list.html:120
+#: terminal/templates/terminal/session_list.html:122
 msgid "Terminate selected"
 msgstr "终断所选"
 
-#: terminal/templates/terminal/session_list.html:140
+#: terminal/templates/terminal/session_list.html:142
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
 
@@ -2322,7 +2326,7 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api.py:210 users/templates/users/login.html:50
+#: users/api.py:208 users/templates/users/login.html:50
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -2697,7 +2701,7 @@ msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:352 users/utils.py:81
+#: users/templates/users/user_detail.html:352 users/utils.py:80
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -2914,11 +2918,11 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:42
+#: users/utils.py:41
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:44
+#: users/utils.py:43
 #, python-format
 msgid ""
 "\n"
@@ -2963,7 +2967,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:83
+#: users/utils.py:82
 #, python-format
 msgid ""
 "\n"
@@ -3007,11 +3011,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:114
+#: users/utils.py:113
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:116
+#: users/utils.py:115
 #, python-format
 msgid ""
 "\n"
@@ -3036,19 +3040,19 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:149
+#: users/utils.py:148
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:151
+#: users/utils.py:150
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:164
+#: users/utils.py:163
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/utils.py:290 users/utils.py:300
+#: users/utils.py:289 users/utils.py:299
 msgid "Bit"
 msgstr " 位"
 
