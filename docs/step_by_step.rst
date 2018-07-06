@@ -219,16 +219,16 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
             return None
 
 
-        class DevelopmentConfig(Config):
-            pass
+    class DevelopmentConfig(Config):
+        pass
 
 
-        class TestConfig(Config):
-            pass
+    class TestConfig(Config):
+        pass
 
 
-        class ProductionConfig(Config):
-            pass
+    class ProductionConfig(Config):
+        pass
 
 
     # Default using Config settings, you can write if/else for different env
