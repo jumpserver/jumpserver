@@ -134,16 +134,16 @@
             return None
 
 
-        class DevelopmentConfig(Config):
-            pass
+    class DevelopmentConfig(Config):
+        pass
 
 
-        class TestConfig(Config):
-            pass
+    class TestConfig(Config):
+        pass
 
 
-        class ProductionConfig(Config):
-            pass
+    class ProductionConfig(Config):
+        pass
 
 
     # Default using Config settings, you can write if/else for different env
