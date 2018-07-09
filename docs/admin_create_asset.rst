@@ -33,6 +33,7 @@
 
 ::
 
+    # 如果不需要使用 ldap 登陆 jumpserver，可以直接跳过，不需要设置
     # 先测试通过才能保存
     # DN 和 OU 一定要完整(如DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org)
     注：可借用第三方 gui 工具查看 ldap 用户的属性，新版本已经支持中文名登录，即cn=中文也可正常使用
