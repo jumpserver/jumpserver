@@ -14,7 +14,7 @@ Windows 资产连接说明
 
     $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
     $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
-    $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
+    $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里，如果不存在直接下一步
     $ systemctl stop docker
     $ systemctl start docker
     $ docker run --name jms_guacamole -d \
