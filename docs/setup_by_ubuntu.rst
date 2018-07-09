@@ -151,26 +151,26 @@
 
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
         # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问了
-        DEBUG = False
+        DEBUG = os.environ.get("DEBUG") or False
 
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
-        LOG_LEVEL = 'ERROR'
+        LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'WARNING'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
         # 使用的数据库配置，支持sqlite3, mysql, postgres等，默认使用sqlite3
         # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # 默认使用SQLite，如果使用其他数据库请注释下面两行
+        # 默认使用SQLite3，如果使用其他数据库请注释下面两行
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
-        # # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
-        DB_ENGINE = 'mysql'
-        DB_HOST = '127.0.0.1'
-        DB_PORT = 3306
-        DB_USER = 'jumpserver'
-        DB_PASSWORD = 'somepassword'
-        DB_NAME = 'jumpserver'
+        # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示(mariadb也是mysql)
+        DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
+        DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
+        DB_PORT = os.environ.get("DB_PORT") or 3306
+        DB_USER = os.environ.get("DB_USER") or 'jumpserver'
+        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'somepassword'
+        DB_NAME = os.environ.get("DB_NAME") or 'jmstest'
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
@@ -178,9 +178,11 @@
         HTTP_LISTEN_PORT = 8080
 
         # Redis 相关设置
-        REDIS_HOST = '127.0.0.1'
-        REDIS_PORT = 6379
-        REDIS_PASSWORD = ''
+        REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
+        REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+        REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
+        REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
+        REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
 
         def __init__(self):
             pass
