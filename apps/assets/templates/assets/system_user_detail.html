@@ -337,10 +337,22 @@ $(document).ready(function () {
     });
 }).on('click', '.btn-clear-auth', function () {
     var the_url = '{% url "api-assets:system-user-auth-info" pk=system_user.id %}';
-    APIUpdateAttr({
-        url: the_url,
-        method: 'DELETE',
-        success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
+    var name = '{{ system_user.name }}';
+    swal({
+        title: '你确定清除该系统用户的认证信息吗 ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true
+    }, function () {
+        APIUpdateAttr({
+            url: the_url,
+            method: 'DELETE',
+            success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
+        });
     });
 })
 </script>
