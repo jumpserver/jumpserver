@@ -69,7 +69,7 @@
 ::
 
     $ cd /opt/
-    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可

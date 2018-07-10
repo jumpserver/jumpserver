@@ -47,7 +47,7 @@
     $ source ~/.bashrc
 
     # 下载 Jumpserver
-    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git
+    $ git clone https://github.com/jumpserver/jumpserver.git
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
     $ cd /opt/jumpserver && git checkout master && git pull
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
