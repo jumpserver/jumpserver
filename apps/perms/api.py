@@ -25,7 +25,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
     permission_classes = (IsSuperUser,)
-	pagination_class = LimitOffsetPagination
+    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve'):
