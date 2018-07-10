@@ -34,6 +34,10 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         logger.info("Asset `{}` create signal received".format(instance))
         update_asset_hardware_info_on_created(instance)
         test_asset_conn_on_created(instance)
+        assets = Asset.objects.filter(pk=instance.pk)
+        system_users = SystemUser.objects.all()
+        for system_user in system_users:
+            push_system_user_to_assets(system_user, assets)
 
 
 @receiver(post_save, sender=SystemUser, dispatch_uid="my_unique_identifier")
