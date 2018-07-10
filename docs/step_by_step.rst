@@ -180,7 +180,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         ALLOWED_HOSTS = ['*']
 
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
-        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问了
+        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问
         DEBUG = os.environ.get("DEBUG") or False
 
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
