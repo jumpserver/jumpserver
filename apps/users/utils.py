@@ -13,7 +13,7 @@ import ipaddress
 from django.http import Http404
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
@@ -200,16 +200,15 @@ def get_login_ip(request):
     return login_ip
 
 
-def write_login_log(username, type='', ip='', user_agent=''):
+def write_login_log(*args, **kwargs):
+    ip = kwargs.get('ip', '')
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
         city = "Unknown"
     else:
         city = get_ip_city(ip)
-    LoginLog.objects.create(
-        username=username, type=type,
-        ip=ip, city=city, user_agent=user_agent
-    )
+    kwargs.update({'ip': ip, 'city': city})
+    LoginLog.objects.create(**kwargs)
 
 
 def get_ip_city(ip, timeout=10):
@@ -332,3 +331,29 @@ def check_password_rules(password):
 
     match_obj = re.match(pattern, password)
     return bool(match_obj)
+
+
+def set_user_login_failed_count_to_cache(key_limit):
+    count = cache.get(key_limit)
+    count = count + 1 if count else 1
+
+    setting_limit_time = Setting.objects.filter(
+        name='SECURITY_LOGIN_LIMIT_TIME'
+    ).first()
+    limit_time = setting_limit_time.cleaned_value if setting_limit_time \
+        else settings.DEFAULT_LOGIN_LIMIT_TIME
+
+    cache.set(key_limit, count, int(limit_time)*60)
+
+
+def is_block_login(key_limit):
+    count = cache.get(key_limit)
+
+    setting_limit_count = Setting.objects.filter(
+        name='SECURITY_LOGIN_LIMIT_COUNT'
+    ).first()
+    limit_count = setting_limit_count.cleaned_value if setting_limit_count \
+        else settings.DEFAULT_LOGIN_LIMIT_COUNT
+
+    if count and count >= limit_count:
+        return True

@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,10 +15,11 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserGroupUpdateMemeberSerializer, UserPKUpdateSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
-from .models import User, UserGroup
+from .models import User, UserGroup, LoginLog
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
-from .utils import check_user_valid, generate_token, get_login_ip, check_otp_code
+from .utils import check_user_valid, generate_token, get_login_ip, \
+    check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -149,10 +151,23 @@ class UserOtpAuthApi(APIView):
             return Response({'msg': '请先进行用户名和密码验证'}, status=401)
 
         if not check_otp_code(user.otp_secret_key, otp_code):
+            data = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_MFA,
+                'status': False
+            }
+            self.write_login_log(request, data)
             return Response({'msg': 'MFA认证失败'}, status=401)
 
+        data = {
+            'username': user.username,
+            'mfa': int(user.otp_enabled),
+            'reason': LoginLog.REASON_NOTHING,
+            'status': True
+        }
+        self.write_login_log(request, data)
         token = generate_token(request, user)
-        self.write_login_log(request, user)
         return Response(
             {
                 'token': token,
@@ -161,7 +176,7 @@ class UserOtpAuthApi(APIView):
         )
 
     @staticmethod
-    def write_login_log(request, user):
+    def write_login_log(request, data):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -169,25 +184,52 @@ class UserOtpAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        write_login_log_async.delay(
-            user.username, ip=login_ip,
-            type=login_type, user_agent=user_agent,
-        )
+        tmp_data = {
+            'ip': login_ip,
+            'type': login_type,
+            'user_agent': user_agent
+        }
+        data.update(tmp_data)
+        write_login_log_async.delay(**data)
 
 
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
+    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
 
     def post(self, request):
-        user, msg = self.check_user_valid(request)
+        # limit login
+        username = request.data.get('username')
+        ip = request.data.get('remote_addr', None)
+        ip = ip if ip else get_login_ip(request)
+        key_limit = self.key_prefix_limit.format(ip, username)
+        if is_block_login(key_limit):
+            msg = _("Log in frequently and try again later")
+            return Response({'msg': msg}, status=401)
 
+        user, msg = self.check_user_valid(request)
         if not user:
+            data = {
+                'username': request.data.get('username', ''),
+                'mfa': LoginLog.MFA_UNKNOWN,
+                'reason': LoginLog.REASON_PASSWORD,
+                'status': False
+            }
+            self.write_login_log(request, data)
+
+            set_user_login_failed_count_to_cache(key_limit)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
+            data = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_NOTHING,
+                'status': True
+            }
+            self.write_login_log(request, data)
             token = generate_token(request, user)
-            self.write_login_log(request, user)
             return Response(
                 {
                     'token': token,
@@ -204,7 +246,8 @@ class UserAuthApi(APIView):
                 'otp_url': reverse('api-users:user-otp-auth'),
                 'seed': seed,
                 'user': self.serializer_class(user).data
-            }, status=300)
+            }, status=300
+        )
 
     @staticmethod
     def check_user_valid(request):
@@ -218,7 +261,7 @@ class UserAuthApi(APIView):
         return user, msg
 
     @staticmethod
-    def write_login_log(request, user):
+    def write_login_log(request, data):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
@@ -226,10 +269,14 @@ class UserAuthApi(APIView):
         if not login_ip:
             login_ip = get_login_ip(request)
 
-        write_login_log_async.delay(
-            user.username, ip=login_ip,
-            type=login_type, user_agent=user_agent,
-        )
+        tmp_data = {
+            'ip': login_ip,
+            'type': login_type,
+            'user_agent': user_agent,
+        }
+        data.update(tmp_data)
+
+        write_login_log_async.delay(**data)
 
 
 class UserConnectionTokenApi(APIView):
