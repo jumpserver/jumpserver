@@ -23,6 +23,8 @@ urlpatterns = [
         api.AssetRefreshHardwareApi.as_view(), name='asset-refresh'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/alive/$',
         api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/gateway/$',
+        api.AssetGatewayApi.as_view(), name='asset-gateway'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/nodes/$',
         api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/auth/$',

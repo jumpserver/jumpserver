@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
+import random
+
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -22,7 +24,8 @@ from ..utils import LabelFilter
 logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetListUpdateApi',
-    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi'
+    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
+    'AssetGatewayApi'
 ]
 
 
@@ -106,3 +109,20 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
         asset = get_object_or_404(Asset, pk=asset_id)
         task = test_asset_connectability_manual.delay(asset)
         return Response({"task": task.id})
+
+
+class AssetGatewayApi(generics.RetrieveAPIView):
+    queryset = Asset.objects.all()
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        asset_id = kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_id)
+
+        if asset.domain and \
+                asset.domain.gateways.filter(protocol=asset.protocol).exists():
+            gateway = random.choice(asset.domain.gateways.filter(protocol=asset.protocol))
+            serializer = serializers.GatewayWithAuthSerializer(instance=gateway)
+            return Response(serializer.data)
+        else:
+            return Response({"msg": "Not have gateway"}, status=404)
