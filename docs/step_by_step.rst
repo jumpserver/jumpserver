@@ -259,7 +259,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
 **3.1 下载或 Clone 项目**
 
-新开一个终端，连接测试机，别忘了 source /opt/py3/bin/activate
+新开一个终端，别忘了 source /opt/py3/bin/activate
 
 ::
 
