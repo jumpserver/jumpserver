@@ -1,3 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import redirect
 
-# Create your views here.
+from django.views.generic import DetailView
+
+from .models import Organization
+
+
+class SwitchOrgView(DetailView):
+    model = Organization
+    object = None
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        self.object = Organization.get_instance(pk)
+        request.session['oid'] = self.object.id.__str__()
+        return redirect('index')
