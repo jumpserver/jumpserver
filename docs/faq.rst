@@ -3,35 +3,17 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
+   Sftp使用说明 <faq_sftp.rst>
+   安装过程常见问题 <faq_install.rst>
    Linux 资产连接说明 <faq_linux.rst>
    Windows 资产连接说明 <faq_windows.rst>
-   Windows sftp使用说明 <faq_sftp.rst>
    二次认证（Google Auth）入口说明 <faq_googleauth.rst>
 
 
-常见问题
+其他问题
 ~~~~~~~~~~~~~~~~~~~~~
 
-1. Windows 资产连接错误排查思路
-
-::
-
-    (1). 如果白屏  检查nginx配置文件的guacamole设置ip是否正确，检查终端管理的gua状态是否在线，检查资产设置及系统用户是否正确；
-    (2). 如果显示没有权限 可能是你在 终端管理里没有接受 guacamole的注册，请接受一下，然后重启guacamole
-    (3). 如果显示未知问题 可能是你的资产填写的端口不对，或者授权的系统用户的协议不是rdp
-    (4). 提示无法连接服务器，请联系管理员或查看日志 一般情况下是登录的系统账户不正确，可以从Windows的日志查看信息（资产的信息填写不正确也会报这个错误）
-    (5). 提示网络问题无法连接或者超时，请检查网络连接并重试，或联系管理员 一般情况下是防火墙设置不正确，可以从Windows的日志查看信息（资产的信息填写不正确也会报这个错误）
-
-2. Linux 资产连接错误排查思路
-
-::
-
-    (1). 检查管理用户的权限是否正确，权限需要与root权限一致。
-    (2). 检查资产的防火墙策略，可以在资产上面新建个用户，尝试用此用户进行ssh连接。
-    (3). 检查资产的python，确定版本不小于2.6，不高于3.x。
-    (4). 检查资产的ssh策略，确保可以被jumpserver应用访问。
-
-3. 用户、系统用户、管理用户的关系
+1. 用户、系统用户、管理用户的关系
 
 ::
 
@@ -39,55 +21,12 @@ FAQ
     系统用户：使用来登录到服务器的用户，如 web, dba, root等，配合sudo实现权限管控
     管理用户：是服务器上已存在的特权用户，Ansible用来获取硬件信息, 如 root, 或者其它拥有 sudo NOPASSWD: ALL权限的用户
 
-    (1). 这里解释一下系统用户里面的sudo，比如有个系统用户的权限是这样的：
+    # 这里解释一下系统用户里面的sudo，比如有个系统用户的权限是这样的：
 
     Sudo: /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail
     意思是允许这个系统用户免密码执行 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
 
-4. coco或guacamole注册失败，或重新注册方法
-
-::
-
-    (1). 在 Jumpserver后台 会话管理 - 终端管理  删掉它们
-
-    (2). coco 重新注册（注意虚拟环境 source /opt/py3/bin/activate）
-
-      $ cd /opt/coco && ./cocod stop
-      $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在key文件直接下一步
-      $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
-
-   (3). guacamole重新注册
-
-      $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
-      $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
-      $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里
-      $ systemctl stop docker
-      $ systemctl start docker
-      $ docker run --name jms_guacamole -d \
-        -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-        -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-        -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-        registry.jumpserver.org/public/guacamole:latest
-
-      # 如果registry.jumpserver.org/public/guacamole:latest下载很慢，可以换成jumpserver/guacamole:latest
-
-      # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
-      $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
-
-5. Ansible报错汇总
-
-::
-
-    (1). 资产是centos5.x Python版本 2.4，
-
-        $ yum -y install python26
-        $ mv /usr/bin/python /usr/bin/python.bak
-        $ ln -s /usr/bin/python2.6 /usr/bin/python
-
-        # 修改 /bin/yum 使用原来的python
-        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
-
-6. input/output error, 通常jumpserver所在服务器字符集问题
+2. input/output error, 通常jumpserver所在服务器字符集问题
 
 ::
 
@@ -107,124 +46,97 @@ FAQ
 
     如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
 
-7. 运行 sh make_migrations.sh 报错，
-    CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
-    这是由于 django-celery-beat老版本有bug引起的
+3. luna 无法访问
 
 ::
 
-    $ rm -rf /opt/py3/lib/python3.6/site-packages/django_celery_beat/migrations/
-    $ pip uninstall django-celery-beat
-    $ pip install django-celery-beat
+    # Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
 
-8. 连接测试常见错误
+    # Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
 
-::
-
-    (1). to use the 'ssh' connection type with passwords, you mast install the sshpass program
-
-        # Centos
-        $ yum -y install sshpass
-
-        # Ubuntu
-        $ apt-get -y install sshpass
-
-    注意，在 coco 服务器上面安装完成后需要重启服务。
-
-    (2). Authentication failure
-
-        # 一般都是资产的管理用户不正确
-
-    (3). Failed to connect to the host via ssh: ssh_exchange_identification: read: Connection reset by peer\r\n
-
-        # 一般是资产的 ssh 或者 防火墙 做了限制，无法连接资产（资产信息填错也可能会报这个错误）
-
-    (4). "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
-
-        # 一般是资产 python 未安装或者 python 异常
-
-9. 其他问题
+4. 录像问题
 
 ::
 
-    (1). 邮箱设置 新建用户无法收到邮件请更新 jumpserver 版本到最新版本
+    # 默认录像存储位置在jumpserver/data/media  可以通过映射或者软连接方式来使用其他目录
 
-    (2). 收到的邮件链接地址是 localhost 可以到 系统设置-基本设置 里面修改 url 地址
+    # 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
+    {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
 
-    (3). coco 提示[service ERROR] Failed register terminal jzsas exist already
-        # 参考上面的coco重新注册方法
+    # 命令记录保存到 elastic
+    {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
 
-    (4). guacamole 不在线
-        # 尝试重启一下guacamole，然后再看看，如果任然不在线，参考上面gua重新注册的方法
-        $ docker restart jms_guacamole  # 如果容器的名称不对，请用docker ps查询
+    # 修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
 
-    (5). LDAP设置 测试通过，但是登录失败需要检查用户的ou是否正确，确认使用了映射的用户属性进行登陆
+5. 在终端修改管理员密码及新建超级用户
 
-    (6). Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
+::
 
-    (7). Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
+    # 管理密码忘记了或者重置管理员密码
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ python manage.py changepassword  <user_name>
 
-    (8). 默认录像存储位置在jumpserver/data/media
+    # 新建超级用户的命令如下命令
+    $ python manage.py createsuperuser --username=user --email=user@domain.com
 
-    (9). 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
-        {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
+6. 清理celery产生的数据(无法正常推送及连接资产，一直显示........等可以使用，请确定字符集是zh_CN.UTF-8)
 
-         命令记录保存到 elastic
-        {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
+::
 
-         修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
+    # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
+    $ cat /etc/locale.conf
+    # 如果不是，请修改，注，本例只是以CentOS 7举例，其他的linux请更换路径
+    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
+    $ export LC_ALL=zh_CN.UTF-8
+    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
-    (10). 管理密码忘记了或者重置管理员密码
-        $ source /opt/py3/bin/activate
-        $ cd /opt/jumpserver/apps
-        $ python manage.py changepassword  <user_name>
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ python manage.py shell
+    $ from celery.task.control import discard_all
+    $ discard_all()
+    $ exit()
+    $ cd /opt/jumpserver
+    $ ./jms restart celery
 
-        # 新建超级用户的命令如下命令
-        $ python manage.py createsuperuser --username=user --email=user@domain.com
+    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的进程，在重新启动jumpserver即可
 
-    (11). 清理celery产生的数据(无法正常推送及连接资产，一直显示........等可以使用，请确定字符集是zh_CN.UTF-8)
-        # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
-        $ cat /etc/locale.conf
-        # 如果不是，请修改，注，本例只是以CentOS 7举例，其他的linux请更换路径
-        $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-        $ export LC_ALL=zh_CN.UTF-8
-        $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
+7. 修改登录超时时间（默认 10 秒）
 
-        $ source /opt/py3/bin/activate
-        $ cd /opt/jumpserver/apps
-        $ python manage.py shell
-        $ from celery.task.control import discard_all
-        $ discard_all()
-        $ exit()
-        $ cd /opt/jumpserver
-        $ ./jms restart celery
+::
 
-    (12). 修改登录超时时间（默认 10 秒）
-        $ vim /opt/coco/coco/proxy.py
-        $ vim /opt/coco/coco/connection.py
+    $ vim /opt/coco/coco/proxy.py
+    $ vim /opt/coco/coco/connection.py
 
-        # 把 TIMEOUT = 10 修改成你想要的数字，两个文件都需要修改，单位为：秒
-        # TIMEOUT = 10 表示超时时间为10秒，可以自行修改。
+    # 把 TIMEOUT = 10 修改成你想要的数字，两个文件都需要修改，单位为：秒
+    # TIMEOUT = 10 表示超时时间为10秒，可以自行修改。
 
-    (13). 升级提示 Table 'xxx' already exists（可用以下命令检查，如果显示内容不一致则无法升级）
-        # cd /opt/jumpserver/apps
-        # python manage.py makemigrations
-        # python manage.py migrate --fake
-        # find . | grep migrations | grep apps | grep -v 'pyc' | grep -v '__init__'
-        # 把这里的内容和下面数据库查询的内容对比
+8. 升级提示 Table 'xxx' already exists（可用以下命令检查，如果显示内容不一致则无法升级）
 
-        # mysql -uroot
-        > use jumpserver;
-        > select * from django_migrations;
-        # 如果对比结果不一样则无法升级
-        > quit;
+::
 
-    (14). 设置浏览器过期
-        $ vim /opt/jumpserver/apps/jumpserver/settings.py
+    $ cd /opt/jumpserver/apps
+    $ python manage.py makemigrations
+    $ python manage.py migrate --fake
+    $ find . | grep migrations | grep apps | grep -v 'pyc' | grep -v '__init__'
+    # 把这里的内容和下面数据库查询的内容对比
 
-        # 找到如下行，注释（可参考 django 设置 session 过期时间），修改或者新增你要的设置即可
-        # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+    # mysql -uroot
+    > use jumpserver;
+    > select * from django_migrations;
+    # 如果对比结果不一样则无法升级
+    > quit;
 
-        # 如下，设置关闭浏览器 cookie 失效，则修改为
-        # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
-        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+9. 设置浏览器过期
+
+::
+
+    $ vim /opt/jumpserver/apps/jumpserver/settings.py
+
+    # 找到如下行，注释（可参考 django 设置 session 过期时间），修改或者新增你要的设置即可
+    # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+
+    # 如下，设置关闭浏览器 cookie 失效，则修改为
+    # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True

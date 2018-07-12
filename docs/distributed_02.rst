@@ -57,7 +57,7 @@
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;
+            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
         }
 
         location /socket.io/ {

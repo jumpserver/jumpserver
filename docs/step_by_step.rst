@@ -1,6 +1,9 @@
 一步一步安装(CentOS)
 --------------------------
 
+本文档旨在帮助用户了解各组件之间的关系
+如果已经接触过之前的版本，可参考 `进阶安装文档 <quickinstall.html>`_
+
 环境
 ~~~~~~~
 
@@ -11,9 +14,8 @@
 ::
 
     # CentOS 7
-    $ setenforce 0  # 可以设置配置文件永久关闭
-    $ systemctl stop iptables.service
-    $ systemctl stop firewalld.service
+    $ setenforce 0  # 临时关闭，重启后失效
+    $ systemctl stop firewalld.service  # 临时关闭，重启后失效
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -21,8 +23,8 @@
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # CentOS6
-    $ setenforce 0
-    $ service iptables stop
+    $ setenforce 0  # 临时关闭，重启后失效
+    $ service iptables stop  # 临时关闭，重启后失效
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -110,9 +112,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ yum -y install redis
+    $ systemctl enable redis
     $ systemctl start redis
 
     # centos6
+    $ yum -y install redis
+    $ chkconfig redis on
     $ service redis start
 
 
@@ -465,16 +470,16 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;
+            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 静态资源，如果修改安装目录，此处需要修改
         }
 
         location /socket.io/ {

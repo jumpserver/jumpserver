@@ -425,16 +425,16 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;
+            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 静态资源，如果修改安装目录，此处需要修改
         }
 
         location /socket.io/ {

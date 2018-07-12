@@ -1,6 +1,24 @@
 Linux 资产连接说明
 ----------------------------
 
+Linux 资产连接错误排查思路
+
+::
+
+    (1). 检查管理用户的权限是否正确，权限需要与root权限一致
+    (2). 检查资产的防火墙策略，可以在资产上面新建个用户，尝试用此用户在jumpserver服务器上进行ssh连接
+    (3). 检查资产的python，确定版本不小于2.6，不高于3.x
+    (4). 检查资产的ssh策略，确保可以被jumpserver应用访问
+
+    # 案例参考. 资产是centos5.x Python版本 2.4，
+
+        $ yum -y install python26
+        $ mv /usr/bin/python /usr/bin/python.bak
+        $ ln -s /usr/bin/python2.6 /usr/bin/python
+
+        # 修改 /bin/yum 使用原来的python
+        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
+
 1. 检查终端是否在线
 
 ::
@@ -101,5 +119,27 @@ Linux 资产连接说明
 .. image:: _static/img/faq_linux_09.jpg
 .. image:: _static/img/faq_linux_10.jpg
 
+10. 连接测试常见错误
+
+::
+
+    # 提示 to use the 'ssh' connection type with passwords, you mast install the sshpass program
+    # Centos
+    $ yum -y install sshpass
+
+    # Ubuntu
+    $ apt-get -y install sshpass
+
+    # 注意，在 coco 服务器上面安装完成后需要重启服务。
+
+    # 提示 Authentication failure
+    # 一般都是资产的管理用户不正确
+
+    # 提示Failed to connect to the host via ssh: ssh_exchange_identification: read: Connection reset by peer\r\n
+    # 一般是资产的 ssh 或者 防火墙 做了限制，无法连接资产（资产信息填错也可能会报这个错误）
+    # 检查防火墙设置以及 /etc/hosts.allow /etc/hosts.deny
+
+    # 提示 "MODULE FAILURE","module_stdout":"/bin/sh: 1: /usr/bin/python: not found\r\n","module_stderr":"Shared connection to xx.xx.xx.xx closed.\r\n"
+    # 一般是资产 python 未安装或者 python 异常
 
 其他问题可参考 `FAQ <faq.html>`_
