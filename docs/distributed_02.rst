@@ -4,7 +4,6 @@
 说明
 ~~~~~~~
 -  # 开头的行表示注释
--  > 开头的行表示需要在 mysql 中执行
 -  $ 开头的行表示需要执行的命令
 
 环境
@@ -31,6 +30,8 @@
     # 设置 http 访问权限
     $ setsebool -P httpd_can_network_connect 1
 
+::
+
     # 安装 nginx
     $ vim /etc/yum.repos.d/nginx.repo
 
@@ -41,6 +42,8 @@
     enabled=1
 
     # 非 Centos7 请参考 http://nginx.org/en/linux_packages.html#stable
+
+::
 
     $ yum -y install nginx
     $ systemctl enable nginx
@@ -207,4 +210,21 @@
     $ nginx -t
     $ systemctl start nginx
 
-    
+    # 访问 http://192.168.100.100
+    # 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+    # 测试连接
+    $ ssh -p2222 admin@192.168.100.100
+    $ sftp -P2222 admin@192.168.100.100
+    密码: admin
+
+    # 如果是用在 Windows 下，Xshell Terminal 登录语法如下
+    $ ssh admin@192.168.100.100 2222
+    $ sftp admin@192.168.100.100 2222
+    密码: admin
+    如果能登陆代表部署成功
+
+    # sftp默认上传的位置在资产的 /tmp 目录下
+    # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
+
+    后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+    如遇到问题可参考 `FAQ <faq.html>`_

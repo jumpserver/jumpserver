@@ -80,7 +80,7 @@
 
         # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
-        CORE_HOST = 'http://127.0.0.1:8080'
+        CORE_HOST = 'http://192.168.100.100'
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -142,3 +142,5 @@
     # 新版本更新了运行脚本，使用方式./jms start|stop|status all  后台运行请添加 -d 参数
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 coco 注册
+
+    # 多节点部署请参考此文档，部署方式一样

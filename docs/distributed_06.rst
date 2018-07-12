@@ -35,3 +35,5 @@
       jumpserver/guacamole:latest
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
+
+    # 多节点部署请参考此文档，部署方式一样，不需要做任何修改
