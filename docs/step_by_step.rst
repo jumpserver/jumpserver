@@ -154,7 +154,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ cp config_example.py config.py
     $ vi config.py
 
-    # 注意对齐，不要直接复制本文档的内容
+    # 注意对齐，不要直接复制本文档的内容，实际内容以文件为准，本文仅供参考
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 

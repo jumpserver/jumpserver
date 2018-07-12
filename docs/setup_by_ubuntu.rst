@@ -256,7 +256,7 @@
     $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
     $ vi conf.py
 
-    # 注意对齐，不要直接复制本文档的内容
+    # 注意对齐，不要直接复制本文档的内容，实际内容以文件为准，本文仅供参考
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
