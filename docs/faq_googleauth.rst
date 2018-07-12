@@ -6,4 +6,5 @@
 ::
 
     # 关闭也是在这里，点击此处的禁用即可
-    # 部分安卓手机无法使用 Google Auth ，可以使用第三方工具（如Microsoft Authenticator 、身份宝等）
+    # 部分安卓手机无法使用 Google Auth ，可以尝试使用系统自带的【扫一扫】工具
+    # 或者尝试使用第三方软件（如Microsoft Authenticator 、身份宝等）

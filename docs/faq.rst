@@ -51,7 +51,6 @@ FAQ
 ::
 
     # Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
-
     # Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
 
 4. 录像问题
@@ -134,9 +133,16 @@ FAQ
 
     $ vim /opt/jumpserver/apps/jumpserver/settings.py
 
-    # 找到如下行，注释（可参考 django 设置 session 过期时间），修改或者新增你要的设置即可
+    # 找到如下行，注释（可参考 django 设置 session 过期时间），修改你要的设置即可
     # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
 
     # 如下，设置关闭浏览器 cookie 失效，则修改为
     # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+10. MFA遗失无法登陆
+
+::
+
+    # 普通用户联系管理员关闭MFA，登录成功后用户在个人信息里面重新绑定.
+    # 如果管理员遗失无法登陆, 修改user_user表对应用户的otp_level为0, 重新登陆绑定即可
