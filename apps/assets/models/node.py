@@ -5,12 +5,14 @@ import uuid
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+
+from orgs.mixins import OrgModelMixin
 from common.utils import with_cache
 
 __all__ = ['Node']
 
 
-class Node(models.Model):
+class Node(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))

@@ -56,6 +56,7 @@ ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
 # Application definition
 
 INSTALLED_APPS = [
+    'orgs.apps.OrgsConfig',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
+    'orgs.middleware.OrgMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -107,6 +109,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.request',
                 'django.template.context_processors.media',
+                'orgs.context_processor.org_processor',
             ],
         },
     },

@@ -7,12 +7,13 @@ import random
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from orgs.mixins import OrgModelMixin
 from .base import AssetUser
 
 __all__ = ['Domain', 'Gateway']
 
 
-class Domain(models.Model):
+class Domain(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))

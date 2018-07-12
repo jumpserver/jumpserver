@@ -11,12 +11,13 @@ from django.conf import settings
 
 from common.utils import get_signer, ssh_key_string_to_obj, ssh_key_gen
 from common.validators import alphanumeric
+from orgs.mixins import OrgModelMixin
 from .utils import private_key_validator
 
 signer = get_signer()
 
 
-class AssetUser(models.Model):
+class AssetUser(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
