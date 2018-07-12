@@ -22,7 +22,7 @@
     $ yum upgrade -y
 
     # 获取 epel-release 源
-    $ yum -y install epel-release
+    $ yum -y install epel-release vim
 
     # 设置防火墙，开发 80 端口
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
@@ -32,6 +32,16 @@
     $ setsebool -P httpd_can_network_connect 1
 
     # 安装 nginx
+    $ vim /etc/yum.repos.d/nginx.repo
+
+    [nginx]
+    name=nginx repo
+    baseurl=http://nginx.org/packages/centos/7/$basearch/
+    gpgcheck=0
+    enabled=1
+
+    # 非 Centos7 请参考 http://nginx.org/en/linux_packages.html#stable
+
     $ yum -y install nginx
     $ systemctl enable nginx
 
@@ -41,8 +51,101 @@
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
-    # 配置 Nginx（如果无法正常访问，请注释掉 nginx.conf 的 server 所有字段）
+::
+
+    # 配置 Nginx
+    $ vim /etc/nginx/nginx.conf
+
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+    stream {
+        log_format  proxy  '$remote_addr [$time_local] '
+                           '$protocol $status $bytes_sent $bytes_received '
+                           '$session_time "$upstream_addr" '
+                           '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
+        access_log /var/log/nginx/tcp-access.log  proxy;
+        open_log_file_cache off;
+
+        include /etc/nginx/conf.d/*.stream;
+    }
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #关闭版本显示
+        server_tokens off;
+
+        #gzip 压缩传输
+        gzip on;
+        gzip_min_length 1k;
+        gzip_buffers    4 16k;
+        gzip_http_version 1.0;
+        gzip_comp_level 2;
+        gzip_types text/plain application/x-javascripttext/css application/xml;
+        gzip_vary on;
+
+        #配置代理参数
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_connect_timeout 90;
+        proxy_read_timeout 90;
+        proxy_send_timeout 90;
+        proxy_buffer_size 4k;
+
+        #缓存配置
+        proxy_temp_file_write_size 264k;
+        proxy_temp_path /var/cache/nginx/nginx_temp;
+        proxy_cache_path /var/cache/nginx/nginx_cache levels=1:2 keys_zone=cache_one:200m inactive=5d max_size=400m;
+        proxy_ignore_headers X-Accel-Expires Expires Cache-Control Set-Cookie;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+::
+
     $ vim /etc/nginx/conf.d/jumpserver.conf
+
+    upstream jumpserver {
+        server 192.168.100.11:80 max_fails=1 fail_timeout=120s;
+        # server ip:port max_fails=1 fail_timeout=120s;
+        # 这里是 jumpserver 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+    }
+
+    upstream cocows {
+        server 192.168.100.12:5000 max_fails=1 fail_timeout=120s;
+        # server ip:port max_fails=1 fail_timeout=120s;
+        # 这里是 coco ws 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+    }
+
+    upstream guacamole {
+        server 192.168.100.13:8081 max_fails=1 fail_timeout=120s;
+        # server ip:port max_fails=1 fail_timeout=120s;
+        # 这里是 guacamole 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+    }
 
     server {
         listen 80;
@@ -52,7 +155,7 @@
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
         location / {
-            proxy_pass http://192.168.100.11;  # 192.168.100.11 是 jumpserver 服务器ip
+            proxy_pass http://jumpserver;  # jumpserver
         }
 
         location /luna/ {
@@ -61,7 +164,7 @@
         }
 
         location /socket.io/ {
-            proxy_pass       http://192.168.100.12:5000/socket.io/;  # 192.168.100.12 是 coco 服务器ip
+            proxy_pass       http://cocows/socket.io/;  # coco
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -69,7 +172,7 @@
         }
 
         location /guacamole/ {
-            proxy_pass       http://192.168.100.13:8081/;  # 192.168.100.13 是 docker 服务器ip
+            proxy_pass       http://guacamole/;  #  guacamole
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -82,6 +185,26 @@
 
 ::
 
+    $ vim /etc/nginx/conf.d/coco.stream
+
+    stream {
+        upstream cocossh {
+            server 192.168.100.12:2222;
+            # server ip:port max_fails=1 fail_timeout=120s;
+            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+        }
+        server {
+            listen 2222;
+            proxy_pass cocossh;
+            proxy_connect_timeout 10s;
+            proxy_timeout 24h;   #代理超时
+        }
+    }
+
+::
+
     # nginx 测试并启动，如果报错请按报错提示自行解决
     $ nginx -t
     $ systemctl start nginx
+
+    
