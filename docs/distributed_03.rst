@@ -5,6 +5,7 @@
 ~~~~~~~
 -  # 开头的行表示注释
 -  $ 开头的行表示需要执行的命令
+-  > 开头的行表示需要在数据库中执行
 
 环境
 ~~~~~~~
@@ -40,3 +41,5 @@
     > grant all on jumpserver.* to 'jumpserver'@'192.168.100.11' identified by 'somepassword';
     > flush privileges;
     > quit
+
+    # 数据库的主从设置请参考其官方，之后会补上

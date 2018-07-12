@@ -1,6 +1,9 @@
 一步一步安装(CentOS)
 --------------------------
 
+本文档旨在帮助用户了解各组件之间的关系
+如果已经接触过之前的版本，可参考 `进阶安装文档 <quickinstall.html>`_
+
 环境
 ~~~~~~~
 
@@ -11,9 +14,8 @@
 ::
 
     # CentOS 7
-    $ setenforce 0  # 可以设置配置文件永久关闭
-    $ systemctl stop iptables.service
-    $ systemctl stop firewalld.service
+    $ setenforce 0  # 临时关闭，重启后失效
+    $ systemctl stop firewalld.service  # 临时关闭，重启后失效
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -21,8 +23,8 @@
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # CentOS6
-    $ setenforce 0
-    $ service iptables stop
+    $ setenforce 0  # 临时关闭，重启后失效
+    $ service iptables stop  # 临时关闭，重启后失效
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -110,9 +112,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 ::
 
     $ yum -y install redis
+    $ systemctl enable redis
     $ systemctl start redis
 
     # centos6
+    $ yum -y install redis
+    $ chkconfig redis on
     $ service redis start
 
 
@@ -149,7 +154,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ cp config_example.py config.py
     $ vi config.py
 
-    # 注意对齐，不要直接复制本文档的内容
+    # 注意对齐，不要直接复制本文档的内容，实际内容以文件为准，本文仅供参考
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
@@ -180,27 +185,27 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         ALLOWED_HOSTS = ['*']
 
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
-        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问了
-        DEBUG = False
+        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问
+        DEBUG = os.environ.get("DEBUG") or False
 
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
-        LOG_LEVEL = 'ERROR'
+        LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'WARNING'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
         # 使用的数据库配置，支持sqlite3, mysql, postgres等，默认使用sqlite3
         # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # 默认使用SQLite，如果使用其他数据库请注释下面两行
+        # 默认使用SQLite3，如果使用其他数据库请注释下面两行
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
-        # # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示
-        DB_ENGINE = 'mysql'
-        DB_HOST = '127.0.0.1'
-        DB_PORT = 3306
-        DB_USER = 'jumpserver'
-        DB_PASSWORD = 'somepassword'
-        DB_NAME = 'jumpserver'
+        # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示(mariadb也是mysql)
+        DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
+        DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
+        DB_PORT = os.environ.get("DB_PORT") or 3306
+        DB_USER = os.environ.get("DB_USER") or 'jumpserver'
+        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'somepassword'
+        DB_NAME = os.environ.get("DB_NAME") or 'jmstest'
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
@@ -208,9 +213,11 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         HTTP_LISTEN_PORT = 8080
 
         # Redis 相关设置
-        REDIS_HOST = '127.0.0.1'
-        REDIS_PORT = 6379
-        REDIS_PASSWORD = ''
+        REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
+        REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+        REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
+        REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
+        REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
 
         def __init__(self):
             pass
@@ -257,7 +264,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
 **3.1 下载或 Clone 项目**
 
-新开一个终端，连接测试机，别忘了 source /opt/py3/bin/activate
+新开一个终端，别忘了 source /opt/py3/bin/activate
 
 ::
 
@@ -430,7 +437,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址>:8080 \
+      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
       registry.jumpserver.org/public/guacamole:latest
 
 六. 配置 Nginx 整合各组件
@@ -463,16 +470,16 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;
+            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;
+            root /opt/jumpserver/data/;  # 静态资源，如果修改安装目录，此处需要修改
         }
 
         location /socket.io/ {
