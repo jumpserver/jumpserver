@@ -10,9 +10,10 @@ from django.shortcuts import redirect
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
+from orgs.mixins import OrgViewGenericMixin
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+class IndexView(LoginRequiredMixin, OrgViewGenericMixin, TemplateView):
     template_name = 'index.html'
 
     session_week = None

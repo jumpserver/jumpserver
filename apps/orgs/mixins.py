@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 from django.db import models
+from django.shortcuts import redirect
+from django.contrib.auth import get_user_model
 
 from common.utils import get_logger
 from .utils import get_current_org, get_model_by_db_table
@@ -8,24 +10,27 @@ from .utils import get_current_org, get_model_by_db_table
 logger = get_logger(__file__)
 
 
-class OrgQuerySet(models.QuerySet):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+__all__ = ['OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin']
 
 
-class OrgManager(OrgQuerySet.as_manager().__class__):
+class OrgManager(models.Manager):
     def get_queryset(self):
         current_org = get_current_org()
+        user_model = get_user_model()
         kwargs = {}
+
+        print("Get queryset ")
+        print(self.model)
+        print(current_org)
 
         if not current_org:
             kwargs['id'] = None
-        elif current_org.is_real:
+        elif issubclass(self.model, user_model):
+            kwargs['orgs'] = current_org
+        elif current_org.is_real():
             kwargs['org'] = current_org
         elif current_org.is_default():
             kwargs['org'] = None
-        print("GET QUWRYSET ")
         print(kwargs)
         return super().get_queryset().filter(**kwargs)
 
@@ -55,11 +60,25 @@ class OrgModelMixin(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        user_model = get_user_model()
         current_org = get_current_org()
         if current_org and not current_org.is_real():
             self.org = current_org
-        return super().save(force_insert=force_insert, force_update=force_update,
-                            using=using, update_fields=update_fields)
+        instance = super().save(
+            force_insert=force_insert, force_update=force_update,
+            using=using, update_fields=update_fields
+        )
+        if isinstance(instance, user_model):
+            instance.orgs.add(current_org)
+        return instance
 
     class Meta:
         abstract = True
+
+
+class OrgViewGenericMixin:
+    def dispatch(self, request, *args, **kwargs):
+        current_org = get_current_org()
+        if not current_org:
+            return redirect('orgs:switch-a-org')
+        return super().dispatch(request, *args, **kwargs)

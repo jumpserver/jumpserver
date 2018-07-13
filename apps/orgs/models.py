@@ -63,7 +63,7 @@ class Organization(models.Model):
         pass
 
     def is_real(self):
-        return len(str(self.id)) == 32
+        return len(str(self.id)) == 36
 
     @classmethod
     def get_user_admin_orgs(cls, user):

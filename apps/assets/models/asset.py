@@ -13,7 +13,7 @@ from django.core.cache import cache
 
 from ..const import ASSET_ADMIN_CONN_CACHE_KEY
 from .user import AdminUser, SystemUser
-from orgs.mixins import OrgModelMixin, OrgQuerySet, OrgManager
+from orgs.mixins import OrgModelMixin,OrgManager
 
 __all__ = ['Asset']
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def default_node():
         return None
 
 
-class AssetQuerySet(OrgQuerySet):
+class AssetQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
 

@@ -120,7 +120,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
-        elif not self.request.user.is_superuser:
+        elif not self.request.user:
             self.raise_exception = True
             return False
         return True
