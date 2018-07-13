@@ -23,7 +23,7 @@
     # 获取 epel-release 源
     $ yum -y install epel-release vim
 
-    # 设置防火墙，开发 80 端口
+    # 设置防火墙，开放 80 443 端口
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
     $ firewall-cmd --zone=public --add-port=443/tcp --permanent
     $ firewall-cmd --reload
