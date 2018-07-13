@@ -79,7 +79,17 @@
         access_log /var/log/nginx/tcp-access.log  proxy;
         open_log_file_cache off;
 
-        include /etc/nginx/conf.d/*.stream;
+        upstream cocossh {
+            server 192.168.100.12:2222;
+            # server ip:port max_fails=1 fail_timeout=120s;
+            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+        }
+        server {
+            listen 2222;
+            proxy_pass cocossh;
+            proxy_connect_timeout 10s;
+            proxy_timeout 24h;   #代理超时
+        }
     }
 
     http {
@@ -93,14 +103,14 @@
         access_log  /var/log/nginx/access.log  main;
 
         sendfile        on;
-        #tcp_nopush     on;
+        # tcp_nopush     on;
 
         keepalive_timeout  65;
 
-        #关闭版本显示
+        # 关闭版本显示
         server_tokens off;
 
-        #gzip 压缩传输
+        # gzip 压缩传输
         gzip on;
         gzip_min_length 1k;
         gzip_buffers    4 16k;
@@ -109,7 +119,7 @@
         gzip_types text/plain application/x-javascripttext/css application/xml;
         gzip_vary on;
 
-        #配置代理参数
+        # 配置代理参数：
         proxy_redirect off;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -119,7 +129,7 @@
         proxy_send_timeout 90;
         proxy_buffer_size 4k;
 
-        #缓存配置
+        # 缓存配置
         proxy_temp_file_write_size 264k;
         proxy_temp_path /var/cache/nginx/nginx_temp;
         proxy_cache_path /var/cache/nginx/nginx_cache levels=1:2 keys_zone=cache_one:200m inactive=5d max_size=400m;
@@ -129,6 +139,9 @@
     }
 
 ::
+
+    # 备份默认的配置文件
+    $ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.bak
 
     $ vim /etc/nginx/conf.d/jumpserver.conf
 
@@ -152,13 +165,11 @@
 
     server {
         listen 80;
-
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        server_name demo.jumpserver.org;  # 自行修改成你的域名
 
         location / {
             proxy_pass http://jumpserver;  # jumpserver
+            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
         location /luna/ {
@@ -172,6 +183,7 @@
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
         location /guacamole/ {
@@ -183,24 +195,7 @@
             proxy_set_header Connection $http_connection;
             access_log off;
             client_max_body_size 100m;  # Windows 文件上传大小限制
-        }
-    }
-
-::
-
-    $ vim /etc/nginx/conf.d/coco.stream
-
-    stream {
-        upstream cocossh {
-            server 192.168.100.12:2222;
-            # server ip:port max_fails=1 fail_timeout=120s;
-            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
-        }
-        server {
-            listen 2222;
-            proxy_pass cocossh;
-            proxy_connect_timeout 10s;
-            proxy_timeout 24h;   #代理超时
+            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
     }
 
