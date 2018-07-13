@@ -64,7 +64,7 @@ class UserLoginView(FormView):
         # limit login authentication
         ip = get_login_ip(request)
         username = self.request.POST.get('username')
-        key_limit = self.key_prefix_limit.format(ip, username)
+        key_limit = self.key_prefix_limit.format(username, ip)
         if is_block_login(key_limit):
             return self.render_to_response(self.get_context_data(block_login=True))
 
@@ -90,7 +90,7 @@ class UserLoginView(FormView):
 
         # limit user login failed count
         ip = get_login_ip(self.request)
-        key_limit = self.key_prefix_limit.format(ip, username)
+        key_limit = self.key_prefix_limit.format(username, ip)
         set_user_login_failed_count_to_cache(key_limit)
 
         # show captcha

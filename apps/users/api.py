@@ -95,6 +95,19 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
+class UserUnblockPKApi(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (IsSuperUser,)
+    serializer_class = UserSerializer
+    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        username = user.username if user else ''
+        key_limit = self.key_prefix_limit.format(username, '*')
+        cache.delete_pattern(key_limit)
+
+
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
@@ -203,7 +216,7 @@ class UserAuthApi(APIView):
         username = request.data.get('username')
         ip = request.data.get('remote_addr', None)
         ip = ip if ip else get_login_ip(request)
-        key_limit = self.key_prefix_limit.format(ip, username)
+        key_limit = self.key_prefix_limit.format(username, ip)
         if is_block_login(key_limit):
             msg = _("Log in frequently and try again later")
             return Response({'msg': msg}, status=401)
