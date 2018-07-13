@@ -108,7 +108,7 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
     object = None
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=AssetPermission.objects.all())
+        self.object = self.get_object(queryset = AssetPermission.objects)
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -138,7 +138,7 @@ class AssetPermissionAssetView(AdminUserRequiredMixin,
     object = None
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=AssetPermission.objects.all())
+        self.object = self.get_object(queryset = AssetPermission.objects)
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):

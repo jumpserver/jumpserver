@@ -19,7 +19,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     资产授权列表的增删改查api
     """
-    queryset = AssetPermission.objects.all()
+    queryset = AssetPermission.objects
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
     permission_classes = (IsSuperUser,)
 
@@ -268,7 +268,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
     """
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetPermissionUpdateUserSerializer
-    queryset = AssetPermission.objects.all()
+    queryset = AssetPermission.objects
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -285,7 +285,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
 class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetPermissionUpdateUserSerializer
-    queryset = AssetPermission.objects.all()
+    queryset = AssetPermission.objects
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -305,7 +305,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
     """
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-    queryset = AssetPermission.objects.all()
+    queryset = AssetPermission.objects
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -322,7 +322,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
 class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-    queryset = AssetPermission.objects.all()
+    queryset = AssetPermission.objects
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()

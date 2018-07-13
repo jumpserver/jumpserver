@@ -93,7 +93,7 @@ class AssetUpdateForm(forms.ModelForm):
 class AssetBulkUpdateForm(forms.ModelForm):
     assets = forms.ModelMultipleChoiceField(
         required=True, help_text='* required',
-        label=_('Select assets'), queryset=Asset.objects.all(),
+        label=_('Select assets'), queryset = Asset.objects,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -105,7 +105,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         label=_('Port'), required=False, min_value=1, max_value=65535,
     )
     admin_user = forms.ModelChoiceField(
-        required=False, queryset=AdminUser.objects.all(),
+        required=False, queryset = AdminUser.objects,
         label=_("Admin user"),
         widget=forms.Select(
             attrs={

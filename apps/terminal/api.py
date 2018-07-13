@@ -102,7 +102,7 @@ class TerminalTokenApi(APIView):
 
 
 class StatusViewSet(viewsets.ModelViewSet):
-    queryset = Status.objects.all()
+    queryset = Status.objects
     serializer_class = StatusSerializer
     permission_classes = (IsSuperUserOrAppUser,)
     session_serializer_class = SessionSerializer
@@ -174,7 +174,7 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 
 class SessionViewSet(viewsets.ModelViewSet):
-    queryset = Session.objects.all()
+    queryset = Session.objects
     serializer_class = SessionSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -192,7 +192,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 
 
 class TaskViewSet(BulkModelViewSet):
-    queryset = Task.objects.all()
+    queryset = Task.objects
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 

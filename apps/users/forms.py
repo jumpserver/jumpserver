@@ -54,6 +54,15 @@ class UserCreateUpdateForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
     )
+    # groups = forms.ModelMultipleChoiceField(
+    #     queryset=UserGroup.objects, required=False, label=_("Groups"),
+    #     widget=forms.SelectMultiple(
+    #         attrs={
+    #             'class': 'select2',
+    #             'data-placeholder': _('Join user groups')
+    #         }
+    #     )
+    # )
 
     class Meta:
         model = User
@@ -67,12 +76,6 @@ class UserCreateUpdateForm(forms.ModelForm):
             'email': '* required',
         }
         widgets = {
-            'groups': forms.SelectMultiple(
-                attrs={
-                    'class': 'select2',
-                    'data-placeholder': _('Join user groups')
-                }
-            ),
             'otp_level': forms.RadioSelect(),
         }
 
@@ -237,7 +240,7 @@ class UserBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select users'),
-        queryset=User.objects.all(),
+        queryset = User.objects,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',

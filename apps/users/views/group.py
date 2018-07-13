@@ -11,6 +11,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from common.utils import get_logger
 from common.const import create_success_msg, update_success_msg
+from orgs.mixins import OrgViewGenericMixin
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
 from .. import forms
@@ -20,7 +21,7 @@ __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
 logger = get_logger(__name__)
 
 
-class UserGroupListView(AdminUserRequiredMixin, TemplateView):
+class UserGroupListView(AdminUserRequiredMixin, OrgViewGenericMixin, TemplateView):
     template_name = 'users/user_group_list.html'
 
     def get_context_data(self, **kwargs):
@@ -32,7 +33,8 @@ class UserGroupListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class UserGroupCreateView(AdminUserRequiredMixin, OrgViewGenericMixin,
+                          SuccessMessageMixin, CreateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
@@ -48,7 +50,8 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         return super().get_context_data(**kwargs)
 
 
-class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
+class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin,
+                          OrgViewGenericMixin, UpdateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
@@ -68,7 +71,7 @@ class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateVie
         return super().get_context_data(**kwargs)
 
 
-class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
+class UserGroupDetailView(AdminUserRequiredMixin, OrgViewGenericMixin, DetailView):
     model = UserGroup
     context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
@@ -84,7 +87,7 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
+class UserGroupGrantedAssetView(AdminUserRequiredMixin, OrgViewGenericMixin, DetailView):
     model = UserGroup
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'

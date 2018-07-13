@@ -18,7 +18,7 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 
 class DomainViewSet(BulkModelViewSet):
-    queryset = Domain.objects.all()
+    queryset = Domain.objects
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.DomainSerializer
 
@@ -36,7 +36,7 @@ class DomainViewSet(BulkModelViewSet):
 class GatewayViewSet(BulkModelViewSet):
     filter_fields = ("domain",)
     search_fields = filter_fields
-    queryset = Gateway.objects.all()
+    queryset = Gateway.objects
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.GatewaySerializer
 

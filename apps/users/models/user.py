@@ -220,11 +220,10 @@ class User(AbstractUser):
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
-        instance = super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
         current_org = get_current_org()
         if current_org and current_org.is_real():
-            instance.orgs.add(current_org)
-        return instance
+            self.orgs.add(current_org)
 
     @property
     def private_token(self):

@@ -9,6 +9,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework_bulk import BulkModelViewSet
 
 from .serializers import UserSerializer, UserGroupSerializer, \
@@ -21,6 +22,7 @@ from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
 from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from orgs.utils import get_current_org
+from orgs.mixins import OrgViewGenericMixin
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -51,7 +53,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
 class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
-    queryset = User.objects.all()
+    queryset = User.objects
     serializer_class = ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):
@@ -61,13 +63,13 @@ class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects
     serializer_class = UserUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -82,7 +84,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
 
 class UserResetPKApi(generics.UpdateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -95,7 +97,7 @@ class UserResetPKApi(generics.UpdateAPIView):
 
 
 class UserUpdatePKApi(generics.UpdateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects
     serializer_class = UserPKUpdateSerializer
     permission_classes = (IsCurrentUserOrReadOnly,)
 
@@ -105,14 +107,14 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
-    queryset = UserGroup.objects.all()
+class UserGroupViewSet(IDInFilterMixin, OrgViewGenericMixin, BulkModelViewSet):
+    queryset = UserGroup.objects
     serializer_class = UserGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
-    queryset = UserGroup.objects.all()
+    queryset = UserGroup.objects
     serializer_class = UserGroupUpdateMemeberSerializer
     permission_classes = (IsSuperUser,)
 

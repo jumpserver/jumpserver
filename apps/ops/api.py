@@ -16,13 +16,13 @@ from .tasks import run_ansible_task
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
+    queryset = Task.objects
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUser,)
 
 
 class TaskRun(generics.RetrieveAPIView):
-    queryset = Task.objects.all()
+    queryset = Task.objects
     serializer_class = TaskViewSet
     permission_classes = (IsSuperUser,)
 
@@ -33,7 +33,7 @@ class TaskRun(generics.RetrieveAPIView):
 
 
 class AdHocViewSet(viewsets.ModelViewSet):
-    queryset = AdHoc.objects.all()
+    queryset = AdHoc.objects
     serializer_class = AdHocSerializer
     permission_classes = (IsSuperUser,)
 
@@ -46,7 +46,7 @@ class AdHocViewSet(viewsets.ModelViewSet):
 
 
 class AdHocRunHistorySet(viewsets.ModelViewSet):
-    queryset = AdHocRunHistory.objects.all()
+    queryset = AdHocRunHistory.objects
     serializer_class = AdHocRunHistorySerializer
     permission_classes = (IsSuperUser,)
 
@@ -68,7 +68,7 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
     permission_classes = (IsSuperUser,)
     buff_size = 1024 * 10
     end = False
-    queryset = CeleryTask.objects.all()
+    queryset = CeleryTask.objects
 
     def get(self, request, *args, **kwargs):
         mark = request.query_params.get("mark") or str(uuid.uuid4())
