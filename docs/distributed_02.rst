@@ -191,7 +191,7 @@
                 # 以域名、URI、参数组合成Web缓存的Key值，Nginx根据Key值哈希，存储缓存内容到二级缓存目录内
                 proxy_cache_key $host$uri$is_args$args;
                 add_header X-Cache '$upstream_cache_status from $host';
-                proxy_pass http://59.172.105.130:78;
+                proxy_pass http://jumpserver;
                 expires 30d;
                 access_log off;
 
