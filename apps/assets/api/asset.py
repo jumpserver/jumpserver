@@ -36,7 +36,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     filter_fields = ("hostname", "ip")
     search_fields = filter_fields
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
-    queryset = Asset.objects
+    queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsSuperUserOrAppUser,)
@@ -65,7 +65,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         if node_id and not show_current_asset:
             node = get_object_or_404(Node, id=node_id)
             if node.is_root():
-                queryset = Asset.objects
+                queryset = Asset.objects.all()
             else:
                 queryset = queryset.filter(
                     nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
@@ -77,7 +77,7 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     Asset bulk update api
     """
-    queryset = Asset.objects
+    queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
 
@@ -86,7 +86,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     """
     Refresh asset hardware info
     """
-    queryset = Asset.objects
+    queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
 
@@ -101,7 +101,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     """
     Test asset admin user connectivity
     """
-    queryset = Asset.objects
+    queryset = Asset.objects.all()
     permission_classes = (IsSuperUser,)
 
     def retrieve(self, request, *args, **kwargs):
@@ -112,7 +112,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
 
 
 class AssetGatewayApi(generics.RetrieveAPIView):
-    queryset = Asset.objects
+    queryset = Asset.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
 
     def retrieve(self, request, *args, **kwargs):

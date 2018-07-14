@@ -78,7 +78,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset = Asset.objects)
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset = Asset.objects.all())
 
     class Meta:
         model = Node

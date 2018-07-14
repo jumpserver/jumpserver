@@ -23,7 +23,7 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
-from common.models import Setting
+from orgs.utils import get_current_org
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
@@ -365,11 +365,17 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     user = keyword = ""
     date_to = date_from = None
 
+    def get_allow_users(self):
+        current_org = get_current_org()
+        users = current_org.get_org_users().values_list('username', flat=True)
+        return users
+
     def get_queryset(self):
+        users = self.get_allow_users()
+        queryset = super().get_queryset().filter(username__in=users)
         self.user = self.request.GET.get('user', '')
         self.keyword = self.request.GET.get("keyword", '')
 
-        queryset = super().get_queryset()
         queryset = queryset.filter(
             datetime__gt=self.date_from, datetime__lt=self.date_to
         )
@@ -391,9 +397,7 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             'date_to': self.date_to,
             'user': self.user,
             'keyword': self.keyword,
-            'user_list': set(
-                LoginLog.objects.all().values_list('username', flat=True)
-            )
+            'user_list': self.get_allow_users(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

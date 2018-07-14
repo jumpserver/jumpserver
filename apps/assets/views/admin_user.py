@@ -90,7 +90,7 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     object = None
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset = AdminUser.objects)
+        self.object = self.get_object(queryset=AdminUser.objects.all())
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):

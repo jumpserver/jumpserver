@@ -40,7 +40,7 @@ __all__ = [
 
 
 class NodeViewSet(BulkModelViewSet):
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.NodeSerializer
 
@@ -79,7 +79,7 @@ class NodeViewSet(BulkModelViewSet):
 
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.NodeSerializer
     instance = None
@@ -166,7 +166,7 @@ class NodeAssetsApi(generics.ListAPIView):
 
 
 class NodeAddChildrenApi(generics.UpdateAPIView):
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
@@ -184,7 +184,7 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 
 class NodeAddAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     instance = None
 
@@ -196,7 +196,7 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
 
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     instance = None
 
@@ -212,7 +212,7 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 
 class NodeReplaceAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects
+    queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     instance = None
 

@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
+from orgs.mixins import OrgModelForm
+from orgs.utils import get_current_org
 from .models import User, UserGroup
 
 
@@ -39,7 +41,7 @@ class UserCheckOtpCodeForm(forms.Form):
     otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
-class UserCreateUpdateForm(forms.ModelForm):
+class UserCreateUpdateForm(OrgModelForm):
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
@@ -54,15 +56,6 @@ class UserCreateUpdateForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
     )
-    # groups = forms.ModelMultipleChoiceField(
-    #     queryset=UserGroup.objects, required=False, label=_("Groups"),
-    #     widget=forms.SelectMultiple(
-    #         attrs={
-    #             'class': 'select2',
-    #             'data-placeholder': _('Join user groups')
-    #         }
-    #     )
-    # )
 
     class Meta:
         model = User
@@ -77,6 +70,12 @@ class UserCreateUpdateForm(forms.ModelForm):
         }
         widgets = {
             'otp_level': forms.RadioSelect(),
+            'groups': forms.SelectMultiple(
+                attrs={
+                    'class': 'select2',
+                    'data-placeholder': _('Join user groups')
+                }
+            )
         }
 
     def clean_public_key(self):
@@ -240,7 +239,7 @@ class UserBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select users'),
-        queryset = User.objects,
+        queryset = User.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -279,6 +278,11 @@ class UserBulkUpdateForm(forms.ModelForm):
         return users
 
 
+def user_limit_to():
+    org = get_current_org()
+    return {"orgs": org}
+
+
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(role=User.ROLE_APP),
@@ -290,6 +294,7 @@ class UserGroupForm(forms.ModelForm):
             }
         ),
         required=False,
+        limit_choices_to=user_limit_to
     )
 
     def __init__(self, **kwargs):
@@ -318,30 +323,12 @@ class UserGroupForm(forms.ModelForm):
         }
 
 
-# class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
-#     def save(self, commit=True):
-#         self.instance = super(UserGroupPrivateAssetPermissionForm, self)\
-#             .save(commit=commit)
-#         self.instance.user_groups = [self.user_group]
-#         self.instance.save()
-#         return self.instance
-#
-#     class Meta:
-#         model = AssetPermission
-#         fields = [
-#             'assets', 'asset_groups', 'system_users', 'name',
-#         ]
-#         widgets = {
-#             'assets': forms.SelectMultiple(
-#                 attrs={'class': 'select2',
-#                        'data-placeholder': _('Select assets')}),
-#             'asset_groups': forms.SelectMultiple(
-#                 attrs={'class': 'select2',
-#                        'data-placeholder': _('Select asset groups')}),
-#             'system_users': forms.SelectMultiple(
-#                 attrs={'class': 'select2',
-#                        'data-placeholder': _('Select system users')}),
-#         }
+class OrgUserField(forms.ModelMultipleChoiceField):
+
+    def get_limit_choices_to(self):
+
+        return {"orgs"}
+
 
 
 class FileForm(forms.Form):

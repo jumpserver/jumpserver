@@ -37,19 +37,19 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
-    queryset = AdminUser.objects
+    queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):
-    queryset = AdminUser.objects
+    queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserAuthSerializer
     permission_classes = (IsSuperUser,)
 
 
 class ReplaceNodesAdminUserApi(generics.UpdateAPIView):
-    queryset = AdminUser.objects
+    queryset = AdminUser.objects.all()
     serializer_class = serializers.ReplaceNodeAdminUserSerializer
     permission_classes = (IsSuperUser,)
 
@@ -74,7 +74,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     Test asset admin user connectivity
     """
-    queryset = AdminUser.objects
+    queryset = AdminUser.objects.all()
     permission_classes = (IsSuperUser,)
 
     def retrieve(self, request, *args, **kwargs):

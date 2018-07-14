@@ -35,7 +35,7 @@ class SystemUserViewSet(BulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """
-    queryset = SystemUser.objects
+    queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -44,7 +44,7 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     Get system user auth info
     """
-    queryset = SystemUser.objects
+    queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
 
@@ -58,7 +58,7 @@ class SystemUserPushApi(generics.RetrieveAPIView):
     """
     Push system user to cluster assets api
     """
-    queryset = SystemUser.objects
+    queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUser,)
 
     def retrieve(self, request, *args, **kwargs):
@@ -74,7 +74,7 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     Push system user to cluster assets api
     """
-    queryset = SystemUser.objects
+    queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUser,)
 
     def retrieve(self, request, *args, **kwargs):

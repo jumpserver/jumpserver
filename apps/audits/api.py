@@ -9,6 +9,6 @@ from .serializers import FTPLogSerializer
 
 
 class FTPLogViewSet(viewsets.ModelViewSet):
-    queryset = FTPLog.objects
+    queryset = FTPLog.objects.all()
     serializer_class = FTPLogSerializer
     permission_classes = (IsSuperUserOrAppUser,)
