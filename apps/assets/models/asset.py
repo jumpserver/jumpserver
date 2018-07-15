@@ -71,16 +71,11 @@ class Asset(OrgModelMixin):
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'),
-                                      db_index=True)
-    hostname = models.CharField(max_length=128, unique=True,
-                                verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL,
-                                choices=PROTOCOL_CHOICES,
-                                verbose_name=_('Protocol'))
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
+    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES,
-                                default='Linux', verbose_name=_('Platform'))
+    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True,
                                related_name='assets', verbose_name=_("Domain"),
                                on_delete=models.SET_NULL)
@@ -94,11 +89,8 @@ class Asset(OrgModelMixin):
                                    null=True, verbose_name=_("Admin user"))
 
     # Some information
-    public_ip = models.GenericIPAddressField(max_length=32, blank=True,
-                                             null=True,
-                                             verbose_name=_('Public IP'))
-    number = models.CharField(max_length=32, null=True, blank=True,
-                              verbose_name=_('Asset number'))
+    public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
+    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     # Collect
     vendor = models.CharField(max_length=64, null=True, blank=True,
@@ -233,7 +225,7 @@ class Asset(OrgModelMixin):
         return data
 
     class Meta:
-        unique_together = ('ip', 'port')
+        unique_together = ('org', 'hostname')
         verbose_name = _("Asset")
 
     @classmethod

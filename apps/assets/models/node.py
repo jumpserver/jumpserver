@@ -7,7 +7,8 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelMixin
-from common.utils import with_cache
+from orgs.utils import get_current_org, set_current_org
+from orgs.models import Organization
 
 __all__ = ['Node']
 
@@ -119,7 +120,11 @@ class Node(OrgModelMixin):
         return self.get_all_assets().valid()
 
     def is_root(self):
-        return self.key == '0'
+        root = self.__class__.root()
+        if self == root:
+            return True
+        else:
+            return False
 
     @property
     def parent(self):
@@ -148,8 +153,8 @@ class Node(OrgModelMixin):
 
     def get_ancestor(self, with_self=False):
         if self.is_root():
-            ancestor = self.__class__.objects.filter(key='0')
-            return ancestor
+            root = self.__class__.root()
+            return [root]
 
         _key = self.key.split(':')
         if not with_self:
@@ -164,10 +169,25 @@ class Node(OrgModelMixin):
         return ancestor
 
     @classmethod
+    def create_root_node(cls):
+        with transaction.atomic():
+            org = get_current_org()
+            set_current_org(Organization.root())
+            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
+            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
+            max_value = max([int(k) for k in org_nodes_roots_keys]) if org_nodes_roots_keys else 0
+            set_current_org(org)
+            root = cls.objects.create(key=max_value+1, value=org.name)
+            return root
+
+    @classmethod
     def root(cls):
-        obj, created = cls.objects.get_or_create(
-            key='0', defaults={"key": '0', 'value': "ROOT"}
-        )
-        print(obj)
-        return obj
+        root = cls.objects.filter(key__regex=r'^[0-9]+$')
+        print("GET ROOT NODE")
+        if len(root) == 1:
+            return root.get()
+        else:
+            return cls.create_root_node()
+
+
 

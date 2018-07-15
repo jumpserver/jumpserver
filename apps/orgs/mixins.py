@@ -18,28 +18,17 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
-    def __init__(self, *args, **kwargs):
-        print("INit manager")
-        super().__init__(*args, **kwargs)
-
     def get_queryset(self):
-        print("GET CURR")
         current_org = get_current_org()
         kwargs = {}
 
-        print("Get queryset ")
-        print(current_org)
-
-        print(self.model)
         if not current_org:
-            pass
+            kwargs['id'] = None
         elif current_org.is_real():
             kwargs['org'] = current_org
         elif current_org.is_default():
             kwargs['org'] = None
         queryset = super().get_queryset().filter(**kwargs)
-        print(kwargs)
-        print(queryset)
         return queryset
 
     def all(self):
