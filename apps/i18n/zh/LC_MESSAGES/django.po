@@ -2774,11 +2774,11 @@ msgstr "发送重置密钥邮件"
 #: users/templates/users/user_detail.html:186
 #: users/templates/users/user_detail.html:444
 msgid "Unblock user"
-msgstr "解锁用户"
+msgstr "解除登录限制"
 
 #: users/templates/users/user_detail.html:189
 msgid "Unblock"
-msgstr "解锁"
+msgstr "解除"
 
 #: users/templates/users/user_detail.html:303
 msgid "Goto profile page enable MFA"
@@ -2820,7 +2820,7 @@ msgstr "ssh密钥"
 
 #: users/templates/users/user_detail.html:454
 msgid "After unlocking the user, the user can log in normally."
-msgstr "解锁用户后，此用户即可正常登录"
+msgstr "解除用户登录限制后，此用户即可正常登录"
 
 #: users/templates/users/user_group_create_update.html:31
 msgid "Cancel"
@@ -3181,7 +3181,7 @@ msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
 #~ msgid "Unblock user successfully. "
-#~ msgstr "解锁用户成功"
+#~ msgstr "解除登录限制成功"
 
 #~ msgid "Clear"
 #~ msgstr "清除"

@@ -182,7 +182,7 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr id="id_unblock_user" style="{% if not unblock %}display:none{% endif %}">
                                             <td>{% trans 'Unblock user' %}</td>
                                             <td>
                                                 <span class="pull-right">
@@ -283,7 +283,7 @@ $(document).ready(function() {
         .on('select2:unselect', function(evt) {
             var data = evt.params.data;
             delete jumpserver.nodes_selected[data.id];
-        })
+        });
 })
 .on('click', '#is_active', function() {
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
@@ -301,7 +301,7 @@ $(document).ready(function() {
 .on('click', '#force_enable_otp', function() {
     {% if request.user == user_object %}
         toastr.error("{% trans 'Goto profile page enable MFA' %}");
-        return
+        return;
     {% endif %}
 
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
@@ -441,7 +441,15 @@ $(document).ready(function() {
         var body = {};
         var success = function() {
             var msg = "{% trans "Success" %}";
-            swal("{% trans 'Unblock user' %}", msg, "success");
+            {#swal("{% trans 'Unblock user' %}", msg, "success");#}
+            swal({
+                title: "{% trans 'Unblock user' %}",
+                text: msg,
+                type: "success"
+                }, function() {
+                    location.reload()
+                }
+            );
         };
         APIUpdateAttr({
             url: the_url,
@@ -460,7 +468,6 @@ $(document).ready(function() {
     }, function() {
         doReset();
     });
-
 })
 </script>
 {% endblock %}

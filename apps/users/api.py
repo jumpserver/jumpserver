@@ -100,12 +100,15 @@ class UserUnblockPKApi(generics.UpdateAPIView):
     permission_classes = (IsSuperUser,)
     serializer_class = UserSerializer
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
+    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def perform_update(self, serializer):
         user = self.get_object()
         username = user.username if user else ''
         key_limit = self.key_prefix_limit.format(username, '*')
+        key_block = self.key_prefix_block.format(username)
         cache.delete_pattern(key_limit)
+        cache.delete(key_block)
 
 
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -210,6 +213,7 @@ class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
+    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def post(self, request):
         # limit login
@@ -217,6 +221,7 @@ class UserAuthApi(APIView):
         ip = request.data.get('remote_addr', None)
         ip = ip if ip else get_login_ip(request)
         key_limit = self.key_prefix_limit.format(username, ip)
+        key_block = self.key_prefix_block.format(username)
         if is_block_login(key_limit):
             msg = _("Log in frequently and try again later")
             return Response({'msg': msg}, status=401)
@@ -231,7 +236,7 @@ class UserAuthApi(APIView):
             }
             self.write_login_log(request, data)
 
-            set_user_login_failed_count_to_cache(key_limit)
+            set_user_login_failed_count_to_cache(key_limit, key_block)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
