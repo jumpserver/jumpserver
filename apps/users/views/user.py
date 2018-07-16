@@ -36,7 +36,9 @@ from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from common.models import Setting
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user_or_tmp_user, get_password_check_rules, check_password_rules
+from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, \
+    get_user_or_tmp_user, get_password_check_rules, check_password_rules, \
+    is_need_unblock
 from ..signals import post_user_create
 from ..tasks import write_login_log_async
 
@@ -168,13 +170,17 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
     context_object_name = "user_object"
+    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def get_context_data(self, **kwargs):
+        user = self.get_object()
+        key_block = self.key_prefix_block.format(user.username)
         groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
         context = {
             'app': _('Users'),
             'action': _('User detail'),
-            'groups': groups
+            'groups': groups,
+            'unblock': is_need_unblock(key_block),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

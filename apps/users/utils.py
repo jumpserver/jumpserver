@@ -333,7 +333,7 @@ def check_password_rules(password):
     return bool(match_obj)
 
 
-def set_user_login_failed_count_to_cache(key_limit):
+def set_user_login_failed_count_to_cache(key_limit, key_block):
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
@@ -342,6 +342,15 @@ def set_user_login_failed_count_to_cache(key_limit):
     ).first()
     limit_time = setting_limit_time.cleaned_value if setting_limit_time \
         else settings.DEFAULT_LOGIN_LIMIT_TIME
+
+    setting_limit_count = Setting.objects.filter(
+        name='SECURITY_LOGIN_LIMIT_COUNT'
+    ).first()
+    limit_count = setting_limit_count.cleaned_value if setting_limit_count \
+        else settings.DEFAULT_LOGIN_LIMIT_COUNT
+
+    if count >= limit_count:
+        cache.set(key_block, 1, int(limit_time)*60)
 
     cache.set(key_limit, count, int(limit_time)*60)
 
@@ -357,3 +366,9 @@ def is_block_login(key_limit):
 
     if count and count >= limit_count:
         return True
+
+
+def is_need_unblock(key_block):
+    if not cache.get(key_block):
+        return False
+    return True
