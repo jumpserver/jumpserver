@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 
 from common.utils import get_logger
-from .utils import get_current_org, get_model_by_db_table, set_current_org
+from .utils import get_current_org, set_current_org
 
 logger = get_logger(__file__)
 
@@ -22,23 +22,27 @@ class OrgManager(models.Manager):
         current_org = get_current_org()
         kwargs = {}
 
+        print(">>>>>>>>>> Get query set")
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():
             kwargs['org'] = current_org
         elif current_org.is_default():
             kwargs['org'] = None
-        queryset = super().get_queryset().filter(**kwargs)
+        queryset = super(OrgManager, self).get_queryset()
+        queryset = queryset.filter(**kwargs)
+        # print(kwargs)
+        print(queryset.query)
         return queryset
 
     def all(self):
         current_org = get_current_org()
         if not current_org:
-            msg = 'You should `objects.set_current_org(org).all()` then run it'
+            msg = 'You can `objects.set_current_org(org).all()` then run it'
             warnings.warn(msg)
             return self
         else:
-            return super().all()
+            return super(OrgManager, self).all()
 
     def set_current_org(self, org):
         set_current_org(org)

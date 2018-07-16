@@ -35,10 +35,9 @@ def set_current_org(org):
     setattr(_thread_locals, 'current_org', org)
 
 
-def get_model_by_db_table(db_table):
-    for model in apps.get_models():
-        if model._meta.db_table == db_table:
-            return model
-    else:
-        # here you can do fallback logic if no model with db_table found
-        raise ValueError('No model found with db_table {}!'.format(db_table))
+def set_to_default_org():
+    set_current_org(Organization.default())
+
+
+def set_to_root_org():
+    set_current_org(Organization.root())

@@ -30,10 +30,8 @@ from .. import serializers
 
 logger = get_logger(__file__)
 __all__ = [
-    'NodeViewSet', 'NodeChildrenApi',
-    'NodeAssetsApi',
-    'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
-    'NodeReplaceAssetsApi',
+    'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
+    'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
     'TestNodeConnectiveApi'
 ]

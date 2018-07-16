@@ -64,6 +64,9 @@ class Node(OrgModelMixin):
     def create_child(self, value):
         with transaction.atomic():
             child_key = self.get_next_child_key()
+            print("Create child")
+            print(self.key)
+            print(child_key)
             child = self.__class__.objects.create(key=child_key, value=value)
             return child
 
@@ -120,15 +123,16 @@ class Node(OrgModelMixin):
         return self.get_all_assets().valid()
 
     def is_root(self):
-        root = self.__class__.root()
-        if self == root:
+        print(type(self.key))
+        print(self.key)
+        if self.key.isdigit():
             return True
         else:
             return False
 
     @property
     def parent(self):
-        if self.key == "0" or not self.key.startswith("0"):
+        if self.is_root():
             return self.__class__.root()
         parent_key = ":".join(self.key.split(":")[:-1])
         try:
@@ -155,7 +159,7 @@ class Node(OrgModelMixin):
         if self.is_root():
             root = self.__class__.root()
             return [root]
-
+        print(self.key)
         _key = self.key.split(':')
         if not with_self:
             _key.pop()
