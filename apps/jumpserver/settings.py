@@ -229,7 +229,11 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'ansible_logs'],
             'level': "INFO",
-        }
+        },
+        # 'django.db': {
+        #     'handlers': ['console', 'file'],
+        #     'level': 'DEBUG'
+        # }
     }
 }
 
@@ -329,6 +333,9 @@ AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
     AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
 )
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    ldap.OPT_TIMEOUT: 5
+}
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
@@ -336,10 +343,11 @@ if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
 
 # Celery using redis as broker
-CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
+CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
     'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
+    'db':CONFIG.REDIS_DB_CELERY_BROKER or 3,
 }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
@@ -360,10 +368,11 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/4' % {
+        'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
             'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,
+            'db':CONFIG.REDIS_DB_CACHE or 4,
         }
     }
 }
@@ -393,6 +402,11 @@ TERMINAL_REPLAY_STORAGE = {
         "TYPE": "server",
     },
 }
+
+
+DEFAULT_PASSWORD_MIN_LENGTH = 6
+DEFAULT_LOGIN_LIMIT_COUNT = 3
+DEFAULT_LOGIN_LIMIT_TIME = 30
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

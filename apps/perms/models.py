@@ -7,11 +7,21 @@ from django.utils import timezone
 from common.utils import date_expired_default, set_or_append_attr_bulk
 
 
-class ValidManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_active=True) \
-            .filter(date_start__lt=timezone.now())\
+class AssetPermissionQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def valid(self):
+        return self.active().filter(date_start__lt=timezone.now())\
             .filter(date_expired__gt=timezone.now())
+
+
+class AssetPermissionManager(models.Manager):
+    def get_queryset(self):
+        return AssetPermissionQuerySet(self.model, using=self._db)
+
+    def valid(self):
+        return self.get_queryset().valid()
 
 
 class AssetPermission(models.Model):
@@ -23,14 +33,13 @@ class AssetPermission(models.Model):
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_start = models.DateTimeField(default=timezone.now, verbose_name=_("Date start"))
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
+    date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
+    date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
-    objects = models.Manager()
-    valid = ValidManager()
+    objects = AssetPermissionManager()
 
     def __str__(self):
         return self.name

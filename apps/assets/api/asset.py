@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
+import random
+
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -11,9 +13,8 @@ from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
-    NodePermissionUtil
-from ..models import  Asset, SystemUser, AdminUser, Node
+from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser
+from ..models import Asset, SystemUser, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
     test_asset_connectability_manual
@@ -22,8 +23,9 @@ from ..utils import LabelFilter
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet', 'UserAssetListView', 'AssetListUpdateApi',
-    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi'
+    'AssetViewSet', 'AssetListUpdateApi',
+    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
+    'AssetGatewayApi'
 ]
 
 
@@ -40,32 +42,34 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset()\
+            .prefetch_related('labels', 'nodes')\
+            .select_related('admin_user')
         admin_user_id = self.request.query_params.get('admin_user_id')
         node_id = self.request.query_params.get("node_id")
+        show_current_asset = self.request.query_params.get("show_current_asset")
 
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
             queryset = queryset.filter(admin_user=admin_user)
-        if node_id:
+
+        if node_id and show_current_asset:
             node = get_object_or_404(Node, id=node_id)
-            if not node.is_root():
+            if node.is_root():
                 queryset = queryset.filter(
-                    nodes__key__regex='{}(:[0-9]+)*$'.format(node.key),
+                    Q(nodes=node_id) | Q(nodes__isnull=True)
                 ).distinct()
-        return queryset
+            else:
+                queryset = queryset.filter(nodes=node).distinct()
 
-
-class UserAssetListView(generics.ListAPIView):
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetSerializer
-    permission_classes = (IsValidUser,)
-
-    def get_queryset(self):
-        assets_granted = NodePermissionUtil.get_user_assets(self.request.user).keys()
-        queryset = self.queryset.filter(
-            id__in=[asset.id for asset in assets_granted]
-        )
+        if node_id and not show_current_asset:
+            node = get_object_or_404(Node, id=node_id)
+            if node.is_root():
+                queryset = Asset.objects.all()
+            else:
+                queryset = queryset.filter(
+                    nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
+                ).distinct()
         return queryset
 
 
@@ -105,3 +109,20 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
         asset = get_object_or_404(Asset, pk=asset_id)
         task = test_asset_connectability_manual.delay(asset)
         return Response({"task": task.id})
+
+
+class AssetGatewayApi(generics.RetrieveAPIView):
+    queryset = Asset.objects.all()
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        asset_id = kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_id)
+
+        if asset.domain and \
+                asset.domain.gateways.filter(protocol=asset.protocol).exists():
+            gateway = random.choice(asset.domain.gateways.filter(protocol=asset.protocol))
+            serializer = serializers.GatewayWithAuthSerializer(instance=gateway)
+            return Response(serializer.data)
+        else:
+            return Response({"msg": "Not have gateway"}, status=404)

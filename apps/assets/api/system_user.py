@@ -40,13 +40,18 @@ class SystemUserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class SystemUserAuthInfoApi(generics.RetrieveUpdateAPIView):
+class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     Get system user auth info
     """
     queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.clear_auth()
+        return Response(status=204)
 
 
 class SystemUserPushApi(generics.RetrieveAPIView):
@@ -58,6 +63,9 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
+        nodes = system_user.nodes.all()
+        for node in nodes:
+            system_user.assets.add(*tuple(node.get_all_assets()))
         task = push_system_user_to_assets_manual.delay(system_user)
         return Response({"task": task.id})
 

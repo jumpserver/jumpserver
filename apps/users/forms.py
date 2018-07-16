@@ -16,13 +16,14 @@ class UserLoginForm(AuthenticationForm):
         max_length=128, strip=False
     )
 
+    def confirm_login_allowed(self, user):
+        if not user.is_staff:
+            raise forms.ValidationError(
+                self.error_messages['inactive'],
+                code='inactive',)
 
-class UserLoginCaptchaForm(AuthenticationForm):
-    username = forms.CharField(label=_('Username'), max_length=100)
-    password = forms.CharField(
-        label=_('Password'), widget=forms.PasswordInput,
-        max_length=128, strip=False
-    )
+
+class UserLoginCaptchaForm(UserLoginForm):
     captcha = CaptchaField()
 
 
@@ -72,7 +73,7 @@ class UserCreateUpdateForm(forms.ModelForm):
                     'data-placeholder': _('Join user groups')
                 }
             ),
-            'otp_level': forms.RadioSelect()
+            'otp_level': forms.RadioSelect(),
         }
 
     def clean_public_key(self):

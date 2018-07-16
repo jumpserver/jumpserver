@@ -100,6 +100,10 @@
                                             </b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Source' %}:</td>
+                                            <td><b>{{ user_object.get_source_display }}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Date expired' %}:</td>
                                             <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
@@ -417,8 +421,8 @@ $(document).ready(function() {
     APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 }).on('click', '.btn-delete-user', function () {
     var $this = $(this);
-    var name = "{{ user.name }}";
-    var uid = "{{ user.id }}";
+    var name = "{{ user_object.name }}";
+    var uid = "{{ user_object.id }}";
     var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'users:user-list' %}";
     objectDelete($this, name, the_url, redirect_url);

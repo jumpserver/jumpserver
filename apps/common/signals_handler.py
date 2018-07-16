@@ -34,7 +34,7 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
 def ldap_auth_on_changed(sender, enabled=True, **kwargs):
     if enabled:
         logger.debug("Enable LDAP auth")
-        if settings.AUTH_LDAP_BACKEND not in settings.AUTH_LDAP_BACKEND:
+        if settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
             settings.AUTHENTICATION_BACKENDS.insert(0, settings.AUTH_LDAP_BACKEND)
 
     else:

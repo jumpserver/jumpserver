@@ -48,16 +48,27 @@ class NodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_asset']
+        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
         list_serializer_class = BulkListSerializer
+
+    def validate(self, data):
+        value = data.get('value')
+        instance = self.instance if self.instance else Node.root()
+        children = instance.parent.get_children().exclude(key=instance.key)
+        values = [child.value for child in children]
+        if value in values:
+            raise serializers.ValidationError(
+                'The same level node name cannot be the same'
+            )
+        return data
 
     @staticmethod
     def get_parent(obj):
-        return obj.parent.id
+        return obj.parent.id if obj.is_node else obj.parent_id
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.get_all_assets().count()
+        return obj.get_all_assets().count() if obj.is_node else 0
 
     def get_fields(self):
         fields = super().get_fields()

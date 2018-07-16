@@ -33,9 +33,10 @@ from django.contrib.auth import logout as auth_logout
 from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
+from common.models import Setting
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user_or_tmp_user
+from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user_or_tmp_user, get_password_check_rules, check_password_rules
 from ..signals import post_user_create
 from ..tasks import write_login_log_async
 
@@ -96,9 +97,28 @@ class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
-        context = {'app': _('Users'), 'action': _('Update user')}
+        check_rules, min_length = get_password_check_rules()
+        context = {
+            'app': _('Users'),
+            'action': _('Update user'),
+            'password_check_rules': check_rules,
+            'min_length': min_length
+        }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        password = form.cleaned_data.get('password')
+        if not password:
+            return super().form_valid(form)
+
+        is_ok = check_password_rules(password)
+        if not is_ok:
+            form.add_error(
+                "password", _("* Your password does not meet the requirements")
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
@@ -318,8 +338,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
+        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
         context = {
             'action': _('Profile'),
+            'mfa_setting': mfa_setting.cleaned_value if mfa_setting else False,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -353,9 +375,12 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
+        check_rules, min_length = get_password_check_rules()
         context = {
             'app': _('Users'),
             'action': _('Password update'),
+            'password_check_rules': check_rules,
+            'min_length': min_length,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -363,6 +388,17 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         auth_logout(self.request)
         return super().get_success_url()
+
+    def form_valid(self, form):
+        password = form.cleaned_data.get('new_password')
+        is_ok = check_password_rules(password)
+        if not is_ok:
+            form.add_error(
+                "new_password",
+                _("* Your password does not meet the requirements")
+            )
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):

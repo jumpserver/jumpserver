@@ -1,10 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 
 from django import template
-from ..backends import get_multi_command_store
+from ..backends import get_multi_command_storage
 
 register = template.Library()
-command_store = get_multi_command_store()
+command_store = get_multi_command_storage()
 
 
 @register.filter

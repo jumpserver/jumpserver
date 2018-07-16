@@ -115,7 +115,7 @@ $(document).ready(function() {
     var success = function(data) {
         var task_id = data.task;
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
     };
     APIUpdateAttr({
         url: the_url,

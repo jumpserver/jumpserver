@@ -1,7 +1,8 @@
 # ~*~ coding: utf-8 ~*~
 #
-
+import os
 import paramiko
+from paramiko.ssh_exception import SSHException
 
 from common.utils import get_object_or_none
 from .models import Asset, SystemUser, Label
@@ -49,21 +50,22 @@ def test_gateway_connectability(gateway):
     """
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    proxy_command = [
-        "ssh", "{}@{}".format(gateway.username, gateway.ip),
-        "-p", str(gateway.port), "-W", "127.0.0.1:{}".format(gateway.port),
-    ]
-
-    if gateway.password:
-        proxy_command.insert(0, "sshpass -p '{}'".format(gateway.password))
-    if gateway.private_key:
-        proxy_command.append("-i {}".format(gateway.private_key_file))
+    proxy = paramiko.SSHClient()
+    proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        sock = paramiko.ProxyCommand(" ".join(proxy_command))
-    except paramiko.ProxyCommandFailure as e:
+        proxy.connect(gateway.ip, gateway.port,
+                      username=gateway.username,
+                      password=gateway.password,
+                      pkey=gateway.private_key_obj)
+    except(paramiko.AuthenticationException,
+           paramiko.BadAuthenticationType,
+           SSHException) as e:
         return False, str(e)
+
+    sock = proxy.get_transport().open_channel(
+        'direct-tcpip', ('127.0.0.1', gateway.port), ('127.0.0.1', 0)
+    )
 
     try:
         client.connect("127.0.0.1", port=gateway.port,
