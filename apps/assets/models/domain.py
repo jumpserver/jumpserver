@@ -34,7 +34,7 @@ class Domain(OrgModelMixin):
         return random.choice(self.gateways)
 
 
-class Gateway(AssetUser):
+class Gateway(AssetUser, OrgModelMixin):
     SSH_PROTOCOL = 'ssh'
     RDP_PROTOCOL = 'rdp'
     PROTOCOL_CHOICES = (
@@ -51,3 +51,5 @@ class Gateway(AssetUser):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ['name', 'org']
