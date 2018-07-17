@@ -119,7 +119,13 @@ Linux 资产连接错误排查思路
 .. image:: _static/img/faq_linux_09.jpg
 .. image:: _static/img/faq_linux_10.jpg
 
-10. 连接测试常见错误
+10. ssh 使用key 登录资产提示 所选的用户密钥未在远程主机上注册
+
+::
+
+    # 这里是信息填写错误，ip端口应该填coco服务器的ip，端口应该填coco服务的ssh端口（默认2222）
+
+11. 连接测试常见错误
 
 ::
 

@@ -300,6 +300,8 @@ CentOS 7 安装文档
     $ yum makecache fast
     $ yum install docker-ce
     $ systemctl start docker
+
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1 ，可以更换 jumpserver/guacamole:latest
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
