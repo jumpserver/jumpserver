@@ -392,7 +392,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 ::
 
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.3.2/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.3.3/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
