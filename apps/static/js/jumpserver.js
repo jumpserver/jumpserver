@@ -173,14 +173,14 @@ function APIUpdateAttr(props) {
         }
         if (typeof props.success === 'function') {
             return props.success(data);
-        } 
+        }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
             toastr.error(fail_message);
         }
         if (typeof props.error === 'function') {
             return props.error(jqXHR.responseText);
-        } 
+        }
     });
   // return true;
 }
@@ -198,7 +198,8 @@ function objectDelete(obj, name, url, redirectTo) {
             }
         };
         var fail = function() {
-            swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            swal("错误", "[ "+name+" ]"+"正在被资产使用中，请先解除资产绑定", "error");
         };
         APIUpdateAttr({
             url: url,
@@ -219,7 +220,7 @@ function objectDelete(obj, name, url, redirectTo) {
         confirmButtonText: '确认',
         closeOnConfirm: true,
     }, function () {
-        doDelete()       
+        doDelete()
     });
 }
 
@@ -272,7 +273,7 @@ jumpserver.initDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      {className: 'text-center', targets: '_all'}
+      {className: 'text-center', render: $.fn.dataTable.render.text(), targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {

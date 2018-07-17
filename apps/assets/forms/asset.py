@@ -16,7 +16,7 @@ class AssetCreateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'public_ip', 'port',  'comment',
             'nodes', 'is_active', 'admin_user', 'labels', 'platform',
-            'domain',
+            'domain', 'protocol',
 
         ]
         widgets = {
@@ -56,7 +56,7 @@ class AssetUpdateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'port', 'nodes',  'is_active', 'platform',
             'public_ip', 'number', 'comment', 'admin_user', 'labels',
-            'domain',
+            'domain', 'protocol',
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={

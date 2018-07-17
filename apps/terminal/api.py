@@ -259,10 +259,35 @@ class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = ReplaySerializer
     permission_classes = (IsSuperUserOrAppUser,)
     session = None
+    upload_to = 'replay'  # 仅添加到本地存储中
 
-    def gen_session_path(self):
+    def get_session_path(self, version=2):
+        """
+        获取session日志的文件路径
+        :param version: 原来后缀是 .gz，为了统一新版本改为 .replay.gz
+        :return:
+        """
+        suffix = '.replay.gz'
+        if version == 1:
+            suffix = '.gz'
         date = self.session.date_start.strftime('%Y-%m-%d')
-        return os.path.join(date, str(self.session.id) + '.gz')
+        return os.path.join(date, str(self.session.id) + suffix)
+
+    def get_local_path(self, version=2):
+        session_path = self.get_session_path(version=version)
+        if version == 2:
+            local_path = os.path.join(self.upload_to, session_path)
+        else:
+            local_path = session_path
+        return local_path
+
+    def save_to_storage(self, f):
+        local_path = self.get_local_path()
+        try:
+            name = default_storage.save(local_path, f)
+            return name, None
+        except OSError as e:
+            return None, e
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -271,46 +296,49 @@ class SessionReplayViewSet(viewsets.ViewSet):
 
         if serializer.is_valid():
             file = serializer.validated_data['file']
-            file_path = self.gen_session_path()
-            try:
-                default_storage.save(file_path, file)
-                return Response({'url': default_storage.url(file_path)},
-                                status=201)
-            except IOError:
-                return Response("Save error", status=500)
+            name, err = self.save_to_storage(file)
+            if not name:
+                msg = "Failed save replay `{}`: {}".format(session_id, err)
+                logger.error(msg)
+                return Response({'msg': str(err)}, status=400)
+            url = default_storage.url(name)
+            return Response({'url': url}, status=201)
         else:
-            logger.error(
-                'Update load data invalid: {}'.format(serializer.errors))
+            msg = 'Upload data invalid: {}'.format(serializer.errors)
+            logger.error(msg)
             return Response({'msg': serializer.errors}, status=401)
 
     def retrieve(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
         self.session = get_object_or_404(Session, id=session_id)
-        path = self.gen_session_path()
 
-        if default_storage.exists(path):
-            url = default_storage.url(path)
-            return redirect(url)
-        else:
-            config = settings.TERMINAL_REPLAY_STORAGE
-            configs = copy.deepcopy(config)
-            for cfg in config:
-                if config[cfg]['TYPE'] == 'server':
-                    configs.__delitem__(cfg)
+        # 新版本和老版本的文件后缀不同
+        session_path = self.get_session_path()  # 存在外部存储上的路径
+        local_path = self.get_local_path()
+        local_path_v1 = self.get_local_path(version=1)
 
-            if not configs:
-                return HttpResponseNotFound()
+        # 去default storage中查找
+        for _local_path in (local_path, local_path_v1, session_path):
+            if default_storage.exists(_local_path):
+                url = default_storage.url(_local_path)
+                return redirect(url)
 
-            date = self.session.date_start.strftime('%Y-%m-%d')
-            file_path = os.path.join(date, str(self.session.id) + '.replay.gz')
-            target_path = default_storage.base_location + '/' + path
-            storage = jms_storage.get_multi_object_storage(configs)
-            ok, err = storage.download(file_path, target_path)
-            if ok:
-                return redirect(default_storage.url(path))
-            else:
-                logger.error("Failed download replay file: {}".format(err))
-        return HttpResponseNotFound()
+        # 去定义的外部storage查找
+        configs = settings.TERMINAL_REPLAY_STORAGE
+        configs = {k: v for k, v in configs.items() if v['TYPE'] != 'server'}
+        if not configs:
+            return HttpResponseNotFound()
+
+        target_path = os.path.join(default_storage.base_location, local_path)   # 保存到storage的路径
+        target_dir = os.path.dirname(target_path)
+        if not os.path.isdir(target_dir):
+            os.makedirs(target_dir, exist_ok=True)
+        storage = jms_storage.get_multi_object_storage(configs)
+        ok, err = storage.download(session_path, target_path)
+        if not ok:
+            logger.error("Failed download replay file: {}".format(err))
+            return HttpResponseNotFound()
+        return redirect(default_storage.url(local_path))
 
 
 class SessionReplayV2ViewSet(SessionReplayViewSet):

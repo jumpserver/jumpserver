@@ -63,6 +63,10 @@
                                             <td><b>{{ system_user.username }}</b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Login mode' %}:</td>
+                                            <td><b>{{ system_user.get_login_mode_display }}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Protocol' %}:</td>
                                             <td><b id="id_protocol_type">{{ system_user.protocol }}</b></td>
                                         </tr>
@@ -148,15 +152,14 @@
                                                 </span>
                                             </td>
                                         </tr>
-
-                                        <tr>
-                                            <td width="50%">{% trans 'Clear auth' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs btn-clear-auth" style="width: 54px">{% trans 'Clear' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
+{#                                        <tr>#}
+{#                                            <td width="50%">{% trans 'Clear auth' %}:</td>#}
+{#                                            <td>#}
+{#                                                <span style="float: right">#}
+{#                                                    <button type="button" class="btn btn-primary btn-xs btn-clear-auth" style="width: 54px">{% trans 'Clear' %}</button>#}
+{#                                                </span>#}
+{#                                            </td>#}
+{#                                        </tr>#}
 
 {#                                        <tr>#}
 {#                                            <td width="50%">{% trans 'Change auth period' %}:</td>#}
@@ -333,10 +336,22 @@ $(document).ready(function () {
     });
 }).on('click', '.btn-clear-auth', function () {
     var the_url = '{% url "api-assets:system-user-auth-info" pk=system_user.id %}';
-    APIUpdateAttr({
-        url: the_url,
-        method: 'DELETE',
-        success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
+    var name = '{{ system_user.name }}';
+    swal({
+        title: '你确定清除该系统用户的认证信息吗 ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true
+    }, function () {
+        APIUpdateAttr({
+            url: the_url,
+            method: 'DELETE',
+            success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
+        });
     });
 })
 </script>

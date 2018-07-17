@@ -19,7 +19,7 @@ signer = get_signer()
 class AssetUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=32, verbose_name=_('Username'), validators=[alphanumeric])
+    username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))

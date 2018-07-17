@@ -95,9 +95,18 @@ class AdminUser(AssetUser):
 class SystemUser(AssetUser):
     SSH_PROTOCOL = 'ssh'
     RDP_PROTOCOL = 'rdp'
+    TELNET_PROTOCOL = 'telnet'
     PROTOCOL_CHOICES = (
         (SSH_PROTOCOL, 'ssh'),
         (RDP_PROTOCOL, 'rdp'),
+        (TELNET_PROTOCOL, 'telnet (beta)'),
+    )
+
+    AUTO_LOGIN = 'auto'
+    MANUAL_LOGIN = 'manual'
+    LOGIN_MODE_CHOICES = (
+        (AUTO_LOGIN, _('Automatic login')),
+        (MANUAL_LOGIN, _('Manually login'))
     )
 
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
@@ -107,6 +116,7 @@ class SystemUser(AssetUser):
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
+    login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=AUTO_LOGIN, max_length=10, verbose_name=_('Login mode'))
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)

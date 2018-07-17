@@ -140,11 +140,6 @@ class DomainGatewayUpdateView(AdminUserRequiredMixin, UpdateView):
         domain = self.object.domain
         return reverse('assets:domain-gateway-list', kwargs={"pk": domain.id})
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        print(form.cleaned_data)
-        return response
-
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),

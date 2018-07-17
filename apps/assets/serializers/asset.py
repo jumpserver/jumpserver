@@ -43,7 +43,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         fields = (
             "id", "hostname", "ip", "port", "system_users_granted",
             "is_active", "system_users_join", "os", 'domain',
-            "platform", "comment"
+            "platform", "comment", "protocol",
         )
 
     @staticmethod

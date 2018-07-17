@@ -93,7 +93,7 @@ class JMSInventory(BaseInventory):
 
         if gateway.password:
             proxy_command_list.insert(
-                0, "sshpass -p {}".format(gateway.password)
+                0, "sshpass -p '{}'".format(gateway.password)
             )
         if gateway.private_key:
             proxy_command_list.append("-i {}".format(gateway.private_key_file))
