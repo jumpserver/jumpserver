@@ -145,4 +145,5 @@ FAQ
 ::
 
     # 普通用户联系管理员关闭MFA，登录成功后用户在个人信息里面重新绑定.
-    # 如果管理员遗失无法登陆, 修改user_user表对应用户的otp_level为0, 重新登陆绑定即可
+    # 如果管理员遗失无法登陆, 修改数据库 user_user 表对应用户的 otp_level 为 0 , 重新登陆绑定即可
+    # 如果在系统设置里面开启的 MFA 二次认证 ，需要修改数据库 settings 表 SECURITY_MFA_AUTH 的 value 值为 false 

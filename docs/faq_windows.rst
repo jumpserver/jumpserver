@@ -16,12 +16,9 @@ Windows 资产连接错误排查思路
 ::
 
     注：连接 Windows 资产提示连接错误，您没有权限访问此连接，请按照此步骤解决
-    # 如果不在线请检查 Windows 组件是否已经正常运行
-    $ docker ps
+    # 如果终端不在线，请检查 Windows 组件是否已经正常运行，可用 docker ps 命令查询，安装文档有说明
 
-    # 如果已经正常运行，但是终端没有 guacamole 的注册请求
-    $ systemctl status firewalld  # 检查防火墙是否运行，如果防火墙运行请开放 guacamole 端口
-
+    # 重新注册 Windows 组件
     $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
     $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
     $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里，如果不存在直接下一步
@@ -76,6 +73,8 @@ Windows 资产连接错误排查思路
     # 不带域的用户直接输入用户名即可，如 administrator
     # 域用户的用户名格式为 user@domain.com，如 administrator@jumpserver.org
     # 如果想让用户登录资产时自己输入资产的账户密码，可以点击系统用户的名称 点击清除认证信息
+    # 此处必须输入能正确登录 windows 资产的 账户密码
+    # 如不确实是不是因为密码或者账户信息错误导致的无法登录，可以使用清除认证信息或者手动登录功能（在系统用户处设置）
 
 .. image:: _static/img/faq_windows_04.jpg
 

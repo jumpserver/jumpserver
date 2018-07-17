@@ -434,6 +434,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 
 
     # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
+    # 不能使用 127.0.0.1 ，可以更换 jumpserver/guacamole:latest
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
@@ -458,6 +459,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
 ::
 
     $ vim /etc/nginx/nginx.conf
+    # CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     ... 省略
     # 把默认server配置块改成这样
