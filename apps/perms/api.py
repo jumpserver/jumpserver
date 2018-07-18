@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk, get_object_or_none
 from users.permissions import IsValidUser, IsSuperUser, IsSuperUserOrAppUser
@@ -20,12 +19,9 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     资产授权列表的增删改查api
     """
-    filter_fields = ("name",)
-    search_fields = filter_fields
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
     permission_classes = (IsSuperUser,)
-    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve'):
