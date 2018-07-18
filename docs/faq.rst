@@ -3,8 +3,9 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
-   Sftp使用说明 <faq_sftp.rst>
-   安装过程常见问题 <faq_install.rst>
+   Sftp 使用说明 <faq_sftp.rst>
+   Telnet 使用说明 <faq_telnet.rst>
+   安装过程 常见问题 <faq_install.rst>
    Linux 资产连接说明 <faq_linux.rst>
    Windows 资产连接说明 <faq_windows.rst>
    二次认证（Google Auth）入口说明 <faq_googleauth.rst>
