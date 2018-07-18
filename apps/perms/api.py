@@ -20,12 +20,9 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     资产授权列表的增删改查api
     """
-    filter_fields = ("name",)
-    search_fields = filter_fields
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
     permission_classes = (IsSuperUser,)
-    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve'):
