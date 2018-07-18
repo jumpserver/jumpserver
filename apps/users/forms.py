@@ -306,6 +306,12 @@ class UserGroupForm(forms.ModelForm):
             })
             kwargs['initial'] = initial
         super().__init__(**kwargs)
+        if 'initial' not in kwargs:
+            return
+        users_field = self.fields.get('users')
+        if hasattr(users_field, 'queryset'):
+            current_org = get_current_org()
+            users_field.queryset = User.objects.filter(orgs=current_org)
 
     def save(self, commit=True):
         group = super().save(commit=commit)

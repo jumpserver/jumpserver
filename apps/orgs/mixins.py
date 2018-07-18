@@ -79,7 +79,6 @@ class OrgModelForm(ModelForm):
         for name, field in self.fields.items():
             if not hasattr(field, 'queryset'):
                 continue
-            print(field)
             model = field.queryset.model
             field.queryset = model.objects.all()
 
