@@ -206,7 +206,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         DB_PORT = os.environ.get("DB_PORT") or 3306
         DB_USER = os.environ.get("DB_USER") or 'jumpserver'
         DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'somepassword'
-        DB_NAME = os.environ.get("DB_NAME") or 'jmstest'
+        DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
