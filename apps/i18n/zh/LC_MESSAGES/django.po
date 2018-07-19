@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-19 18:14+0800\n"
+"POT-Creation-Date: 2018-07-19 18:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2204,8 +2204,8 @@ msgid "Goto"
 msgstr "转到"
 
 #: terminal/templates/terminal/command_list.html:99
-msgid "Export selected"
-msgstr "导出记录"
+msgid "Export command"
+msgstr "导出命令"
 
 #: terminal/templates/terminal/session_detail.html:17
 #: terminal/views/session.py:116

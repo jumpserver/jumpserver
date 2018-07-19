@@ -83,6 +83,7 @@ class CommandExportView(DatetimeSearchMixin, AdminUserRequiredMixin, View):
         return response
 
     def get_queryset(self):
+        self.get_date_range()
         self.action = self.request.GET.get('action', '')
         self.command = self.request.GET.get('command', '')
         self.user = self.request.GET.get("user", '')
