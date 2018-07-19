@@ -372,3 +372,18 @@ def is_need_unblock(key_block):
     if not cache.get(key_block):
         return False
     return True
+
+
+def is_restrict_access(username, ip, mode):
+    user = settings.RESTRICT_ACCESS.get(username, None)
+    if not user:
+        return False
+
+    ips = user.get('ip', [])
+    modes = user.get('mode', [])
+    if ('*' not in ips) and (ip not in ips):
+        return True
+    elif ('*' not in modes) and (mode not in modes):
+        return True
+    else:
+        return False

@@ -46,7 +46,9 @@
                     <form class="m-t" role="form" method="post" action="">
                         {% csrf_token %}
 
-                        {% if block_login %}
+                        {% if restrict_access %}
+                            <p class="red-fonts">{% trans 'Restrict access!' %}</p>
+                        {% elif block_login %}
                             <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
                         {% elif form.errors %}
                             {% if 'captcha' in form.errors %}

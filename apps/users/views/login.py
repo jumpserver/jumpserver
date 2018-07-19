@@ -28,7 +28,7 @@ from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
     set_tmp_user_to_cache, get_password_check_rules, check_password_rules, \
-    is_block_login, set_user_login_failed_count_to_cache
+    is_block_login, set_user_login_failed_count_to_cache, is_restrict_access
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -65,6 +65,11 @@ class UserLoginView(FormView):
         # limit login authentication
         ip = get_login_ip(request)
         username = self.request.POST.get('username')
+
+        # check restrict access
+        if is_restrict_access(username, ip, 'web'):
+            return self.render_to_response(self.get_context_data(restrict_access=True))
+
         key_limit = self.key_prefix_limit.format(username, ip)
         if is_block_login(key_limit):
             return self.render_to_response(self.get_context_data(block_login=True))

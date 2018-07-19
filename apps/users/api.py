@@ -19,7 +19,8 @@ from .models import User, UserGroup, LoginLog
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token, get_login_ip, \
-    check_otp_code, set_user_login_failed_count_to_cache, is_block_login
+    check_otp_code, set_user_login_failed_count_to_cache, is_block_login, \
+    is_restrict_access
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -222,6 +223,9 @@ class UserAuthApi(APIView):
         ip = ip if ip else get_login_ip(request)
         key_limit = self.key_prefix_limit.format(username, ip)
         key_block = self.key_prefix_block.format(username)
+        if is_restrict_access(username, ip, 'ssh'):
+            msg = _("Restrict access")
+            return Response({'msg': msg}, status=401)
         if is_block_login(key_limit):
             msg = _("Log in frequently and try again later")
             return Response({'msg': msg}, status=401)
