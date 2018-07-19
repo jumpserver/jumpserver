@@ -93,7 +93,7 @@ class DatetimeSearchMixin:
     date_format = '%Y-%m-%d'
     date_from = date_to = None
 
-    def get(self, request, *args, **kwargs):
+    def get_date_range(self):
         date_from_s = self.request.GET.get('date_from')
         date_to_s = self.request.GET.get('date_to')
 
@@ -113,6 +113,9 @@ class DatetimeSearchMixin:
             )
         else:
             self.date_to = timezone.now()
+
+    def get(self, request, *args, **kwargs):
+        self.get_date_range()
         return super().get(request, *args, **kwargs)
 
 

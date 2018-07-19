@@ -1,0 +1,103 @@
+{% load common_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Command Report</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .background {
+            background-color: #535659;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        .paper {
+            margin-left: 23%;
+            margin-right: 24%;
+            border: solid;
+            padding: 50px;
+            background-color: #fff;
+        }
+
+        h2 {
+            font-style: italic;
+            text-align: center;
+        }
+        .info {
+            width: 200px;
+            margin-left: 450px;
+            font-style: italic;
+            text-align: left;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .command {
+            margin-left: 10px;
+        }
+        .command-desc {
+            font-size: 12px;
+        }
+        .command-desc span {
+            float: right;
+        }
+
+        .command-input {
+            {#font-style: italic;#}
+            font-size: 15px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .command-input span {
+            font-size: 13px;
+        }
+
+        .hr-line-dashed {
+            border-top: 1px dashed #000;
+            color: #000;
+            background-color: #fff;
+            height: 1px;
+            margin: 20px 0;
+        }
+        pre {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="background">
+    <div class="paper">
+        <h2>Command Report</h2>
+        <div class="info">
+            <p>total: {{ total_count }}</p>
+            <p>date: {{ now | ts_to_date }}</p>
+        </div>
+
+        <div class="hr-line-dashed"></div>
+
+        <div>
+            {% for command in queryset %}
+                <div class="command">
+                    <p class="command-desc">
+                        [{{ command.user}} {{ command.system_user }}@{{ command.asset }} {{ command.timestamp | ts_to_date }}]
+                        <span>{{ forloop.counter }}</span>
+                    </p>
+
+                    <p class="command-input"><span>$ </span>{{ command.input }}</p>
+
+                    <pre>{{ command.output }}</pre>
+                </div>
+
+                <div class="hr-line-dashed"></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</body>
+</html>
