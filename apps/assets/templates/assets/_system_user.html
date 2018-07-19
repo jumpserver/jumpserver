@@ -36,12 +36,13 @@
                             {% endif %}
                             <h3>{% trans 'Basic' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
+                            {% bootstrap_field form.login_mode layout="horizontal" %}
                             {% bootstrap_field form.username layout="horizontal" %}
                             {% bootstrap_field form.priority layout="horizontal" %}
                             {% bootstrap_field form.protocol layout="horizontal" %}
 
+                            <h3 id="auth_title_id">{% trans 'Auth' %}</h3>
                             {% block auth %}
-                            <h3>{% trans 'Auth' %}</h3>
                             <div class="auto-generate">
                                 <div class="form-group">
                                     <label for="{{ form.auto_generate_key.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto generate key' %}</label>
@@ -80,14 +81,21 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
 var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
+var login_mode_id = '#' + '{{ form.login_mode.id_for_label }}';
+
+var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
+var password_id = '#' + '{{ form.password.id_for_label }}';
 var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
 var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
 var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
 var shell_id = '#' + '{{ form.shell.id_for_label }}';
+
 var need_change_field = [
     auto_generate_key, private_key_id, auto_push_id, sudo_id, shell_id
+];
+var need_change_field_login_mode = [
+    auto_generate_key, private_key_id, auto_push_id, password_id
 ];
 
 function protocolChange() {
@@ -96,7 +104,19 @@ function protocolChange() {
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').addClass('hidden')
         });
-    } else {
+    }
+    else if ($(protocol_id + " option:selected").text() === 'telnet (beta)') {
+        $('.auth-fields').removeClass('hidden');
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').addClass('hidden')
+        });
+    }
+    else {
+        if($(login_mode_id).val() === 'manual'){
+            $(sudo_id).closest('.form-group').removeClass('hidden');
+            $(shell_id).closest('.form-group').removeClass('hidden');
+            return
+        }
         authFieldsDisplay();
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').removeClass('hidden')
@@ -111,18 +131,35 @@ function authFieldsDisplay() {
         $('.auth-fields').removeClass('hidden');
     }
 }
+function loginModeChange(){
+    if ($(login_mode_id).val() === 'manual'){
+        $('#auth_title_id').addClass('hidden');
+        $.each(need_change_field_login_mode, function(index, value){
+            $(value).closest('.form-group').addClass('hidden')
+        })
+    }
+    else if($(login_mode_id).val() === 'auto'){
+        $('#auth_title_id').removeClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden')
+        protocolChange();
+    }
+}
 
 $(document).ready(function () {
     $('.select2').select2();
     authFieldsDisplay();
     protocolChange();
+    loginModeChange();
 })
 .on('change', protocol_id, function(){
     protocolChange();
 })
 .on('change', auto_generate_key, function(){
     authFieldsDisplay();
-});
+})
+.on('change', login_mode_id, function(){
+    loginModeChange();
+})
 
 </script>
 {% endblock %}

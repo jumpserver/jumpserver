@@ -51,11 +51,11 @@ def test_gateway_connectability(gateway):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     proxy = paramiko.SSHClient()
-    proxy.load_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
     proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        proxy.connect(gateway.ip, username=gateway.username,
+        proxy.connect(gateway.ip, gateway.port,
+                      username=gateway.username,
                       password=gateway.password,
                       pkey=gateway.private_key_obj)
     except(paramiko.AuthenticationException,

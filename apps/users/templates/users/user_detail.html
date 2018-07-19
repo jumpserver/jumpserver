@@ -182,6 +182,14 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        <tr style="{% if not unblock %}display:none{% endif %}">
+                                            <td>{% trans 'Unblock user' %}</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs"  id="btn-unblock-user" style="width: 54px">{% trans 'Unblock' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -275,7 +283,7 @@ $(document).ready(function() {
         .on('select2:unselect', function(evt) {
             var data = evt.params.data;
             delete jumpserver.nodes_selected[data.id];
-        })
+        });
 })
 .on('click', '#is_active', function() {
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
@@ -293,7 +301,7 @@ $(document).ready(function() {
 .on('click', '#force_enable_otp', function() {
     {% if request.user == user_object %}
         toastr.error("{% trans 'Goto profile page enable MFA' %}");
-        return
+        return;
     {% endif %}
 
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
@@ -421,11 +429,45 @@ $(document).ready(function() {
     APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 }).on('click', '.btn-delete-user', function () {
     var $this = $(this);
-    var name = "{{ user.name }}";
-    var uid = "{{ user.id }}";
+    var name = "{{ user_object.name }}";
+    var uid = "{{ user_object.id }}";
     var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'users:user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
+}).on('click', '#btn-unblock-user', function () {
+    function doReset() {
+        {#var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';#}
+        var the_url = '{%  url "api-users:user-unblock" pk=user_object.id %}';
+        var body = {};
+        var success = function() {
+            var msg = "{% trans "Success" %}";
+            {#swal("{% trans 'Unblock user' %}", msg, "success");#}
+            swal({
+                title: "{% trans 'Unblock user' %}",
+                text: msg,
+                type: "success"
+                }, function() {
+                    location.reload()
+                }
+            );
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success: success
+        });
+    }
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans "After unlocking the user, the user can log in normally."%}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doReset();
+    });
 })
 </script>
 {% endblock %}

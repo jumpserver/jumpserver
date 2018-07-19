@@ -170,7 +170,7 @@ class TerminalSettingForm(BaseForm):
 
 
 class SecuritySettingForm(BaseForm):
-    # MFA全局设置
+    # MFA global setting
     SECURITY_MFA_AUTH = forms.BooleanField(
         initial=False, required=False,
         label=_("MFA Secondary certification"),
@@ -179,12 +179,26 @@ class SecuritySettingForm(BaseForm):
             'authentication (valid for all users, including administrators)'
         )
     )
-    # 最小长度
+    # limit login count
+    SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
+        initial=3, min_value=3,
+        label=_("Limit the number of login failures")
+    )
+    # limit login time
+    SECURITY_LOGIN_LIMIT_TIME = forms.IntegerField(
+        initial=30, min_value=5,
+        label=_("No logon interval"),
+        help_text=_(
+            "Tip :(unit/minute) if the user has failed to log in for a limited "
+            "number of times, no login is allowed during this time interval."
+        )
+    )
+    # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
         initial=6, label=_("Password minimum length"),
         min_value=6
     )
-    # 大写字母
+    # upper case
     SECURITY_PASSWORD_UPPER_CASE = forms.BooleanField(
 
         initial=False, required=False,
@@ -193,21 +207,21 @@ class SecuritySettingForm(BaseForm):
             'After opening, the user password changes '
             'and resets must contain uppercase letters')
     )
-    # 小写字母
+    # lower case
     SECURITY_PASSWORD_LOWER_CASE = forms.BooleanField(
         initial=False, required=False,
         label=_("Must contain lowercase letters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain lowercase letters')
     )
-    # 数字
+    # number
     SECURITY_PASSWORD_NUMBER = forms.BooleanField(
         initial=False, required=False,
         label=_("Must contain numeric characters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain numeric characters')
     )
-    # 特殊字符
+    # special char
     SECURITY_PASSWORD_SPECIAL_CHAR= forms.BooleanField(
         initial=False, required=False,
         label=_("Must contain special characters"),

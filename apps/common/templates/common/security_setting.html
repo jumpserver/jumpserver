@@ -39,9 +39,9 @@
                                     {% endif %}
                                     {% csrf_token %}
 
-                                    <h3>{% trans "MFA setting" %}</h3>
+                                    <h3>{% trans "User login settings" %}</h3>
                                     {% for field in form %}
-                                        {% if forloop.counter == 2 %}
+                                        {% if forloop.counter == 4 %}
                                             <div class="hr-line-dashed"></div>
                                             <h3>{% trans "Password check rule" %}</h3>
                                         {% endif %}
