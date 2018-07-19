@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, viewsets
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -22,6 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
+from orgs.utils import get_current_org
 from ..hands import IsSuperUser
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
@@ -37,10 +38,17 @@ __all__ = [
 ]
 
 
-class NodeViewSet(BulkModelViewSet):
+class NodeViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.NodeSerializer
+
+    def get_queryset(self):
+        # queryset = super(NodeViewSet, self).get_queryset()
+        print("API GET QUWRYSET")
+        # print(get_current_org())
+        # print(queryset)
+        return Node.objects.all()
 
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()

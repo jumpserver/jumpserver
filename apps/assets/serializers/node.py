@@ -31,6 +31,7 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
+        return 1
         return len(obj.assets_granted)
 
     @staticmethod
@@ -39,6 +40,7 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_parent(obj):
+        return '0'
         return obj.parent.id
 
 

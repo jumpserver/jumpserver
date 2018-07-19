@@ -234,10 +234,10 @@ LOGGING = {
             'handlers': ['console', 'ansible_logs'],
             'level': "INFO",
         },
-        # 'django.db': {
-        #     'handlers': ['console', 'file'],
-        #     'level': 'DEBUG'
-        # }
+        'django.db': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 }
 

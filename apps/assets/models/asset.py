@@ -225,7 +225,7 @@ class Asset(OrgModelMixin):
         return data
 
     class Meta:
-        unique_together = ('org', 'hostname')
+        unique_together = [('org', 'hostname'),]
         verbose_name = _("Asset")
 
     @classmethod

@@ -8,6 +8,7 @@ from django.forms import ModelForm
 
 from common.utils import get_logger
 from .utils import get_current_org, set_current_org
+from .models import Organization
 
 logger = get_logger(__file__)
 
@@ -32,19 +33,21 @@ class OrgManager(models.Manager):
         queryset = super(OrgManager, self).get_queryset()
         queryset = queryset.filter(**kwargs)
         # print(kwargs)
-        print(queryset.query)
+        # print(queryset.query)
         return queryset
 
-    def all(self):
-        current_org = get_current_org()
-        if not current_org:
-            msg = 'You can `objects.set_current_org(org).all()` then run it'
-            warnings.warn(msg)
-            return self
-        else:
-            return super(OrgManager, self).all()
+    # def all(self):
+    #     current_org = get_current_org()
+    #     if not current_org:
+    #         msg = 'You can `objects.set_current_org(org).all()` then run it'
+    #         warnings.warn(msg)
+    #         return self
+    #     else:
+    #         return super(OrgManager, self).all()
 
     def set_current_org(self, org):
+        if isinstance(org, str):
+            org = Organization.objects.get(name=org)
         set_current_org(org)
         return self
 

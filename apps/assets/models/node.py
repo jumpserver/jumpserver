@@ -23,7 +23,8 @@ class Node(OrgModelMixin):
     is_node = True
 
     def __str__(self):
-        return self.full_value
+        return self.value
+        # return self.full_value
 
     def __eq__(self, other):
         return self.key == other.key
@@ -181,8 +182,8 @@ class Node(OrgModelMixin):
     @classmethod
     def root(cls):
         root = cls.objects.filter(key__regex=r'^[0-9]+$')
-        if len(root) == 1:
-            return root.get()
+        if root:
+            return root[0]
         else:
             return cls.create_root_node()
 

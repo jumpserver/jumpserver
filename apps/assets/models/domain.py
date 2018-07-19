@@ -52,4 +52,4 @@ class Gateway(AssetUser, OrgModelMixin):
         return self.name
 
     class Meta:
-        unique_together = ['name', 'org']
+        unique_together = [('name', 'org')]
