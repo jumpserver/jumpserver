@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-13 19:20+0800\n"
+"POT-Creation-Date: 2018-07-19 18:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -445,7 +445,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:282
 #: users/models/user.py:31 users/models/user.py:333
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:361
+#: users/templates/users/user_group_list.html:13 users/views/user.py:367
 msgid "User"
 msgstr "用户"
 
@@ -685,6 +685,7 @@ msgstr "重置"
 #: common/templates/common/security_setting.html:71
 #: common/templates/common/terminal_setting.html:108
 #: perms/templates/perms/asset_permission_create_update.html:70
+#: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:47
@@ -814,7 +815,7 @@ msgstr "选择节点"
 #: users/templates/users/user_detail.html:374
 #: users/templates/users/user_detail.html:399
 #: users/templates/users/user_detail.html:422
-#: users/templates/users/user_detail.html:458
+#: users/templates/users/user_detail.html:466
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:200
@@ -1005,7 +1006,7 @@ msgstr "存在资产，不能删除"
 #: assets/templates/assets/system_user_list.html:134
 #: users/templates/users/user_detail.html:369
 #: users/templates/users/user_detail.html:394
-#: users/templates/users/user_detail.html:453
+#: users/templates/users/user_detail.html:461
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:195
 msgid "Are you sure?"
@@ -2002,7 +2003,7 @@ msgstr "文档"
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:343
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:349
 msgid "Profile"
 msgstr "个人信息"
 
@@ -2059,13 +2060,13 @@ msgstr "关闭"
 
 #: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
 #: users/views/group.py:62 users/views/group.py:79 users/views/group.py:95
-#: users/views/login.py:330 users/views/login.py:388 users/views/user.py:65
-#: users/views/user.py:80 users/views/user.py:102 users/views/user.py:175
-#: users/views/user.py:330 users/views/user.py:380 users/views/user.py:415
+#: users/views/login.py:332 users/views/login.py:390 users/views/user.py:67
+#: users/views/user.py:82 users/views/user.py:104 users/views/user.py:180
+#: users/views/user.py:336 users/views/user.py:386 users/views/user.py:421
 msgid "Users"
 msgstr "用户管理"
 
-#: templates/_nav.html:13 users/views/user.py:66
+#: templates/_nav.html:13 users/views/user.py:68
 msgid "User list"
 msgstr "用户列表"
 
@@ -2093,7 +2094,7 @@ msgstr "命令记录"
 msgid "Web terminal"
 msgstr "Web终端"
 
-#: templates/_nav.html:51 terminal/views/command.py:47
+#: templates/_nav.html:51 terminal/views/command.py:49
 #: terminal/views/session.py:75 terminal/views/session.py:93
 #: terminal/views/session.py:115 terminal/views/terminal.py:31
 #: terminal/views/terminal.py:46 terminal/views/terminal.py:58
@@ -2202,13 +2203,17 @@ msgstr "参数"
 msgid "Goto"
 msgstr "转到"
 
+#: terminal/templates/terminal/command_list.html:99
+msgid "Export command"
+msgstr "导出命令"
+
 #: terminal/templates/terminal/session_detail.html:17
 #: terminal/views/session.py:116
 msgid "Session detail"
 msgstr "会话详情"
 
 #: terminal/templates/terminal/session_detail.html:28
-#: terminal/views/command.py:48
+#: terminal/views/command.py:50
 msgid "Command list"
 msgstr "命令记录列表"
 
@@ -2324,7 +2329,7 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api.py:221 users/templates/users/login.html:50
+#: users/api.py:226 users/templates/users/login.html:50
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -2725,7 +2730,7 @@ msgid "Setting"
 msgstr "设置"
 
 #: users/templates/users/user_create.html:4
-#: users/templates/users/user_list.html:16 users/views/user.py:80
+#: users/templates/users/user_list.html:16 users/views/user.py:82
 msgid "Create user"
 msgstr "创建用户"
 
@@ -2734,7 +2739,7 @@ msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
-#: users/templates/users/user_granted_asset.html:18 users/views/user.py:176
+#: users/templates/users/user_granted_asset.html:18 users/views/user.py:181
 msgid "User detail"
 msgstr "用户详情"
 
@@ -2772,7 +2777,7 @@ msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
 #: users/templates/users/user_detail.html:186
-#: users/templates/users/user_detail.html:444
+#: users/templates/users/user_detail.html:446
 msgid "Unblock user"
 msgstr "解除登录限制"
 
@@ -2818,7 +2823,7 @@ msgstr "更新ssh密钥成功"
 msgid "User SSH public key update"
 msgstr "ssh密钥"
 
-#: users/templates/users/user_detail.html:454
+#: users/templates/users/user_detail.html:462
 msgid "After unlocking the user, the user can log in normally."
 msgstr "解除用户登录限制后，此用户即可正常登录"
 
@@ -2878,8 +2883,8 @@ msgstr "用户删除失败"
 msgid "Administrator Settings force MFA login"
 msgstr "管理员设置强制使用MFA登录"
 
-#: users/templates/users/user_profile.html:116 users/views/user.py:205
-#: users/views/user.py:259
+#: users/templates/users/user_profile.html:116 users/views/user.py:211
+#: users/views/user.py:265
 msgid "User groups"
 msgstr "用户组"
 
@@ -2925,7 +2930,7 @@ msgid ""
 "corresponding private key."
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
-#: users/templates/users/user_update.html:4 users/views/user.py:103
+#: users/templates/users/user_update.html:4 users/views/user.py:105
 msgid "Update user"
 msgstr "更新用户"
 
@@ -3079,104 +3084,104 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:75
+#: users/views/login.py:76
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:178 users/views/user.py:500 users/views/user.py:525
+#: users/views/login.py:180 users/views/user.py:506 users/views/user.py:531
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
-#: users/views/login.py:207
+#: users/views/login.py:209
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:208
+#: users/views/login.py:210
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:224
+#: users/views/login.py:226
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:237
+#: users/views/login.py:239
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:238
+#: users/views/login.py:240
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:251
+#: users/views/login.py:253
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:252
+#: users/views/login.py:254
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:273 users/views/login.py:286
+#: users/views/login.py:275 users/views/login.py:288
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:282
+#: users/views/login.py:284
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:292 users/views/user.py:118 users/views/user.py:398
+#: users/views/login.py:294 users/views/user.py:120 users/views/user.py:404
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:330
+#: users/views/login.py:332
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:389
+#: users/views/login.py:391
 msgid "Login log list"
 msgstr "登录日志"
 
-#: users/views/user.py:129
+#: users/views/user.py:131
 msgid "Bulk update user success"
 msgstr "批量更新用户成功"
 
-#: users/views/user.py:234
+#: users/views/user.py:240
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:331
+#: users/views/user.py:337
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:362
+#: users/views/user.py:368
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:381
+#: users/views/user.py:387
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:416
+#: users/views/user.py:422
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:457
+#: users/views/user.py:463
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:551
+#: users/views/user.py:557
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:552
+#: users/views/user.py:558
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:554
+#: users/views/user.py:560
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:555
+#: users/views/user.py:561
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
