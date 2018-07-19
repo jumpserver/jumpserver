@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-19 11:54+0800\n"
+"POT-Creation-Date: 2018-07-19 18:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -685,6 +685,7 @@ msgstr "重置"
 #: common/templates/common/security_setting.html:71
 #: common/templates/common/terminal_setting.html:108
 #: perms/templates/perms/asset_permission_create_update.html:70
+#: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:47
@@ -921,7 +922,6 @@ msgid "Import"
 msgstr "导入"
 
 #: assets/templates/assets/asset_list.html:70
-#: terminal/templates/terminal/command_list.html:104
 #: users/templates/users/user_list.html:10
 msgid "Export"
 msgstr "导出"
@@ -2094,7 +2094,7 @@ msgstr "命令记录"
 msgid "Web terminal"
 msgstr "Web终端"
 
-#: templates/_nav.html:51 terminal/views/command.py:50
+#: templates/_nav.html:51 terminal/views/command.py:49
 #: terminal/views/session.py:75 terminal/views/session.py:93
 #: terminal/views/session.py:115 terminal/views/terminal.py:31
 #: terminal/views/terminal.py:46 terminal/views/terminal.py:58
@@ -2204,12 +2204,8 @@ msgid "Goto"
 msgstr "转到"
 
 #: terminal/templates/terminal/command_list.html:99
-msgid "Current selected"
-msgstr "当前命令"
-
-#: terminal/templates/terminal/command_list.html:100
-msgid "All selected"
-msgstr "全部命令"
+msgid "Export selected"
+msgstr "导出记录"
 
 #: terminal/templates/terminal/session_detail.html:17
 #: terminal/views/session.py:116
@@ -2217,7 +2213,7 @@ msgid "Session detail"
 msgstr "会话详情"
 
 #: terminal/templates/terminal/session_detail.html:28
-#: terminal/views/command.py:51
+#: terminal/views/command.py:50
 msgid "Command list"
 msgstr "命令记录列表"
 

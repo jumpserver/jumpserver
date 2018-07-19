@@ -99,8 +99,5 @@ class CommandExportView(DatetimeSearchMixin, AdminUserRequiredMixin, View):
             filter_kwargs['system_user'] = self.system_user
         if self.command:
             filter_kwargs['input'] = self.command
-        if self.action == 'all':
-            queryset = self.model.objects.all()
-        else:
-            queryset = common_storage.filter(**filter_kwargs)
+        queryset = common_storage.filter(**filter_kwargs)
         return queryset
