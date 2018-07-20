@@ -38,10 +38,8 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         current_org = get_current_org()
-        if current_org.is_real():
-            queryset = queryset.filter(orgs=current_org)
-        elif current_org.is_default():
-            queryset = queryset.filter(orgs=None)
+        org_users = current_org.get_org_users().values_list('id', flat=True)
+        queryset = queryset.filter(id__in=org_users)
         return queryset
 
     def get_permissions(self):
@@ -110,7 +108,6 @@ class UserGroupViewSet(BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permission_classes = (IsSuperUser,)
-
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):

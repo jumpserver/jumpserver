@@ -3,7 +3,6 @@
 from django.db import models
 from django.shortcuts import redirect
 import warnings
-from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 
 from common.utils import get_logger
@@ -12,6 +11,9 @@ from .models import Organization
 
 logger = get_logger(__file__)
 
+from threading import local
+
+tl = local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm'
@@ -19,12 +21,15 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
+
     def get_queryset(self):
         current_org = get_current_org()
         kwargs = {}
+        if not hasattr(tl, 'times'):
+            tl.times = 0
 
-        # print(">>>>>>>>>> Get query set")
-        # print(current_org)
+        print("[{}]>>>>>>>>>> Get query set".format(tl.times))
+        print(current_org)
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():
@@ -35,6 +40,7 @@ class OrgManager(models.Manager):
         queryset = queryset.filter(**kwargs)
         # print(kwargs)
         # print(queryset.query)
+        tl.times += 1
         return queryset
 
     def all(self):

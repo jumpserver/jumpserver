@@ -365,13 +365,14 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     user = keyword = ""
     date_to = date_from = None
 
-    def get_allow_users(self):
+    @staticmethod
+    def get_org_users():
         current_org = get_current_org()
         users = current_org.get_org_users().values_list('username', flat=True)
         return users
 
     def get_queryset(self):
-        users = self.get_allow_users()
+        users = self.get_org_users()
         queryset = super().get_queryset().filter(username__in=users)
         self.user = self.request.GET.get('user', '')
         self.keyword = self.request.GET.get("keyword", '')
@@ -397,7 +398,7 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             'date_to': self.date_to,
             'user': self.user,
             'keyword': self.keyword,
-            'user_list': self.get_allow_users(),
+            'user_list': self.get_org_users(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

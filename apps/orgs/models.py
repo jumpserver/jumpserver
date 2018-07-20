@@ -55,7 +55,7 @@ class Organization(models.Model):
     def get_org_users(self):
         from users.models import User
         if self.is_default():
-            return User.objects.all()
+            return User.objects.filter(orgs__isnull=True)
         else:
             return self.users.all()
 
