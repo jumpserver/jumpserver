@@ -106,10 +106,11 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class UserGroupViewSet(IDInFilterMixin, OrgViewGenericMixin, BulkModelViewSet):
+class UserGroupViewSet(BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permission_classes = (IsSuperUser,)
+
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):

@@ -78,7 +78,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'orgs.middleware.OrgPreMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -234,10 +233,10 @@ LOGGING = {
             'handlers': ['console', 'ansible_logs'],
             'level': "INFO",
         },
-        'django.db': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG'
-        }
+        # 'django.db': {
+        #     'handlers': ['console', 'file'],
+        #     'level': 'DEBUG'
+        # }
     }
 }
 

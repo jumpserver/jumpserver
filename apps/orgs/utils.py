@@ -24,7 +24,8 @@ def get_current_request():
 
 
 def get_current_org():
-    return getattr(_thread_locals, 'current_org', None)
+    org = getattr(_thread_locals, 'current_org', None)
+    return org
 
 
 def get_current_user():

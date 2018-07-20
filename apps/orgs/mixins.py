@@ -23,7 +23,8 @@ class OrgManager(models.Manager):
         current_org = get_current_org()
         kwargs = {}
 
-        print(">>>>>>>>>> Get query set")
+        # print(">>>>>>>>>> Get query set")
+        # print(current_org)
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():
@@ -36,14 +37,14 @@ class OrgManager(models.Manager):
         # print(queryset.query)
         return queryset
 
-    # def all(self):
-    #     current_org = get_current_org()
-    #     if not current_org:
-    #         msg = 'You can `objects.set_current_org(org).all()` then run it'
-    #         warnings.warn(msg)
-    #         return self
-    #     else:
-    #         return super(OrgManager, self).all()
+    def all(self):
+        current_org = get_current_org()
+        if not current_org:
+            msg = 'You can `objects.set_current_org(org).all()` then run it'
+            warnings.warn(msg)
+            return self
+        else:
+            return super(OrgManager, self).all()
 
     def set_current_org(self, org):
         if isinstance(org, str):
