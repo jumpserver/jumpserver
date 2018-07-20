@@ -131,7 +131,7 @@
         proxy_buffer_size 4k;
 
         # 缓存配置，如果不使用可以直接注释
-        proxy_temp_file_write_size 264k;
+        proxy_temp_file_write_size 256k;
         proxy_temp_path /var/cache/nginx/nginx_temp;
         proxy_cache_path /var/cache/nginx/nginx_cache levels=1:2 keys_zone=cache_one:200m inactive=5d max_size=400m;
         proxy_ignore_headers X-Accel-Expires Expires Cache-Control Set-Cookie;
