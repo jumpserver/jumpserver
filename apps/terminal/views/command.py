@@ -6,7 +6,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
+from common.mixins import DatetimeSearchMixin
+from common.permissions import AdminUserRequiredMixin
 from ..models import Command
 from .. import utils
 from ..backends import get_multi_command_storage

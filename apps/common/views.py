@@ -8,7 +8,7 @@ from django.conf import settings
 
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
-from .mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from .signals import ldap_auth_enable
 
 

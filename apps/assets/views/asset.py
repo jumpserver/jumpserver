@@ -29,7 +29,7 @@ from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
-from ..hands import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 
 
 __all__ = [

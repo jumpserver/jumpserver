@@ -22,7 +22,8 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
 from common.utils import get_object_or_none
-from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
+from common.mixins import DatetimeSearchMixin
+from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \

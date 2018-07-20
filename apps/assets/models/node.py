@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelMixin
-from orgs.utils import current_org, set_current_org
+from orgs.utils import current_org, set_current_org, get_current_org
 from orgs.models import Organization
 
 __all__ = ['Node']
@@ -169,13 +169,15 @@ class Node(OrgModelMixin):
 
     @classmethod
     def create_root_node(cls):
+        # 如果使用current_org 在set_current_org时会死循环
+        _current_org = get_current_org()
         with transaction.atomic():
             set_current_org(Organization.root())
             org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
             org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
             max_value = max([int(k) for k in org_nodes_roots_keys]) if org_nodes_roots_keys else 0
-            set_current_org(current_org)
-            root = cls.objects.create(key=max_value+1, value=current_org.name)
+            set_current_org(_current_org)
+            root = cls.objects.create(key=str(max_value+1), value=_current_org.name)
             return root
 
     @classmethod

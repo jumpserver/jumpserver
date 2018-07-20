@@ -34,9 +34,10 @@ from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from common.models import Setting
+from common.permissions import AdminUserRequiredMixin
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, generate_otp_uri, check_otp_code, get_user_or_tmp_user, get_password_check_rules, check_password_rules
+from ..utils import generate_otp_uri, check_otp_code, get_user_or_tmp_user, get_password_check_rules, check_password_rules
 from ..signals import post_user_create
 from ..tasks import write_login_log_async
 
