@@ -23,7 +23,7 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
-from orgs.utils import get_current_org
+from orgs.utils import current_org
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
@@ -367,7 +367,6 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     @staticmethod
     def get_org_users():
-        current_org = get_current_org()
         users = current_org.get_org_users().values_list('username', flat=True)
         return users
 

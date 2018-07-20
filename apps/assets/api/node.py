@@ -22,7 +22,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from orgs.utils import get_current_org
 from ..hands import IsSuperUser
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util

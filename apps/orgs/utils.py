@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
-import re
-from django.apps import apps
 
+from functools import partial
+
+from common.utils import LocalProxy
 from .models import Organization
 
 try:
@@ -42,3 +43,13 @@ def set_to_default_org():
 
 def set_to_root_org():
     set_current_org(Organization.root())
+
+
+def _find(attr):
+    if hasattr(_thread_locals, attr):
+        return getattr(_thread_locals, attr)
+    return None
+
+
+current_org = LocalProxy(get_current_org)
+

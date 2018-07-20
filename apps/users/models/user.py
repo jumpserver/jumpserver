@@ -16,7 +16,7 @@ from django.shortcuts import reverse
 from common.utils import get_signer, date_expired_default
 from common.models import Setting
 from orgs.mixins import OrgManager
-from orgs.utils import get_current_org
+from orgs.utils import current_org
 
 
 __all__ = ['User']
@@ -222,7 +222,6 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
-        current_org = get_current_org()
         if current_org and current_org.is_real():
             self.orgs.add(current_org)
 

@@ -211,7 +211,7 @@ class AssetExportView(View):
         fields = [
             field for field in Asset._meta.fields
             if field.name not in [
-                'date_created'
+                'date_created', 'org_id'
             ]
         ]
         filename = 'assets-{}.csv'.format(

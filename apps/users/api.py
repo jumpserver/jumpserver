@@ -20,7 +20,7 @@ from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
     IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
-from orgs.utils import get_current_org
+from orgs.utils import current_org
 from orgs.mixins import OrgViewGenericMixin
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
@@ -37,7 +37,6 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        current_org = get_current_org()
         org_users = current_org.get_org_users().values_list('id', flat=True)
         queryset = queryset.filter(id__in=org_users)
         return queryset

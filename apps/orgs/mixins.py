@@ -4,9 +4,10 @@ from django.db import models
 from django.shortcuts import redirect
 import warnings
 from django.forms import ModelForm
+from django.http.response import HttpResponseForbidden
 
 from common.utils import get_logger
-from .utils import get_current_org, set_current_org
+from .utils import current_org, set_current_org
 from .models import Organization
 
 logger = get_logger(__file__)
@@ -23,7 +24,6 @@ __all__ = [
 class OrgManager(models.Manager):
 
     def get_queryset(self):
-        current_org = get_current_org()
         kwargs = {}
         if not hasattr(tl, 'times'):
             tl.times = 0
@@ -44,7 +44,6 @@ class OrgManager(models.Manager):
         return queryset
 
     def all(self):
-        current_org = get_current_org()
         if not current_org:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
             warnings.warn(msg)
@@ -64,7 +63,6 @@ class OrgModelMixin(models.Model):
     objects = OrgManager()
 
     def save(self, *args, **kwargs):
-        current_org = get_current_org()
         if current_org and current_org.is_real():
             self.org_id = current_org.id
         return super(OrgModelMixin, self).save(*args, **kwargs)
@@ -75,9 +73,16 @@ class OrgModelMixin(models.Model):
 
 class OrgViewGenericMixin:
     def dispatch(self, request, *args, **kwargs):
-        current_org = get_current_org()
+        print("Crrent org: {}".format(current_org))
         if not current_org:
             return redirect('orgs:switch-a-org')
+
+        if not current_org.can_admin_by(request.user):
+            print("{} cannot admin {}".format(request.user, current_org))
+            if request.user.is_org_admin:
+                print("Is org admin")
+                return redirect('orgs:switch-a-org')
+            return HttpResponseForbidden()
         return super().dispatch(request, *args, **kwargs)
 
 

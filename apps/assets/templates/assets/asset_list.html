@@ -721,9 +721,7 @@ $(document).ready(function(){
         return
     }
 
-    var data = {
-        'assets': assets_selected
-    };
+    var data = {'assets': assets_selected};
     var success = function () {
         asset_table2.selected = [];
         asset_table2.ajax.reload()

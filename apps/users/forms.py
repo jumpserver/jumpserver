@@ -7,7 +7,7 @@ from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins import OrgModelForm
-from orgs.utils import get_current_org
+from orgs.utils import current_org
 from .models import User, UserGroup
 
 
@@ -279,8 +279,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 
 def user_limit_to():
-    org = get_current_org()
-    return {"orgs": org}
+    return {"orgs": current_org}
 
 
 class UserGroupForm(forms.ModelForm):
@@ -308,7 +307,6 @@ class UserGroupForm(forms.ModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            current_org = get_current_org()
             users_field.queryset = current_org.get_org_users()
 
     def save(self, commit=True):

@@ -22,7 +22,7 @@ class IndexView(LoginRequiredMixin, OrgViewGenericMixin, TemplateView):
     session_month_dates_archive = []
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_superuser:
+        if not request.user.is_org_admin:
             return redirect('assets:user-asset-list')
         return super(IndexView, self).get(request, *args, **kwargs)
 

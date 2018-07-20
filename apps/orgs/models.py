@@ -60,7 +60,16 @@ class Organization(models.Model):
             return self.users.all()
 
     def get_org_admins(self):
-        pass
+        if self.is_real():
+            return self.admins.all()
+        return []
+
+    def can_admin_by(self, user):
+        if user.is_superuser:
+            return True
+        if user in list(self.get_org_admins()):
+            return True
+        return False
 
     def is_real(self):
         return len(str(self.id)) == 36

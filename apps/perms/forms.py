@@ -5,7 +5,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelForm
-from orgs.utils import get_current_org
+from orgs.utils import current_org
 from .hands import User
 from .models import AssetPermission
 
@@ -29,7 +29,6 @@ class AssetPermissionForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            current_org = get_current_org()
             users_field.queryset = User.objects.filter(orgs=current_org)
 
     class Meta:
