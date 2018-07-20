@@ -81,7 +81,7 @@
         open_log_file_cache off;
 
         upstream cocossh {
-            server 192.168.100.12:2222;
+            server 192.168.100.12:2222 max_fails=1 fail_timeout=120s;
             # server ip:port max_fails=1 fail_timeout=120s;
             # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
         }
@@ -110,31 +110,6 @@
 
         # 关闭版本显示
         server_tokens off;
-
-        # gzip 压缩传输
-        gzip on;
-        gzip_min_length 1k;
-        gzip_buffers    4 16k;
-        gzip_http_version 1.0;
-        gzip_comp_level 2;
-        gzip_types text/plain application/x-javascripttext/css application/xml;
-        gzip_vary on;
-
-        # 配置代理参数，如果不使用可以直接注释
-        proxy_redirect off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_connect_timeout 90;
-        proxy_read_timeout 90;
-        proxy_send_timeout 90;
-        proxy_buffer_size 4k;
-
-        # 缓存配置，如果不使用可以直接注释
-        proxy_temp_file_write_size 256k;
-        proxy_temp_path /var/cache/nginx/nginx_temp;
-        proxy_cache_path /var/cache/nginx/nginx_cache levels=1:2 keys_zone=cache_one:200m inactive=5d max_size=400m;
-        proxy_ignore_headers X-Accel-Expires Expires Cache-Control Set-Cookie;
 
         include /etc/nginx/conf.d/*.conf;
     }
@@ -183,20 +158,12 @@
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_prefer_server_ciphers on;
 
-        # 缓存设置，可以自行修改，如果不使用可以直接注释
-        location ~ .*\.(gz|woff2|htm|html|gif|jpg|jpeg|png|bmp|ico|xls|css|js)$ {
-                proxy_cache cache_one;
-                proxy_cache_valid 200 304 302 2d;
-                proxy_cache_valid any 1d;
-                # 以域名、URI、参数组合成Web缓存的Key值，Nginx根据Key值哈希，存储缓存内容到二级缓存目录内
-                proxy_cache_key $host$uri$is_args$args;
-                add_header X-Cache '$upstream_cache_status from $host';
-                proxy_pass http://jumpserver;
-                expires 30d;
-                access_log off;
-
         location / {
             proxy_pass http://jumpserver;  # jumpserver
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
             # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
@@ -211,6 +178,10 @@
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
             # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
@@ -218,9 +189,11 @@
             proxy_pass       http://guacamole/;  #  guacamole
             proxy_buffering off;
             proxy_http_version 1.1;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $http_connection;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
             client_max_body_size 100m;  # Windows 文件上传大小限制
             # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;

@@ -198,19 +198,33 @@ FAQ
         location / {
                 # 这里的IP是后端服务器的IP，后端服务器就是文档一步一步安装来的
                 proxy_pass http://192.168.244.144;
-                proxy_redirect      default;
-                proxy_set_header    Host             $host;
-                proxy_set_header    X-Real-IP        $remote_addr;
-                proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
-                proxy_set_header    HTTP_X_FORWARDED_FOR $remote_addr;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_read_timeout 150;
         }
-        # 新增下面这一段
+
+        # 新增下面内容
         location /socket.io/ {
                 proxy_pass http://192.168.244.144/socket.io/;
                 proxy_buffering off;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        location /guacamole/ {
+                proxy_pass       http://192.168.244.144/guacamole/;
+                proxy_buffering off;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection $http_connection;
+                client_max_body_size 100m;  # Windows 文件上传大小限制
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
