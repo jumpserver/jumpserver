@@ -420,9 +420,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         server_name _;
 
         ## 新增如下内容，以上内容是原文内容，请从这一行开始复制
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
         location /luna/ {
             try_files $uri / /index.html;
@@ -439,26 +436,35 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;
+            proxy_pass       http://localhost:5000/socket.io/; # 如果coco安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
         }
 
         location /guacamole/ {
             proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $http_connection;
             access_log off;
             client_max_body_size 100m;  # Windows 文件上传大小限制
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
 
         location / {
             proxy_pass http://localhost:8080;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
         ## 到此结束，请不要继续复制了
 

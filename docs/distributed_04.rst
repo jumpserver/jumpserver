@@ -166,10 +166,6 @@
     server {
         listen 80;
 
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
         location /media/ {
             add_header Content-Encoding gzip;
             root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改
@@ -181,6 +177,9 @@
 
         location / {
             proxy_pass http://localhost:8080;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
 
