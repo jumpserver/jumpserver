@@ -212,10 +212,10 @@ def write_login_log(*args, **kwargs):
 
 
 def get_ip_city(ip, timeout=10):
-    # Taobao ip api: http://ip.taobao.com//service/getIpInfo.php?ip=8.8.8.8
+    # Taobao ip api: http://ip.taobao.com/service/getIpInfo.php?ip=8.8.8.8
     # Sina ip api: http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=8.8.8.8&format=json
 
-    url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
+    url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % ip
     try:
         r = requests.get(url, timeout=timeout)
     except:
@@ -224,8 +224,8 @@ def get_ip_city(ip, timeout=10):
     if r and r.status_code == 200:
         try:
             data = r.json()
-            if not isinstance(data, int) and data['ret'] == 1:
-                city = data['country'] + ' ' + data['city']
+            if not isinstance(data, int) and data['code'] == 0:
+                city = data['data']['country'] + ' ' + data['data']['city']
         except ValueError:
             pass
     return city
