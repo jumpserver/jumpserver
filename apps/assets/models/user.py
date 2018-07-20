@@ -69,7 +69,7 @@ class AdminUser(AssetUser):
 
     class Meta:
         ordering = ['name']
-        unique_together = [('name', 'org'),]
+        unique_together = [('name', 'org_id')]
         verbose_name = _("Admin user")
 
     @classmethod
@@ -157,7 +157,7 @@ class SystemUser(AssetUser):
 
     class Meta:
         ordering = ['name']
-        unique_together = [('name', 'org'),]
+        unique_together = [('name', 'org_id')]
         verbose_name = _("System user")
 
     @classmethod

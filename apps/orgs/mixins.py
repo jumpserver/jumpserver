@@ -27,9 +27,9 @@ class OrgManager(models.Manager):
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():
-            kwargs['org'] = current_org
+            kwargs['org_id'] = current_org.id
         elif current_org.is_default():
-            kwargs['org'] = None
+            kwargs['org_id'] = None
         queryset = super(OrgManager, self).get_queryset()
         queryset = queryset.filter(**kwargs)
         # print(kwargs)
@@ -53,13 +53,13 @@ class OrgManager(models.Manager):
 
 
 class OrgModelMixin(models.Model):
-    org = models.ForeignKey('orgs.Organization', on_delete=models.PROTECT, null=True)
+    org_id = models.CharField(max_length=36, null=True)
     objects = OrgManager()
 
     def save(self, *args, **kwargs):
         current_org = get_current_org()
         if current_org and current_org.is_real():
-            self.org = current_org
+            self.org_id = current_org.id
         return super(OrgModelMixin, self).save(*args, **kwargs)
 
     class Meta:

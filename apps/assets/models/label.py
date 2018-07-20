@@ -34,4 +34,4 @@ class Label(models.Model):
 
     class Meta:
         db_table = "assets_label"
-        unique_together = [('name', 'value'),]
+        unique_together = [('name', 'value')]
