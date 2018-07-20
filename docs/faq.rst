@@ -166,3 +166,51 @@ FAQ
 
     # 资产授权就是把 系统用户关联到用户 并授权到 对应的资产
     # 用户只能看到自己被授权的资产
+
+13. Web Terminal 页面经常需要重新刷新页面才能连接资产
+
+::
+
+    # 具体表现为在luna页面一会可以连接资产，一会就不行，需要多次刷新页面
+    # 如果从开发者工具里面看，可以看到部分不正常的 502 socket.io
+    # 此问题一般是由最前端一层的nginx反向代理造成的，需要在每层的代理上添加（注意是每层）
+    $ vim /etc/nginx/conf.d/jumpserver.conf  # 配置文件所在目录，自行修改
+
+    ...  # 省略
+
+    location /socket.io/ {
+                proxy_pass http://你后端的服务器url地址/socket.io/;
+                proxy_buffering off;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                access_log off;  # 不记录到 log
+    }
+    ...
+
+    # 为了便于理解，附上一份 demo 网站的配置文件参考
+    $ vim /etc/nginx/conf.d/jumpserver.conf
+    server {
+
+        listen 80;
+        server_name demo.jumpserver.org;
+
+        location / {
+                # 这里的IP是后端服务器的IP，后端服务器就是文档一步一步安装来的
+                proxy_pass http://192.168.244.144;
+                proxy_redirect      default;
+                proxy_set_header    Host             $host;
+                proxy_set_header    X-Real-IP        $remote_addr;
+                proxy_set_header    X-Forwarded-For  $proxy_add_x_forwarded_for;
+                proxy_set_header    HTTP_X_FORWARDED_FOR $remote_addr;
+                proxy_read_timeout 150;
+        }
+        # 新增下面这一段
+        location /socket.io/ {
+                proxy_pass http://192.168.244.144/socket.io/;
+                proxy_buffering off;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+        }
+    }
