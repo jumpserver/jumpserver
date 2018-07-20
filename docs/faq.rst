@@ -179,12 +179,28 @@ FAQ
     ...  # 省略
 
     location /socket.io/ {
-                proxy_pass http://你后端的服务器url地址/socket.io/;
-                proxy_buffering off;
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-                access_log off;  # 不记录到 log
+            proxy_pass http://你后端的服务器url地址/socket.io/;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;  # 不记录到 log
+    }
+
+    location /guacamole/ {
+            proxy_pass       http://你后端的服务器url地址/guacamole/;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+            client_max_body_size 100m;  # Windows 文件上传大小限制
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;  # 不记录到 log
     }
     ...
 
