@@ -11,7 +11,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import AdminUser, Node
-from ..hands import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 
 __all__ = [
     'AdminUserCreateView', 'AdminUserDetailView',

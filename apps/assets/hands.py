@@ -11,6 +11,6 @@
 """
 
 
-from common.mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from common.permissions import IsAppUser, IsSuperUser, IsValidUser, IsSuperUserOrAppUser
 from users.models import User, UserGroup

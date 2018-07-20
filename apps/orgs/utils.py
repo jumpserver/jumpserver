@@ -20,19 +20,6 @@ def get_org_from_request(request):
     return org
 
 
-def get_current_request():
-    return getattr(_thread_locals, 'request', None)
-
-
-def get_current_org():
-    org = getattr(_thread_locals, 'current_org', None)
-    return org
-
-
-def get_current_user():
-    return getattr(_thread_locals, 'user', None)
-
-
 def set_current_org(org):
     setattr(_thread_locals, 'current_org', org)
 
@@ -46,10 +33,13 @@ def set_to_root_org():
 
 
 def _find(attr):
-    if hasattr(_thread_locals, attr):
-        return getattr(_thread_locals, attr)
-    return None
+    return getattr(_thread_locals, attr, None)
 
 
-current_org = LocalProxy(get_current_org)
+def get_current_org():
+    return _find('current_org')
 
+
+current_org = LocalProxy(partial(_find, 'current_org'))
+current_user = LocalProxy(partial(_find, 'current_user'))
+current_request = LocalProxy(partial(_find, 'current_request'))

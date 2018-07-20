@@ -13,7 +13,7 @@ from common.utils import get_logger
 from common.const import create_success_msg, update_success_msg
 from orgs.mixins import OrgViewGenericMixin
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from .. import forms
 
 __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',

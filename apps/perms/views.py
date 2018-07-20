@@ -8,7 +8,7 @@ from django.views.generic.edit import DeleteView, SingleObjectMixin
 from django.urls import reverse_lazy
 from django.conf import settings
 
-from common.mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from .hands import Node, Asset, SystemUser, User, UserGroup
 from .models import AssetPermission
 from .forms import AssetPermissionForm
