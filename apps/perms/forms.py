@@ -9,7 +9,6 @@ from orgs.utils import current_org
 from .hands import User
 from .models import AssetPermission
 
-
 class AssetPermissionForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(role=User.ROLE_APP),
@@ -29,7 +28,8 @@ class AssetPermissionForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = User.objects.filter(orgs=current_org)
+            # users_field.queryset = User.objects.filter(orgs=current_org)
+            users_field.queryset = current_org.get_org_users().exclude(role=User.ROLE_APP)
 
     class Meta:
         model = AssetPermission
