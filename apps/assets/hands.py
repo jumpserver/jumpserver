@@ -12,5 +12,5 @@
 
 
 from common.permissions import AdminUserRequiredMixin
-from common.permissions import IsAppUser, IsSuperUser, IsValidUser, IsSuperUserOrAppUser
+from common.permissions import IsAppUser, IsOrgAdmin, IsValidUser, IsOrgAdminOrAppUser
 from users.models import User, UserGroup

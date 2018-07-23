@@ -16,12 +16,10 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
-from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
-    IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from orgs.utils import current_org
-from orgs.mixins import OrgViewGenericMixin
+from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -32,7 +30,7 @@ logger = get_logger(__name__)
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     filter_fields = ('username', 'email', 'name', 'id')
 
     def get_queryset(self):
@@ -43,12 +41,12 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_permissions(self):
         if self.action == "retrieve":
-            self.permission_classes = (IsSuperUserOrAppUser,)
+            self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
 
 class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     queryset = User.objects.all()
     serializer_class = ChangeUserPasswordSerializer
 
@@ -61,7 +59,7 @@ class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdateGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
@@ -106,13 +104,13 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 class UserGroupViewSet(BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupUpdateMemeberSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserToken(APIView):
@@ -288,7 +286,7 @@ class UserAuthApi(APIView):
 
 
 class UserConnectionTokenApi(APIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def post(self, request):
         user_id = request.data.get('user', '')

@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 
-
 class NoDeleteQuerySet(models.query.QuerySet):
 
     def delete(self):
