@@ -23,29 +23,29 @@ class IsAppUser(IsValidUser):
             and request.user.is_app
 
 
-class IsSuperUser(IsValidUser):
+class IsOrgAdmin(IsValidUser):
     """Allows access only to superuser"""
 
     def has_permission(self, request, view):
-        return super(IsSuperUser, self).has_permission(request, view) \
-            and request.user.is_superuser
+        return super(IsOrgAdmin, self).has_permission(request, view) \
+            and current_org.can_admin_by(request.user)
 
 
-class IsSuperUserOrAppUser(IsValidUser):
+class IsOrgAdminOrAppUser(IsValidUser):
     """Allows access between superuser and app user"""
 
     def has_permission(self, request, view):
-        return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-            and (request.user.is_superuser or request.user.is_app)
+        return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
+            and (current_org.can_admin_by(request.user) or request.user.is_app)
 
 
-class IsSuperUserOrAppUserOrUserReadonly(IsSuperUserOrAppUser):
+class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):
     def has_permission(self, request, view):
         if IsValidUser.has_permission(self, request, view) \
                 and request.method in permissions.SAFE_METHODS:
             return True
         else:
-            return IsSuperUserOrAppUser.has_permission(self, request, view)
+            return IsOrgAdminOrAppUser.has_permission(self, request, view)
 
 
 class IsCurrentUserOrReadOnly(permissions.BasePermission):
@@ -59,7 +59,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
-        elif not self.request.user:
+        elif not current_org.can_admin_by(self.request.user):
             self.raise_exception = True
             return False
         return True

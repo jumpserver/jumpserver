@@ -13,7 +13,7 @@ from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from ..hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser
+from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser
 from ..models import Asset, SystemUser, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
@@ -39,7 +39,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_queryset(self):
         queryset = super().get_queryset()\
@@ -79,7 +79,7 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):
@@ -88,7 +88,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
@@ -102,7 +102,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     Test asset admin user connectivity
     """
     queryset = Asset.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
@@ -113,7 +113,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
 
 class AssetGatewayApi(generics.RetrieveAPIView):
     queryset = Asset.objects.all()
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')

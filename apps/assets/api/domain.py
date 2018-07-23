@@ -2,12 +2,12 @@
 
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.views import APIView, Response
-from rest_framework.generics import RetrieveAPIView
+from rest_condition import Or
 
 from django.views.generic.detail import SingleObjectMixin
 
 from common.utils import get_logger
-from ..hands import IsSuperUser, IsSuperUserOrAppUser
+from common.permissions import IsOrgAdmin, IsAppUser
 from ..models import Domain, Gateway
 from ..utils import test_gateway_connectability
 from .. import serializers
@@ -19,7 +19,7 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 class DomainViewSet(BulkModelViewSet):
     queryset = Domain.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.DomainSerializer
 
     def get_serializer_class(self):
@@ -29,7 +29,7 @@ class DomainViewSet(BulkModelViewSet):
 
     def get_permissions(self):
         if self.request.query_params.get('gateway'):
-            self.permission_classes = (IsSuperUserOrAppUser,)
+            self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
 
@@ -37,12 +37,12 @@ class GatewayViewSet(BulkModelViewSet):
     filter_fields = ("domain",)
     search_fields = filter_fields
     queryset = Gateway.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.GatewaySerializer
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     model = Gateway
     object = None
 

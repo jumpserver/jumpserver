@@ -24,8 +24,8 @@ from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
-from .hands import IsSuperUserOrAppUser, IsAppUser, \
-    IsSuperUserOrAppUserOrUserReadonly
+from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser, \
+    IsOrgAdminOrAppUserOrUserReadonly
 from .backends import get_command_storage, get_multi_command_storage, \
     SessionCommandSerializer
 
@@ -35,7 +35,7 @@ logger = logging.getLogger(__file__)
 class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = TerminalSerializer
-    permission_classes = (IsSuperUserOrAppUserOrUserReadonly,)
+    permission_classes = (IsOrgAdminOrAppUserOrUserReadonly,)
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name')
@@ -104,7 +104,7 @@ class TerminalTokenApi(APIView):
 class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     session_serializer_class = SessionSerializer
     task_serializer_class = TaskSerializer
 
@@ -176,7 +176,7 @@ class StatusViewSet(viewsets.ModelViewSet):
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
@@ -194,11 +194,11 @@ class SessionViewSet(viewsets.ModelViewSet):
 class TaskViewSet(BulkModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
 
 class KillSessionAPI(APIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     model = Task
 
     def post(self, request, *args, **kwargs):
@@ -230,7 +230,7 @@ class CommandViewSet(viewsets.ViewSet):
     command_store = get_command_storage()
     multi_command_storage = get_multi_command_storage()
     serializer_class = SessionCommandSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_queryset(self):
         self.command_store.filter(**dict(self.request.query_params))
@@ -256,7 +256,7 @@ class CommandViewSet(viewsets.ViewSet):
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = ReplaySerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     session = None
     upload_to = 'replay'  # 仅添加到本地存储中
 
@@ -341,7 +341,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
 
 class SessionReplayV2ViewSet(SessionReplayViewSet):
     serializer_class = ReplaySerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     session = None
 
     def retrieve(self, request, *args, **kwargs):

@@ -17,7 +17,7 @@ from rest_framework_bulk import BulkModelViewSet
 from django.db.models import Count
 
 from common.utils import get_logger
-from ..hands import IsSuperUser
+from ..hands import IsOrgAdmin
 from ..models import Label
 from .. import serializers
 
@@ -28,7 +28,7 @@ __all__ = ['LabelViewSet']
 
 class LabelViewSet(BulkModelViewSet):
     queryset = Label.objects.annotate(asset_count=Count("assets"))
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.LabelSerializer
 
     def list(self, request, *args, **kwargs):

@@ -22,7 +22,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from ..hands import IsSuperUser
+from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
 from .. import serializers
@@ -39,7 +39,7 @@ __all__ = [
 
 class NodeViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
     def get_queryset(self):
@@ -56,7 +56,7 @@ class NodeViewSet(viewsets.ModelViewSet):
 
 
 # class NodeWithAssetsApi(generics.ListAPIView):
-#     permission_classes = (IsSuperUser,)
+#     permission_classes = (IsOrgAdmin,)
 #     serializers = serializers.NodeSerializer
 #
 #     def get_node(self):
@@ -85,7 +85,7 @@ class NodeViewSet(viewsets.ModelViewSet):
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
     instance = None
 
@@ -157,7 +157,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
 
 
 class NodeAssetsApi(generics.ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSerializer
 
     def get_queryset(self):
@@ -172,7 +172,7 @@ class NodeAssetsApi(generics.ListAPIView):
 
 class NodeAddChildrenApi(generics.UpdateAPIView):
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
 
@@ -190,7 +190,7 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 class NodeAddAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -202,7 +202,7 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -218,7 +218,7 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 class NodeReplaceAssetsApi(generics.UpdateAPIView):
     serializer_class = serializers.NodeAssetsSerializer
     queryset = Node.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     instance = None
 
     def perform_update(self, serializer):
@@ -229,7 +229,7 @@ class NodeReplaceAssetsApi(generics.UpdateAPIView):
 
 
 class RefreshNodeHardwareInfoApi(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     model = Node
 
     def get(self, request, *args, **kwargs):
@@ -242,7 +242,7 @@ class RefreshNodeHardwareInfoApi(APIView):
 
 
 class TestNodeConnectiveApi(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     model = Node
 
     def get(self, request, *args, **kwargs):
