@@ -9,6 +9,7 @@ from orgs.utils import current_org
 from .hands import User
 from .models import AssetPermission
 
+
 class AssetPermissionForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(role=User.ROLE_APP),
@@ -34,7 +35,7 @@ class AssetPermissionForm(OrgModelForm):
     class Meta:
         model = AssetPermission
         exclude = (
-            'id', 'date_created', 'created_by'
+            'id', 'date_created', 'created_by', 'org_id'
         )
         widgets = {
             'users': forms.SelectMultiple(

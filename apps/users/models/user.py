@@ -223,7 +223,7 @@ class User(AbstractUser):
             self.is_active = True
         super().save(*args, **kwargs)
         if current_org and current_org.is_real():
-            self.orgs.add(current_org)
+            self.orgs.add(current_org.id)
 
     @property
     def private_token(self):

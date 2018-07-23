@@ -2,7 +2,6 @@
 
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.views import APIView, Response
-from rest_condition import Or
 
 from django.views.generic.detail import SingleObjectMixin
 
