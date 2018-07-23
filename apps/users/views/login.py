@@ -308,7 +308,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated() and not request.user.is_first_login:
+        if request.user.is_authenticated and not request.user.is_first_login:
             return redirect(reverse('index'))
         return super().dispatch(request, *args, **kwargs)
 

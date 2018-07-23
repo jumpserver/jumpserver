@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'rest_framework',
     'rest_framework_swagger',
+    'drf_yasg',
     'django_filters',
     'bootstrap3',
     'captcha',
@@ -294,6 +295,7 @@ REST_FRAMEWORK = {
         'common.permissions.IsOrgAdmin',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
         'users.authentication.AccessKeyAuthentication',
         'users.authentication.AccessTokenAuthentication',
         'users.authentication.PrivateTokenAuthentication',
@@ -425,3 +427,12 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+}
