@@ -2,6 +2,7 @@
 #
 
 import random
+import time
 
 from rest_framework import generics, permissions
 from rest_framework.response import Response
@@ -42,6 +43,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
+        time.sleep(3)
         queryset = super().get_queryset()\
             .prefetch_related('labels', 'nodes')\
             .select_related('admin_user')

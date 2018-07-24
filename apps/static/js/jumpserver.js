@@ -250,6 +250,22 @@ function makeLabel(data) {
 var jumpserver = {};
 jumpserver.checked = false;
 jumpserver.selected = {};
+jumpserver.language = {
+    processing: "加载中",
+    search: "搜索",
+    lengthMenu: "每页  _MENU_",
+    info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
+    infoFiltered: "",
+    infoEmpty: "",
+    zeroRecords: "没有匹配项",
+    emptyTable: "没有记录",
+    paginate: {
+        first: "«",
+        previous: "‹",
+        next: "›",
+        last: "»"
+    }
+};
 jumpserver.initDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -293,21 +309,7 @@ jumpserver.initDataTable = function (options) {
         },
         columns: options.columns || [],
         select: options.select || select,
-        language: {
-            search: "搜索",
-            lengthMenu: "每页  _MENU_",
-            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
-            infoFiltered:   "",
-            infoEmpty:      "",
-            zeroRecords:    "没有匹配项",
-            emptyTable:     "没有记录",
-            paginate: {
-                first:      "«",
-                previous:   "‹",
-                next:       "›",
-                last:       "»"
-            }
-        },
+        language: jumpserver.language,
         lengthMenu: [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
@@ -343,6 +345,16 @@ jumpserver.initDataTable = function (options) {
     return table;
 };
 
+jumpserver.initStaticTable = function (selector) {
+    $(selector).DataTable({
+        "searching": false,
+        "bInfo": false,
+        "paging": false,
+        "order": [],
+        "language": jumpserver.language
+    });
+};
+
 jumpserver.initServerSideDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -374,11 +386,11 @@ jumpserver.initServerSideDataTable = function (options) {
             selector: 'td:first-child'
       };
   var table = ele.DataTable({
-        pageLength: options.pageLength || 15,
-        dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        order: options.order || [],
+        // pageLength: options.pageLength || 15,
+        // dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        // order: options.order || [],
         // select: options.select || 'multi',
-        buttons: [],
+        // buttons: [],
         columnDefs: columnDefs,
         serverSide: true,
         processing: true,
@@ -432,21 +444,7 @@ jumpserver.initServerSideDataTable = function (options) {
         },
         columns: options.columns || [],
         select: options.select || select,
-        language: {
-            search: "搜索",
-            lengthMenu: "每页  _MENU_",
-            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
-            infoFiltered:   "",
-            infoEmpty:      "",
-            zeroRecords:    "没有匹配项",
-            emptyTable:     "没有记录",
-            paginate: {
-                first:      "«",
-                previous:   "‹",
-                next:       "›",
-                last:       "»"
-            }
-        },
+        language: jumpserver.language,
         lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
     });
     table.selected = [];

@@ -44,7 +44,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'assets/asset_list.html'
 
     def get_context_data(self, **kwargs):
-        print(Node.root().name)
+        Node.root()
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),

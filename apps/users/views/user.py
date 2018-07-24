@@ -57,7 +57,7 @@ __all__ = [
 logger = get_logger(__name__)
 
 
-class UserListView(TemplateView):
+class UserListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'users/user_list.html'
 
     def get_context_data(self, **kwargs):
