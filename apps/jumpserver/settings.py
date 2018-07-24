@@ -231,7 +231,7 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
         'django_auth_ldap': {
-            'handlers': ['console', 'ansible_logs'],
+            'handlers': ['console', 'file'],
             'level': "INFO",
         },
         # 'django.db': {
@@ -377,7 +377,7 @@ CACHES = {
             'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,
-            'db':CONFIG.REDIS_DB_CACHE or 4,
+            'db': CONFIG.REDIS_DB_CACHE or 4,
         }
     }
 }

@@ -9,7 +9,7 @@ from .. import api
 
 app_name = 'orgs'
 router = DefaultRouter()
-router.register(r'', api.OrgViewSet, 'org')
+router.register(r'orgs', api.OrgViewSet, 'org')
 
 
 urlpatterns = [

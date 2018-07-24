@@ -2,12 +2,11 @@
 
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.views import APIView, Response
-from rest_condition import Or
 
 from django.views.generic.detail import SingleObjectMixin
 
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsAppUser
+from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser
 from ..models import Domain, Gateway
 from ..utils import test_gateway_connectability
 from .. import serializers
