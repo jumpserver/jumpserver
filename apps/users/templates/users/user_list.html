@@ -59,7 +59,7 @@ function initTable() {
         ele: $('#user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk=DEFAULT_PK %}">' + escape(cellData) + '</a>';
+                var detail_btn = '<a href="{% url "users:user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
             {targets: 4, createdCell: function (td, cellData) {
