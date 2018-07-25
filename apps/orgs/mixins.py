@@ -58,7 +58,7 @@ class OrgManager(models.Manager):
 
 
 class OrgModelMixin(models.Model):
-    org_id = models.CharField(max_length=36, null=True)
+    org_id = models.CharField(max_length=36, null=True, blank=True)
     objects = OrgManager()
 
     def save(self, *args, **kwargs):

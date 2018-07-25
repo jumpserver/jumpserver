@@ -29,12 +29,13 @@ class AssetPermissionForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = User.objects.filter(orgs=current_org)
+            # users_field.queryset = User.objects.filter(orgs=current_org)
+            users_field.queryset = current_org.get_org_users().exclude(role=User.ROLE_APP)
 
     class Meta:
         model = AssetPermission
         exclude = (
-            'id', 'date_created', 'created_by'
+            'id', 'date_created', 'created_by', 'org_id'
         )
         widgets = {
             'users': forms.SelectMultiple(
