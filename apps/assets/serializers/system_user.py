@@ -53,7 +53,7 @@ class SystemUserAuthSerializer(AuthSerializer):
         model = SystemUser
         fields = [
             "id", "name", "username", "protocol",
-            "password", "private_key",
+            "login_mode", "password", "private_key",
         ]
 
 

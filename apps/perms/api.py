@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk, get_object_or_none
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
@@ -72,10 +73,7 @@ class UserGrantedAssetsApi(ListAPIView):
 
         util = AssetPermissionUtil(user)
         for k, v in util.get_assets().items():
-            if k.is_unixlike():
-                system_users_granted = [s for s in v if s.protocol in ['ssh', 'telnet']]
-            else:
-                system_users_granted = [s for s in v if s.protocol in ['rdp', 'telnet']]
+            system_users_granted = [s for s in v if s.protocol == k.protocol]
             k.system_users_granted = system_users_granted
             queryset.append(k)
         return queryset
@@ -123,10 +121,7 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
-                if k.is_unixlike():
-                    system_users_granted = [s for s in v if s.protocol in ['ssh', 'telnet']]
-                else:
-                    system_users_granted = [s for s in v if s.protocol in ['rdp', 'telnet']]
+                system_users_granted = [s for s in v if s.protocol == k.protocol]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
             queryset.append(node)

@@ -55,9 +55,11 @@ class Organization(models.Model):
     def get_org_users(self):
         from users.models import User
         if self.is_default():
-            return User.objects.filter(orgs__isnull=True)
+            users = User.objects.filter(orgs__isnull=True)
         else:
-            return self.users.all()
+            users = self.users.all()
+        users = users.exclude(role=User.ROLE_APP)
+        return users
 
     def get_org_admins(self):
         if self.is_real():

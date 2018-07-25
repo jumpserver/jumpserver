@@ -4,6 +4,7 @@ from collections import OrderedDict
 import logging
 import os
 import uuid
+import copy
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
@@ -310,6 +311,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
     def retrieve(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
         self.session = get_object_or_404(Session, id=session_id)
+
         # 新版本和老版本的文件后缀不同
         session_path = self.get_session_path()  # 存在外部存储上的路径
         local_path = self.get_local_path()

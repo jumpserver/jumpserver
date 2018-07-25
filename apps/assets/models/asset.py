@@ -142,7 +142,7 @@ class Asset(OrgModelMixin):
         return False, warning
 
     def is_unixlike(self):
-        if self.platform not in ("Windows",):
+        if self.platform not in ("Windows", "Windows2016"):
             return True
         else:
             return False

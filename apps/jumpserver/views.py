@@ -10,6 +10,7 @@ from users.models import User
 from assets.models import Asset
 from terminal.models import Session
 from common.permissions import AdminUserRequiredMixin
+from orgs.utils import current_org
 
 
 class IndexView(AdminUserRequiredMixin, TemplateView):
@@ -27,7 +28,7 @@ class IndexView(AdminUserRequiredMixin, TemplateView):
 
     @staticmethod
     def get_user_count():
-        return User.objects.filter(role__in=('Admin', 'User')).count()
+        return current_org.get_org_users().count()
 
     @staticmethod
     def get_asset_count():
@@ -49,7 +50,6 @@ class IndexView(AdminUserRequiredMixin, TemplateView):
 
     def get_week_login_asset_count(self):
         return self.session_week.count()
-        # return self.session_week.values('asset').distinct().count()
 
     def get_month_day_metrics(self):
         month_str = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']

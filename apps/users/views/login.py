@@ -52,6 +52,7 @@ class UserLoginView(FormView):
     redirect_field_name = 'next'
     key_prefix_captcha = "_LOGIN_INVALID_{}"
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
+    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -65,7 +66,7 @@ class UserLoginView(FormView):
         # limit login authentication
         ip = get_login_ip(request)
         username = self.request.POST.get('username')
-        key_limit = self.key_prefix_limit.format(ip, username)
+        key_limit = self.key_prefix_limit.format(username, ip)
         if is_block_login(key_limit):
             return self.render_to_response(self.get_context_data(block_login=True))
 
@@ -91,8 +92,9 @@ class UserLoginView(FormView):
 
         # limit user login failed count
         ip = get_login_ip(self.request)
-        key_limit = self.key_prefix_limit.format(ip, username)
-        set_user_login_failed_count_to_cache(key_limit)
+        key_limit = self.key_prefix_limit.format(username, ip)
+        key_block = self.key_prefix_block.format(username)
+        set_user_login_failed_count_to_cache(key_limit, key_block)
 
         # show captcha
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)

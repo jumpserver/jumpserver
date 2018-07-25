@@ -29,6 +29,8 @@ urlpatterns = [
         api.UserResetPKApi.as_view(), name='user-public-key-reset'),
     url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/pubkey/update/$',
         api.UserUpdatePKApi.as_view(), name='user-public-key-update'),
+    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/unblock/$',
+        api.UserUnblockPKApi.as_view(), name='user-unblock'),
     url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/groups/$',
         api.UserUpdateGroupApi.as_view(), name='user-update-group'),
     url(r'^groups/(?P<pk>[0-9a-zA-Z\-]{36})/users/$',
