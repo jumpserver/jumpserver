@@ -23,10 +23,10 @@ __all__ = [
 class OrgManager(models.Manager):
 
     def get_queryset(self):
+        queryset = super(OrgManager, self).get_queryset()
         kwargs = {}
         if not hasattr(tl, 'times'):
             tl.times = 0
-
         print("[{}]>>>>>>>>>> Get query set".format(tl.times))
         print(current_org)
         if not current_org:
@@ -34,11 +34,8 @@ class OrgManager(models.Manager):
         elif current_org.is_real():
             kwargs['org_id'] = current_org.id
         elif current_org.is_default():
-            kwargs['org_id'] = None
-        queryset = super(OrgManager, self).get_queryset()
+            queryset = queryset.filter(org_id="").filter(org_id__isnull=True)
         queryset = queryset.filter(**kwargs)
-        # print(kwargs)
-        # print(queryset.query)
         tl.times += 1
         return queryset
 

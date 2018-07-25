@@ -3,8 +3,10 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from orgs.mixins import OrgModelMixin
 
-class FTPLog(models.Model):
+
+class FTPLog(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
     remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
