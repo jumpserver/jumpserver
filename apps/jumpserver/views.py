@@ -176,3 +176,6 @@ class LunaView(View):
         如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
         """
         return HttpResponse(msg)
+
+
+

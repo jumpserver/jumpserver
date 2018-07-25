@@ -20,7 +20,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = Asset
         list_serializer_class = BulkListSerializer
         fields = '__all__'
-        validators = []  # If not set to [], partial bulk update will be error
+        # validators = []  # If not set to [], partial bulk update will be error
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

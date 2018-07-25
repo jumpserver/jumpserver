@@ -386,11 +386,10 @@ jumpserver.initServerSideDataTable = function (options) {
             selector: 'td:first-child'
       };
   var table = ele.DataTable({
-        // pageLength: options.pageLength || 15,
-        // dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        // order: options.order || [],
-        // select: options.select || 'multi',
-        // buttons: [],
+        pageLength: options.pageLength || 15,
+        dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        order: options.order || [],
+        buttons: [],
         columnDefs: columnDefs,
         serverSide: true,
         processing: true,
@@ -475,8 +474,7 @@ jumpserver.initServerSideDataTable = function (options) {
                 }
             })
         }
-    }).
-    on('draw', function(){
+    }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
         var table_data = [];
