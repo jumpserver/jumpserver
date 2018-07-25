@@ -45,10 +45,6 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
-class AssetManager(OrgManager):
-    pass
-
-
 class Asset(OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
@@ -131,7 +127,7 @@ class Asset(OrgModelMixin):
     comment = models.TextField(max_length=128, default='', blank=True,
                                verbose_name=_('Comment'))
 
-    objects = AssetManager()
+    objects = OrgManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
