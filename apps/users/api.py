@@ -103,7 +103,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 
 class UserUnblockPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = UserSerializer
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
     key_prefix_block = "_LOGIN_BLOCK_{}"
