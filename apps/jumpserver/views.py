@@ -21,10 +21,10 @@ class IndexView(AdminUserRequiredMixin, TemplateView):
     session_month_dates = []
     session_month_dates_archive = []
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not request.user.is_org_admin:
             return redirect('assets:user-asset-list')
-        return super(IndexView, self).get(request, *args, **kwargs)
+        return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod
     def get_user_count():
