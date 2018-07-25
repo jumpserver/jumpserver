@@ -3,6 +3,7 @@
 from threading import local
 
 from django.db import models
+from django.db.models import Q
 from django.shortcuts import redirect
 import warnings
 from django.forms import ModelForm
@@ -34,7 +35,7 @@ class OrgManager(models.Manager):
         elif current_org.is_real():
             kwargs['org_id'] = current_org.id
         elif current_org.is_default():
-            queryset = queryset.filter(org_id="").filter(org_id__isnull=True)
+            queryset = queryset.filter(Q(org_id="") | Q(org_id__isnull=True))
         queryset = queryset.filter(**kwargs)
         tl.times += 1
         return queryset
@@ -61,7 +62,7 @@ class OrgModelMixin(models.Model):
     def save(self, *args, **kwargs):
         if current_org and current_org.is_real():
             self.org_id = current_org.id
-        return super(OrgModelMixin, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

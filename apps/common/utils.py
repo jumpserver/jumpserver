@@ -68,10 +68,8 @@ class Signer(metaclass=Singleton):
         self.secret_key = secret_key
 
     def sign(self, value):
-        if isinstance(value, bytes):
-            value = value.decode("utf-8")
         s = JSONWebSignatureSerializer(self.secret_key)
-        return s.dumps(value)
+        return s.dumps(value).decode()
 
     def unsign(self, value):
         if value is None:

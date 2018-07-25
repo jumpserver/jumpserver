@@ -24,8 +24,7 @@ from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
-from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser, \
-    IsOrgAdminOrAppUserOrUserReadonly
+from common.permissions import IsAppUser, IsOrgAdminOrAppUser
 from .backends import get_command_storage, get_multi_command_storage, \
     SessionCommandSerializer
 
@@ -35,7 +34,7 @@ logger = logging.getLogger(__file__)
 class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = TerminalSerializer
-    permission_classes = (IsOrgAdminOrAppUserOrUserReadonly,)
+    permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name')
@@ -238,13 +237,14 @@ class CommandViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
         if serializer.is_valid():
+            print(serializer.validated_data)
             ok = self.command_store.bulk_save(serializer.validated_data)
             if ok:
                 return Response("ok", status=201)
             else:
                 return Response("Save error", status=500)
         else:
-            msg = "Not valid: {}".format(serializer.errors)
+            msg = "Command not valid: {}".format(serializer.errors)
             logger.error(msg)
             return Response({"msg": msg}, status=401)
 
