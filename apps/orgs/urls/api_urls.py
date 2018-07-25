@@ -2,10 +2,17 @@
 #
 
 from django.conf.urls import url
-from .. import views
+
+from rest_framework.routers import DefaultRouter
+from .. import api
+
 
 app_name = 'orgs'
+router = DefaultRouter()
+router.register(r'orgs', api.OrgViewSet, 'org')
+
 
 urlpatterns = [
-    # url(r'^(?P<pk>[0-9a-zA-Z\-]{36})/$', views.OrgDetailView.as_view(), name='asset-index')
 ]
+
+urlpatterns += router.urls

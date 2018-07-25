@@ -86,7 +86,18 @@ class LDAPTestingAPI(APIView):
 
 class DjangoSettingsAPI(APIView):
     def get(self, request):
-        return Response('Danger, Close now')
+        if not settings.DEBUG:
+            return Response("Not in debug mode")
+
+        data = {}
+        for k, v in settings.__dict__.items():
+            if k and k.isupper():
+                try:
+                    json.dumps(v)
+                    data[k] = v
+                except (json.JSONDecodeError, TypeError):
+                    data[k] = str(v)
+        return Response(data)
 
 
 

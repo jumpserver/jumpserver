@@ -64,9 +64,12 @@
             <span class="nav-label">{% trans 'Web terminal' %}</span>
             </a>
         </li>
+        {% if request.user.is_superuser %}
         <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
+        {% endif %}
     </ul>
 </li>
+{% if request.user.is_superuser %}
 <li id="ops">
     <a>
         <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
@@ -75,6 +78,7 @@
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
     </ul>
 </li>
+{% endif %}
 <li id="audits">
     <a>
         <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
@@ -92,11 +96,13 @@
 {#        <li id="download"><a href="">{% trans 'File download' %}</a></li>#}
 {#    </ul>#}
 {#</li>#}
+{% if request.user.is_superuser %}
 <li id="settings">
     <a href="{% url 'settings:basic-setting' %}">
         <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
+{% endif %}
 
 <script>
 $(document).ready(function () {

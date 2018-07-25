@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from threading import local
+
 from django.db import models
 from django.shortcuts import redirect
 import warnings
@@ -11,9 +13,6 @@ from .utils import current_org, set_current_org
 from .models import Organization
 
 logger = get_logger(__file__)
-
-from threading import local
-
 tl = local()
 
 __all__ = [
@@ -73,7 +72,7 @@ class OrgModelMixin(models.Model):
 
 class OrgViewGenericMixin:
     def dispatch(self, request, *args, **kwargs):
-        print("Crrent org: {}".format(current_org))
+        print("Current org: {}".format(current_org))
         if not current_org:
             return redirect('orgs:switch-a-org')
 
@@ -83,6 +82,8 @@ class OrgViewGenericMixin:
                 print("Is org admin")
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
+        else:
+            print(current_org.can_admin_by(request.user))
         return super().dispatch(request, *args, **kwargs)
 
 

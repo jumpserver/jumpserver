@@ -4,16 +4,15 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
-from orgs.mixins import OrgViewGenericMixin
+from common.permissions import AdminUserRequiredMixin
 
 
-class IndexView(LoginRequiredMixin, OrgViewGenericMixin, TemplateView):
+class IndexView(AdminUserRequiredMixin, TemplateView):
     template_name = 'index.html'
 
     session_week = None

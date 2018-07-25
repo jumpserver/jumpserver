@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'rest_framework',
     'rest_framework_swagger',
+    'drf_yasg',
     'django_filters',
     'bootstrap3',
     'captcha',
@@ -230,7 +231,7 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
         'django_auth_ldap': {
-            'handlers': ['console', 'ansible_logs'],
+            'handlers': ['console', 'file'],
             'level': "INFO",
         },
         # 'django.db': {
@@ -294,6 +295,7 @@ REST_FRAMEWORK = {
         'common.permissions.IsOrgAdmin',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
         'users.authentication.AccessKeyAuthentication',
         'users.authentication.AccessTokenAuthentication',
         'users.authentication.PrivateTokenAuthentication',
@@ -375,7 +377,7 @@ CACHES = {
             'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,
-            'db':CONFIG.REDIS_DB_CACHE or 4,
+            'db': CONFIG.REDIS_DB_CACHE or 4,
         }
     }
 }
@@ -425,3 +427,12 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+}

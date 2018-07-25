@@ -195,7 +195,7 @@ class User(AbstractUser):
 
     @property
     def is_org_admin(self):
-        if self.is_superuser or self.admin_orgs:
+        if self.is_superuser or self.admin_orgs.exists():
             return True
         else:
             return False
@@ -223,7 +223,7 @@ class User(AbstractUser):
             self.is_active = True
         super().save(*args, **kwargs)
         if current_org and current_org.is_real():
-            self.orgs.add(current_org)
+            self.orgs.add(current_org.id)
 
     @property
     def private_token(self):

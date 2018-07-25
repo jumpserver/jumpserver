@@ -16,6 +16,8 @@ _thread_locals = local()
 
 def get_org_from_request(request):
     oid = request.session.get("oid")
+    if not oid:
+        oid = request.META.get("HTTP_X_JMS_ORG")
     org = Organization.get_instance(oid)
     return org
 
