@@ -2,8 +2,9 @@
 #
 
 import random
+import time
 
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
@@ -39,9 +40,10 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
+        time.sleep(3)
         queryset = super().get_queryset()\
             .prefetch_related('labels', 'nodes')\
             .select_related('admin_user')

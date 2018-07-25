@@ -3,6 +3,8 @@
 
 from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import redirect
+from django.http.response import HttpResponseForbidden
 
 from orgs.utils import current_org
 
@@ -21,6 +23,18 @@ class IsAppUser(IsValidUser):
     def has_permission(self, request, view):
         return super(IsAppUser, self).has_permission(request, view) \
             and request.user.is_app
+
+
+class IsSuperUser(IsValidUser):
+    def has_permission(self, request, view):
+        return super(IsSuperUser, self).has_permission(request, view) \
+               and request.user.is_superuser
+
+
+class IsSuperUserOrAppUser(IsSuperUser):
+    def has_permission(self, request, view):
+        return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
+            and (request.user.is_superuser or request.user.is_app)
 
 
 class IsOrgAdmin(IsValidUser):
@@ -63,3 +77,18 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             self.raise_exception = True
             return False
         return True
+
+    def dispatch(self, request, *args, **kwargs):
+        print("Current org: {}".format(current_org))
+        if not current_org:
+            return redirect('orgs:switch-a-org')
+
+        if not current_org.can_admin_by(request.user):
+            print("{} cannot admin {}".format(request.user, current_org))
+            if request.user.is_org_admin:
+                print("Is org admin")
+                return redirect('orgs:switch-a-org')
+            return HttpResponseForbidden()
+        else:
+            print(current_org.can_admin_by(request.user))
+        return super().dispatch(request, *args, **kwargs)

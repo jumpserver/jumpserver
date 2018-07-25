@@ -9,13 +9,28 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.utils.encoding import iri_to_uri
+from rest_framework import permissions
 
-from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
+# from rest_framework.schemas import get_schema_view
+# from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 from .views import IndexView, LunaView
 
-schema_view = get_schema_view(title='Users API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
+# schema_view = get_schema_view(title='Users API', renderer_classes=[OpenAPIRenderer, SwaggerUIRenderer])
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
 api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>\w+)/(?P<extra>.*)$')
 
 
@@ -85,5 +100,7 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
 
 if settings.DEBUG:
     urlpatterns += [
-        url(r'^docs/', schema_view, name="docs"),
+        url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
+        url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=None), name="docs"),
+        url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=None), name='redoc'),
     ]

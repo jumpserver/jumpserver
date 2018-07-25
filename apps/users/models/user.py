@@ -195,7 +195,7 @@ class User(AbstractUser):
 
     @property
     def is_org_admin(self):
-        if self.is_superuser or self.admin_orgs:
+        if self.is_superuser or self.admin_orgs.exists():
             return True
         else:
             return False
