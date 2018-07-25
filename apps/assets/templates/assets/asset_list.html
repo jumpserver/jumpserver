@@ -10,6 +10,7 @@
 
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+{#    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">#}
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
 	<style type="text/css">
@@ -27,6 +28,10 @@
             list-style: none;
             background-clip: padding-box;
          }
+        .dataTables_wrapper .dataTables_processing {
+            opacity: .9;
+            border: none;
+        }
         div#rMenu li{
         	margin: 1px 0;
         	cursor: pointer;
@@ -34,20 +39,6 @@
          }
         .dropdown a:hover {
             background-color: #f1f1f1
-        }
-
-        .dataTables_wrapper .dataTables_processing {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            width: 30%;
-            height: 40px;
-            margin-left: -20%;
-            margin-top: -25px;
-            padding-top: 20px;
-            text-align: center;
-            font-size: 1.2em;
-            background: none;
         }
 	</style>
 
