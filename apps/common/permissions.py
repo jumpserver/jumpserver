@@ -80,6 +80,9 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
 
     def dispatch(self, request, *args, **kwargs):
         print("Current org: {}".format(current_org))
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
         if not current_org:
             return redirect('orgs:switch-a-org')
 
