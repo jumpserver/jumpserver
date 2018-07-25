@@ -73,10 +73,7 @@ class UserGrantedAssetsApi(ListAPIView):
 
         util = AssetPermissionUtil(user)
         for k, v in util.get_assets().items():
-            if k.is_unixlike():
-                system_users_granted = [s for s in v if s.protocol in ['ssh', 'telnet']]
-            else:
-                system_users_granted = [s for s in v if s.protocol in ['rdp', 'telnet']]
+            system_users_granted = [s for s in v if s.protocol == k.protocol]
             k.system_users_granted = system_users_granted
             queryset.append(k)
         return queryset
@@ -124,10 +121,7 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
-                if k.is_unixlike():
-                    system_users_granted = [s for s in v if s.protocol in ['ssh', 'telnet']]
-                else:
-                    system_users_granted = [s for s in v if s.protocol in ['rdp', 'telnet']]
+                system_users_granted = [s for s in v if s.protocol == k.protocol]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
             queryset.append(node)
