@@ -252,7 +252,7 @@ FAQ
 
     # 这是因为系统用户的协议和资产的协议不一致导致的
     # 检查系统用户的协议和资产的协议
-    # 如果是更新了版本出现的问题，请执行下面代码解决
+    # 如果是更新了版本 Windows资产 出现的问题，请执行下面代码解决
     $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps
     $ python manage.py shell
