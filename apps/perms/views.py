@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 
 from common.permissions import AdminUserRequiredMixin
+from orgs.utils import current_org
 from .hands import Node, Asset, SystemUser, User, UserGroup
 from .models import AssetPermission
 from .forms import AssetPermissionForm
@@ -87,7 +88,6 @@ class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
             'system_users_remain': SystemUser.objects.exclude(
                 granted_by_permissions=self.object
             ),
-
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -108,7 +108,7 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
     object = None
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset = AssetPermission.objects.all())
+        self.object = self.get_object(queryset=AssetPermission.objects.all())
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -116,11 +116,13 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
+
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': User.objects.exclude(asset_permissions=self.object)
-                .exclude(role=User.ROLE_APP),
+            'users_remain': current_org.get_org_users().exclude(
+                asset_permissions=self.object
+            ),
             'user_groups_remain': UserGroup.objects.exclude(
                 asset_permissions=self.object
             )
