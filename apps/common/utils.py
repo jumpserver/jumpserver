@@ -16,6 +16,7 @@ import calendar
 import threading
 from io import StringIO
 import uuid
+from functools import wraps
 
 import paramiko
 import sshpubkeys
@@ -395,3 +396,17 @@ class TeeObj:
     def close(self):
         self.file_obj.close()
 
+
+def with_cache(func):
+    cache = {}
+    key = "_{}.{}".format(func.__module__, func.__name__)
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        cached = cache.get(key)
+        if cached:
+            return cached
+        res = func(*args, **kwargs)
+        cache[key] = res
+        return res
+    return wrapper

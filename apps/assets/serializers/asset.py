@@ -12,35 +12,10 @@ __all__ = [
 ]
 
 
-class NodeTMPSerializer(serializers.ModelSerializer):
-    parent = serializers.SerializerMethodField()
-    assets_amount = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
-        list_serializer_class = BulkListSerializer
-
-    @staticmethod
-    def get_parent(obj):
-        return obj.parent.id
-
-    @staticmethod
-    def get_assets_amount(obj):
-        return obj.get_all_assets().count()
-
-    def get_fields(self):
-        fields = super().get_fields()
-        field = fields["key"]
-        field.required = False
-        return fields
-
-
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     资产的数据结构
     """
-
     class Meta:
         model = Asset
         list_serializer_class = BulkListSerializer
@@ -61,14 +36,14 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
-    nodes = NodeTMPSerializer(many=True, read_only=True)
+    # nodes = NodeTMPSerializer(many=True, read_only=True)
 
     class Meta:
         model = Asset
         fields = (
             "id", "hostname", "ip", "port", "system_users_granted",
-            "is_active", "system_users_join", "os", 'domain', "nodes",
-            "platform", "comment"
+            "is_active", "system_users_join", "os", 'domain',
+            "platform", "comment", "protocol",
         )
 
     @staticmethod

@@ -173,14 +173,14 @@ function APIUpdateAttr(props) {
         }
         if (typeof props.success === 'function') {
             return props.success(data);
-        } 
+        }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
             toastr.error(fail_message);
         }
         if (typeof props.error === 'function') {
             return props.error(jqXHR.responseText);
-        } 
+        }
     });
   // return true;
 }
@@ -198,7 +198,8 @@ function objectDelete(obj, name, url, redirectTo) {
             }
         };
         var fail = function() {
-            swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            swal("错误", "[ "+name+" ]"+"正在被资产使用中，请先解除资产绑定", "error");
         };
         APIUpdateAttr({
             url: url,
@@ -219,7 +220,7 @@ function objectDelete(obj, name, url, redirectTo) {
         confirmButtonText: '确认',
         closeOnConfirm: true,
     }, function () {
-        doDelete()       
+        doDelete()
     });
 }
 
@@ -272,7 +273,7 @@ jumpserver.initDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      {className: 'text-center', targets: '_all'}
+      {className: 'text-center', render: $.fn.dataTable.render.text(), targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {
@@ -608,4 +609,92 @@ function setUrlParam(url, name, value) {
         url += newParam.join("&")
     }
     return url
+}
+
+// 校验密码-改变规则颜色
+function checkPasswordRules(password, minLength) {
+    if (wordMinLength(password, minLength)) {
+        $('#rule_SECURITY_PASSWORD_MIN_LENGTH').css('color', 'green')
+    }
+    else {
+        $('#rule_SECURITY_PASSWORD_MIN_LENGTH').css('color', '#908a8a')
+    }
+
+    if (wordUpperCase(password)) {
+        $('#rule_SECURITY_PASSWORD_UPPER_CASE').css('color', 'green');
+    }
+    else {
+        $('#rule_SECURITY_PASSWORD_UPPER_CASE').css('color', '#908a8a')
+    }
+
+    if (wordLowerCase(password)) {
+        $('#rule_SECURITY_PASSWORD_LOWER_CASE').css('color', 'green')
+    }
+    else {
+        $('#rule_SECURITY_PASSWORD_LOWER_CASE').css('color', '#908a8a')
+    }
+
+    if (wordNumber(password)) {
+        $('#rule_SECURITY_PASSWORD_NUMBER').css('color', 'green')
+    }
+    else {
+        $('#rule_SECURITY_PASSWORD_NUMBER').css('color', '#908a8a')
+    }
+
+    if (wordSpecialChar(password)) {
+        $('#rule_SECURITY_PASSWORD_SPECIAL_CHAR').css('color', 'green')
+    }
+    else {
+        $('#rule_SECURITY_PASSWORD_SPECIAL_CHAR').css('color', '#908a8a')
+    }
+}
+
+// 最小长度
+function wordMinLength(word, minLength) {
+    //var minLength = {{ min_length }};
+    var re = new RegExp("^(.{" + minLength + ",})$");
+    return word.match(re)
+}
+// 大写字母
+function wordUpperCase(word) {
+    return word.match(/([A-Z]+)/)
+}
+// 小写字母
+function wordLowerCase(word) {
+    return word.match(/([a-z]+)/)
+}
+// 数字字符
+function wordNumber(word) {
+    return word.match(/([\d]+)/)
+}
+// 特殊字符
+function wordSpecialChar(word) {
+    return word.match(/[`,~,!,@,#,\$,%,\^,&,\*,\(,\),\-,_,=,\+,\{,\},\[,\],\|,\\,;,',:,",\,,\.,<,>,\/,\?]+/)
+}
+
+// 显示弹窗密码规则
+function popoverPasswordRules(password_check_rules, $el) {
+    var message = "";
+    jQuery.each(password_check_rules, function (idx, rules) {
+        message += "<li id=" + rules.id + " style='list-style-type:none;'> <i class='fa fa-check-circle-o' style='margin-right:10px;' ></i>" + rules.label + "</li>";
+    });
+    //$('#id_password_rules').html(message);
+    $el.html(message)
+}
+
+// 初始化弹窗popover
+function initPopover($container, $progress, $idPassword, $el, password_check_rules){
+    options = {};
+    // User Interface
+    options.ui = {
+        container: $container,
+        viewports: {
+            progress: $progress
+            //errors: $('.popover-content')
+        },
+        showProgressbar: true,
+        showVerdictsInsideProgressBar: true
+    };
+    $idPassword.pwstrength(options);
+    popoverPasswordRules(password_check_rules, $el);
 }

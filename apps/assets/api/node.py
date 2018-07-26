@@ -31,7 +31,7 @@ from .. import serializers
 logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi',
-    'NodeAssetsApi', 'NodeWithAssetsApi',
+    'NodeAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi',
     'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
@@ -42,14 +42,7 @@ __all__ = [
 class NodeViewSet(BulkModelViewSet):
     queryset = Node.objects.all()
     permission_classes = (IsSuperUser,)
-    # serializer_class = serializers.NodeSerializer
-
-    def get_serializer_class(self):
-        show_current_asset = self.request.query_params.get('show_current_asset')
-        if show_current_asset:
-            return serializers.NodeCurrentSerializer
-        else:
-            return serializers.NodeSerializer
+    serializer_class = serializers.NodeSerializer
 
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()
@@ -57,32 +50,32 @@ class NodeViewSet(BulkModelViewSet):
         serializer.save()
 
 
-class NodeWithAssetsApi(generics.ListAPIView):
-    permission_classes = (IsSuperUser,)
-    serializers = serializers.NodeSerializer
-
-    def get_node(self):
-        pk = self.kwargs.get('pk') or self.request.query_params.get('node')
-        if not pk:
-            node = Node.root()
-        else:
-            node = get_object_or_404(Node, pk)
-        return node
-
-    def get_queryset(self):
-        queryset = []
-        node = self.get_node()
-        children = node.get_children()
-        assets = node.get_assets()
-        queryset.extend(list(children))
-
-        for asset in assets:
-            node = Node()
-            node.id = asset.id
-            node.parent = node.id
-            node.value = asset.hostname
-            queryset.append(node)
-        return queryset
+# class NodeWithAssetsApi(generics.ListAPIView):
+#     permission_classes = (IsSuperUser,)
+#     serializers = serializers.NodeSerializer
+#
+#     def get_node(self):
+#         pk = self.kwargs.get('pk') or self.request.query_params.get('node')
+#         if not pk:
+#             node = Node.root()
+#         else:
+#             node = get_object_or_404(Node, pk)
+#         return node
+#
+#     def get_queryset(self):
+#         queryset = []
+#         node = self.get_node()
+#         children = node.get_children()
+#         assets = node.get_assets()
+#         queryset.extend(list(children))
+#
+#         for asset in assets:
+#             node = Node()
+#             node.id = asset.id
+#             node.parent = node.id
+#             node.value = asset.hostname
+#             queryset.append(node)
+#         return queryset
 
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
@@ -123,7 +116,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         if not pk:
-            node = Node.root()
+            node = None
         else:
             node = get_object_or_404(Node, pk=pk)
         return node
@@ -133,7 +126,8 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         query_all = self.request.query_params.get("all")
         query_assets = self.request.query_params.get('assets')
         node = self.get_object()
-        if node == Node.root():
+        if node is None:
+            node = Node.root()
             queryset.append(node)
         if query_all:
             children = node.get_all_children()
@@ -146,9 +140,9 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
             for asset in assets:
                 node_fake = Node()
                 node_fake.id = asset.id
-                node_fake.parent = node
-                node_fake.value = asset.hostname
                 node_fake.is_node = False
+                node_fake.parent_id = node.id
+                node_fake.value = asset.hostname
                 queryset.append(node_fake)
         queryset = sorted(queryset, key=lambda x: x.is_node, reverse=True)
         return queryset
@@ -184,9 +178,7 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
         for node in children:
             if not node:
                 continue
-            # node.parent = instance
-            # node.save()
-            node.set_parent(instance)
+            node.parent = instance
         return Response("OK")
 
 

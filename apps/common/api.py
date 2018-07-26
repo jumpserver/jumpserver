@@ -21,23 +21,13 @@ class MailTestingAPI(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
-            kwargs = {
-                "host": serializer.validated_data["EMAIL_HOST"],
-                "port": serializer.validated_data["EMAIL_PORT"],
-                "username": serializer.validated_data["EMAIL_HOST_USER"],
-                "password": serializer.validated_data["EMAIL_HOST_PASSWORD"],
-                "use_ssl": serializer.validated_data["EMAIL_USE_SSL"],
-                "use_tls": serializer.validated_data["EMAIL_USE_TLS"]
-            }
-            connection = get_connection(timeout=5, **kwargs)
+            for k, v in serializer.validated_data.items():
+                if k.startswith('EMAIL'):
+                    setattr(settings, k, v)
             try:
-                connection.open()
-            except Exception as e:
-                return Response({"error": str(e)}, status=401)
-
-            try:
-                send_mail("Test", "Test smtp setting", email_host_user,
-                          [email_host_user], connection=connection)
+                subject = "Test"
+                message = "Test smtp setting"
+                send_mail(subject, message,  email_host_user, [email_host_user])
             except Exception as e:
                 return Response({"error": str(e)}, status=401)
 

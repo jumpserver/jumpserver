@@ -63,22 +63,26 @@ def on_system_user_assets_change(sender, instance=None, **kwargs):
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_changed(sender, instance=None, **kwargs):
-    if isinstance(instance, Asset) and kwargs['action'] == 'post_add':
-        logger.debug("Asset node change signal received")
-        nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users_assets = defaultdict(set)
-        system_users = SystemUser.objects.filter(nodes__in=nodes)
-        for system_user in system_users:
-            system_users_assets[system_user].update({instance})
-        for system_user, assets in system_users_assets.items():
-            system_user.assets.add(*tuple(assets))
+    if isinstance(instance, Asset):
+        if kwargs['action'] == 'post_add':
+            logger.debug("Asset node change signal received")
+            nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+            system_users_assets = defaultdict(set)
+            system_users = SystemUser.objects.filter(nodes__in=nodes)
+            # 清理节点缓存
+            for system_user in system_users:
+                system_users_assets[system_user].update({instance})
+            for system_user, assets in system_users_assets.items():
+                system_user.assets.add(*tuple(assets))
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_assets_changed(sender, instance=None, **kwargs):
-    if isinstance(instance, Node) and kwargs['action'] == 'post_add':
-        logger.debug("Node assets change signal received")
+    if isinstance(instance, Node):
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users = SystemUser.objects.filter(nodes=instance)
-        for system_user in system_users:
-            system_user.assets.add(*tuple(assets))
+        if kwargs['action'] == 'post_add':
+            logger.debug("Node assets change signal received")
+            # 重新关联系统用户和资产的关系
+            system_users = SystemUser.objects.filter(nodes=instance)
+            for system_user in system_users:
+                system_user.assets.add(*tuple(assets))
