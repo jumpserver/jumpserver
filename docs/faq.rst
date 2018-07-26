@@ -244,3 +244,10 @@ FAQ
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
+
+14. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
+
+::
+
+    # 这是因为系统用户的协议和资产的协议不一致导致的
+    # 检查系统用户的协议和资产的协议
