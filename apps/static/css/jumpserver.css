@@ -335,13 +335,13 @@ div.dataTables_wrapper div.dataTables_filter {
 
 .nav-header, body.mini-navbar .nav-header {
     padding: 0;
-    background: #202c37;
+    /*background: #202c37;*/
 }
 
 .profile-element div:first-child {
     line-height: 60px;
     /*width: 70px;*/
-    float: left;
+    /*float: left;*/
     text-align: center;
 }
 
