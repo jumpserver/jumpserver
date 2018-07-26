@@ -19,6 +19,7 @@ Windows 资产连接错误排查思路
     # 如果终端不在线，请检查 Windows 组件是否已经正常运行，可用 docker ps 命令查询，安装文档有说明
 
     # 重新注册 Windows 组件
+    # 在Jumpserver后台 会话管理-终端管理 删掉 guacamole 的注册
     $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
     $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
     $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里，如果不存在直接下一步
