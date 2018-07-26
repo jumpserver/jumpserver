@@ -3,6 +3,7 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
+   Ldap 使用说明 <faq_ldap.rst>
    Sftp 使用说明 <faq_sftp.rst>
    Telnet 使用说明 <faq_telnet.rst>
    安装过程 常见问题 <faq_install.rst>
