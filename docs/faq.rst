@@ -95,9 +95,9 @@ FAQ
     $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps
     $ python manage.py shell
-    $ from celery.task.control import discard_all
-    $ discard_all()
-    $ exit()
+    >>> from celery.task.control import discard_all
+    >>> discard_all()
+    >>> exit()
     $ cd /opt/jumpserver
     $ ./jms restart celery
 
@@ -252,4 +252,10 @@ FAQ
 
     # 这是因为系统用户的协议和资产的协议不一致导致的
     # 检查系统用户的协议和资产的协议
-    # 请更新至最新代码，此问题已经解决
+    # 如果是更新了版本 Windows资产 出现的问题，请执行下面代码解决
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ python manage.py shell
+    >>> from assets.models import Asset
+    >>> Asset.objects.filter(platform__startswith='Win').update(protocol='rdp')
+    >>> exit()
