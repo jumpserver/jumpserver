@@ -26,7 +26,7 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = Node
         fields = [
             'id', 'key', 'name', 'value', 'parent',
-            'assets_granted', 'assets_amount',
+            'assets_granted', 'assets_amount', 'org_id',
         ]
 
     @staticmethod
@@ -48,7 +48,10 @@ class NodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
+        fields = [
+            'id', 'key', 'value', 'parent', 'assets_amount',
+            'is_node', 'org_id',
+        ]
         list_serializer_class = BulkListSerializer
 
     def validate(self, data):
