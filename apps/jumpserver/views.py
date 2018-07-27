@@ -22,7 +22,7 @@ class IndexView(AdminUserRequiredMixin, TemplateView):
     session_month_dates_archive = []
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_org_admin:
+        if not request.user.is_authenticated or not request.user.is_org_admin:
             return redirect('assets:user-asset-list')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 

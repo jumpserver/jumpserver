@@ -31,7 +31,7 @@ schema_view = get_schema_view(
    public=True,
    permission_classes=(permissions.AllowAny,),
 )
-api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>\w+)/(?P<extra>.*)$')
+api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
 
 
 class HttpResponseTemporaryRedirect(HttpResponse):
@@ -43,12 +43,12 @@ class HttpResponseTemporaryRedirect(HttpResponse):
 
 
 @csrf_exempt
-def redirect_old_format_api(request, *args, **kwargs):
+def redirect_new_format_api(request, *args, **kwargs):
     path, query = request.path, request.GET.urlencode()
     matched = api_url_pattern.match(path)
     if matched:
-        app, version, extra = matched.groups()
-        path = '/api/{version}/{app}/{extra}?{query}'.format(**{
+        version, app, extra = matched.groups()
+        path = '/api/{app}/{version}/{extra}?{query}'.format(**{
             "app": app, "version": version, "extra": extra,
             "query": query
         })
@@ -58,14 +58,14 @@ def redirect_old_format_api(request, *args, **kwargs):
 
 
 v1_api_patterns = [
-    url(r'^users/', include('users.urls.api_urls', namespace='api-users')),
-    url(r'^assets/', include('assets.urls.api_urls', namespace='api-assets')),
-    url(r'^perms/', include('perms.urls.api_urls', namespace='api-perms')),
-    url(r'^terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
-    url(r'^ops/', include('ops.urls.api_urls', namespace='api-ops')),
-    url(r'^audits/', include('audits.urls.api_urls', namespace='api-audits')),
-    url(r'^orgs/', include('orgs.urls.api_urls', namespace='api-orgs')),
-    url(r'^common/', include('common.urls.api_urls', namespace='api-common')),
+    url(r'^users/v1/', include('users.urls.api_urls', namespace='api-users')),
+    url(r'^assets/v1/', include('assets.urls.api_urls', namespace='api-assets')),
+    url(r'^perms/v1/', include('perms.urls.api_urls', namespace='api-perms')),
+    url(r'^terminal/v1/', include('terminal.urls.api_urls', namespace='api-terminal')),
+    url(r'^ops/v1/', include('ops.urls.api_urls', namespace='api-ops')),
+    url(r'^audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
+    url(r'^orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
+    url(r'^common/v1/', include('common.urls.api_urls', namespace='api-common')),
 ]
 
 app_view_patterns = [
@@ -84,8 +84,8 @@ urlpatterns = [
     url(r'^luna/', LunaView.as_view(), name='luna-error'),
     url(r'^settings/', include('common.urls.view_urls', namespace='settings')),
     url(r'^common/', include('common.urls.view_urls', namespace='common')),
-    url(r'^api/v1/', include(v1_api_patterns)),
-    url(r'^api/(?P<app>.*)/v1/.*', redirect_old_format_api),
+    url(r'^api/v1/.*', redirect_new_format_api),
+    url(r'^api/', include(v1_api_patterns)),
 
     # Api url view map
     # External apps url
