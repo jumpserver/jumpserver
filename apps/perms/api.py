@@ -9,6 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk, get_object_or_none
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
+from orgs.mixins import RootOrgViewMixin
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
@@ -236,7 +237,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         return assets
 
 
-class ValidateUserAssetPermissionView(APIView):
+class ValidateUserAssetPermissionView(RootOrgViewMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     @staticmethod

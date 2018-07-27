@@ -10,7 +10,7 @@ from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 
 from common.utils import get_logger
-from .utils import current_org, set_current_org
+from .utils import current_org, set_current_org, set_to_root_org
 from .models import Organization
 
 logger = get_logger(__file__)
@@ -82,6 +82,12 @@ class OrgViewGenericMixin:
             return HttpResponseForbidden()
         else:
             print(current_org.can_admin_by(request.user))
+        return super().dispatch(request, *args, **kwargs)
+
+
+class RootOrgViewMixin:
+    def dispatch(self, request, *args, **kwargs):
+        set_to_root_org()
         return super().dispatch(request, *args, **kwargs)
 
 
