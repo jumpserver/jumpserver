@@ -25,7 +25,7 @@ class AssetPermissionManager(OrgManager):
 
 class AssetPermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', related_name='asset_permissions', blank=True, verbose_name=_("User"))
     user_groups = models.ManyToManyField('users.UserGroup', related_name='asset_permissions', blank=True, verbose_name=_("User group"))
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
@@ -39,6 +39,9 @@ class AssetPermission(OrgModelMixin):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
+
+    class Meta:
+        unique_together = [('org_id', 'name')]
 
     def __str__(self):
         return self.name
