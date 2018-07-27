@@ -42,13 +42,6 @@ class NodeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
-    def get_queryset(self):
-        # queryset = super(NodeViewSet, self).get_queryset()
-        print("API GET QUWRYSET")
-        # print(get_current_org())
-        # print(queryset)
-        return Node.objects.all()
-
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()
         serializer.validated_data["key"] = child_key

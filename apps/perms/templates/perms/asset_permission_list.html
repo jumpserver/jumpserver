@@ -240,9 +240,12 @@ function initTree() {
     var zNodes = [];
     $.get("{% url 'api-assets:node-children-2' %}?assets=1&all=", function(data, status){
         $.each(data, function (index, value) {
-            value["pId"] = value["parent"];
+             if (value["parent"] !== value["id"]){
+                value["pId"] = value["parent"];
+            } else {
+                value["isParent"] = true;
+            }
             value["name"] = value["value"];
-            value["open"] = value["key"] === "0";
             value["isParent"] = value["is_node"];
             value["iconSkin"] = value["is_node"] ? null : 'file';
         });
