@@ -92,9 +92,6 @@ urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
 ]
 urlpatterns += app_view_patterns
-
-# urlpatterns = wrapper_patterns_with_org(urlpatterns)
-
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
