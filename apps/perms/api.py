@@ -14,6 +14,8 @@ from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
 from . import serializers
+from orgs.utils import set_current_org
+from orgs.models import Organization
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
@@ -128,6 +130,7 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         return queryset
 
     def get_permissions(self):
+        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
