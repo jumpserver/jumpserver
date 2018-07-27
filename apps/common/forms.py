@@ -181,7 +181,7 @@ class SecuritySettingForm(BaseForm):
     )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
-        initial=3, min_value=3,
+        initial=7, min_value=3,
         label=_("Limit the number of login failures")
     )
     # limit login time

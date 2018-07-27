@@ -43,7 +43,7 @@ class Gateway(AssetUser):
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocol = models.CharField(choices=PROTOCOL_CHOICES, max_length=16, default=SSH_PROTOCOL, verbose_name=_("Protocol"))
-    domain = models.ForeignKey(Domain, verbose_name=_("Domain"))
+    domain = models.ForeignKey(Domain, verbose_name=_("Domain"), on_delete=models.CASCADE)
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 

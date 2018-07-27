@@ -4,7 +4,6 @@ from collections import OrderedDict
 import logging
 import os
 import uuid
-import copy
 
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
@@ -16,12 +15,13 @@ from django.conf import settings
 
 import jms_storage
 
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 from rest_framework_bulk import BulkModelViewSet
 
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, is_uuid
+from .hands import SystemUser
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
@@ -187,8 +187,13 @@ class SessionViewSet(viewsets.ModelViewSet):
         return self.queryset
 
     def perform_create(self, serializer):
-        if self.request.user.terminal:
+        if hasattr(self.request.user, 'terminal'):
             serializer.validated_data["terminal"] = self.request.user.terminal
+        sid = serializer.validated_data["system_user"]
+        if is_uuid(sid):
+            _system_user = SystemUser.get_system_user_by_id_or_cached(sid)
+            if _system_user:
+                serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
 
 
