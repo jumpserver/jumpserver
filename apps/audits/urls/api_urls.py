@@ -12,7 +12,6 @@ router = DefaultRouter()
 router.register(r'ftp-log', api.FTPLogViewSet, 'ftp-log')
 
 urlpatterns = [
-#    url(r'^celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', api.CeleryTaskLogApi.as_view(), name='celery-task-log'),
 ]
 
 urlpatterns += router.urls

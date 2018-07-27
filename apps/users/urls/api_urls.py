@@ -3,7 +3,7 @@
 #
 from __future__ import absolute_import
 
-from django.conf.urls import url
+from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 from .. import api
 
@@ -15,26 +15,19 @@ router.register(r'groups', api.UserGroupViewSet, 'user-group')
 
 
 urlpatterns = [
-    # url(r'', api.UserListView.as_view()),
-    url(r'^token/$', api.UserToken.as_view(), name='user-token'),
-    url(r'^connection-token/$', api.UserConnectionTokenApi.as_view(), name='connection-token'),
-    url(r'^profile/$', api.UserProfile.as_view(), name='user-profile'),
-    url(r'^auth/$', api.UserAuthApi.as_view(), name='user-auth'),
-    url(r'^otp/auth/$', api.UserOtpAuthApi.as_view(), name='user-otp-auth'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/password/$',
-        api.ChangeUserPasswordApi.as_view(), name='change-user-password'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/password/reset/$',
-        api.UserResetPasswordApi.as_view(), name='user-reset-password'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/pubkey/reset/$',
-        api.UserResetPKApi.as_view(), name='user-public-key-reset'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/pubkey/update/$',
-        api.UserUpdatePKApi.as_view(), name='user-public-key-update'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/unblock/$',
-        api.UserUnblockPKApi.as_view(), name='user-unblock'),
-    url(r'^users/(?P<pk>[0-9a-zA-Z\-]{36})/groups/$',
-        api.UserUpdateGroupApi.as_view(), name='user-update-group'),
-    url(r'^groups/(?P<pk>[0-9a-zA-Z\-]{36})/users/$',
-        api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
+    # path(r'', api.UserListView.as_view()),
+    path('token/', api.UserToken.as_view(), name='user-token'),
+    path('connection-token/', api.UserConnectionTokenApi.as_view(), name='connection-token'),
+    path('profile/', api.UserProfile.as_view(), name='user-profile'),
+    path('auth/', api.UserAuthApi.as_view(), name='user-auth'),
+    path('otp/auth/', api.UserOtpAuthApi.as_view(), name='user-otp-auth'),
+    path('users/<uuid:pk>/password/', api.ChangeUserPasswordApi.as_view(), name='change-user-password'),
+    path('users/<uuid:pk>/password/reset/', api.UserResetPasswordApi.as_view(), name='user-reset-password'),
+    path('users/<uuid:pk>/pubkey/reset/', api.UserResetPKApi.as_view(), name='user-public-key-reset'),
+    path('users/<uuid:pk>/pubkey/update/', api.UserUpdatePKApi.as_view(), name='user-public-key-update'),
+    path('users/<uuid:pk>/unblock/', api.UserUnblockPKApi.as_view(), name='user-unblock'),
+    path('users/<uuid:pk>/groups/', api.UserUpdateGroupApi.as_view(), name='user-update-group'),
+    path('groups/<uuid:pk>/users/', api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
 ]
 
 urlpatterns += router.urls
