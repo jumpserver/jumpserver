@@ -29,9 +29,9 @@ Windows 资产连接错误排查思路
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      registry.jumpserver.org/public/guacamole:latest
+      jumpserver/guacamole:latest
 
-    # 如果registry.jumpserver.org/public/guacamole:latest下载很慢，可以换成jumpserver/guacamole:latest
+    # 如果不是镜像不是jumpserver/guacamole 请更换 registry.jumpserver.org/public/guacamole
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
     $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
