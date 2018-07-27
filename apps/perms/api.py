@@ -101,6 +101,7 @@ class UserGrantedNodesApi(ListAPIView):
         return nodes.keys()
 
     def get_permissions(self):
+        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
@@ -157,6 +158,7 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         return assets
 
     def get_permissions(self):
+        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
