@@ -114,7 +114,7 @@ class Node(OrgModelMixin):
         args = []
         kwargs = {}
         if self.is_default_node():
-            args.append(Q(nodes__key__regex=pattern) | Q(nodes__key=None))
+            args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
         else:
             kwargs['nodes__key__regex'] = pattern
         assets = Asset.objects.filter(*args, **kwargs)
