@@ -384,13 +384,13 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get update
     $ apt-get install docker-ce
 
-    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1 ，可以更换 jumpserver/guacamole:latest
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1 ，可以更换 registry.jumpserver.org/public/guacamole:latest
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      registry.jumpserver.org/public/guacamole:latest
+      jumpserver/guacamole:latest
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 

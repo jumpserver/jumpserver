@@ -259,3 +259,27 @@ FAQ
     >>> from assets.models import Asset
     >>> Asset.objects.filter(platform__startswith='Win').update(protocol='rdp')
     >>> exit()
+
+15. 重启服务器后无法访问 Jumpserver，页面提示502 或者 403等
+
+::
+
+    # CentOS 7 临时关闭
+    $ setenforce 0  # 临时关闭 selinux，重启后失效
+    $ systemctl stop firewalld.service  # 临时关闭防火墙，重启后失效
+
+    # Centos 7 如需永久关闭，还需执行下面步骤
+    $ sed -i "s/enforcing/disabled/g" `grep enforcing -rl /etc/selinux/config`  # 禁用 selinux
+    $ systemctl disable firewalld.service  # 禁用防火墙
+
+    # Centos 7 在不关闭 selinux 和 防火墙 的情况下使用 Jumpserver
+    $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
+    $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
+    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent  # 用户HTTP/WS登录端口 coco
+    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent  # guacamole端口 docker
+      --permanent  永久生效，没有此参数重启后失效
+
+    $ firewall-cmd --reload  # 重新载入规则
+
+    # selinux 设置 http 访问权限
+    $ setsebool -P httpd_can_network_connect 1
