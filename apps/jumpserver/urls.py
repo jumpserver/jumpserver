@@ -83,7 +83,6 @@ urlpatterns = [
     path('api/v1/', redirect_format_api),
     path('api/', include(v1_api_patterns)),
 
-    # Api url view map
     # External apps url
     path('captcha/', include('captcha.urls')),
 ]
