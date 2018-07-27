@@ -48,7 +48,7 @@ class AssetCreateForm(OrgModelForm):
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
             ),
-            'platform': _("* required Must set exact system platform, Windows, Linux ..."),
+            # 'platform': _("* required Must set exact system platform, Windows, Linux ..."),
             'domain': _("If your have some network not connect with each other, you can set domain")
         }
 
@@ -88,7 +88,7 @@ class AssetUpdateForm(OrgModelForm):
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
             ),
-            'platform': _("* required Must set exact system platform, Windows, Linux ..."),
+            # 'platform': _("* required Must set exact system platform, Windows, Linux ..."),
             'domain': _("If your have some network not connect with each other, you can set domain")
         }
 
