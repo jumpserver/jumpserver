@@ -8,9 +8,10 @@
     </div>
 {#    <div class="clearfix"></div>#}
     <div class="logo-element">
-        <img alt="image" height="40px" src="/static/img/logo.png"/>
+        <img alt="image" height="40" src="/static/img/logo.png"/>
     </div>
-    {% if ADMIN_ORGS and ADMIN_ORGS|length != 1 %}
+    {{ request.COOKIE.IN_ADMIN_PAGE  }}
+    {% if ADMIN_ORGS and ADMIN_ORGS|length != 1 and request.COOKIES.IN_ADMIN_PAGE != 'No' %}
     <div style="height: 55px;">
         <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="display: block; background-color: transparent; color: #8095a8; padding: 14px 20px 14px 25px">
             <i class="fa fa-bookmark" style="width: 14px; "></i>
