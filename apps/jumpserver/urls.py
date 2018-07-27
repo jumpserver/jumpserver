@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import re
 
 from django.conf.urls import url, include
+from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.response import Response
@@ -58,7 +59,7 @@ def redirect_format_api(request, *args, **kwargs):
 
 
 v1_api_patterns = [
-    url(r'^users/v1/', include('users.urls.api_urls', namespace='api-users')),
+    path('users/v1/', include('users.urls.api_urls', namespace='api-users')),
     url(r'^assets/v1/', include('assets.urls.api_urls', namespace='api-assets')),
     url(r'^perms/v1/', include('perms.urls.api_urls', namespace='api-perms')),
     url(r'^terminal/v1/', include('terminal.urls.api_urls', namespace='api-terminal')),
@@ -69,7 +70,7 @@ v1_api_patterns = [
 ]
 
 app_view_patterns = [
-    url(r'^users/', include('users.urls.views_urls', namespace='users')),
+    path('users/', include('users.urls.views_urls', namespace='users')),
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
     url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
