@@ -6,7 +6,6 @@ from .models import Organization
 
 
 def org_processor(request):
-    print('Crernt Org', current_org.name)
     context = {
         'ADMIN_ORGS': Organization.get_user_admin_orgs(request.user),
         'CURRENT_ORG': get_current_org(),

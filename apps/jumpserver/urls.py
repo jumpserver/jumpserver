@@ -17,12 +17,12 @@ from .views import IndexView, LunaView
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Jumpserver API Docs",
       default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
+      description="Jumpserver Restful api docs",
+      terms_of_service="https://www.jumpserver.org",
+      contact=openapi.Contact(email="support@fit2cloud.com"),
+      license=openapi.License(name="GPLv2 License"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
@@ -80,7 +80,7 @@ urlpatterns = [
     path('luna/', LunaView.as_view(), name='luna-error'),
     path('settings/', include('common.urls.view_urls', namespace='settings')),
     path('common/', include('common.urls.view_urls', namespace='common')),
-    re_path(r'^api/v1/.*', redirect_format_api),
+    path('api/v1/', redirect_format_api),
     path('api/', include(v1_api_patterns)),
 
     # Api url view map
