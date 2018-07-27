@@ -17,7 +17,8 @@ logger = get_logger(__file__)
 tl = local()
 
 __all__ = [
-    'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm'
+    'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
+    'RootOrgViewMixin',
 ]
 
 
