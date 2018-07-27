@@ -110,15 +110,21 @@ class Node(OrgModelMixin):
 
     def get_all_assets(self):
         from .asset import Asset
-        if self.is_root():
-            assets = Asset.objects.all()
+        pattern = r'^{0}$|^{0}:'.format(self.key)
+        args = []
+        kwargs = {}
+        if self.is_default_node():
+            args.append(Q(nodes__key__regex=pattern) | Q(nodes__key=None))
         else:
-            pattern = r'^{0}$|^{0}:'.format(self.key)
-            assets = Asset.objects.filter(nodes__key__regex=pattern)
+            kwargs['nodes__key__regex'] = pattern
+        assets = Asset.objects.filter(*args, **kwargs)
         return assets
 
     def get_all_valid_assets(self):
         return self.get_all_assets().valid()
+
+    def is_default_node(self):
+        return self.is_root() and self.key == '0'
 
     def is_root(self):
         if self.key.isdigit():
@@ -129,7 +135,7 @@ class Node(OrgModelMixin):
     @property
     def parent(self):
         if self.is_root():
-            return self.__class__.root()
+            return self
         parent_key = ":".join(self.key.split(":")[:-1])
         try:
             parent = self.__class__.objects.get(key=parent_key)
@@ -139,17 +145,17 @@ class Node(OrgModelMixin):
 
     @parent.setter
     def parent(self, parent):
-        if self.is_node:
-            children = self.get_all_children()
-            old_key = self.key
-            with transaction.atomic():
-                self.key = parent.get_next_child_key()
-                for child in children:
-                    child.key = child.key.replace(old_key, self.key, 1)
-                    child.save()
-                self.save()
-        else:
-            self.key = parent.key+':fake'
+        if not self.is_node:
+            self.key = parent.key + ':fake'
+            return
+        children = self.get_all_children()
+        old_key = self.key
+        with transaction.atomic():
+            self.key = parent.get_next_child_key()
+            for child in children:
+                child.key = child.key.replace(old_key, self.key, 1)
+                child.save()
+            self.save()
 
     def get_ancestor(self, with_self=False):
         if self.is_root():
@@ -175,7 +181,7 @@ class Node(OrgModelMixin):
             set_current_org(Organization.root())
             org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
             org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
-            max_value = max([int(k) for k in org_nodes_roots_keys]) if org_nodes_roots_keys else 0
+            max_value = max([int(k) for k in org_nodes_roots_keys]) if org_nodes_roots_keys else -1
             set_current_org(_current_org)
             root = cls.objects.create(key=str(max_value+1), value=_current_org.name)
             return root
