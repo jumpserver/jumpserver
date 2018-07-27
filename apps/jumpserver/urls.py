@@ -43,7 +43,7 @@ class HttpResponseTemporaryRedirect(HttpResponse):
 
 
 @csrf_exempt
-def redirect_new_format_api(request, *args, **kwargs):
+def redirect_format_api(request, *args, **kwargs):
     path, query = request.path, request.GET.urlencode()
     matched = api_url_pattern.match(path)
     if matched:
@@ -84,7 +84,7 @@ urlpatterns = [
     url(r'^luna/', LunaView.as_view(), name='luna-error'),
     url(r'^settings/', include('common.urls.view_urls', namespace='settings')),
     url(r'^common/', include('common.urls.view_urls', namespace='common')),
-    url(r'^api/v1/.*', redirect_new_format_api),
+    url(r'^api/v1/.*', redirect_format_api),
     url(r'^api/', include(v1_api_patterns)),
 
     # Api url view map
