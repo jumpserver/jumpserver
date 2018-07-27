@@ -40,14 +40,15 @@
 
 ::
 
-    $ docker pull registry.jumpserver.org/public/guacamole:latest
+    $ docker pull jumpserver/guacamole:latest
+    # 如果镜像不是 jumpserver/guacamole，请修改成 registry.jumpserver.org/public/guacamole
     $ docker stop jms_guacamole  # 或者写guacamole的容器ID
     $ docker rename jms_guacamole jms_guacamole_bak  # 如果名称不正确请手动修改
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写Jumpserver的url地址> \
-      registry.jumpserver.org/public/guacamole:latest
+      jumpserver/guacamole:latest
 
     # 确定升级完成后，可以删除备份容器
     $ docker rm jms_guacamole_bak
