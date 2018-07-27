@@ -427,20 +427,19 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
-修改下面 docker run 里的 JUMPSERVER_SERVER 参数，填上 Jumpserver 的 url 地址, 启动成功后去
-Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册，如果页面显示不正常可以等部署完成后再处理
+启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册，如果页面显示不正常可以等部署完成后再处理
 
 .. code:: shell
 
 
     # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
-    # 不能使用 127.0.0.1 ，可以更换 jumpserver/guacamole:latest
+    # 不能使用 127.0.0.1 ，可以更换 registry.jumpserver.org/public/guacamole:latest
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      registry.jumpserver.org/public/guacamole:latest
+      jumpserver/guacamole:latest
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -462,7 +461,7 @@ Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/term
     # CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     ... 省略
-    # 把默认server配置块改成这样
+    # 把默认server配置块改成这样，原有的内容请保持不动
 
     server {
         listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
