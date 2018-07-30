@@ -306,6 +306,7 @@
 
         # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
         # LOG_LEVEL = 'INFO'
+        LOG_LEVEL = 'WARN'
 
         # 日志存放的目录
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
