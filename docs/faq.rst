@@ -117,17 +117,7 @@ FAQ
 
 ::
 
-    $ cd /opt/jumpserver/apps
-    $ python manage.py makemigrations
-    $ python manage.py migrate --fake
-    $ find . | grep migrations | grep apps | grep -v 'pyc' | grep -v '__init__'
-    # 把这里的内容和下面数据库查询的内容对比
-
-    # mysql -uroot
-    > use jumpserver;
-    > select * from django_migrations;
-    # 如果对比结果不一样则无法升级
-    > quit;
+    # 数据库表结构文件丢失，请参考离线升级文档，把备份的数据库表文件还原
 
 9. 设置浏览器过期
 

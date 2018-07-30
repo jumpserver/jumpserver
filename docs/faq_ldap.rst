@@ -49,3 +49,5 @@ LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
     # 如：{"username": "uid", "name": "sn", "email": "mail"} 或 {"username": "sAMAccountName", "name": "cn", "email": "mail"}
     # "username": "uid" 这里的 uid 必须和上面的 (uid=%(user)s) 这里的 uid 一致
     # 如果上面是(sAMAccountName=%(user)s) 那么下面也应该修改为{"username": "sAMAccountName",
+    # username 是 jumpserver 的用户用户名，name 是 jumpserver 的用户名称，mail 是 jumpserver 用户的邮箱
+    # 属性映射的意思是把ldap的什么属性来作为jumpserver的用户用户名，把ldap的什么属性作为jumpserver的用户名称，把ldap的什么属性作为jumpserver的用户邮箱
