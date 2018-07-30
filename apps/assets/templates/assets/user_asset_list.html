@@ -176,9 +176,8 @@ $(document).ready(function () {
 .on('click', '.asset_detail', function() {
     var data = asset_table.ajax.json();
     var asset_id = this.getAttribute("asset-id");
-    var tr = '';
-
-    var desc_dict = {
+    var trs = '';
+    var desc = {
         'hostname': "{% trans 'Hostname' %}",
         'ip': "{% trans 'IP' %}",
         'port': "{% trans 'Port' %}",
@@ -191,23 +190,17 @@ $(document).ready(function () {
         'comment': "{% trans 'Comment' %}"
         {#'date_joined': "{% trans 'Date joined' %}",#}
     };
-
     $.each(data, function(index, value){
         if(value.id === asset_id){
-            var copy_value = Object.assign({}, value);
-            delete copy_value.id;
-            delete copy_value.system_users_granted;
-            delete copy_value.org_id;
-            for(var i in desc_dict){
-                tr += "<tr>\n" +
-                  "<td>"+ desc_dict[i] + ":</td>"+
-                  "<td><b>"+ copy_value[i] + "</b></td>\n" +
+            for(var i in desc){
+                trs += "<tr>\n" +
+                  "<td>"+ desc[i] + ":</td>"+
+                  "<td><b>"+ (value[i] === null?'':value[i]) + "</b></td>\n" +
                   "</tr>";
             }
         }
     });
-
-    $('#asset_detail_tbody').html(tr)
+    $('#asset_detail_tbody').html(trs)
 });
 
 </script>
