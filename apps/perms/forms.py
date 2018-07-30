@@ -29,8 +29,7 @@ class AssetPermissionForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            # users_field.queryset = User.objects.filter(orgs=current_org)
-            users_field.queryset = current_org.get_org_users().exclude(role=User.ROLE_APP)
+            users_field.queryset = current_org.get_org_users()
 
     class Meta:
         model = AssetPermission

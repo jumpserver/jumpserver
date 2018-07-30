@@ -253,6 +253,12 @@ jumpserver.selected = {};
 jumpserver.language = {
     processing: "加载中",
     search: "搜索",
+    select: {
+        rows: {
+            _:  "选中 %d 项",
+            0: ""
+        }
+    },
     lengthMenu: "每页  _MENU_",
     info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
     infoFiltered: "",

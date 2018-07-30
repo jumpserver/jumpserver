@@ -9,6 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk, get_object_or_none
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
+from orgs.mixins import RootOrgViewMixin
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
@@ -86,7 +87,7 @@ class UserGrantedAssetsApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesApi(ListAPIView):
+class UserGrantedNodesApi(RootOrgViewMixin, ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = NodeSerializer
 
@@ -101,13 +102,12 @@ class UserGrantedNodesApi(ListAPIView):
         return nodes.keys()
 
     def get_permissions(self):
-        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(ListAPIView):
+class UserGrantedNodesWithAssetsApi(RootOrgViewMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeGrantedSerializer
 
@@ -131,13 +131,12 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         return queryset
 
     def get_permissions(self):
-        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
 
 
-class UserGrantedNodeAssetsApi(ListAPIView):
+class UserGrantedNodeAssetsApi(RootOrgViewMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
@@ -158,7 +157,6 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         return assets
 
     def get_permissions(self):
-        set_current_org(Organization.root())
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
@@ -241,7 +239,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         return assets
 
 
-class ValidateUserAssetPermissionView(APIView):
+class ValidateUserAssetPermissionView(RootOrgViewMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     @staticmethod

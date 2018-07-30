@@ -3,7 +3,7 @@
 from __future__ import unicode_literals, absolute_import
 
 from django.utils.translation import ugettext as _
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, TemplateView
 from django.views.generic.edit import DeleteView, SingleObjectMixin
 from django.urls import reverse_lazy
 from django.conf import settings
@@ -15,11 +15,8 @@ from .models import AssetPermission
 from .forms import AssetPermissionForm
 
 
-class AssetPermissionListView(AdminUserRequiredMixin, ListView):
-    model = AssetPermission
+class AssetPermissionListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'perms/asset_permission_list.html'
-    paginate_by = settings.DISPLAY_PER_PAGE
-    user = user_group = asset = node = system_user = q = ""
 
     def get_context_data(self, **kwargs):
         context = {
