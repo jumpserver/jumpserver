@@ -263,7 +263,8 @@ class AdHoc(models.Model):
         }
         :return:
         """
-        self._become = signer.sign(json.dumps(item)).decode('utf-8')
+        # self._become = signer.sign(json.dumps(item)).decode('utf-8')
+        self._become = signer.sign(json.dumps(item))
 
     @property
     def options(self):
