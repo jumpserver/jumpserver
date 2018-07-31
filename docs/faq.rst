@@ -43,7 +43,7 @@ FAQ
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/sysconfig/i18n
 
     # Ubuntu
-    $ apt-get install language-pack-zh-hanscd
+    $ apt-get install language-pack-zh-hans
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
 
     如果任然报input/output error，尝试执行 yum update 后重启服务器（仅测试中参考使用，实际运营服务器请谨慎操作）
