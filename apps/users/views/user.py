@@ -90,6 +90,12 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         post_user_create.send(self.__class__, user=user)
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super(UserCreateView, self).get_form_kwargs()
+        data = {'request': self.request}
+        kwargs.update(data)
+        return kwargs
+
 
 class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
@@ -122,6 +128,12 @@ class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
             )
             return self.form_invalid(form)
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super(UserUpdateView, self).get_form_kwargs()
+        data = {'request': self.request}
+        kwargs.update(data)
+        return kwargs
 
 
 class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
