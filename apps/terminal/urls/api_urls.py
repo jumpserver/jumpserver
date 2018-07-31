@@ -23,7 +23,7 @@ urlpatterns = [
          api.SessionReplayV2ViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
          name='session-replay'),
     path('tasks/kill-session/', api.KillSessionAPI.as_view(), name='kill-session'),
-    path('terminal/<uuid:terminal>/access-key', api.TerminalTokenApi.as_view(),
+    path('terminal/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
          name='terminal-access-key'),
     path('terminal/config', api.TerminalConfig.as_view(), name='terminal-config'),
     # v2: get session's replay
