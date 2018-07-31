@@ -55,7 +55,10 @@
        </div>
    </div>
 </div>
+
+{% include 'assets/_user_asset_detail_modal.html' %}
 {% endblock %}
+
 
 {% block custom_foot_js %}
 <script>
@@ -71,11 +74,15 @@ function initTable() {
     var options = {
         ele: $('#user_assets_table'),
         columnDefs: [
+            {#{targets: 1, createdCell: function (td, cellData, rowData) {#}
+            {#        {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}#}
+            {#        var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';#}
+            {#        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));#}
+            {#    }},#}
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
-                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-            }},
+                var detail_btn = '<a class="asset_detail" asset-id="rowData_id" data-toggle="modal" data-target="#user_asset_detail_modal" tabindex="0">'+ cellData +'</a>'
+                $(td).html(detail_btn.replace("rowData_id", rowData.id));
+                }},
             {targets: 3, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
@@ -165,7 +172,37 @@ function initTree() {
 
 $(document).ready(function () {
     initTree();
+})
+.on('click', '.asset_detail', function() {
+    var data = asset_table.ajax.json();
+    var asset_id = this.getAttribute("asset-id");
+    var trs = '';
+    var desc = {
+        'hostname': "{% trans 'Hostname' %}",
+        'ip': "{% trans 'IP' %}",
+        'port': "{% trans 'Port' %}",
+        'protocol': "{% trans 'Protocol' %}",
+        'platform': "{% trans 'Platform' %}",
+        'os': "{% trans 'OS' %}",
+        'system_users_join': "{% trans 'System user' %}",
+        'domain': "{% trans 'Domain' %}",
+        'is_active': "{% trans 'Is active' %}",
+        'comment': "{% trans 'Comment' %}"
+        {#'date_joined': "{% trans 'Date joined' %}",#}
+    };
+    $.each(data, function(index, value){
+        if(value.id === asset_id){
+            for(var i in desc){
+                trs += "<tr>\n" +
+                  "<td>"+ desc[i] + ":</td>"+
+                  "<td><b>"+ (value[i] === null?'':value[i]) + "</b></td>\n" +
+                  "</tr>";
+            }
+        }
+    });
+    $('#asset_detail_tbody').html(trs)
 });
+
 </script>
 
 {% endblock %}
