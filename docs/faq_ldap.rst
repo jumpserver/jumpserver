@@ -37,7 +37,7 @@ LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
 ::
 
     # DN 一定要是完整的DN，不能跳过OU，可以使用其他工具查询
-    # 如：cn=admin,ou=aaa,dc=jumpserver,dc=org，必须要写成cn=admin,ou=aaa,dc=jumpserver,ou=org 不能缩写成cn=admin,dc=jumpserver,dc=org
+    # 如：cn=admin,ou=aaa,dc=jumpserver,dc=org，必须要写成cn=admin,ou=aaa,dc=jumpserver,dc=org 不能缩写成cn=admin,dc=jumpserver,dc=org
 
     # 用户OU 用户OU可以只写顶层OU，不写子OU
     # 如：ou=aaa,ou=bbb,ou=ccc,dc=jumpserver,dc=org，可以只写ou=ccc,dc=jumpserver,dc=org，根据需求自行修改
