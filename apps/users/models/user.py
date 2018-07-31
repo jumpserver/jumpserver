@@ -118,7 +118,7 @@ class User(AbstractUser):
 
     @otp_secret_key.setter
     def otp_secret_key(self, item):
-        self._otp_secret_key = signer.sign(item).decode('utf-8')
+        self._otp_secret_key = signer.sign(item)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))

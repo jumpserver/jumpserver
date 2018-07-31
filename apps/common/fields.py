@@ -62,7 +62,7 @@ class EncryptMixin:
     def get_prep_value(self, value):
         if value is None:
             return value
-        return signer.sign(value).decode('utf-8')
+        return signer.sign(value)
 
 
 class EncryptTextField(EncryptMixin, models.TextField):
