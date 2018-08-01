@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-19 18:29+0800\n"
+"POT-Creation-Date: 2018-08-01 10:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -74,10 +74,6 @@ msgid ""
 msgstr ""
 "root或其他拥有NOPASSWD: ALL权限的用户, 如果是windows或其它硬件可以随意设置一"
 "个, 更多信息查看左侧 `管理用户` 菜单"
-
-#: assets/forms/asset.py:48 assets/forms/asset.py:88
-msgid "* required Must set exact system platform, Windows, Linux ..."
-msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
 
 #: assets/forms/asset.py:49 assets/forms/asset.py:89
 msgid ""
@@ -511,7 +507,7 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:159 audits/models.py:12
+#: assets/models/user.py:179 audits/models.py:12
 #: audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:43
 #: perms/models.py:34 perms/models.py:78
@@ -1808,6 +1804,7 @@ msgstr "内容"
 #: ops/templates/ops/task_list.html:21 ops/templates/ops/task_list.html:26
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
+#: terminal/templates/terminal/session_list.html:61
 #: users/templates/users/login_log_list.html:35
 #: users/templates/users/login_log_list.html:40
 msgid "Search"
@@ -2729,6 +2726,42 @@ msgstr "再次输入密码"
 msgid "Setting"
 msgstr "设置"
 
+#: users/templates/users/reset_password.html:105
+#: users/templates/users/user_password_update.html:98
+#: users/templates/users/user_update.html:34
+msgid "Very weak"
+msgstr "很弱"
+
+#: users/templates/users/reset_password.html:106
+#: users/templates/users/user_password_update.html:99
+#: users/templates/users/user_update.html:35
+msgid "Weak"
+msgstr "弱"
+
+#: users/templates/users/reset_password.html:107
+#: users/templates/users/user_password_update.html:100
+#: users/templates/users/user_update.html:36
+msgid "Normal"
+msgstr "正常"
+
+#: users/templates/users/reset_password.html:108
+#: users/templates/users/user_password_update.html:101
+#: users/templates/users/user_update.html:37
+msgid "Medium"
+msgstr "一般"
+
+#: users/templates/users/reset_password.html:109
+#: users/templates/users/user_password_update.html:102
+#: users/templates/users/user_update.html:38
+msgid "Strong"
+msgstr "强"
+
+#: users/templates/users/reset_password.html:110
+#: users/templates/users/user_password_update.html:103
+#: users/templates/users/user_update.html:39
+msgid "Very strong"
+msgstr "很强"
+
 #: users/templates/users/user_create.html:4
 #: users/templates/users/user_list.html:16 users/views/user.py:82
 msgid "Create user"
@@ -3184,6 +3217,9 @@ msgstr "MFA 解绑成功"
 #: users/views/user.py:561
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
+
+#~ msgid "* required Must set exact system platform, Windows, Linux ..."
+#~ msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
 
 #~ msgid "Unblock user successfully. "
 #~ msgstr "解除登录限制成功"
