@@ -78,6 +78,30 @@ class UserCreateUpdateForm(OrgModelForm):
             )
         }
 
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super(UserCreateUpdateForm, self).__init__(*args, **kwargs)
+
+        roles = []
+        # Super admin user
+        if self.request.user.is_superuser:
+            roles.append((User.ROLE_ADMIN, dict(User.ROLE_CHOICES).get(User.ROLE_ADMIN)))
+            roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+
+        # Org admin user
+        else:
+            user = kwargs.get('instance')
+            # Update
+            if user:
+                role = kwargs.get('instance').role
+                roles.append((role, dict(User.ROLE_CHOICES).get(role)))
+            # Create
+            else:
+                roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+
+        field = self.fields['role']
+        field.choices = set(roles)
+
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
         if not public_key:
