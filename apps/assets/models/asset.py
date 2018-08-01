@@ -162,6 +162,12 @@ class Asset(OrgModelMixin):
         return nodes
 
     @property
+    def org_name(self):
+        from orgs.models import Organization
+        org = Organization.get_instance(self.org_id)
+        return org.name
+
+    @property
     def hardware_info(self):
         if self.cpu_count:
             return '{} Core {} {}'.format(
