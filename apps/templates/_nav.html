@@ -80,6 +80,18 @@
 {#        <li id="download"><a href="">{% trans 'File download' %}</a></li>#}
 {#    </ul>#}
 {#</li>#}
+{% if XPACK_ENABLED %}
+<li id="xpack">
+    <a>
+        <i class="fa fa-sitemap" style="width: 14px"></i> <span class="nav-label">{% trans 'XPack' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        {% for plugin in XPACK_PLUGINS %}
+        <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
+        {% endfor %}
+    </ul>
+</li>
+{% endif %}
 {% if request.user.is_superuser %}
 <li id="settings">
     <a href="{% url 'settings:basic-setting' %}">

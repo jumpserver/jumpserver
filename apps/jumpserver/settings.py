@@ -78,6 +78,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+
+XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
+XPACK_ENABLED = os.path.isdir(XPACK_DIR)
+if XPACK_ENABLED:
+    INSTALLED_APPS.append('xpack.apps.XpackConfig')
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -94,10 +100,30 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'jumpserver.urls'
 
+
+def get_xpack_context_processor():
+    if XPACK_ENABLED:
+        return ['xpack.context_processor.xpack_processor']
+    return []
+
+
+def get_xpack_templates_dir():
+    if XPACK_ENABLED:
+        dirs = []
+        from xpack.utils import find_enabled_plugins
+        for i in find_enabled_plugins():
+            template_dir = os.path.join(BASE_DIR, 'xpack', 'plugins', i, 'templates')
+            if os.path.isdir(template_dir):
+                dirs.append(template_dir)
+        return dirs
+    else:
+        return []
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), *get_xpack_templates_dir()],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,6 +137,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.template.context_processors.media',
                 'orgs.context_processor.org_processor',
+                *get_xpack_context_processor(),
             ],
         },
     },

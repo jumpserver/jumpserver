@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 import re
+import os
 
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -73,6 +74,10 @@ app_view_patterns = [
     path('audits/', include('audits.urls.view_urls', namespace='audits')),
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
 ]
+
+XPACK_DIR = os.path.join(settings.BASE_DIR, 'xpack')
+if os.path.isdir(XPACK_DIR):
+    app_view_patterns.append(path('xpack/', include('xpack.urls', namespace='xpack')))
 
 
 urlpatterns = [
