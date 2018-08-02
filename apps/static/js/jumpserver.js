@@ -685,7 +685,7 @@ function popoverPasswordRules(password_check_rules, $el) {
 }
 
 // 初始化弹窗popover
-function initPopover($container, $progress, $idPassword, $el, password_check_rules){
+function initPopover($container, $progress, $idPassword, $el, password_check_rules, i18n_fallback){
     options = {};
     // User Interface
     options.ui = {
@@ -696,6 +696,14 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
         },
         showProgressbar: true,
         showVerdictsInsideProgressBar: true
+    };
+    options.i18n = {
+        fallback: i18n_fallback,
+        t: function (key) {
+            var result = '';
+            result = options.i18n.fallback[key];
+            return result === key ? '' : result;
+        }
     };
     $idPassword.pwstrength(options);
     popoverPasswordRules(password_check_rules, $el);
