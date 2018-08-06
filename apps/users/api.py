@@ -19,6 +19,7 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
 from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
+from .hands import Asset, SystemUser
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from .hands import Asset, SystemUser
