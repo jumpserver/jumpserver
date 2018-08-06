@@ -29,8 +29,7 @@ class OrgManager(models.Manager):
         kwargs = {}
         if not hasattr(tl, 'times'):
             tl.times = 0
-        print("[{}]>>>>>>>>>> Get query set".format(tl.times))
-        print(current_org)
+        # logger.debug("[{}]>>>>>>>>>> Get query set".format(tl.times))
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():

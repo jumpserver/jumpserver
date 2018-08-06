@@ -97,12 +97,10 @@ class Node(OrgModelMixin):
 
     def get_assets(self):
         from .asset import Asset
-        if self.is_root():
-            assets = Asset.objects.filter(
-                Q(nodes__id=self.id) | Q(nodes__isnull=True)
-            )
+        if self.is_default_node():
+            assets = Asset.objects.filter(nodes__isnull=True)
         else:
-            assets = self.assets.all()
+            assets = Asset.objects.filter(nodes__id=self.id)
         return assets
 
     def get_valid_assets(self):
@@ -133,12 +131,16 @@ class Node(OrgModelMixin):
             return False
 
     @property
+    def parent_key(self):
+        parent_key = ":".join(self.key.split(":")[:-1])
+        return parent_key
+
+    @property
     def parent(self):
         if self.is_root():
             return self
-        parent_key = ":".join(self.key.split(":")[:-1])
         try:
-            parent = self.__class__.objects.get(key=parent_key)
+            parent = self.__class__.objects.get(key=self.parent_key)
             return parent
         except Node.DoesNotExist:
             return self.__class__.root()
@@ -196,6 +198,13 @@ class Node(OrgModelMixin):
             return root[0]
         else:
             return cls.create_root_node()
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        import random
+        for i in range(count):
+            node = random.choice(cls.objects.all())
+            node.create_child('Node {}'.format(i))
 
 
 
