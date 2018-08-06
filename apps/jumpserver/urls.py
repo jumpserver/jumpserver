@@ -30,6 +30,7 @@ schema_view = get_schema_view(
 )
 api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
 
+
 class HttpResponseTemporaryRedirect(HttpResponse):
     status_code = 307
 
@@ -75,7 +76,7 @@ app_view_patterns = [
 ]
 
 if settings.XPACK_ENABLED:
-    app_view_patterns.append(path('xpack/', include('xpack.urls.views_urls', namespace='xpack')))
+    app_view_patterns.append(path('xpack/', include('xpack.urls', namespace='xpack')))
 
 
 urlpatterns = [
