@@ -342,7 +342,6 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_granted_asset.html'
-    object = None
 
     def get_context_data(self, **kwargs):
         context = {

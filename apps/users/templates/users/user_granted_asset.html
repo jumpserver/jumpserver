@@ -72,6 +72,7 @@ function initTable() {
     } else {
         inited = true;
     }
+    url = "{% url 'api-perms:user-assets' pk=object.id %}";
     var options = {
         ele: $('#user_assets_table'),
         columnDefs: [
@@ -102,15 +103,12 @@ function initTable() {
             {data: "system_users_granted", orderable: false}
         ]
     };
-    return jumpserver.initDataTable(options);
+    asset_table = jumpserver.initDataTable(options);
 }
 
 function onSelected(event, treeNode) {
     url = '{% url "api-perms:user-node-assets" pk=object.id node_id=DEFAULT_PK %}';
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>", treeNode.node_id, treeNode.id, treeNode);
     url = url.replace("{{ DEFAULT_PK }}", treeNode.node_id);
-    setCookie('node_selected', treeNode.node_id);
-    asset_table = initTable();
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
 }
@@ -153,6 +151,7 @@ function initTree() {
 
 $(document).ready(function () {
     initTree();
+    initTable();
 });
 </script>
 {% endblock %}

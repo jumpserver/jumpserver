@@ -15,8 +15,6 @@ from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
 from . import serializers
-from orgs.utils import set_current_org
-from orgs.models import Organization
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
@@ -58,7 +56,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserGrantedAssetsApi(ListAPIView):
+class UserGrantedAssetsApi(RootOrgViewMixin, ListAPIView):
     """
     用户授权的所有资产
     """
