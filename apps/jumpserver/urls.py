@@ -75,7 +75,7 @@ app_view_patterns = [
 ]
 
 if settings.XPACK_ENABLED:
-    app_view_patterns.append(path('xpack/', include('xpack.urls.views_urls', namespace='xpack')))
+    app_view_patterns.append(path('xpack/', include('xpack.urls', namespace='xpack')))
 
 
 urlpatterns = [
