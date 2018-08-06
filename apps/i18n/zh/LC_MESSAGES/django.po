@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-31 19:18+0800\n"
+"POT-Creation-Date: 2018-08-03 15:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -96,7 +96,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:225 assets/templates/assets/admin_user_list.html:25
+#: assets/models/asset.py:231 assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:23
 #: assets/templates/assets/label_list.html:16
@@ -142,6 +142,9 @@ msgstr "资产"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:52
+#: xpack/plugins/orgs/templates/orgs/org_list.html:12
+#: xpack/templates/orgs/org_list.html:12
 msgid "Name"
 msgstr "名称"
 
@@ -349,6 +352,7 @@ msgstr "创建者"
 #: perms/templates/perms/asset_permission_detail.html:94
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
 #: users/templates/users/user_group_detail.html:63
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:60
 msgid "Date created"
 msgstr "创建日期"
 
@@ -372,6 +376,9 @@ msgstr "创建日期"
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
 #: users/templates/users/user_profile.html:130
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:64
+#: xpack/plugins/orgs/templates/orgs/org_list.html:15
+#: xpack/templates/orgs/org_list.html:14
 msgid "Comment"
 msgstr "备注"
 
@@ -452,6 +459,10 @@ msgstr "默认资产组"
 #: users/models/user.py:33 users/models/user.py:348
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:380
+#: xpack/plugins/orgs/forms.py:26
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:113
+#: xpack/plugins/orgs/templates/orgs/org_list.html:14
+#: xpack/templates/orgs/org_list.html:13
 msgid "User"
 msgstr "用户"
 
@@ -787,6 +798,9 @@ msgstr "测试"
 #: users/templates/users/user_list.html:77
 #: users/templates/users/user_profile.html:151
 #: users/templates/users/user_profile.html:180
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:25
+#: xpack/plugins/orgs/templates/orgs/org_list.html:48
+#: xpack/templates/orgs/org_list.html:43
 msgid "Update"
 msgstr "更新"
 
@@ -810,6 +824,9 @@ msgstr "更新"
 #: users/templates/users/user_group_list.html:45
 #: users/templates/users/user_list.html:81
 #: users/templates/users/user_list.html:85
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:29
+#: xpack/plugins/orgs/templates/orgs/org_list.html:50
+#: xpack/templates/orgs/org_list.html:45
 msgid "Delete"
 msgstr "删除"
 
@@ -836,6 +853,8 @@ msgstr "选择节点"
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:200
 #: users/templates/users/user_profile.html:222
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
+#: xpack/templates/orgs/org_list.html:86
 msgid "Confirm"
 msgstr "确认"
 
@@ -869,6 +888,8 @@ msgstr "比例"
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:29
+#: xpack/plugins/orgs/templates/orgs/org_list.html:16
+#: xpack/templates/orgs/org_list.html:15
 msgid "Action"
 msgstr "动作"
 
@@ -1021,6 +1042,7 @@ msgstr "存在资产，不能删除"
 #: users/templates/users/user_detail.html:461
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:195
+#: xpack/templates/orgs/org_list.html:81
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
@@ -1576,7 +1598,7 @@ msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
 #: common/views.py:19 common/views.py:45 common/views.py:71 common/views.py:101
-#: common/views.py:129 templates/_nav.html:86
+#: common/views.py:129 templates/_nav.html:98
 msgid "Settings"
 msgstr "系统设置"
 
@@ -1638,6 +1660,7 @@ msgid "Become"
 msgstr "Become"
 
 #: ops/models/adhoc.py:161 users/templates/users/user_group_detail.html:59
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
 
@@ -1857,7 +1880,7 @@ msgid "Task run history"
 msgstr "执行历史"
 
 #: perms/forms.py:20 users/forms.py:265 users/forms.py:270 users/forms.py:282
-#: users/forms.py:316
+#: users/forms.py:316 xpack/plugins/orgs/forms.py:30
 msgid "Select users"
 msgstr "选择用户"
 
@@ -1911,6 +1934,8 @@ msgstr "添加资产"
 #: perms/templates/perms/asset_permission_user.html:97
 #: perms/templates/perms/asset_permission_user.html:125
 #: users/templates/users/user_group_detail.html:95
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:93
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:130
 msgid "Add"
 msgstr "添加"
 
@@ -2113,6 +2138,10 @@ msgstr "终端管理"
 #: templates/_nav.html:59
 msgid "Job Center"
 msgstr "作业中心"
+
+#: templates/_nav.html:86
+msgid "XPack"
+msgstr ""
 
 #: templates/captcha/image.html:3
 msgid "Play CAPTCHA as audio file"
@@ -2738,6 +2767,42 @@ msgstr "再次输入密码"
 msgid "Setting"
 msgstr "设置"
 
+#: users/templates/users/reset_password.html:105
+#: users/templates/users/user_password_update.html:98
+#: users/templates/users/user_update.html:34
+msgid "Very weak"
+msgstr "很弱"
+
+#: users/templates/users/reset_password.html:106
+#: users/templates/users/user_password_update.html:99
+#: users/templates/users/user_update.html:35
+msgid "Weak"
+msgstr "弱"
+
+#: users/templates/users/reset_password.html:107
+#: users/templates/users/user_password_update.html:100
+#: users/templates/users/user_update.html:36
+msgid "Normal"
+msgstr "正常"
+
+#: users/templates/users/reset_password.html:108
+#: users/templates/users/user_password_update.html:101
+#: users/templates/users/user_update.html:37
+msgid "Medium"
+msgstr "一般"
+
+#: users/templates/users/reset_password.html:109
+#: users/templates/users/user_password_update.html:102
+#: users/templates/users/user_update.html:38
+msgid "Strong"
+msgstr "强"
+
+#: users/templates/users/reset_password.html:110
+#: users/templates/users/user_password_update.html:103
+#: users/templates/users/user_update.html:39
+msgid "Very strong"
+msgstr "很强"
+
 #: users/templates/users/user_create.html:4
 #: users/templates/users/user_list.html:16 users/views/user.py:83
 msgid "Create user"
@@ -2837,6 +2902,7 @@ msgid "After unlocking the user, the user can log in normally."
 msgstr "解除用户登录限制后，此用户即可正常登录"
 
 #: users/templates/users/user_group_create_update.html:31
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
 msgstr "取消"
 
@@ -2847,27 +2913,33 @@ msgid "User group detail"
 msgstr "用户组详情"
 
 #: users/templates/users/user_group_detail.html:86
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:121
 msgid "Add user"
 msgstr "添加用户"
 
 #: users/templates/users/user_group_list.html:5 users/views/group.py:44
+#: xpack/templates/orgs/org_list.html:5
 msgid "Create user group"
 msgstr "创建用户组"
 
 #: users/templates/users/user_group_list.html:82
+#: xpack/templates/orgs/org_list.html:82
 msgid "This will delete the selected groups !!!"
 msgstr "删除选择组"
 
 #: users/templates/users/user_group_list.html:90
+#: xpack/templates/orgs/org_list.html:90
 msgid "UserGroups Deleted."
 msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:91
 #: users/templates/users/user_group_list.html:96
+#: xpack/templates/orgs/org_list.html:91 xpack/templates/orgs/org_list.html:96
 msgid "UserGroups Delete"
 msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:95
+#: xpack/templates/orgs/org_list.html:95
 msgid "UserGroup Deleting failed."
 msgstr "用户组删除失败"
 
@@ -2942,30 +3014,6 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 #: users/templates/users/user_update.html:4 users/views/user.py:112
 msgid "Update user"
 msgstr "更新用户"
-
-#: users/templates/users/user_update.html:34
-msgid "Very weak"
-msgstr "很弱"
-
-#: users/templates/users/user_update.html:35
-msgid "Weak"
-msgstr "弱"
-
-#: users/templates/users/user_update.html:36
-msgid "Normal"
-msgstr "正常"
-
-#: users/templates/users/user_update.html:37
-msgid "Medium"
-msgstr "一般"
-
-#: users/templates/users/user_update.html:38
-msgid "Strong"
-msgstr "强"
-
-#: users/templates/users/user_update.html:39
-msgid "Very strong"
-msgstr "很强"
 
 #: users/utils.py:41
 msgid "Create account successfully"
@@ -3217,6 +3265,54 @@ msgstr "MFA 解绑成功"
 #: users/views/user.py:574
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
+
+#: xpack/plugins/orgs/forms.py:14
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:76
+#: xpack/plugins/orgs/templates/orgs/org_list.html:13
+msgid "Admin"
+msgstr "管理员"
+
+#: xpack/plugins/orgs/forms.py:18
+msgid "Select admins"
+msgstr "选择管理员"
+
+#: xpack/plugins/orgs/meta.py:7
+msgid "Organization"
+msgstr "组织管理"
+
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:22
+#: xpack/plugins/orgs/views.py:73
+msgid "Org detail"
+msgstr "组织详情"
+
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:84
+msgid "Add admin"
+msgstr "添加管理员"
+
+#: xpack/plugins/orgs/templates/orgs/org_list.html:5
+msgid "Create organization "
+msgstr "创建组织"
+
+#: xpack/plugins/orgs/views.py:24
+msgid "Org"
+msgstr "组织"
+
+#: xpack/plugins/orgs/views.py:25
+msgid "Org list"
+msgstr "组织列表"
+
+#: xpack/plugins/orgs/views.py:40 xpack/plugins/orgs/views.py:56
+#: xpack/plugins/orgs/views.py:72
+msgid "Orgs"
+msgstr "组织"
+
+#: xpack/plugins/orgs/views.py:41
+msgid "Create org"
+msgstr "创建组织"
+
+#: xpack/plugins/orgs/views.py:57
+msgid "Update org"
+msgstr "更新组织"
 
 #~ msgid "* required Must set exact system platform, Windows, Linux ..."
 #~ msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."

@@ -27,7 +27,6 @@ __all__ = ['LabelViewSet']
 
 
 class LabelViewSet(BulkModelViewSet):
-    queryset = Label.objects.annotate(asset_count=Count("assets"))
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.LabelSerializer
 
@@ -36,3 +35,7 @@ class LabelViewSet(BulkModelViewSet):
             self.serializer_class = serializers.LabelDistinctSerializer
             self.queryset = self.queryset.values("name").distinct()
         return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = Label.objects.annotate(asset_count=Count("assets"))
+        return self.queryset
