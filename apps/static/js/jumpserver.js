@@ -224,6 +224,42 @@ function objectDelete(obj, name, url, redirectTo) {
     });
 }
 
+function orgDelete(obj, name, url, redirectTo){
+    function doDelete() {
+        var body = {};
+        var success = function() {
+            if (!redirectTo) {
+                $(obj).parent().parent().remove();
+            } else {
+                window.location.href=redirectTo;
+            }
+        };
+        var fail = function() {
+            swal("错误",  "[ " + name + " ] 组织中存在未删除信息，请删除后重试", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success_message: "删除成功",
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: "请先删除组织内的以下信息：",
+        text: "用户列表、用户组、资产列表、网域列表、管理用户、系统用户、标签管理、资产授权规则",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true
+    }, function () {
+        doDelete();
+    });
+}
+
 $.fn.serializeObject = function()
 {
     var o = {};
