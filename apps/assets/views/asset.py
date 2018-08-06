@@ -186,7 +186,7 @@ class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:asset-list')
 
 
-class AssetDetailView(DetailView):
+class AssetDetailView(LoginRequiredMixin, DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
@@ -203,7 +203,7 @@ class AssetDetailView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportView(View):
+class AssetExportView(LoginRequiredMixin, View):
     def get(self, request):
         spm = request.GET.get('spm', '')
         assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else []

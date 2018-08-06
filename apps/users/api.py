@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 
 from rest_framework import generics
@@ -20,6 +21,7 @@ from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
+from .hands import Asset, SystemUser
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -311,10 +313,16 @@ class UserConnectionTokenApi(APIView):
         asset_id = request.data.get('asset', '')
         system_user_id = request.data.get('system_user', '')
         token = str(uuid.uuid4())
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_user_id)
         value = {
             'user': user_id,
+            'username': user.username,
             'asset': asset_id,
-            'system_user': system_user_id
+            'hostname': asset.hostname,
+            'system_user': system_user_id,
+            'system_user_name': system_user.name
         }
         cache.set(token, value, timeout=20)
         return Response({"token": token}, status=201)
