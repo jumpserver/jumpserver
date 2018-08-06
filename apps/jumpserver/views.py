@@ -5,15 +5,15 @@ from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
-from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
 
 
-class IndexView(AdminUserRequiredMixin, TemplateView):
+class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
 
     session_week = None
@@ -22,7 +22,9 @@ class IndexView(AdminUserRequiredMixin, TemplateView):
     session_month_dates_archive = []
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated or not request.user.is_org_admin:
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if not request.user.is_org_admin:
             return redirect('assets:user-asset-list')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 

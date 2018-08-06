@@ -193,7 +193,7 @@ $(document).ready(function () {
     $.each(data, function(index, value){
         if(value.id === asset_id){
             for(var i in desc){
-                trs += "<tr>\n" +
+                trs += "<tr class='no-borders-tr'>\n" +
                   "<td>"+ desc[i] + ":</td>"+
                   "<td><b>"+ (value[i] === null?'':value[i]) + "</b></td>\n" +
                   "</tr>";
