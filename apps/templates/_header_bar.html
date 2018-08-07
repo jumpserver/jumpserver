@@ -35,7 +35,7 @@
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
                     <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs"> </i><span> {% trans 'Profile' %}</span></a></li>
-                    {% if request.user.is_superuser %}
+                    {% if request.user.is_org_admin %}
                         {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
                             <li><a id="switch_admin"><i class="fa fa-exchange"></i><span> {% trans 'Admin page' %}</span></a></li>
                         {% else %}

@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
 
+from orgs.mixins import OrgModelMixin, OrgManager
+
 
 class AssetPermissionQuerySet(models.QuerySet):
     def active(self):
@@ -16,17 +18,14 @@ class AssetPermissionQuerySet(models.QuerySet):
             .filter(date_expired__gt=timezone.now())
 
 
-class AssetPermissionManager(models.Manager):
-    def get_queryset(self):
-        return AssetPermissionQuerySet(self.model, using=self._db)
-
+class AssetPermissionManager(OrgManager):
     def valid(self):
         return self.get_queryset().valid()
 
 
-class AssetPermission(models.Model):
+class AssetPermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', related_name='asset_permissions', blank=True, verbose_name=_("User"))
     user_groups = models.ManyToManyField('users.UserGroup', related_name='asset_permissions', blank=True, verbose_name=_("User group"))
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
@@ -39,7 +38,10 @@ class AssetPermission(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
-    objects = AssetPermissionManager()
+    objects = AssetPermissionManager.from_queryset(AssetPermissionQuerySet)()
+
+    class Meta:
+        unique_together = [('org_id', 'name')]
 
     def __str__(self):
         return self.name
@@ -71,7 +73,7 @@ class AssetPermission(models.Model):
         return assets
 
 
-class NodePermission(models.Model):
+class NodePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, verbose_name=_("Node"))
     user_group = models.ForeignKey('users.UserGroup', on_delete=models.CASCADE, verbose_name=_("User group"))

@@ -29,7 +29,7 @@ from common.utils import get_object_or_none, get_logger, is_uuid
 from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
-from ..hands import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 
 
 __all__ = [
@@ -186,7 +186,7 @@ class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:asset-list')
 
 
-class AssetDetailView(DetailView):
+class AssetDetailView(LoginRequiredMixin, DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
@@ -203,7 +203,7 @@ class AssetDetailView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportView(View):
+class AssetExportView(LoginRequiredMixin, View):
     def get(self, request):
         spm = request.GET.get('spm', '')
         assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else []
@@ -211,7 +211,7 @@ class AssetExportView(View):
         fields = [
             field for field in Asset._meta.fields
             if field.name not in [
-                'date_created'
+                'date_created', 'org_id'
             ]
         ]
         filename = 'assets-{}.csv'.format(

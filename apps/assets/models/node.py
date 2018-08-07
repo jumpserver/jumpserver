@@ -5,12 +5,15 @@ import uuid
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from common.utils import with_cache
+
+from orgs.mixins import OrgModelMixin
+from orgs.utils import current_org, set_current_org, get_current_org
+from orgs.models import Organization
 
 __all__ = ['Node']
 
 
-class Node(models.Model):
+class Node(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
@@ -20,7 +23,8 @@ class Node(models.Model):
     is_node = True
 
     def __str__(self):
-        return self.full_value
+        return self.value
+        # return self.full_value
 
     def __eq__(self, other):
         return self.key == other.key
@@ -93,12 +97,10 @@ class Node(models.Model):
 
     def get_assets(self):
         from .asset import Asset
-        if self.is_root():
-            assets = Asset.objects.filter(
-                Q(nodes__id=self.id) | Q(nodes__isnull=True)
-            )
+        if self.is_default_node():
+            assets = Asset.objects.filter(nodes__isnull=True)
         else:
-            assets = self.assets.all()
+            assets = Asset.objects.filter(nodes__id=self.id)
         return assets
 
     def get_valid_assets(self):
@@ -106,49 +108,61 @@ class Node(models.Model):
 
     def get_all_assets(self):
         from .asset import Asset
-        if self.is_root():
-            assets = Asset.objects.all()
+        pattern = r'^{0}$|^{0}:'.format(self.key)
+        args = []
+        kwargs = {}
+        if self.is_default_node():
+            args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
         else:
-            pattern = r'^{0}$|^{0}:'.format(self.key)
-            assets = Asset.objects.filter(nodes__key__regex=pattern)
+            kwargs['nodes__key__regex'] = pattern
+        assets = Asset.objects.filter(*args, **kwargs)
         return assets
 
     def get_all_valid_assets(self):
         return self.get_all_assets().valid()
 
+    def is_default_node(self):
+        return self.is_root() and self.key == '0'
+
     def is_root(self):
-        return self.key == '0'
+        if self.key.isdigit():
+            return True
+        else:
+            return False
+
+    @property
+    def parent_key(self):
+        parent_key = ":".join(self.key.split(":")[:-1])
+        return parent_key
 
     @property
     def parent(self):
-        if self.key == "0" or not self.key.startswith("0"):
-            return self.__class__.root()
-        parent_key = ":".join(self.key.split(":")[:-1])
+        if self.is_root():
+            return self
         try:
-            parent = self.__class__.objects.get(key=parent_key)
+            parent = self.__class__.objects.get(key=self.parent_key)
             return parent
         except Node.DoesNotExist:
             return self.__class__.root()
 
     @parent.setter
     def parent(self, parent):
-        if self.is_node:
-            children = self.get_all_children()
-            old_key = self.key
-            with transaction.atomic():
-                self.key = parent.get_next_child_key()
-                for child in children:
-                    child.key = child.key.replace(old_key, self.key, 1)
-                    child.save()
-                self.save()
-        else:
-            self.key = parent.key+':fake'
+        if not self.is_node:
+            self.key = parent.key + ':fake'
+            return
+        children = self.get_all_children()
+        old_key = self.key
+        with transaction.atomic():
+            self.key = parent.get_next_child_key()
+            for child in children:
+                child.key = child.key.replace(old_key, self.key, 1)
+                child.save()
+            self.save()
 
     def get_ancestor(self, with_self=False):
         if self.is_root():
-            ancestor = self.__class__.objects.filter(key='0')
-            return ancestor
-
+            root = self.__class__.root()
+            return [root]
         _key = self.key.split(':')
         if not with_self:
             _key.pop()
@@ -162,10 +176,35 @@ class Node(models.Model):
         return ancestor
 
     @classmethod
+    def create_root_node(cls):
+        # 如果使用current_org 在set_current_org时会死循环
+        _current_org = get_current_org()
+        with transaction.atomic():
+            if _current_org.is_default():
+                key = '0'
+            else:
+                set_current_org(Organization.root())
+                org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
+                org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
+                key = max([int(k) for k in org_nodes_roots_keys]) + 1
+                set_current_org(_current_org)
+            root = cls.objects.create(key=key, value=_current_org.name)
+            return root
+
+    @classmethod
     def root(cls):
-        obj, created = cls.objects.get_or_create(
-            key='0', defaults={"key": '0', 'value': "ROOT"}
-        )
-        print(obj)
-        return obj
+        root = cls.objects.filter(key__regex=r'^[0-9]+$')
+        if root:
+            return root[0]
+        else:
+            return cls.create_root_node()
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        import random
+        for i in range(count):
+            node = random.choice(cls.objects.all())
+            node.create_child('Node {}'.format(i))
+
+
 

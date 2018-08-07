@@ -3,14 +3,17 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from ..models import Asset, AdminUser
 from common.utils import get_logger
+from orgs.mixins import OrgModelForm
+
+from ..models import Asset, AdminUser
+
 
 logger = get_logger(__file__)
 __all__ = ['AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm']
 
 
-class AssetCreateForm(forms.ModelForm):
+class AssetCreateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
@@ -50,7 +53,7 @@ class AssetCreateForm(forms.ModelForm):
         }
 
 
-class AssetUpdateForm(forms.ModelForm):
+class AssetUpdateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
@@ -90,7 +93,7 @@ class AssetUpdateForm(forms.ModelForm):
         }
 
 
-class AssetBulkUpdateForm(forms.ModelForm):
+class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
         required=True, help_text='* required',
         label=_('Select assets'), queryset=Asset.objects.all(),
@@ -105,7 +108,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         label=_('Port'), required=False, min_value=1, max_value=65535,
     )
     admin_user = forms.ModelChoiceField(
-        required=False, queryset=AdminUser.objects.all(),
+        required=False, queryset=AdminUser.objects,
         label=_("Admin user"),
         widget=forms.Select(
             attrs={

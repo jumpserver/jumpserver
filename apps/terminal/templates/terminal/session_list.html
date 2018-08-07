@@ -150,12 +150,7 @@
             });
         }
         $(document).ready(function() {
-            $('table').DataTable({
-                "searching": false,
-                "paging": false,
-                "bInfo" : false,
-                "order": []
-            });
+            jumpserver.initStaticTable('table');
             $('.select2').select2({
                 dropdownAutoWidth: true,
                 width: "auto"

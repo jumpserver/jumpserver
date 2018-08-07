@@ -4,7 +4,6 @@ from django.db import models
 from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.mixins import UserPassesTestMixin
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
@@ -119,11 +118,4 @@ class DatetimeSearchMixin:
         return super().get(request, *args, **kwargs)
 
 
-class AdminUserRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        if not self.request.user.is_authenticated:
-            return False
-        elif not self.request.user.is_superuser:
-            self.raise_exception = True
-            return False
-        return True
+

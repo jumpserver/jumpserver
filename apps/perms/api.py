@@ -7,7 +7,8 @@ from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpda
 from rest_framework import viewsets
 
 from common.utils import set_or_append_attr_bulk, get_object_or_none
-from users.permissions import IsValidUser, IsSuperUser, IsSuperUserOrAppUser
+from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
+from orgs.mixins import RootOrgViewMixin
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
@@ -21,7 +22,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve'):
@@ -54,11 +55,11 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserGrantedAssetsApi(ListAPIView):
+class UserGrantedAssetsApi(RootOrgViewMixin, ListAPIView):
     """
     用户授权的所有资产
     """
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -83,8 +84,8 @@ class UserGrantedAssetsApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+class UserGrantedNodesApi(RootOrgViewMixin, ListAPIView):
+    permission_classes = (IsOrgAdmin,)
     serializer_class = NodeSerializer
 
     def get_queryset(self):
@@ -103,8 +104,8 @@ class UserGrantedNodesApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+class UserGrantedNodesWithAssetsApi(RootOrgViewMixin, ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeGrantedSerializer
 
     def get_queryset(self):
@@ -132,8 +133,8 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodeAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+class UserGrantedNodeAssetsApi(RootOrgViewMixin, ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -159,7 +160,7 @@ class UserGrantedNodeAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -179,7 +180,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodesApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = NodeSerializer
 
     def get_queryset(self):
@@ -195,7 +196,7 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
 
 class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = NodeGrantedSerializer
 
     def get_queryset(self):
@@ -218,7 +219,7 @@ class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -235,8 +236,8 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         return assets
 
 
-class ValidateUserAssetPermissionView(APIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+class ValidateUserAssetPermissionView(RootOrgViewMixin, APIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     @staticmethod
     def get(request):
@@ -260,7 +261,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
     """
     将用户从授权中移除，Detail页面会调用
     """
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionUpdateUserSerializer
     queryset = AssetPermission.objects.all()
 
@@ -277,7 +278,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
 
 
 class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionUpdateUserSerializer
     queryset = AssetPermission.objects.all()
 
@@ -297,7 +298,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
     """
     将用户从授权中移除，Detail页面会调用
     """
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionUpdateAssetSerializer
     queryset = AssetPermission.objects.all()
 
@@ -314,7 +315,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
 
 
 class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetPermissionUpdateAssetSerializer
     queryset = AssetPermission.objects.all()
 

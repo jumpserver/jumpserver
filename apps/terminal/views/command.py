@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.template import loader
 import time
 
-from common.mixins import DatetimeSearchMixin, AdminUserRequiredMixin
+from common.mixins import DatetimeSearchMixin
+from common.permissions import AdminUserRequiredMixin
 from ..models import Command
 from .. import utils
 from ..backends import get_multi_command_storage

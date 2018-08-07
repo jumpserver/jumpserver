@@ -2,7 +2,8 @@ from django.conf import settings
 from django.views.generic import ListView
 from django.utils.translation import ugettext as _
 
-from common.mixins import AdminUserRequiredMixin, DatetimeSearchMixin
+from common.mixins import DatetimeSearchMixin
+from common.permissions import AdminUserRequiredMixin
 
 from .models import FTPLog
 

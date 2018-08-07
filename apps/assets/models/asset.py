@@ -13,6 +13,7 @@ from django.core.cache import cache
 
 from ..const import ASSET_ADMIN_CONN_CACHE_KEY
 from .user import AdminUser, SystemUser
+from orgs.mixins import OrgModelMixin,OrgManager
 
 __all__ = ['Asset']
 logger = logging.getLogger(__name__)
@@ -44,12 +45,7 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
-class AssetManager(models.Manager):
-    def get_queryset(self):
-        return AssetQuerySet(self.model, using=self._db)
-
-
-class Asset(models.Model):
+class Asset(OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -71,16 +67,11 @@ class Asset(models.Model):
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'),
-                                      db_index=True)
-    hostname = models.CharField(max_length=128, unique=True,
-                                verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL,
-                                choices=PROTOCOL_CHOICES,
-                                verbose_name=_('Protocol'))
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
+    hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
+    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES,
-                                default='Linux', verbose_name=_('Platform'))
+    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True,
                                related_name='assets', verbose_name=_("Domain"),
                                on_delete=models.SET_NULL)
@@ -94,11 +85,8 @@ class Asset(models.Model):
                                    null=True, verbose_name=_("Admin user"))
 
     # Some information
-    public_ip = models.GenericIPAddressField(max_length=32, blank=True,
-                                             null=True,
-                                             verbose_name=_('Public IP'))
-    number = models.CharField(max_length=32, null=True, blank=True,
-                              verbose_name=_('Asset number'))
+    public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
+    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     # Collect
     vendor = models.CharField(max_length=64, null=True, blank=True,
@@ -139,7 +127,7 @@ class Asset(models.Model):
     comment = models.TextField(max_length=128, default='', blank=True,
                                verbose_name=_('Comment'))
 
-    objects = AssetManager()
+    objects = OrgManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -172,6 +160,12 @@ class Asset(models.Model):
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
+
+    @property
+    def org_name(self):
+        from orgs.models import Organization
+        org = Organization.get_instance(self.org_id)
+        return org.name
 
     @property
     def hardware_info(self):
@@ -233,7 +227,7 @@ class Asset(models.Model):
         return data
 
     class Meta:
-        unique_together = ('ip', 'port')
+        unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
 
     @classmethod

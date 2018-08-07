@@ -80,12 +80,7 @@
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function() {
-            $('table').DataTable({
-                "searching": false,
-                "bInfo" : false,
-                "paging": false,
-                "order": []
-            });
+            jumpserver.initStaticTable('table');
             $('#date .input-daterange').datepicker({
                 format: "yyyy-mm-dd",
                 todayBtn: "linked",

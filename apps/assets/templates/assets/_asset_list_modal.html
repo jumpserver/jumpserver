@@ -71,7 +71,7 @@ function initTable2() {
 
 function onSelected2(event, treeNode) {
     var url = asset_table2.ajax.url();
-    url = setUrlParam(url, "node_id", treeNode.id);
+    url = setUrlParam(url, "node_id", treeNode.node_id);
     setCookie('node_selected', treeNode.id);
     asset_table2.ajax.url(url);
     asset_table2.ajax.reload();
@@ -97,17 +97,20 @@ function initTree2() {
     var zNodes = [];
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
-            value["pId"] = value["parent"];
+            value["node_id"] = value["id"];
+            value["id"] = value["tree_id"];
+            value["pId"] = value["tree_parent"];
             {#value["open"] = true;#}
             if (value["key"] === "0") {
                 value["open"] = true;
             }
             value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
-            value['value'] = value['value'];
         });
         zNodes = data;
         $.fn.zTree.init($("#assetTree2"), setting, zNodes);
         zTree2 = $.fn.zTree.getZTreeObj("assetTree2");
+        var root = zTree2.getNodes()[0];
+        zTree2.expandNode(root);
     });
 }
 
