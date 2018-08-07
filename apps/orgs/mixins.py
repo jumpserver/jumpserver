@@ -43,7 +43,6 @@ class OrgManager(models.Manager):
     def all(self):
         if not current_org:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
-            warnings.warn(msg)
             return self
         else:
             return super(OrgManager, self).all()

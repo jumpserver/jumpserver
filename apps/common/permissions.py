@@ -79,7 +79,6 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
     def dispatch(self, request, *args, **kwargs):
-        print("Current org: {}".format(current_org))
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
 
@@ -92,6 +91,4 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
                 print("Is org admin")
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
-        else:
-            print(current_org.can_admin_by(request.user))
         return super().dispatch(request, *args, **kwargs)
