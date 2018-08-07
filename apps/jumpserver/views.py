@@ -1,6 +1,6 @@
 import datetime
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
@@ -180,4 +180,9 @@ class LunaView(View):
         return HttpResponse(msg)
 
 
-
+class I18NView(View):
+    def get(self, request, lang):
+        referer_url = request.META.get('HTTP_REFERER', '/')
+        response = HttpResponseRedirect(referer_url)
+        response.set_cookie('django_language', lang)
+        return response

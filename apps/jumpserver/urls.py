@@ -14,7 +14,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from .views import IndexView, LunaView
+from .views import IndexView, LunaView, I18NView
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -82,6 +82,7 @@ if settings.XPACK_ENABLED:
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('luna/', LunaView.as_view(), name='luna-error'),
+    path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('common.urls.view_urls', namespace='settings')),
     path('common/', include('common.urls.view_urls', namespace='common')),
     path('api/v1/', redirect_format_api),
