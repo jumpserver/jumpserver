@@ -27,36 +27,6 @@
 
             <li class="dropdown">
                 <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
-                    <i class="fa fa-globe"></i>
-                    {% if request.COOKIES.django_language == 'zh-hans' %}
-                        <span class="m-r-sm text-muted welcome-message">{% trans 'Zh (cn)' %} <b class="caret"></b></span>
-                    {% elif request.COOKIES.django_language == 'en' %}
-                        <span class="m-r-sm text-muted welcome-message">{% trans 'En' %} <b class="caret"></b></span>
-                    {% endif %}
-                </a>
-
-                <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
-                    <li>
-                        <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}">
-                            <span> {% trans 'Zh (cn)' %}</span>
-                            {% if request.COOKIES.django_language == 'en' %}
-                                <i class="fa fa-exchange" style="margin-left: 30%"></i>
-                            {% endif %}
-                        </a>
-                    </li>
-                    <li>
-                        <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
-                            <span> {% trans 'En' %}</span>
-                            {% if request.COOKIES.django_language == 'zh-hans' %}
-                                <i class="fa fa-exchange" style="margin-left: 30%"></i>
-                            {% endif %}
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="dropdown">
-                <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
                     <i class="fa fa-handshake-o"></i>
                     <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %} <b class="caret"></b></span>
                 </a>
@@ -77,6 +47,31 @@
                 </ul>
 
             </li>
+
+            <li class="dropdown">
+                <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
+                    <i class="fa fa-globe"></i>
+                    {% if request.COOKIES.django_language == 'en' %}
+                        <span class="m-r-sm text-muted welcome-message">English<b class="caret"></b></span>
+                    {% else %}
+                        <span class="m-r-sm text-muted welcome-message">{% trans 'Chinese' %} <b class="caret"></b></span>
+                    {% endif %}
+                </a>
+
+                <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
+                    <li>
+                        <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}">
+                            <span> {% trans 'Chinese' %}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
+                            <span>English</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
 
             <li class="dropdown">
                 {% if request.user.is_authenticated %}

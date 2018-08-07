@@ -1,6 +1,7 @@
 import datetime
 
 from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
@@ -184,5 +185,5 @@ class I18NView(View):
     def get(self, request, lang):
         referer_url = request.META.get('HTTP_REFERER', '/')
         response = HttpResponseRedirect(referer_url)
-        response.set_cookie('django_language', lang)
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
         return response
