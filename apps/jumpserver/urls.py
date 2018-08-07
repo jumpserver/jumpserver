@@ -6,6 +6,8 @@ import os
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import JavaScriptCatalog
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -78,6 +80,9 @@ app_view_patterns = [
 if settings.XPACK_ENABLED:
     app_view_patterns.append(path('xpack/', include('xpack.urls', namespace='xpack')))
 
+js_i18n_patterns = i18n_patterns(
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+)
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
@@ -94,6 +99,7 @@ urlpatterns = [
 urlpatterns += app_view_patterns
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += js_i18n_patterns
 
 if settings.DEBUG:
     urlpatterns += [
