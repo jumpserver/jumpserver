@@ -269,7 +269,10 @@
     # 用户（组），资产（节点），系统用户是一对一的关系，所以当拥有 Linux、Windows 不同类型资产时，
     应该分别给 Linux 资产和 Windows 资产创建授权规则。
 
-.. image:: _static/img/create_auth_rules.jpg
+资产授权与节点授权的区别请参考下面示例，一般情况下，资产授权给个人，节点授权给用户组，一个授权只能选择一个系统用户
+
+.. image:: _static/img/create_auth_rules01.jpg
+.. image:: _static/img/create_auth_rules02.jpg
 
 ::
 

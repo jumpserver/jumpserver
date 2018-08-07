@@ -37,10 +37,10 @@ LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
 ::
 
     # DN 一定要是完整的DN，不能跳过OU，可以使用其他工具查询
-    # 如：cn=admin,ou=aaa,dc=jumpserver,ou=org，必须要写成cn=admin,ou=aaa,dc=jumpserver,ou=org 不能缩写成cn=admin,dc=jumpserver,dc=org
+    # 如：cn=admin,ou=aaa,dc=jumpserver,dc=org，必须要写成cn=admin,ou=aaa,dc=jumpserver,dc=org 不能缩写成cn=admin,dc=jumpserver,dc=org
 
     # 用户OU 用户OU可以只写顶层OU，不写子OU
-    # 如：ou=aaa,ou=bbb,ou=ccc,dc=jumpserver,ou=org，可以只写ou=ccc,dc=jumpserver,dc=org，根据需求自行修改
+    # 如：ou=aaa,ou=bbb,ou=ccc,dc=jumpserver,dc=org，可以只写ou=ccc,dc=jumpserver,dc=org，根据需求自行修改
 
     # 用户过滤器  筛选用户的规则，点击测试连接就是根据这个规则到用户OU里面去检索用户，可以自定义规则
     # 如：(uid=%(user)s) 或 (sAMAccountName=%(user)s)  等，这里的属性需要与下面的属性映射设置一致
