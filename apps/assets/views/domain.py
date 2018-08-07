@@ -7,7 +7,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy, reverse
 
-from common.mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
 from common.utils import get_object_or_none
 from ..models import Domain, Gateway
@@ -139,11 +139,6 @@ class DomainGatewayUpdateView(AdminUserRequiredMixin, UpdateView):
     def get_success_url(self):
         domain = self.object.domain
         return reverse('assets:domain-gateway-list', kwargs={"pk": domain.id})
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        print(form.cleaned_data)
-        return response
 
     def get_context_data(self, **kwargs):
         context = {

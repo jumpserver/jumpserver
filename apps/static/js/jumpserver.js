@@ -173,14 +173,14 @@ function APIUpdateAttr(props) {
         }
         if (typeof props.success === 'function') {
             return props.success(data);
-        } 
+        }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
             toastr.error(fail_message);
         }
         if (typeof props.error === 'function') {
-            return props.error(jqXHR.responseText);
-        } 
+            return props.error(jqXHR.responseText, jqXHR.status);
+        }
     });
   // return true;
 }
@@ -198,7 +198,8 @@ function objectDelete(obj, name, url, redirectTo) {
             }
         };
         var fail = function() {
-            swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
+            swal("错误", "[ "+name+" ]"+"正在被资产使用中，请先解除资产绑定", "error");
         };
         APIUpdateAttr({
             url: url,
@@ -219,7 +220,48 @@ function objectDelete(obj, name, url, redirectTo) {
         confirmButtonText: '确认',
         closeOnConfirm: true,
     }, function () {
-        doDelete()       
+        doDelete()
+    });
+}
+
+function orgDelete(obj, name, url, redirectTo){
+    function doDelete() {
+        var body = {};
+        var success = function() {
+            if (!redirectTo) {
+                $(obj).parent().parent().remove();
+            } else {
+                window.location.href=redirectTo;
+            }
+        };
+        var fail = function(responseText, status) {
+            if (status === 400){
+                swal("错误",  "[ " + name + " ] 组织中包含未删除信息，请删除后重试", "error");
+            }
+            else if (status === 405){
+                swal("错误",  "请勿在组织 [ "+ name + " ] 下执行此操作，切换到其他组织后重试", "error");
+            }
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success_message: "删除成功",
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: "请确保组织内的以下信息已删除",
+        text: "用户列表、用户组、资产列表、网域列表、管理用户、系统用户、标签管理、资产授权规则",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true
+    }, function () {
+        doDelete();
     });
 }
 
@@ -249,6 +291,28 @@ function makeLabel(data) {
 var jumpserver = {};
 jumpserver.checked = false;
 jumpserver.selected = {};
+jumpserver.language = {
+    processing: "加载中",
+    search: "搜索",
+    select: {
+        rows: {
+            _:  "选中 %d 项",
+            0: ""
+        }
+    },
+    lengthMenu: "每页  _MENU_",
+    info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
+    infoFiltered: "",
+    infoEmpty: "",
+    zeroRecords: "没有匹配项",
+    emptyTable: "没有记录",
+    paginate: {
+        first: "«",
+        previous: "‹",
+        next: "›",
+        last: "»"
+    }
+};
 jumpserver.initDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -272,7 +336,7 @@ jumpserver.initDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      {className: 'text-center', targets: '_all'}
+      {className: 'text-center', render: $.fn.dataTable.render.text(), targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {
@@ -292,21 +356,7 @@ jumpserver.initDataTable = function (options) {
         },
         columns: options.columns || [],
         select: options.select || select,
-        language: {
-            search: "搜索",
-            lengthMenu: "每页  _MENU_",
-            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
-            infoFiltered:   "",
-            infoEmpty:      "",
-            zeroRecords:    "没有匹配项",
-            emptyTable:     "没有记录",
-            paginate: {
-                first:      "«",
-                previous:   "‹",
-                next:       "›",
-                last:       "»"
-            }
-        },
+        language: jumpserver.language,
         lengthMenu: [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
@@ -342,6 +392,16 @@ jumpserver.initDataTable = function (options) {
     return table;
 };
 
+jumpserver.initStaticTable = function (selector) {
+    $(selector).DataTable({
+        "searching": false,
+        "bInfo": false,
+        "paging": false,
+        "order": [],
+        "language": jumpserver.language
+    });
+};
+
 jumpserver.initServerSideDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -374,9 +434,8 @@ jumpserver.initServerSideDataTable = function (options) {
       };
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
-        dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         order: options.order || [],
-        // select: options.select || 'multi',
         buttons: [],
         columnDefs: columnDefs,
         serverSide: true,
@@ -431,21 +490,7 @@ jumpserver.initServerSideDataTable = function (options) {
         },
         columns: options.columns || [],
         select: options.select || select,
-        language: {
-            search: "搜索",
-            lengthMenu: "每页  _MENU_",
-            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
-            infoFiltered:   "",
-            infoEmpty:      "",
-            zeroRecords:    "没有匹配项",
-            emptyTable:     "没有记录",
-            paginate: {
-                first:      "«",
-                previous:   "‹",
-                next:       "›",
-                last:       "»"
-            }
-        },
+        language: jumpserver.language,
         lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
     });
     table.selected = [];
@@ -476,8 +521,7 @@ jumpserver.initServerSideDataTable = function (options) {
                 }
             })
         }
-    }).
-    on('draw', function(){
+    }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
         var table_data = [];
@@ -682,7 +726,7 @@ function popoverPasswordRules(password_check_rules, $el) {
 }
 
 // 初始化弹窗popover
-function initPopover($container, $progress, $idPassword, $el, password_check_rules){
+function initPopover($container, $progress, $idPassword, $el, password_check_rules, i18n_fallback){
     options = {};
     // User Interface
     options.ui = {
@@ -693,6 +737,14 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
         },
         showProgressbar: true,
         showVerdictsInsideProgressBar: true
+    };
+    options.i18n = {
+        fallback: i18n_fallback,
+        t: function (key) {
+            var result = '';
+            result = options.i18n.fallback[key];
+            return result === key ? '' : result;
+        }
     };
     $idPassword.pwstrength(options);
     popoverPasswordRules(password_check_rules, $el);

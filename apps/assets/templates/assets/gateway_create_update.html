@@ -42,7 +42,7 @@
                             {% bootstrap_field form.domain layout="horizontal" %}
 
                             {% block auth %}
-                            <h3>{% trans 'Auth' %}</h3>
+                            <h3 id="auth_title">{% trans 'Auth' %}</h3>
                             <div class="auth-fields">
                                 {% bootstrap_field form.username layout="horizontal" %}
                                 {% bootstrap_field form.password layout="horizontal" %}
@@ -72,14 +72,23 @@
 var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
 var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
 var port = '#' + '{{ form.port.id_for_label }}';
+var username = '#' + '{{ form.username.id_for_label }}';
+var password = '#' + '{{ form.password.id_for_label }}';
+var auth_title = '#auth_title';
 
 function protocolChange() {
     if ($(protocol_id + " option:selected").text() === 'rdp') {
-        $(port).val(3389);
-        $(private_key_id).closest('.form-group').addClass('hidden')
+        {#$(port).val(3389);#}
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(username).closest('.form-group').addClass('hidden');
+        $(password).closest('.form-group').addClass('hidden');
+        $(auth_title).addClass('hidden');
     } else {
-        $(port).val(22);
-        $(private_key_id).closest('.form-group').removeClass('hidden')
+        {#$(port).val(22);#}
+        $(private_key_id).closest('.form-group').removeClass('hidden');
+        $(username).closest('.form-group').removeClass('hidden');
+        $(password).closest('.form-group').removeClass('hidden');
+        $(auth_title).removeClass('hidden');
     }
 }
 

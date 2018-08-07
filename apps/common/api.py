@@ -8,12 +8,12 @@ from django.core.mail import get_connection, send_mail
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .permissions import IsSuperUser
+from .permissions import IsOrgAdmin
 from .serializers import MailTestSerializer, LDAPTestSerializer
 
 
 class MailTestingAPI(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = MailTestSerializer
     success_message = _("Test mail sent to {}, please check")
 
@@ -37,7 +37,7 @@ class MailTestingAPI(APIView):
 
 
 class LDAPTestingAPI(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = LDAPTestSerializer
     success_message = _("Test ldap success")
 
@@ -86,7 +86,18 @@ class LDAPTestingAPI(APIView):
 
 class DjangoSettingsAPI(APIView):
     def get(self, request):
-        return Response('Danger, Close now')
+        if not settings.DEBUG:
+            return Response("Not in debug mode")
+
+        data = {}
+        for k, v in settings.__dict__.items():
+            if k and k.isupper():
+                try:
+                    json.dumps(v)
+                    data[k] = v
+                except (json.JSONDecodeError, TypeError):
+                    data[k] = str(v)
+        return Response(data)
 
 
 

@@ -7,12 +7,13 @@ import random
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from orgs.mixins import OrgModelMixin
 from .base import AssetUser
 
 __all__ = ['Domain', 'Gateway']
 
 
-class Domain(models.Model):
+class Domain(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -43,10 +44,12 @@ class Gateway(AssetUser):
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     protocol = models.CharField(choices=PROTOCOL_CHOICES, max_length=16, default=SSH_PROTOCOL, verbose_name=_("Protocol"))
-    domain = models.ForeignKey(Domain, verbose_name=_("Domain"))
+    domain = models.ForeignKey(Domain, on_delete=models.CASCADE, verbose_name=_("Domain"))
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Comment"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = [('name', 'org_id')]

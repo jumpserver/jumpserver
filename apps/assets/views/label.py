@@ -6,7 +6,7 @@ from django.views.generic import TemplateView, CreateView, \
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 
-from common.mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
 from ..models import Label
 from ..forms import LabelForm

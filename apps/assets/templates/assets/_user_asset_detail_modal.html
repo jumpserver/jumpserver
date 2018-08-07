@@ -1,0 +1,24 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+<style>
+    .modal-body {
+        background-color: white !important;
+    }
+</style>
+{% block modal_id %}user_asset_detail_modal{% endblock %}
+
+{% block modal_title %}{% trans "Asset detail" %}{% endblock %}
+
+{% block modal_body %}
+    <div class="ibox-content" style="background-color: inherit">
+        <table class="table">
+            <tbody id="asset_detail_tbody">
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block modal_button %}
+<button data-dismiss="modal" class="btn btn-white" type="button">{% trans "Close" %}</button>
+{% endblock %}

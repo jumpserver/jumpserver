@@ -45,13 +45,17 @@
                     </div>
                     <form class="m-t" role="form" method="post" action="">
                         {% csrf_token %}
-                        {% if form.errors %}
+
+                        {% if block_login %}
+                            <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
+                        {% elif form.errors %}
                             {% if 'captcha' in form.errors %}
                                 <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
                             {% else %}
                                 <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
                             {% endif %}
                         {% endif %}
+
                         <div class="form-group">
                             <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
                         </div>

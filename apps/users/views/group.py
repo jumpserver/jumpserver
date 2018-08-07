@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
-from django import forms
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
@@ -11,8 +10,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from common.utils import get_logger
 from common.const import create_success_msg, update_success_msg
+from common.permissions import AdminUserRequiredMixin
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin
 from .. import forms
 
 __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',

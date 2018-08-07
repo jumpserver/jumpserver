@@ -4,12 +4,13 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.db.models import Count
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
+from orgs.utils import current_org
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -20,14 +21,16 @@ class IndexView(LoginRequiredMixin, TemplateView):
     session_month_dates = []
     session_month_dates_archive = []
 
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_superuser:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        if not request.user.is_org_admin:
             return redirect('assets:user-asset-list')
-        return super(IndexView, self).get(request, *args, **kwargs)
+        return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod
     def get_user_count():
-        return User.objects.filter(role__in=('Admin', 'User')).count()
+        return current_org.get_org_users().count()
 
     @staticmethod
     def get_asset_count():
@@ -49,7 +52,6 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     def get_week_login_asset_count(self):
         return self.session_week.count()
-        # return self.session_week.values('asset').distinct().count()
 
     def get_month_day_metrics(self):
         month_str = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']
@@ -176,3 +178,6 @@ class LunaView(View):
         如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
         """
         return HttpResponse(msg)
+
+
+

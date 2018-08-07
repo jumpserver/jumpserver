@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 
 from common.mixins import DatetimeSearchMixin
 from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
-from .hands import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 
 
 class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):

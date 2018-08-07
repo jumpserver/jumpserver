@@ -4,8 +4,10 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from orgs.mixins import OrgModelMixin
 
-class AbstractSessionCommand(models.Model):
+
+class AbstractSessionCommand(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=64, db_index=True, verbose_name=_("User"))
     asset = models.CharField(max_length=128, db_index=True, verbose_name=_("Asset"))

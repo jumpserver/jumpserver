@@ -26,7 +26,7 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = Node
         fields = [
             'id', 'key', 'name', 'value', 'parent',
-            'assets_granted', 'assets_amount',
+            'assets_granted', 'assets_amount', 'org_id',
         ]
 
     @staticmethod
@@ -43,12 +43,16 @@ class NodeGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class NodeSerializer(serializers.ModelSerializer):
-    parent = serializers.SerializerMethodField()
     assets_amount = serializers.SerializerMethodField()
+    tree_id = serializers.SerializerMethodField()
+    tree_parent = serializers.SerializerMethodField()
 
     class Meta:
         model = Node
-        fields = ['id', 'key', 'value', 'parent', 'assets_amount', 'is_node']
+        fields = [
+            'id', 'key', 'value', 'assets_amount',
+            'is_node', 'org_id', 'tree_id', 'tree_parent',
+        ]
         list_serializer_class = BulkListSerializer
 
     def validate(self, data):
@@ -63,12 +67,16 @@ class NodeSerializer(serializers.ModelSerializer):
         return data
 
     @staticmethod
-    def get_parent(obj):
-        return obj.parent.id if obj.is_node else obj.parent_id
+    def get_assets_amount(obj):
+        return obj.assets__count if hasattr(obj, 'assets__count') else 0
 
     @staticmethod
-    def get_assets_amount(obj):
-        return obj.get_all_assets().count() if obj.is_node else 0
+    def get_tree_id(obj):
+        return obj.key
+
+    @staticmethod
+    def get_tree_parent(obj):
+        return obj.parent_key
 
     def get_fields(self):
         fields = super().get_fields()
@@ -78,7 +86,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset = Asset.objects.all())
 
     class Meta:
         model = Node

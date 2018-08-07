@@ -104,7 +104,14 @@ function protocolChange() {
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').addClass('hidden')
         });
-    } else {
+    }
+    else if ($(protocol_id + " option:selected").text() === 'telnet (beta)') {
+        $('.auth-fields').removeClass('hidden');
+        $.each(need_change_field, function (index, value) {
+            $(value).closest('.form-group').addClass('hidden')
+        });
+    }
+    else {
         if($(login_mode_id).val() === 'manual'){
             $(sudo_id).closest('.form-group').removeClass('hidden');
             $(shell_id).closest('.form-group').removeClass('hidden');
@@ -133,8 +140,8 @@ function loginModeChange(){
     }
     else if($(login_mode_id).val() === 'auto'){
         $('#auth_title_id').removeClass('hidden');
-        protocolChange();
         $(password_id).closest('.form-group').removeClass('hidden')
+        protocolChange();
     }
 }
 

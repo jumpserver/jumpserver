@@ -9,6 +9,7 @@ from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
 from common.const import tee_cache_key_fmt
+from common.permissions import IsOrgAdmin
 from .hands import IsSuperUser
 from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
 from .serializers import TaskSerializer, AdHocSerializer, \
@@ -20,13 +21,15 @@ from .celery import app
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
+    label = None
+    help_text = ''
 
 
 class TaskRun(generics.RetrieveAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskViewSet
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
@@ -37,7 +40,7 @@ class TaskRun(generics.RetrieveAPIView):
 class AdHocViewSet(viewsets.ModelViewSet):
     queryset = AdHoc.objects.all()
     serializer_class = AdHocSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
         task_id = self.request.query_params.get('task')
@@ -50,7 +53,7 @@ class AdHocViewSet(viewsets.ModelViewSet):
 class AdHocRunHistorySet(viewsets.ModelViewSet):
     queryset = AdHocRunHistory.objects.all()
     serializer_class = AdHocRunHistorySerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def get_queryset(self):
         task_id = self.request.query_params.get('task')
@@ -67,7 +70,7 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
 
 
 class CeleryTaskLogApi(generics.RetrieveAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     buff_size = 1024 * 10
     end = False
     queryset = CeleryTask.objects.all()

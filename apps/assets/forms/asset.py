@@ -3,20 +3,23 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from ..models import Asset, AdminUser
 from common.utils import get_logger
+from orgs.mixins import OrgModelForm
+
+from ..models import Asset, AdminUser
+
 
 logger = get_logger(__file__)
 __all__ = ['AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm']
 
 
-class AssetCreateForm(forms.ModelForm):
+class AssetCreateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port',  'comment',
             'nodes', 'is_active', 'admin_user', 'labels', 'platform',
-            'domain',
+            'domain', 'protocol',
 
         ]
         widgets = {
@@ -45,18 +48,18 @@ class AssetCreateForm(forms.ModelForm):
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
             ),
-            'platform': _("* required Must set exact system platform, Windows, Linux ..."),
+            # 'platform': _("* required Must set exact system platform, Windows, Linux ..."),
             'domain': _("If your have some network not connect with each other, you can set domain")
         }
 
 
-class AssetUpdateForm(forms.ModelForm):
+class AssetUpdateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
             'hostname', 'ip', 'port', 'nodes',  'is_active', 'platform',
             'public_ip', 'number', 'comment', 'admin_user', 'labels',
-            'domain',
+            'domain', 'protocol',
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
@@ -85,12 +88,12 @@ class AssetUpdateForm(forms.ModelForm):
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
             ),
-            'platform': _("* required Must set exact system platform, Windows, Linux ..."),
+            # 'platform': _("* required Must set exact system platform, Windows, Linux ..."),
             'domain': _("If your have some network not connect with each other, you can set domain")
         }
 
 
-class AssetBulkUpdateForm(forms.ModelForm):
+class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
         required=True, help_text='* required',
         label=_('Select assets'), queryset=Asset.objects.all(),
@@ -105,7 +108,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         label=_('Port'), required=False, min_value=1, max_value=65535,
     )
     admin_user = forms.ModelChoiceField(
-        required=False, queryset=AdminUser.objects.all(),
+        required=False, queryset=AdminUser.objects,
         label=_("Admin user"),
         widget=forms.Select(
             attrs={

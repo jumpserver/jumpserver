@@ -92,27 +92,52 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div id="actions" class="">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="export">{% trans 'Export command' %}</option>
+            </select>
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                    {% trans 'Submit' %}
+                </button>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block custom_foot_js %}
 <script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
 <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
 <script>
-    $(document).ready(function () {
-        $('.footable').footable();
-        $('.select2').select2({
-            dropdownAutoWidth : true,
-            width: 'auto'
-        });
-        $('#date .input-daterange').datepicker({
-            format: "yyyy-mm-dd",
-            todayBtn: "linked",
-            keyboardNavigation: false,
-            forceParse: false,
-            calendarWeeks: true,
-            autoclose: true
-        });
+$(document).ready(function () {
+    $('.footable').footable();
+    $('.select2').select2({
+        dropdownAutoWidth : true,
+        width: 'auto'
     });
+    $('#date .input-daterange').datepicker({
+        format: "yyyy-mm-dd",
+        todayBtn: "linked",
+        keyboardNavigation: false,
+        forceParse: false,
+        calendarWeeks: true,
+        autoclose: true
+    });
+})
+.on('click', '#btn_bulk_update', function(){
+    var action = $('#slct_bulk_update').val();
+    var param_action = '&action=' + action;
+    var local_params = window.location.search;
+    if(!local_params){
+        param_action = '?action=' + action;
+    }
+    var params = local_params + param_action;
+    var pathname = window.location.pathname + 'export/';
+    var url = pathname + params;
+    window.open(url);
+});
 </script>
 {% endblock %}
 
