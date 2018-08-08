@@ -170,7 +170,7 @@
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object or user_object.get_source_display == "LDAP/AD"  %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
