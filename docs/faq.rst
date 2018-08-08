@@ -244,11 +244,17 @@ FAQ
     # 检查系统用户的协议和资产的协议
     # 如果是更新了版本 Windows资产 出现的问题，请执行下面代码解决
     $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/utils
+    $ sh 2018_07_15_set_win_protocol_to_ssh.sh
+
+    # 如果不存在 2018_07_15_set_win_protocol_to_ssh.sh 脚本，可以手动执行下面命令解决
+    $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps
     $ python manage.py shell
     >>> from assets.models import Asset
     >>> Asset.objects.filter(platform__startswith='Win').update(protocol='rdp')
     >>> exit()
+
 
 15. 重启服务器后无法访问 Jumpserver，页面提示502 或者 403等
 
@@ -274,7 +280,7 @@ FAQ
     # selinux 设置 http 访问权限
     $ setsebool -P httpd_can_network_connect 1
 
-16. 添加组织及组织管理员命令
+16. 添加组织及组织管理员命令(1.4.0版本)
 
 ::
 
