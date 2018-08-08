@@ -71,7 +71,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(many=True, queryset = User.objects.all())
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
     class Meta:
         model = UserGroup

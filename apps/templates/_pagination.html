@@ -10,7 +10,7 @@
            <ul class="pagination" style="margin-top: 0; float: right">
                {% if page_obj.has_previous %}
                    <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
-                       <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
+                       <a data-page="next" class="page" href="?page={{ page_obj.previous_page_number}}">‹</a>
                    </li>
                {% endif %}
 
@@ -26,7 +26,7 @@
 
                {% if page_obj.has_next %}
                    <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
-                       <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
+                       <a data-page="next" class="page" href="?page={{ page_obj.next_page_number }}">›</a>
                    </li>
                {% endif %}
            </ul>
@@ -40,7 +40,7 @@
             var old_href = $(this).attr('href').replace('?', '');
             var searchArray = searchStr.split('&');
 
-            if (searchStr == '') {
+            if (searchStr === '') {
                 searchStr = '?page=1'
             }
 

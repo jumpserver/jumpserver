@@ -7,7 +7,9 @@ from django.db import transaction
 
 from jumpserver.utils import current_request
 from common.utils import get_request_ip
-from .models import OperateLog
+from users.models import User
+from .models import OperateLog, PasswordChangeLog
+
 
 MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
@@ -43,3 +45,15 @@ def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
 @receiver(post_delete, dispatch_uid="my_unique_identifier")
 def on_object_delete(sender, instance=None, **kwargs):
     create_operate_log(OperateLog.ACTION_DELETE, sender, instance)
+
+
+@receiver(post_save, sender=User, dispatch_uid="my_unique_identifier")
+def on_user_change_password(sender, instance=None, **kwargs):
+    if hasattr(instance, '_set_password'):
+        if not current_request or not current_request.user.is_authenticated:
+            return
+        with transaction.atomic():
+            PasswordChangeLog.objects.create(
+                user=instance, change_by=current_request.user,
+                remote_addr=get_request_ip(current_request),
+            )

@@ -19,7 +19,6 @@ from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
 from .utils import check_user_valid, generate_token, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
-from .hands import Asset, SystemUser
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from .hands import Asset, SystemUser
@@ -38,7 +37,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users().values_list('id', flat=True)
+        org_users = current_org.get_org_users()
         queryset = queryset.filter(id__in=org_users)
         return queryset
 

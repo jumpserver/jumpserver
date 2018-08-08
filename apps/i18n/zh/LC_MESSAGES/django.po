@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-08 12:52+0800\n"
+"POT-Creation-Date: 2018-08-08 16:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -107,7 +107,7 @@ msgstr "端口"
 #: assets/templates/assets/label_list.html:16
 #: assets/templates/assets/system_user_list.html:30 audits/models.py:13
 #: audits/templates/audits/ftp_log_list.html:41
-#: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:47
+#: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:47
 #: perms/models.py:31
 #: perms/templates/perms/asset_permission_create_update.html:40
 #: perms/templates/perms/asset_permission_list.html:56
@@ -430,7 +430,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:360
+#: users/models/user.py:364
 msgid "System"
 msgstr "系统"
 
@@ -458,10 +458,12 @@ msgid "Default asset group"
 msgstr "默认资产组"
 
 #: assets/models/label.py:15 audits/models.py:11 audits/models.py:31
-#: audits/templates/audits/ftp_log_list.html:33
-#: audits/templates/audits/ftp_log_list.html:71
+#: audits/models.py:44 audits/templates/audits/ftp_log_list.html:33
+#: audits/templates/audits/ftp_log_list.html:70
 #: audits/templates/audits/operate_log_list.html:33
-#: audits/templates/audits/operate_log_list.html:67 perms/forms.py:16
+#: audits/templates/audits/operate_log_list.html:66
+#: audits/templates/audits/password_change_log_list.html:33
+#: audits/templates/audits/password_change_log_list.html:50 perms/forms.py:16
 #: perms/forms.py:41 perms/models.py:29
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/asset_permission_list.html:54
@@ -471,7 +473,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:312
-#: users/models/user.py:33 users/models/user.py:348
+#: users/models/user.py:33 users/models/user.py:352
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:379
 #: xpack/plugins/orgs/forms.py:26
@@ -545,7 +547,7 @@ msgstr "登录模式"
 
 #: assets/models/user.py:181 assets/templates/assets/user_asset_list.html:167
 #: audits/models.py:14 audits/templates/audits/ftp_log_list.html:49
-#: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:53
+#: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:53
 #: perms/models.py:33 perms/models.py:81
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:58
@@ -898,7 +900,7 @@ msgstr "比例"
 #: assets/templates/assets/label_list.html:17
 #: assets/templates/assets/system_user_list.html:35 audits/models.py:32
 #: audits/templates/audits/operate_log_list.html:41
-#: audits/templates/audits/operate_log_list.html:68
+#: audits/templates/audits/operate_log_list.html:67
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:42
 #: perms/templates/perms/asset_permission_list.html:60
@@ -1264,24 +1266,25 @@ msgstr "资产管理"
 msgid "System user asset"
 msgstr "系统用户集群资产"
 
-#: audits/models.py:12 audits/models.py:35
-#: audits/templates/audits/ftp_log_list.html:74
-#: audits/templates/audits/operate_log_list.html:71 terminal/models.py:131
-#: terminal/templates/terminal/session_list.html:74
+#: audits/models.py:12 audits/models.py:35 audits/models.py:46
+#: audits/templates/audits/ftp_log_list.html:73
+#: audits/templates/audits/operate_log_list.html:70
+#: audits/templates/audits/password_change_log_list.html:52
+#: terminal/models.py:131 terminal/templates/terminal/session_list.html:74
 #: terminal/templates/terminal/terminal_detail.html:47
 msgid "Remote addr"
 msgstr "远端地址"
 
-#: audits/models.py:15 audits/templates/audits/ftp_log_list.html:75
+#: audits/models.py:15 audits/templates/audits/ftp_log_list.html:74
 msgid "Operate"
 msgstr "操作"
 
 #: audits/models.py:16 audits/templates/audits/ftp_log_list.html:56
-#: audits/templates/audits/ftp_log_list.html:76
+#: audits/templates/audits/ftp_log_list.html:75
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:17 audits/templates/audits/ftp_log_list.html:77
+#: audits/models.py:17 audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:66
 #: users/templates/users/user_detail.html:443
 msgid "Success"
@@ -1292,14 +1295,19 @@ msgid "Create"
 msgstr "创建"
 
 #: audits/models.py:33 audits/templates/audits/operate_log_list.html:49
+#: audits/templates/audits/operate_log_list.html:68
 msgid "Resource Type"
 msgstr "资源类型"
 
-#: audits/models.py:34
+#: audits/models.py:34 audits/templates/audits/operate_log_list.html:69
 msgid "Resource"
 msgstr "资源"
 
-#: audits/templates/audits/ftp_log_list.html:78
+#: audits/models.py:45 audits/templates/audits/password_change_log_list.html:51
+msgid "Change by"
+msgstr "修改者"
+
+#: audits/templates/audits/ftp_log_list.html:77
 #: ops/templates/ops/adhoc_history.html:52
 #: ops/templates/ops/adhoc_history_detail.html:61
 #: ops/templates/ops/task_history.html:58 perms/models.py:35
@@ -1309,6 +1317,7 @@ msgid "Date start"
 msgstr "开始日期"
 
 #: audits/templates/audits/operate_log_list.html:58
+#: audits/templates/audits/password_change_log_list.html:42
 #: ops/templates/ops/task_list.html:21 ops/templates/ops/task_list.html:26
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
@@ -1318,22 +1327,16 @@ msgstr "开始日期"
 msgid "Search"
 msgstr "搜索"
 
-#: audits/templates/audits/operate_log_list.html:69
-msgid "Resouce Type"
-msgstr ""
-
-#: audits/templates/audits/operate_log_list.html:70
-msgid "Resouce"
-msgstr ""
-
-#: audits/templates/audits/operate_log_list.html:72
+#: audits/templates/audits/operate_log_list.html:71
+#: audits/templates/audits/password_change_log_list.html:53
 #: ops/templates/ops/task_adhoc.html:63
 #: terminal/templates/terminal/command_list.html:76
 #: terminal/templates/terminal/session_detail.html:50
 msgid "Datetime"
 msgstr "日期"
 
-#: audits/views.py:64 audits/views.py:108 templates/_nav.html:68
+#: audits/views.py:64 audits/views.py:108 audits/views.py:141
+#: templates/_nav.html:68
 msgid "Audits"
 msgstr "日志审计"
 
@@ -1344,6 +1347,10 @@ msgstr "FTP日志"
 #: audits/views.py:109 templates/_nav.html:72
 msgid "Operate log"
 msgstr "操作日志"
+
+#: audits/views.py:142 templates/_nav.html:73
+msgid "Password change log"
+msgstr "改密日志"
 
 #: common/api.py:18
 msgid "Test mail sent to {}, please check"
@@ -1660,7 +1667,7 @@ msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
 #: common/views.py:19 common/views.py:45 common/views.py:71 common/views.py:101
-#: common/views.py:129 templates/_nav.html:99
+#: common/views.py:129 templates/_nav.html:100
 msgid "Settings"
 msgstr "系统设置"
 
@@ -1961,7 +1968,7 @@ msgstr ""
 msgid "Date expired"
 msgstr "失效日期"
 
-#: perms/models.py:45 perms/models.py:93 templates/_nav.html:34
+#: perms/models.py:45 perms/models.py:92 templates/_nav.html:34
 msgid "Asset permission"
 msgstr "资产授权"
 
@@ -2192,7 +2199,7 @@ msgstr "终端管理"
 msgid "Job Center"
 msgstr "作业中心"
 
-#: templates/_nav.html:87
+#: templates/_nav.html:88
 msgid "XPack"
 msgstr ""
 
@@ -2636,7 +2643,7 @@ msgstr "状态"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:32 users/models/user.py:356
+#: users/models/user.py:32 users/models/user.py:360
 msgid "Administrator"
 msgstr "管理员"
 
@@ -2678,7 +2685,7 @@ msgstr "微信"
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:359
+#: users/models/user.py:363
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 

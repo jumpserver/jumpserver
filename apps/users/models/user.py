@@ -112,6 +112,10 @@ class User(AbstractUser):
     def password_raw(self, password_raw_):
         self.set_password(password_raw_)
 
+    def set_password(self, raw_password):
+        self._set_password = True
+        return super().set_password(raw_password)
+
     @property
     def otp_secret_key(self):
         return signer.unsign(self._otp_secret_key)

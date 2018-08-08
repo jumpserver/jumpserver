@@ -37,3 +37,14 @@ class OperateLog(OrgModelMixin):
 
     def __str__(self):
         return "<{}> {} <{}>".format(self.user, self.action, self.resource)
+
+
+class PasswordChangeLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    user = models.CharField(max_length=128, verbose_name=_('User'))
+    change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
+    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
+    datetime = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "{} change {}'s password".format(self.change_by, self.user)

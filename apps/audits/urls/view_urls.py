@@ -11,4 +11,5 @@ app_name = "audits"
 urlpatterns = [
     path('ftp-log/', views.FTPLogListView.as_view(), name='ftp-log-list'),
     path('operate-log/', views.OperateLogListView.as_view(), name='operate-log-list'),
+    path('password-change-log/', views.PasswordChangeLogList.as_view(), name='password-change-log-list'),
 ]
