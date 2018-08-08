@@ -32,10 +32,14 @@ def create_operate_log(action, sender, resource):
 
 
 @receiver(post_save, dispatch_uid="my_unique_identifier")
-def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
+def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
     if created:
         action = OperateLog.ACTION_CREATE
     else:
         action = OperateLog.ACTION_UPDATE
     create_operate_log(action, sender, instance)
 
+
+@receiver(post_delete, dispatch_uid="my_unique_identifier")
+def on_object_delete(sender, instance=None, **kwargs):
+    create_operate_log(OperateLog.ACTION_DELETE, sender, instance)

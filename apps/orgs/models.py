@@ -18,6 +18,9 @@ class Organization(models.Model):
     ROOT_ID = 'ROOT'
     DEFAULT_ID = 'DEFAULT'
 
+    class Meta:
+        verbose_name = _("Organization")
+
     def __str__(self):
         return self.name
 

@@ -22,6 +22,9 @@ class Node(OrgModelMixin):
 
     is_node = True
 
+    class Meta:
+        verbose_name = _("Node")
+
     def __str__(self):
         return self.value
         # return self.full_value

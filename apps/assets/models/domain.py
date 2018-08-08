@@ -20,6 +20,9 @@ class Domain(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True,
                                         verbose_name=_('Date created'))
 
+    class Meta:
+        verbose_name = _("Domain")
+
     def __str__(self):
         return self.name
 
@@ -53,3 +56,4 @@ class Gateway(AssetUser):
 
     class Meta:
         unique_together = [('name', 'org_id')]
+        verbose_name = _("Gateway")

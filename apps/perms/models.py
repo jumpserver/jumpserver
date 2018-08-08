@@ -42,6 +42,7 @@ class AssetPermission(OrgModelMixin):
 
     class Meta:
         unique_together = [('org_id', 'name')]
+        verbose_name = _("Asset permission")
 
     def __str__(self):
         return self.name

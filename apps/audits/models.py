@@ -29,7 +29,7 @@ class OperateLog(OrgModelMixin):
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
-    action = models.CharField(max_length=16, verbose_name=_("Action"))
+    action = models.CharField(max_length=16, choices=ACTION_CHOICES, verbose_name=_("Action"))
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
     remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
