@@ -7,7 +7,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy, reverse
 
-from common.mixins import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
 from common.utils import get_object_or_none
 from ..models import Domain, Gateway

@@ -9,10 +9,9 @@ from .. import api
 app_name = "audits"
 
 router = DefaultRouter()
-router.register(r'v1/ftp-log', api.FTPLogViewSet, 'ftp-log')
+router.register(r'ftp-log', api.FTPLogViewSet, 'ftp-log')
 
 urlpatterns = [
-#    url(r'^v1/celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', api.CeleryTaskLogApi.as_view(), name='celery-task-log'),
 ]
 
 urlpatterns += router.urls

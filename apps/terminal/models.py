@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from users.models import User
+from orgs.mixins import OrgModelMixin
 from .backends.command.models import AbstractSessionCommand
 
 
@@ -112,7 +113,7 @@ class Status(models.Model):
         return self.date_created.strftime("%Y-%m-%d %H:%M:%S")
 
 
-class Session(models.Model):
+class Session(OrgModelMixin):
     LOGIN_FROM_CHOICES = (
         ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal'),

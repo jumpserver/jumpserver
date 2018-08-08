@@ -20,7 +20,7 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from ..hands import IsSuperUser
+from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
 from .. import serializers
 from ..tasks import test_admin_user_connectability_manual
@@ -39,19 +39,19 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserAuthSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class ReplaceNodesAdminUserApi(generics.UpdateAPIView):
     queryset = AdminUser.objects.all()
     serializer_class = serializers.ReplaceNodeAdminUserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def update(self, request, *args, **kwargs):
         admin_user = self.get_object()
@@ -75,7 +75,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
     Test asset admin user connectivity
     """
     queryset = AdminUser.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()

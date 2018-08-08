@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core import signing
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -15,6 +15,8 @@ from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
 from common.models import Setting
+from orgs.mixins import OrgManager
+from orgs.utils import current_org
 
 
 __all__ = ['User']
@@ -116,7 +118,7 @@ class User(AbstractUser):
 
     @otp_secret_key.setter
     def otp_secret_key(self, item):
-        self._otp_secret_key = signer.sign(item).decode('utf-8')
+        self._otp_secret_key = signer.sign(item)
 
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
@@ -187,6 +189,18 @@ class User(AbstractUser):
             self.role = 'User'
 
     @property
+    def admin_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_admin_orgs(self)
+
+    @property
+    def is_org_admin(self):
+        if self.is_superuser or self.admin_orgs.exists():
+            return True
+        else:
+            return False
+
+    @property
     def is_app(self):
         return self.role == 'App'
 
@@ -207,8 +221,9 @@ class User(AbstractUser):
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True
-
         super().save(*args, **kwargs)
+        if current_org and current_org.is_real():
+            self.orgs.add(current_org.id)
 
     @property
     def private_token(self):

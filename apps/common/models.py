@@ -5,7 +5,7 @@ from django.db import models
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django_auth_ldap.config import LDAPSearch
+from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
 
 class SettingQuerySet(models.QuerySet):
@@ -72,10 +72,11 @@ class Setting(models.Model):
                 settings.AUTHENTICATION_BACKENDS.remove(settings.AUTH_LDAP_BACKEND)
 
         if self.name == "AUTH_LDAP_SEARCH_FILTER":
-            settings.AUTH_LDAP_USER_SEARCH = LDAPSearch(
-                settings.AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE,
-                settings.AUTH_LDAP_SEARCH_FILTER,
-            )
+            settings.AUTH_LDAP_USER_SEARCH_UNION = [
+                LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, settings.AUTH_LDAP_SEARCH_FILTER)
+                for USER_SEARCH in str(settings.AUTH_LDAP_SEARCH_OU).split("|")
+            ]
+            settings.AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*settings.AUTH_LDAP_USER_SEARCH_UNION)
 
     class Meta:
         db_table = "settings"

@@ -20,12 +20,12 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = Asset
         list_serializer_class = BulkListSerializer
         fields = '__all__'
-        validators = []  # If not set to [], partial bulk update will be error
+        # validators = []  # If not set to [], partial bulk update will be error
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
         fields.extend([
-            'hardware_info', 'is_connective',
+            'hardware_info', 'is_connective', 'org_name'
         ])
         return fields
 
@@ -43,7 +43,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         fields = (
             "id", "hostname", "ip", "port", "system_users_granted",
             "is_active", "system_users_join", "os", 'domain',
-            "platform", "comment", "protocol",
+            "platform", "comment", "protocol", "org_id", "org_name",
         )
 
     @staticmethod
@@ -61,6 +61,6 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
         model = Asset
         fields = (
             "id", "hostname", "system_users_granted",
-            "is_active", "system_users_join",
-            "os", "platform", "comment",
+            "is_active", "system_users_join", "org_name",
+            "os", "platform", "comment", "org_id", "protocol"
         )

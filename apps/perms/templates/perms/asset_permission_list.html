@@ -80,12 +80,12 @@ function onSelected(event, treeNode) {
     var url = table.ajax.url();
     if (treeNode.is_node) {
         url = setUrlParam(url, 'asset', "");
-        url = setUrlParam(url, 'node', treeNode.id)
+        url = setUrlParam(url, 'node', treeNode.node_id)
     } else {
         url = setUrlParam(url, 'node', "");
-        url = setUrlParam(url, 'asset', treeNode.id)
+        url = setUrlParam(url, 'asset', treeNode.node_id)
     }
-    setCookie('node_selected', treeNode.id);
+    setCookie('node_selected', treeNode.node_id);
     table.ajax.url(url);
     table.ajax.reload();
 }
@@ -111,10 +111,19 @@ function selectQueryNode() {
 
 function filter(treeId, parentNode, childNodes) {
     $.each(childNodes, function (index, value) {
-        value["pId"] = value["parent"];
-        value["name"] = value["value"];
-        value["isParent"] = value["is_node"];
+        value["node_id"] = value["id"];
+        value["id"] = value["tree_id"];
+        if (value["tree_id"] !== value["tree_parent"]) {
+            value["pId"] = value["tree_parent"];
+        } else {
+            value["isParent"] = true;
+        }
+        value['name'] = value['value'];
         value["iconSkin"] = value["is_node"] ? null : 'file';
+
+        {#value["pId"] = value["parent"];#}
+        {#value["name"] = value["value"];#}
+        value["isParent"] = value["is_node"];
     });
     return childNodes;
 }
@@ -227,7 +236,7 @@ function initTree() {
         async: {
 			enable: true,
 			url: "{% url 'api-assets:node-children-2' %}?assets=1&all=",
-			autoParam:["id", "name=n", "level=lv"],
+			autoParam:["node_id=id", "name=n", "level=lv"],
 			dataFilter: filter,
             type: 'get'
 		},
@@ -238,19 +247,22 @@ function initTree() {
     };
 
     var zNodes = [];
-    $.get("{% url 'api-assets:node-children-2' %}?assets=1&all=", function(data, status){
+    $.get("{% url 'api-assets:node-children-2' %}?assets=1", function(data, status){
         $.each(data, function (index, value) {
-            value["pId"] = value["parent"];
-            value["name"] = value["value"];
-            value["open"] = value["key"] === "0";
+            value["node_id"] = value["id"];
+            value["id"] = value["tree_id"];
+            if (value["tree_id"] !== value["tree_parent"]) {
+                value["pId"] = value["tree_parent"];
+            }
             value["isParent"] = value["is_node"];
+            value['name'] = value['value'];
             value["iconSkin"] = value["is_node"] ? null : 'file';
         });
         zNodes = data;
-        {#$.fn.zTree.init($("#assetTree"), setting);#}
         $.fn.zTree.init($("#assetTree"), setting, zNodes);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
-        {#selectQueryNode();#}
+        var root = zTree.getNodes()[0];
+        zTree.expandNode(root);
     });
 }
 
@@ -288,9 +300,9 @@ $(document).ready(function(){
     var _assets = [];
     $.each(nodes, function (id, node) {
         if (node.is_node) {
-            _nodes.push(node.id)
+            _nodes.push(node.node_id)
         } else {
-            _assets.push(node.id)
+            _assets.push(node.node_id)
         }
     });
     url += "?assets=" + _assets.join(",") + "&nodes=" + _nodes.join(",");

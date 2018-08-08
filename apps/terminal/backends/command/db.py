@@ -21,7 +21,7 @@ class CommandStore(CommandBase):
             user=command["user"], asset=command["asset"],
             system_user=command["system_user"], input=command["input"],
             output=command["output"], session=command["session"],
-            timestamp=command["timestamp"]
+            org_id=command["org_id"], timestamp=command["timestamp"]
         )
 
     def bulk_save(self, commands):
@@ -33,7 +33,7 @@ class CommandStore(CommandBase):
             _commands.append(self.model(
                 user=c["user"], asset=c["asset"], system_user=c["system_user"],
                 input=c["input"], output=c["output"], session=c["session"],
-                timestamp=c["timestamp"]
+                org_id=c["org_id"], timestamp=c["timestamp"]
             ))
         return self.model.objects.bulk_create(_commands)
 

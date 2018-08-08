@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
 
-from users.utils import AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
 from ..backends import get_multi_command_storage
