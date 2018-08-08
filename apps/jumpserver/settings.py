@@ -95,6 +95,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
+    'jumpserver.middleware.RequestMiddleware',
     'orgs.middleware.OrgMiddleware',
 ]
 
@@ -127,7 +128,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'jumpserver.context_processor.jumpserver_processor',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -136,6 +136,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.request',
                 'django.template.context_processors.media',
+                'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
                 *get_xpack_context_processor(),
             ],

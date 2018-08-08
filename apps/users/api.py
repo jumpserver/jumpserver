@@ -17,14 +17,14 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
-from .utils import check_user_valid, generate_token, get_login_ip, \
+from .utils import check_user_valid, generate_token, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
 from .hands import Asset, SystemUser
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from .hands import Asset, SystemUser
 from common.mixins import IDInFilterMixin
-from common.utils import get_logger
+from common.utils import get_logger, get_request_ip
 
 
 logger = get_logger(__name__)
@@ -207,7 +207,7 @@ class UserOtpAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = get_login_ip(request)
+            login_ip = get_request_ip(request)
 
         tmp_data = {
             'ip': login_ip,
@@ -228,7 +228,7 @@ class UserAuthApi(APIView):
         # limit login
         username = request.data.get('username')
         ip = request.data.get('remote_addr', None)
-        ip = ip if ip else get_login_ip(request)
+        ip = ip if ip else get_request_ip(request)
         key_limit = self.key_prefix_limit.format(username, ip)
         key_block = self.key_prefix_block.format(username)
         if is_block_login(key_limit):
@@ -294,7 +294,7 @@ class UserAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = get_login_ip(request)
+            login_ip = get_request_ip(request)
 
         tmp_data = {
             'ip': login_ip,

@@ -21,12 +21,12 @@ from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, get_request_ip
 from common.mixins import DatetimeSearchMixin
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
 from ..models import User, LoginLog
-from ..utils import send_reset_password_mail, check_otp_code, get_login_ip, \
+from ..utils import send_reset_password_mail, check_otp_code, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
     set_tmp_user_to_cache, get_password_check_rules, check_password_rules, \
     is_block_login, set_user_login_failed_count_to_cache
@@ -64,7 +64,7 @@ class UserLoginView(FormView):
 
     def post(self, request, *args, **kwargs):
         # limit login authentication
-        ip = get_login_ip(request)
+        ip = get_request_ip(request)
         username = self.request.POST.get('username')
         key_limit = self.key_prefix_limit.format(username, ip)
         if is_block_login(key_limit):
@@ -91,7 +91,7 @@ class UserLoginView(FormView):
         self.write_login_log(data)
 
         # limit user login failed count
-        ip = get_login_ip(self.request)
+        ip = get_request_ip(self.request)
         key_limit = self.key_prefix_limit.format(username, ip)
         key_block = self.key_prefix_block.format(username)
         set_user_login_failed_count_to_cache(key_limit, key_block)
@@ -104,7 +104,7 @@ class UserLoginView(FormView):
         return super().form_invalid(form)
 
     def get_form_class(self):
-        ip = get_login_ip(self.request)
+        ip = get_request_ip(self.request)
         if cache.get(self.key_prefix_captcha.format(ip)):
             return self.form_class_captcha
         else:
@@ -139,7 +139,7 @@ class UserLoginView(FormView):
         return super().get_context_data(**kwargs)
 
     def write_login_log(self, data):
-        login_ip = get_login_ip(self.request)
+        login_ip = get_request_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         tmp_data = {
             'ip': login_ip,
@@ -185,7 +185,7 @@ class UserLoginOtpView(FormView):
         return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def write_login_log(self, data):
-        login_ip = get_login_ip(self.request)
+        login_ip = get_request_ip(self.request)
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         tmp_data = {
             'ip': login_ip,

@@ -190,16 +190,6 @@ def validate_ip(ip):
     return False
 
 
-def get_login_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
-    if x_forwarded_for and x_forwarded_for[0]:
-        login_ip = x_forwarded_for[0]
-    else:
-        login_ip = request.META.get('REMOTE_ADDR', '')
-
-    return login_ip
-
-
 def write_login_log(*args, **kwargs):
     ip = kwargs.get('ip', '')
     if not (ip and validate_ip(ip)):
