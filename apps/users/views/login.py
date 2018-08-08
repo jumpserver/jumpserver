@@ -178,7 +178,7 @@ class UserLoginOtpView(FormView):
                 'status': False
             }
             self.write_login_log(data)
-            form.add_error('otp_code', _('MFA code invalid'))
+            form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
             return super().form_invalid(form)
 
     def get_success_url(self):

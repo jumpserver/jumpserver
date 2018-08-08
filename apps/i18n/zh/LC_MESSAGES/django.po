@@ -3170,8 +3170,8 @@ msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
 #: users/views/login.py:181 users/views/user.py:519 users/views/user.py:544
-msgid "MFA code invalid"
-msgstr "MFA码认证失败"
+msgid "MFA code invalid, or ntp sync server time"
+msgstr "MFA码认证失败, 或服务器时间需要同步"
 
 #: users/views/login.py:210
 msgid "Logout success"
