@@ -215,7 +215,12 @@ def get_ip_city(ip, timeout=10):
         try:
             data = r.json()
             if not isinstance(data, int) and data['code'] == 0:
-                city = data['data']['country'] + ' ' + data['data']['city']
+                country = data['data']['country']
+                _city = data['data']['city']
+                if country == 'XX':
+                    city = _city
+                else:
+                    city = ' '.join([country, _city])
         except ValueError:
             pass
     return city

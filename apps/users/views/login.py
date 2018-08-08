@@ -361,46 +361,6 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         return form
 
 
-class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
-    template_name = 'users/login_log_list.html'
-    model = LoginLog
-    paginate_by = settings.DISPLAY_PER_PAGE
-    user = keyword = ""
-    date_to = date_from = None
-
-    @staticmethod
-    def get_org_users():
-        users = current_org.get_org_users().values_list('username', flat=True)
-        return users
-
-    def get_queryset(self):
-        users = self.get_org_users()
-        queryset = super().get_queryset().filter(username__in=users)
-        self.user = self.request.GET.get('user', '')
-        self.keyword = self.request.GET.get("keyword", '')
-
-        queryset = queryset.filter(
-            datetime__gt=self.date_from, datetime__lt=self.date_to
-        )
-        if self.user:
-            queryset = queryset.filter(username=self.user)
-        if self.keyword:
-            queryset = queryset.filter(
-                Q(ip__contains=self.keyword) |
-                Q(city__contains=self.keyword) |
-                Q(username__contains=self.keyword)
-            )
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': _('Users'),
-            'action': _('Login log list'),
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'user': self.user,
-            'keyword': self.keyword,
-            'user_list': self.get_org_users(),
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+class LoginLogListView(ListView):
+    def get(self, request, *args, **kwargs):
+        return redirect(reverse('audits:login-log-list'))

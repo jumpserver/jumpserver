@@ -4,6 +4,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelMixin
+from .hands import LoginLog
+
+__all__ = [
+    'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',
+]
 
 
 class FTPLog(OrgModelMixin):
@@ -48,3 +53,8 @@ class PasswordChangeLog(models.Model):
 
     def __str__(self):
         return "{} change {}'s password".format(self.change_by, self.user)
+
+
+class UserLoginLog(LoginLog):
+    class Meta:
+        proxy = True
