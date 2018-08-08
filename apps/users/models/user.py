@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
-from common.models import Setting
+from common.models import common_settings
 from orgs.mixins import OrgManager
 from orgs.utils import current_org
 
@@ -282,8 +282,7 @@ class User(AbstractUser):
 
     @property
     def otp_force_enabled(self):
-        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
-        if mfa_setting and mfa_setting.cleaned_value:
+        if common_settings.SECURITY_MFA_AUTH:
             return True
         return self.otp_level == 2
 

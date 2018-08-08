@@ -19,7 +19,7 @@ from django.core.cache import cache
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
-from common.models import Setting
+from common.models import common_settings, Setting
 from common.forms import SecuritySettingForm
 from .models import User, LoginLog
 
@@ -305,8 +305,8 @@ def check_password_rules(password):
     lower_field_name = 'SECURITY_PASSWORD_LOWER_CASE'
     number_field_name = 'SECURITY_PASSWORD_NUMBER'
     special_field_name = 'SECURITY_PASSWORD_SPECIAL_CHAR'
-    min_length_setting = Setting.objects.filter(name=min_field_name).first()
-    min_length = min_length_setting.value if min_length_setting else settings.DEFAULT_PASSWORD_MIN_LENGTH
+    min_length = getattr(common_settings, min_field_name) or \
+                 settings.DEFAULT_PASSWORD_MIN_LENGTH
 
     password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
     if not password_setting:
@@ -328,37 +328,40 @@ def check_password_rules(password):
     return bool(match_obj)
 
 
-def set_user_login_failed_count_to_cache(key_limit, key_block):
+key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
+key_prefix_block = "_LOGIN_BLOCK_{}"
+
+
+# def increase_login_failed_count(key_limit, key_block):
+def increase_login_failed_count(username, ip):
+    key_limit = key_prefix_limit.format(username, ip)
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
-    setting_limit_time = Setting.objects.filter(
-        name='SECURITY_LOGIN_LIMIT_TIME'
-    ).first()
-    limit_time = setting_limit_time.cleaned_value if setting_limit_time \
-        else settings.DEFAULT_LOGIN_LIMIT_TIME
-
-    setting_limit_count = Setting.objects.filter(
-        name='SECURITY_LOGIN_LIMIT_COUNT'
-    ).first()
-    limit_count = setting_limit_count.cleaned_value if setting_limit_count \
-        else settings.DEFAULT_LOGIN_LIMIT_COUNT
-
-    if count >= limit_count:
-        cache.set(key_block, 1, int(limit_time)*60)
-
+    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
+        settings.DEFAULT_LOGIN_LIMIT_TIME
     cache.set(key_limit, count, int(limit_time)*60)
 
 
-def is_block_login(key_limit):
-    count = cache.get(key_limit)
+def clean_failed_count(username, ip):
+    key_limit = key_prefix_limit.format(username, ip)
+    key_block = key_prefix_block.format(username)
+    cache.delete(key_limit)
+    cache.delete(key_block)
 
-    setting_limit_count = Setting.objects.filter(
-        name='SECURITY_LOGIN_LIMIT_COUNT'
-    ).first()
-    limit_count = setting_limit_count.cleaned_value if setting_limit_count \
-        else settings.DEFAULT_LOGIN_LIMIT_COUNT
 
+def is_block_login(username, ip):
+    key_limit = key_prefix_limit.format(username, ip)
+    key_block = key_prefix_block.format(username)
+    count = cache.get(key_limit, 0)
+
+    limit_count = common_settings.SECURITY_LOGIN_LIMIT_COUNT or \
+        settings.DEFAULT_LOGIN_LIMIT_COUNT
+    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
+        settings.DEFAULT_LOGIN_LIMIT_TIME
+
+    if count >= limit_count:
+        cache.set(key_block, 1, int(limit_time)*60)
     if count and count >= limit_count:
         return True
 

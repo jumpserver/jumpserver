@@ -34,6 +34,13 @@ class Setting(models.Model):
     def __str__(self):
         return self.name
 
+    def __getattr__(self, item):
+        instances = self.__class__.objects.filter(name=item)
+        if len(instances) == 1:
+            return instances[0].cleaned_value
+        else:
+            return None
+
     @property
     def cleaned_value(self):
         try:
@@ -81,3 +88,5 @@ class Setting(models.Model):
     class Meta:
         db_table = "settings"
 
+
+common_settings = Setting()

@@ -8,7 +8,6 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from django.core.files.storage import default_storage
-from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
@@ -22,14 +21,11 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
 from common.utils import get_object_or_none, get_request_ip
-from common.mixins import DatetimeSearchMixin
-from common.permissions import AdminUserRequiredMixin
-from orgs.utils import current_org
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
     set_tmp_user_to_cache, get_password_check_rules, check_password_rules, \
-    is_block_login, set_user_login_failed_count_to_cache
+    is_block_login, increase_login_failed_count, clean_failed_count
 from ..tasks import write_login_log_async
 from .. import forms
 
@@ -51,8 +47,6 @@ class UserLoginView(FormView):
     form_class_captcha = forms.UserLoginCaptchaForm
     redirect_field_name = 'next'
     key_prefix_captcha = "_LOGIN_INVALID_{}"
-    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
@@ -66,10 +60,8 @@ class UserLoginView(FormView):
         # limit login authentication
         ip = get_request_ip(request)
         username = self.request.POST.get('username')
-        key_limit = self.key_prefix_limit.format(username, ip)
-        if is_block_login(key_limit):
+        if is_block_login(username, ip):
             return self.render_to_response(self.get_context_data(block_login=True))
-
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -77,6 +69,10 @@ class UserLoginView(FormView):
             return HttpResponse(_("Please enable cookies and try again."))
 
         set_tmp_user_to_cache(self.request, form.get_user())
+        username = form.cleaned_data.get('username')
+        ip = get_request_ip(self.request)
+        # 登陆成功，清除缓存计数
+        clean_failed_count(username, ip)
         return redirect(self.get_success_url())
 
     def form_invalid(self, form):
@@ -92,9 +88,7 @@ class UserLoginView(FormView):
 
         # limit user login failed count
         ip = get_request_ip(self.request)
-        key_limit = self.key_prefix_limit.format(username, ip)
-        key_block = self.key_prefix_block.format(username)
-        set_user_login_failed_count_to_cache(key_limit, key_block)
+        increase_login_failed_count(username, ip)
 
         # show captcha
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)

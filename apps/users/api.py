@@ -18,7 +18,7 @@ from .serializers import UserSerializer, UserGroupSerializer, \
 from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
 from .utils import check_user_valid, generate_token, \
-    check_otp_code, set_user_login_failed_count_to_cache, is_block_login
+    check_otp_code, increase_login_failed_count, is_block_login, clean_failed_count
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from .hands import Asset, SystemUser
@@ -220,18 +220,16 @@ class UserOtpAuthApi(APIView):
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
-    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def post(self, request):
         # limit login
         username = request.data.get('username')
         ip = request.data.get('remote_addr', None)
-        ip = ip if ip else get_request_ip(request)
-        key_limit = self.key_prefix_limit.format(username, ip)
-        key_block = self.key_prefix_block.format(username)
-        if is_block_login(key_limit):
+        ip = ip or get_request_ip(request)
+
+        if is_block_login(username, ip):
             msg = _("Log in frequently and try again later")
+            logger.warn(msg + ': ' + username + ':' + ip)
             return Response({'msg': msg}, status=401)
 
         user, msg = self.check_user_valid(request)
@@ -243,8 +241,7 @@ class UserAuthApi(APIView):
                 'status': False
             }
             self.write_login_log(request, data)
-
-            set_user_login_failed_count_to_cache(key_limit, key_block)
+            increase_login_failed_count(username, ip)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
@@ -255,6 +252,8 @@ class UserAuthApi(APIView):
                 'status': True
             }
             self.write_login_log(request, data)
+            # 登陆成功，清除原来的缓存计数
+            clean_failed_count(username, ip)
             token = generate_token(request, user)
             return Response(
                 {
