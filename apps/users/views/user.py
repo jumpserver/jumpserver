@@ -515,7 +515,7 @@ class UserOtpEnableBindView(TemplateView, FormView):
             return super().form_valid(form)
 
         else:
-            form.add_error("otp_code", _("MFA code invalid"))
+            form.add_error("otp_code", _("MFA code invalid, or ntp sync server time"))
             return self.form_invalid(form)
 
     def save_otp(self, otp_secret_key):
@@ -540,7 +540,7 @@ class UserOtpDisableAuthenticationView(FormView):
             user.save()
             return super().form_valid(form)
         else:
-            form.add_error('otp_code', _('MFA code invalid'))
+            form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
             return super().form_invalid(form)
 
 
