@@ -13,16 +13,68 @@
 {#            <li>#}
 {#                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>#}
 {#            </li>#}
+
+{#            <li class="dropdown">#}
+{#                <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">#}
+{#                    <span class="m-r-sm text-muted welcome-message">{% trans 'Supports' %}</span>#}
+{#                </a>#}
+{#            </li>#}
+{#            <li class="dropdown">#}
+{#                <a class="count-info"  href="http://docs.jumpserver.org/" target="_blank">#}
+{#                     <span class="m-r-sm text-muted welcome-message">{% trans 'Docs' %}</span>#}
+{#                </a>#}
+{#            </li>#}
+
             <li class="dropdown">
-                <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">
-                    <span class="m-r-sm text-muted welcome-message">{% trans 'Supports' %}</span>
+                <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
+                    <i class="fa fa-handshake-o"></i>
+                    <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %} <b class="caret"></b></span>
                 </a>
+
+                <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
+                    <li>
+                        <a class="count-info"  href="http://docs.jumpserver.org/" target="_blank">
+                            <i class="fa fa-file-text"></i>
+                            <span class="m-r-sm text-muted welcome-message">{% trans 'Docs' %}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">
+                            <i class="fa fa-suitcase"></i>
+                            <span class="m-r-sm text-muted welcome-message">{% trans 'Commercial support' %}</span>
+                        </a>
+                    </li>
+                </ul>
+
             </li>
+
             <li class="dropdown">
-                <a class="count-info"  href="http://docs.jumpserver.org/" target="_blank">
-                     <span class="m-r-sm text-muted welcome-message">{% trans 'Docs' %}</span>
+                <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
+                    <i class="fa fa-globe"></i>
+                    {% ifequal request.COOKIES.django_language 'en' %}
+                        <span class="m-r-sm text-muted welcome-message">English<b class="caret"></b></span>
+                    {% else %}
+                        <span class="m-r-sm text-muted welcome-message">中文<b class="caret"></b></span>
+                    {% endifequal %}
                 </a>
+
+                <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
+                    <li>
+                        <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}">
+                            <i class="fa fa-flag"></i>
+                            <span> 中文</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
+                            <i class="fa fa-flag-checkered"></i>
+                            <span> English</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
+
+
             <li class="dropdown">
                 {% if request.user.is_authenticated %}
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">

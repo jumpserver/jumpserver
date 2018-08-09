@@ -3,10 +3,13 @@
 
 {% block help_message %}
     <div class="alert alert-info help-message">
-    系统用户是 Jumpserver跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`);
-    简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。
-    系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。
-    目前还不支持Windows的自动推送
+{#    系统用户是 Jumpserver跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`);#}
+{#    简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。#}
+{#    系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。#}
+{#    目前还不支持Windows的自动推送#}
+    {% trans 'System user is Jumpserver jump login assets used by the users, can be understood as the user login assets, such as web, sa, the dba (` ssh web@some-host `), rather than using a user the username login server jump (` ssh xiaoming@some-host `); '%}
+    {% trans 'In simple terms, users log into Jumpserver using their own username, and Jumpserver uses system users to log into assets. '%}
+    {% trans 'When system users are created, if you choose auto push Jumpserver to use ansible push system users into the asset, if the asset (Switch, Windows) does not support ansible, please manually fill in the account password. Automatic push for Windows is not currently supported.' %}
     </div>
 {% endblock %}
 
@@ -135,6 +138,7 @@ $(document).ready(function(){
             text: "{% trans 'This will delete the selected System Users !!!' %}",
             type: "warning",
             showCancelButton: true,
+            cancelButtonText: "{% trans 'Cancel' %}",
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "{% trans 'Confirm' %}",
             closeOnConfirm: false
