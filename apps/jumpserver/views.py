@@ -85,7 +85,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        return User.objects.all().count() - self.get_month_active_user_total()
+        return current_org.get_org_users().count() - self.get_month_active_user_total()
 
     def get_month_active_asset_total(self):
         return self.session_month.values('asset').distinct().count()
@@ -95,7 +95,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     @staticmethod
     def get_user_disabled_total():
-        return User.objects.filter(is_active=False).count()
+        return current_org.get_org_users().filter(is_active=False).count()
 
     @staticmethod
     def get_asset_disabled_total():

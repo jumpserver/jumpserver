@@ -17,14 +17,13 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
-from .utils import check_user_valid, generate_token, get_login_ip, \
-    check_otp_code, set_user_login_failed_count_to_cache, is_block_login
-from .hands import Asset, SystemUser
+from .utils import check_user_valid, generate_token, \
+    check_otp_code, increase_login_failed_count, is_block_login, clean_failed_count
 from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 from .hands import Asset, SystemUser
 from common.mixins import IDInFilterMixin
-from common.utils import get_logger
+from common.utils import get_logger, get_request_ip
 
 
 logger = get_logger(__name__)
@@ -38,7 +37,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users().values_list('id', flat=True)
+        org_users = current_org.get_org_users()
         queryset = queryset.filter(id__in=org_users)
         return queryset
 
@@ -207,7 +206,7 @@ class UserOtpAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = get_login_ip(request)
+            login_ip = get_request_ip(request)
 
         tmp_data = {
             'ip': login_ip,
@@ -221,18 +220,16 @@ class UserOtpAuthApi(APIView):
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
-    key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
-    key_prefix_block = "_LOGIN_BLOCK_{}"
 
     def post(self, request):
         # limit login
         username = request.data.get('username')
         ip = request.data.get('remote_addr', None)
-        ip = ip if ip else get_login_ip(request)
-        key_limit = self.key_prefix_limit.format(username, ip)
-        key_block = self.key_prefix_block.format(username)
-        if is_block_login(key_limit):
+        ip = ip or get_request_ip(request)
+
+        if is_block_login(username, ip):
             msg = _("Log in frequently and try again later")
+            logger.warn(msg + ': ' + username + ':' + ip)
             return Response({'msg': msg}, status=401)
 
         user, msg = self.check_user_valid(request)
@@ -244,8 +241,7 @@ class UserAuthApi(APIView):
                 'status': False
             }
             self.write_login_log(request, data)
-
-            set_user_login_failed_count_to_cache(key_limit, key_block)
+            increase_login_failed_count(username, ip)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
@@ -256,6 +252,8 @@ class UserAuthApi(APIView):
                 'status': True
             }
             self.write_login_log(request, data)
+            # 登陆成功，清除原来的缓存计数
+            clean_failed_count(username, ip)
             token = generate_token(request, user)
             return Response(
                 {
@@ -294,7 +292,7 @@ class UserAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = get_login_ip(request)
+            login_ip = get_request_ip(request)
 
         tmp_data = {
             'ip': login_ip,

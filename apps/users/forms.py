@@ -263,7 +263,7 @@ class UserBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select users'),
-        queryset = User.objects.all(),
+        queryset=User.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -308,7 +308,7 @@ def user_limit_to():
 
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.exclude(role=User.ROLE_APP),
+        queryset=User.objects.all(),
         label=_("User"),
         widget=forms.SelectMultiple(
             attrs={
@@ -347,13 +347,6 @@ class UserGroupForm(forms.ModelForm):
         help_texts = {
             'name': '* required'
         }
-
-
-class OrgUserField(forms.ModelMultipleChoiceField):
-
-    def get_limit_choices_to(self):
-
-        return {"orgs"}
 
 
 class FileForm(forms.Form):

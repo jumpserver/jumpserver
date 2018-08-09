@@ -38,27 +38,24 @@
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="asset">
-                <option value="">{% trans 'Asset' %}</option>
-                {% for a in asset_list %}
-                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
+                <option value="">{% trans 'Action' %}</option>
+                {% for k, v in actions.items %}
+                    <option value="{{ k }}" {% if k == action %} selected {% endif %}>{{ v }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="system_user">
-                <option value="">{% trans 'System user' %}</option>
-                {% for su in system_user_list %}
-                    <option value="{{ su }}" {% if su == system_user %} selected {% endif %}>{{ su }}</option>
+                <option value="">{% trans 'Resource Type' %}</option>
+                {% for r in resource_type_list %}
+                    <option value="{{ r }}" {% if r == resource_type %} selected {% endif %}>{{ r }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="filename" placeholder="{% trans 'Filename' %}" value="{{ filename }}">
-        </div>
-        <div class="input-group">
             <div class="input-group-btn">
                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    搜索
+                    {% trans 'Search' %}
                 </button>
             </div>
         </div>
@@ -66,16 +63,12 @@
 {% endblock %}
 
 {% block table_head %}
-{#    <th class="text-center">{% trans 'ID' %}</th>#}
     <th class="text-center">{% trans 'User' %}</th>
-    <th class="text-center">{% trans 'Asset' %}</th>
-    <th class="text-center">{% trans 'System user' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
+    <th class="text-center">{% trans 'Resource Type' %}</th>
+    <th class="text-center">{% trans 'Resource' %}</th>
     <th class="text-center">{% trans 'Remote addr' %}</th>
-    <th class="text-center">{% trans 'Operate' %}</th>
-    <th class="text-center">{% trans 'Filename' %}</th>
-    <th class="text-center">{% trans 'Success' %}</th>
-    <th class="text-center">{% trans 'Date start' %}</th>
-{#    <th class="text-center">{% trans 'Action' %}</th>#}
+    <th class="text-center">{% trans 'Datetime' %}</th>
 {% endblock %}
 
 {% block table_body %}
@@ -85,19 +78,11 @@
 {#                <a href="{% url 'terminal:object-detail' pk=object.id %}">{{ forloop.counter }}</a>#}
 {#            </td>#}
             <td class="text-center">{{ object.user }}</td>
-            <td class="text-center">{{ object.asset }}</td>
-            <td class="text-center">{{ object.system_user }}</td>
-            <td class="text-center">{{ object.remote_addr|default:"" }}</td>
-            <td class="text-center">{{ object.operate }}</td>
-            <td class="text-center">{{ object.filename }}</td>
-            <td class="text-center">
-                {% if object.is_success %}
-                    <i class="fa fa-check text-navy"></i>
-                {% else %}
-                    <i class="fa fa-times text-danger"></i>
-                {% endif %}
-            </td>
-            <td class="text-center">{{ object.date_start }}</td>
+            <td class="text-center">{{ object.get_action_display }}</td>
+            <td class="text-center">{{ object.resource_type }}</td>
+            <td class="text-center">{{ object.resource }}</td>
+            <td class="text-center">{{ object.remote_addr }}</td>
+            <td class="text-center">{{ object.datetime }}</td>
         </tr>
     {% endfor %}
 {% endblock %}
@@ -113,7 +98,8 @@
                 "searching": false,
                 "paging": false,
                 "bInfo" : false,
-                "order": []
+                "order": [],
+                "language": jumpserver.language
             });
             $('.select2').select2({
                 dropdownAutoWidth: true,

@@ -18,6 +18,9 @@ class Organization(models.Model):
     ROOT_ID = 'ROOT'
     DEFAULT_ID = 'DEFAULT'
 
+    class Meta:
+        verbose_name = _("Organization")
+
     def __str__(self):
         return self.name
 
@@ -52,13 +55,16 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    def get_org_users(self):
+    def get_org_users(self, include_app=False):
         from users.models import User
         if self.is_default():
             users = User.objects.filter(orgs__isnull=True)
+        elif self.is_root():
+            users = User.objects.all()
         else:
             users = self.users.all()
-        users = users.exclude(role=User.ROLE_APP)
+        if not include_app:
+            users = users.exclude(role=User.ROLE_APP)
         return users
 
     def get_org_admins(self):
@@ -98,6 +104,12 @@ class Organization(models.Model):
 
     def is_default(self):
         if self.id is self.DEFAULT_ID:
+            return True
+        else:
+            return False
+
+    def is_root(self):
+        if self.id is self.ROOT_ID:
             return True
         else:
             return False

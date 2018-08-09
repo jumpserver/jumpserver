@@ -6,23 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
-from .hands import User
 from .models import AssetPermission
 
 
 class AssetPermissionForm(OrgModelForm):
-    users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.exclude(role=User.ROLE_APP),
-        label=_("User"),
-        widget=forms.SelectMultiple(
-            attrs={
-                'class': 'select2',
-                'data-placeholder': _('Select users')
-            }
-        ),
-        required=False,
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'initial' not in kwargs:

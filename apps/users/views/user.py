@@ -33,7 +33,7 @@ from django.contrib.auth import logout as auth_logout
 from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
-from common.models import Setting
+from common.models import Setting, common_settings
 from common.permissions import AdminUserRequiredMixin
 from .. import forms
 from ..models import User, UserGroup
@@ -356,10 +356,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
-        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
+        mfa_setting = common_settings.SECURITY_MFA_AUTH
         context = {
             'action': _('Profile'),
-            'mfa_setting': mfa_setting.cleaned_value if mfa_setting else False,
+            'mfa_setting': mfa_setting if mfa_setting is not None else False,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
