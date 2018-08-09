@@ -8,11 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-"POT-Creation-Date: 2018-08-08 17:17+0800\n"
-=======
-"POT-Creation-Date: 2018-08-09 11:00+0800\n"
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+"POT-Creation-Date: 2018-08-09 12:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -25,15 +21,6 @@ msgstr ""
 msgid "New node {}"
 msgstr "新节点 {}"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/api/node.py:213
-msgid "更新节点资产硬件信息: {}"
-msgstr ""
-
-#: assets/api/node.py:226
-msgid "测试节点下资产是否可连接: {}"
-msgstr ""
-=======
 #: assets/api/node.py:214
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
@@ -41,7 +28,6 @@ msgstr "更新节点资产硬件信息: {}"
 #: assets/api/node.py:228
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 
 #: assets/forms/asset.py:27 assets/models/asset.py:80 assets/models/user.py:113
 #: assets/templates/assets/asset_detail.html:183
@@ -53,11 +39,7 @@ msgstr "节点管理"
 #: assets/forms/asset.py:30 assets/forms/asset.py:69 assets/forms/asset.py:112
 #: assets/forms/asset.py:116 assets/models/asset.py:85
 #: assets/models/cluster.py:19 assets/models/user.py:73
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:24
-=======
-#: assets/templates/assets/asset_detail.html:73 templates/_nav.html:25
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
 msgid "Admin user"
 msgstr "管理用户"
@@ -74,12 +56,8 @@ msgid "Label"
 msgstr "标签"
 
 #: assets/forms/asset.py:37 assets/forms/asset.py:76 assets/models/asset.py:76
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/models/domain.py:24 assets/models/domain.py:50
 #: assets/templates/assets/user_asset_list.html:168
-=======
-#: assets/models/domain.py:47 assets/templates/assets/user_asset_list.html:168
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
 msgstr "网域"
@@ -127,11 +105,7 @@ msgstr "端口"
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:30 audits/models.py:18
-=======
-#: assets/templates/assets/system_user_list.html:33 audits/models.py:13
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+#: assets/templates/assets/system_user_list.html:33 audits/models.py:18
 #: audits/templates/audits/ftp_log_list.html:41
 #: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:34
 #: perms/models.py:31
@@ -151,11 +125,7 @@ msgstr "资产"
 #: assets/models/base.py:22 assets/models/cluster.py:18
 #: assets/models/domain.py:18 assets/models/group.py:20
 #: assets/models/label.py:18 assets/templates/assets/admin_user_detail.html:56
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/admin_user_list.html:23
-=======
 #: assets/templates/assets/admin_user_list.html:26
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/domain_detail.html:56
 #: assets/templates/assets/domain_gateway_list.html:56
 #: assets/templates/assets/domain_list.html:25
@@ -189,21 +159,12 @@ msgstr "名称"
 #: assets/templates/assets/admin_user_list.html:27
 #: assets/templates/assets/domain_gateway_list.html:60
 #: assets/templates/assets/system_user_detail.html:62
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:27
+#: assets/templates/assets/system_user_list.html:30
 #: audits/templates/audits/login_log_list.html:49
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:70 users/models/user.py:49
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:60
-=======
-#: assets/templates/assets/system_user_list.html:30
-#: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
-#: users/forms.py:33 users/models/authentication.py:70 users/models/user.py:49
-#: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/login.html:62
-#: users/templates/users/login_log_list.html:49
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -266,12 +227,8 @@ msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 #: assets/templates/assets/domain_gateway_list.html:57
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:46
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/user_asset_list.html:162
 #: audits/templates/audits/login_log_list.html:52 common/forms.py:145
-=======
-#: assets/templates/assets/user_asset_list.html:162 common/forms.py:144
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: perms/templates/perms/asset_permission_asset.html:55
 #: users/templates/users/user_granted_asset.html:45
 #: users/templates/users/user_group_granted_asset.html:45
@@ -284,11 +241,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:92
 #: assets/templates/assets/system_user_asset.html:49
 #: assets/templates/assets/user_asset_list.html:45
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/user_asset_list.html:161 common/forms.py:144
-=======
-#: assets/templates/assets/user_asset_list.html:161 common/forms.py:143
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: perms/templates/perms/asset_permission_asset.html:54
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
@@ -299,11 +252,7 @@ msgstr "主机名"
 #: assets/models/user.py:116
 #: assets/templates/assets/domain_gateway_list.html:59
 #: assets/templates/assets/system_user_detail.html:70
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:28
-=======
 #: assets/templates/assets/system_user_list.html:31
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/user_asset_list.html:164
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
@@ -314,11 +263,7 @@ msgstr "协议"
 msgid "Platform"
 msgstr "系统平台"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/models/asset.py:81 assets/models/domain.py:52
-=======
-#: assets/models/asset.py:81 assets/models/domain.py:49
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/models/label.py:21 assets/templates/assets/asset_detail.html:105
 #: assets/templates/assets/user_asset_list.html:169
 msgid "Is active"
@@ -419,25 +364,15 @@ msgstr "创建日期"
 
 #: assets/models/asset.py:128 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/domain.py:19
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/models/domain.py:51 assets/models/group.py:23
 #: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
-#: assets/templates/assets/admin_user_list.html:29
-=======
-#: assets/models/domain.py:48 assets/models/group.py:23
-#: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:32
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/asset_detail.html:125
 #: assets/templates/assets/domain_detail.html:76
 #: assets/templates/assets/domain_gateway_list.html:61
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:34
-=======
 #: assets/templates/assets/system_user_list.html:37
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/user_asset_list.html:170 common/models.py:30
 #: ops/models/adhoc.py:42 orgs/models.py:15 perms/models.py:39
 #: perms/models.py:86 perms/templates/perms/asset_permission_detail.html:102
@@ -495,11 +430,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: users/models/user.py:364
-=======
-#: users/models/user.py:360
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+#: users/models/user.py:363
 msgid "System"
 msgstr "系统"
 
@@ -511,14 +442,6 @@ msgstr "默认Cluster"
 msgid "Cluster"
 msgstr "集群"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/models/domain.py:59 assets/templates/assets/domain_detail.html:21
-#: assets/templates/assets/domain_detail.html:64
-#: assets/templates/assets/domain_gateway_list.html:21
-#: assets/templates/assets/domain_list.html:24
-msgid "Gateway"
-msgstr "网关"
-=======
 #: assets/models/cluster.py:56
 msgid "Beijing unicom"
 msgstr "北京联通"
@@ -530,7 +453,13 @@ msgstr "北京电信"
 #: assets/models/cluster.py:56
 msgid "BGP full netcom"
 msgstr "BGP全网通"
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+
+#: assets/models/domain.py:59 assets/templates/assets/domain_detail.html:21
+#: assets/templates/assets/domain_detail.html:64
+#: assets/templates/assets/domain_gateway_list.html:21
+#: assets/templates/assets/domain_list.html:27
+msgid "Gateway"
+msgstr "网关"
 
 #: assets/models/group.py:30
 msgid "Asset group"
@@ -540,7 +469,6 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: assets/models/label.py:15 audits/models.py:16 audits/models.py:36
 #: audits/models.py:49 audits/templates/audits/ftp_log_list.html:33
 #: audits/templates/audits/ftp_log_list.html:70
@@ -551,22 +479,13 @@ msgstr "默认资产组"
 #: perms/models.py:29
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/asset_permission_list.html:54
-#: perms/templates/perms/asset_permission_list.html:142
-=======
-#: assets/models/label.py:15 audits/models.py:11
-#: audits/templates/audits/ftp_log_list.html:33
-#: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:16
-#: perms/forms.py:41 perms/models.py:29
-#: perms/templates/perms/asset_permission_create_update.html:36
-#: perms/templates/perms/asset_permission_list.html:54
 #: perms/templates/perms/asset_permission_list.html:142 templates/index.html:87
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: terminal/backends/command/models.py:12 terminal/models.py:127
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:312
-#: users/models/user.py:33 users/models/user.py:352
+#: users/models/user.py:33 users/models/user.py:351
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:379
 #: xpack/plugins/orgs/forms.py:26
@@ -639,21 +558,12 @@ msgid "Login mode"
 msgstr "登录模式"
 
 #: assets/models/user.py:181 assets/templates/assets/user_asset_list.html:167
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: audits/models.py:19 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:40
 #: perms/models.py:33 perms/models.py:81
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:58
 #: perms/templates/perms/asset_permission_list.html:154 templates/_nav.html:25
-=======
-#: audits/models.py:14 audits/templates/audits/ftp_log_list.html:49
-#: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:53
-#: perms/models.py:33 perms/models.py:80
-#: perms/templates/perms/asset_permission_detail.html:140
-#: perms/templates/perms/asset_permission_list.html:58
-#: perms/templates/perms/asset_permission_list.html:154 templates/_nav.html:26
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: terminal/backends/command/models.py:14 terminal/models.py:129
 #: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/command_list.html:74
@@ -904,22 +814,14 @@ msgstr "测试"
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:88
 #: assets/templates/assets/asset_detail.html:24
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/asset_list.html:170
-=======
 #: assets/templates/assets/asset_list.html:171
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
 #: assets/templates/assets/domain_gateway_list.html:85
 #: assets/templates/assets/domain_list.html:53
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:89 audits/models.py:32
-=======
-#: assets/templates/assets/system_user_list.html:92
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+#: assets/templates/assets/system_user_list.html:92 audits/models.py:32
 #: perms/templates/perms/asset_permission_detail.html:30
 #: perms/templates/perms/asset_permission_list.html:200
 #: terminal/templates/terminal/terminal_detail.html:16
@@ -939,22 +841,14 @@ msgstr "更新"
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:89
 #: assets/templates/assets/asset_detail.html:28
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/asset_list.html:171
-=======
 #: assets/templates/assets/asset_list.html:172
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
 #: assets/templates/assets/domain_gateway_list.html:86
 #: assets/templates/assets/domain_list.html:54
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:90 audits/models.py:33
-=======
-#: assets/templates/assets/system_user_list.html:93
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+#: assets/templates/assets/system_user_list.html:93 audits/models.py:33
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:201
@@ -981,11 +875,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/asset_list.html:627
-=======
 #: assets/templates/assets/asset_list.html:629
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/system_user_detail.html:195
 #: assets/templates/assets/system_user_detail.html:347
 #: assets/templates/assets/system_user_list.html:143 templates/_modal.html:22
@@ -1042,13 +932,9 @@ msgstr "比例"
 #: assets/templates/assets/domain_gateway_list.html:62
 #: assets/templates/assets/domain_list.html:29
 #: assets/templates/assets/label_list.html:17
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/system_user_list.html:35 audits/models.py:37
+#: assets/templates/assets/system_user_list.html:38 audits/models.py:37
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
-=======
-#: assets/templates/assets/system_user_list.html:38
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:42
 #: perms/templates/perms/asset_permission_list.html:60
@@ -1210,22 +1096,6 @@ msgstr "仅显示当前节点资产"
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/asset_list.html:206
-msgid "Create node failed"
-msgstr "创建节点失败"
-
-#: assets/templates/assets/asset_list.html:218
-msgid "Have child node, cancel"
-msgstr "存在子节点，不能删除"
-
-#: assets/templates/assets/asset_list.html:220
-msgid "Have assets, cancel"
-msgstr "存在资产，不能删除"
-
-#: assets/templates/assets/asset_list.html:622
-#: assets/templates/assets/system_user_list.html:134
-=======
 #: assets/templates/assets/asset_list.html:207
 msgid "Create node failed"
 msgstr "创建节点失败"
@@ -1240,7 +1110,6 @@ msgstr "存在资产，不能删除"
 
 #: assets/templates/assets/asset_list.html:623
 #: assets/templates/assets/system_user_list.html:137
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: users/templates/users/user_detail.html:369
 #: users/templates/users/user_detail.html:395
 #: users/templates/users/user_detail.html:463
@@ -1250,22 +1119,6 @@ msgstr "存在资产，不能删除"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: assets/templates/assets/asset_list.html:623
-msgid "This will delete the selected assets !!!"
-msgstr "删除选择资产"
-
-#: assets/templates/assets/asset_list.html:631
-msgid "Asset Deleted."
-msgstr "已被删除"
-
-#: assets/templates/assets/asset_list.html:632
-#: assets/templates/assets/asset_list.html:637
-msgid "Asset Delete"
-msgstr "删除"
-
-#: assets/templates/assets/asset_list.html:636
-=======
 #: assets/templates/assets/asset_list.html:624
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
@@ -1294,7 +1147,6 @@ msgid "Asset Delete"
 msgstr "删除"
 
 #: assets/templates/assets/asset_list.html:638
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1312,16 +1164,6 @@ msgstr "确认删除"
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-=======
-#: assets/templates/assets/domain_detail.html:21
-#: assets/templates/assets/domain_detail.html:64
-#: assets/templates/assets/domain_gateway_list.html:21
-#: assets/templates/assets/domain_list.html:27
-msgid "Gateway"
-msgstr "网关"
-
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: assets/templates/assets/domain_gateway_list.html:31
 msgid "Gateway list"
 msgstr "网关列表"
@@ -1682,7 +1524,7 @@ msgstr "改密日志"
 
 #: audits/views.py:183 templates/_nav.html:10 users/views/group.py:28
 #: users/views/group.py:44 users/views/group.py:60 users/views/group.py:76
-#: users/views/group.py:92 users/views/login.py:333 users/views/user.py:68
+#: users/views/group.py:92 users/views/login.py:327 users/views/user.py:68
 #: users/views/user.py:83 users/views/user.py:111 users/views/user.py:193
 #: users/views/user.py:348 users/views/user.py:398 users/views/user.py:433
 msgid "Users"
@@ -2382,11 +2224,7 @@ msgid "Select user groups"
 msgstr "选择用户组"
 
 #: perms/views.py:23 perms/views.py:53 perms/views.py:68 perms/views.py:83
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
 #: perms/views.py:118 perms/views.py:150 templates/_nav.html:30
-=======
-#: perms/views.py:118 perms/views.py:150 templates/_nav.html:31
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: xpack/plugins/orgs/templates/orgs/org_list.html:21
 msgid "Perms"
 msgstr "权限管理"
@@ -2485,17 +2323,6 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-=======
-#: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
-#: users/views/group.py:61 users/views/group.py:78 users/views/group.py:94
-#: users/views/login.py:333 users/views/login.py:397 users/views/user.py:68
-#: users/views/user.py:83 users/views/user.py:111 users/views/user.py:193
-#: users/views/user.py:348 users/views/user.py:398 users/views/user.py:433
-msgid "Users"
-msgstr "用户管理"
-
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: templates/_nav.html:13 users/views/user.py:69
 msgid "User list"
 msgstr "用户列表"
@@ -2922,23 +2749,19 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: users/api.py:234 users/templates/users/login.html:50
-=======
-#: users/api.py:177
+#: users/api.py:176
 msgid "Please verify the user name and password first"
 msgstr "请先进行用户名和密码验证"
 
-#: users/api.py:189
+#: users/api.py:188
 msgid "MFA certification failed"
 msgstr "MFA认证失败"
 
-#: users/api.py:238 users/templates/users/login.html:52
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
+#: users/api.py:234 users/templates/users/login.html:52
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
-#: users/api.py:275
+#: users/api.py:273
 msgid "Please carry seed value and conduct MFA secondary certification"
 msgstr "请携带seed值, 进行MFA二次认证"
 
@@ -3143,7 +2966,7 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:32 users/models/user.py:360
+#: users/models/user.py:32 users/models/user.py:359
 msgid "Administrator"
 msgstr "管理员"
 
@@ -3185,7 +3008,7 @@ msgstr "微信"
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:363
+#: users/models/user.py:362
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -3343,19 +3166,7 @@ msgstr "改变世界，从一点点开始。"
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#: users/templates/users/login_otp.html:45
-=======
-#: users/templates/users/login_log_list.html:51
-msgid "UA"
-msgstr "Agent"
-
-#: users/templates/users/login_log_list.html:53
-msgid "City"
-msgstr "城市"
-
 #: users/templates/users/login_otp.html:46
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: users/templates/users/user_detail.html:91
 #: users/templates/users/user_profile.html:85
 msgid "MFA certification"
@@ -3861,56 +3672,56 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:77
+#: users/views/login.py:69
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:181 users/views/user.py:518 users/views/user.py:543
+#: users/views/login.py:175 users/views/user.py:518 users/views/user.py:543
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
-#: users/views/login.py:210
+#: users/views/login.py:204
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:211
+#: users/views/login.py:205
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:227
+#: users/views/login.py:221
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:240
+#: users/views/login.py:234
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:241
+#: users/views/login.py:235
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:254
+#: users/views/login.py:248
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:255
+#: users/views/login.py:249
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:276 users/views/login.py:289
+#: users/views/login.py:270 users/views/login.py:283
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:285
+#: users/views/login.py:279
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:295 users/views/user.py:127 users/views/user.py:416
+#: users/views/login.py:289 users/views/user.py:127 users/views/user.py:416
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:333
+#: users/views/login.py:327
 msgid "First login"
 msgstr "首次登陆"
 
@@ -3968,13 +3779,6 @@ msgstr "管理员"
 msgid "Select admins"
 msgstr "选择管理员"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-=======
-#: xpack/plugins/orgs/meta.py:8
-msgid "Organization"
-msgstr "组织管理"
-
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:22
 #: xpack/plugins/orgs/views.py:73
 msgid "Org detail"
@@ -4009,13 +3813,8 @@ msgstr "创建组织"
 msgid "Update org"
 msgstr "更新组织"
 
-<<<<<<< HEAD:apps/i18n/zh/LC_MESSAGES/django.po
-#~ msgid "Login log list"
-#~ msgstr "登录日志"
-=======
 #~ msgid "Chinese"
 #~ msgstr "中文"
->>>>>>> michael_dev:apps/locale/zh/LC_MESSAGES/django.po
 
 #~ msgid "* required Must set exact system platform, Windows, Linux ..."
 #~ msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
