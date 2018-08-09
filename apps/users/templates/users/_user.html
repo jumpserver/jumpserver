@@ -66,4 +66,14 @@
             });
         })
     </script>
+    <script>
+        $(document).ready(function(){
+            var user_source = "{{ user_object.get_source_display }}";
+            if (user_source === 'LDAP/AD') {
+                $.each(["username","name","email","password"], function (i, v) {
+                    $("#id_" + v).attr('readonly', 'readonly')
+                })
+            }
+        })
+    </script>
 {% endblock %}

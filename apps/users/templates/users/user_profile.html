@@ -148,7 +148,7 @@
                                         <td>{% trans 'Update password' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" {% if user.get_source_display != "LDAP/AD" %} href="{% url 'users:user-password-update' %} {% else %} disabled="disabled" {% endif %}">{% trans 'Update' %}</a>
+                                                <a type="button" class="btn btn-primary btn-xs" {% if request.user.source == "ldap"  %} disabled="disabled" {% endif %} style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Update' %}</a>
                                             </span>
                                         </td>
                                     </tr>

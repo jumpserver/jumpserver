@@ -76,5 +76,13 @@
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/cropper/cropper.min.js' %}"></script>
     <script>
+        $(document).ready(function(){
+            var user_source = "{{ request.user.source }}";
+            if (user_source === 'ldap') {
+                $.each(["username","name","email"], function (i, v) {
+                    $("#id_" + v).attr('readonly', 'readonly')
+                })
+            }
+        })
     </script>
 {% endblock %}

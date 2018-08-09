@@ -143,4 +143,14 @@
     })
 
 </script>
+<script>
+    $(document).ready(function(){
+        var user_source = "{{ request.user.source }}";
+        if (user_source === 'ldap') {
+            $.each(["0-username","0-name","0-email"], function (i, v) {
+                $("#id_" + v).attr('readonly', 'readonly')
+            })
+        }
+    })
+</script>
 {% endblock %}
