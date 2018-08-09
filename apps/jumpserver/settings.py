@@ -14,7 +14,7 @@ import os
 import sys
 
 import ldap
-from django_auth_ldap.config import LDAPSearch
+from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -56,6 +56,7 @@ ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
 # Application definition
 
 INSTALLED_APPS = [
+    'orgs.apps.OrgsConfig',
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'rest_framework',
     'rest_framework_swagger',
+    'drf_yasg',
     'django_filters',
     'bootstrap3',
     'captcha',
@@ -75,6 +77,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+
+XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
+XPACK_ENABLED = os.path.isdir(XPACK_DIR)
+if XPACK_ENABLED:
+    INSTALLED_APPS.append('xpack.apps.XpackConfig')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,14 +95,35 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
+    'orgs.middleware.OrgMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
 
+
+def get_xpack_context_processor():
+    if XPACK_ENABLED:
+        return ['xpack.context_processor.xpack_processor']
+    return []
+
+
+def get_xpack_templates_dir():
+    if XPACK_ENABLED:
+        dirs = []
+        from xpack.utils import find_enabled_plugins
+        for i in find_enabled_plugins():
+            template_dir = os.path.join(BASE_DIR, 'xpack', 'plugins', i, 'templates')
+            if os.path.isdir(template_dir):
+                dirs.append(template_dir)
+        return dirs
+    else:
+        return []
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), *get_xpack_templates_dir()],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -107,6 +136,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.request',
                 'django.template.context_processors.media',
+                'orgs.context_processor.org_processor',
+                *get_xpack_context_processor(),
             ],
         },
     },
@@ -227,13 +258,13 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
         'django_auth_ldap': {
-            'handlers': ['console', 'ansible_logs'],
+            'handlers': ['console', 'file'],
             'level': "INFO",
         },
-        # 'django.db': {
-        #     'handlers': ['console', 'file'],
-        #     'level': 'DEBUG'
-        # }
+        'django.db': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 }
 
@@ -288,9 +319,10 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
-        'users.permissions.IsSuperUser',
+        'common.permissions.IsOrgAdmin',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
         'users.authentication.AccessKeyAuthentication',
         'users.authentication.AccessTokenAuthentication',
         'users.authentication.PrivateTokenAuthentication',
@@ -325,9 +357,11 @@ AUTH_LDAP_SEARCH_OU = CONFIG.AUTH_LDAP_SEARCH_OU
 AUTH_LDAP_SEARCH_FILTER = CONFIG.AUTH_LDAP_SEARCH_FILTER
 AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
 AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
-AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    AUTH_LDAP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER,
-)
+AUTH_LDAP_USER_SEARCH_UNION = [
+    LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
+    for USER_SEARCH in str(AUTH_LDAP_SEARCH_OU).split("|")
+]
+AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*AUTH_LDAP_USER_SEARCH_UNION)
 AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
 AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
@@ -336,6 +370,7 @@ AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_TIMEOUT: 5
 }
+AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
 AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
@@ -372,7 +407,7 @@ CACHES = {
             'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,
-            'db':CONFIG.REDIS_DB_CACHE or 4,
+            'db': CONFIG.REDIS_DB_CACHE or 4,
         }
     }
 }
@@ -405,7 +440,7 @@ TERMINAL_REPLAY_STORAGE = {
 
 
 DEFAULT_PASSWORD_MIN_LENGTH = 6
-DEFAULT_LOGIN_LIMIT_COUNT = 3
+DEFAULT_LOGIN_LIMIT_COUNT = 7
 DEFAULT_LOGIN_LIMIT_TIME = 30
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
@@ -422,3 +457,12 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+}

@@ -130,7 +130,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% if user.is_superuser %}
+                        {% if user.is_superuser or user.is_org_admin %}
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">

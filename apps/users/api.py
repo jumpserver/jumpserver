@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 
 from rest_framework import generics
@@ -16,10 +17,12 @@ from .serializers import UserSerializer, UserGroupSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from .tasks import write_login_log_async
 from .models import User, UserGroup, LoginLog
-from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, \
-    IsSuperUserOrAppUser
 from .utils import check_user_valid, generate_token, get_login_ip, \
     check_otp_code, set_user_login_failed_count_to_cache, is_block_login
+from .hands import Asset, SystemUser
+from orgs.utils import current_org
+from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
+from .hands import Asset, SystemUser
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -30,17 +33,23 @@ logger = get_logger(__name__)
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role="App")
     serializer_class = UserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     filter_fields = ('username', 'email', 'name', 'id')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_users = current_org.get_org_users().values_list('id', flat=True)
+        queryset = queryset.filter(id__in=org_users)
+        return queryset
 
     def get_permissions(self):
         if self.action == "retrieve":
-            self.permission_classes = (IsSuperUserOrAppUser,)
+            self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
 
 class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     queryset = User.objects.all()
     serializer_class = ChangeUserPasswordSerializer
 
@@ -53,7 +62,7 @@ class ChangeUserPasswordApi(generics.RetrieveUpdateAPIView):
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserUpdateGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
@@ -97,7 +106,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 
 class UserUnblockPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
     serializer_class = UserSerializer
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
     key_prefix_block = "_LOGIN_BLOCK_{}"
@@ -114,13 +123,13 @@ class UserUnblockPKApi(generics.UpdateAPIView):
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupUpdateMemeberSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsOrgAdmin,)
 
 
 class UserToken(APIView):
@@ -298,17 +307,23 @@ class UserAuthApi(APIView):
 
 
 class UserConnectionTokenApi(APIView):
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def post(self, request):
         user_id = request.data.get('user', '')
         asset_id = request.data.get('asset', '')
         system_user_id = request.data.get('system_user', '')
         token = str(uuid.uuid4())
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_user_id)
         value = {
             'user': user_id,
+            'username': user.username,
             'asset': asset_id,
-            'system_user': system_user_id
+            'hostname': asset.hostname,
+            'system_user': system_user_id,
+            'system_user_name': system_user.name
         }
         cache.set(token, value, timeout=20)
         return Response({"token": token}, status=201)

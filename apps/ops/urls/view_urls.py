@@ -1,8 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+from django.urls import path
 
-
-from django.conf.urls import url
 from .. import views
 
 __all__ = ["urlpatterns"]
@@ -10,13 +9,13 @@ __all__ = ["urlpatterns"]
 app_name = "ops"
 
 urlpatterns = [
-    # TResource Task url
-    url(r'^task/$', views.TaskListView.as_view(), name='task-list'),
-    url(r'^task/(?P<pk>[0-9a-zA-Z\-]{36})/$', views.TaskDetailView.as_view(), name='task-detail'),
-    url(r'^task/(?P<pk>[0-9a-zA-Z\-]{36})/adhoc/$', views.TaskAdhocView.as_view(), name='task-adhoc'),
-    url(r'^task/(?P<pk>[0-9a-zA-Z\-]{36})/history/$', views.TaskHistoryView.as_view(), name='task-history'),
-    url(r'^adhoc/(?P<pk>[0-9a-zA-Z\-]{36})/$', views.AdHocDetailView.as_view(), name='adhoc-detail'),
-    url(r'^adhoc/(?P<pk>[0-9a-zA-Z\-]{36})/history/$', views.AdHocHistoryView.as_view(), name='adhoc-history'),
-    url(r'^adhoc/history/(?P<pk>[0-9a-zA-Z\-]{36})/$', views.AdHocHistoryDetailView.as_view(), name='adhoc-history-detail'),
-    url(r'^celery/task/(?P<pk>[0-9a-zA-Z\-]{36})/log/$', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
+    # Resource Task url
+    path('task/', views.TaskListView.as_view(), name='task-list'),
+    path('task/<uuid:pk>/', views.TaskDetailView.as_view(), name='task-detail'),
+    path('task/<uuid:pk>/adhoc/', views.TaskAdhocView.as_view(), name='task-adhoc'),
+    path('task/<uuid:pk>/history/', views.TaskHistoryView.as_view(), name='task-history'),
+    path('adhoc/<uuid:pk>/', views.AdHocDetailView.as_view(), name='adhoc-detail'),
+    path('adhoc/<uuid:pk>/history/', views.AdHocHistoryView.as_view(), name='adhoc-history'),
+    path('adhoc/history/<uuid:pk>/', views.AdHocHistoryDetailView.as_view(), name='adhoc-history-detail'),
+    path('celery/task/<uuid:pk>/log/', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
 ]

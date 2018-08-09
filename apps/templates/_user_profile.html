@@ -1,15 +1,41 @@
 {% load static %}
 {% load i18n %}
 <li class="nav-header">
-    <div class="dropdown profile-element">
-        <div href="http://www.jumpserver.org" target="_blank">
-            <img alt="logo" height="55" width="185" src="/static/img/logo-text.png" style="margin-left: 20px"/>
+    <div class="profile-element" style="height: 65px">
+        <div href="http://www.jumpserver.org" target="_blank" style="width: 100%; background-image: url({% static 'img/header-profile.png' %})">
+            <img alt="logo" height="55" width="185" src="/static/img/logo-text.png"/>
         </div>
     </div>
-    <div class="clearfix"></div>
     <div class="logo-element">
         <img alt="image" height="40" src="/static/img/logo.png"/>
     </div>
+    {% if ADMIN_ORGS and request.COOKIES.IN_ADMIN_PAGE != 'No' %}
+        {% if ADMIN_ORGS|length > 1 or not CURRENT_ORG.is_default %}
+        <div style="height: 55px;">
+            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="display: block; background-color: transparent; color: #8095a8; padding: 14px 20px 14px 25px">
+                <i class="fa fa-bookmark" style="width: 14px; "></i>
+                <span class="nav-label" style="padding-left: 7px">
+                    {{ CURRENT_ORG.name }}
+                </span>
+                <span class="fa fa-sort-desc pull-right"></span>
+            </a>
+            <ul class="dropdown-menu" style="width: 219px;">
+                {% for org in ADMIN_ORGS %}
+                    <li>
+                        <a class="org-dropdown"
+                           href="{% url 'orgs:org-switch' pk=org.id %}"
+                           data-id="{{ org.id }}">
+                            {{ org.name }}
+                            {% if org.id == CURRENT_ORG.id %}
+                                <span class="fa fa-circle pull-right" style="padding-top: 5px; color: #1ab394"></span>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endif %}
 </li>
 <script>
 $(document).ready(function () {

@@ -4,9 +4,10 @@
 import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from orgs.mixins import OrgModelMixin
 
 
-class Label(models.Model):
+class Label(OrgModelMixin):
     SYSTEM_CATEGORY = "S"
     USER_CATEGORY = "U"
     CATEGORY_CHOICES = (
@@ -34,4 +35,4 @@ class Label(models.Model):
 
     class Meta:
         db_table = "assets_label"
-        unique_together = ('name', 'value')
+        unique_together = [('name', 'value')]
