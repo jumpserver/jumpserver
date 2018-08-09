@@ -41,7 +41,7 @@
                     <li>
                         <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">
                             <i class="fa fa-suitcase"></i>
-                            <span class="m-r-sm text-muted welcome-message">{% trans 'Supports' %}</span>
+                            <span class="m-r-sm text-muted welcome-message">{% trans 'Commercial support' %}</span>
                         </a>
                     </li>
                 </ul>
@@ -51,22 +51,24 @@
             <li class="dropdown">
                 <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
                     <i class="fa fa-globe"></i>
-                    {% if request.COOKIES.django_language == 'en' %}
+                    {% ifequal request.COOKIES.django_language 'en' %}
                         <span class="m-r-sm text-muted welcome-message">English<b class="caret"></b></span>
                     {% else %}
-                        <span class="m-r-sm text-muted welcome-message">{% trans 'Chinese' %} <b class="caret"></b></span>
-                    {% endif %}
+                        <span class="m-r-sm text-muted welcome-message">中文<b class="caret"></b></span>
+                    {% endifequal %}
                 </a>
 
                 <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
                     <li>
                         <a id="switch_cn" href="{% url 'i18n-switch' lang='zh-hans' %}">
-                            <span> {% trans 'Chinese' %}</span>
+                            <i class="fa fa-flag"></i>
+                            <span> 中文</span>
                         </a>
                     </li>
                     <li>
                         <a id="switch_en" href="{% url 'i18n-switch' lang='en' %}">
-                            <span>English</span>
+                            <i class="fa fa-flag-checkered"></i>
+                            <span> English</span>
                         </a>
                     </li>
                 </ul>

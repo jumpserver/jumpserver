@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -174,10 +175,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 class LunaView(View):
     def get(self, request):
-        msg = """
-        Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, 
-        如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
-        """
+        msg = _("<div>Luna is a separately deployed program, you need to deploy Luna, coco, configure nginx for url distribution,</div> "
+                "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
         return HttpResponse(msg)
 
 

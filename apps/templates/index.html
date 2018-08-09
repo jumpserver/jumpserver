@@ -64,7 +64,7 @@
                 {% for data in user_visit_count_top_five %}
                     <li class="list-group-item fist-item">
                         <span class="pull-right">
-                            {{ data.total }}次/周
+                            {{ data.total }}{% trans ' times/week' %}
                         </span>
                         <span class="label ">{{ forloop.counter }}</span> {{ data.user }}
                     </li>
@@ -130,12 +130,12 @@
                                         <i class="fa fa-info-circle"></i>
                                         <strong data-toggle="tooltip" title="{{ data.asset }}">{{ data.asset }}</strong>
                                         <br/>
-                                        <small class="text-navy">{{ data.total }}次</small>
+                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
                                         <p class="m-b-xs">{% trans 'The last time a user logged in' %}</p>
                                         <p>{{ data.last.user }}</p>
-                                        <p>于{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -218,12 +218,12 @@
                                         <i class="fa fa-info-circle"></i>
                                         <strong data-toggle="tooltip" title="{{ data.user }}">{{ data.user }}</strong>
                                         <br/>
-                                        <small class="text-navy">{{ data.total }}次</small>
+                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
                                         <p class="m-b-xs">{% trans 'The last time logged on to the host' %}</p>
                                         <p>{{ data.last.asset }}</p>
-                                        <p>于{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>

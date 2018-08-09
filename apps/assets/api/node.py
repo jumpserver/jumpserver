@@ -210,7 +210,8 @@ class RefreshNodeHardwareInfoApi(APIView):
         node_id = kwargs.get('pk')
         node = get_object_or_404(self.model, id=node_id)
         assets = node.assets.all()
-        task_name = _("更新节点资产硬件信息: {}".format(node.name))
+        # task_name = _("更新节点资产硬件信息: {}".format(node.name))
+        task_name = _("Update node asset hardware information: {}").format(node.name)
         task = update_assets_hardware_info_util.delay(assets, task_name=task_name)
         return Response({"task": task.id})
 
@@ -223,6 +224,7 @@ class TestNodeConnectiveApi(APIView):
         node_id = kwargs.get('pk')
         node = get_object_or_404(self.model, id=node_id)
         assets = node.assets.all()
-        task_name = _("测试节点下资产是否可连接: {}".format(node.name))
+        # task_name = _("测试节点下资产是否可连接: {}".format(node.name))
+        task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
         task = test_asset_connectability_util.delay(assets, task_name=task_name)
         return Response({"task": task.id})

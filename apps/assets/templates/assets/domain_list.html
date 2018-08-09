@@ -4,8 +4,11 @@
 
 {% block help_message %}
     <div class="alert alert-info help-message">
-    网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。<br>
-    JMS => 网域网关 => 目标资产
+{#    网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。<br>#}
+{#    JMS => 网域网关 => 目标资产#}
+    {% trans 'The domain function is added to address the fact that some environments (such as the hybrid cloud) cannot be connected directly by jumping on the gateway server.' %}
+    <br>
+    {% trans 'JMS => Domain gateway => Target assets' %}
     </div>
 {% endblock %}
 

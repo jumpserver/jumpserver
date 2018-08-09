@@ -173,7 +173,10 @@ class UserOtpAuthApi(APIView):
 
         user = cache.get(seed, None)
         if not user:
-            return Response({'msg': '请先进行用户名和密码验证'}, status=401)
+            return Response(
+                {'msg': _('Please verify the user name and password first')},
+                status=401
+            )
 
         if not check_otp_code(user.otp_secret_key, otp_code):
             data = {
@@ -183,7 +186,7 @@ class UserOtpAuthApi(APIView):
                 'status': False
             }
             self.write_login_log(request, data)
-            return Response({'msg': 'MFA认证失败'}, status=401)
+            return Response({'msg': _('MFA certification failed')}, status=401)
 
         data = {
             'username': user.username,
@@ -269,7 +272,8 @@ class UserAuthApi(APIView):
         return Response(
             {
                 'code': 101,
-                'msg': '请携带seed值,进行MFA二次认证',
+                'msg': _('Please carry seed value and '
+                         'conduct MFA secondary certification'),
                 'otp_url': reverse('api-users:user-otp-auth'),
                 'seed': seed,
                 'user': self.serializer_class(user).data

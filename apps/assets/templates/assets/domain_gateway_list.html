@@ -120,8 +120,8 @@ $(document).ready(function(){
     APIUpdateAttr({
         url: the_url,
         method: "GET",
-        success_message: "可连接",
-        fail_message: "连接失败"
+        success_message: "{% trans 'Can be connected' %}",
+        fail_message: "{% trans 'The connection fails' %}"
     })
 });
 </script>
