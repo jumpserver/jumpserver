@@ -467,6 +467,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     server {
         listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
 
+        client_max_body_size 100m;  # 录像上传大小限制
+
         location /luna/ {
             try_files $uri / /index.html;
             alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
@@ -503,7 +505,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
-            client_max_body_size 100m;  # Windows 文件上传大小限制
         }
 
         location / {
