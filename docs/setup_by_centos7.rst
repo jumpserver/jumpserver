@@ -35,8 +35,8 @@ CentOS 7 安装文档
 
     $ firewall-cmd --reload  # 重新载入规则
 
-    # selinux 设置 http 访问权限
-    $ setsebool -P httpd_can_network_connect 1
+    $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
+    $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
