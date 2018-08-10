@@ -8,7 +8,6 @@ import codecs
 import chardet
 from io import StringIO
 
-from django.conf import settings
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
@@ -25,11 +24,12 @@ from django.shortcuts import redirect
 from django.contrib.messages.views import SuccessMessageMixin
 
 from common.mixins import JSONResponseMixin
-from common.utils import get_object_or_none, get_logger, is_uuid
+from common.utils import get_object_or_none, get_logger
+from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
+from orgs.utils import current_org
 from .. import forms
 from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
-from common.permissions import AdminUserRequiredMixin
 
 
 __all__ = [
@@ -44,7 +44,10 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'assets/asset_list.html'
 
     def get_context_data(self, **kwargs):
-        Node.root()
+        if current_org.is_default():
+            Node.default_node()
+        else:
+            Node.root()
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),

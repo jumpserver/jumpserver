@@ -43,10 +43,6 @@ class NodeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
-    def get_queryset(self):
-        queryset = super().get_queryset().annotate(Count('assets'))
-        return queryset
-
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()
         serializer.validated_data["key"] = child_key
@@ -108,9 +104,9 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
             queryset.append(node)
 
         if query_all:
-            children = node.get_all_children().annotate(Count("assets"))
+            children = node.get_all_children()
         else:
-            children = node.get_children().annotate(Count("assets"))
+            children = node.get_children()
         queryset.extend(list(children))
 
         if query_assets:
