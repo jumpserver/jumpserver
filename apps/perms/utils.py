@@ -139,8 +139,6 @@ class AssetPermissionUtil:
         for node, system_users in nodes.items():
             _assets = node.get_all_assets().valid().prefetch_related('nodes')
             for asset in _assets:
-                if isinstance(asset, Node):
-                    print(_assets)
                 assets[asset].update(system_users)
         self._assets = assets
         return self._assets

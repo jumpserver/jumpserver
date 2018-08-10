@@ -194,9 +194,10 @@ function addTreeNode() {
     $.post(url,  {}, function (data, status){
         if (status === "success") {
             var newNode = {
+                id: data["key"],
                 name: data["value"],
-                id: data["id"],
-                pId: parentNode.node_id
+                node_id: data["id"],
+                pId: parentNode.id
             };
             newNode.checked = zTree.getSelectedNodes()[0].checked;
             zTree.addNodes(parentNode, 0, newNode);
@@ -287,7 +288,9 @@ function onRename(event, treeId, treeNode, isCancel){
     APIUpdateAttr({
         url: url,
         body: JSON.stringify(data),
-        method: "PATCH"
+        method: "PATCH",
+        success_message: "{% trans 'Rename success' %}",
+        fail_message: "{% trans 'Rename failed, do not change the root node name' %}"
     })
 }
 

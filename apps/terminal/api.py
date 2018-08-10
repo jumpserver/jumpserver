@@ -243,7 +243,6 @@ class CommandViewSet(viewsets.ViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
         if serializer.is_valid():
-            print(serializer.validated_data)
             ok = self.command_store.bulk_save(serializer.validated_data)
             if ok:
                 return Response("ok", status=201)
