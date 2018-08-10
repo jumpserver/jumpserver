@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-03 15:14+0800\n"
+"POT-Creation-Date: 2018-08-10 16:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,15 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/api/node.py:97
+#: assets/api/node.py:58
+msgid "You cant update the root node name"
+msgstr ""
+
+#: assets/api/node.py:82
 msgid "New node {}"
 msgstr "新节点 {}"
 
-#: assets/api/node.py:232
+#: assets/api/node.py:221
 msgid "更新节点资产硬件信息: {}"
 msgstr ""
 
-#: assets/api/node.py:245
+#: assets/api/node.py:234
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
@@ -54,7 +58,7 @@ msgid "Label"
 msgstr "标签"
 
 #: assets/forms/asset.py:37 assets/forms/asset.py:76 assets/models/asset.py:76
-#: assets/models/domain.py:47 assets/templates/assets/user_asset_list.html:188
+#: assets/models/domain.py:47 assets/templates/assets/user_asset_list.html:168
 msgid "Domain"
 msgstr "网域"
 
@@ -63,7 +67,7 @@ msgstr "网域"
 #: assets/templates/assets/asset_update.html:35 perms/forms.py:50
 #: perms/forms.py:57 perms/models.py:78
 #: perms/templates/perms/asset_permission_list.html:57
-#: perms/templates/perms/asset_permission_list.html:142
+#: perms/templates/perms/asset_permission_list.html:151
 msgid "Node"
 msgstr "节点"
 
@@ -91,7 +95,7 @@ msgstr "选择资产"
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/domain_gateway_list.html:58
 #: assets/templates/assets/system_user_asset.html:51
-#: assets/templates/assets/user_asset_list.html:183
+#: assets/templates/assets/user_asset_list.html:163
 msgid "Port"
 msgstr "端口"
 
@@ -106,7 +110,7 @@ msgstr "端口"
 #: perms/models.py:31
 #: perms/templates/perms/asset_permission_create_update.html:40
 #: perms/templates/perms/asset_permission_list.html:56
-#: perms/templates/perms/asset_permission_list.html:139
+#: perms/templates/perms/asset_permission_list.html:148
 #: terminal/backends/command/models.py:13 terminal/models.py:128
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
@@ -118,7 +122,7 @@ msgstr "资产"
 #: assets/forms/domain.py:55 assets/forms/user.py:79 assets/forms/user.py:139
 #: assets/models/base.py:22 assets/models/cluster.py:18
 #: assets/models/domain.py:18 assets/models/group.py:20
-#: assets/models/label.py:17 assets/templates/assets/admin_user_detail.html:56
+#: assets/models/label.py:18 assets/templates/assets/admin_user_detail.html:56
 #: assets/templates/assets/admin_user_list.html:23
 #: assets/templates/assets/domain_detail.html:56
 #: assets/templates/assets/domain_gateway_list.html:56
@@ -142,9 +146,6 @@ msgstr "资产"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:52
-#: xpack/plugins/orgs/templates/orgs/org_list.html:12
-#: xpack/templates/orgs/org_list.html:12
 msgid "Name"
 msgstr "名称"
 
@@ -221,7 +222,7 @@ msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 #: assets/templates/assets/domain_gateway_list.html:57
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:46
-#: assets/templates/assets/user_asset_list.html:182 common/forms.py:144
+#: assets/templates/assets/user_asset_list.html:162 common/forms.py:145
 #: perms/templates/perms/asset_permission_asset.html:55
 #: users/templates/users/login_log_list.html:52
 #: users/templates/users/user_granted_asset.html:45
@@ -235,7 +236,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:91
 #: assets/templates/assets/system_user_asset.html:49
 #: assets/templates/assets/user_asset_list.html:45
-#: assets/templates/assets/user_asset_list.html:181 common/forms.py:143
+#: assets/templates/assets/user_asset_list.html:161 common/forms.py:144
 #: perms/templates/perms/asset_permission_asset.html:54
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
@@ -247,19 +248,19 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:59
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:28
-#: assets/templates/assets/user_asset_list.html:184
+#: assets/templates/assets/user_asset_list.html:164
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
 
 #: assets/models/asset.py:74 assets/templates/assets/asset_detail.html:97
-#: assets/templates/assets/user_asset_list.html:185
+#: assets/templates/assets/user_asset_list.html:165
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:81 assets/models/domain.py:49
-#: assets/models/label.py:20 assets/templates/assets/asset_detail.html:105
-#: assets/templates/assets/user_asset_list.html:189
+#: assets/models/label.py:21 assets/templates/assets/asset_detail.html:105
+#: assets/templates/assets/user_asset_list.html:169
 msgid "Is active"
 msgstr "激活"
 
@@ -308,7 +309,7 @@ msgid "Disk info"
 msgstr "硬盘信息"
 
 #: assets/models/asset.py:111 assets/templates/assets/asset_detail.html:101
-#: assets/templates/assets/user_asset_list.html:186
+#: assets/templates/assets/user_asset_list.html:166
 msgid "OS"
 msgstr "操作系统"
 
@@ -344,7 +345,7 @@ msgstr "创建者"
 
 #: assets/models/asset.py:126 assets/models/cluster.py:26
 #: assets/models/domain.py:21 assets/models/group.py:22
-#: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:64
+#: assets/models/label.py:24 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/domain_detail.html:68
 #: assets/templates/assets/system_user_detail.html:96
 #: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:63
@@ -352,14 +353,13 @@ msgstr "创建者"
 #: perms/templates/perms/asset_permission_detail.html:94
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
 #: users/templates/users/user_group_detail.html:63
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:60
 msgid "Date created"
 msgstr "创建日期"
 
 #: assets/models/asset.py:128 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/domain.py:19
 #: assets/models/domain.py:48 assets/models/group.py:23
-#: assets/models/label.py:21 assets/templates/assets/admin_user_detail.html:72
+#: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:29
 #: assets/templates/assets/asset_detail.html:125
 #: assets/templates/assets/domain_detail.html:76
@@ -367,7 +367,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_list.html:25
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:34
-#: assets/templates/assets/user_asset_list.html:190 common/models.py:30
+#: assets/templates/assets/user_asset_list.html:170 common/models.py:30
 #: ops/models/adhoc.py:42 orgs/models.py:15 perms/models.py:39
 #: perms/models.py:85 perms/templates/perms/asset_permission_detail.html:102
 #: terminal/models.py:27 terminal/templates/terminal/terminal_detail.html:63
@@ -376,9 +376,6 @@ msgstr "创建日期"
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
 #: users/templates/users/user_profile.html:130
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:64
-#: xpack/plugins/orgs/templates/orgs/org_list.html:15
-#: xpack/templates/orgs/org_list.html:14
 msgid "Comment"
 msgstr "备注"
 
@@ -423,7 +420,7 @@ msgstr "运营商"
 msgid "Default"
 msgstr "默认"
 
-#: assets/models/cluster.py:36 assets/models/label.py:13
+#: assets/models/cluster.py:36 assets/models/label.py:14
 #: users/models/user.py:360
 msgid "System"
 msgstr "系统"
@@ -444,13 +441,13 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:14 audits/models.py:11
+#: assets/models/label.py:15 audits/models.py:11
 #: audits/templates/audits/ftp_log_list.html:33
 #: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:16
 #: perms/forms.py:41 perms/models.py:29
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/asset_permission_list.html:54
-#: perms/templates/perms/asset_permission_list.html:133
+#: perms/templates/perms/asset_permission_list.html:142
 #: terminal/backends/command/models.py:12 terminal/models.py:127
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
@@ -458,20 +455,16 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:312
 #: users/models/user.py:33 users/models/user.py:348
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:380
-#: xpack/plugins/orgs/forms.py:26
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:113
-#: xpack/plugins/orgs/templates/orgs/org_list.html:14
-#: xpack/templates/orgs/org_list.html:13
+#: users/templates/users/user_group_list.html:13 users/views/user.py:379
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:18 assets/models/node.py:19
+#: assets/models/label.py:19 assets/models/node.py:19
 #: assets/templates/assets/label_list.html:15 common/models.py:27
 msgid "Value"
 msgstr "值"
 
-#: assets/models/label.py:19
+#: assets/models/label.py:20
 msgid "Category"
 msgstr "分类"
 
@@ -492,9 +485,9 @@ msgstr "手动登录"
 #: assets/templates/assets/system_user_asset.html:21
 #: assets/views/admin_user.py:29 assets/views/admin_user.py:47
 #: assets/views/admin_user.py:63 assets/views/admin_user.py:78
-#: assets/views/admin_user.py:102 assets/views/asset.py:49
-#: assets/views/asset.py:96 assets/views/asset.py:156 assets/views/asset.py:173
-#: assets/views/asset.py:197 assets/views/domain.py:29
+#: assets/views/admin_user.py:102 assets/views/asset.py:52
+#: assets/views/asset.py:99 assets/views/asset.py:159 assets/views/asset.py:176
+#: assets/views/asset.py:200 assets/views/domain.py:29
 #: assets/views/domain.py:45 assets/views/domain.py:61
 #: assets/views/domain.py:74 assets/views/domain.py:98
 #: assets/views/domain.py:126 assets/views/domain.py:145
@@ -528,13 +521,13 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:181 assets/templates/assets/user_asset_list.html:187
+#: assets/models/user.py:181 assets/templates/assets/user_asset_list.html:167
 #: audits/models.py:14 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:73 perms/forms.py:53
 #: perms/models.py:33 perms/models.py:80
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:58
-#: perms/templates/perms/asset_permission_list.html:145 templates/_nav.html:26
+#: perms/templates/perms/asset_permission_list.html:154 templates/_nav.html:26
 #: terminal/backends/command/models.py:14 terminal/models.py:129
 #: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/command_list.html:74
@@ -628,7 +621,7 @@ msgstr "资产csv文件"
 msgid "If set id, will use this id update asset existed"
 msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
-#: assets/templates/assets/_asset_list_modal.html:7 assets/views/asset.py:50
+#: assets/templates/assets/_asset_list_modal.html:7 assets/views/asset.py:53
 #: templates/_nav.html:23
 msgid "Asset list"
 msgstr "资产列表"
@@ -715,12 +708,12 @@ msgstr "重置"
 msgid "Submit"
 msgstr "提交"
 
-#: assets/templates/assets/_user_asset_detail_modal.html:7
-#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:198
+#: assets/templates/assets/_user_asset_detail_modal.html:11
+#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:201
 msgid "Asset detail"
 msgstr "资产详情"
 
-#: assets/templates/assets/_user_asset_detail_modal.html:20
+#: assets/templates/assets/_user_asset_detail_modal.html:23
 #: templates/_modal.html:21
 msgid "Close"
 msgstr "关闭"
@@ -780,7 +773,7 @@ msgstr "测试"
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:85
 #: assets/templates/assets/asset_detail.html:24
-#: assets/templates/assets/asset_list.html:180
+#: assets/templates/assets/asset_list.html:170
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
 #: assets/templates/assets/domain_gateway_list.html:85
@@ -789,7 +782,7 @@ msgstr "测试"
 #: assets/templates/assets/system_user_detail.html:26
 #: assets/templates/assets/system_user_list.html:89
 #: perms/templates/perms/asset_permission_detail.html:30
-#: perms/templates/perms/asset_permission_list.html:191
+#: perms/templates/perms/asset_permission_list.html:200
 #: terminal/templates/terminal/terminal_detail.html:16
 #: terminal/templates/terminal/terminal_list.html:71
 #: users/templates/users/user_detail.html:25
@@ -798,16 +791,13 @@ msgstr "测试"
 #: users/templates/users/user_list.html:77
 #: users/templates/users/user_profile.html:151
 #: users/templates/users/user_profile.html:180
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:25
-#: xpack/plugins/orgs/templates/orgs/org_list.html:48
-#: xpack/templates/orgs/org_list.html:43
 msgid "Update"
 msgstr "更新"
 
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:86
 #: assets/templates/assets/asset_detail.html:28
-#: assets/templates/assets/asset_list.html:181
+#: assets/templates/assets/asset_list.html:171
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
 #: assets/templates/assets/domain_gateway_list.html:86
@@ -817,16 +807,13 @@ msgstr "更新"
 #: assets/templates/assets/system_user_list.html:90
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_detail.html:34
-#: perms/templates/perms/asset_permission_list.html:192
+#: perms/templates/perms/asset_permission_list.html:201
 #: terminal/templates/terminal/terminal_list.html:73
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
 #: users/templates/users/user_group_list.html:45
 #: users/templates/users/user_list.html:81
 #: users/templates/users/user_list.html:85
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:29
-#: xpack/plugins/orgs/templates/orgs/org_list.html:50
-#: xpack/templates/orgs/org_list.html:45
 msgid "Delete"
 msgstr "删除"
 
@@ -841,7 +828,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-#: assets/templates/assets/asset_list.html:646
+#: assets/templates/assets/asset_list.html:630
 #: assets/templates/assets/system_user_detail.html:195
 #: assets/templates/assets/system_user_list.html:139 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
@@ -853,8 +840,6 @@ msgstr "选择节点"
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:200
 #: users/templates/users/user_profile.html:222
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
-#: xpack/templates/orgs/org_list.html:86
 msgid "Confirm"
 msgstr "确认"
 
@@ -888,8 +873,6 @@ msgstr "比例"
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:29
-#: xpack/plugins/orgs/templates/orgs/org_list.html:16
-#: xpack/templates/orgs/org_list.html:15
 msgid "Action"
 msgstr "动作"
 
@@ -945,7 +928,7 @@ msgstr "刷新"
 msgid "Update successfully!"
 msgstr "更新成功"
 
-#: assets/templates/assets/asset_list.html:68 assets/views/asset.py:97
+#: assets/templates/assets/asset_list.html:68 assets/views/asset.py:100
 msgid "Create asset"
 msgstr "创建资产"
 
@@ -1023,43 +1006,50 @@ msgstr "仅显示当前节点资产"
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-#: assets/templates/assets/asset_list.html:223
+#: assets/templates/assets/asset_list.html:207
 msgid "Create node failed"
 msgstr "创建节点失败"
 
-#: assets/templates/assets/asset_list.html:235
+#: assets/templates/assets/asset_list.html:219
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:237
+#: assets/templates/assets/asset_list.html:221
 msgid "Have assets, cancel"
 msgstr "存在资产，不能删除"
 
-#: assets/templates/assets/asset_list.html:641
+#: assets/templates/assets/asset_list.html:292
+msgid "Rename success"
+msgstr "重命名成功"
+
+#: assets/templates/assets/asset_list.html:293
+msgid "Rename failed, do not change the root node name"
+msgstr "重命名失败，不可以更改根节点名称"
+
+#: assets/templates/assets/asset_list.html:625
 #: assets/templates/assets/system_user_list.html:134
 #: users/templates/users/user_detail.html:369
 #: users/templates/users/user_detail.html:394
 #: users/templates/users/user_detail.html:461
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:195
-#: xpack/templates/orgs/org_list.html:81
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:642
+#: assets/templates/assets/asset_list.html:626
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:650
+#: assets/templates/assets/asset_list.html:634
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:651
-#: assets/templates/assets/asset_list.html:656
+#: assets/templates/assets/asset_list.html:635
+#: assets/templates/assets/asset_list.html:640
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:655
+#: assets/templates/assets/asset_list.html:639
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1189,19 +1179,19 @@ msgstr "更新管理用户"
 msgid "Admin user detail"
 msgstr "管理用户详情"
 
-#: assets/views/asset.py:63 templates/_nav_user.html:4
+#: assets/views/asset.py:66 templates/_nav_user.html:4
 msgid "My assets"
 msgstr "我的资产"
 
-#: assets/views/asset.py:157
+#: assets/views/asset.py:160
 msgid "Bulk update asset"
 msgstr "批量更新资产"
 
-#: assets/views/asset.py:174
+#: assets/views/asset.py:177
 msgid "Update asset"
 msgstr "更新资产"
 
-#: assets/views/asset.py:314
+#: assets/views/asset.py:317
 msgid "already exists"
 msgstr "已经存在"
 
@@ -1299,7 +1289,11 @@ msgstr "邮件已经发送{}, 请检查"
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: common/api.py:80
+#: common/api.py:72
+msgid "Search no entry matched in ou {}"
+msgstr ""
+
+#: common/api.py:81
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
@@ -1361,7 +1355,7 @@ msgstr "SMTP密码"
 msgid "Some provider use token except password"
 msgstr "一些邮件提供商需要输入的是Token"
 
-#: common/forms.py:96 common/forms.py:136
+#: common/forms.py:96 common/forms.py:137
 msgid "Use SSL"
 msgstr "使用SSL"
 
@@ -1389,20 +1383,24 @@ msgstr "绑定DN"
 msgid "User OU"
 msgstr "用户OU"
 
-#: common/forms.py:120
+#: common/forms.py:118
+msgid "Use | split User OUs"
+msgstr ""
+
+#: common/forms.py:121
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: common/forms.py:121
+#: common/forms.py:122
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: common/forms.py:124
+#: common/forms.py:125
 msgid "User attr map"
 msgstr "LDAP属性映射"
 
-#: common/forms.py:131
+#: common/forms.py:132
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -1410,116 +1408,116 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的属性"
 
-#: common/forms.py:138
+#: common/forms.py:139
 msgid "Enable LDAP auth"
 msgstr "启用LDAP认证"
 
-#: common/forms.py:147
+#: common/forms.py:148
 msgid "List sort by"
 msgstr "资产列表排序"
 
-#: common/forms.py:150
+#: common/forms.py:151
 msgid "Heartbeat interval"
 msgstr "心跳间隔"
 
-#: common/forms.py:150 ops/models/adhoc.py:37
+#: common/forms.py:151 ops/models/adhoc.py:37
 msgid "Units: seconds"
 msgstr "单位: 秒"
 
-#: common/forms.py:153
+#: common/forms.py:154
 msgid "Password auth"
 msgstr "密码认证"
 
-#: common/forms.py:156
+#: common/forms.py:157
 msgid "Public key auth"
 msgstr "密钥认证"
 
-#: common/forms.py:159 common/templates/common/terminal_setting.html:68
+#: common/forms.py:160 common/templates/common/terminal_setting.html:68
 #: terminal/forms.py:30 terminal/models.py:21
 msgid "Command storage"
 msgstr "命令存储"
 
-#: common/forms.py:160
+#: common/forms.py:161
 msgid ""
 "Set terminal storage setting, `default` is the using as default,You can set "
 "other storage and some terminal using"
 msgstr "设置终端命令存储，default是默认用的存储方式"
 
-#: common/forms.py:165 common/templates/common/terminal_setting.html:86
+#: common/forms.py:166 common/templates/common/terminal_setting.html:86
 #: terminal/forms.py:35 terminal/models.py:22
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: common/forms.py:166
+#: common/forms.py:167
 msgid ""
 "Set replay storage setting, `default` is the using as default,You can set "
 "other storage and some terminal using"
 msgstr "设置终端录像存储，default是默认用的存储方式"
 
-#: common/forms.py:176
+#: common/forms.py:177
 msgid "MFA Secondary certification"
 msgstr "MFA 二次认证"
 
-#: common/forms.py:178
+#: common/forms.py:179
 msgid ""
 "After opening, the user login must use MFA secondary authentication (valid "
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: common/forms.py:185
+#: common/forms.py:186
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: common/forms.py:190
+#: common/forms.py:191
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: common/forms.py:192
+#: common/forms.py:193
 msgid ""
 "Tip :(unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示:（单位 / 分钟）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
 
-#: common/forms.py:198
+#: common/forms.py:199
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:205
+#: common/forms.py:206
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:207
+#: common/forms.py:208
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:213
+#: common/forms.py:214
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:214
+#: common/forms.py:215
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:220
+#: common/forms.py:221
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:221
+#: common/forms.py:222
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:227
+#: common/forms.py:228
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:228
+#: common/forms.py:229
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -1660,7 +1658,6 @@ msgid "Become"
 msgstr "Become"
 
 #: ops/models/adhoc.py:161 users/templates/users/user_group_detail.html:59
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
 
@@ -1880,13 +1877,13 @@ msgid "Task run history"
 msgstr "执行历史"
 
 #: perms/forms.py:20 users/forms.py:265 users/forms.py:270 users/forms.py:282
-#: users/forms.py:316 xpack/plugins/orgs/forms.py:30
+#: users/forms.py:316
 msgid "Select users"
 msgstr "选择用户"
 
 #: perms/forms.py:44 perms/models.py:30 perms/models.py:79
 #: perms/templates/perms/asset_permission_list.html:55
-#: perms/templates/perms/asset_permission_list.html:136 templates/_nav.html:14
+#: perms/templates/perms/asset_permission_list.html:145 templates/_nav.html:14
 #: users/models/group.py:26 users/models/user.py:57
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:200
@@ -1934,8 +1931,6 @@ msgstr "添加资产"
 #: perms/templates/perms/asset_permission_user.html:97
 #: perms/templates/perms/asset_permission_user.html:125
 #: users/templates/users/user_group_detail.html:95
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:93
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:130
 msgid "Add"
 msgstr "添加"
 
@@ -2041,7 +2036,7 @@ msgstr "文档"
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:362
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:361
 msgid "Profile"
 msgstr "个人信息"
 
@@ -2096,7 +2091,7 @@ msgstr ""
 #: users/views/group.py:61 users/views/group.py:78 users/views/group.py:94
 #: users/views/login.py:333 users/views/login.py:397 users/views/user.py:68
 #: users/views/user.py:83 users/views/user.py:111 users/views/user.py:193
-#: users/views/user.py:349 users/views/user.py:399 users/views/user.py:434
+#: users/views/user.py:348 users/views/user.py:398 users/views/user.py:433
 msgid "Users"
 msgstr "用户管理"
 
@@ -2367,7 +2362,7 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api.py:232 users/templates/users/login.html:50
+#: users/api.py:235 users/templates/users/login.html:50
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -2902,7 +2897,6 @@ msgid "After unlocking the user, the user can log in normally."
 msgstr "解除用户登录限制后，此用户即可正常登录"
 
 #: users/templates/users/user_group_create_update.html:31
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
 msgstr "取消"
 
@@ -2913,33 +2907,27 @@ msgid "User group detail"
 msgstr "用户组详情"
 
 #: users/templates/users/user_group_detail.html:86
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:121
 msgid "Add user"
 msgstr "添加用户"
 
 #: users/templates/users/user_group_list.html:5 users/views/group.py:44
-#: xpack/templates/orgs/org_list.html:5
 msgid "Create user group"
 msgstr "创建用户组"
 
 #: users/templates/users/user_group_list.html:82
-#: xpack/templates/orgs/org_list.html:82
 msgid "This will delete the selected groups !!!"
 msgstr "删除选择组"
 
 #: users/templates/users/user_group_list.html:90
-#: xpack/templates/orgs/org_list.html:90
 msgid "UserGroups Deleted."
 msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:91
 #: users/templates/users/user_group_list.html:96
-#: xpack/templates/orgs/org_list.html:91 xpack/templates/orgs/org_list.html:96
 msgid "UserGroups Delete"
 msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:95
-#: xpack/templates/orgs/org_list.html:95
 msgid "UserGroup Deleting failed."
 msgstr "用户组删除失败"
 
@@ -3169,7 +3157,7 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:181 users/views/user.py:519 users/views/user.py:544
+#: users/views/login.py:181 users/views/user.py:518 users/views/user.py:543
 msgid "MFA code invalid"
 msgstr "MFA码认证失败"
 
@@ -3210,7 +3198,7 @@ msgstr "Token错误或失效"
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:295 users/views/user.py:127 users/views/user.py:417
+#: users/views/login.py:295 users/views/user.py:127 users/views/user.py:416
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -3230,89 +3218,74 @@ msgstr "批量更新用户成功"
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:350
+#: users/views/user.py:349
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:381
+#: users/views/user.py:380
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:400
+#: users/views/user.py:399
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:435
+#: users/views/user.py:434
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:476
+#: users/views/user.py:475
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:570
+#: users/views/user.py:569
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:571
+#: users/views/user.py:570
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:573
+#: users/views/user.py:572
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:574
+#: users/views/user.py:573
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
-#: xpack/plugins/orgs/forms.py:14
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:76
-#: xpack/plugins/orgs/templates/orgs/org_list.html:13
-msgid "Admin"
-msgstr "管理员"
+#~ msgid "Admin"
+#~ msgstr "管理员"
 
-#: xpack/plugins/orgs/forms.py:18
-msgid "Select admins"
-msgstr "选择管理员"
+#~ msgid "Select admins"
+#~ msgstr "选择管理员"
 
-#: xpack/plugins/orgs/meta.py:7
-msgid "Organization"
-msgstr "组织管理"
+#~ msgid "Organization"
+#~ msgstr "组织管理"
 
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:22
-#: xpack/plugins/orgs/views.py:73
-msgid "Org detail"
-msgstr "组织详情"
+#~ msgid "Org detail"
+#~ msgstr "组织详情"
 
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:84
-msgid "Add admin"
-msgstr "添加管理员"
+#~ msgid "Add admin"
+#~ msgstr "添加管理员"
 
-#: xpack/plugins/orgs/templates/orgs/org_list.html:5
-msgid "Create organization "
-msgstr "创建组织"
+#~ msgid "Create organization "
+#~ msgstr "创建组织"
 
-#: xpack/plugins/orgs/views.py:24
-msgid "Org"
-msgstr "组织"
+#~ msgid "Org"
+#~ msgstr "组织"
 
-#: xpack/plugins/orgs/views.py:25
-msgid "Org list"
-msgstr "组织列表"
+#~ msgid "Org list"
+#~ msgstr "组织列表"
 
-#: xpack/plugins/orgs/views.py:40 xpack/plugins/orgs/views.py:56
-#: xpack/plugins/orgs/views.py:72
-msgid "Orgs"
-msgstr "组织"
+#~ msgid "Orgs"
+#~ msgstr "组织"
 
-#: xpack/plugins/orgs/views.py:41
-msgid "Create org"
-msgstr "创建组织"
+#~ msgid "Create org"
+#~ msgstr "创建组织"
 
-#: xpack/plugins/orgs/views.py:57
-msgid "Update org"
-msgstr "更新组织"
+#~ msgid "Update org"
+#~ msgstr "更新组织"
 
 #~ msgid "* required Must set exact system platform, Windows, Linux ..."
 #~ msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."

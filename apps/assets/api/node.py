@@ -48,6 +48,18 @@ class NodeViewSet(viewsets.ModelViewSet):
         serializer.validated_data["key"] = child_key
         serializer.save()
 
+    def update(self, request, *args, **kwargs):
+        node = self.get_object()
+        if node.is_root():
+            node_value = node.value
+            post_value = request.data.get('value')
+            if node_value != post_value:
+                return Response(
+                    {"msg": _("You cant update the root node name")},
+                    status=400
+                )
+        return super().update(request, *args, **kwargs)
+
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     queryset = Node.objects.all()
