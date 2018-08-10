@@ -23,6 +23,9 @@
     # 安装依赖包
     $ yum install -y yum-utils device-mapper-persistent-data lvm2
 
+    # 设置 selinux 策略
+    $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key
+
     # 安装 docker（192.168.100.100 是 jumpserver 的 url 地址）
     $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     $ yum makecache fast

@@ -277,8 +277,8 @@ FAQ
 
     $ firewall-cmd --reload  # 重新载入规则
 
-    # selinux 设置 http 访问权限
-    $ setsebool -P httpd_can_network_connect 1
+    $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
+    $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
 16. 添加组织及组织管理员命令(1.4.0版本)
 
