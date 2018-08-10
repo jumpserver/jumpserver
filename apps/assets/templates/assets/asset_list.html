@@ -288,7 +288,9 @@ function onRename(event, treeId, treeNode, isCancel){
     APIUpdateAttr({
         url: url,
         body: JSON.stringify(data),
-        method: "PATCH"
+        method: "PATCH",
+        success_message: "{% trans 'Rename success' %}",
+        fail_message: "{% trans 'Rename failed, do not change the root node name' %}"
     })
 }
 

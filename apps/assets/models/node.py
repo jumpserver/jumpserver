@@ -200,6 +200,11 @@ class Node(OrgModelMixin):
             return cls.create_root_node()
 
     @classmethod
+    def default_node(cls):
+        defaults = {'value': 'Default'}
+        return cls.objects.get_or_create(defaults=defaults, key='0')
+
+    @classmethod
     def generate_fake(cls, count=100):
         import random
         for i in range(count):
