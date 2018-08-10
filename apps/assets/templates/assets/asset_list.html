@@ -194,9 +194,10 @@ function addTreeNode() {
     $.post(url,  {}, function (data, status){
         if (status === "success") {
             var newNode = {
+                id: data["key"],
                 name: data["value"],
-                id: data["id"],
-                pId: parentNode.node_id
+                node_id: data["id"],
+                pId: parentNode.id
             };
             newNode.checked = zTree.getSelectedNodes()[0].checked;
             zTree.addNodes(parentNode, 0, newNode);
