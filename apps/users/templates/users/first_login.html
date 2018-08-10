@@ -148,7 +148,7 @@
         var user_source = "{{ request.user.source }}";
         if (user_source === 'ldap') {
             $.each(["0-username","0-name","0-email"], function (i, v) {
-                $("#id_" + v).attr('disabled', 'disabled')
+                $("#id_" + v).attr('readonly', 'readonly')
             })
         }
     })
