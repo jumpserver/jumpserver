@@ -166,6 +166,8 @@
     server {
         listen 80;
 
+        client_max_body_size 100m;  # 录像上传大小限制
+
         location /media/ {
             add_header Content-Encoding gzip;
             root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改

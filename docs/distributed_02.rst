@@ -158,6 +158,8 @@
         ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
         ssl_prefer_server_ciphers on;
 
+        client_max_body_size 100m;  # 录像上传大小限制
+
         location / {
             proxy_pass http://jumpserver;  # jumpserver
             proxy_set_header X-Real-IP $remote_addr;
@@ -195,7 +197,6 @@
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
-            client_max_body_size 100m;  # Windows 文件上传大小限制
             # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
     }
