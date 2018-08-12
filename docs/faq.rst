@@ -85,23 +85,10 @@ FAQ
 
 ::
 
-    # 检测 /etc/locale.conf 是否是 LANG="zh_CN.UTF-8"
-    $ cat /etc/locale.conf
-    # 如果不是，请修改，注，本例只是以CentOS 7举例，其他的linux请更换路径
-    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-    $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
-
     $ source /opt/py3/bin/activate
-    $ cd /opt/jumpserver/apps
-    $ python manage.py shell
-    >>> from celery.task.control import discard_all
-    >>> discard_all()
-    >>> exit()
-    $ cd /opt/jumpserver
-    $ ./jms restart celery
+    $ celery -A ops purge -f
 
-    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的进程，在重新启动jumpserver即可
+    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的jumpserver相关进程，在重新启动jumpserver即可
 
 7. 修改登录超时时间（默认 10 秒）
 
