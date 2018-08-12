@@ -87,10 +87,8 @@ FAQ
 
     $ source /opt/py3/bin/activate
     $ celery -A ops purge -f
-    $ cd /opt/jumpserver
-    $ ./jms restart celery
 
-    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的进程，在重新启动jumpserver即可
+    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的jumpserver相关进程，在重新启动jumpserver即可
 
 7. 修改登录超时时间（默认 10 秒）
 
