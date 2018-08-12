@@ -187,7 +187,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
         # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
         # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问
-        DEBUG = os.environ.get("DEBUG") or False
+        DEBUG = os.environ.get("DEBUG") or True
 
         # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
         LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'WARNING'
@@ -210,7 +210,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
-        HTTP_BIND_HOST = '127.0.0.1'
+        HTTP_BIND_HOST = '0.0.0.0'
         HTTP_LISTEN_PORT = 8080
 
         # Redis 相关设置
@@ -258,7 +258,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，跟着教程继续操作就行，后面搭建 nginx 代理就可以正常访问了
+运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 后面搭建 nginx 代理后请通过代理的端口访问，原因是因为 django 无法在非 debug 模式下加载静态资源
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -283,7 +283,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/coco/requirements
     $ yum -y  install $(cat rpm_requirements.txt)
-    $ pip install -r requirements.txt -i https://pypi.org/simple
+    $ pip install -r requirements.txt
 
 **3.3 修改配置文件并运行**
 
@@ -379,7 +379,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受coco的注册，如果页面不正常可以等部署完成后再处理
+启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受coco的注册
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -428,7 +428,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
-启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册，如果页面显示不正常可以等部署完成后再处理
+启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
 
 .. code:: shell
 
