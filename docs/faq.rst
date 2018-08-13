@@ -86,6 +86,7 @@ FAQ
 ::
 
     $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
     $ celery -A ops purge -f
 
     # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的jumpserver相关进程，在重新启动jumpserver即可
