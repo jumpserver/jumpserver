@@ -94,8 +94,8 @@ CentOS 7 安装文档
     $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 安装依赖 RPM 包
-    $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
-    $ yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt)
+    $ cat /opt/jumpserver/requirements/rpm_requirements.txt | xargs -r yum -y install
+    $ cat /opt/coco/requirements/rpm_requirements.txt | xargs -r yum -y install
 
     # 安装 Python 库依赖
     $ pip install --upgrade pip
