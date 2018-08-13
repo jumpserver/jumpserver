@@ -23,6 +23,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'first_name', 'last_name', 'password', '_private_key',
             '_public_key', '_otp_secret_key', 'user_permissions'
         ]
+        # validators = []
 
     def get_field_names(self, declared_fields, info):
         fields = super(UserSerializer, self).get_field_names(declared_fields, info)
@@ -71,7 +72,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(many=True, queryset = User.objects.all())
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
     class Meta:
         model = UserGroup
