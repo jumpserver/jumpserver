@@ -23,6 +23,7 @@
    :maxdepth: 1
 
    安装文档 <setup_by_centos7.rst>
+   离线安装文档 <setup_by_local.rst>
 
 分布式部署文档（基于CentOS 7）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
