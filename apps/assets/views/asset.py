@@ -9,6 +9,7 @@ import chardet
 from io import StringIO
 
 from django.db import transaction
+from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -76,14 +77,6 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    # def form_valid(self, form):
-    #     print("form valid")
-    #     asset = form.save()
-    #     asset.created_by = self.request.user.username or 'Admin'
-    #     asset.date_created = timezone.now()
-    #     asset.save()
-    #     return super().form_valid(form)
-
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
         node_id = self.request.GET.get("node_id")
@@ -106,29 +99,12 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return create_success_msg % ({"name": cleaned_data["hostname"]})
 
 
-# class AssetModalListView(AdminUserRequiredMixin, ListView):
-#     paginate_by = settings.DISPLAY_PER_PAGE
-#     model = Asset
-#     context_object_name = 'asset_modal_list'
-#     template_name = 'assets/_asset_list_modal.html'
-#
-#     def get_context_data(self, **kwargs):
-#         assets = Asset.objects.all()
-#         assets_id = self.request.GET.get('assets_id', '')
-#         assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
-#         context = {
-#             'all_assets': assets_id_list,
-#             'assets': assets
-#         }
-#         kwargs.update(context)
-#         return super().get_context_data(**kwargs)
-
-
 class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     model = Asset
     form_class = forms.AssetBulkUpdateForm
     template_name = 'assets/asset_bulk_update.html'
     success_url = reverse_lazy('assets:asset-list')
+    success_message = _("Bulk update asset success")
     id_list = None
     form = None
 
@@ -150,6 +126,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, self.success_message)
             return redirect(self.success_url)
         else:
             return self.get(request, form=form, *args, **kwargs)

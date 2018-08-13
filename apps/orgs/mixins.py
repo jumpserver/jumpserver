@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-from threading import local
 
+from werkzeug.local import Local
 from django.db import models
 from django.db.models import Q
 from django.shortcuts import redirect
-import warnings
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 
@@ -14,7 +13,7 @@ from .utils import current_org, set_current_org, set_to_root_org
 from .models import Organization
 
 logger = get_logger(__file__)
-tl = local()
+tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
@@ -93,8 +92,8 @@ class RootOrgViewMixin:
 class OrgModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'initial' not in kwargs:
-            return
+        # if 'initial' not in kwargs:
+        #     return
         for name, field in self.fields.items():
             if not hasattr(field, 'queryset'):
                 continue
