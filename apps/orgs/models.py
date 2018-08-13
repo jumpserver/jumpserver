@@ -27,7 +27,7 @@ class Organization(models.Model):
 
     def expire_cache(self):
         key = self.CACHE_PREFIX.format(self.id)
-        cache.set(key, self, 0)
+        cache.set(key, self, 1)
 
     @classmethod
     def get_instance_from_cache(cls, oid):
