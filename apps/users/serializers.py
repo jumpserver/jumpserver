@@ -65,6 +65,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = UserGroup
         list_serializer_class = BulkListSerializer
         fields = '__all__'
+        read_only_fields = ['id', 'created_by']
 
     @staticmethod
     def get_users(obj):
