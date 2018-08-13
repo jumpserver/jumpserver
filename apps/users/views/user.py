@@ -24,9 +24,9 @@ from django.views import View
 from django.views.generic.base import TemplateView
 from django.db import transaction
 from django.views.generic.edit import (
-    CreateView, UpdateView, FormMixin, FormView
+    CreateView, UpdateView, FormView
 )
-from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.generic.detail import DetailView
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
@@ -41,7 +41,6 @@ from ..utils import generate_otp_uri, check_otp_code, \
     get_user_or_tmp_user, get_password_check_rules, check_password_rules, \
     is_need_unblock
 from ..signals import post_user_create
-from ..tasks import write_login_log_async
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
@@ -171,7 +170,7 @@ class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
-            'action': 'Bulk update asset',
+            'action': _('Bulk update user'),
             'form': self.form,
             'users_selected': self.id_list,
         }
