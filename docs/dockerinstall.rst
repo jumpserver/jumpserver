@@ -10,7 +10,6 @@ CentOS7 自动安装脚本脚本见: `自动安装 <fool_install.html>`_
 
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
-
 快速启动
 ```````````````
 使用 root 命令行输入::

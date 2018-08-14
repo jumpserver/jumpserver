@@ -1,4 +1,4 @@
-CentOS 7 离线安装文档
+CentOS 7 组件离线安装文档
 --------------------------------------------
 
 说明
@@ -21,6 +21,7 @@ CentOS 7 离线安装文档
     $ tar xf coco.tar.gz -C /opt
     $ tar xf luna.tar.gz -C /opt
     $ tar xf package.tar.gz -C /opt
+    $ mv guacamole.tar /opt
 
     # yum update -y
 
