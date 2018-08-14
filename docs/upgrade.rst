@@ -1,6 +1,11 @@
 更新升级
 -------------
 
+说明
+~~~~~~~
+- 不支持从 0.x 版本升级到 1.x 版本
+- 本文档仅针对 1.0 及之后的版本升级教程
+
 1. 升级 Jumpserver（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
@@ -8,11 +13,20 @@
     # 升级前请做好 jumpserver 与 数据库 备份，谨防意外，具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
     $ git pull
-    $ pip install -r requirements/requirements.txt  # 如果使用其他源下载失败可以使用 -i 参数指定源
+
+    # 版本小于 1.3 升级到最新版本请使用新的 config.py
+    $ mv config.py config.bak
+    $ cp config_example.py config.py
+    $ vim config.py  # 参考安装文档进行修改
+
+    $ pip install -r requirements/requirements.txt
     $ cd utils && sh make_migrations.sh
 
-    # 1.0.x 升级 1.2.0 及以后的版本 需要执行迁移脚本（新版本授权管理更新）
+    # 1.0.x 升级到最新版本需要执行迁移脚本（新版本授权管理更新）
     $ sh 2018_04_11_migrate_permissions.sh
+
+    # 任意版本升级到 1.4.0 版本，需要执行
+    $ sh 2018_07_15_set_win_protocol_to_ssh.sh
  
 2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
@@ -21,9 +35,6 @@
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
     $ git pull && pip install -r requirements/requirements.txt
-
-    # 如果使用其他源下载失败可以使用 -i 参数指定源
-    $ pip install -r requirements/requirements.txt -i https://pypi.org/simple
 
 3. 升级 Luna
 

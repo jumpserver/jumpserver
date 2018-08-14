@@ -406,11 +406,11 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
-    $ yum remove docker-latest-logrotate  docker-logrotate  docker-selinux dockdocker-engine
-    $ yum install -y yum-utils   device-mapper-persistent-data   lvm2
+    $ yum remove docker-latest-logrotate docker-logrotate docker-selinux dockdocker-engine
+    $ yum install -y yum-utils device-mapper-persistent-data lvm2
 
     # 添加docker官方源
-    $ yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+    $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
     $ yum makecache fast
     $ yum install docker-ce
 
