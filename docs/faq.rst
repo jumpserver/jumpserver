@@ -9,6 +9,7 @@ FAQ
    安装过程 常见问题 <faq_install.rst>
    Linux 资产连接说明 <faq_linux.rst>
    Windows 资产连接说明 <faq_windows.rst>
+   添加组织 及 组织管理员说明 <faq_org.rst>
    二次认证（Google Auth）入口说明 <faq_googleauth.rst>
 
 
@@ -175,7 +176,6 @@ FAQ
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $http_connection;
-            client_max_body_size 100m;  # Windows 文件上传大小限制
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -190,6 +190,8 @@ FAQ
         listen 80;
         server_name demo.jumpserver.org;
 
+        client_max_body_size 100m;  # 上传录像大小限制
+
         location / {
                 # 这里的IP是后端服务器的IP，后端服务器就是文档一步一步安装来的
                 proxy_pass http://192.168.244.144;
@@ -199,7 +201,6 @@ FAQ
                 proxy_read_timeout 150;
         }
 
-        # 新增下面内容
         location /socket.io/ {
                 proxy_pass http://192.168.244.144/socket.io/;
                 proxy_buffering off;
@@ -217,7 +218,6 @@ FAQ
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection $http_connection;
-                client_max_body_size 100m;  # Windows 文件上传大小限制
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header Host $host;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -259,30 +259,9 @@ FAQ
     # Centos 7 在不关闭 selinux 和 防火墙 的情况下使用 Jumpserver
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
-    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent  # 用户HTTP/WS登录端口 coco
-    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent  # guacamole端口 docker
       --permanent  永久生效，没有此参数重启后失效
 
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
-
-16. 添加组织及组织管理员命令(1.4.0版本)
-
-::
-
-    $ source /opt/py3/bin/activate
-    $ cd /opt/jumpserver/apps
-    $ python manage.py shell
-    >>> from assets.models import Asset
-    >>> from orgs.models import Organization
-    >>> from users.models import User
-    >>> dev_org = Organization.objects.create(name='开发部')
-    >>> user = User.objects.create(name='用户', username='user', email='user@jumpserver.org')
-    >>> user.set_password('PassWord')
-    >>> user.save()
-    >>> dev_org.admins.add(user)
-    >>> exit()
-
-    # 然后使用 user 用户登录 jumpserver 即可
