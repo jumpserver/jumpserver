@@ -56,6 +56,8 @@ class Organization(models.Model):
         from users.models import User
         if self.is_default():
             users = User.objects.filter(orgs__isnull=True)
+        elif not self.is_real():
+            users = User.objects.all()
         else:
             users = self.users.all()
         users = users.exclude(role=User.ROLE_APP)
@@ -95,6 +97,12 @@ class Organization(models.Model):
     @classmethod
     def root(cls):
         return cls(id=cls.ROOT_ID, name='Root')
+
+    def is_root(self):
+        if self.id is self.ROOT_ID:
+            return True
+        else:
+            return False
 
     def is_default(self):
         if self.id is self.DEFAULT_ID:
