@@ -100,6 +100,7 @@ class Asset(OrgModelMixin):
                                  verbose_name=_('CPU model'))
     cpu_count = models.IntegerField(null=True, verbose_name=_('CPU count'))
     cpu_cores = models.IntegerField(null=True, verbose_name=_('CPU cores'))
+    cpu_vcpus = models.IntegerField(null=True, verbose_name=_('CPU vcpus'))
     memory = models.CharField(max_length=64, null=True, blank=True,
                               verbose_name=_('Memory'))
     disk_total = models.CharField(max_length=1024, null=True, blank=True,
@@ -171,7 +172,7 @@ class Asset(OrgModelMixin):
     def hardware_info(self):
         if self.cpu_count:
             return '{} Core {} {}'.format(
-                self.cpu_count * self.cpu_cores,
+                self.cpu_vcpus or self.cpu_count * self.cpu_cores,
                 self.memory, self.disk_total
             )
         else:
