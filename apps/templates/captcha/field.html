@@ -1,6 +1,15 @@
+{% load i18n %}
 {{image}}{{hidden_field}}{{text_field}}
 
 <script>
+    function check_captcha(e){
+        if(true === e.validity.patternMismatch){
+          e.setCustomValidity('{% trans "Please input a valid captcha" %}');
+        }else{
+          e.setCustomValidity('');
+        }
+    }
+
     function refresh_captcha() {
         $.getJSON("{% url "captcha-refresh" %}",
                 function (result) {

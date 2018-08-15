@@ -1,7 +1,8 @@
 {% load i18n %}
 <div class="row">
     <div class="col-sm-6">
-        <input autocomplete="off" id="{{id}}_1" class="form-control" name="{{name}}_1" placeholder="{% trans 'Captcha' %}" type="text" />
+        <input autocomplete="off" id="{{id}}_1" class="form-control" name="{{name}}_1" placeholder="{% trans 'Captcha' %}" type="text"
+                oninput="check_captcha(this)" pattern="^[A-Za-z]{4}$" required />
     </div>
 </div>
 </br>
