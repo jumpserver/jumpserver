@@ -306,7 +306,7 @@ def user_limit_to():
     return {"orgs": current_org}
 
 
-class UserGroupForm(forms.ModelForm):
+class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(role=User.ROLE_APP),
         label=_("User"),
@@ -342,7 +342,7 @@ class UserGroupForm(forms.ModelForm):
     class Meta:
         model = UserGroup
         fields = [
-            'name', 'users', 'comment'
+            'name', 'users', 'comment',
         ]
         help_texts = {
             'name': '* required'

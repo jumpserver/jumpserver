@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-15 15:14+0800\n"
+"POT-Creation-Date: 2018-08-16 16:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "测试节点下资产是否可连接: {}"
 msgstr ""
 
-#: assets/forms/asset.py:27 assets/models/asset.py:80 assets/models/user.py:113
+#: assets/forms/asset.py:27 assets/models/asset.py:82 assets/models/user.py:113
 #: assets/templates/assets/asset_detail.html:183
 #: assets/templates/assets/asset_detail.html:191
 #: assets/templates/assets/system_user_detail.html:178 perms/models.py:32
@@ -41,7 +41,7 @@ msgid "Nodes"
 msgstr "节点管理"
 
 #: assets/forms/asset.py:30 assets/forms/asset.py:69 assets/forms/asset.py:112
-#: assets/forms/asset.py:116 assets/models/asset.py:85
+#: assets/forms/asset.py:116 assets/models/asset.py:87
 #: assets/models/cluster.py:19 assets/models/user.py:73
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:25
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
@@ -59,7 +59,7 @@ msgstr "管理用户"
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:37 assets/forms/asset.py:76 assets/models/asset.py:76
+#: assets/forms/asset.py:37 assets/forms/asset.py:76 assets/models/asset.py:78
 #: assets/models/domain.py:47 assets/templates/assets/user_asset_list.html:168
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
@@ -93,7 +93,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:108 assets/models/asset.py:73
+#: assets/forms/asset.py:108 assets/models/asset.py:75
 #: assets/models/domain.py:45 assets/templates/assets/admin_user_assets.html:53
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/domain_gateway_list.html:58
@@ -103,7 +103,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:232 assets/templates/assets/admin_user_list.html:25
+#: assets/models/asset.py:242 assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:23
 #: assets/templates/assets/label_list.html:16
@@ -141,7 +141,7 @@ msgstr "密码不能包含特殊字符"
 #: common/templates/common/terminal_setting.html:72
 #: common/templates/common/terminal_setting.html:90 ops/models/adhoc.py:36
 #: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:35
-#: orgs/models.py:10 perms/models.py:28
+#: orgs/models.py:12 perms/models.py:28
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:17
@@ -225,7 +225,7 @@ msgid ""
 "password."
 msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 
-#: assets/models/asset.py:70 assets/models/domain.py:44
+#: assets/models/asset.py:72 assets/models/domain.py:44
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/admin_user_assets.html:52
 #: assets/templates/assets/asset_detail.html:61
@@ -241,7 +241,7 @@ msgstr "如果选择手动登录模式，用户名和密码则不需要填写"
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:71 assets/templates/assets/_asset_list_modal.html:45
+#: assets/models/asset.py:73 assets/templates/assets/_asset_list_modal.html:45
 #: assets/templates/assets/admin_user_assets.html:51
 #: assets/templates/assets/asset_detail.html:57
 #: assets/templates/assets/asset_list.html:91
@@ -254,7 +254,7 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:72 assets/models/domain.py:46
+#: assets/models/asset.py:74 assets/models/domain.py:46
 #: assets/models/user.py:116
 #: assets/templates/assets/domain_gateway_list.html:59
 #: assets/templates/assets/system_user_detail.html:70
@@ -264,109 +264,109 @@ msgstr "主机名"
 msgid "Protocol"
 msgstr "协议"
 
-#: assets/models/asset.py:74 assets/templates/assets/asset_detail.html:97
+#: assets/models/asset.py:76 assets/templates/assets/asset_detail.html:97
 #: assets/templates/assets/user_asset_list.html:165
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:81 assets/models/domain.py:49
+#: assets/models/asset.py:83 assets/models/domain.py:49
 #: assets/models/label.py:21 assets/templates/assets/asset_detail.html:105
 #: assets/templates/assets/user_asset_list.html:169
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:88 assets/templates/assets/asset_detail.html:65
+#: assets/models/asset.py:90 assets/templates/assets/asset_detail.html:65
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:89 assets/templates/assets/asset_detail.html:113
+#: assets/models/asset.py:91 assets/templates/assets/asset_detail.html:113
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:93 assets/templates/assets/asset_detail.html:77
+#: assets/models/asset.py:95 assets/templates/assets/asset_detail.html:77
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:95 assets/templates/assets/asset_detail.html:81
+#: assets/models/asset.py:97 assets/templates/assets/asset_detail.html:81
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:97 assets/templates/assets/asset_detail.html:109
+#: assets/models/asset.py:99 assets/templates/assets/asset_detail.html:109
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:100
+#: assets/models/asset.py:102
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:101
+#: assets/models/asset.py:103
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:102
+#: assets/models/asset.py:104
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:103
+#: assets/models/asset.py:105
 #, fuzzy
 #| msgid "CPU count"
 msgid "CPU vcpus"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:105 assets/templates/assets/asset_detail.html:89
+#: assets/models/asset.py:107 assets/templates/assets/asset_detail.html:89
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:107
+#: assets/models/asset.py:109
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:109
+#: assets/models/asset.py:111
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:112 assets/templates/assets/asset_detail.html:101
+#: assets/models/asset.py:114 assets/templates/assets/asset_detail.html:101
 #: assets/templates/assets/user_asset_list.html:166
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:114
+#: assets/models/asset.py:116
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:116
+#: assets/models/asset.py:118
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:118
+#: assets/models/asset.py:120
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:122 assets/templates/assets/asset_create.html:34
+#: assets/models/asset.py:124 assets/templates/assets/asset_create.html:34
 #: assets/templates/assets/asset_detail.html:220
 #: assets/templates/assets/asset_update.html:39 templates/_nav.html:27
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset.py:124 assets/models/base.py:30
+#: assets/models/asset.py:126 assets/models/base.py:30
 #: assets/models/cluster.py:28 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:117
 #: assets/templates/assets/domain_detail.html:72
 #: assets/templates/assets/system_user_detail.html:100
-#: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:13 perms/models.py:37
+#: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:37
 #: perms/models.py:83 perms/templates/perms/asset_permission_detail.html:98
 #: users/models/user.py:92 users/templates/users/user_detail.html:111
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:127 assets/models/cluster.py:26
+#: assets/models/asset.py:129 assets/models/cluster.py:26
 #: assets/models/domain.py:21 assets/models/group.py:22
 #: assets/models/label.py:24 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/domain_detail.html:68
 #: assets/templates/assets/system_user_detail.html:96
 #: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:63
-#: orgs/models.py:14 perms/models.py:38 perms/models.py:84
+#: orgs/models.py:16 perms/models.py:38 perms/models.py:84
 #: perms/templates/perms/asset_permission_detail.html:94
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
 #: users/templates/users/user_group_detail.html:63
@@ -374,7 +374,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/asset.py:129 assets/models/base.py:27
+#: assets/models/asset.py:131 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/domain.py:19
 #: assets/models/domain.py:48 assets/models/group.py:23
 #: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
@@ -386,7 +386,7 @@ msgstr "创建日期"
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:34
 #: assets/templates/assets/user_asset_list.html:170 common/models.py:30
-#: ops/models/adhoc.py:42 orgs/models.py:15 perms/models.py:39
+#: ops/models/adhoc.py:42 orgs/models.py:17 perms/models.py:39
 #: perms/models.py:85 perms/templates/perms/asset_permission_detail.html:102
 #: terminal/models.py:27 terminal/templates/terminal/terminal_detail.html:63
 #: users/models/group.py:15 users/models/user.py:84
@@ -1918,6 +1918,10 @@ msgstr "任务列表"
 msgid "Task run history"
 msgstr "执行历史"
 
+#: orgs/mixins.py:79
+msgid "Organization"
+msgstr "组织"
+
 #: perms/forms.py:20 users/forms.py:265 users/forms.py:270 users/forms.py:316
 #: xpack/plugins/orgs/forms.py:30
 msgid "Select users"
@@ -3322,7 +3326,7 @@ msgid "Select admins"
 msgstr "选择管理员"
 
 #: xpack/plugins/orgs/meta.py:8
-msgid "Organization"
+msgid "Organizations"
 msgstr "组织管理"
 
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:22
