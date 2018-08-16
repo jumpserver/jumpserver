@@ -86,3 +86,9 @@ def on_node_assets_changed(sender, instance=None, **kwargs):
             system_users = SystemUser.objects.filter(nodes=instance)
             for system_user in system_users:
                 system_user.assets.add(*tuple(assets))
+
+
+@receiver(post_save, sender=Node)
+def on_node_update_or_created(sender, instance=None, created=False, **kwargs):
+    if instance and not created:
+        instance.expire_full_value()

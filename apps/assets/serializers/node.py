@@ -68,7 +68,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return obj.assets__count if hasattr(obj, 'assets__count') else 0
+        return obj.get_all_assets().count()
 
     @staticmethod
     def get_tree_id(obj):
