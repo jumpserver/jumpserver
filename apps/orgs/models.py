@@ -4,6 +4,8 @@ from django.db import models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import is_uuid
+
 
 class Organization(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -15,19 +17,23 @@ class Organization(models.Model):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     CACHE_PREFIX = 'JMS_ORG_{}'
-    ROOT_ID = 'ROOT'
-    DEFAULT_ID = 'DEFAULT'
+    ROOT_ID_NAME = 'ROOT'
+    DEFAULT_ID_NAME = 'DEFAULT'
 
     def __str__(self):
         return self.name
 
     def set_to_cache(self):
-        key = self.CACHE_PREFIX.format(self.id)
-        cache.set(key, self, 3600)
+        key_id = self.CACHE_PREFIX.format(self.id)
+        key_name = self.CACHE_PREFIX.format(self.name)
+        cache.set(key_id, self, 3600)
+        cache.set(key_name, self, 3600)
 
     def expire_cache(self):
-        key = self.CACHE_PREFIX.format(self.id)
-        cache.set(key, self, 1)
+        key_id = self.CACHE_PREFIX.format(self.id)
+        key_name = self.CACHE_PREFIX.format(self.name)
+        cache.delete(key_id)
+        cache.delete(key_name)
 
     @classmethod
     def get_instance_from_cache(cls, oid):
@@ -35,18 +41,23 @@ class Organization(models.Model):
         return cache.get(key, None)
 
     @classmethod
-    def get_instance(cls, oid, default=True):
-        cached = cls.get_instance_from_cache(oid)
+    def get_instance(cls, id_or_name, default=True):
+        cached = cls.get_instance_from_cache(id_or_name)
         if cached:
             return cached
 
-        if oid == cls.DEFAULT_ID:
+        if not id_or_name:
+            return cls.default() if default else None
+        elif id_or_name == cls.DEFAULT_ID_NAME:
             return cls.default()
-        elif oid == cls.ROOT_ID:
+        elif id_or_name == cls.ROOT_ID_NAME:
             return cls.root()
 
         try:
-            org = cls.objects.get(id=oid)
+            if is_uuid(id_or_name):
+                org = cls.objects.get(id=id_or_name)
+            else:
+                org = cls.objects.get(name=id_or_name)
             org.set_to_cache()
         except cls.DoesNotExist:
             org = cls.default() if default else None
@@ -56,6 +67,8 @@ class Organization(models.Model):
         from users.models import User
         if self.is_default():
             users = User.objects.filter(orgs__isnull=True)
+        elif not self.is_real():
+            users = User.objects.all()
         else:
             users = self.users.all()
         users = users.exclude(role=User.ROLE_APP)
@@ -90,14 +103,20 @@ class Organization(models.Model):
 
     @classmethod
     def default(cls):
-        return cls(id=cls.DEFAULT_ID, name="Default")
+        return cls(id=cls.DEFAULT_ID_NAME, name=cls.DEFAULT_ID_NAME)
 
     @classmethod
     def root(cls):
-        return cls(id=cls.ROOT_ID, name='Root')
+        return cls(id=cls.ROOT_ID_NAME, name=cls.ROOT_ID_NAME)
+
+    def is_root(self):
+        if self.id is self.ROOT_ID_NAME:
+            return True
+        else:
+            return False
 
     def is_default(self):
-        if self.id is self.DEFAULT_ID:
+        if self.id is self.DEFAULT_ID_NAME:
             return True
         else:
             return False

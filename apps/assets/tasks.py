@@ -44,7 +44,7 @@ def set_assets_hardware_info(result, **kwargs):
             logger.error("Get asset info failed: {}".format(hostname))
             continue
 
-        asset = get_object_or_none(Asset, hostname=hostname)
+        asset = Asset.objects.get_object_by_fullname(hostname)
         if not asset:
             continue
 
@@ -60,6 +60,7 @@ def set_assets_hardware_info(result, **kwargs):
         ___cpu_model = ___cpu_model[:64]
         ___cpu_count = info.get('ansible_processor_count', 0)
         ___cpu_cores = info.get('ansible_processor_cores', None) or len(info.get('ansible_processor', []))
+        ___cpu_vcpus = info.get('ansible_processor_vcpus', 0)
         ___memory = '%s %s' % capacity_convert('{} MB'.format(info.get('ansible_memtotal_mb')))
         disk_info = {}
         for dev, dev_info in info.get('ansible_devices', {}).items():
@@ -95,7 +96,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
         # task_name = _("Update some assets hardware info")
         task_name = _("更新资产硬件信息")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
-    hostname_list = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
+    hostname_list = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hostname_list:
         logger.info("Not hosts get, may be asset is not active or not unixlike platform")
         return {}
@@ -134,7 +135,7 @@ def update_assets_hardware_info_period():
     # task_name = _("Update assets hardware info period")
     task_name = _("定期更新资产硬件信息")
     hostname_list = [
-        asset.hostname for asset in Asset.objects.all()
+        asset.fullname for asset in Asset.objects.all()
         if asset.is_active and asset.is_unixlike()
     ]
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
@@ -181,7 +182,7 @@ def test_admin_user_connectability_util(admin_user, task_name):
     from ops.utils import update_or_create_ansible_task
 
     assets = admin_user.get_related_assets()
-    hosts = [asset.hostname for asset in assets
+    hosts = [asset.fullname for asset in assets
              if asset.is_active and asset.is_unixlike()]
     if not hosts:
         return
@@ -228,7 +229,7 @@ def test_asset_connectability_util(assets, task_name=None):
     if task_name is None:
         # task_name = _("Test assets connectability")
         task_name = _("测试资产可连接性")
-    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
+    hosts = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("No hosts, passed")
         return {}
@@ -280,7 +281,7 @@ def test_system_user_connectability_util(system_user, task_name):
     """
     from ops.utils import update_or_create_ansible_task
     assets = system_user.get_assets()
-    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
+    hosts = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     if not hosts:
         logger.info("No hosts, passed")
@@ -378,7 +379,7 @@ def push_system_user_util(system_users, assets, task_name):
         logger.info("Not tasks, passed")
         return {}
 
-    hosts = [asset.hostname for asset in assets if asset.is_active and asset.is_unixlike()]
+    hosts = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("Not hosts, passed")
         return {}

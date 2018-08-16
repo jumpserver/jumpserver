@@ -6,8 +6,10 @@ import uuid
 import logging
 import random
 from functools import reduce
+from collections import defaultdict
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
@@ -100,6 +102,7 @@ class Asset(OrgModelMixin):
                                  verbose_name=_('CPU model'))
     cpu_count = models.IntegerField(null=True, verbose_name=_('CPU count'))
     cpu_cores = models.IntegerField(null=True, verbose_name=_('CPU cores'))
+    cpu_vcpus = models.IntegerField(null=True, verbose_name=_('CPU vcpus'))
     memory = models.CharField(max_length=64, null=True, blank=True,
                               verbose_name=_('Memory'))
     disk_total = models.CharField(max_length=1024, null=True, blank=True,
@@ -161,17 +164,25 @@ class Asset(OrgModelMixin):
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
-    @property
-    def org_name(self):
-        from orgs.models import Organization
-        org = Organization.get_instance(self.org_id)
-        return org.name
+    @classmethod
+    def get_queryset_by_fullname_list(cls, fullname_list):
+        org_fullname_map = defaultdict(list)
+        for fullname in fullname_list:
+            hostname, org = cls.split_fullname(fullname)
+            org_fullname_map[org].append(hostname)
+        filter_arg = Q()
+        for org, hosts in org_fullname_map.items():
+            if org.is_real():
+                filter_arg |= Q(hostname__in=hosts, org_id=org.id)
+            else:
+                filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
+        return Asset.objects.filter(filter_arg)
 
     @property
     def hardware_info(self):
         if self.cpu_count:
             return '{} Core {} {}'.format(
-                self.cpu_count * self.cpu_cores,
+                self.cpu_vcpus or self.cpu_count * self.cpu_cores,
                 self.memory, self.disk_total
             )
         else:

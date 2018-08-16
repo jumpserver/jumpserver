@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-13 15:01+0800\n"
+"POT-Creation-Date: 2018-08-15 15:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -103,7 +103,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:231 assets/templates/assets/admin_user_list.html:25
+#: assets/models/asset.py:232 assets/templates/assets/admin_user_list.html:25
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:23
 #: assets/templates/assets/label_list.html:16
@@ -123,7 +123,11 @@ msgstr "端口"
 msgid "Asset"
 msgstr "资产"
 
-#: assets/forms/domain.py:55 assets/forms/user.py:79 assets/forms/user.py:139
+#: assets/forms/domain.py:42
+msgid "Password should not contain special characters"
+msgstr "密码不能包含特殊字符"
+
+#: assets/forms/domain.py:59 assets/forms/user.py:79 assets/forms/user.py:139
 #: assets/models/base.py:22 assets/models/cluster.py:18
 #: assets/models/domain.py:18 assets/models/group.py:20
 #: assets/models/label.py:18 assets/templates/assets/admin_user_detail.html:56
@@ -156,7 +160,7 @@ msgstr "资产"
 msgid "Name"
 msgstr "名称"
 
-#: assets/forms/domain.py:56 assets/forms/user.py:80 assets/forms/user.py:140
+#: assets/forms/domain.py:60 assets/forms/user.py:80 assets/forms/user.py:140
 #: assets/models/base.py:23 assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/domain_gateway_list.html:60
@@ -303,42 +307,48 @@ msgstr "CPU数量"
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:104 assets/templates/assets/asset_detail.html:89
+#: assets/models/asset.py:103
+#, fuzzy
+#| msgid "CPU count"
+msgid "CPU vcpus"
+msgstr "CPU数量"
+
+#: assets/models/asset.py:105 assets/templates/assets/asset_detail.html:89
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:106
+#: assets/models/asset.py:107
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:108
+#: assets/models/asset.py:109
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:111 assets/templates/assets/asset_detail.html:101
+#: assets/models/asset.py:112 assets/templates/assets/asset_detail.html:101
 #: assets/templates/assets/user_asset_list.html:166
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:113
+#: assets/models/asset.py:114
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:115
+#: assets/models/asset.py:116
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:117
+#: assets/models/asset.py:118
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:121 assets/templates/assets/asset_create.html:34
+#: assets/models/asset.py:122 assets/templates/assets/asset_create.html:34
 #: assets/templates/assets/asset_detail.html:220
 #: assets/templates/assets/asset_update.html:39 templates/_nav.html:27
 msgid "Labels"
 msgstr "标签管理"
 
-#: assets/models/asset.py:123 assets/models/base.py:30
+#: assets/models/asset.py:124 assets/models/base.py:30
 #: assets/models/cluster.py:28 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:117
@@ -350,7 +360,7 @@ msgstr "标签管理"
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:126 assets/models/cluster.py:26
+#: assets/models/asset.py:127 assets/models/cluster.py:26
 #: assets/models/domain.py:21 assets/models/group.py:22
 #: assets/models/label.py:24 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/domain_detail.html:68
@@ -364,7 +374,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/asset.py:128 assets/models/base.py:27
+#: assets/models/asset.py:129 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/domain.py:19
 #: assets/models/domain.py:48 assets/models/group.py:23
 #: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
@@ -474,7 +484,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:19
+#: assets/models/label.py:19 assets/models/node.py:20
 #: assets/templates/assets/label_list.html:15 common/models.py:27
 msgid "Value"
 msgstr "值"
@@ -483,7 +493,7 @@ msgstr "值"
 msgid "Category"
 msgstr "分类"
 
-#: assets/models/node.py:18
+#: assets/models/node.py:19
 msgid "Key"
 msgstr ""
 
@@ -557,35 +567,35 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/tasks.py:96 assets/tasks.py:116
+#: assets/tasks.py:97 assets/tasks.py:117
 msgid "更新资产硬件信息"
 msgstr ""
 
-#: assets/tasks.py:135
+#: assets/tasks.py:136
 msgid "定期更新资产硬件信息"
 msgstr ""
 
-#: assets/tasks.py:213
+#: assets/tasks.py:214
 msgid "定期测试管理账号可连接性: {}"
 msgstr ""
 
-#: assets/tasks.py:220
+#: assets/tasks.py:221
 msgid "测试管理行号可连接性: {}"
 msgstr ""
 
-#: assets/tasks.py:230
+#: assets/tasks.py:231
 msgid "测试资产可连接性"
 msgstr ""
 
-#: assets/tasks.py:300
+#: assets/tasks.py:301
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:316
+#: assets/tasks.py:317
 msgid "定期测试系统用户可连接性: {}"
 msgstr ""
 
-#: assets/tasks.py:401
+#: assets/tasks.py:402
 msgid "推送系统用户到入资产: {}"
 msgstr ""
 
@@ -850,7 +860,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
-#: assets/templates/assets/asset_list.html:630
+#: assets/templates/assets/asset_list.html:631
 #: assets/templates/assets/system_user_detail.html:195
 #: assets/templates/assets/system_user_list.html:139 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
@@ -1052,7 +1062,7 @@ msgstr "重命名成功"
 msgid "Rename failed, do not change the root node name"
 msgstr "重命名失败，不可以更改根节点名称"
 
-#: assets/templates/assets/asset_list.html:625
+#: assets/templates/assets/asset_list.html:626
 #: assets/templates/assets/system_user_list.html:134
 #: users/templates/users/user_detail.html:369
 #: users/templates/users/user_detail.html:394
@@ -1063,20 +1073,20 @@ msgstr "重命名失败，不可以更改根节点名称"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:626
+#: assets/templates/assets/asset_list.html:627
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:634
+#: assets/templates/assets/asset_list.html:635
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:635
-#: assets/templates/assets/asset_list.html:640
+#: assets/templates/assets/asset_list.html:636
+#: assets/templates/assets/asset_list.html:641
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:639
+#: assets/templates/assets/asset_list.html:640
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 

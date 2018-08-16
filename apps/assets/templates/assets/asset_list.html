@@ -451,10 +451,11 @@ $(document).ready(function(){
     $.each(rows, function (index, obj) {
         assets.push(obj.id)
     });
+    var _node_id = current_node ? current_node : null;
     $.ajax({
         url: "{% url "assets:asset-export" %}",
         method: 'POST',
-        data: JSON.stringify({assets_id: assets, node_id: current_node.node_id}),
+        data: JSON.stringify({assets_id: assets, node_id: _node_id}),
         dataType: "json",
         success: function (data, textStatus) {
             window.open(data.redirect)

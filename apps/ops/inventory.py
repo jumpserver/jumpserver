@@ -2,7 +2,7 @@
 #
 
 from .ansible.inventory import BaseInventory
-from assets.utils import get_assets_by_hostname_list, get_system_user_by_name
+from assets.utils import get_assets_by_fullname_list, get_system_user_by_name
 
 __all__ = [
     'JMSInventory'
@@ -44,7 +44,7 @@ class JMSInventory(BaseInventory):
         super().__init__(host_list=host_list)
 
     def get_jms_assets(self):
-        assets = get_assets_by_hostname_list(self.hostname_list)
+        assets = get_assets_by_fullname_list(self.hostname_list)
         return assets
 
     def convert_to_ansible(self, asset, run_as_admin=False):
