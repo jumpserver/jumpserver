@@ -6,8 +6,10 @@ import uuid
 import logging
 import random
 from functools import reduce
+from collections import defaultdict
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
@@ -162,11 +164,19 @@ class Asset(OrgModelMixin):
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
-    @property
-    def org_name(self):
-        from orgs.models import Organization
-        org = Organization.get_instance(self.org_id)
-        return org.name
+    @classmethod
+    def get_queryset_by_fullname_list(cls, fullname_list):
+        org_fullname_map = defaultdict(list)
+        for fullname in fullname_list:
+            hostname, org = cls.split_fullname(fullname)
+            org_fullname_map[org].append(hostname)
+        filter_arg = Q()
+        for org, hosts in org_fullname_map.items():
+            if org.is_real():
+                filter_arg |= Q(hostname__in=hosts, org_id=org.id)
+            else:
+                filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
+        return Asset.objects.filter(filter_arg)
 
     @property
     def hardware_info(self):
