@@ -39,7 +39,7 @@ class OrgManager(models.Manager):
         elif current_org.is_default():
             queryset = queryset.filter(org_id="")
         queryset = queryset.filter(**kwargs)
-        tl.times += 1
+        # tl.times += 1
         return queryset
 
     def filter_by_fullname(self, fullname, field=None):
