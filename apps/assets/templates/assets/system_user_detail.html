@@ -338,13 +338,13 @@ $(document).ready(function () {
     var the_url = '{% url "api-assets:system-user-auth-info" pk=system_user.id %}';
     var name = '{{ system_user.name }}';
     swal({
-        title: '你确定清除该系统用户的认证信息吗 ?',
+        title: "{% trans 'Are you sure to remove authentication information for the system user ?' %}",
         text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,
-        cancelButtonText: '取消',
+        cancelButtonText: "{% trans 'Cancel' %}",
         confirmButtonColor: "#ed5565",
-        confirmButtonText: '确认',
+        confirmButtonText: "{% trans 'Confirm' %}",
         closeOnConfirm: true
     }, function () {
         APIUpdateAttr({

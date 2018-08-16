@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -10,6 +11,7 @@
 
     {% include '_head_css_js.html' %}
     <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static "js/jumpserver.js" %}"></script>
 
 </head>
@@ -40,7 +42,7 @@
                     {% endif %}
                     <div class="row">
                         <div class="col-lg-3">
-                                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">返回</a>
+                                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">{% trans 'Return' %}</a>
                         </div>
                     </div>
                 </div>

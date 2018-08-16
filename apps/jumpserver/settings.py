@@ -262,16 +262,17 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': "INFO",
         },
-        # 'django.db': {
-        #     'handlers': ['console', 'file'],
-        #     'level': 'DEBUG'
-        # }
+        'django.db': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-LANGUAGE_CODE = 'en'
+# LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'zh'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -282,7 +283,9 @@ USE_L10N = True
 USE_TZ = True
 
 # I18N translation
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'i18n'), ]
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -323,6 +326,7 @@ REST_FRAMEWORK = {
         'common.permissions.IsOrgAdmin',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
         'users.authentication.AccessKeyAuthentication',
         'users.authentication.AccessTokenAuthentication',
         'users.authentication.PrivateTokenAuthentication',
