@@ -93,8 +93,8 @@ def update_assets_hardware_info_util(assets, task_name=None):
     """
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
-        # task_name = _("Update some assets hardware info")
-        task_name = _("更新资产硬件信息")
+        task_name = _("Update some assets hardware info")
+        # task_name = _("更新资产硬件信息")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
     hostname_list = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hostname_list:
@@ -113,8 +113,8 @@ def update_assets_hardware_info_util(assets, task_name=None):
 
 @shared_task
 def update_asset_hardware_info_manual(asset):
-    # task_name = _("Update asset hardware info")
-    task_name = _("更新资产硬件信息")
+    task_name = _("Update asset hardware info")
+    # task_name = _("更新资产硬件信息")
     return update_assets_hardware_info_util([asset], task_name=task_name)
 
 
@@ -132,8 +132,8 @@ def update_assets_hardware_info_period():
         return
 
     from ops.utils import update_or_create_ansible_task
-    # task_name = _("Update assets hardware info period")
-    task_name = _("定期更新资产硬件信息")
+    task_name = _("Update assets hardware info period")
+    # task_name = _("定期更新资产硬件信息")
     hostname_list = [
         asset.fullname for asset in Asset.objects.all()
         if asset.is_active and asset.is_unixlike()
@@ -210,15 +210,15 @@ def test_admin_user_connectability_period():
 
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
-        # task_name = _("Test admin user connectability period: {}".format(admin_user.name))
-        task_name = _("定期测试管理账号可连接性: {}".format(admin_user.name))
+        task_name = _("Test admin user connectability period: {}".format(admin_user.name))
+        # task_name = _("定期测试管理账号可连接性: {}".format(admin_user.name))
         test_admin_user_connectability_util(admin_user, task_name)
 
 
 @shared_task
 def test_admin_user_connectability_manual(admin_user):
-    # task_name = _("Test admin user connectability: {}").format(admin_user.name)
-    task_name = _("测试管理行号可连接性: {}").format(admin_user.name)
+    task_name = _("Test admin user connectability: {}").format(admin_user.name)
+    # task_name = _("测试管理行号可连接性: {}").format(admin_user.name)
     return test_admin_user_connectability_util(admin_user, task_name)
 
 
@@ -227,8 +227,8 @@ def test_asset_connectability_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
-        # task_name = _("Test assets connectability")
-        task_name = _("测试资产可连接性")
+        task_name = _("Test assets connectability")
+        # task_name = _("测试资产可连接性")
     hosts = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     if not hosts:
         logger.info("No hosts, passed")
@@ -313,8 +313,8 @@ def test_system_user_connectability_period():
 
     system_users = SystemUser.objects.all()
     for system_user in system_users:
-        # task_name = _("Test system user connectability period: {}".format(system_user))
-        task_name = _("定期测试系统用户可连接性: {}".format(system_user))
+        task_name = _("Test system user connectability period: {}".format(system_user))
+        # task_name = _("定期测试系统用户可连接性: {}".format(system_user))
         test_system_user_connectability_util(system_user, task_name)
 
 
@@ -393,13 +393,15 @@ def push_system_user_util(system_users, assets, task_name):
 @shared_task
 def push_system_user_to_assets_manual(system_user):
     assets = system_user.get_assets()
-    task_name = "推送系统用户到入资产: {}".format(system_user.name)
+    # task_name = "推送系统用户到入资产: {}".format(system_user.name)
+    task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util([system_user], assets, task_name=task_name)
 
 
 @shared_task
 def push_system_user_to_assets(system_user, assets):
-    task_name = _("推送系统用户到入资产: {}").format(system_user.name)
+    # task_name = _("推送系统用户到入资产: {}").format(system_user.name)
+    task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util.delay([system_user], assets, task_name)
 
 
