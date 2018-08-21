@@ -25,7 +25,7 @@
 
 ::
 
-    # 这是由于 config.py 里面的内容格式不对，请参考安装文档的说明，把提示的内容与上一行对其即可
+    # 这是由于 config.py 里面的内容格式不对，请参考安装文档的说明，把提示的内容与上一行对齐即可
 
 5. bash make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
