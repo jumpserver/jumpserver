@@ -89,9 +89,12 @@
     $ cp config.py $jumpserver_backup
     $ cp -r data/media $jumpserver_backup/
 
-    $ for app in audits common users assets ops perms terminal;do
-        mkdir -p $jumpserver_backup/${app}_migrations
-        cp apps/${app}/migrations/*.py $jumpserver_backup/${app}_migrations
+    $ cd apps
+    $ for d in $(ls);do
+        if [ -d $d ] && [ -d $d/migrations ];then
+          mkdir -p $jumpserver_backup/${d}/migrations
+          cp ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
+        fi
       done
 
 2. 备份数据库，已被不时之需
@@ -115,12 +118,15 @@
 ::
 
    $ cd /opt/jumpserver
-   $ for app in audits common users assets ops perms terminal;do
-       cp $jumpserver_backup/${app}_migrations/*.py apps/${app}/migrations/
-     done
-
    $ cp $jumpserver_backup/config.py .
    $ cp -r $jumpserver_backup/media/* data/media/
+
+   $ cd apps
+   $ for d in $(ls);do
+       if [ -d $d ] && [ -d $d/migrations ];then
+         cp $jumpserver_backup/${d}/migrations/*.py ${d}/migrations/
+       fi
+     done
 
 5. 更新依赖或表结构
 
