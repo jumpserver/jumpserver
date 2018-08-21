@@ -17,6 +17,7 @@ LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
 
     # 用户OU  ou=jumpserver,dc=jumpserver,dc=org
     # 这里是设置用来登录jumpserver的组织单元，比如我要用某个ou的用户来登录jumpserver
+    # 多OU用法  ou=jumpserver,dc=jumpserver,dc=org | ou=user,dc=jumpserver,dc=org | ou=xxx,dc=jumpserver,dc=org
 
     # 用户过滤器  (cn=%(user)s)
     # 这里是设置筛选ldap用户的哪些属性
