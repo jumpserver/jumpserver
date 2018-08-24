@@ -258,12 +258,12 @@ class UserPublicKeyForm(forms.Form):
 UserPublicKeyForm.verbose_name = _("Public key")
 
 
-class UserBulkUpdateForm(forms.ModelForm):
+class UserBulkUpdateForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         required=True,
         help_text='* required',
         label=_('Select users'),
-        queryset = User.objects.all(),
+        queryset=User.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -274,12 +274,12 @@ class UserBulkUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['users', 'role', 'groups', 'date_expired']
+        fields = ['users', 'groups', 'date_expired']
         widgets = {
             "groups": forms.SelectMultiple(
                 attrs={
                     'class': 'select2',
-                    'data-placeholder': _('Select users')
+                    'data-placeholder': _('User group')
                 }
             )
         }
@@ -306,7 +306,7 @@ def user_limit_to():
     return {"orgs": current_org}
 
 
-class UserGroupForm(forms.ModelForm):
+class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(role=User.ROLE_APP),
         label=_("User"),
@@ -342,7 +342,7 @@ class UserGroupForm(forms.ModelForm):
     class Meta:
         model = UserGroup
         fields = [
-            'name', 'users', 'comment'
+            'name', 'users', 'comment',
         ]
         help_texts = {
             'name': '* required'

@@ -35,4 +35,4 @@ class Label(OrgModelMixin):
 
     class Meta:
         db_table = "assets_label"
-        unique_together = [('name', 'value')]
+        unique_together = [('name', 'value', 'org_id')]

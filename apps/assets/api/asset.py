@@ -48,7 +48,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             return
 
         node = get_object_or_404(Node, id=node_id)
-        show_current_asset = self.request.query_params.get("show_current_asset")
+        show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
         if node.is_root():
             if show_current_asset:

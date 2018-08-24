@@ -22,7 +22,7 @@ class UserGroup(OrgModelMixin):
 
     class Meta:
         ordering = ['name']
-        unique_together = [('org_id', 'name')]
+        unique_together = [('org_id', 'name'),]
         verbose_name = _("User group")
 
     @classmethod

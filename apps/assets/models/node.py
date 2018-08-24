@@ -5,9 +5,10 @@ import uuid
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.core.cache import cache
 
 from orgs.mixins import OrgModelMixin
-from orgs.utils import current_org, set_current_org, get_current_org
+from orgs.utils import set_current_org, get_current_org
 from orgs.models import Organization
 
 __all__ = ['Node']
@@ -21,10 +22,10 @@ class Node(OrgModelMixin):
     date_create = models.DateTimeField(auto_now_add=True)
 
     is_node = True
+    _full_value_cache_key_prefix = '_NODE_VALUE_{}'
 
     def __str__(self):
-        return self.value
-        # return self.full_value
+        return self.full_value
 
     def __eq__(self, other):
         return self.key == other.key
@@ -47,10 +48,29 @@ class Node(OrgModelMixin):
 
     @property
     def full_value(self):
-        ancestor = [a.value for a in self.get_ancestor(with_self=True)]
+        key = self._full_value_cache_key_prefix.format(self.key)
+        cached = cache.get(key)
+        if cached:
+            return cached
+        value = self.get_full_value()
+        self.cache_full_value(value)
+        return value
+
+    def get_full_value(self):
+        # ancestor = [a.value for a in self.get_ancestor(with_self=True)]
         if self.is_root():
             return self.value
-        return ' / '.join(ancestor)
+        parent_full_value = self.parent.full_value
+        value = parent_full_value + ' / ' + self.value
+        return value
+
+    def cache_full_value(self, value):
+        key = self._full_value_cache_key_prefix.format(self.key)
+        cache.set(key, value, 3600)
+
+    def expire_full_value(self):
+        key = self._full_value_cache_key_prefix.format(self.key)
+        cache.delete_pattern(key+'*')
 
     @property
     def level(self):
@@ -205,11 +225,14 @@ class Node(OrgModelMixin):
         return cls.objects.get_or_create(defaults=defaults, key='0')
 
     @classmethod
+    def get_tree_name_ref(cls):
+        pass
+
+    @classmethod
     def generate_fake(cls, count=100):
         import random
         for i in range(count):
             node = random.choice(cls.objects.all())
             node.create_child('Node {}'.format(i))
-
 
 

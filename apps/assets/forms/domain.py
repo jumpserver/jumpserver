@@ -36,6 +36,10 @@ class DomainForm(forms.ModelForm):
 
 
 class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        password_field = self.fields.get('password')
+        password_field.help_text = _('Password should not contain special characters')
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`

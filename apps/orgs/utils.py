@@ -2,16 +2,13 @@
 #
 
 from functools import partial
+from werkzeug.local import Local
 
 from common.utils import LocalProxy
 from .models import Organization
 
-try:
-    from threading import local
-except ImportError:
-    from django.utils._threading_local import local
 
-_thread_locals = local()
+_thread_locals = Local()
 
 
 def get_org_from_request(request):
