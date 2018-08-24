@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-17 10:37+0800\n"
+"POT-Creation-Date: 2018-08-24 14:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -36,7 +36,7 @@ msgstr "测试节点下资产是否可连接: {}"
 #: assets/forms/asset.py:27 assets/models/asset.py:82 assets/models/user.py:113
 #: assets/templates/assets/asset_detail.html:183
 #: assets/templates/assets/asset_detail.html:191
-#: assets/templates/assets/system_user_detail.html:178 perms/models.py:32
+#: assets/templates/assets/system_user_asset.html:95 perms/models.py:32
 msgid "Nodes"
 msgstr "节点管理"
 
@@ -141,7 +141,7 @@ msgstr "不能包含特殊字符"
 #: assets/templates/assets/system_user_detail.html:58
 #: assets/templates/assets/system_user_list.html:29 common/models.py:26
 #: common/templates/common/terminal_setting.html:72
-#: common/templates/common/terminal_setting.html:90 ops/models/adhoc.py:36
+#: common/templates/common/terminal_setting.html:90 ops/models/adhoc.py:37
 #: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:35
 #: orgs/models.py:12 perms/models.py:28
 #: perms/templates/perms/asset_permission_detail.html:62
@@ -386,7 +386,7 @@ msgstr "创建日期"
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:37
 #: assets/templates/assets/user_asset_list.html:170 common/models.py:30
-#: ops/models/adhoc.py:42 orgs/models.py:17 perms/models.py:39
+#: ops/models/adhoc.py:43 orgs/models.py:17 perms/models.py:39
 #: perms/models.py:86 perms/templates/perms/asset_permission_detail.html:102
 #: terminal/models.py:27 terminal/templates/terminal/terminal_detail.html:63
 #: users/models/group.py:15 users/models/user.py:84
@@ -531,6 +531,7 @@ msgstr "手动登录"
 #: assets/models/user.py:114
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:11
 #: assets/templates/assets/system_user_asset.html:21
+#: assets/templates/assets/system_user_detail.html:22
 #: assets/views/admin_user.py:29 assets/views/admin_user.py:47
 #: assets/views/admin_user.py:63 assets/views/admin_user.py:78
 #: assets/views/admin_user.py:102 assets/views/asset.py:53
@@ -622,9 +623,13 @@ msgstr "测试系统用户可连接性: {}"
 msgid "Test system user connectability period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:397 assets/tasks.py:404
+#: assets/tasks.py:397 assets/tasks.py:412
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
+
+#: assets/tasks.py:403
+msgid "Push system users to asset: {} => {}"
+msgstr "推送系统用户到入资产: {} => {}"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:5
 msgid "Update asset group"
@@ -805,7 +810,7 @@ msgid "Reachable"
 msgstr "可连接"
 
 #: assets/templates/assets/admin_user_assets.html:66
-#: assets/templates/assets/system_user_asset.html:64
+#: assets/templates/assets/system_user_asset.html:65
 #: assets/templates/assets/system_user_detail.html:116
 #: perms/templates/perms/asset_permission_detail.html:114
 msgid "Quick update"
@@ -818,7 +823,7 @@ msgstr "测试可连接性"
 
 #: assets/templates/assets/admin_user_assets.html:75
 #: assets/templates/assets/asset_detail.html:171
-#: assets/templates/assets/system_user_asset.html:81
+#: assets/templates/assets/system_user_asset.html:74
 #: assets/templates/assets/system_user_detail.html:151
 msgid "Test"
 msgstr "测试"
@@ -888,8 +893,8 @@ msgstr "选择节点"
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:200
 #: assets/templates/assets/asset_list.html:633
-#: assets/templates/assets/system_user_detail.html:195
-#: assets/templates/assets/system_user_detail.html:347
+#: assets/templates/assets/system_user_asset.html:112
+#: assets/templates/assets/system_user_detail.html:330
 #: assets/templates/assets/system_user_list.html:143 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:375
@@ -944,6 +949,7 @@ msgstr "比例"
 #: assets/templates/assets/domain_gateway_list.html:62
 #: assets/templates/assets/domain_list.html:29
 #: assets/templates/assets/label_list.html:17
+#: assets/templates/assets/system_user_asset.html:53
 #: assets/templates/assets/system_user_list.html:38 audits/models.py:37
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
@@ -1144,7 +1150,7 @@ msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
 #: assets/templates/assets/asset_list.html:631
-#: assets/templates/assets/system_user_detail.html:345
+#: assets/templates/assets/system_user_detail.html:328
 #: assets/templates/assets/system_user_list.html:141
 #: users/templates/users/user_detail.html:373
 #: users/templates/users/user_detail.html:399
@@ -1232,26 +1238,32 @@ msgstr "创建标签"
 msgid "Assets of "
 msgstr "资产"
 
-#: assets/templates/assets/system_user_asset.html:70
-#: assets/templates/assets/system_user_detail.html:139
-msgid "Push system user now"
-msgstr "立刻推送系统"
-
-#: assets/templates/assets/system_user_asset.html:73
-#: assets/templates/assets/system_user_detail.html:142
-msgid "Push"
-msgstr "推送"
-
-#: assets/templates/assets/system_user_asset.html:78
+#: assets/templates/assets/system_user_asset.html:71
 #: assets/templates/assets/system_user_detail.html:148
 msgid "Test assets connective"
 msgstr "测试资产可连接性"
 
-#: assets/templates/assets/system_user_asset.html:147
+#: assets/templates/assets/system_user_asset.html:80
+#: assets/templates/assets/system_user_detail.html:139
+msgid "Push system user now"
+msgstr "立刻推送系统"
+
+#: assets/templates/assets/system_user_asset.html:83
+#: assets/templates/assets/system_user_asset.html:159
+#: assets/templates/assets/system_user_detail.html:142
+msgid "Push"
+msgstr "推送"
+
+#: assets/templates/assets/system_user_asset.html:103
+msgid "Add to node"
+msgstr "添加到节点"
+
+#: assets/templates/assets/system_user_asset.html:223
 msgid "Task has been send, Go to ops task list seen result"
 msgstr "任务已下发，查看ops任务列表"
 
-#: assets/templates/assets/system_user_asset.html:159
+#: assets/templates/assets/system_user_asset.html:235
+#: assets/templates/assets/system_user_asset.html:273
 msgid "Task has been send, seen left assets status"
 msgstr "任务已下发，查看左侧资产状态"
 
@@ -1263,19 +1275,15 @@ msgstr "家目录"
 msgid "Uid"
 msgstr "Uid"
 
-#: assets/templates/assets/system_user_detail.html:186
-msgid "Add to node"
-msgstr "添加到节点"
-
-#: assets/templates/assets/system_user_detail.html:341
+#: assets/templates/assets/system_user_detail.html:324
 msgid "Are you sure to remove authentication information for the system user ?"
 msgstr "你确定清除该系统用户的认证信息吗 ?"
 
-#: assets/templates/assets/system_user_detail.html:353
+#: assets/templates/assets/system_user_detail.html:336
 msgid "Clear auth"
 msgstr "清除认证信息"
 
-#: assets/templates/assets/system_user_detail.html:353
+#: assets/templates/assets/system_user_detail.html:336
 msgid "success"
 msgstr "成功"
 
@@ -1696,7 +1704,7 @@ msgstr "资产列表排序"
 msgid "Heartbeat interval"
 msgstr "心跳间隔"
 
-#: common/forms.py:151 ops/models/adhoc.py:37
+#: common/forms.py:151 ops/models/adhoc.py:38
 msgid "Units: seconds"
 msgstr "单位: 秒"
 
@@ -1889,89 +1897,89 @@ msgstr ""
 msgid "Waiting ..."
 msgstr ""
 
-#: ops/models/adhoc.py:37
+#: ops/models/adhoc.py:38
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/models/adhoc.py:38
+#: ops/models/adhoc.py:39
 msgid "Crontab"
 msgstr "Crontab"
 
-#: ops/models/adhoc.py:38
+#: ops/models/adhoc.py:39
 msgid "5 * * * *"
 msgstr ""
 
-#: ops/models/adhoc.py:40
+#: ops/models/adhoc.py:41
 msgid "Callback"
 msgstr "回调"
 
-#: ops/models/adhoc.py:154 ops/templates/ops/adhoc_detail.html:114
+#: ops/models/adhoc.py:155 ops/templates/ops/adhoc_detail.html:114
 msgid "Tasks"
 msgstr "任务"
 
-#: ops/models/adhoc.py:155 ops/templates/ops/adhoc_detail.html:57
+#: ops/models/adhoc.py:156 ops/templates/ops/adhoc_detail.html:57
 #: ops/templates/ops/task_adhoc.html:60
 msgid "Pattern"
 msgstr ""
 
-#: ops/models/adhoc.py:156 ops/templates/ops/adhoc_detail.html:61
+#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:61
 msgid "Options"
 msgstr "选项"
 
-#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:53
+#: ops/models/adhoc.py:158 ops/templates/ops/adhoc_detail.html:53
 #: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:38
 msgid "Hosts"
 msgstr "主机"
 
-#: ops/models/adhoc.py:158
+#: ops/models/adhoc.py:159
 msgid "Run as admin"
 msgstr "再次执行"
 
-#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:72
+#: ops/models/adhoc.py:160 ops/templates/ops/adhoc_detail.html:72
 #: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
 msgid "Run as"
 msgstr "用户"
 
-#: ops/models/adhoc.py:160 ops/templates/ops/adhoc_detail.html:82
+#: ops/models/adhoc.py:161 ops/templates/ops/adhoc_detail.html:82
 #: ops/templates/ops/task_adhoc.html:62
 msgid "Become"
 msgstr "Become"
 
-#: ops/models/adhoc.py:161 users/templates/users/user_group_detail.html:59
+#: ops/models/adhoc.py:162 users/templates/users/user_group_detail.html:59
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:324
+#: ops/models/adhoc.py:326
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:325
+#: ops/models/adhoc.py:327
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:326 ops/templates/ops/adhoc_history.html:57
+#: ops/models/adhoc.py:328 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:41
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:327 ops/templates/ops/adhoc_detail.html:106
+#: ops/models/adhoc.py:329 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/adhoc_history_detail.html:69
 #: ops/templates/ops/task_detail.html:83 ops/templates/ops/task_history.html:61
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:328 ops/templates/ops/adhoc_history.html:56
+#: ops/models/adhoc.py:330 ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/task_history.html:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models/adhoc.py:329
+#: ops/models/adhoc.py:331
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:330
+#: ops/models/adhoc.py:332
 msgid "Adhoc result summary"
 msgstr "汇总"
 

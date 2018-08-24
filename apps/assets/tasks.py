@@ -399,6 +399,14 @@ def push_system_user_to_assets_manual(system_user):
 
 
 @shared_task
+def push_system_user_a_asset_manual(system_user, asset):
+    task_name = _("Push system users to asset: {} => {}").format(
+        system_user.name, asset.fullname
+    )
+    return push_system_user_util([system_user], [asset], task_name=task_name)
+
+
+@shared_task
 def push_system_user_to_assets(system_user, assets):
     # task_name = _("推送系统用户到入资产: {}").format(system_user.name)
     task_name = _("Push system users to assets: {}").format(system_user.name)

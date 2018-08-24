@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_signer, get_logger
+from orgs.utils import set_to_root_org
 from ..celery.utils import delete_celery_periodic_task, \
     create_or_update_celery_periodic_tasks, \
     disable_celery_periodic_task
@@ -205,6 +206,7 @@ class AdHoc(models.Model):
             return {}
 
     def run(self, record=True):
+        set_to_root_org()
         if record:
             return self._run_and_record()
         else:
