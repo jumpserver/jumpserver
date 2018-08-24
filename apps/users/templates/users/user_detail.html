@@ -149,7 +149,6 @@
                                                     </div>
                                                 </div>
                                             </span></td>
-
                                         </tr>
                                         <tr>
                                           <td>{% trans 'Force enabled MFA' %}:</td>
@@ -165,6 +164,14 @@
                                                     </div>
                                                 </div>
                                             </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Reset MFA' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-mfa" style="width: 54px">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Send reset password mail' %}:</td>
@@ -471,6 +478,12 @@ $(document).ready(function() {
     }, function() {
         doReset();
     });
+}).on('click', '#btn-reset-mfa', function () {
+    APIUpdateAttr({
+        url: "{% url 'api-users:user-reset-otp' pk=user_object.id %}",
+        method: "GET",
+        success_message: "{% trans 'Reset user MFA success' %}"
+    })
 })
 </script>
 {% endblock %}
