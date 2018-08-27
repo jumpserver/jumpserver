@@ -84,6 +84,7 @@ class Task(models.Model):
         return self.history.all()
 
     def run(self, record=True):
+        set_to_root_org()
         if self.latest_adhoc:
             return self.latest_adhoc.run(record=record)
         else:
