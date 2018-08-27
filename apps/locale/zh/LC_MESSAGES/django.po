@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-24 14:43+0800\n"
+"POT-Creation-Date: 2018-08-27 18:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -188,7 +188,7 @@ msgstr "密码或密钥密码"
 #: users/templates/users/login.html:65
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
-#: users/templates/users/user_password_authentication.html:14
+#: users/templates/users/user_password_authentication.html:18
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_profile_update.html:40
 #: users/templates/users/user_pubkey_update.html:40
@@ -730,8 +730,9 @@ msgstr "其它"
 #: terminal/templates/terminal/terminal_update.html:47
 #: users/templates/users/_user.html:46
 #: users/templates/users/user_bulk_update.html:23
+#: users/templates/users/user_detail.html:172
 #: users/templates/users/user_password_update.html:71
-#: users/templates/users/user_profile.html:188
+#: users/templates/users/user_profile.html:198
 #: users/templates/users/user_profile_update.html:63
 #: users/templates/users/user_pubkey_update.html:70
 #: users/templates/users/user_pubkey_update.html:76
@@ -848,7 +849,8 @@ msgstr "测试"
 #: users/templates/users/user_group_list.html:43
 #: users/templates/users/user_list.html:77
 #: users/templates/users/user_profile.html:151
-#: users/templates/users/user_profile.html:180
+#: users/templates/users/user_profile.html:181
+#: users/templates/users/user_profile.html:190
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:25
 #: xpack/plugins/orgs/templates/orgs/org_list.html:85
 #: xpack/templates/orgs/org_list.html:43
@@ -897,14 +899,14 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:330
 #: assets/templates/assets/system_user_list.html:143 templates/_modal.html:22
 #: terminal/templates/terminal/session_detail.html:108
-#: users/templates/users/user_detail.html:375
-#: users/templates/users/user_detail.html:401
-#: users/templates/users/user_detail.html:424
-#: users/templates/users/user_detail.html:469
+#: users/templates/users/user_detail.html:382
+#: users/templates/users/user_detail.html:408
+#: users/templates/users/user_detail.html:431
+#: users/templates/users/user_detail.html:476
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:87
 #: users/templates/users/user_list.html:201
-#: users/templates/users/user_profile.html:222
+#: users/templates/users/user_profile.html:232
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 #: xpack/templates/orgs/org_list.html:86
 msgid "Confirm"
@@ -1022,8 +1024,8 @@ msgid "Refresh"
 msgstr "刷新"
 
 #: assets/templates/assets/asset_detail.html:300
-#: users/templates/users/user_detail.html:294
-#: users/templates/users/user_detail.html:321
+#: users/templates/users/user_detail.html:301
+#: users/templates/users/user_detail.html:328
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -1136,9 +1138,9 @@ msgstr "重命名失败，不能更改root节点的名称"
 
 #: assets/templates/assets/asset_list.html:627
 #: assets/templates/assets/system_user_list.html:137
-#: users/templates/users/user_detail.html:369
-#: users/templates/users/user_detail.html:395
-#: users/templates/users/user_detail.html:463
+#: users/templates/users/user_detail.html:376
+#: users/templates/users/user_detail.html:402
+#: users/templates/users/user_detail.html:470
 #: users/templates/users/user_group_list.html:81
 #: users/templates/users/user_list.html:195
 #: xpack/templates/orgs/org_list.html:81
@@ -1152,9 +1154,9 @@ msgstr "删除选择资产"
 #: assets/templates/assets/asset_list.html:631
 #: assets/templates/assets/system_user_detail.html:328
 #: assets/templates/assets/system_user_list.html:141
-#: users/templates/users/user_detail.html:373
-#: users/templates/users/user_detail.html:399
-#: users/templates/users/user_detail.html:467
+#: users/templates/users/user_detail.html:380
+#: users/templates/users/user_detail.html:406
+#: users/templates/users/user_detail.html:474
 #: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:85
 #: users/templates/users/user_list.html:199
@@ -1439,7 +1441,7 @@ msgstr "文件名"
 
 #: audits/models.py:22 audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:66
-#: users/templates/users/user_detail.html:445
+#: users/templates/users/user_detail.html:452
 msgid "Success"
 msgstr "成功"
 
@@ -2146,7 +2148,7 @@ msgstr "组织管理"
 #: perms/templates/perms/asset_permission_list.html:145 templates/_nav.html:14
 #: users/forms.py:282 users/models/group.py:26 users/models/user.py:57
 #: users/templates/users/_select_user_modal.html:16
-#: users/templates/users/user_detail.html:200
+#: users/templates/users/user_detail.html:207
 #: users/templates/users/user_list.html:26
 #: xpack/plugins/orgs/templates/orgs/org_list.html:15
 msgid "User group"
@@ -2202,7 +2204,7 @@ msgid "Add node to this permission"
 msgstr "添加节点"
 
 #: perms/templates/perms/asset_permission_asset.html:125
-#: users/templates/users/user_detail.html:217
+#: users/templates/users/user_detail.html:224
 msgid "Join"
 msgstr "加入"
 
@@ -2780,21 +2782,25 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api.py:176
-msgid "Please verify the user name and password first"
-msgstr "请先进行用户名和密码验证"
-
-#: users/api.py:188
-msgid "MFA certification failed"
-msgstr "MFA认证失败"
-
-#: users/api.py:234 users/templates/users/login.html:52
+#: users/api/auth.py:38 users/templates/users/login.html:52
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
-#: users/api.py:273
+#: users/api/auth.py:77
 msgid "Please carry seed value and conduct MFA secondary certification"
 msgstr "请携带seed值, 进行MFA二次认证"
+
+#: users/api/auth.py:190
+msgid "Please verify the user name and password first"
+msgstr "请先进行用户名和密码验证"
+
+#: users/api/auth.py:202
+msgid "MFA certification failed"
+msgstr "MFA认证失败"
+
+#: users/api/user.py:134
+msgid "Could not reset self otp, use profile reset instead"
+msgstr ""
 
 #: users/authentication.py:56
 msgid "Invalid signature header. No credentials provided."
@@ -2871,7 +2877,7 @@ msgstr ""
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:76 users/templates/users/user_detail.html:208
+#: users/forms.py:76 users/templates/users/user_detail.html:215
 msgid "Join user groups"
 msgstr "添加到用户组"
 
@@ -3048,31 +3054,15 @@ msgid "Home page"
 msgstr "首页"
 
 #: users/templates/users/_base_otp.html:44
-msgid "Authenticate"
-msgstr "验证身份"
-
-#: users/templates/users/_base_otp.html:51
-msgid "Install"
-msgstr "安装应用"
-
-#: users/templates/users/_base_otp.html:58
-msgid "Bind"
-msgstr "绑定 MFA"
-
-#: users/templates/users/_base_otp.html:64
-msgid "OK"
-msgstr "完成"
-
-#: users/templates/users/_base_otp.html:69
 msgid "Security token validation"
 msgstr "安全令牌验证"
 
-#: users/templates/users/_base_otp.html:69 users/templates/users/_user.html:13
+#: users/templates/users/_base_otp.html:44 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:51
 msgid "Account"
 msgstr "账户"
 
-#: users/templates/users/_base_otp.html:69
+#: users/templates/users/_base_otp.html:44
 msgid "Follow these steps to complete the binding operation"
 msgstr "请按照以下步骤完成绑定操作"
 
@@ -3127,10 +3117,10 @@ msgstr "上一步"
 
 #: users/templates/users/first_login.html:105
 #: users/templates/users/login_otp.html:67
-#: users/templates/users/user_otp_authentication.html:22
-#: users/templates/users/user_otp_enable_bind.html:19
-#: users/templates/users/user_otp_enable_install_app.html:22
-#: users/templates/users/user_password_authentication.html:17
+#: users/templates/users/user_otp_authentication.html:26
+#: users/templates/users/user_otp_enable_bind.html:23
+#: users/templates/users/user_otp_enable_install_app.html:26
+#: users/templates/users/user_password_authentication.html:21
 msgid "Next"
 msgstr "下一步"
 
@@ -3204,20 +3194,20 @@ msgid "MFA certification"
 msgstr "MFA认证"
 
 #: users/templates/users/login_otp.html:51
-#: users/templates/users/user_otp_authentication.html:7
+#: users/templates/users/user_otp_authentication.html:11
 msgid ""
 "The account protection has been opened, please complete the following "
 "operations according to the prompts"
 msgstr "账号保护已开启，请根据提示完成以下操作"
 
 #: users/templates/users/login_otp.html:55
-#: users/templates/users/user_otp_authentication.html:9
+#: users/templates/users/user_otp_authentication.html:13
 msgid "Open Authenticator and enter the 6-bit dynamic code"
 msgstr "请打开手机Google Authenticator应用，输入6位动态码"
 
 #: users/templates/users/login_otp.html:65
-#: users/templates/users/user_otp_authentication.html:19
-#: users/templates/users/user_otp_enable_bind.html:16
+#: users/templates/users/user_otp_authentication.html:23
+#: users/templates/users/user_otp_enable_bind.html:20
 msgid "Six figures"
 msgstr "6位数字"
 
@@ -3257,7 +3247,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:360 users/utils.py:80
+#: users/templates/users/user_detail.html:367 users/utils.py:80
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -3348,73 +3338,83 @@ msgstr "强制启用"
 msgid "Last login"
 msgstr "最后登录"
 
-#: users/templates/users/user_detail.html:155
+#: users/templates/users/user_detail.html:154
 msgid "Force enabled MFA"
 msgstr "强制启用MFA"
 
-#: users/templates/users/user_detail.html:170
+#: users/templates/users/user_detail.html:169
+msgid "Reset MFA"
+msgstr "重置MFA"
+
+#: users/templates/users/user_detail.html:177
 msgid "Send reset password mail"
 msgstr "发送重置密码邮件"
 
-#: users/templates/users/user_detail.html:173
-#: users/templates/users/user_detail.html:181
+#: users/templates/users/user_detail.html:180
+#: users/templates/users/user_detail.html:188
 msgid "Send"
 msgstr "发送"
 
-#: users/templates/users/user_detail.html:178
+#: users/templates/users/user_detail.html:185
 msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
-#: users/templates/users/user_detail.html:186
-#: users/templates/users/user_detail.html:448
+#: users/templates/users/user_detail.html:193
+#: users/templates/users/user_detail.html:455
 msgid "Unblock user"
 msgstr "解除登录限制"
 
-#: users/templates/users/user_detail.html:189
+#: users/templates/users/user_detail.html:196
 msgid "Unblock"
 msgstr "解除"
 
-#: users/templates/users/user_detail.html:303
+#: users/templates/users/user_detail.html:310
 msgid "Goto profile page enable MFA"
 msgstr "请去个人信息页面启用自己的MFA"
 
-#: users/templates/users/user_detail.html:359
+#: users/templates/users/user_detail.html:366
 msgid "An e-mail has been sent to the user`s mailbox."
 msgstr "已发送邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:370
+#: users/templates/users/user_detail.html:377
 msgid "This will reset the user password and send a reset mail"
 msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:385
+#: users/templates/users/user_detail.html:392
 msgid ""
 "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
 "the user to update his new ssh public key."
 msgstr "重设密钥邮件将会发送到用户邮箱"
 
-#: users/templates/users/user_detail.html:386
+#: users/templates/users/user_detail.html:393
 msgid "Reset SSH public key"
 msgstr "重置SSH密钥"
 
-#: users/templates/users/user_detail.html:396
+#: users/templates/users/user_detail.html:403
 msgid "This will reset the user public key and send a reset mail"
 msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:414
-#: users/templates/users/user_profile.html:211
+#: users/templates/users/user_detail.html:421
+#: users/templates/users/user_profile.html:221
 msgid "Successfully updated the SSH public key."
 msgstr "更新ssh密钥成功"
 
-#: users/templates/users/user_detail.html:415
-#: users/templates/users/user_detail.html:419
-#: users/templates/users/user_profile.html:212
-#: users/templates/users/user_profile.html:217
+#: users/templates/users/user_detail.html:422
+#: users/templates/users/user_detail.html:426
+#: users/templates/users/user_profile.html:222
+#: users/templates/users/user_profile.html:227
 msgid "User SSH public key update"
 msgstr "ssh密钥"
 
-#: users/templates/users/user_detail.html:464
+#: users/templates/users/user_detail.html:471
 msgid "After unlocking the user, the user can log in normally."
 msgstr "解除用户登录限制后，此用户即可正常登录"
+
+#: users/templates/users/user_detail.html:485
+#, fuzzy
+#| msgid "Reset password success"
+msgid "Reset user MFA success"
+msgstr "重置密码成功"
 
 #: users/templates/users/user_group_detail.html:22
 #: users/templates/users/user_group_granted_asset.html:18
@@ -3470,29 +3470,42 @@ msgstr "删除"
 msgid "User Deleting failed."
 msgstr "用户删除失败"
 
-#: users/templates/users/user_otp_authentication.html:28
+#: users/templates/users/user_otp_authentication.html:6
+#: users/templates/users/user_password_authentication.html:6
+msgid "Authenticate"
+msgstr "验证身份"
+
+#: users/templates/users/user_otp_authentication.html:32
 msgid "Unbind"
 msgstr "解绑 MFA"
 
-#: users/templates/users/user_otp_enable_bind.html:8
+#: users/templates/users/user_otp_enable_bind.html:6
+msgid "Bind"
+msgstr "绑定 MFA"
+
+#: users/templates/users/user_otp_enable_bind.html:12
 msgid ""
 "Use the mobile Google Authenticator application to scan the following qr "
 "code for a 6-bit verification code"
 msgstr "使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码"
 
-#: users/templates/users/user_otp_enable_install_app.html:7
+#: users/templates/users/user_otp_enable_install_app.html:6
+msgid "Install"
+msgstr "安装应用"
+
+#: users/templates/users/user_otp_enable_install_app.html:11
 msgid "Download and install the Google Authenticator application on your phone"
 msgstr "请在手机端下载并安装 Google Authenticator 应用"
 
-#: users/templates/users/user_otp_enable_install_app.html:10
+#: users/templates/users/user_otp_enable_install_app.html:14
 msgid "Android downloads"
 msgstr "Android手机下载"
 
-#: users/templates/users/user_otp_enable_install_app.html:15
+#: users/templates/users/user_otp_enable_install_app.html:19
 msgid "iPhone downloads"
 msgstr "iPhone手机下载"
 
-#: users/templates/users/user_otp_enable_install_app.html:19
+#: users/templates/users/user_otp_enable_install_app.html:23
 msgid ""
 "After installation, click the next step to enter the binding page (if "
 "installed, go to the next step directly)."
@@ -3512,18 +3525,22 @@ msgid "Update password"
 msgstr "更改密码"
 
 #: users/templates/users/user_profile.html:156
-msgid "Update MFA settings"
-msgstr "更改MFA设置"
+msgid "Set MFA"
+msgstr "设置MFA"
 
-#: users/templates/users/user_profile.html:177
+#: users/templates/users/user_profile.html:178
+msgid "Update MFA"
+msgstr "更改MFA"
+
+#: users/templates/users/user_profile.html:187
 msgid "Update SSH public key"
 msgstr "更改SSH密钥"
 
-#: users/templates/users/user_profile.html:185
+#: users/templates/users/user_profile.html:195
 msgid "Reset public key and download"
 msgstr "重置并下载SSH密钥"
 
-#: users/templates/users/user_profile.html:215
+#: users/templates/users/user_profile.html:225
 msgid "Failed to update SSH public key."
 msgstr "更新密钥失败"
 
@@ -3687,7 +3704,7 @@ msgstr "禁用或失效"
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/utils.py:284 users/utils.py:294
+#: users/utils.py:286 users/utils.py:296
 msgid "Bit"
 msgstr " 位"
 
@@ -3788,19 +3805,19 @@ msgstr "密钥更新"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:568
+#: users/views/user.py:572
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:569
+#: users/views/user.py:573
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:571
+#: users/views/user.py:575
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:572
+#: users/views/user.py:576
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
@@ -3851,6 +3868,12 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "OK"
+#~ msgstr "完成"
+
+#~ msgid "Update MFA settings"
+#~ msgstr "更改MFA设置"
 
 #~ msgid "MFA code invalid"
 #~ msgstr "MFA码认证失败"

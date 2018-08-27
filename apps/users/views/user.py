@@ -52,7 +52,7 @@ __all__ = [
     'UserPublicKeyGenerateView',
     'UserOtpEnableAuthenticationView', 'UserOtpEnableInstallAppView',
     'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
-    'UserOtpDisableAuthenticationView',
+    'UserOtpDisableAuthenticationView', 'UserOtpUpdateView'
 ]
 
 logger = get_logger(__name__)
@@ -541,6 +541,10 @@ class UserOtpDisableAuthenticationView(FormView):
         else:
             form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
             return super().form_invalid(form)
+
+
+class UserOtpUpdateView(UserOtpDisableAuthenticationView):
+    success_url = reverse_lazy('users:user-otp-enable-bind')
 
 
 class UserOtpSettingsSuccessView(TemplateView):
