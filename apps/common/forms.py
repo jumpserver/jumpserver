@@ -4,7 +4,6 @@ import json
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import escape
 from django.db import transaction
 from django.conf import settings
 
@@ -194,6 +193,14 @@ class SecuritySettingForm(BaseForm):
             "number of times, no login is allowed during this time interval."
         )
     )
+    SECURITY_MAX_IDLE_TIME = forms.IntegerField(
+        initial=30, required=False,
+        label=_("Connection max idle time"),
+        help_text=_(
+            'If idle time more than it, disconnect connection(only ssh now) '
+            'Unit: minute'
+        ),
+    )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
         initial=6, label=_("Password minimum length"),
@@ -223,9 +230,10 @@ class SecuritySettingForm(BaseForm):
                     'and resets must contain numeric characters')
     )
     # special char
-    SECURITY_PASSWORD_SPECIAL_CHAR= forms.BooleanField(
+    SECURITY_PASSWORD_SPECIAL_CHAR = forms.BooleanField(
         initial=False, required=False,
         label=_("Must contain special characters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain special characters')
     )
+
