@@ -35,6 +35,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from common.models import Setting
 from common.permissions import AdminUserRequiredMixin
+from orgs.utils import current_org
 from .. import forms
 from ..models import User, UserGroup
 from ..utils import generate_otp_uri, check_otp_code, \
@@ -196,6 +197,12 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_users = current_org.get_org_users().values_list('id', flat=True)
+        queryset = queryset.filter(id__in=org_users)
+        return queryset
 
 
 @method_decorator(csrf_exempt, name='dispatch')
