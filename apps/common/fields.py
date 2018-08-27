@@ -74,3 +74,10 @@ class EncryptCharField(EncryptMixin, models.CharField):
         kwargs['max_length'] = 2048
         super().__init__(*args, **kwargs)
 
+
+class FormEncryptMixin:
+    pass
+
+
+class FormEncryptCharField(FormEncryptMixin, forms.CharField):
+    pass
