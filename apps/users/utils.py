@@ -269,9 +269,6 @@ def generate_otp_uri(request, issuer="Jumpserver"):
 def check_otp_code(otp_secret_key, otp_code):
     if not otp_secret_key or not otp_code:
         return False
-    print('*'*100)
-    print(otp_secret_key)
-    print(otp_code)
     totp = pyotp.TOTP(otp_secret_key)
     return totp.verify(otp_code)
 
