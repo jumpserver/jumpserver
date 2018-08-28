@@ -95,11 +95,12 @@ Windows 资产连接错误排查思路
 
 .. image:: _static/img/faq_windows_07.jpg
 
-9. 上传文件到 windows
+9. Windows 资产文件上传和下载
 
 ::
 
     # 直接拖拽文件到 windows 窗口即可，文件上传后在 Guacamole RDP上的 G 目录查看
+    # 下载在 luna 页面，按 ctrl+alt+shift ，选择文件下载即可
 
 .. image:: _static/img/faq_windows_08.jpg
 
