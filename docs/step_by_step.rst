@@ -133,10 +133,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
     $ systemctl enable mariadb
     $ systemctl start mariadb
 
-    # centos6
-    $ yum -y install mysql mysql-devel mysql-server
-    $ chkconfig mysqld on
-    $ service mysqld start
+    # centos6 需要安装手动安装 mysql5.5 或以上的版本，自带的 mysql5.1 不支持，或者直接在其他现有 mysql 服务器上创建 jumpserver 数据库连接
 
 **2.6 创建数据库 Jumpserver 并授权**
 
