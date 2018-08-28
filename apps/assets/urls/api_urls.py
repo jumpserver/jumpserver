@@ -37,7 +37,9 @@ urlpatterns = [
     path('system-user/<uuid:pk>/push/',
          api.SystemUserPushApi.as_view(), name='system-user-push'),
     path('system-user/<uuid:pk>/asset/<uuid:aid>/push/',
-         api.SystemUserPushToAsset.as_view(), name='system-user-push-to-asset'),
+         api.SystemUserPushToAssetApi.as_view(), name='system-user-push-to-asset'),
+    path('system-user/<uuid:pk>/asset/<uuid:aid>/test/',
+         api.SystemUserTestAssetConnectabilityApi.as_view(), name='system-user-test-to-asset'),
     path('system-user/<uuid:pk>/connective/',
          api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
 

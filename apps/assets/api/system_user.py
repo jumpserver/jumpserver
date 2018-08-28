@@ -24,14 +24,16 @@ from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..models import SystemUser, Asset
 from .. import serializers
 from ..tasks import push_system_user_to_assets_manual, \
-    test_system_user_connectability_manual, push_system_user_a_asset_manual
+    test_system_user_connectability_manual, push_system_user_a_asset_manual, \
+    test_system_user_connectability_a_asset
 
 
 logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi',
     'SystemUserPushApi', 'SystemUserTestConnectiveApi',
-    'SystemUserAssetsListView', 'SystemUserPushToAsset',
+    'SystemUserAssetsListView', 'SystemUserPushToAssetApi',
+    'SystemUserTestAssetConnectabilityApi',
 ]
 
 
@@ -103,7 +105,7 @@ class SystemUserAssetsListView(generics.ListAPIView):
         return system_user.assets.all()
 
 
-class SystemUserPushToAsset(generics.RetrieveAPIView):
+class SystemUserPushToAssetApi(generics.RetrieveAPIView):
     queryset = SystemUser.objects.all()
     permission_classes = (IsOrgAdmin,)
 
@@ -112,4 +114,16 @@ class SystemUserPushToAsset(generics.RetrieveAPIView):
         asset_id = self.kwargs.get('aid')
         asset = get_object_or_404(Asset, id=asset_id)
         task = push_system_user_a_asset_manual.delay(system_user, asset)
+        return Response({"task": task.id})
+
+
+class SystemUserTestAssetConnectabilityApi(generics.RetrieveAPIView):
+    queryset = SystemUser.objects.all()
+    permission_classes = (IsOrgAdmin,)
+
+    def retrieve(self, request, *args, **kwargs):
+        system_user = self.get_object()
+        asset_id = self.kwargs.get('aid')
+        asset = get_object_or_404(Asset, id=asset_id)
+        task = test_system_user_connectability_a_asset.delay(system_user, asset)
         return Response({"task": task.id})

@@ -272,15 +272,16 @@ def set_system_user_connectablity_info(result, **kwargs):
 
 
 @shared_task
-def test_system_user_connectability_util(system_user, task_name):
+def test_system_user_connectability_util(system_user, assets, task_name):
     """
     Test system cant connect his assets or not.
     :param system_user:
+    :param assets:
     :param task_name:
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    assets = system_user.get_assets()
+    # assets = system_user.get_assets()
     hosts = [asset.fullname for asset in assets if asset.is_active and asset.is_unixlike()]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     if not hosts:
@@ -299,7 +300,16 @@ def test_system_user_connectability_util(system_user, task_name):
 @shared_task
 def test_system_user_connectability_manual(system_user):
     task_name = _("Test system user connectability: {}").format(system_user)
-    return test_system_user_connectability_util(system_user, task_name)
+    assets = system_user.get_assets()
+    return test_system_user_connectability_util(system_user, assets, task_name)
+
+
+@shared_task
+def test_system_user_connectability_a_asset(system_user, asset):
+    task_name = _("Test system user connectability: {} => {}").format(
+        system_user, asset
+    )
+    return test_system_user_connectability_util(system_user, [asset], task_name)
 
 
 @shared_task
