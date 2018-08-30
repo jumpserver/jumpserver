@@ -28,6 +28,7 @@ if [ "$a" == y -o "$a" == Y ];then
     read -p '请输入该用户的密码:' DB_PASSWORD
     mysqldump -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /$jumpserver_backup/$DB_NAME$(date -d "today" +"%Y%m%d_%H%M%S").sql || {
         echo -e "\033[31m 备份数据库失败，请检查输入是否有误 \033[0m"
+        stty erase ^H
         exit 1
     }
     echo -e "\033[31m 备份数据库完成 \033[0m"
