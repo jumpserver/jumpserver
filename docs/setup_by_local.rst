@@ -303,13 +303,6 @@ CentOS 7 组件离线安装文档
     $ systemctl start docker
     $ docker load < /opt/guacamole.tar
 
-    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1
-    $ docker run --name jms_guacamole -d \
-      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      jumpserver/guacamole:latest
-
 ::
 
 
@@ -384,8 +377,16 @@ CentOS 7 组件离线安装文档
     $ cd /opt/coco
     $ cp conf_example.py conf.py
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
-
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
+
+    # 运行 Guacamole
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1
+    $ docker run --name jms_guacamole -d \
+        -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+        -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+        -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
+        jumpserver/guacamole:latest
+    # docker 重启容器的方法docker restart jms_guacamole
 
     # 运行 Nginx
     $ nginx -t   # 确保配置没有问题, 有问题请先解决

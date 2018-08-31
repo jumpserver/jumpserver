@@ -425,8 +425,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
 
-启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
-
 .. code:: shell
 
 
@@ -438,6 +436,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
       -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
       -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
       jumpserver/guacamole:latest
+
+启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
