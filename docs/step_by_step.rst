@@ -141,7 +141,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ mysql
     > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'somepassword';
+    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
 
 **2.7 修改 Jumpserver 配置文件**
@@ -202,7 +202,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
         DB_PORT = os.environ.get("DB_PORT") or 3306
         DB_USER = os.environ.get("DB_USER") or 'jumpserver'
-        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'somepassword'
+        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
         DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问

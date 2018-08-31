@@ -58,7 +58,7 @@ CentOS 7 安装文档
     # 创建数据库 Jumpserver 并授权
     $ mysql -uroot
     > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'somepassword';
+    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
 
     # 安装 Nginx ，用作代理服务器整合 Jumpserver 与各个组件
@@ -160,7 +160,7 @@ CentOS 7 安装文档
         DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
         DB_PORT = os.environ.get("DB_PORT") or 3306
         DB_USER = os.environ.get("DB_USER") or 'jumpserver'
-        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'somepassword'
+        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
         DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
