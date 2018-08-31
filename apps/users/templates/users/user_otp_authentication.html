@@ -2,6 +2,10 @@
 {% load static %}
 {% load i18n %}
 
+{% block small_title %}
+    {% trans 'Authenticate' %}
+{% endblock %}
+
 {% block content %}
     <div class="verify">
         <p style="margin: 20px auto;"><strong style="color: #000000">{% trans 'The account protection has been opened, please complete the following operations according to the prompts' %}</strong></p>

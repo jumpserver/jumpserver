@@ -34,37 +34,12 @@
 
 		 <!--内容-->
 		 <article>
-		 	<div class="clearfix">		 		
-			 	<ul class="change-color">
-			 		<li>
-			 			<div>		 				
-			 				<i class="iconfont icon-step active"></i>
-			 				<span></span>
-			 			</div>
-                        <div class="back">{% trans 'Authenticate' %}</div>
-			 		</li>
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-step2"></i>
-			 				<span></span>
-			 			</div>
-                        <div class="back">{% trans 'Install' %}</div>
-			 		</li>
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-step1"></i>
-			 				<span></span>
-			 			</div>		 			
-                        <div class="back">{% trans 'Bind' %}</div>
-			 		</li>
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-duigou"></i>
-			 			</div>
-                        <div>{% trans 'OK' %}</div>
-			 		</li>
-			 	</ul>
-		 	</div>
+            <div class="" style="text-align: center; margin-bottom: 50px">
+                <h2>
+                    {% block small_title %}
+                    {% endblock %}
+                </h2>
+            </div>
 		 	<div >
                 <div class="verify">{% trans 'Security token validation' %}&nbsp;&nbsp;{% trans 'Account' %}&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;{% trans 'Follow these steps to complete the binding operation' %}</div>
 		 		<div class="line"></div>
