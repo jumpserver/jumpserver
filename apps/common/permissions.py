@@ -92,3 +92,9 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
         return super().dispatch(request, *args, **kwargs)
+
+
+class SuperUserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_authenticated and self.request.user.is_superuser:
+            return True
