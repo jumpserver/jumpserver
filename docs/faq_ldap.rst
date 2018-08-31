@@ -1,7 +1,8 @@
 LDAP 使用说明
 ------------------------------
 
-LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
+-  LDAP 支持 使用 LADP 与 Windows AD 的用户作为 jumpserver 登录用户
+-  已经存在的用户不能与要登录的 LDAP 用户有用户名和邮箱同名，具有唯一性
 
 1. LDAP 设置说明
 
