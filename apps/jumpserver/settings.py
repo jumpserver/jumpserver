@@ -95,6 +95,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
+    'jumpserver.middleware.RequestMiddleware',
     'orgs.middleware.OrgMiddleware',
 ]
 
@@ -127,7 +128,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'jumpserver.context_processor.jumpserver_processor',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -136,6 +136,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.request',
                 'django.template.context_processors.media',
+                'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
                 *get_xpack_context_processor(),
             ],
@@ -214,7 +215,10 @@ LOGGING = {
         },
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': "D",
+            'interval': 1,
+            "backupCount": 7,
             'formatter': 'main',
             'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
         },
@@ -270,7 +274,8 @@ LOGGING = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-LANGUAGE_CODE = 'en'
+# LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'zh'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -281,7 +286,9 @@ USE_L10N = True
 USE_TZ = True
 
 # I18N translation
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'i18n'), ]
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -441,7 +448,8 @@ TERMINAL_REPLAY_STORAGE = {
 
 DEFAULT_PASSWORD_MIN_LENGTH = 6
 DEFAULT_LOGIN_LIMIT_COUNT = 7
-DEFAULT_LOGIN_LIMIT_TIME = 30
+DEFAULT_LOGIN_LIMIT_TIME = 30  # Unit: minute
+DEFAULT_SECURITY_MAX_IDLE_TIME = 30  # Unit: minute
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

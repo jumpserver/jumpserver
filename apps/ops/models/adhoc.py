@@ -207,6 +207,7 @@ class AdHoc(models.Model):
             return {}
 
     def run(self, record=True):
+        set_to_root_org()
         if record:
             return self._run_and_record()
         else:

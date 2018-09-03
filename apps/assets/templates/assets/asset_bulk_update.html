@@ -5,9 +5,9 @@
 
 {% block form %}
 <div class="ydxbd" id="formlists" style="display: block;">
-    <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
+    <p id="tags_p" class="mgl-5 c02">{% trans 'Select properties that need to be modified' %}</p>
     <div class="tagBtnList">
-        <a class="label label-primary" id="change_all" value="1">全选</a>
+        <a class="label label-primary" id="change_all" value="1">{% trans 'Select all' %}</a>
         {% for field in form %}
             {% if field.name != 'assets' %}
              <a data-id="{{ field.id_for_label }}" class="label label-default label-primary field-tag" value="1">{{ field.label }}</a>

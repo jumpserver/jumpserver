@@ -24,6 +24,9 @@ class Node(OrgModelMixin):
     is_node = True
     _full_value_cache_key_prefix = '_NODE_VALUE_{}'
 
+    class Meta:
+        verbose_name = _("Node")
+
     def __str__(self):
         return self.full_value
 

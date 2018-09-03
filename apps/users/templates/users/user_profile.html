@@ -153,7 +153,7 @@
                                         </td>
                                     </tr>
                                     <tr class="no-borders-tr">
-                                        <td>{% trans 'Update MFA settings' %}:</td>
+                                        <td>{% trans 'Set MFA' %}:</td>
                                         <td>
                                             <span class="pull-right">
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
@@ -173,6 +173,16 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    {% if request.user.otp_enabled and request.user.otp_secret_key %}
+                                    <tr>
+                                        <td>{% trans 'Update MFA' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-otp-update' %}">{% trans 'Update' %}</a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
                                     <tr>
                                         <td>{% trans 'Update SSH public key' %}:</td>
                                         <td>

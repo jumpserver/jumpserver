@@ -1,8 +1,9 @@
+{% load i18n %}
 {% load common_tags %}
    {% if is_paginated %}
    <div class="col-sm-4">
        <div class="dataTables_info text-center" id="editable_info" role="status" aria-live="polite">
-           显示第 {{ page_obj.start_index }} 至 {{ page_obj.end_index }} 项结果，共 {{ paginator.count }} 项
+{#           显示第 {{ page_obj.start_index }} 至 {{ page_obj.end_index }} 项结果，共 {{ paginator.count }} 项#}
        </div>
    </div>
    <div class="col-sm-4">
@@ -10,7 +11,7 @@
            <ul class="pagination" style="margin-top: 0; float: right">
                {% if page_obj.has_previous %}
                    <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
-                       <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
+                       <a data-page="next" class="page" href="?page={{ page_obj.previous_page_number}}">‹</a>
                    </li>
                {% endif %}
 
@@ -26,7 +27,7 @@
 
                {% if page_obj.has_next %}
                    <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
-                       <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
+                       <a data-page="next" class="page" href="?page={{ page_obj.next_page_number }}">›</a>
                    </li>
                {% endif %}
            </ul>
@@ -40,7 +41,7 @@
             var old_href = $(this).attr('href').replace('?', '');
             var searchArray = searchStr.split('&');
 
-            if (searchStr == '') {
+            if (searchStr === '') {
                 searchStr = '?page=1'
             }
 
@@ -53,6 +54,13 @@
                 $(this).attr('href', searchArray.join('&'));
             }
         })
+
+        $('#editable_info').html(
+            "{% trans 'Displays the results of items _START_ to _END_; A total of _TOTAL_ entries' %}"
+                .replace('_START_', {{ page_obj.start_index }})
+                .replace('_END_', {{ page_obj.end_index }})
+                .replace('_TOTAL_', {{ paginator.count }})
+        )
     });
 
 </script>

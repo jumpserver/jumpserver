@@ -1,68 +1,59 @@
 # -*- coding: utf-8 -*-
 #
 import json
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import escape
 from django.db import transaction
 from django.conf import settings
 
-from .models import Setting
-from .fields import DictField
-
-
-def to_model_value(value):
-    try:
-        return json.dumps(value)
-    except json.JSONDecodeError:
-        return None
-
-
-def to_form_value(value):
-    try:
-        data = json.loads(value)
-        if isinstance(data, dict):
-            data = value
-        return data
-    except json.JSONDecodeError:
-        return ""
+from .models import Setting, common_settings
+from .fields import FormDictField, FormEncryptCharField, \
+    FormEncryptMixin, FormEncryptDictField
 
 
 class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        db_settings = Setting.objects.all()
         for name, field in self.fields.items():
-            db_value = getattr(db_settings, name).value
+            db_value = getattr(common_settings, name)
             django_value = getattr(settings, name) if hasattr(settings, name) else None
+
             if db_value is False or db_value:
-                field.initial = to_form_value(db_value)
+                if isinstance(db_value, dict):
+                    db_value = json.dumps(db_value)
+                initial_value = db_value
             elif django_value is False or django_value:
-                field.initial = to_form_value(to_model_value(django_value))
+                initial_value = django_value
+            else:
+                initial_value = ''
+            field.initial = initial_value
 
     def save(self, category="default"):
         if not self.is_bound:
             raise ValueError("Form is not bound")
 
-        db_settings = Setting.objects.all()
-        if self.is_valid():
-            with transaction.atomic():
-                for name, value in self.cleaned_data.items():
-                    field = self.fields[name]
-                    if isinstance(field.widget, forms.PasswordInput) and not value:
-                        continue
-                    if value == to_form_value(getattr(db_settings, name).value):
-                        continue
-
-                    defaults = {
-                        'name': name,
-                        'category': category,
-                        'value': to_model_value(value)
-                    }
-                    Setting.objects.update_or_create(defaults=defaults, name=name)
-        else:
+        # db_settings = Setting.objects.all()
+        if not self.is_valid():
             raise ValueError(self.errors)
+
+        with transaction.atomic():
+            for name, value in self.cleaned_data.items():
+                field = self.fields[name]
+                if isinstance(field.widget, forms.PasswordInput) and not value:
+                    continue
+                if value == getattr(common_settings, name):
+                    continue
+
+                encrypted = True if isinstance(field, FormEncryptMixin) else False
+                try:
+                    setting = Setting.objects.get(name=name)
+                except Setting.DoesNotExist:
+                    setting = Setting()
+                setting.name = name
+                setting.category = category
+                setting.encrypted = encrypted
+                setting.cleaned_value = value
+                setting.save()
 
 
 class BasicSettingForm(BaseForm):
@@ -88,7 +79,7 @@ class EmailSettingForm(BaseForm):
     EMAIL_HOST_USER = forms.CharField(
         max_length=128, label=_("SMTP user"), initial='noreply@jumpserver.org'
     )
-    EMAIL_HOST_PASSWORD = forms.CharField(
+    EMAIL_HOST_PASSWORD = FormEncryptCharField(
         max_length=1024, label=_("SMTP password"), widget=forms.PasswordInput,
         required=False, help_text=_("Some provider use token except password")
     )
@@ -109,7 +100,7 @@ class LDAPSettingForm(BaseForm):
     AUTH_LDAP_BIND_DN = forms.CharField(
         label=_("Bind DN"), initial='cn=admin,dc=jumpserver,dc=org'
     )
-    AUTH_LDAP_BIND_PASSWORD = forms.CharField(
+    AUTH_LDAP_BIND_PASSWORD = FormEncryptCharField(
         label=_("Password"), initial='',
         widget=forms.PasswordInput, required=False
     )
@@ -121,15 +112,12 @@ class LDAPSettingForm(BaseForm):
         label=_("User search filter"), initial='(cn=%(user)s)',
         help_text=_("Choice may be (cn|uid|sAMAccountName)=%(user)s)")
     )
-    AUTH_LDAP_USER_ATTR_MAP = DictField(
+    AUTH_LDAP_USER_ATTR_MAP = FormDictField(
         label=_("User attr map"),
-        initial=json.dumps({
-            "username": "cn",
-            "name": "sn",
-            "email": "mail"
-        }),
         help_text=_(
-            "User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr")
+            "User attr map present how to map LDAP user attr to jumpserver, "
+            "username,name,email is jumpserver attr"
+        )
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
@@ -156,13 +144,13 @@ class TerminalSettingForm(BaseForm):
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Public key auth")
     )
-    TERMINAL_COMMAND_STORAGE = DictField(
+    TERMINAL_COMMAND_STORAGE = FormEncryptDictField(
         label=_("Command storage"), help_text=_(
             "Set terminal storage setting, `default` is the using as default,"
             "You can set other storage and some terminal using"
         )
     )
-    TERMINAL_REPLAY_STORAGE = DictField(
+    TERMINAL_REPLAY_STORAGE = FormEncryptDictField(
         label=_("Replay storage"), help_text=_(
             "Set replay storage setting, `default` is the using as default,"
             "You can set other storage and some terminal using"
@@ -194,6 +182,14 @@ class SecuritySettingForm(BaseForm):
             "number of times, no login is allowed during this time interval."
         )
     )
+    SECURITY_MAX_IDLE_TIME = forms.IntegerField(
+        initial=30, required=False,
+        label=_("Connection max idle time"),
+        help_text=_(
+            'If idle time more than it, disconnect connection(only ssh now) '
+            'Unit: minute'
+        ),
+    )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
         initial=6, label=_("Password minimum length"),
@@ -223,9 +219,10 @@ class SecuritySettingForm(BaseForm):
                     'and resets must contain numeric characters')
     )
     # special char
-    SECURITY_PASSWORD_SPECIAL_CHAR= forms.BooleanField(
+    SECURITY_PASSWORD_SPECIAL_CHAR = forms.BooleanField(
         initial=False, required=False,
         label=_("Must contain special characters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain special characters')
     )
+

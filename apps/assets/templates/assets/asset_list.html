@@ -4,7 +4,8 @@
 
 {% block help_message %}
     <div class="alert alert-info help-message">
-    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产
+{#    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产#}
+    {% trans 'The left side is the asset tree, right click to create, delete, and change the tree node, authorization asset is also organized as a node, and the right side is the asset under that node' %}
     </div>
 {% endblock %}
 
@@ -627,6 +628,7 @@ $(document).ready(function(){
             text: "{% trans 'This will delete the selected assets !!!' %}",
             type: "warning",
             showCancelButton: true,
+            cancelButtonText: "{% trans 'Cancel' %}",
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "{% trans 'Confirm' %}",
             closeOnConfirm: false
