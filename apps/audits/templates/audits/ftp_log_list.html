@@ -66,7 +66,6 @@
 {% endblock %}
 
 {% block table_head %}
-    <th class="text-center"></th>
 {#    <th class="text-center">{% trans 'ID' %}</th>#}
     <th class="text-center">{% trans 'User' %}</th>
     <th class="text-center">{% trans 'Asset' %}</th>
@@ -82,7 +81,6 @@
 {% block table_body %}
     {% for object in object_list %}
         <tr class="gradeX">
-            <td class="text-center"><input type="checkbox" value="{{ object.id }}"></td>
 {#            <td class="text-center">#}
 {#                <a href="{% url 'terminal:object-detail' pk=object.id %}">{{ forloop.counter }}</a>#}
 {#            </td>#}

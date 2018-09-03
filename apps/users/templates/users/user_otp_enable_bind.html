@@ -2,10 +2,14 @@
 {% load static %}
 {% load i18n %}
 
+{% block small_title %}
+    {% trans 'Bind' %}
+{% endblock %}
+
 {% block content %}
 
     <div class="verify">
-        <p style="margin:20px auto;"><strong style="color: #000000">使用手机 Google Authenticator 应用扫描以下二维码，获取6位验证码</strong></p>
+        <p style="margin:20px auto;"><strong style="color: #000000">{% trans 'Use the mobile Google Authenticator application to scan the following qr code for a 6-bit verification code' %}</strong></p>
 
         <div id="qr_code"></div>
 

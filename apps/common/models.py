@@ -7,6 +7,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
+from .utils import get_signer
+
+signer = get_signer()
+
 
 class SettingQuerySet(models.QuerySet):
     def __getattr__(self, item):
@@ -26,6 +30,7 @@ class Setting(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     value = models.TextField(verbose_name=_("Value"))
     category = models.CharField(max_length=128, default="default")
+    encrypted = models.BooleanField(default=False)
     enabled = models.BooleanField(verbose_name=_("Enabled"), default=True)
     comment = models.TextField(verbose_name=_("Comment"))
 
@@ -34,10 +39,21 @@ class Setting(models.Model):
     def __str__(self):
         return self.name
 
+    def __getattr__(self, item):
+        instances = self.__class__.objects.filter(name=item)
+        if len(instances) == 1:
+            return instances[0].cleaned_value
+        else:
+            return None
+
     @property
     def cleaned_value(self):
         try:
-            return json.loads(self.value)
+            value = self.value
+            if self.encrypted:
+                value = signer.unsign(value)
+            value = json.loads(value)
+            return value
         except json.JSONDecodeError:
             return None
 
@@ -45,6 +61,8 @@ class Setting(models.Model):
     def cleaned_value(self, item):
         try:
             v = json.dumps(item)
+            if self.encrypted:
+                v = signer.sign(v)
             self.value = v
         except json.JSONDecodeError as e:
             raise ValueError("Json dump error: {}".format(str(e)))
@@ -59,11 +77,7 @@ class Setting(models.Model):
             pass
 
     def refresh_setting(self):
-        try:
-            value = json.loads(self.value)
-        except json.JSONDecodeError:
-            return
-        setattr(settings, self.name, value)
+        setattr(settings, self.name, self.cleaned_value)
 
         if self.name == "AUTH_LDAP":
             if self.cleaned_value and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
@@ -81,3 +95,5 @@ class Setting(models.Model):
     class Meta:
         db_table = "settings"
 
+
+common_settings = Setting()

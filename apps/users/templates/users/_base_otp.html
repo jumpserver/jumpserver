@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="{% static 'css/otp.css' %}" />
         <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
         <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
+        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 	</head>
 
 	<body>
@@ -23,9 +24,9 @@
 		 		<a href="{% url 'index' %}">Jumpserver</a>
 		 	</div>
 		 	<div>
-		 		<a href="{% url 'index' %}">首页</a>
+                <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
 		 		<b>丨</b>
-		 		<a href="http://docs.jumpserver.org/zh/docs/">文档</a>
+                <a href="http://docs.jumpserver.org/zh/docs/">{% trans 'Docs' %}</a>
 		 		<b>丨</b>
 		 		<a href="https://www.github.com/jumpserver/">GitHub</a>
 		 	</div>
@@ -33,39 +34,14 @@
 
 		 <!--内容-->
 		 <article>
-		 	<div class="clearfix">		 		
-			 	<ul class="change-color">
-			 		<li>
-			 			<div>		 				
-			 				<i class="iconfont icon-step active"></i>
-			 				<span></span>
-			 			</div>
-			 			<div class="back">验证身份</div>
-			 		</li>
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-step2"></i>
-			 				<span></span>
-			 			</div>
-			 			<div class="back">安装应用</div>
-			 		</li>
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-step1"></i>
-			 				<span></span>
-			 			</div>		 			
-			 			<div class="back">绑定MFA</div>
-			 		</li>           
-			 		<li>
-			 			<div>
-			 				<i class="iconfont icon-duigou"></i>
-			 			</div>
-			 			<div>完成</div>
-			 		</li>
-			 	</ul>
-		 	</div>
+            <div class="" style="text-align: center; margin-bottom: 50px">
+                <h2>
+                    {% block small_title %}
+                    {% endblock %}
+                </h2>
+            </div>
 		 	<div >
-		 		<div class="verify">安全令牌验证&nbsp;&nbsp;账户&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;请按照以下步骤完成绑定操作</div>
+                <div class="verify">{% trans 'Security token validation' %}&nbsp;&nbsp;{% trans 'Account' %}&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;{% trans 'Follow these steps to complete the binding operation' %}</div>
 		 		<div class="line"></div>
 
                 {% block content %}

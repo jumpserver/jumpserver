@@ -10,6 +10,7 @@
     <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
     {% include '_head_css_js.html' %}
     <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static "js/jumpserver.js" %}"></script>
     <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
     <style>
@@ -23,18 +24,18 @@
     <div class="loginColumns animated fadeInDown">
         <div class="row">
             <div class="col-md-6">
-                <h2 class="font-bold">欢迎使用Jumpserver开源堡垒机</h2>
+                <h2 class="font-bold">{% trans 'Welcome to the Jumpserver open source fortress' %}</h2>
                 <p>
-                    全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计系统。
+                    {% trans "The world's first fully open source fortress, using the GNU GPL v2.0 open source protocol, is a professional operation and maintenance audit system in compliance with 4A." %}
                 </p>
                 <p>
-                    使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
+                    {% trans "Developed using Python/Django, following the Web 2.0 specification and equipped with industry-leading Web Terminal solutions, with beautiful interactive interface and good user experience." %}
                 </p>
                 <p>
-                    采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发访问限制。
+                    {% trans 'Distributed architecture is adopted to support multi-machine room deployment across regions, central node provides API, and each machine room deploys login node, which can be extended horizontally and without concurrent access restrictions.' %}
                 </p>
                 <p>
-                    改变世界，从一点点开始。
+                    {% trans  "Changes the world, starting with a little bit." %}
                 </p>
 
             </div>
@@ -47,11 +48,11 @@
                     <div  class="m-t">
 
                         <div class="form-group">
-                            <p style="margin:30px auto;" class="text-center"><strong style="color:#000000">账号保护已开启，请根据提示完成以下操作</strong></p>
+                            <p style="margin:30px auto;" class="text-center"><strong style="color:#000000">{% trans 'The account protection has been opened, please complete the following operations according to the prompts' %}</strong></p>
                             <div class="text-center">
                                 <img src="{% static 'img/otp_auth.png' %}" alt="" width="72px" height="117">
                             </div>
-                            <p style="margin: 30px auto">&nbsp;请打开手机Google Authenticator应用，输入6位动态码</p>
+                            <p style="margin: 30px auto">&nbsp;{% trans 'Open Authenticator and enter the 6-bit dynamic code' %}</p>
                         </div>
 
                         <form class="m-t" role="form" method="post" action="">

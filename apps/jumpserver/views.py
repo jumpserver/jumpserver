@@ -1,8 +1,10 @@
 import datetime
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -85,7 +87,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        return User.objects.all().count() - self.get_month_active_user_total()
+        return current_org.get_org_users().count() - self.get_month_active_user_total()
 
     def get_month_active_asset_total(self):
         return self.session_month.values('asset').distinct().count()
@@ -95,7 +97,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     @staticmethod
     def get_user_disabled_total():
-        return User.objects.filter(is_active=False).count()
+        return current_org.get_org_users().filter(is_active=False).count()
 
     @staticmethod
     def get_asset_disabled_total():
@@ -173,11 +175,14 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 class LunaView(View):
     def get(self, request):
-        msg = """
-        Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, 
-        如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运
-        """
+        msg = _("<div>Luna is a separately deployed program, you need to deploy Luna, coco, configure nginx for url distribution,</div> "
+                "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
         return HttpResponse(msg)
 
 
-
+class I18NView(View):
+    def get(self, request, lang):
+        referer_url = request.META.get('HTTP_REFERER', '/')
+        response = HttpResponseRedirect(referer_url)
+        response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
+        return response

@@ -9,6 +9,7 @@ from django.conf import settings
 
 from users.models import User
 from orgs.mixins import OrgModelMixin
+from common.models import common_settings
 from .backends.command.models import AbstractSessionCommand
 
 
@@ -62,6 +63,10 @@ class Terminal(models.Model):
                 configs[k] = getattr(settings, k)
         configs.update(self.get_common_storage())
         configs.update(self.get_replay_storage())
+        configs.update({
+            'SECURITY_MAX_IDLE_TIME': common_settings.SECURITY_MAX_IDLE_TIME or
+                settings.DEFAULT_SECURITY_MAX_IDLE_TIME,
+        })
         return configs
 
     def create_app_user(self):

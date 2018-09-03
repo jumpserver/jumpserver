@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-08 14:48+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: static/js/jumpserver.js:158
+msgid "Update is successful!"
+msgstr "更新成功"
+
+#: static/js/jumpserver.js:160
+msgid "An unknown error occurred while updating.."
+msgstr "更新时发生未知错误"
+
+#: static/js/jumpserver.js:205 static/js/jumpserver.js:247
+#: static/js/jumpserver.js:252
+msgid "Error"
+msgstr "错误"
+
+#: static/js/jumpserver.js:205
+msgid "Being used by the asset, please unbind the asset first."
+msgstr "正在被资产使用中，请先解除资产绑定"
+
+#: static/js/jumpserver.js:212 static/js/jumpserver.js:260
+msgid "Delete the success"
+msgstr "删除成功"
+
+#: static/js/jumpserver.js:219
+msgid "Are you sure about deleting it?"
+msgstr "你确定删除吗 ?"
+
+#: static/js/jumpserver.js:224 static/js/jumpserver.js:273
+msgid "Cancel"
+msgstr "取消"
+
+#: static/js/jumpserver.js:227 static/js/jumpserver.js:276
+msgid "Confirm"
+msgstr "确认"
+
+#: static/js/jumpserver.js:247
+msgid ""
+"The organization contains undeleted information. Please try again after "
+"deleting"
+msgstr "组织中包含未删除信息，请删除后重试"
+
+#: static/js/jumpserver.js:252
+msgid ""
+"Do not perform this operation under this organization. Try again after "
+"switching to another organization"
+msgstr "请勿在此组织下执行此操作，切换到其他组织后重试"
+
+#: static/js/jumpserver.js:267
+msgid ""
+"Please ensure that the following information in the organization has been "
+"deleted"
+msgstr "请确保组织内的以下信息已删除"
+
+#: static/js/jumpserver.js:269
+msgid ""
+"User list、User group、Asset list、Domain list、Admin user、System user、"
+"Labels、Asset permission"
+msgstr ""
+"用户列表、用户组、资产列表、网域列表、管理用户、系统用户、标签管理、资产授权"
+"规则"
+
+#: static/js/jumpserver.js:311
+msgid "Loading ..."
+msgstr "加载中 ..."
+
+#: static/js/jumpserver.js:313
+msgid "Search"
+msgstr "搜索"
+
+#: static/js/jumpserver.js:317
+#, javascript-format
+msgid "Selected item %d"
+msgstr "选中 %d 项"
+
+#: static/js/jumpserver.js:322
+msgid "Per page _MENU_"
+msgstr "每页  _MENU_"
+
+#: static/js/jumpserver.js:324
+msgid ""
+"Displays the results of items _START_ to _END_; A total of _TOTAL_ entries"
+msgstr "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项"
+
+#: static/js/jumpserver.js:328
+msgid "No match"
+msgstr "没有匹配项"
+
+#: static/js/jumpserver.js:330
+msgid "No record"
+msgstr "没有记录"
