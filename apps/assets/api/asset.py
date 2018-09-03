@@ -2,9 +2,8 @@
 #
 
 import random
-import time
 
-from rest_framework import generics, permissions
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
@@ -14,8 +13,8 @@ from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser
-from ..models import Asset, SystemUser, AdminUser, Node
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
     test_asset_connectability_manual
@@ -40,7 +39,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def filter_node(self):
         node_id = self.request.query_params.get("node_id")
