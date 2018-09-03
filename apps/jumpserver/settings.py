@@ -215,7 +215,10 @@ LOGGING = {
         },
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': "D",
+            'interval': 1,
+            "backupCount": 7,
             'formatter': 'main',
             'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
         },
