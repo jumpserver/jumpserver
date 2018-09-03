@@ -13,7 +13,7 @@ from .utils import get_signer
 signer = get_signer()
 
 
-class DictField(forms.Field):
+class FormDictField(forms.Field):
     widget = forms.Textarea
 
     def to_python(self, value):
@@ -23,6 +23,7 @@ class DictField(forms.Field):
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
         if isinstance(value, six.string_types):
+            value = value.replace("'", '"')
             try:
                 value = json.loads(value)
                 return value
@@ -80,4 +81,8 @@ class FormEncryptMixin:
 
 
 class FormEncryptCharField(FormEncryptMixin, forms.CharField):
+    pass
+
+
+class FormEncryptDictField(FormEncryptMixin, FormDictField):
     pass

@@ -1,45 +1,32 @@
 # -*- coding: utf-8 -*-
 #
 import json
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
 from django.conf import settings
 
 from .models import Setting, common_settings
-from .fields import DictField, FormEncryptCharField, FormEncryptMixin
-
-
-# def to_model_value(value):
-#     try:
-#         return json.dumps(value)
-#     except json.JSONDecodeError:
-#         return None
-#
-#
-# def to_form_value(value):
-#     try:
-#         data = json.loads(value)
-#         if isinstance(data, dict):
-#             data = value
-#         return data
-#     except json.JSONDecodeError:
-#         return ""
+from .fields import FormDictField, FormEncryptCharField, \
+    FormEncryptMixin, FormEncryptDictField
 
 
 class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # db_settings = Setting.objects.all()
         for name, field in self.fields.items():
             db_value = getattr(common_settings, name)
             django_value = getattr(settings, name) if hasattr(settings, name) else None
 
             if db_value is False or db_value:
-                field.initial = db_value
+                if isinstance(db_value, dict):
+                    db_value = json.dumps(db_value)
+                initial_value = db_value
             elif django_value is False or django_value:
-                field.initial = django_value
+                initial_value = django_value
+            else:
+                initial_value = ''
+            field.initial = initial_value
 
     def save(self, category="default"):
         if not self.is_bound:
@@ -67,7 +54,6 @@ class BaseForm(forms.Form):
                 setting.encrypted = encrypted
                 setting.cleaned_value = value
                 setting.save()
-                return setting
 
 
 class BasicSettingForm(BaseForm):
@@ -126,15 +112,12 @@ class LDAPSettingForm(BaseForm):
         label=_("User search filter"), initial='(cn=%(user)s)',
         help_text=_("Choice may be (cn|uid|sAMAccountName)=%(user)s)")
     )
-    AUTH_LDAP_USER_ATTR_MAP = DictField(
+    AUTH_LDAP_USER_ATTR_MAP = FormDictField(
         label=_("User attr map"),
-        initial=json.dumps({
-            "username": "cn",
-            "name": "sn",
-            "email": "mail"
-        }),
         help_text=_(
-            "User attr map present how to map LDAP user attr to jumpserver, username,name,email is jumpserver attr")
+            "User attr map present how to map LDAP user attr to jumpserver, "
+            "username,name,email is jumpserver attr"
+        )
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
@@ -161,13 +144,13 @@ class TerminalSettingForm(BaseForm):
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Public key auth")
     )
-    TERMINAL_COMMAND_STORAGE = DictField(
+    TERMINAL_COMMAND_STORAGE = FormEncryptDictField(
         label=_("Command storage"), help_text=_(
             "Set terminal storage setting, `default` is the using as default,"
             "You can set other storage and some terminal using"
         )
     )
-    TERMINAL_REPLAY_STORAGE = DictField(
+    TERMINAL_REPLAY_STORAGE = FormEncryptDictField(
         label=_("Replay storage"), help_text=_(
             "Set replay storage setting, `default` is the using as default,"
             "You can set other storage and some terminal using"
