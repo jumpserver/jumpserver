@@ -40,5 +40,3 @@ def get_current_org():
 
 
 current_org = LocalProxy(partial(_find, 'current_org'))
-current_user = LocalProxy(partial(_find, 'current_user'))
-current_request = LocalProxy(partial(_find, 'current_request'))

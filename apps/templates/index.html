@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 {% block content %}
 <div class="wrapper wrapper-content">
@@ -7,7 +8,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-success pull-right">Users</span>
-                    <h5>用户总数</h5>
+                    <h5>{% trans 'Total users' %}</h5>
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'users:user-list' %}">{{ users_count }}</a></h1>
@@ -19,7 +20,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-info pull-right">Hosts</span>
-                    <h5>主机总数</h5>
+                    <h5>{% trans 'Total hosts' %}</h5>
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'assets:asset-list' %}">{{ assets_count }}</a></h1>
@@ -32,7 +33,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-primary pull-right">Online</span>
-                    <h5>在线用户</h5>
+                    <h5>{% trans 'Online users' %}</h5>
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_users"></span>{{ online_user_count }}</a></h1>
@@ -45,7 +46,8 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-danger pull-right">Connected</span>
-                    <h5>在线会话</h5>
+                    <h5>{% trans 'Online sessions' %}</h5>
+
                 </div>
                 <div class="ibox-content">
                         <h1 class="no-margins"><a href="{% url 'terminal:session-online-list' %}"> <span id="online_hosts"></span>{{ online_asset_count }}</a></h1>
@@ -56,13 +58,13 @@
     </div>
     <div class="row">
         <div class="col-sm-2 border-bottom white-bg dashboard-header" style="margin-left:15px;height: 346px">
-            <h2>活跃用户TOP5</h2>
-            <small>过去一周共有<span class="text-info">{{ user_visit_count_weekly }}</span>位用户登录<span class="text-success">{{ asset_visit_count_weekly }}</span>次资产.</small>
+            <h2>{% trans ' Top 5 Active user' %}</h2>
+            <small>{% trans 'In the past week, a total of ' %}<span class="text-info">{{ user_visit_count_weekly }}</span>{% trans ' users have logged in ' %}<span class="text-success">{{ asset_visit_count_weekly }}</span>{% trans ' times asset.' %}</small>
             <ul class="list-group clear-list m-t">
                 {% for data in user_visit_count_top_five %}
                     <li class="list-group-item fist-item">
                         <span class="pull-right">
-                            {{ data.total }}次/周
+                            {{ data.total }}{% trans ' times/week' %}
                         </span>
                         <span class="label ">{{ forloop.counter }}</span> {{ data.user }}
                     </li>
@@ -73,21 +75,20 @@
         <div class="col-sm-3 white-bg" id="top1" style="margin-left: -15px;height: 346px">
             <div class="statistic-box">
                 <h4>
-                    活跃用户资产占比
+                    {% trans 'Active user asset ratio' %}
                 </h4>
                 <p>
-                    以下图形分别描述一个月活跃用户和资产占所有用户主机的百分比
+                    {% trans 'The following graphs describe the percentage of active users per month and assets per user host per month, respectively.' %}
                 </p>
                 <div class="row text-center">
                     <div class="col-sm-6">
                         <div id="activeUser"  style="width: 140px; height: 140px;">
-
                         </div>
-                        <h5>用户</h5>
+                        <h5>{% trans 'User' %}</h5>
                     </div>
                     <div class="col-sm-6">
                         <div id="activeAsset" style="width: 140px; height: 140px;"></div>
-                        <h5>主机</h5>
+                        <h5>{% trans 'Host' %}</h5>
                     </div>
                 </div>
                 <div class="m-t">
@@ -102,7 +103,7 @@
         <div class="col-sm-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>一周Top10资产</h5>
+                    <h5>{% trans 'Top 10 assets in a week' %}</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -117,8 +118,8 @@
                     </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3><i class="fa fa-inbox"></i> 一周Top10资产 </h3>
-                    <small><i class="fa fa-map-marker"></i> 登录次数及最近一次登录记录. </small>
+                    <h3><i class="fa fa-inbox"></i>{% trans 'Top 10 assets in a week'%}</h3>
+                    <small><i class="fa fa-map-marker"></i>{% trans 'Login frequency and last login record.' %}</small>
                 </div>
                 <div class="ibox-content inspinia-timeline">
                     {% if week_asset_hot_ten %}
@@ -129,18 +130,18 @@
                                         <i class="fa fa-info-circle"></i>
                                         <strong data-toggle="tooltip" title="{{ data.asset }}">{{ data.asset }}</strong>
                                         <br/>
-                                        <small class="text-navy">{{ data.total }}次</small>
+                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">最近一次登录用户</p>
+                                        <p class="m-b-xs">{% trans 'The last time a user logged in' %}</p>
                                         <p>{{ data.last.user }}</p>
-                                        <p>于{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-center">(暂无)</p>
+                        <p class="text-center">{% trans '(No)' %}</p>
                     {% endif %}
                 </div>
             </div>
@@ -148,14 +149,14 @@
         <div class="col-sm-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>最近十次登录</h5>
+                    <h5>{% trans 'Last 10 login' %}</h5>
                     <div class="ibox-tools">
                         <span class="label label-info-light">10 Messages</span>
                        </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3><i class="fa fa-paper-plane-o"></i> 登录记录 </h3>
-                    <small><i class="fa fa-map-marker"></i> 最近十次登录记录. </small>
+                    <h3><i class="fa fa-paper-plane-o"></i> {% trans 'Login record' %}</h3>
+                    <small><i class="fa fa-map-marker"></i>{% trans 'Last 10 login records.' %}</small>
                 </div>
                 <div class="ibox-content">
                     <div>
@@ -168,18 +169,18 @@
                                         </a>
                                         <div class="media-body ">
                                             {% ifequal login.is_finished 0 %}
-                                                <small class="pull-right text-navy">{{ login.date_start|timesince }} 前</small>
+                                                <small class="pull-right text-navy">{{ login.date_start|timesince }} {% trans 'Before' %}</small>
                                             {% else %}
-                                                <small class="pull-right">{{ login.date_start|timesince }} 前</small>
+                                                <small class="pull-right">{{ login.date_start|timesince }} {% trans 'Before' %}</small>
                                             {% endifequal %}
-                                            <strong>{{ login.user }}</strong> 登录了{{ login.asset }} <br>
+                                            <strong>{{ login.user }}</strong> {% trans 'Login in ' %}{{ login.asset }} <br>
                                             <small class="text-muted">{{ login.date_start }}</small>
 
                                         </div>
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                <p class="text-center">(暂无)</p>
+                                <p class="text-center">{% trans '(No)' %}</p>
                             {% endif %}
                         </div>
                     </div>
@@ -190,7 +191,7 @@
         <div class="col-sm-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>一周Top10用户</h5>
+                    <h5>{% trans 'Top 10 users in a week' %}</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -205,8 +206,8 @@
                     </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3><i class="fa fa-user"></i> 一周Top10用户 </h3>
-                    <small><i class="fa fa-map-marker"></i> 用户登录次数及最近一次登录记录. </small>
+                    <h3><i class="fa fa-user"></i>{% trans 'Top 10 users in a week' %}</h3>
+                    <small><i class="fa fa-map-marker"></i>{% trans 'User login frequency and last login record.' %}</small>
                 </div>
                 <div class="ibox-content inspinia-timeline">
                     {% if week_user_hot_ten %}
@@ -217,18 +218,18 @@
                                         <i class="fa fa-info-circle"></i>
                                         <strong data-toggle="tooltip" title="{{ data.user }}">{{ data.user }}</strong>
                                         <br/>
-                                        <small class="text-navy">{{ data.total }}次</small>
+                                        <small class="text-navy">{{ data.total }}{% trans ' times' %}</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">最近一次登录主机</p>
+                                        <p class="m-b-xs">{% trans 'The last time logged on to the host' %}</p>
                                         <p>{{ data.last.asset }}</p>
-                                        <p>于{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
+                                        <p>{% trans 'At ' %}{{ data.last.date_start |date:"Y-m-d H:i:s" }}</p>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p class="text-center">(暂无)</p>
+                        <p class="text-center">{% trans '(No)' %}</p>
                     {% endif %}
                 </div>
             </div>
@@ -264,8 +265,8 @@ $(document).ready(function(){
             var top10Chart = ec.init(document.getElementById('top10'));
             var option = {
                 title : {
-                    text: '月数据总览',
-                    subtext: '一个月内历史汇总',
+                    text: "{% trans 'Monthly data overview' %}",
+                    subtext: "{% trans 'History summary in one month' %}",
                     x: 'center'
                 },
                 tooltip : {
@@ -273,7 +274,7 @@ $(document).ready(function(){
                 },
                 backgroundColor: '#fff',
                 legend: {
-                    data:['登陆次数', '活跃用户','活跃资产'],
+                    data:["{% trans 'Login count' %}", "{% trans 'Active users' %}", "{% trans 'Active assets' %}"],
                     y: 'bottom'
                 },
                 toolbox: {
@@ -297,21 +298,21 @@ $(document).ready(function(){
                 ],
                 series : [
                     {
-                        name:'登陆次数',
+                        name:"{% trans 'Login count' %}",
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_total_visit_count|safe}}
                     },
                     {
-                        name:'活跃用户',
+                        name:"{% trans 'Active users' %}",
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_user|safe }}
                     },
                     {
-                        name:'活跃资产',
+                        name:"{% trans 'Active assets' %}",
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
@@ -338,7 +339,7 @@ $(document).ready(function(){
                     show: false,
                     orient : 'vertical',
                     x : 'left',
-                    data:['月活跃用户','禁用用户','月未登陆用户']
+                    data:["{% trans 'Monthly active users' %}", "{% trans 'Disable user' %}", "{% trans 'Month not logged in user' %}"]
                 },
                 toolbox: {
                     show : false,
@@ -364,7 +365,7 @@ $(document).ready(function(){
                 calculable : true,
                 series : [
                     {
-                        name:'访问来源',
+                        name:"{% trans 'Access to the source' %}",
                         type:'pie',
                         radius : ['50%', '70%'],
                         itemStyle : {
@@ -388,9 +389,9 @@ $(document).ready(function(){
                             }
                         },
                         data:[
-                            {value:{{ month_user_active }}, name:'月活跃用户'},
-                            {value:{{ month_user_disabled }}, name:'禁用用户'},
-                            {value:{{ month_user_inactive }}, name:'月未登陆用户'}
+                            {value:{{ month_user_active }}, name:"{% trans 'Monthly active users' %}"},
+                            {value:{{ month_user_disabled }}, name:"{% trans 'Disable user' %}"},
+                            {value:{{ month_user_inactive }}, name:"{% trans 'Month not logged in user' %}"}
                         ]
                     }
                 ]
@@ -414,7 +415,7 @@ $(document).ready(function(){
                     show: false,
                     orient : 'vertical',
                     x : 'left',
-                    data:['月被登陆主机','禁用主机','月未登陆主机']
+                    data:["{% trans 'Month is logged into the host' %}", "{% trans 'Disable host' %}", "{% trans 'Month not logged on host' %}"]
                 },
                 toolbox: {
                     show : false,
@@ -440,7 +441,7 @@ $(document).ready(function(){
                 calculable : true,
                 series : [
                     {
-                        name:'访问来源',
+                        name:"{% trans 'Access to the source' %}",
                         type:'pie',
                         radius : ['50%', '70%'],
                         itemStyle : {
@@ -464,9 +465,9 @@ $(document).ready(function(){
                             }
                         },
                         data:[
-                            {value:{{ month_asset_active }}, name:'月被登陆主机'},
-                            {value:{{ month_asset_disabled }}, name:'禁用主机'},
-                            {value:{{ month_asset_inactive }}, name:'月未登陆主机'}
+                            {value:{{ month_asset_active }}, name:"{% trans 'Month is logged into the host' %}"},
+                            {value:{{ month_asset_disabled }}, name:"{% trans 'Disable host' %}"},
+                            {value:{{ month_asset_inactive }}, name:"{% trans 'Month not logged on host' %}"}
                         ]
                     }
                 ]

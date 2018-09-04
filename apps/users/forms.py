@@ -308,7 +308,7 @@ def user_limit_to():
 
 class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.exclude(role=User.ROLE_APP),
+        queryset=User.objects.all(),
         label=_("User"),
         widget=forms.SelectMultiple(
             attrs={
@@ -347,13 +347,6 @@ class UserGroupForm(OrgModelForm):
         help_texts = {
             'name': '* required'
         }
-
-
-class OrgUserField(forms.ModelMultipleChoiceField):
-
-    def get_limit_choices_to(self):
-
-        return {"orgs"}
 
 
 class FileForm(forms.Form):

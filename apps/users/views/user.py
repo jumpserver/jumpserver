@@ -33,8 +33,9 @@ from django.contrib.auth import logout as auth_logout
 from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
-from common.models import Setting
+from common.models import Setting, common_settings
 from common.permissions import AdminUserRequiredMixin
+from orgs.utils import current_org
 from .. import forms
 from ..models import User, UserGroup
 from ..utils import generate_otp_uri, check_otp_code, \
@@ -52,7 +53,7 @@ __all__ = [
     'UserPublicKeyGenerateView',
     'UserOtpEnableAuthenticationView', 'UserOtpEnableInstallAppView',
     'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
-    'UserOtpDisableAuthenticationView',
+    'UserOtpDisableAuthenticationView', 'UserOtpUpdateView'
 ]
 
 logger = get_logger(__name__)
@@ -196,6 +197,12 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        org_users = current_org.get_org_users().values_list('id', flat=True)
+        queryset = queryset.filter(id__in=org_users)
+        return queryset
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -355,10 +362,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
-        mfa_setting = Setting.objects.filter(name='SECURITY_MFA_AUTH').first()
+        mfa_setting = common_settings.SECURITY_MFA_AUTH
         context = {
             'action': _('Profile'),
-            'mfa_setting': mfa_setting.cleaned_value if mfa_setting else False,
+            'mfa_setting': mfa_setting if mfa_setting is not None else False,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -514,7 +521,7 @@ class UserOtpEnableBindView(TemplateView, FormView):
             return super().form_valid(form)
 
         else:
-            form.add_error("otp_code", _("MFA code invalid"))
+            form.add_error("otp_code", _("MFA code invalid, or ntp sync server time"))
             return self.form_invalid(form)
 
     def save_otp(self, otp_secret_key):
@@ -539,8 +546,12 @@ class UserOtpDisableAuthenticationView(FormView):
             user.save()
             return super().form_valid(form)
         else:
-            form.add_error('otp_code', _('MFA code invalid'))
+            form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
             return super().form_invalid(form)
+
+
+class UserOtpUpdateView(UserOtpDisableAuthenticationView):
+    success_url = reverse_lazy('users:user-otp-enable-bind')
 
 
 class UserOtpSettingsSuccessView(TemplateView):

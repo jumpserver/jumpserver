@@ -2,21 +2,25 @@
 {% load i18n %}
 {% load static %}
 
+{% block small_title %}
+    {% trans 'Install' %}
+{% endblock %}
+
 {% block content %}
     <div class="verify">
-        <p style="margin: 20px auto;"><strong style="color: #000000">请在手机端下载并安装 Google Authenticator 应用</strong></p>
+        <p style="margin: 20px auto;"><strong style="color: #000000">{% trans 'Download and install the Google Authenticator application on your phone' %}</strong></p>
         <div>
             <img src="{% static 'img/authenticator_android.png' %}" width="128" height="128" alt="">
-            <p>Android手机下载</p>
+            <p>{% trans 'Android downloads' %}</p>
         </div>
 
         <div>
             <img src="{% static 'img/authenticator_iphone.png' %}" width="128" height="128" alt="">
-            <p>iPhone手机下载</p>
+            <p>{% trans 'iPhone downloads' %}</p>
         </div>
 
         <p style="margin: 20px auto;"></p>
-        <p style="margin: 20px auto;"><strong style="color: #000000">安装完成后点击下一步进入绑定页面（如已安装，直接进入下一步）</strong></p>
+        <p style="margin: 20px auto;"><strong style="color: #000000">{% trans 'After installation, click the next step to enter the binding page (if installed, go to the next step directly).' %}</strong></p>
     </div>
 
     <a href="{% url 'users:user-otp-enable-bind' %}" class="next">{% trans 'Next' %}</a>

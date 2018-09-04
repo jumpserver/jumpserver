@@ -94,6 +94,7 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': _('assets'),
             'action': _('System user asset'),
+            'nodes_remain': Node.objects.exclude(systemuser=self.object)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

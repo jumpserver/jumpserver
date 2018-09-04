@@ -52,7 +52,8 @@ class Cluster(models.Model):
                           contact=forgery_py.name.full_name(),
                           phone=forgery_py.address.phone(),
                           address=forgery_py.address.city() + forgery_py.address.street_address(),
-                          operator=choice(['北京联通', '北京电信', 'BGP全网通']),
+                          # operator=choice(['北京联通', '北京电信', 'BGP全网通']),
+                          operator=choice([_('Beijing unicom'), _('Beijing telecom'), _('BGP full netcom')]),
                           comment=forgery_py.lorem_ipsum.sentence(),
                           created_by='Fake')
             try:
