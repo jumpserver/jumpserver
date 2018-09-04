@@ -96,7 +96,7 @@ FAQ
 
 ::
 
-    $ vim /opt/coco/coco/conf.py
+    $ vim /opt/coco/conf.py
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
 
