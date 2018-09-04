@@ -118,6 +118,6 @@ class TerminalConnectView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView
         return super(TerminalConnectView, self).get_context_data(**kwargs)
 
 
-class WebTerminalView(LoginRequiredMixin, SuperUserRequiredMixin, View):
+class WebTerminalView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return redirect('/luna/?' + request.GET.urlencode())
