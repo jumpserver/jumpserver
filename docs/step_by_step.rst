@@ -355,6 +355,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         # 登录是否支持秘钥认证
         # PUBLIC_KEY_AUTH = True
 
+        # SSH白名单
+        # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
+
+        # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
+        # BLOCK_SSH_USER = []
+
         # 和Jumpserver 保持心跳时间间隔
         # HEARTBEAT_INTERVAL = 5
 
@@ -366,6 +372,12 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
         REPLAY_STORAGE = {
             "TYPE": "server"
         }
+
+        # SSH连接超时时间 (default 15 seconds)
+        # SSH_TIMEOUT = 15
+
+        # 语言 = en
+        LANGUAGE_CODE = 'zh'
 
 
     config = Config()

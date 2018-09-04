@@ -14,7 +14,7 @@
     $ cd /opt/jumpserver
     $ git pull
 
-    # 版本小于 1.3 升级到最新版本请使用新的 config.py
+    # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py
     $ mv config.py config.bak
     $ cp config_example.py config.py
     $ vim config.py  # 参考安装文档进行修改
@@ -41,6 +41,11 @@
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
     $ git pull && pip install -r requirements/requirements.txt
+
+    # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
+    $ mv conf.py coco.bak
+    $ cp cp conf_example.py conf.py
+    $ vim conf.py  # 参考安装文档进行修改
 
 3. 升级 Luna
 

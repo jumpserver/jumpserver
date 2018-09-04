@@ -96,13 +96,11 @@ FAQ
 
 ::
 
-    $ vim /opt/coco/coco/proxy.py
-    $ vim /opt/coco/coco/connection.py
+    $ vim /opt/coco/coco/conf.py
 
-    # 把 TIMEOUT = 10 修改成你想要的数字，两个文件都需要修改，单位为：秒
-    # TIMEOUT = 10 表示超时时间为10秒，可以自行修改。
+    # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
 
-8. 升级提示 Table 'xxx' already exists（可用以下命令检查，如果显示内容不一致则无法升级）
+8. 升级提示 Table 'xxx' already exists
 
 ::
 
