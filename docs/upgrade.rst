@@ -126,10 +126,10 @@
    $ cp $jumpserver_backup/config.py .
    $ cp -r $jumpserver_backup/media/* data/media/
 
-   $ cd apps
+   $ cd $jumpserver_backup/
    $ for d in $(ls);do
        if [ -d $d ] && [ -d $d/migrations ];then
-         cp $jumpserver_backup/${d}/migrations/*.py ${d}/migrations/
+         cp ${d}/migrations/*.py /opt/jumpserver/apps/${d}/migrations/
        fi
      done
 
