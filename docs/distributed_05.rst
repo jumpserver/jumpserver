@@ -48,7 +48,7 @@
     $ yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt)
 
     # 安装 Python 库依赖
-    $ pip install --upgrade pip && pip install -r /opt/coco/requirements/requirements.txt
+    $ pip install --upgrade pip && pip install -r /opt/coco/requirements/requirements.txt -i https://pypi.python.org/simple
 
     # # 修改 Coco 配置文件
     $ cd /opt/coco

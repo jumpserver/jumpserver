@@ -104,7 +104,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
 ::
 
-    $ pip install -r requirements.txt  # 不要指定-i参数，因为镜像上可能没有最新的包，如果没有任何报错请继续
+    $ pip install -r requirements.txt -i https://pypi.python.org/simple
 
 Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
@@ -280,7 +280,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     $ cd /opt/coco/requirements
     $ yum -y  install $(cat rpm_requirements.txt)
-    $ pip install -r requirements.txt
+    $ pip install -r requirements.txt -i https://pypi.python.org/simple
 
 **3.3 修改配置文件并运行**
 

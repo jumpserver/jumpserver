@@ -57,7 +57,7 @@
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
 
     # 安装 Python 库依赖
-    $ pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt
+    $ pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://pypi.python.org/simple
 
     # 修改 jumpserver 配置文件
     $ cd /opt/jumpserver

@@ -19,7 +19,7 @@
     $ cp config_example.py config.py
     $ vim config.py  # 参考安装文档进行修改
 
-    $ pip install -r requirements/requirements.txt
+    $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
     $ cd utils && sh make_migrations.sh
 
     # 1.0.x 升级到最新版本需要执行迁移脚本（新版本授权管理更新）
@@ -40,7 +40,7 @@
 
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
-    $ git pull && pip install -r requirements/requirements.txt
+    $ git pull && pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
 
     # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
     $ mv conf.py coco.bak
@@ -137,7 +137,8 @@
 
 ::
 
-   $ pip install -r requirements/requirements.txt && cd utils && sh make_migrations.sh
+   $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
+   $ cd utils && sh make_migrations.sh
 
 
 **Coco**
@@ -177,7 +178,7 @@ coco 是无状态的，备份 keys 目录即可
 
 ::
 
-   $ git pull && cd requirements && pip install -r requirements.txt
+   $ git pull &&  pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
 
 
 **Luna**
