@@ -126,10 +126,10 @@
    $ cp $jumpserver_backup/config.py .
    $ cp -r $jumpserver_backup/media/* data/media/
 
-   $ cd apps
+   $ cd $jumpserver_backup/
    $ for d in $(ls);do
        if [ -d $d ] && [ -d $d/migrations ];then
-         cp $jumpserver_backup/${d}/migrations/*.py ${d}/migrations/
+         cp ${d}/migrations/*.py /opt/jumpserver/apps/${d}/migrations/
        fi
      done
 
@@ -137,6 +137,7 @@
 
 ::
 
+   $ cd /opt/jumpserver
    $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
    $ cd utils && sh make_migrations.sh
 
