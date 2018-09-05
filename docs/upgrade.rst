@@ -40,7 +40,7 @@
 
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
-    $ git pull && pip install -r requirements/requirements.txt  -i https://pypi.python.org/simple
+    $ git pull && pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
 
     # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
     $ mv conf.py coco.bak
