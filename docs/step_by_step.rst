@@ -255,7 +255,7 @@ Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
     # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 后面搭建 nginx 代理后请通过代理的端口访问，原因是因为 django 无法在非 debug 模式下加载静态资源
+运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，继续往下操作，后面搭建 nginx 代理后即可正常访问，原因是因为 django 无法在非 debug 模式下加载静态资源
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
