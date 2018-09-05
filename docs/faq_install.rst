@@ -82,9 +82,9 @@
     (py3) [root@localhost py3]
 
     # 如果已经在 py3 虚拟环境下
-    $ cd /opt/coco/requirements
-    $ pip install -r requirements.txt
-    # 然后重新执行 ./jms start 即可
+    $ cd /opt/coco/
+    $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
+    # 然后重新执行 ./cocod start 即可
 
 11. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
 
