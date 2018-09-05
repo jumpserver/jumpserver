@@ -106,6 +106,17 @@ FAQ
 
     # 数据库表结构文件丢失，请参考离线升级文档，把备份的数据库表文件还原
 
+    # 可以使用如下命令检查丢失了什么表结构
+    $ cd /opt/jumpserver/apps
+    $ for d in $(ls); do if [ -d $d ] && [ -d $d/migrations ]; then ll ${d}/migrations/*.py | grep -v __init__.py; fi; done
+
+    # 新开一个终端
+    $ mysql -uroot -p
+    > use jumpserver;
+    > select app,name from django_migrations where app in('assets','audits','common','ops','orgs','perms','terminal','users') order by app asc;
+
+    # 对比即可知道丢失什么文件，把文件从备份目录拷贝即可
+
 9. 设置浏览器过期
 
 ::
