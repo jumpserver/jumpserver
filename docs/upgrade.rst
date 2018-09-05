@@ -137,6 +137,7 @@
 
 ::
 
+   $ cd /opt/jumpserver
    $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
    $ cd utils && sh make_migrations.sh
 
