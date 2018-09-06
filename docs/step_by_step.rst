@@ -5,6 +5,12 @@
 
 安装过程中遇到问题可参考 `安装过程中常见的问题 <faq_install.html>`_
 
+测试推荐硬件
+~~~~~~~~~~~~~
+
+-  CPU: 64位双核处理器
+-  内存: 4G DDR3
+
 环境
 ~~~~~~~
 
@@ -105,8 +111,6 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 ::
 
     $ pip install -r requirements.txt -i https://pypi.python.org/simple
-
-Pip 加速设置请参考 <https://segmentfault.com/a/1190000011875306>
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
