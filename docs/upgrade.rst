@@ -10,6 +10,17 @@
 
 ::
 
+    # 为了保证能顺利升级，请先检查数据库表结构文件是否完整
+    $ cd /opt/jumpserver/apps
+    $ for d in $(ls); do if [ -d $d ] && [ -d $d/migrations ]; then ll ${d}/migrations/*.py | grep -v __init__.py; fi; done
+
+    # 新开一个终端，连接到 jumpserver 的数据库服务器
+    $ mysql -uroot -p
+    > use jumpserver;
+    > select app,name from django_migrations where app in('assets','audits','common','ops','orgs','perms','terminal','users') order by app asc;
+
+    # 如果左右对比信息不一致，请勿升级，升级必然失败
+
     # 升级前请做好 jumpserver 与 数据库 备份，谨防意外，具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
     $ git pull
