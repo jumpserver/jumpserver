@@ -21,7 +21,7 @@ from django.urls import reverse_lazy
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 
-sys.path.append(PROJECT_DIR)
+sys.path.insert(0, PROJECT_DIR)
 
 # Import project config setting
 try:
