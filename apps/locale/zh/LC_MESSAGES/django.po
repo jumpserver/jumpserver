@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-04 16:00+0800\n"
+"POT-Creation-Date: 2018-09-07 12:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -759,7 +759,7 @@ msgstr "重置"
 #: common/templates/common/terminal_setting.html:108
 #: perms/templates/perms/asset_permission_create_update.html:70
 #: terminal/templates/terminal/command_list.html:103
-#: terminal/templates/terminal/session_list.html:126
+#: terminal/templates/terminal/session_list.html:127
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:47
 #: users/templates/users/forgot_password.html:45
@@ -1759,7 +1759,7 @@ msgid ""
 "Tip :(unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
-"提示:（单位 / 分钟）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
+"提示: (单位: 分钟) 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
 
 #: common/forms.py:187
 msgid "Connection max idle time"
@@ -1768,47 +1768,47 @@ msgstr "SSH最大空闲时间"
 #: common/forms.py:189
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
-msgstr "如果超过该配置没有操作，连接会被断开"
+msgstr "提示: (单位: 分钟) 如果超过该配置没有操作，连接会被断开(仅ssh) "
 
 #: common/forms.py:195
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:202
+#: common/forms.py:201
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:204
+#: common/forms.py:203
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:210
+#: common/forms.py:209
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:211
+#: common/forms.py:210
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:217
+#: common/forms.py:216
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:218
+#: common/forms.py:217
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:224
+#: common/forms.py:223
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:225
+#: common/forms.py:224
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -2717,9 +2717,19 @@ msgstr "终断"
 msgid "Terminate selected"
 msgstr "终断所选"
 
-#: terminal/templates/terminal/session_list.html:142
+#: terminal/templates/terminal/session_list.html:123
+msgid "Confirm finished"
+msgstr "确认已完成"
+
+#: terminal/templates/terminal/session_list.html:143
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
+
+#: terminal/templates/terminal/session_list.html:156
+#, fuzzy
+#| msgid "MFA enable success"
+msgid "Finish session success"
+msgstr "MFA 绑定成功"
 
 #: terminal/templates/terminal/terminal_detail.html:13
 #: terminal/views/terminal.py:59
@@ -2805,7 +2815,7 @@ msgstr "MFA认证失败"
 
 #: users/api/user.py:134
 msgid "Could not reset self otp, use profile reset instead"
-msgstr ""
+msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
 #: users/authentication.py:56
 msgid "Invalid signature header. No credentials provided."

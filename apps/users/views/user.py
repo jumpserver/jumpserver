@@ -505,8 +505,10 @@ class UserOtpEnableBindView(TemplateView, FormView):
 
     def get_context_data(self, **kwargs):
         user = get_user_or_tmp_user(self.request)
+        otp_uri, otp_secret_key = generate_otp_uri(self.request)
         context = {
-            'otp_uri': generate_otp_uri(self.request),
+            'otp_uri': otp_uri,
+            'otp_secret_key': otp_secret_key,
             'user': user
         }
         kwargs.update(context)

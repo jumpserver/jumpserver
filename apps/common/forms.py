@@ -197,7 +197,6 @@ class SecuritySettingForm(BaseForm):
     )
     # upper case
     SECURITY_PASSWORD_UPPER_CASE = forms.BooleanField(
-
         initial=False, required=False,
         label=_("Must contain capital letters"),
         help_text=_(

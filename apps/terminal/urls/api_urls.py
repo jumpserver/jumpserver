@@ -3,20 +3,20 @@
 #
 
 from django.urls import path
-from rest_framework import routers
+from rest_framework_bulk.routes import BulkRouter
 
 from .. import api
 
 app_name = 'terminal'
 
-router = routers.DefaultRouter()
+router = BulkRouter()
+router.register(r'sessions', api.SessionViewSet, 'session')
 router.register(r'terminal/(?P<terminal>[a-zA-Z0-9\-]{36})?/?status', api.StatusViewSet, 'terminal-status')
 router.register(r'terminal/(?P<terminal>[a-zA-Z0-9\-]{36})?/?sessions', api.SessionViewSet, 'terminal-sessions')
 router.register(r'terminal', api.TerminalViewSet, 'terminal')
 router.register(r'tasks', api.TaskViewSet, 'tasks')
 router.register(r'command', api.CommandViewSet, 'command')
-router.register(r'sessions', api.SessionViewSet, 'session')
-router.register(r'status', api.StatusViewSet, 'session')
+router.register(r'status', api.StatusViewSet, 'status')
 
 urlpatterns = [
     path('sessions/<uuid:pk>/replay/',

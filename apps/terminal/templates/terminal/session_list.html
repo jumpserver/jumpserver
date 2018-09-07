@@ -120,6 +120,7 @@
         <div class="input-group">
             <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
                 <option value="terminate">{% trans 'Terminate selected' %}</option>
+                <option value="finished">{% trans 'Confirm finished' %}</option>
             </select>
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
                 <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
@@ -144,6 +145,21 @@
             APIUpdateAttr({
                 url: the_url,
                 method: 'POST',
+                body: JSON.stringify(data),
+                success: success,
+                success_message: success_message
+            });
+        }
+
+        function finishedSession(data) {
+            var the_url = "{% url 'api-terminal:session-list' %}";
+            var success_message = '{% trans "Finish session success" %}';
+            var success = function() {
+              location.reload();
+            };
+            APIUpdateAttr({
+                url: the_url,
+                method: 'PATCH',
                 body: JSON.stringify(data),
                 success: success,
                 success_message: success_message
@@ -183,9 +199,23 @@
             function doTerminate() {
                 terminateSession(id_list)
             }
+
+            function doFinishSession() {
+               var data = [];
+               $.each(id_list, function (i, v) {
+                   data.push({
+                       "pk": v,
+                       "is_finished": true
+                   })
+               });
+               finishedSession(data)
+            }
             switch(action) {
                 case 'terminate':
                     doTerminate();
+                    break;
+                case "finished":
+                    doFinishSession();
                     break;
                 default:
                     break;
