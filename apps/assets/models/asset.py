@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 import uuid
 import logging
@@ -54,8 +54,8 @@ class Asset(OrgModelMixin):
         ('Unix', 'Unix'),
         ('MacOS', 'MacOS'),
         ('BSD', 'BSD'),
-        ('Windows', 'Windows'),
-        ('Windows2016', 'Windows(2016)'),
+        ('Windows', 'Windows 7/8/2008/2012'),
+        ('Windows2016', 'Windows 10/2016'),
         ('Other', 'Other'),
     )
 
