@@ -17,7 +17,8 @@
 
 .. image:: _static/img/windows_assert.jpg
 
-1.2 Web 上传文件到 Windows 资产
+1.2 Web 上传文件到 Win 资产
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Windows 资产的文件上传方式为：直接拖拽需要上传的文件到 Windows 资产窗口即可，上传后的文件位置在资产的 Guacamole RDP上的 G 目录下
 
