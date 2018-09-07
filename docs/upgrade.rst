@@ -1,4 +1,4 @@
-更新升级
+在线更新升级
 -------------
 
 说明
@@ -6,7 +6,7 @@
 - 不支持从 0.x 版本升级到 1.x 版本
 - 本文档仅针对 1.0 及之后的版本升级教程
 
-1. 升级 Jumpserver（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
+0. 检查数据库表结构文件是否完整
 
 ::
 
@@ -20,6 +20,10 @@
     > select app,name from django_migrations where app in('assets','audits','common','ops','orgs','perms','terminal','users') order by app asc;
 
     # 如果左右对比信息不一致，请勿升级，升级必然失败
+
+1. 升级 Jumpserver（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
+
+::
 
     # 升级前请做好 jumpserver 与 数据库 备份，谨防意外，具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
@@ -90,6 +94,10 @@
 切换分支或离线升级
 -------------------------------
 
+说明
+~~~~~~~
+- 不支持从 0.x 版本升级到 1.x 版本
+- 本文档仅针对 1.0 及之后的版本升级教程
 
 **Jumpserver**
 
