@@ -10,15 +10,6 @@ Linux 资产连接错误排查思路
     (3). 检查资产的python，确定版本不小于2.6，不高于3.x
     (4). 检查资产的ssh策略，确保可以被jumpserver应用访问
 
-    # 案例参考. 资产是centos5.x Python版本 2.4，
-
-        $ yum -y install python26
-        $ mv /usr/bin/python /usr/bin/python.bak
-        $ ln -s /usr/bin/python2.6 /usr/bin/python
-
-        # 修改 /bin/yum 使用原来的python
-        $ sed -i 's@/usr/bin/python$@/usr/bin/python2.4@g' /bin/yum
-
 1. 检查终端是否在线
 
 ::
