@@ -3,6 +3,7 @@ import uuid
 
 from django.core.cache import cache
 from django.contrib.auth import logout
+from django.utils.translation import ugettext as _
 
 from rest_framework import generics
 from rest_framework.response import Response
@@ -132,7 +133,7 @@ class UserResetOTPApi(generics.RetrieveAPIView):
         user = self.get_object() if kwargs.get('pk') else request.user
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
-            return Response({"msg": msg}, status=401)
+            return Response({"error": msg}, status=401)
         if user.otp_enabled and user.otp_secret_key:
             user.otp_secret_key = ''
             user.save()

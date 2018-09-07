@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'captcha',
     'django_celery_beat',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',

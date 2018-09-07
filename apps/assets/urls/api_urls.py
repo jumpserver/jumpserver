@@ -5,7 +5,6 @@ from rest_framework_bulk.routes import BulkRouter
 
 app_name = 'assets'
 
-
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
 router.register(r'admin-user', api.AdminUserViewSet, 'admin-user')

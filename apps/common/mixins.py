@@ -71,19 +71,20 @@ class BulkSerializerMixin(object):
         ret = super(BulkSerializerMixin, self).to_internal_value(data)
 
         id_attr = getattr(self.Meta, 'update_lookup_field', 'id')
-        request_method = getattr(getattr(self.context.get('view'), 'request'), 'method', '')
-        # add update_lookup_field field back to validated data
-        # since super by default strips out read-only fields
-        # hence id will no longer be present in validated_data
-        if all((isinstance(self.root, BulkListSerializer),
-                id_attr,
-                request_method in ('PUT', 'PATCH'))):
-            id_field = self.fields[id_attr]
-            if data.get("id"):
-                id_value = id_field.to_internal_value(data.get("id"))
-            else:
-                id_value = id_field.to_internal_value(data.get("pk"))
-            ret[id_attr] = id_value
+        if self.context.get('view'):
+            request_method = getattr(getattr(self.context.get('view'), 'request'), 'method', '')
+            # add update_lookup_field field back to validated data
+            # since super by default strips out read-only fields
+            # hence id will no longer be present in validated_data
+            if all((isinstance(self.root, BulkListSerializer),
+                    id_attr,
+                    request_method in ('PUT', 'PATCH'))):
+                id_field = self.fields[id_attr]
+                if data.get("id"):
+                    id_value = id_field.to_internal_value(data.get("id"))
+                else:
+                    id_value = id_field.to_internal_value(data.get("pk"))
+                ret[id_attr] = id_value
 
         return ret
 

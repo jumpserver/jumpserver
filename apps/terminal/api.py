@@ -15,6 +15,7 @@ from django.conf import settings
 
 import jms_storage
 
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
@@ -173,9 +174,10 @@ class StatusViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class SessionViewSet(viewsets.ModelViewSet):
+class SessionViewSet(BulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_queryset(self):
@@ -183,7 +185,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
             self.queryset = terminal.session_set.all()
-        return self.queryset
+        return self.queryset.all()
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
