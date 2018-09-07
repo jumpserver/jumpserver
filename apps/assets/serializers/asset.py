@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
-from ..models import Asset, Node
+from ..models import Asset
 from .system_user import AssetSystemUserSerializer
 
 __all__ = [

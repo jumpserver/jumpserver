@@ -9,9 +9,15 @@
 {% block content %}
 
     <div class="verify">
-        <p style="margin:20px auto;"><strong style="color: #000000">{% trans 'Use the mobile Google Authenticator application to scan the following qr code for a 6-bit verification code' %}</strong></p>
+        <p style="margin:20px auto;">
+            <strong style="color: #000000">
+            {% trans 'Use the mobile Google Authenticator application to scan the following qr code for a 6-bit verification code' %}
+            </strong>
+        </p>
 
-        <div id="qr_code"></div>
+        <div id="qr_code">
+        </div>
+        <div style="display: block; margin: 0">Secret: {{ otp_secret_key }}</div>
 
         <form class="" role="form" method="post" action="">
             {% csrf_token %}

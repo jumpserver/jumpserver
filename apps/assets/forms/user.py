@@ -98,15 +98,18 @@ class SystemUserForm(PasswordAndKeyAuthForm):
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
-        if login_mode == SystemUser.MANUAL_LOGIN or protocol == SystemUser.TELNET_PROTOCOL:
+        if login_mode == SystemUser.MANUAL_LOGIN or \
+                protocol in [SystemUser.RDP_PROTOCOL, SystemUser.TELNET_PROTOCOL]:
             system_user.auto_push = 0
+            auto_generate_key = False
             system_user.save()
 
         if auto_generate_key:
             logger.info('Auto generate key and set system user auth')
             system_user.auto_gen_auth()
         else:
-            system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
+            system_user.set_auth(password=password, private_key=private_key,
+                                 public_key=public_key)
 
         return system_user
 

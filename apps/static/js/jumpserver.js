@@ -154,8 +154,10 @@ function activeNav() {
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
-    var success_message = props.success_message || gettext('Update is successful!');
-    var fail_message = props.fail_message || gettext('An unknown error occurred while updating..');
+    var user_success_message = props.success_message;
+    var default_success_message = gettext('Update is successful!');
+    var user_fail_message = props.fail_message;
+    var default_failed_message = gettext('An unknown error occurred while updating..');
     var flash_message = props.flash_message || true;
     if (props.flash_message === false){
         flash_message = false;
@@ -169,14 +171,36 @@ function APIUpdateAttr(props) {
         dataType: props.data_type || "json"
     }).done(function(data, textStatue, jqXHR) {
         if (flash_message) {
-            toastr.success(success_message);
+            var msg = "";
+            if (user_fail_message) {
+                msg = user_success_message;
+            } else {
+                msg = default_success_message;
+            }
+            toastr.success(msg);
         }
         if (typeof props.success === 'function') {
             return props.success(data);
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
-            toastr.error(fail_message);
+            var msg = "";
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+            if (user_fail_message) {
+                msg = user_fail_message;
+            } else if (jqXHR.responseJSON) {
+                if (jqXHR.responseJSON.error) {
+                    msg = jqXHR.responseJSON.error
+                } else if (jqXHR.responseJSON.msg) {
+                    msg = jqXHR.responseJSON.msg
+                }
+            }
+            if (msg === "") {
+                msg = default_failed_message;
+            }
+            toastr.error(msg);
         }
         if (typeof props.error === 'function') {
             return props.error(jqXHR.responseText, jqXHR.status);

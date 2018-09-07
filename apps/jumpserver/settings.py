@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'captcha',
     'django_celery_beat',
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -354,6 +355,10 @@ AUTHENTICATION_BACKENDS = [
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
+
+# File Upload Permissions
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Auth LDAP settings
 AUTH_LDAP = CONFIG.AUTH_LDAP
