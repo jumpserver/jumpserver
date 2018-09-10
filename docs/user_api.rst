@@ -9,6 +9,7 @@ API 文档
 
 
 - 手动调用 api 的方法
+
 ::
 
     $ curl -X POST -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}' http://localhost/api/users/v1/token/  # 获取token
@@ -17,8 +18,8 @@ API 文档
     $ curl -H 'Authorization: Bearer 937b38011acf499eb474e2fecb424ab3' -H "Content-Type:application/json" http://localhost/api/users/v1/users/
     # 使用token访问，token有效期 1小时
 
-
 - python代码示例
+
 ::
 
     import requests
