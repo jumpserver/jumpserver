@@ -145,7 +145,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
     $ mysql
     > create database jumpserver default charset 'utf8';
-    > grant all privileges on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
+    > grant all privileges on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword' WITH GRANT OPTION;
     > flush privileges;
 
 **2.7 修改 Jumpserver 配置文件**
