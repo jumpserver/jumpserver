@@ -88,12 +88,12 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
 **2.1 下载或 Clone 项目**
 
-项目提交较多 git clone 时较大，你可以选择去 Github 项目页面直接下载zip包。
+项目提交较多 git clone 时较大，你可以选择去 Github 项目页面直接下载zip包。也可以限制depth层数只clone最新版本
 
 ::
 
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git --depth 0 && cd jumpserver && git checkout master
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
@@ -145,7 +145,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
     $ mysql
     > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
+    > grant all privileges on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
 
 **2.7 修改 Jumpserver 配置文件**
