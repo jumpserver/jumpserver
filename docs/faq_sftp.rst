@@ -15,3 +15,10 @@ sftp 使用说明
     $ ls 列出你的系统用户
     $ cd 你的系统用户
     # 此处即是当前资产的 /tmp 目录
+
+    # 如果需要修改 /tmp 为其他目录
+    $ vim coco/coco/sftp.py
+
+    class SFTPServer(paramiko.SFTPServerInterface):
+        root = '/tmp'
+        # 修改 /tmp 为你要指定的目录，如: root = '/'
