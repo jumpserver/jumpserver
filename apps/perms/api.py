@@ -6,13 +6,14 @@ from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
 
-from common.utils import set_or_append_attr_bulk, get_object_or_none
+from common.utils import set_or_append_attr_bulk
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
+from orgs.utils import set_to_root_org
 from . import serializers
 
 
@@ -55,12 +56,18 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserGrantedAssetsApi(RootOrgViewMixin, ListAPIView):
+class UserGrantedAssetsApi(ListAPIView):
     """
     用户授权的所有资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
@@ -84,9 +91,18 @@ class UserGrantedAssetsApi(RootOrgViewMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesApi(RootOrgViewMixin, ListAPIView):
+class UserGrantedNodesApi(ListAPIView):
+    """
+    查询用户授权的所有节点的API, 如果是超级用户或者是 app，切换到root org
+    """
     permission_classes = (IsOrgAdmin,)
     serializer_class = NodeSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
@@ -104,9 +120,18 @@ class UserGrantedNodesApi(RootOrgViewMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(RootOrgViewMixin, ListAPIView):
+class UserGrantedNodesWithAssetsApi(ListAPIView):
+    """
+    用户授权的节点并带着节点下资产的api
+    """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeGrantedSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
@@ -133,9 +158,18 @@ class UserGrantedNodesWithAssetsApi(RootOrgViewMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodeAssetsApi(RootOrgViewMixin, ListAPIView):
+class UserGrantedNodeAssetsApi(ListAPIView):
+    """
+    查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
+    """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser or request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
