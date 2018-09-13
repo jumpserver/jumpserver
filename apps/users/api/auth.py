@@ -12,19 +12,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.utils import get_logger, get_request_ip
+from common.permissions import IsOrgAdminOrAppUser
+from orgs.mixins import RootOrgViewMixin
 from ..serializers import UserSerializer
 from ..tasks import write_login_log_async
 from ..models import User, LoginLog
 from ..utils import check_user_valid, generate_token, \
-    check_otp_code, increase_login_failed_count, is_block_login, clean_failed_count
-from common.permissions import IsOrgAdminOrAppUser
+    check_otp_code, increase_login_failed_count, is_block_login, \
+    clean_failed_count
 from ..hands import Asset, SystemUser
 
 
 logger = get_logger(__name__)
 
 
-class UserAuthApi(APIView):
+class UserAuthApi(RootOrgViewMixin, APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
@@ -112,7 +114,7 @@ class UserAuthApi(APIView):
         write_login_log_async.delay(**data)
 
 
-class UserConnectionTokenApi(APIView):
+class UserConnectionTokenApi(RootOrgViewMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def post(self, request):
@@ -176,7 +178,7 @@ class UserToken(APIView):
             return Response({'error': msg}, status=406)
 
 
-class UserOtpAuthApi(APIView):
+class UserOtpAuthApi(RootOrgViewMixin, APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
