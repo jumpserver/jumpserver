@@ -62,14 +62,15 @@ class UserGrantedAssetsApi(ListAPIView):
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.is_app or \
+    
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
                 self.kwargs.get('pk') is None:
             set_to_root_org()
-        return super().dispatch(request, *args, **kwargs)
-
+    
     def get_queryset(self):
+        self.change_org_if_need()
         user_id = self.kwargs.get('pk', '')
         queryset = []
 
@@ -97,14 +98,15 @@ class UserGrantedNodesApi(ListAPIView):
     """
     permission_classes = (IsOrgAdmin,)
     serializer_class = NodeSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.is_app or \
+    
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
                 self.kwargs.get('pk') is None:
             set_to_root_org()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        self.change_org_if_need()
         user_id = self.kwargs.get('pk', '')
         if user_id:
             user = get_object_or_404(User, id=user_id)
@@ -126,14 +128,15 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeGrantedSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.is_app or \
+    
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
                 self.kwargs.get('pk') is None:
             set_to_root_org()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        self.change_org_if_need()
         user_id = self.kwargs.get('pk', '')
         queryset = []
         if not user_id:
@@ -164,14 +167,15 @@ class UserGrantedNodeAssetsApi(ListAPIView):
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_superuser or request.user.is_app or \
+    
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
                 self.kwargs.get('pk') is None:
             set_to_root_org()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        self.change_org_if_need()
         user_id = self.kwargs.get('pk', '')
         node_id = self.kwargs.get('node_id')
 
