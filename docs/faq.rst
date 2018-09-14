@@ -20,14 +20,9 @@ FAQ
 
 ::
 
-    用户：每个公司的同事创建一个用户账号，用来登录Jumpserver
-    系统用户：使用来登录到服务器的用户，如 web, dba, root等，配合sudo实现权限管控
-    管理用户：是服务器上已存在的特权用户，Ansible用来获取硬件信息, 如 root, 或者其它拥有 sudo NOPASSWD: ALL权限的用户
-
-    # 这里解释一下系统用户里面的sudo，比如有个系统用户的权限是这样的：
-
-    Sudo: /usr/bin/git,/usr/bin/php,/bin/cat,/bin/more,/bin/less,/usr/bin/head,/usr/bin/tail
-    意思是允许这个系统用户免密码执行 git、PHP、cat、more、less、head、tail 命令，只要关联了这个系统用户的用户在相应的资产都可以执行这些命令。
+    用户管理里面的用户列表 是用来登录jumpserver平台的用户，用户需要先登录jumpserver平台，才能管理或者连接资产
+    资产管理里面的管理用户 是jumpserver用来管理资产需要的服务账户，Linux资产需要root或 NOPASSWD: ALL sudo权限，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。Windows资产随意指定一个，暂无作用
+    资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户，Linux资产可以自动推送该系统用户到资产上，Windows需要指定资产上已经创建的系统用户
 
 2. input/output error, 通常jumpserver所在服务器字符集问题
 
