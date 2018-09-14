@@ -59,7 +59,7 @@
 
     # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
     $ mv conf.py coco.bak
-    $ cp cp conf_example.py conf.py
+    $ cp conf_example.py conf.py
     $ vim conf.py  # 参考安装文档进行修改
 
 3. 升级 Luna
