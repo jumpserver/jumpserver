@@ -209,7 +209,7 @@ class Node(OrgModelMixin):
                 set_current_org(Organization.root())
                 org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
                 org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True) or [0]
-                key = max([int(k) for k in org_nodes_roots_keys]) + 1
+                key = str(max([int(k) for k in org_nodes_roots_keys]) + 1)
                 set_current_org(_current_org)
             root = cls.objects.create(key=key, value=_current_org.name)
             return root

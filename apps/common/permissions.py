@@ -86,9 +86,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             return redirect('orgs:switch-a-org')
 
         if not current_org.can_admin_by(request.user):
-            print("{} cannot admin {}".format(request.user, current_org))
             if request.user.is_org_admin:
-                print("Is org admin")
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
         return super().dispatch(request, *args, **kwargs)
