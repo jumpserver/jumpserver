@@ -69,6 +69,7 @@ FAQ
     {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
 
     # 修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
+    # 注意，命令记录需要所有保存地址都正常可用，否则 历史会话 和 命令记录 页面无法正常访问
 
 5. 在终端修改管理员密码及新建超级用户
 

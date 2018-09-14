@@ -58,20 +58,28 @@
     # 如果没有error提示进程无法启动，那么这是正常现象
     # 如果不想在前台启动，可以使用 ./jms start all -d 在后台启动
 
-8. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
+8. 执行 ./jms start all 后提示 xxx is stopped
+
+::
+
+    # Error: xxx start error
+    # xxx is stopped
+    $ ./jms restart xxx  # 如 ./jms restart gunicorn
+
+9. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
 
 ::
 
     # 这是严格模式的警告，可以参考后面的url解决，或者忽略
 
-9. 启动 jumpserver 后，访问 8080 端口页面显示不正常
+10. 启动 jumpserver 后，访问 8080 端口页面显示不正常
 
 ::
 
     # 这是因为你在 config.py 里面设置了 DEBUG = False
     # 跟着教程继续操作，后面搭建 nginx 代理即可正常访问
 
-10. 执行 ./cocod start 后提示 No module named 'jms'
+11. 执行 ./cocod start 后提示 No module named 'jms'
 
 ::
 
@@ -86,7 +94,7 @@
     $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
     # 然后重新执行 ./cocod start 即可
 
-11. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
+12. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
 
 ::
 
@@ -96,7 +104,7 @@
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
-12. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
+13. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
 
 ::
 
@@ -110,7 +118,7 @@
 
     # 保存后重新执行 ./cocod start 即可
 
-13. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
+14. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
 
 ::
 
@@ -166,7 +174,7 @@
 
     ...
 
-14. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
+15. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
 
 ::
 
