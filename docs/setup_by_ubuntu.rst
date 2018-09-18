@@ -57,7 +57,7 @@
 ::
 
     $ cd /opt
-    $ git clone git://github.com/kennethreitz/autoenv.git
+    $ git clone https://github.com/kennethreitz/autoenv.git
     $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
     $ source ~/.bashrc
 
