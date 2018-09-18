@@ -29,13 +29,12 @@ CentOS 7 安装文档
     $ systemctl start firewalld
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
-    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent  # 用户HTTP/WS登录端口 coco
-    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent  # guacamole端口 docker
       --permanent  永久生效，没有此参数重启后失效
 
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
+    $ mkdir -p /opt/guacamole/key
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
