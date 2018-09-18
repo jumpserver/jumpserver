@@ -79,7 +79,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 ::
 
     $ cd /opt
-    $ git clone git://github.com/kennethreitz/autoenv.git
+    $ git clone https://github.com/kennethreitz/autoenv.git
     $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
     $ source ~/.bashrc
 
