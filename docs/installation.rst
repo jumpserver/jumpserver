@@ -5,6 +5,7 @@
    :maxdepth: 1
 
    quickinstall
+   dockerinstall
    step_by_step
    setup_by_ubuntu
    setup_by_optimization
