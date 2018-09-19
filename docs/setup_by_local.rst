@@ -35,6 +35,7 @@ CentOS 7 组件离线安装文档
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
+    $ mkdir -p /opt/guacamole/key
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
