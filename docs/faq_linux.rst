@@ -53,6 +53,8 @@ Linux 资产连接错误排查思路
 ::
 
     # 请参考第一条检查终端是否在线
+    # 检查 coco 的 ws 端口（默认 5000）
+    # 检查 nginx 配置的 socket.io 设置是否有误
 
 .. image:: _static/img/faq_linux_03.jpg
 
