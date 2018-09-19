@@ -79,7 +79,7 @@ CentOS 7 安装文档
 
     # 自动载入 Python3 虚拟环境
     $ cd /opt
-    $ git clone git://github.com/kennethreitz/autoenv.git
+    $ git clone https://github.com/kennethreitz/autoenv.git
     $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
     $ source ~/.bashrc
 
