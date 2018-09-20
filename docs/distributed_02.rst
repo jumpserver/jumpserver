@@ -82,9 +82,9 @@
         open_log_file_cache off;
 
         upstream cocossh {
-            server 192.168.100.12:2222 max_fails=1 fail_timeout=120s;
-            # server ip:port max_fails=1 fail_timeout=120s;
-            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+            server 192.168.100.12:2222 max_fails=1 fail_timeout=5s;
+            # server ip:port max_fails=1 fail_timeout=5s;
+            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=5s 是 HA 参数
         }
         server {
             listen 2222;
@@ -123,21 +123,21 @@
     $ vim /etc/nginx/conf.d/jumpserver.conf
 
     upstream jumpserver {
-        server 192.168.100.11:80 max_fails=1 fail_timeout=120s;
-        # server ip:port max_fails=1 fail_timeout=120s;
-        # 这里是 jumpserver 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+        server 192.168.100.11:80 max_fails=1 fail_timeout=10s;
+        # server ip:port max_fails=1 fail_timeout=10s;
+        # 这里是 jumpserver 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
     }
 
     upstream cocows {
-        server 192.168.100.12:5000 max_fails=1 fail_timeout=120s;
-        # server ip:port max_fails=1 fail_timeout=120s;
-        # 这里是 coco ws 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+        server 192.168.100.12:5000 max_fails=1 fail_timeout=10s;
+        # server ip:port max_fails=1 fail_timeout=10s;
+        # 这里是 coco ws 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
     }
 
     upstream guacamole {
-        server 192.168.100.13:8081 max_fails=1 fail_timeout=120s;
-        # server ip:port max_fails=1 fail_timeout=120s;
-        # 这里是 guacamole 的后端ip ，max_fails=1 fail_timeout=120s 是 HA 参数
+        server 192.168.100.13:8081 max_fails=1 fail_timeout=10s;
+        # server ip:port max_fails=1 fail_timeout=10s;
+        # 这里是 guacamole 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
     }
 
     server {
