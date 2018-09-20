@@ -104,4 +104,11 @@ Windows 资产连接错误排查思路
 
 .. image:: _static/img/faq_windows_08.jpg
 
+10. Windows 无法录像
+
+::
+
+    # 把 docker stop 后重新启动就好了，记得启动 guacamole
+
+
 其他问题可参考 `FAQ <faq.html>`_
