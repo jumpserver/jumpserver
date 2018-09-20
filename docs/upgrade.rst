@@ -27,6 +27,7 @@
 
     # 升级前请做好 jumpserver 与 数据库 备份，谨防意外，具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
+    $ ./jms stop
     $ git pull
 
     # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py
@@ -48,6 +49,8 @@
     $ python manage.py makemigrations
     $ python manage.py migrate
     $ cd ../utils && sh make_migrations.sh
+
+    $ cd ../ && ./jms start all
  
 2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
@@ -55,12 +58,15 @@
 
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
+    $ ./cocod stop
     $ git pull && pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
 
     # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
     $ mv conf.py coco.bak
     $ cp conf_example.py conf.py
     $ vim conf.py  # 参考安装文档进行修改
+
+    $ ./cocod start
 
 3. 升级 Luna
 
@@ -72,6 +78,8 @@
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
+
+    # 注意把浏览器缓存刷新下
 
 4. 升级 guacamole
 

@@ -18,7 +18,7 @@ Linux 资产连接错误排查思路
 
     # 如果不在线请检查 Linux 组件是否正常运行，箭头指示处 绿色表示正常，红色表示异常
     $ ps -ef | grep cocod | grep -v grep
-    $ netstat -an | grep ":2222" | grep -v grep
+    $ cat /opt/coco/logs/coco.log  # 检查有没有 error
 
     # 如果不在线可以尝试重启 coco
     $ source /opt/py3/bin/activate

@@ -270,3 +270,25 @@ FAQ
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
+
+16. 生成随机 SECRET_KEY
+
+::
+
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ python manage.py shell
+    >>> from django.core.management.utils import get_random_secret_key
+    >>> get_random_secret_key()
+
+17. 传递明文数据到 Jumpserver 数据库（数据导入）
+
+::
+
+    # 以导入 admin 用户 public_key 为例
+    $ $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    >>> from users.models  import User
+    >>> user = User.objects.get(username='admin')
+    >>> user.public_key = '明文key'
+    >>> user.save()
