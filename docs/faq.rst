@@ -78,17 +78,7 @@ FAQ
     # 新建超级用户的命令如下命令
     $ python manage.py createsuperuser --username=user --email=user@domain.com
 
-6. 清理celery产生的数据(无法正常推送及连接资产，一直显示........等可以使用，请确定字符集是zh_CN.UTF-8)
-
-::
-
-    $ source /opt/py3/bin/activate
-    $ cd /opt/jumpserver/apps
-    $ celery -A ops purge -f
-
-    # 如果任然异常，手动结束所有jumpserver进程，然后kill掉未能正常结束的jumpserver相关进程，在重新启动jumpserver即可
-
-7. 修改登录超时时间（默认 10 秒）
+6. 修改登录超时时间（默认 10 秒）
 
 ::
 
@@ -96,7 +86,7 @@ FAQ
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
 
-8. 升级提示 Table 'xxx' already exists
+7. 升级提示 Table 'xxx' already exists
 
 ::
 
@@ -113,7 +103,7 @@ FAQ
 
     # 对比即可知道丢失什么文件，把文件从备份目录拷贝即可
 
-9. 设置浏览器过期
+8. 设置浏览器过期
 
 ::
 
@@ -126,7 +116,7 @@ FAQ
     # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-10. MFA遗失无法登陆
+9. MFA遗失无法登陆
 
 ::
 
@@ -134,7 +124,7 @@ FAQ
     # 如果管理员遗失无法登陆, 修改数据库 user_user 表对应用户的 otp_level 为 0 , 重新登陆绑定即可
     # 如果在系统设置里面开启的 MFA 二次认证 ，需要修改数据库 settings 表 SECURITY_MFA_AUTH 的 value 值为 false
 
-11. 用户管理的用户与资产管理的管理用户、系统用户说明
+10. 用户管理的用户与资产管理的管理用户、系统用户说明
 
 ::
 
@@ -145,14 +135,14 @@ FAQ
     以阿里云例：先登录阿里云平台，看到资产后使用资产上面的账户登录资产。
     Jumpserver：先登录Jumpserver，看到资产后使用系统用户登录资产，一个意思。
 
-12. 资产授权说明
+11. 资产授权说明
 
 ::
 
     # 资产授权就是把 系统用户关联到用户 并授权到 对应的资产
     # 用户只能看到自己被授权的资产
 
-13. Web Terminal 页面经常需要重新刷新页面才能连接资产
+12. Web Terminal 页面经常需要重新刷新页面才能连接资产
 
 ::
 
@@ -229,7 +219,7 @@ FAQ
         }
     }
 
-14. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
+13. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
 
 ::
 
@@ -271,7 +261,7 @@ FAQ
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
-16. 生成随机 SECRET_KEY
+14. 生成随机 SECRET_KEY
 
 ::
 
@@ -281,7 +271,7 @@ FAQ
     >>> from django.core.management.utils import get_random_secret_key
     >>> get_random_secret_key()
 
-17. 传递明文数据到 Jumpserver 数据库（数据导入）
+15. 传递明文数据到 Jumpserver 数据库（数据导入）
 
 ::
 
