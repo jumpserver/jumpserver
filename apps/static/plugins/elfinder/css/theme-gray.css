@@ -505,7 +505,8 @@ div.elfinder-cwd-wrapper-list tr.ui-state-default td span.ui-icon {
   margin-right: 5px;
 }
 div.elfinder-cwd-wrapper-list .ui-icon-grip-dotted-vertical {
-  margin: 2px;
+  margin: 1px;
+  float: right;
 }
 .elfinder-cwd-view-list .elfinder-navbar-root-local td .elfinder-cwd-icon,
 .elfinder-navbar-root-local .elfinder-cwd-icon,
