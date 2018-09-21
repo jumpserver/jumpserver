@@ -24,7 +24,7 @@
     # 安装 mariadb 服务
     $ yum install -y install mariadb mariadb-devel mariadb-server
 
-    # 设置防火墙，开发 3306 端口
+    # 设置防火墙，开放 3306 端口
     $ firewall-cmd --zone=public --add-port=3306/tcp --permanent
     $ firewall-cmd --reload
 

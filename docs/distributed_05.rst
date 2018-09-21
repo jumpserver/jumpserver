@@ -23,6 +23,11 @@
     # 安装依赖包
     $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
 
+    # 设置防火墙，开放 2222 5000 端口
+    $ firewall-cmd --zone=public --add-port=2222/tcp --permanent
+    $ firewall-cmd --zone=public --add-port=5000/tcp --permanent
+    $ firewall-cmd --reload
+
     # 安装 Python3.6.1
     $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
     $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
