@@ -23,6 +23,10 @@
     # 安装依赖包
     $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
 
+    # 设置防火墙，开放 80 端口
+    $ firewall-cmd --zone=public --add-port=80/tcp --permanent
+    $ firewall-cmd --reload
+
     # 安装 redis
     $ yum -y install redis
     $ systemctl enable redis

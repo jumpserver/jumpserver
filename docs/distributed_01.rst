@@ -28,6 +28,13 @@ Guacamole 服务器运行 docker 服务
 
 Nginx 代理服务器运行 nginx 服务，注意 upstream 的负载模式，需要解决 session 问题
 
+安全
+~~~~~~~
+
+ssh、telnet协议 资产的防火墙设置允许 coco 与 jumpserver 访问
+
+rdp协议 资产的防火墙设置允许 guacamole 与jumpserver 访问
+
 其他
 ~~~~~~~
 
