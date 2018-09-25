@@ -5,9 +5,10 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
-    TerminalSettingForm, SecuritySettingForm
+    TerminalSettingForm, SecuritySettingForm, StorageSettingForm
 from common.permissions import SuperUserRequiredMixin
 from .signals import ldap_auth_enable
+import json
 
 
 class BasicSettingView(SuperUserRequiredMixin, TemplateView):
@@ -104,11 +105,13 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
             'replay_storage': replay_storage,
             'command_storage': command_storage,
         }
+
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
     def post(self, request):
         form = self.form_class(request.POST)
+        
         if form.is_valid():
             form.save()
             msg = _("Update setting successfully, please restart program")
@@ -144,3 +147,54 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
             context = self.get_context_data()
             context.update({"form": form})
             return render(request, self.template_name, context)
+
+
+class StorageSettingView(SuperUserRequiredMixin, TemplateView):
+    form_class = StorageSettingForm
+    template_name = "common/storage_setting.html"
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Storage setting'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        get_body = request.GET
+        setting_name = get_body.get("setting_name", '')
+        setting_data = get_body.get("storage_info", None)
+
+        if setting_data is not None:
+            setting_dict = json.loads(setting_data, encoding='utf-8')
+        else:
+            setting_dict = {}
+
+        context = self.get_context_data(**kwargs)
+        form = self.form_class()
+        form.set_setting_name(setting_name)
+        form.set_initial(setting_dict)
+        context.update({"form": form})
+
+        context["setting_name"] = setting_name
+        if setting_name == "TERMINAL_COMMAND_STORAGE":
+            context['action'] = "Command storage setting"
+        elif setting_name == "TERMINAL_REPLAY_STORAGE":
+            context['action'] = "Replay storage setting"
+
+        return self.render_to_response(context)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            form.save()
+            msg = _("Update setting successfully, please restart program")
+            messages.success(request, msg)
+            return redirect('settings:terminal-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)
+
