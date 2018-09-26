@@ -5,27 +5,27 @@
 
 ::
 
-    # 一般是由于时间不同步，或者网络有问题导致的
-    # 可以尝试下载 releases 包
+    一般是由于时间不同步，或者网络有问题导致的
+    可以尝试下载 releases 包
 
 2. pip install 提示 ssl 错误
 
 ::
 
-    # 参考第一条解决
+    参考第一条解决
 
 3. pip install 提示 download 错误
 
 ::
 
-    # 一般是由于网络不好，导致下载文件失败，重新执行命令即可
-    # 如果多次重试均无效，请更换网络环境
+    一般是由于网络不好，导致下载文件失败，重新执行命令即可
+    如果多次重试均无效，请更换网络环境
 
 4. bash make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
 
 ::
 
-    # 这是由于 config.py 里面的内容格式不对，请参考安装文档的说明，把提示的内容与上一行对齐即可
+    这是由于 config.py 里面的内容格式不对，请参考安装文档的说明，把提示的内容与上一行对齐即可
 
 5. bash make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
@@ -55,8 +55,8 @@
 
 ::
 
-    # 如果没有error提示进程无法启动，那么这是正常现象
-    # 如果不想在前台启动，可以使用 ./jms start all -d 在后台启动
+    如果没有error提示进程无法启动，那么这是正常现象
+    如果不想在前台启动，可以使用 ./jms start all -d 在后台启动
 
 8. 执行 ./jms start all 后提示 xxx is stopped
 
@@ -70,14 +70,14 @@
 
 ::
 
-    # 这是严格模式的警告，可以参考后面的url解决，或者忽略
+    这是严格模式的警告，可以参考后面的url解决，或者忽略
 
 10. 启动 jumpserver 后，访问 8080 端口页面显示不正常
 
 ::
 
-    # 这是因为你在 config.py 里面设置了 DEBUG = False
-    # 跟着教程继续操作，后面搭建 nginx 代理即可正常访问
+    这是因为你在 config.py 里面设置了 DEBUG = False
+    跟着教程继续操作，后面搭建 nginx 代理即可正常访问
 
 11. 执行 ./cocod start 后提示 No module named 'jms'
 
@@ -178,4 +178,4 @@
 
 ::
 
-    # 请通过 nginx 代理的端口访问 jumpserver 页面，不要再直接访问 8080 端口
+    请通过 nginx 代理的端口访问 jumpserver 页面，不要再直接访问 8080 端口
