@@ -276,9 +276,10 @@ FAQ
 ::
 
     # 以导入 admin 用户 public_key 为例
-    $ $ source /opt/py3/bin/activate
+    $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps
-    >>> from users.models  import User
+    $ python manage.py shell
+    >>> from users.models import User
     >>> user = User.objects.get(username='admin')
     >>> user.public_key = '明文key'
     >>> user.save()
