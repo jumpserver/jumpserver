@@ -3,12 +3,12 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
-   Ldap 使用说明 <faq_ldap.rst>
-   Sftp 使用说明 <faq_sftp.rst>
-   Telnet 使用说明 <faq_telnet.rst>
+   LDAP 使用说明 <faq_ldap.rst>
+   SFTP 使用说明 <faq_sftp.rst>
+   TELNET 使用说明 <faq_telnet.rst>
    安装过程 常见问题 <faq_install.rst>
-   Linux 资产连接说明 <faq_linux.rst>
-   Windows 资产连接说明 <faq_windows.rst>
+   RDP 协议资产连接说明 <faq_rdp.rst>
+   SSH 协议资产连接说明 <faq_ssh.rst>
    添加组织 及 组织管理员说明 <faq_org.rst>
    二次认证（Google Auth）入口说明 <faq_googleauth.rst>
 
@@ -48,8 +48,8 @@ FAQ
 
 ::
 
-    # Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
-    # Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
+    Luna 打开网页提示403 Forbidden错误，一般是nginx配置文件的luna路径不正确或者luna下载了源代码，请重新下载编译好的代码
+    Luna 打开网页提示502 Bad Gateway错误，一般是selinux和防火墙的问题，请根据nginx的errorlog来检查
 
 4. 录像问题
 
@@ -120,29 +120,18 @@ FAQ
 
 ::
 
-    # 普通用户联系管理员关闭MFA，登录成功后用户在个人信息里面重新绑定.
-    # 如果管理员遗失无法登陆, 修改数据库 user_user 表对应用户的 otp_level 为 0 , 重新登陆绑定即可
-    # 如果在系统设置里面开启的 MFA 二次认证 ，需要修改数据库 settings 表 SECURITY_MFA_AUTH 的 value 值为 false
+    普通用户联系管理员关闭MFA，登录成功后用户在个人信息里面重新绑定.
+    如果管理员遗失无法登陆, 修改数据库 user_user 表对应用户的 otp_level 为 0 , 重新登陆绑定即可
+    如果在系统设置里面开启的 MFA 二次认证 ，需要修改数据库 settings 表 SECURITY_MFA_AUTH 的 value 值为 false
 
-10. 用户管理的用户与资产管理的管理用户、系统用户说明
-
-::
-
-    # 用户管理里面的用户是登录 Jumpserver 使用的，类似 用户使用自己的阿里云账户 登录 阿里云平台
-    # 资产管理下面的 管理用户 和 系统用户 都是资产的登录账户，管理用户是 Jumpserver 调用，系统用户是给 普通用户 登录资产使用的账户
-    # 管理用户是给 Jumpserver 使用，相当于服务账户，用来检测资产的存活，硬件信息，推送系统用户等，后期还会用来执行命令等
-    # 系统用户是给 使用Jumpserver登录资产的人 使用，就像 你 我 一样的人，这个人先要登录 Jumpserver ，然后使用 系统用户 连接资产
-    以阿里云例：先登录阿里云平台，看到资产后使用资产上面的账户登录资产。
-    Jumpserver：先登录Jumpserver，看到资产后使用系统用户登录资产，一个意思。
-
-11. 资产授权说明
+10. 资产授权说明
 
 ::
 
     # 资产授权就是把 系统用户关联到用户 并授权到 对应的资产
     # 用户只能看到自己被授权的资产
 
-12. Web Terminal 页面经常需要重新刷新页面才能连接资产
+11. Web Terminal 页面经常需要重新刷新页面才能连接资产
 
 ::
 
@@ -219,7 +208,7 @@ FAQ
         }
     }
 
-13. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
+12. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
 
 ::
 
@@ -239,7 +228,7 @@ FAQ
     >>> exit()
 
 
-15. 重启服务器后无法访问 Jumpserver，页面提示502 或者 403等
+13. 重启服务器后无法访问 Jumpserver，页面提示502 或者 403等
 
 ::
 
