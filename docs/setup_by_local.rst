@@ -327,7 +327,7 @@ CentOS 7 组件离线安装文档
         listen 80;
         server_name demo.jumpserver.org;  # 修改成你的域名
 
-        client_max_body_size 100m;  # 录像上传大小限制
+        client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;

@@ -480,7 +480,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     server {
         listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
 
-        client_max_body_size 100m;  # 录像上传大小限制
+        client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;
