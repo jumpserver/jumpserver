@@ -433,7 +433,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         server_name _;
 
         ## 新增如下内容，以上内容是原文内容，请从这一行开始复制
-        client_max_body_size 100m;  # 录像上传大小限制
+        client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;

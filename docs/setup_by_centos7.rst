@@ -323,7 +323,7 @@ CentOS 7 安装文档
     server {
         listen 80;
 
-        client_max_body_size 100m;  # 录像上传大小限制
+        client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;
