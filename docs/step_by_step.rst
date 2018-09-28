@@ -137,7 +137,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
     $ systemctl enable mariadb
     $ systemctl start mariadb
 
-    # centos6 需要安装手动安装 mysql5.5 或以上的版本，自带的 mysql5.1 不支持，或者直接在其他现有 mysql 服务器上创建 jumpserver 数据库连接
+    # centos6 需要安装手动安装 mysql5.6 或以上的版本，自带的 mysql5.1 不支持，或者直接在其他现有 mysql 服务器上创建 jumpserver 数据库连接
 
 **2.6 创建数据库 Jumpserver 并授权**
 
