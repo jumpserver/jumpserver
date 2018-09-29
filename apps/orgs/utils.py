@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from functools import partial
 from werkzeug.local import Local
 

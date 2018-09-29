@@ -94,8 +94,11 @@ $(document).ready(function () {
         autoclose: true
     });
     $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
-        e.preventDefault();
-        $("#asset_list_modal").modal();
+        if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
+            e.preventDefault();
+            e.stopPropagation();
+            $("#asset_list_modal").modal();
+        }
     })
 })
 .on('click', '#btn_asset_modal_confirm', function () {
