@@ -375,7 +375,7 @@
 			'pass'                : '密码', // added 18.04.2012
 			'confirmUnmount'      : '确实要卸载 $1?',  // from v2.1 added 30.04.2012
 			'dropFilesBrowser': '从浏览器中拖放或粘贴文件', // from v2.1 added 30.05.2012
-			'dropPasteFiles'  : '拖放文件，粘贴网址或剪贴板图像', // from v2.1 added 07.04.2014
+			'dropPasteFiles'  : '拖放文件，或粘贴剪贴板图像', // from v2.1 added 07.04.2014
 			'encoding'        : '编码', // from v2.1 added 19.12.2014
 			'locale'          : '语言环境',   // from v2.1 added 19.12.2014
 			'searchTarget'    : '目标: $1',                // from v2.1 added 22.5.2015
