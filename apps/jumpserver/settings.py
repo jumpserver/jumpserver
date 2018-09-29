@@ -28,9 +28,9 @@ try:
     from config import config as CONFIG
 except ImportError:
     msg = """
-    
+
     Error: No config file found.
-    
+
     You can run `cp config_example.py config.py`, and edit it.
     """
     raise ImportError(msg)
@@ -152,7 +152,8 @@ LOGIN_URL = reverse_lazy('users:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+# SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database

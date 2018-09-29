@@ -34,6 +34,9 @@ class Config:
     DB_ENGINE = 'sqlite3'
     DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
+    # Session settings
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
     # MySQL or postgres setting like:
     # DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
     # DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
@@ -75,4 +78,3 @@ class ProductionConfig(Config):
 
 # Default using Config settings, you can write if/else for different env
 config = DevelopmentConfig()
-
