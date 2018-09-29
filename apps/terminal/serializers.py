@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.core.cache import cache
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
@@ -28,19 +29,8 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_alive(obj):
-        try:
-            status = obj.status_set.latest()
-        except Status.DoesNotExist:
-            status = None
-
-        if not status:
-            return False
-
-        delta = timezone.now() - status.date_created
-        if delta < timezone.timedelta(seconds=600):
-            return True
-        else:
-            return False
+        key = StatusSerializer.CACHE_KEY_PREFIX + str(obj.id)
+        return cache.get(key)
 
 
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -57,10 +47,17 @@ class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class StatusSerializer(serializers.ModelSerializer):
+    CACHE_KEY_PREFIX = 'terminal_status_'
 
     class Meta:
         fields = '__all__'
         model = Status
+
+    def create(self, validated_data):
+        terminal_id = str(validated_data['terminal'].id)
+        key = self.CACHE_KEY_PREFIX + terminal_id
+        cache.set(key, 1, 60)
+        return validated_data
 
 
 class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
