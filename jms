@@ -126,6 +126,7 @@ def start_gunicorn():
         '-k', 'gthread',
         '--threads', '10',
         '-w', str(WORKERS),
+        '--max-requests', '4096',
         '--access-logformat', log_format,
         '-p', pid_file,
     ]

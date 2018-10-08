@@ -93,6 +93,9 @@ class TerminalAcceptView(SuperUserRequiredMixin, JSONResponseMixin, UpdateView):
 
 
 class TerminalConnectView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView):
+    """
+    Abandon
+    """
     template_name = 'flash_message_standalone.html'
     model = Terminal
 
