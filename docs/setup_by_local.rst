@@ -355,6 +355,14 @@ CentOS 7 组件离线安装文档
             access_log off;
         }
 
+        location /coco/ {
+            proxy_pass       http://localhost:5000/coco/;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
         location /guacamole/ {
             proxy_pass       http://localhost:8081/;  # 如果docker安装在别的服务器, 请填写它的ip
             proxy_buffering off;

@@ -52,7 +52,7 @@
 
     # 下载 luna
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
@@ -186,6 +186,14 @@
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
             # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
+        }
+
+        location /coco/ {
+            proxy_pass       http://cocows/coco/;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
         }
 
         location /guacamole/ {
