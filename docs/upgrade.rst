@@ -52,7 +52,20 @@
     $ cd ../utils && sh make_migrations.sh
 
     $ cd ../ && ./jms start all
- 
+
+    # 任意版本升级到 1.4.2 版本，需要修改 nginx 配置
+    $ vim /etc/nginx/conf.d/jumpserver.conf
+
+    ...
+    location /coco/ {
+        proxy_pass       http://localhost:5000/coco/;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        access_log off;
+    }
+    ...
+
 2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
 
 ::
@@ -76,7 +89,7 @@
 ::
 
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
