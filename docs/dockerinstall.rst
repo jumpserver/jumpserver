@@ -15,8 +15,8 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
     # 1.0.0 版本
     $ docker run --name jms_server -d -p 80:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:1.0.0
 
-    # 1.4.1 版本（新）
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.1
+    # 1.4.2 版本（新）
+    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.2
 
 访问
 ```````````````
@@ -46,7 +46,7 @@ XShell等工具请添加connection连接，ssh 端口 2222
  ::
 
    docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  registry.jumpserver.org/public/jumpserver:1.0.0
-   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.1
+   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.2
 
 
 仓库地址
