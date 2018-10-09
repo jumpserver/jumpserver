@@ -118,7 +118,17 @@
 
     # 保存后重新执行 ./cocod start 即可
 
-14. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
+14. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/keys/.access_key'
+
+::
+
+    # 这是一个小 bug，之后的版本会修复掉
+    $ cd /opt/coco
+    $ mkdir keys
+
+    # 保存后重新执行 ./cocod start 即可
+
+15. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
 
 ::
 
@@ -174,7 +184,7 @@
 
     ...
 
-15. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
+16. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
 
 ::
 
