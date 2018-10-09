@@ -40,17 +40,17 @@
     $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
     $ cd utils && sh make_migrations.sh
 
+    # 如果执行 sh make_migrations.sh 时有红色文字提示 Run 'manage.py make_migrations' 和 'manage.py migrate' ，则需要执行下面4条命令，没有则忽略这一步
+    $ cd /opt/jumpserver/apps
+    $ python manage.py makemigrations
+    $ python manage.py migrate
+    $ cd ../utils && sh make_migrations.sh
+
     # 1.0.x 升级到最新版本需要执行迁移脚本 （新版本授权管理更新，非 1.0.x 版本请忽略）
     $ sh 2018_04_11_migrate_permissions.sh
 
     # 任意版本升级到 1.4.0 版本，需要执行（当前版本小于 1.4.0 需要执行此步骤）
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
-
-    # 如果执行 sh make_migrations.sh 时有红色提示 Run 'manage.py make_migrations' 和 'manage.py migrate'
-    $ cd /opt/jumpserver/apps
-    $ python manage.py makemigrations
-    $ python manage.py migrate
-    $ cd ../utils && sh make_migrations.sh
 
     $ cd ../ && ./jms start all
 
