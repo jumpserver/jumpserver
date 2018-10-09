@@ -55,7 +55,7 @@
     $ cd ../ && ./jms start all
 
     # 任意版本升级到 1.4.2 版本，需要修改 nginx 配置 （当前版本小于 1.4.2 需要执行此步骤）
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vim /etc/nginx/conf.d/jumpserver.conf  # 部分用户的配置文件是/etc/nginx/nginx.conf
 
     ...
 
