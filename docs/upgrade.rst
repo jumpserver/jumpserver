@@ -3,6 +3,7 @@
 
 说明
 ~~~~~~~
+- 请先检查自己各组件的当前版本
 - 不支持从 0.x 版本升级到 1.x 版本
 - 本文档仅针对 1.0 及之后的版本升级教程
 - 从 1.4.x 版本开始 mysql 版本需要大于等于 5.6，PostgreSQL 版本需要大于等于 9.4
@@ -31,7 +32,7 @@
     $ ./jms stop
     $ git pull
 
-    # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py
+    # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py （当前版本小于 1.3 需要执行此步骤）
     $ mv config.py config.bak
     $ cp config_example.py config.py
     $ vim config.py  # 参考安装文档进行修改
@@ -39,10 +40,10 @@
     $ pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
     $ cd utils && sh make_migrations.sh
 
-    # 1.0.x 升级到最新版本需要执行迁移脚本（新版本授权管理更新）
+    # 1.0.x 升级到最新版本需要执行迁移脚本 （新版本授权管理更新，非 1.0.x 版本请忽略）
     $ sh 2018_04_11_migrate_permissions.sh
 
-    # 任意版本升级到 1.4.0 版本，需要执行
+    # 任意版本升级到 1.4.0 版本，需要执行（当前版本小于 1.4.0 需要执行此步骤）
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
 
     # 如果执行 sh make_migrations.sh 时有红色提示 Run 'manage.py make_migrations' 和 'manage.py migrate'
@@ -53,17 +54,29 @@
 
     $ cd ../ && ./jms start all
 
-    # 任意版本升级到 1.4.2 版本，需要修改 nginx 配置
+    # 任意版本升级到 1.4.2 版本，需要修改 nginx 配置 （当前版本小于 1.4.2 需要执行此步骤）
     $ vim /etc/nginx/conf.d/jumpserver.conf
 
     ...
+
+    location /socket.io/ {
+        ... 原内容
+    }
+
+    # 加入下面内容
     location /coco/ {
-        proxy_pass       http://localhost:5000/coco/;
+        proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器，请填写它的ip
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         access_log off;
     }
+    # 到此结束
+
+    location /guacamole/ {
+        ... 原内容
+    }
+
     ...
 
 2. 升级 Coco（如果是新开的终端，别忘了 source /opt/py3/bin/activate）
@@ -75,7 +88,7 @@
     $ ./cocod stop
     $ git pull && pip install -r requirements/requirements.txt -i https://pypi.python.org/simple
 
-    # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py
+    # coco 版本小于 1.4.1 升级到最新版本请使用新的 conf.py （当前版本小于 1.4.1 需要执行此步骤）
     $ mv conf.py coco.bak
     $ cp conf_example.py conf.py
     $ vim conf.py  # 参考安装文档进行修改
@@ -89,6 +102,7 @@
 ::
 
     $ cd /opt
+    $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.2/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
@@ -113,7 +127,7 @@
     $ docker rm jms_guacamole_bak
 
 
-切换分支或离线升级
+切换分支或releases包升级
 -------------------------------
 
 说明

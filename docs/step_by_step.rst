@@ -471,14 +471,12 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 ::
 
-    $ vim /etc/nginx/nginx.conf
-    # CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
-
-    ... 省略
-    # 把默认server配置块改成这样，原有的内容请保持不动
+    $ vim /etc/nginx/conf.d/jumpserver.conf
+    # 注意注释 nginx.conf 里面的 server {} 内容 ，CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     server {
         listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
+        server_name demo.jumpserver.org;  # 修改成你的域名
 
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
@@ -509,7 +507,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
 
         location /coco/ {
-            proxy_pass       http://localhost:5000/coco/;
+            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器，请填写它的ip
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -535,8 +533,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
-
-    ... 省略
 
 6.3 运行 Nginx
 
