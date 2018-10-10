@@ -62,6 +62,10 @@
                                 </div>
                             </div>
                             {% endblock %}
+                            <div id="command-filter-block">
+                                <h3>{% trans 'Command filter' %}</h3>
+                                {% bootstrap_field form.cmd_filters layout="horizontal" %}
+                            </div>
                             <h3>{% trans 'Other' %}</h3>
                             {% bootstrap_field form.sudo layout="horizontal" %}
                             {% bootstrap_field form.shell layout="horizontal" %}
@@ -101,6 +105,7 @@ var need_change_field_login_mode = [
 function protocolChange() {
     if ($(protocol_id + " option:selected").text() === 'rdp') {
         $('.auth-fields').removeClass('hidden');
+        $('#command-filter-block').addClass('hidden');
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').addClass('hidden')
         });

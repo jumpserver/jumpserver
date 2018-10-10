@@ -16,6 +16,7 @@ urlpatterns = [
     path('terminal/<uuid:pk>/update/', views.TerminalUpdateView.as_view(), name='terminal-update'),
     path('<uuid:pk>/accept/', views.TerminalAcceptView.as_view(), name='terminal-accept'),
     path('web-terminal/', views.WebTerminalView.as_view(), name='web-terminal'),
+    path('web-sftp/', views.WebSFTPView.as_view(), name='web-sftp'),
 
     # Session view
     path('session-online/', views.SessionOnlineListView.as_view(), name='session-online-list'),

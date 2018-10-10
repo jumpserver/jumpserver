@@ -1,0 +1,20 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+<form id="groupForm" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% bootstrap_field form.name layout="horizontal" %}
+    {% bootstrap_field form.comment layout="horizontal" %}
+
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

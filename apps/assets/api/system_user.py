@@ -33,7 +33,8 @@ __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi',
     'SystemUserPushApi', 'SystemUserTestConnectiveApi',
     'SystemUserAssetsListView', 'SystemUserPushToAssetApi',
-    'SystemUserTestAssetConnectabilityApi',
+    'SystemUserTestAssetConnectabilityApi', 'SystemUserCommandFilterRuleListApi',
+
 ]
 
 
@@ -127,3 +128,16 @@ class SystemUserTestAssetConnectabilityApi(generics.RetrieveAPIView):
         asset = get_object_or_404(Asset, id=asset_id)
         task = test_system_user_connectability_a_asset.delay(system_user, asset)
         return Response({"task": task.id})
+
+
+class SystemUserCommandFilterRuleListApi(generics.ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get_serializer_class(self):
+        from ..serializers import CommandFilterRuleSerializer
+        return CommandFilterRuleSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk', None)
+        system_user = get_object_or_404(SystemUser, pk=pk)
+        return system_user.cmd_filter_rules
