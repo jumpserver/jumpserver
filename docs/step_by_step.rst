@@ -5,11 +5,12 @@
 
 安装过程中遇到问题可参考 `安装过程中常见的问题 <faq_install.html>`_
 
-测试推荐硬件
+测试推荐环境
 ~~~~~~~~~~~~~
 
 -  CPU: 64位双核处理器
 -  内存: 4G DDR3
+-  数据库：mysql 版本大于等于 5.6  mariadb 版本大于等于 5.5.6
 
 环境
 ~~~~~~~
@@ -137,7 +138,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
     $ systemctl enable mariadb
     $ systemctl start mariadb
 
-    # centos6 需要安装手动安装 mysql5.6 或以上的版本，自带的 mysql5.1 不支持，或者直接在其他现有 mysql 服务器上创建 jumpserver 数据库连接
+    # centos6 自带的 mysql5.1 不支持，请在其他服务器上创建 jumpserver 数据库连接
 
 **2.6 创建数据库 Jumpserver 并授权**
 
