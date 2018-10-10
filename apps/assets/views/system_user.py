@@ -91,10 +91,11 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
     context_object_name = 'system_user'
 
     def get_context_data(self, **kwargs):
+        nodes_remain = sorted(Node.objects.exclude(systemuser=self.object), reverse=True)
         context = {
             'app': _('assets'),
             'action': _('System user asset'),
-            'nodes_remain': Node.objects.exclude(systemuser=self.object)
+            'nodes_remain': nodes_remain
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

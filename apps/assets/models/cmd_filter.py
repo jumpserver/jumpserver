@@ -35,11 +35,10 @@ class CommandFilterRule(OrgModelMixin):
         (TYPE_COMMAND, _('Command')),
     )
 
-    ACTION_DENY = 'deny'
-    ACTION_ACCEPT = 'accept'
+    ACTION_DENY, ACTION_ALLOW = range(2)
     ACTION_CHOICES = (
         (ACTION_DENY, _('Deny')),
-        (ACTION_ACCEPT, _('Accept'))
+        (ACTION_ALLOW, _('Allow')),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -47,11 +46,14 @@ class CommandFilterRule(OrgModelMixin):
     type = models.CharField(max_length=16, default=TYPE_COMMAND, choices=TYPE_CHOICES, verbose_name=_("Type"))
     priority = models.IntegerField(default=50, verbose_name=_("Priority"), validators=[MinValueValidator(1), MaxValueValidator(100)])
     content = models.TextField(max_length=1024, verbose_name=_("Content"), help_text=_("One line one command"))
-    action = models.CharField(max_length=16, default=ACTION_DENY, choices=ACTION_CHOICES, verbose_name=_("Action"))
+    action = models.IntegerField(default=ACTION_DENY, choices=ACTION_CHOICES, verbose_name=_("Action"))
     comment = models.CharField(max_length=64, blank=True, default='', verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Created by'))
+
+    class Meta:
+        ordering = ('priority', 'action')
 
     def __str__(self):
         return '{} % {}'.format(self.type, self.content)

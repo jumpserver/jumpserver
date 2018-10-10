@@ -51,7 +51,24 @@
 
 {% block custom_foot_js %}
 <script>
+var content_origin_placeholder = '';
+var content_origin_help_text = '';
+var content_ref = '';
+var content_help_ref = '';
+
 $(document).ready(function(){
+    content_ref = $('#id_content');
+    content_help_ref = content_ref.next();
+    content_origin_placeholder = content_ref.attr('placeholder');
+    content_origin_help_text = content_help_ref.html();
+}).on('change', '#id_type', function () {
+    if ($('#id_type :selected').val() === 'regex') {
+        content_ref.attr('placeholder', 'rm.*|reboot|shutdown');
+        content_help_ref.html("");
+    } else {
+        content_ref.attr('placeholder', content_origin_placeholder);
+        content_help_ref.html(content_origin_help_text);
+    }
 })
 </script>
 {% endblock %}

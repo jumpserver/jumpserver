@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+from django import forms
+
 from orgs.mixins import OrgModelForm
 from ..models import CommandFilter, CommandFilterRule
 
@@ -18,3 +20,8 @@ class CommandFilterRuleForm(OrgModelForm):
         fields = [
             'filter', 'type', 'content', 'priority', 'action', 'comment'
         ]
+        widgets = {
+            'content':  forms.Textarea(attrs={
+                'placeholder': 'eg:\r\nreboot\r\nrm -rf'
+            }),
+        }

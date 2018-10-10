@@ -1295,7 +1295,7 @@ msgstr "创建规则"
 
 #: assets/templates/assets/cmd_filter_rule_list.html:61
 msgid "Strategy"
-msgstr "分类"
+msgstr "策略"
 
 #: assets/templates/assets/delete_confirm.html:6
 #: perms/templates/perms/delete_confirm.html:6 templates/delete_confirm.html:6

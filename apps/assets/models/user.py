@@ -117,7 +117,7 @@ class SystemUser(AssetUser):
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=AUTO_LOGIN, max_length=10, verbose_name=_('Login mode'))
-    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"))
+    cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
 
     cache_key = "__SYSTEM_USER_CACHED_{}"
 

@@ -66,7 +66,7 @@ $(document).ready(function(){
     var $data_table = $('#cmd_filter_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var uid = $this.data('uid');
-    var the_url = '{% url "api-assets:label-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var the_url = '{% url "api-assets:cmd-filter-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();
