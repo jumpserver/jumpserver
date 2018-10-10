@@ -110,7 +110,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
 ::
 
-    $ pip install -r requirements.txt -i https://pypi.python.org/simple
+    $ pip install -r requirements.txt 
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
@@ -284,7 +284,7 @@ Yum 加速设置请参考 <http://mirrors.163.com/.help/centos.html>
 
     $ cd /opt/coco/requirements
     $ yum -y  install $(cat rpm_requirements.txt)
-    $ pip install -r requirements.txt -i https://pypi.python.org/simple
+    $ pip install -r requirements.txt 
 
 **3.3 修改配置文件并运行**
 

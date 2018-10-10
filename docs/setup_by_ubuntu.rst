@@ -88,7 +88,7 @@
 
 ::
 
-    $ pip install -r requirements.txt -i https://pypi.python.org/simple
+    $ pip install -r requirements.txt 
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
@@ -248,7 +248,7 @@
 ::
 
     $ cd /opt/coco/requirements
-    $ pip install -r requirements.txt -i https://pypi.python.org/simple
+    $ pip install -r requirements.txt 
 
 **3.3 查看配置文件并运行**
 

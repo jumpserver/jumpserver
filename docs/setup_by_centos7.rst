@@ -98,8 +98,8 @@ CentOS 7 安装文档
 
     # 安装 Python 库依赖
     $ pip install --upgrade pip
-    $ pip install -r /opt/jumpserver/requirements/requirements.txt -i https://pypi.python.org/simple
-    $ pip install -r /opt/coco/requirements/requirements.txt -i https://pypi.python.org/simple
+    $ pip install -r /opt/jumpserver/requirements/requirements.txt 
+    $ pip install -r /opt/coco/requirements/requirements.txt 
 
 ::
 
