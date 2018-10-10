@@ -88,7 +88,7 @@
 
 ::
 
-    $ pip install -r requirements.txt 
+    $ pip install -r requirements.txt
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
@@ -248,13 +248,14 @@
 ::
 
     $ cd /opt/coco/requirements
-    $ pip install -r requirements.txt 
+    $ pip install -r requirements.txt
 
 **3.3 查看配置文件并运行**
 
 ::
 
     $ cd /opt/coco
+    $ mkdir keys
     $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
     $ vi conf.py
 

@@ -53,7 +53,7 @@
     $ yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt)
 
     # 安装 Python 库依赖
-    $ pip install --upgrade pip && pip install -r /opt/coco/requirements/requirements.txt 
+    $ pip install --upgrade pip && pip install -r /opt/coco/requirements/requirements.txt
 
     # # 修改 Coco 配置文件
     $ cd /opt/coco
@@ -156,7 +156,8 @@
 
     # 运行 coco
     $ cd /opt/coco
-    $ ./cocod start all  # 后台运行使用 -d 参数./cocod start -d
+    $ mkdir keys
+    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status 后台运行请添加 -d 参数
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 coco 注册

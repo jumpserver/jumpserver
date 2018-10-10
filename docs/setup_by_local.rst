@@ -198,6 +198,7 @@ CentOS 7 组件离线安装文档
 
     # 修改 Coco 配置文件
     $ cd /opt/coco
+    $ mkdir keys
     $ cp conf_example.py conf.py
     $ vi conf.py
 
