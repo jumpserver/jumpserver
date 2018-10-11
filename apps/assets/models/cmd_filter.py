@@ -44,7 +44,8 @@ class CommandFilterRule(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     filter = models.ForeignKey('CommandFilter', on_delete=models.CASCADE, verbose_name=_("Filter"), related_name='rules')
     type = models.CharField(max_length=16, default=TYPE_COMMAND, choices=TYPE_CHOICES, verbose_name=_("Type"))
-    priority = models.IntegerField(default=50, verbose_name=_("Priority"), validators=[MinValueValidator(1), MaxValueValidator(100)])
+    priority = models.IntegerField(default=50, verbose_name=_("Priority"), help_text=_("1-100, the lower will be match first"),
+                                   validators=[MinValueValidator(1), MaxValueValidator(100)])
     content = models.TextField(max_length=1024, verbose_name=_("Content"), help_text=_("One line one command"))
     action = models.IntegerField(default=ACTION_DENY, choices=ACTION_CHOICES, verbose_name=_("Action"))
     comment = models.CharField(max_length=64, blank=True, default='', verbose_name=_("Comment"))

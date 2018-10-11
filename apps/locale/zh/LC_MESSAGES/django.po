@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-10 19:30+0800\n"
+"POT-Creation-Date: 2018-10-11 10:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -136,7 +136,7 @@ msgstr "不能包含特殊字符"
 #: assets/templates/assets/admin_user_detail.html:56
 #: assets/templates/assets/admin_user_list.html:26
 #: assets/templates/assets/cmd_filter_detail.html:61
-#: assets/templates/assets/cmd_filter_list.html:14
+#: assets/templates/assets/cmd_filter_list.html:24
 #: assets/templates/assets/domain_detail.html:56
 #: assets/templates/assets/domain_gateway_list.html:56
 #: assets/templates/assets/domain_list.html:25
@@ -360,7 +360,7 @@ msgstr "标签管理"
 
 #: assets/models/asset.py:126 assets/models/base.py:30
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:24
-#: assets/models/cmd_filter.py:53 assets/models/group.py:21
+#: assets/models/cmd_filter.py:54 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:117
 #: assets/templates/assets/cmd_filter_detail.html:77
@@ -389,13 +389,13 @@ msgstr "创建日期"
 
 #: assets/models/asset.py:131 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:21
-#: assets/models/cmd_filter.py:50 assets/models/domain.py:19
+#: assets/models/cmd_filter.py:51 assets/models/domain.py:19
 #: assets/models/domain.py:51 assets/models/group.py:23
 #: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:32
 #: assets/templates/assets/asset_detail.html:125
 #: assets/templates/assets/cmd_filter_detail.html:65
-#: assets/templates/assets/cmd_filter_list.html:17
+#: assets/templates/assets/cmd_filter_list.html:27
 #: assets/templates/assets/cmd_filter_rule_list.html:62
 #: assets/templates/assets/domain_detail.html:76
 #: assets/templates/assets/domain_gateway_list.html:61
@@ -520,19 +520,23 @@ msgstr "类型"
 msgid "Priority"
 msgstr "优先级"
 
-#: assets/models/cmd_filter.py:48
+#: assets/models/cmd_filter.py:47
+msgid "1-100, the lower will be match first"
+msgstr "优先级可选范围为1-100，1最高优先级 100最低优先级"
+
+#: assets/models/cmd_filter.py:49
 #: assets/templates/assets/cmd_filter_rule_list.html:59
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:48
+#: assets/models/cmd_filter.py:49
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:49
+#: assets/models/cmd_filter.py:50
 #: assets/templates/assets/admin_user_list.html:33
 #: assets/templates/assets/asset_list.html:97
-#: assets/templates/assets/cmd_filter_list.html:18
+#: assets/templates/assets/cmd_filter_list.html:28
 #: assets/templates/assets/cmd_filter_rule_list.html:63
 #: assets/templates/assets/domain_gateway_list.html:62
 #: assets/templates/assets/domain_list.html:29
@@ -735,7 +739,7 @@ msgstr "选择资产"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:21
 #: assets/templates/assets/cmd_filter_detail.html:89
-#: assets/templates/assets/cmd_filter_list.html:16
+#: assets/templates/assets/cmd_filter_list.html:26
 #: assets/templates/assets/user_asset_list.html:48
 #: users/templates/users/user_granted_asset.html:47
 msgid "System users"
@@ -933,7 +937,7 @@ msgstr "测试"
 #: assets/templates/assets/asset_detail.html:24
 #: assets/templates/assets/asset_list.html:171
 #: assets/templates/assets/cmd_filter_detail.html:29
-#: assets/templates/assets/cmd_filter_list.html:47
+#: assets/templates/assets/cmd_filter_list.html:57
 #: assets/templates/assets/cmd_filter_rule_list.html:86
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
@@ -964,7 +968,7 @@ msgstr "更新"
 #: assets/templates/assets/asset_detail.html:28
 #: assets/templates/assets/asset_list.html:172
 #: assets/templates/assets/cmd_filter_detail.html:33
-#: assets/templates/assets/cmd_filter_list.html:48
+#: assets/templates/assets/cmd_filter_list.html:58
 #: assets/templates/assets/cmd_filter_rule_list.html:87
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
@@ -1266,7 +1270,7 @@ msgid "Configuration"
 msgstr "配置"
 
 #: assets/templates/assets/cmd_filter_detail.html:25
-#: assets/templates/assets/cmd_filter_list.html:15
+#: assets/templates/assets/cmd_filter_list.html:25
 #: assets/templates/assets/cmd_filter_rule_list.html:23
 msgid "Rules"
 msgstr "规则"
@@ -1279,7 +1283,34 @@ msgstr "更新日期"
 msgid "Binding to system user"
 msgstr "绑定到系统用户"
 
-#: assets/templates/assets/cmd_filter_list.html:6 assets/views/cmd_filter.py:47
+#: assets/templates/assets/cmd_filter_list.html:6
+msgid ""
+"System user bound some command filter, each command filter has some rules,"
+msgstr "系统用户可以绑定一些命令过滤器，一个过滤器可以定义一些规则"
+
+#: assets/templates/assets/cmd_filter_list.html:7
+msgid "When user login asset with this system user, then run a command,"
+msgstr "当用户使用这个系统用户登录资产，然后执行一个命令"
+
+#: assets/templates/assets/cmd_filter_list.html:8
+msgid "The command will be filter by rules, higher priority(lower number) rule run first,"
+msgstr "这个命令需要被绑定过滤器的所有规则匹配，高优先级(数字越低)先被匹配,"
+
+#: assets/templates/assets/cmd_filter_list.html:9
+msgid ""
+"When a rule matched, if rule action is allow, then allow command execute,"
+msgstr "当一个规则匹配到了，如果规则的动作是 允许, 这个命令会被放行,"
+
+#: assets/templates/assets/cmd_filter_list.html:10
+msgid "else if action is deny, then command with be deny,"
+msgstr "如果规则的动作是 禁止，命令将会被禁止执行,"
+
+#: assets/templates/assets/cmd_filter_list.html:11
+msgid "else match next rule, if none matched, allowed"
+msgstr "否则就匹配下一个规则，如果最后没有匹配到规则，则允许执行"
+
+#: assets/templates/assets/cmd_filter_list.html:16
+#: assets/views/cmd_filter.py:47
 msgid "Create command filter"
 msgstr "创建命令过滤器"
 
