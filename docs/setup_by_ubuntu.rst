@@ -177,7 +177,7 @@
 
         # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
-        HTTP_BIND_HOST = '127.0.0.1'
+        HTTP_BIND_HOST = '0.0.0.0'
         HTTP_LISTEN_PORT = 8080
 
         # Redis 相关设置
@@ -385,7 +385,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     # 安装 docker  参考官方教程 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
-    ## apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual  # Ubuntu 14.04 需要先执行这一行
+    # apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual  # Ubuntu 14.04 需要先执行这一行
 
     $ apt-get remove docker docker-engine docker.io
     $ apt-get install apt-transport-https ca-certificates curl software-properties-common
@@ -399,7 +399,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get update
     $ apt-get install docker-ce
 
-    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1 ，可以更换 registry.jumpserver.org/public/guacamole:latest
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144:8080 或者 http://192.168.244.144 不能使用 127.0.0.1 ，可以更换 registry.jumpserver.org/public/guacamole:latest
 
     $ docker run --name jms_guacamole -d \
       -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \

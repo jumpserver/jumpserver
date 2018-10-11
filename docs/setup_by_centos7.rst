@@ -398,7 +398,7 @@ CentOS 7 安装文档
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
     # 运行 Guacamole
-    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144 不能使用 127.0.0.1
+    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144:8080 或 http://192.168.244.144 不能使用 127.0.0.1
     $ docker run --name jms_guacamole -d \
         -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
