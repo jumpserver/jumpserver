@@ -467,9 +467,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ yum -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/nginx.conf
-
-内容如下：
+6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf
 
 ::
 
