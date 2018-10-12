@@ -31,6 +31,8 @@ class Node(OrgModelMixin):
         return self.full_value
 
     def __eq__(self, other):
+        if not other:
+            return False
         return self.key == other.key
 
     def __gt__(self, other):

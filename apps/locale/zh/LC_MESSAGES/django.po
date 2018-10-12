@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-07 12:00+0800\n"
+"POT-Creation-Date: 2018-10-12 16:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -44,6 +44,8 @@ msgstr "节点管理"
 #: assets/forms/asset.py:116 assets/models/asset.py:87
 #: assets/models/cluster.py:19 assets/models/user.py:73
 #: assets/templates/assets/asset_detail.html:73 templates/_nav.html:24
+#: xpack/plugins/cloud/models.py:128
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:75
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
 msgid "Admin user"
 msgstr "管理用户"
@@ -73,6 +75,9 @@ msgstr "网域"
 #: perms/forms.py:44 perms/models.py:79
 #: perms/templates/perms/asset_permission_list.html:57
 #: perms/templates/perms/asset_permission_list.html:151
+#: xpack/plugins/cloud/models.py:127
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:71
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:66
 msgid "Node"
 msgstr "节点"
 
@@ -121,6 +126,8 @@ msgstr "端口"
 #: terminal/templates/terminal/command_list.html:73
 #: terminal/templates/terminal/session_list.html:41
 #: terminal/templates/terminal/session_list.html:72
+#: xpack/plugins/cloud/models.py:173
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:65
 #: xpack/plugins/orgs/templates/orgs/org_list.html:16
 msgid "Asset"
 msgstr "资产"
@@ -156,6 +163,11 @@ msgstr "不能包含特殊字符"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
+#: xpack/plugins/cloud/models.py:35 xpack/plugins/cloud/models.py:123
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:52
+#: xpack/plugins/cloud/templates/cloud/account_list.html:12
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:55
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:12
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:52
 #: xpack/plugins/orgs/templates/orgs/org_list.html:12
 #: xpack/templates/orgs/org_list.html:12
@@ -357,6 +369,7 @@ msgstr "标签管理"
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:37
 #: perms/models.py:84 perms/templates/perms/asset_permission_detail.html:98
 #: users/models/user.py:92 users/templates/users/user_detail.html:111
+#: xpack/plugins/cloud/models.py:41 xpack/plugins/cloud/models.py:131
 msgid "Created by"
 msgstr "创建者"
 
@@ -370,6 +383,10 @@ msgstr "创建者"
 #: perms/templates/perms/asset_permission_detail.html:94
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
 #: users/templates/users/user_group_detail.html:63
+#: xpack/plugins/cloud/models.py:42 xpack/plugins/cloud/models.py:132
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:68
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:87
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:19
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:60
 msgid "Date created"
 msgstr "创建日期"
@@ -393,7 +410,12 @@ msgstr "创建日期"
 #: users/templates/users/user_detail.html:123
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_profile.html:130
+#: users/templates/users/user_profile.html:130 xpack/plugins/cloud/models.py:40
+#: xpack/plugins/cloud/models.py:129
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:72
+#: xpack/plugins/cloud/templates/cloud/account_list.html:15
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:79
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:20
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_list.html:22
 #: xpack/templates/orgs/org_list.html:14
@@ -740,6 +762,8 @@ msgstr "其它"
 #: users/templates/users/user_profile_update.html:63
 #: users/templates/users/user_pubkey_update.html:70
 #: users/templates/users/user_pubkey_update.html:76
+#: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
+#: xpack/plugins/cloud/templates/cloud/sync_task_create.html:35
 msgid "Reset"
 msgstr "重置"
 
@@ -856,6 +880,8 @@ msgstr "测试"
 #: users/templates/users/user_profile.html:151
 #: users/templates/users/user_profile.html:181
 #: users/templates/users/user_profile.html:190
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:25
+#: xpack/plugins/cloud/templates/cloud/account_list.html:38
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:25
 #: xpack/plugins/orgs/templates/orgs/org_list.html:85
 #: xpack/templates/orgs/org_list.html:43
@@ -882,6 +908,10 @@ msgstr "更新"
 #: users/templates/users/user_group_list.html:45
 #: users/templates/users/user_list.html:81
 #: users/templates/users/user_list.html:85
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:29
+#: xpack/plugins/cloud/templates/cloud/account_list.html:40
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:32
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:45
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
 #: xpack/plugins/orgs/templates/orgs/org_list.html:87
 #: xpack/templates/orgs/org_list.html:45
@@ -912,6 +942,8 @@ msgstr "选择节点"
 #: users/templates/users/user_group_list.html:87
 #: users/templates/users/user_list.html:201
 #: users/templates/users/user_profile.html:232
+#: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
+#: xpack/plugins/cloud/templates/cloud/sync_task_create.html:36
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 #: xpack/templates/orgs/org_list.html:86
 msgid "Confirm"
@@ -967,6 +999,8 @@ msgstr "比例"
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:29
+#: xpack/plugins/cloud/templates/cloud/account_list.html:16
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:21
 #: xpack/plugins/orgs/templates/orgs/org_list.html:23
 #: xpack/templates/orgs/org_list.html:15
 msgid "Action"
@@ -1437,7 +1471,8 @@ msgstr "文件名"
 
 #: audits/models.py:22 audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:66
-#: users/templates/users/user_detail.html:452
+#: users/templates/users/user_detail.html:452 xpack/plugins/cloud/api.py:55
+#: xpack/plugins/cloud/api.py:84
 msgid "Success"
 msgstr "成功"
 
@@ -1480,6 +1515,8 @@ msgstr "选择用户"
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
 #: terminal/templates/terminal/session_list.html:61
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:50
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:50
 msgid "Search"
 msgstr "搜索"
 
@@ -1488,6 +1525,8 @@ msgstr "搜索"
 #: ops/templates/ops/adhoc_history_detail.html:49
 #: ops/templates/ops/task_detail.html:55
 #: terminal/templates/terminal/session_list.html:70
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:62
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:62
 msgid "ID"
 msgstr "ID"
 
@@ -1512,12 +1551,16 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/templates/audits/login_log_list.html:55
-#: users/models/authentication.py:76
+#: users/models/authentication.py:76 xpack/plugins/cloud/models.py:158
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:67
 msgid "Reason"
 msgstr "原因"
 
 #: audits/templates/audits/login_log_list.html:56
-#: users/models/authentication.py:77
+#: users/models/authentication.py:77 xpack/plugins/cloud/models.py:157
+#: xpack/plugins/cloud/models.py:174
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:68
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:67
 msgid "Status"
 msgstr "状态"
 
@@ -1881,7 +1924,7 @@ msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
 #: common/views.py:19 common/views.py:45 common/views.py:71 common/views.py:101
-#: common/views.py:129 templates/_nav.html:100
+#: common/views.py:129 templates/_nav.html:104
 msgid "Settings"
 msgstr "系统设置"
 
@@ -1890,7 +1933,7 @@ msgstr "系统设置"
 msgid "Update setting successfully, please restart program"
 msgstr "更新设置成功, 请手动重启程序"
 
-#: jumpserver/views.py:178
+#: jumpserver/views.py:180
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, coco, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -1953,6 +1996,7 @@ msgid "Become"
 msgstr "Become"
 
 #: ops/models/adhoc.py:163 users/templates/users/user_group_detail.html:59
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
@@ -2124,6 +2168,7 @@ msgid "Versions"
 msgstr "版本"
 
 #: ops/templates/ops/task_list.html:71
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:43
 msgid "Run"
 msgstr "执行"
 
@@ -2399,6 +2444,14 @@ msgstr "作业中心"
 #: templates/_nav.html:88
 msgid "XPack"
 msgstr ""
+
+#: templates/_nav.html:95 xpack/plugins/cloud/views.py:26
+msgid "Account list"
+msgstr "账户列表"
+
+#: templates/_nav.html:96 xpack/plugins/cloud/views.py:85
+msgid "Sync task list"
+msgstr "同步任务列表"
 
 #: templates/_pagination.html:59
 msgid ""
@@ -2797,23 +2850,23 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api/auth.py:38 users/templates/users/login.html:52
+#: users/api/auth.py:40 users/templates/users/login.html:52
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
-#: users/api/auth.py:77
+#: users/api/auth.py:79
 msgid "Please carry seed value and conduct MFA secondary certification"
 msgstr "请携带seed值, 进行MFA二次认证"
 
-#: users/api/auth.py:190
+#: users/api/auth.py:192
 msgid "Please verify the user name and password first"
 msgstr "请先进行用户名和密码验证"
 
-#: users/api/auth.py:202
+#: users/api/auth.py:204
 msgid "MFA certification failed"
 msgstr "MFA认证失败"
 
-#: users/api/user.py:134
+#: users/api/user.py:135
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
@@ -2994,7 +3047,8 @@ msgstr "用户名/密码 校验失败"
 msgid "MFA authentication failed"
 msgstr "MFA 认证失败"
 
-#: users/models/authentication.py:67
+#: users/models/authentication.py:67 xpack/plugins/cloud/models.py:150
+#: xpack/plugins/cloud/models.py:164
 msgid "Failed"
 msgstr "失败"
 
@@ -3074,6 +3128,9 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:44 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:51
+#: xpack/plugins/cloud/models.py:124
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:59
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:13
 msgid "Account"
 msgstr "账户"
 
@@ -3133,7 +3190,7 @@ msgstr "上一步"
 #: users/templates/users/first_login.html:105
 #: users/templates/users/login_otp.html:67
 #: users/templates/users/user_otp_authentication.html:26
-#: users/templates/users/user_otp_enable_bind.html:23
+#: users/templates/users/user_otp_enable_bind.html:29
 #: users/templates/users/user_otp_enable_install_app.html:26
 #: users/templates/users/user_password_authentication.html:21
 msgid "Next"
@@ -3222,7 +3279,7 @@ msgstr "请打开手机Google Authenticator应用，输入6位动态码"
 
 #: users/templates/users/login_otp.html:65
 #: users/templates/users/user_otp_authentication.html:23
-#: users/templates/users/user_otp_enable_bind.html:20
+#: users/templates/users/user_otp_enable_bind.html:26
 msgid "Six figures"
 msgstr "6位数字"
 
@@ -3496,7 +3553,7 @@ msgstr "解绑 MFA"
 msgid "Bind"
 msgstr "绑定 MFA"
 
-#: users/templates/users/user_otp_enable_bind.html:12
+#: users/templates/users/user_otp_enable_bind.html:14
 msgid ""
 "Use the mobile Google Authenticator application to scan the following qr "
 "code for a 6-bit verification code"
@@ -3737,7 +3794,7 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:175 users/views/user.py:524 users/views/user.py:549
+#: users/views/login.py:175 users/views/user.py:526 users/views/user.py:551
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -3818,31 +3875,241 @@ msgstr "密钥更新"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:579
+#: users/views/user.py:581
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:580
+#: users/views/user.py:582
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:582
+#: users/views/user.py:584
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:583
+#: users/views/user.py:585
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
+
+#: xpack/plugins/cloud/api.py:54 xpack/plugins/cloud/providers/provider.py:76
+#, fuzzy
+#| msgid "Unavailable"
+msgid "Account unavailable"
+msgstr "无效"
+
+#: xpack/plugins/cloud/api.py:79
+#, fuzzy
+#| msgid "Create sync task"
+msgid "Get sync task error"
+msgstr "创建同步任务"
+
+#: xpack/plugins/cloud/api.py:82
+msgid "New provider error"
+msgstr ""
+
+#: xpack/plugins/cloud/forms.py:13
+msgid "Access Key ID"
+msgstr ""
+
+#: xpack/plugins/cloud/forms.py:14
+msgid "Access Key Secret"
+msgstr ""
+
+#: xpack/plugins/cloud/forms.py:59
+msgid "Select account"
+msgstr "选择账户"
+
+#: xpack/plugins/cloud/forms.py:65
+msgid "Select regions"
+msgstr "选择地域"
+
+#: xpack/plugins/cloud/forms.py:71
+msgid "Select instances"
+msgstr "选择实例"
+
+#: xpack/plugins/cloud/forms.py:77
+msgid "Select node"
+msgstr "选择节点"
+
+#: xpack/plugins/cloud/forms.py:83 xpack/plugins/orgs/forms.py:18
+msgid "Select admins"
+msgstr "选择管理员"
+
+#: xpack/plugins/cloud/meta.py:9 xpack/plugins/cloud/views.py:25
+#: xpack/plugins/cloud/views.py:41 xpack/plugins/cloud/views.py:57
+#: xpack/plugins/cloud/views.py:71 xpack/plugins/cloud/views.py:84
+#: xpack/plugins/cloud/views.py:100 xpack/plugins/cloud/views.py:121
+#: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:179
+msgid "Cloud"
+msgstr "云管理"
+
+#: xpack/plugins/cloud/models.py:25
+msgid "Aliyun"
+msgstr "阿里云"
+
+#: xpack/plugins/cloud/models.py:26
+msgid "AWS (China)"
+msgstr "AWS (中国)"
+
+#: xpack/plugins/cloud/models.py:27
+msgid "AWS (International)"
+msgstr "AWS (国际)"
+
+#: xpack/plugins/cloud/models.py:30
+msgid "Available"
+msgstr "有效"
+
+#: xpack/plugins/cloud/models.py:31
+msgid "Unavailable"
+msgstr "无效"
+
+#: xpack/plugins/cloud/models.py:36
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:56
+#: xpack/plugins/cloud/templates/cloud/account_list.html:13
+msgid "Provider"
+msgstr "云服务商"
+
+#: xpack/plugins/cloud/models.py:37
+msgid "Access key id"
+msgstr ""
+
+#: xpack/plugins/cloud/models.py:38
+msgid "Access key secret"
+msgstr ""
+
+#: xpack/plugins/cloud/models.py:39
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:60
+#: xpack/plugins/cloud/templates/cloud/account_list.html:14
+msgid "Validity"
+msgstr "账户状态"
+
+#: xpack/plugins/cloud/models.py:125
+msgid "Regions"
+msgstr "地域"
+
+#: xpack/plugins/cloud/models.py:126
+msgid "Instances"
+msgstr "实例"
+
+#: xpack/plugins/cloud/models.py:130
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:83
+msgid "Date last sync"
+msgstr "最后同步日期"
+
+#: xpack/plugins/cloud/models.py:151 xpack/plugins/cloud/models.py:165
+msgid "Succeed"
+msgstr "成功"
+
+#: xpack/plugins/cloud/models.py:152
+msgid "Partial succeed"
+msgstr ""
+
+#: xpack/plugins/cloud/models.py:155 xpack/plugins/cloud/models.py:169
+msgid "Sync task"
+msgstr "同步任务"
+
+#: xpack/plugins/cloud/models.py:156
+msgid "Result"
+msgstr ""
+
+#: xpack/plugins/cloud/models.py:159 xpack/plugins/cloud/models.py:175
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:69
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:68
+msgid "Date sync"
+msgstr "同步日期"
+
+#: xpack/plugins/cloud/models.py:166
+msgid "Exist"
+msgstr "存在"
+
+#: xpack/plugins/cloud/models.py:170
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:25
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:26
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:26
+#: xpack/plugins/cloud/views.py:137
+msgid "Sync task history"
+msgstr "同步历史列表"
+
+#: xpack/plugins/cloud/models.py:171
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:67
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:63
+msgid "Instance"
+msgstr "实例"
+
+#: xpack/plugins/cloud/models.py:172
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:63
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:64
+msgid "Region"
+msgstr "地域"
+
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:22
+#: xpack/plugins/cloud/views.py:72
+msgid "Account detail"
+msgstr "账户详情"
+
+#: xpack/plugins/cloud/templates/cloud/account_list.html:5
+#: xpack/plugins/cloud/views.py:42
+msgid "Create account"
+msgstr "创建账户"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_create.html:91
+msgid "Loading..."
+msgstr ""
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_create.html:106
+#, fuzzy
+#| msgid "Create node failed"
+msgid "Load failed"
+msgstr "创建节点失败"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:22
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:23
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:23
+#: xpack/plugins/cloud/views.py:122
+msgid "Sync task detail"
+msgstr "同步任务详情"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:28
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:29
+#: xpack/plugins/cloud/templates/cloud/sync_task_instance.html:29
+#: xpack/plugins/cloud/views.py:180
+msgid "Sync task instance"
+msgstr "同步实例列表"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:63
+msgid "Total count"
+msgstr "总数"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:64
+msgid "Succeed count"
+msgstr "成功"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:65
+msgid "Failed count"
+msgstr "失败"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_history.html:66
+msgid "Exist count"
+msgstr "存在"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:5
+#: xpack/plugins/cloud/views.py:101
+msgid "Create sync task"
+msgstr "创建同步任务"
+
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:80
+msgid "Sync success"
+msgstr "同步成功"
+
+#: xpack/plugins/cloud/views.py:58
+msgid "Update account"
+msgstr "更新账户"
 
 #: xpack/plugins/orgs/forms.py:14
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:76
 #: xpack/plugins/orgs/templates/orgs/org_list.html:13
 msgid "Admin"
 msgstr "管理员"
-
-#: xpack/plugins/orgs/forms.py:18
-msgid "Select admins"
-msgstr "选择管理员"
 
 #: xpack/plugins/orgs/meta.py:8
 msgid "Organizations"

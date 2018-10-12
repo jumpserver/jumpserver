@@ -91,6 +91,10 @@
         {% for plugin in XPACK_PLUGINS %}
         <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
         {% endfor %}
+
+        <li id="id_cloud_account"><a href="{% url 'xpack:cloud:account-list' %}">{% trans 'Account list' %}</a></li>
+        <li id="id_cloud_sync_task"><a href="{% url 'xpack:cloud:sync-task-list' %}">{% trans 'Sync task list' %}</a></li>
+
     </ul>
 </li>
 {% endif %}
