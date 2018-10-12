@@ -14,7 +14,8 @@ class SwitchOrgView(DetailView):
         pk = kwargs.get('pk')
         self.object = Organization.get_instance(pk)
         request.session['oid'] = self.object.id.__str__()
-        return redirect('index')
+        referer = request.META.get('HTTP_REFERER', reverse('index'))
+        return redirect(referer)
 
 
 class SwitchToAOrgView(View):

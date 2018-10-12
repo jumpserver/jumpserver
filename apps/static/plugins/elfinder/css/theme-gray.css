@@ -1528,9 +1528,15 @@ a.ui-button:active .ui-icon,
 .std42-dialog .ui-dialog-titlebar .elfinder-titlebar-minimize:hover .ui-icon {
   background-color: #ff9800;
 }
-.elfinder-dialog-title {
+.elfinder-dialog-title  {
   color: #f1f1f1;
+
 }
+
+.ui-dialog-buttonpane {
+  background: #fff;
+}
+
 .std42-dialog .ui-dialog-content {
   background: #fff;
 }

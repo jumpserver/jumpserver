@@ -100,3 +100,9 @@ def is_bool_field(field):
 @register.filter
 def to_dict(data):
     return dict(data)
+
+
+@register.filter
+def sort(data):
+    print(data)
+    return sorted(data)

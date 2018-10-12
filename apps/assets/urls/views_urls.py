@@ -49,4 +49,12 @@ urlpatterns = [
 
     path('domain/<uuid:pk>/gateway/create/', views.DomainGatewayCreateView.as_view(), name='domain-gateway-create'),
     path('domain/gateway/<uuid:pk>/update/', views.DomainGatewayUpdateView.as_view(), name='domain-gateway-update'),
+
+    path('cmd-filter/', views.CommandFilterListView.as_view(), name='cmd-filter-list'),
+    path('cmd-filter/create/', views.CommandFilterCreateView.as_view(), name='cmd-filter-create'),
+    path('cmd-filter/<uuid:pk>/update/', views.CommandFilterUpdateView.as_view(), name='cmd-filter-update'),
+    path('cmd-filter/<uuid:pk>/', views.CommandFilterDetailView.as_view(), name='cmd-filter-detail'),
+    path('cmd-filter/<uuid:pk>/rule/', views.CommandFilterRuleListView.as_view(), name='cmd-filter-rule-list'),
+    path('cmd-filter/<uuid:filter_pk>/rule/create/', views.CommandFilterRuleCreateView.as_view(), name='cmd-filter-rule-create'),
+    path('cmd-filter/<uuid:filter_pk>/rule/<uuid:pk>/update/', views.CommandFilterRuleUpdateView.as_view(), name='cmd-filter-rule-update'),
 ]

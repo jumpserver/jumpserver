@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
+    <script src='{% static "js/plugins/select2/select2.full.min.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'assets:cmd-filter-detail' pk=object.id %}" class="text-center">
+                                <i class="fa fa-laptop"></i> {% trans 'Detail' %}
+                                </a>
+                            </li>
+                            <li>
+                                <li>
+                                <a href="{% url 'assets:cmd-filter-rule-list' pk=object.id %}" class="text-center">
+                                    <i class="fa fa-laptop"></i> {% trans 'Rules' %}
+                                </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:cmd-filter-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-del">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Name' %}:</td>
+                                            <td><b>{{ object.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ object.comment }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date updated' %}:</td>
+                                            <td><b>{{ object.date_updated }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}:</td>
+                                            <td><b>{{ object.created_by  }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4" style="padding-left: 0; padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System users' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="table-clusters">
+                                    <tbody>
+                                    <form>
+                                        <tr>
+                                            <td colspan="2" class="no-borders">
+                                                <select data-placeholder="{% trans 'Binding to system user' %}"  id="system_users_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                {% for system_user in system_users_remain %}
+                                                    <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
+                                                {% endfor %}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="no-borders">
+                                                <button type="button" class="btn btn-primary btn-sm" id="btn-binding-system-users">{% trans 'Confirm' %}</button>
+                                            </td>
+                                        </tr>
+                                    </form>
+                                    {% for system_user in object.system_users.all %}
+                                    <tr>
+                                      <td><b class="bdg-system-users" data-gid={{ system_user.id }}>{{ system_user }}</b></td>
+                                      <td>
+                                          <button class="btn btn-danger pull-right btn-xs btn-unbound-system-user" data-gid={{ system_user.id }} type="button"><i class="fa fa-minus"></i></button>
+                                      </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+function updateCMDFilterSystemUsers(system_users) {
+    var the_url = "{% url 'api-assets:cmd-filter-detail' pk=object.id %}";
+    var body = {
+        system_users: Object.assign([], system_users)
+    };
+    var success = function(data) {
+        location.reload();
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        method: 'PATCH',
+        success: success
+    });
+}
+$(document).ready(function () {
+    $(".select2").select2();
+}).on('click', '#btn-binding-system-users', function () {
+    var origin_system_users = $.map($(".bdg-system-users"), function (s) {
+        return $(s).data('gid')
+    });
+    var new_selected_system_users_id = $.map($("#system_users_selected").select2('data'), function (s) {
+        return s.id;
+    });
+    var system_users = origin_system_users.concat(new_selected_system_users_id);
+    updateCMDFilterSystemUsers(system_users)
+}).on('click', '.btn-unbound-system-user', function () {
+    var unbound_system_user = $(this).data('gid');
+    var origin_system_users = $.map($(".bdg-system-users"), function (s) {
+        return $(s).data('gid')
+    });
+    var system_users = $.grep(origin_system_users, function (n, i) {
+        return n !== unbound_system_user
+    });
+    updateCMDFilterSystemUsers(system_users)
+})
+</script>
+{% endblock %}

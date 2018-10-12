@@ -1,7 +1,10 @@
 # coding:utf-8
 from django.urls import path
-from .. import api
+from rest_framework_nested import routers
+# from rest_framework.routers import DefaultRouter
 from rest_framework_bulk.routes import BulkRouter
+
+from .. import api
 
 app_name = 'assets'
 
@@ -13,6 +16,11 @@ router.register(r'labels', api.LabelViewSet, 'label')
 router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domain', api.DomainViewSet, 'domain')
 router.register(r'gateway', api.GatewayViewSet, 'gateway')
+router.register(r'cmd-filter', api.CommandFilterViewSet, 'cmd-filter')
+
+cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filter', lookup='filter')
+cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
+
 
 urlpatterns = [
     path('assets-bulk/', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
@@ -42,6 +50,9 @@ urlpatterns = [
     path('system-user/<uuid:pk>/connective/',
          api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
 
+    path('system-user/<uuid:pk>/cmd-filter-rules/',
+         api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
+
     path('nodes/<uuid:pk>/children/',
          api.NodeChildrenApi.as_view(), name='node-children'),
     path('nodes/children/', api.NodeChildrenApi.as_view(), name='node-children-2'),
@@ -64,5 +75,5 @@ urlpatterns = [
          api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
 ]
 
-urlpatterns += router.urls
+urlpatterns += router.urls + cmd_filter_router.urls
 
