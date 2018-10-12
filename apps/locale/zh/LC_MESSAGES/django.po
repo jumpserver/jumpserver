@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-11 10:40+0800\n"
+"POT-Creation-Date: 2018-10-12 14:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -83,6 +83,10 @@ msgid ""
 msgstr ""
 "root或其他拥有NOPASSWD: ALL权限的用户, 如果是windows或其它硬件可以随意设置一"
 "个, 更多信息查看左侧 `管理用户` 菜单"
+
+#: assets/forms/asset.py:51 assets/forms/asset.py:91
+msgid "Windows 2016 RDP protocol is different, If is window 2016, set it"
+msgstr "Windows 2016的RDP协议与之前不同，如果是请设置"
 
 #: assets/forms/asset.py:52 assets/forms/asset.py:92
 msgid ""
@@ -1293,7 +1297,9 @@ msgid "When user login asset with this system user, then run a command,"
 msgstr "当用户使用这个系统用户登录资产，然后执行一个命令"
 
 #: assets/templates/assets/cmd_filter_list.html:8
-msgid "The command will be filter by rules, higher priority(lower number) rule run first,"
+msgid ""
+"The command will be filter by rules, higher priority(lower number) rule run "
+"first,"
 msgstr "这个命令需要被绑定过滤器的所有规则匹配，高优先级(数字越低)先被匹配,"
 
 #: assets/templates/assets/cmd_filter_list.html:9
