@@ -90,7 +90,7 @@
                                                 <td colspan="2" class="no-borders">
                                                     <select data-placeholder="{% trans 'Select nodes' %}"  id="nodes_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for node in nodes %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node.value }}</option>
+                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>

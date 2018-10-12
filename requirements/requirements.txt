@@ -71,3 +71,4 @@ urllib3==1.22
 vine==1.1.4
 drf-yasg==1.9.1
 Werkzeug==0.14.1
+drf-nested-routers==0.90.2

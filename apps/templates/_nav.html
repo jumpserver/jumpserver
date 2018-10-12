@@ -24,6 +24,7 @@
         <li id="admin-user"><a href="{% url 'assets:admin-user-list' %}">{% trans 'Admin user' %}</a></li>
         <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
         <li id="label"><a href="{% url 'assets:label-list' %}">{% trans 'Labels' %}</a></li>
+        <li id="cmd-filter"><a href="{% url 'assets:cmd-filter-list' %}">{% trans 'Command filters' %}</a></li>
     </ul>
 </li>
 <li id="perms">
@@ -45,6 +46,11 @@
         <li>
             <a href="{% url 'terminal:web-terminal' %}" target="_blank">
             <span class="nav-label">{% trans 'Web terminal' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'terminal:web-sftp' %}" target="_blank">
+            <span class="nav-label">{% trans 'File manager' %}</span>
             </a>
         </li>
         {% if request.user.is_superuser %}
@@ -91,10 +97,8 @@
         {% for plugin in XPACK_PLUGINS %}
         <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
         {% endfor %}
-
         <li id="id_cloud_account"><a href="{% url 'xpack:cloud:account-list' %}">{% trans 'Account list' %}</a></li>
         <li id="id_cloud_sync_task"><a href="{% url 'xpack:cloud:sync-task-list' %}">{% trans 'Sync task list' %}</a></li>
-
     </ul>
 </li>
 {% endif %}

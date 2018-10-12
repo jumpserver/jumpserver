@@ -9,7 +9,7 @@ from django.views.generic.detail import DetailView
 
 from common.const import create_success_msg, update_success_msg
 from ..forms import SystemUserForm
-from ..models import SystemUser, Node
+from ..models import SystemUser, Node, CommandFilter
 from common.permissions import AdminUserRequiredMixin
 
 
@@ -73,7 +73,7 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
-            'nodes_remain': Node.objects.exclude(systemuser=self.object)
+            'cmd_filters_remain': CommandFilter.objects.exclude(system_users=self.object)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -91,10 +91,11 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
     context_object_name = 'system_user'
 
     def get_context_data(self, **kwargs):
+        nodes_remain = sorted(Node.objects.exclude(systemuser=self.object), reverse=True)
         context = {
             'app': _('assets'),
             'action': _('System user asset'),
-            'nodes_remain': Node.objects.exclude(systemuser=self.object)
+            'nodes_remain': nodes_remain
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
