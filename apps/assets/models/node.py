@@ -38,12 +38,10 @@ class Node(OrgModelMixin):
             return True
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]
-        if len(self_key) < len(other_key):
-            return True
-        elif len(self_key) > len(other_key):
-            return False
-        else:
-            return self_key[-1] < other_key[-1]
+        return self_key.__lt__(other_key)
+
+    def __lt__(self, other):
+        return not self.__gt__(other)
 
     @property
     def name(self):

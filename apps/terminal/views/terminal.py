@@ -16,7 +16,7 @@ from common.permissions import SuperUserRequiredMixin
 __all__ = [
     "TerminalListView", "TerminalUpdateView", "TerminalDetailView",
     "TerminalDeleteView", "TerminalConnectView", "TerminalAcceptView",
-    "WebTerminalView",
+    "WebTerminalView", 'WebSFTPView',
 ]
 
 
@@ -124,3 +124,8 @@ class TerminalConnectView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView
 class WebTerminalView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return redirect('/luna/?' + request.GET.urlencode())
+
+
+class WebSFTPView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return redirect('/coco/elfinder/sftp/?' + request.GET.urlencode())

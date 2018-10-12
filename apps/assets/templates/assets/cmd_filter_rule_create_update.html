@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ action }}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+                            {% bootstrap_form form layout="horizontal" %}
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+var content_origin_placeholder = '';
+var content_origin_help_text = '';
+var content_ref = '';
+var content_help_ref = '';
+
+$(document).ready(function(){
+    content_ref = $('#id_content');
+    content_help_ref = content_ref.next();
+    content_origin_placeholder = content_ref.attr('placeholder');
+    content_origin_help_text = content_help_ref.html();
+}).on('change', '#id_type', function () {
+    if ($('#id_type :selected').val() === 'regex') {
+        content_ref.attr('placeholder', 'rm.*|reboot|shutdown');
+        content_help_ref.html("");
+    } else {
+        content_ref.attr('placeholder', content_origin_placeholder);
+        content_help_ref.html(content_origin_help_text);
+    }
+})
+</script>
+{% endblock %}

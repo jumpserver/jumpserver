@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
+    <script src='{% static "js/plugins/select2/select2.full.min.js" %}'></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'assets:cmd-filter-detail' pk=object.id %}" class="text-center">
+                                    <i class="fa fa-laptop"></i> {% trans 'Detail' %}
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'assets:cmd-filter-rule-list' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Rules' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-12" style="padding-left: 0;">
+                            <div class="" id="content_start">
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left"><b>{% trans 'Command filter rule list' %}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <div class="uc pull-left  m-r-5">
+                                        <a href="{% url 'assets:cmd-filter-rule-create' filter_pk=object.id %}" class="btn btn-sm btn-primary"> {% trans "Create rule" %} </a>
+                                    </div>
+                                    <table class="table table-striped table-bordered table-hover " id="cmd_filter_rule_list_table" >
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                            </th>
+                                            <th class="text-center">{% trans 'Type' %}</th>
+                                            <th class="text-center">{% trans 'Content' %}</th>
+	                                        <th class="text-center">{% trans 'Priority' %}</th>
+                                            <th class="text-center">{% trans 'Strategy' %}</th>
+                                            <th class="text-center">{% trans 'Comment' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block content_bottom_left %}{% endblock %}
+{% block custom_foot_js %}
+<script>
+function initTable() {
+    var options = {
+        ele: $('#cmd_filter_rule_list_table'),
+        columnDefs: [
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "assets:cmd-filter-rule-update" filter_pk=object.id pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                $(td).html(update_btn + del_btn)
+            }}
+        ],
+        ajax_url: '{% url "api-assets:cmd-filter-rule-list" filter_pk=object.id %}',
+        columns: [
+            {data: "id"}, {data: "type.display" }, {data: 'content'}, {data: 'priority'},
+	        {data: 'action.display'}, {data: "comment" }, {data: "id"}
+        ],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initDataTable(options);
+}
+$(document).ready(function(){
+    initTable();
+})
+.on('click', '.btn-delete', function () {
+    var $this = $(this);
+    var $data_table = $('#cmd_filter_rule_list_table').DataTable();
+    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-assets:cmd-filter-rule-detail" filter_pk=object.id pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+    setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
+})
+</script>
+{% endblock %}

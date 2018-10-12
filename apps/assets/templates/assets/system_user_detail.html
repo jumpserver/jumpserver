@@ -156,44 +156,47 @@
                                     </table>
                                 </div>
                             </div>
-{#                            <div class="panel panel-info">#}
-{#                                <div class="panel-heading">#}
-{#                                    <i class="fa fa-info-circle"></i> {% trans 'Nodes' %}#}
-{#                                </div>#}
-{#                                <div class="panel-body">#}
-{#                                    <table class="table node_edit" id="add-asset2group">#}
-{#                                        <tbody>#}
-{#                                        <form>#}
-{#                                            <tr>#}
-{#                                                <td colspan="2" class="no-borders">#}
-{#                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="select2" style="width: 100%" multiple="" tabindex="4">#}
-{#                                                        {% for node in nodes_remain %}#}
-{#                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>#}
-{#                                                        {% endfor %}#}
-{#                                                    </select>#}
-{#                                                </td>#}
-{#                                            </tr>#}
-{#                                            <tr>#}
-{#                                                <td colspan="2" class="no-borders">#}
-{#                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-node">{% trans 'Confirm' %}</button>#}
-{#                                                </td>#}
-{#                                            </tr>#}
-{#                                        </form>#}
-{##}
-{#                                        {% for node in system_user.nodes.all %}#}
-{#                                        <tr>#}
-{#                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>#}
-{#                                          <td>#}
-{#                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>#}
-{#                                          </td>#}
-{#                                        </tr>#}
-{#                                        {% endfor %}#}
-{#                                        </tbody>#}
-{#                                    </table>#}
-{#                                </div>#}
-{#                            </div>#}
                         </div>
                     </div>
+                    {% if system_user.protocol != 'rdp' %}
+                    <div class="col-sm-4" style="padding-left: 0; padding-right: 0">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <i class="fa fa-info-circle"></i> {% trans 'Command filter' %}
+                            </div>
+                            <div class="panel-body">
+                                <table class="table">
+                                <tbody>
+                                <form>
+                                    <tr>
+                                        <td colspan="2" class="no-borders">
+                                            <select data-placeholder="{% trans 'Binding command filters' %}"  id="command_filters_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
+                                            {% for cf in cmd_filters_remain %}
+                                                <option value="{{ cf.id }}" id="opt_{{ cf.id }}" >{{ cf }}</option>
+                                            {% endfor %}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="no-borders">
+                                            <button type="button" class="btn btn-info btn-sm" id="btn-binding-command-filters">{% trans 'Confirm' %}</button>
+                                        </td>
+                                    </tr>
+                                </form>
+                                {% for cf in object.cmd_filters.all %}
+                                <tr>
+                                  <td><b class="bdg-command-filters" data-gid={{ cf.id }}>{{ cf }}</b></td>
+                                  <td>
+                                      <button class="btn btn-danger pull-right btn-xs btn-unbound-command-filter" data-gid={{ cf.id }} type="button"><i class="fa fa-minus"></i></button>
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -201,27 +204,13 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function updateSystemUserNode(nodes) {
+function updateCommandFilters(command_filters) {
     var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
     var body = {
-        nodes: Object.assign([], nodes)
+        cmd_filters: Object.assign([], command_filters)
     };
     var success = function(data) {
-        // remove all the selected groups from select > option and rendered ul element;
-        $('.select2-selection__rendered').empty();
-        $('#node_selected').val('');
-        $.map(jumpserver.nodes_selected, function(node_name, index) {
-            $('#opt_' + index).remove();
-            // change tr html of user groups.
-            $('.node_edit tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_node" data-gid="' + index + '">' + node_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.groups_selected
-        jumpserver.nodes_selected = {};
+        location.reload();
     };
     APIUpdateAttr({
         url: the_url,
@@ -229,21 +218,12 @@ function updateSystemUserNode(nodes) {
         success: success
     });
 }
-jumpserver.nodes_selected = {};
 $(document).ready(function () {
     if($('#id_protocol_type').text() === 'rdp'){
         $('.only-ssh').addClass('hidden')
     }
     $(".panel-body .table tr:visible:first").addClass('no-borders-tr');
     $('.select2').select2()
-    .on('select2:select', function(evt) {
-            var data = evt.params.data;
-            jumpserver.nodes_selected[data.id] = data.text;
-    })
-    .on('select2:unselect', function(evt) {
-        var data = evt.params.data;
-        delete jumpserver.nodes_selected[data.id];
-    });
 })
 .on('click', '#btn-auto-push', function () {
     var checked = $(this).prop('checked');
@@ -255,33 +235,6 @@ $(document).ready(function () {
         url: the_url,
         body: JSON.stringify(body)
     });
-})
-.on('click', '#btn-add-to-node', function() {
-    if (Object.keys(jumpserver.nodes_selected).length === 0) {
-        return false;
-    }
-    var nodes = $('.bdg_node').map(function() {
-        return $(this).data('gid');
-    }).get();
-    $.map(jumpserver.nodes_selected, function(value, index) {
-        nodes.push(index);
-    });
-    updateSystemUserNode(nodes);
-})
-.on('click', '.btn-remove-from-node', function() {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_node');
-    var gid = $badge.data('gid');
-    var node_name = $badge.html() || $badge.text();
-    $('#groups_selected').append(
-        '<option value="' + gid + '" id="opt_' + gid + '">' + node_name + '</option>'
-    );
-    $tr.remove();
-    var nodes = $('.bdg_node').map(function () {
-        return $(this).data('gid');
-    }).get();
-    updateSystemUserNode(nodes);
 }).on('click', '.btn-del', function () {
     var $this = $(this);
     var name = "{{ system_user.name}}";
@@ -317,25 +270,24 @@ $(document).ready(function () {
         success: success,
         flash_message: false
     });
-}).on('click', '.btn-clear-auth', function () {
-    var the_url = '{% url "api-assets:system-user-auth-info" pk=system_user.id %}';
-    var name = '{{ system_user.name }}';
-    swal({
-        title: "{% trans 'Are you sure to remove authentication information for the system user ?' %}",
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: "{% trans 'Cancel' %}",
-        confirmButtonColor: "#ed5565",
-        confirmButtonText: "{% trans 'Confirm' %}",
-        closeOnConfirm: true
-    }, function () {
-        APIUpdateAttr({
-            url: the_url,
-            method: 'DELETE',
-            success_message: "{% trans 'Clear auth' %}" + " {% trans 'success' %}"
-        });
+}).on('click', '#btn-binding-command-filters', function () {
+    var new_selected_cmd_filters = $.map($('#command_filters_selected').select2('data'), function (i) {
+        return i.id;
     });
+    var origin_cmd_filters = $.map($(".bdg-command-filters"), function (s) {
+        return $(s).data('gid')
+    });
+    var command_filters = new_selected_cmd_filters.concat(origin_cmd_filters);
+    updateCommandFilters(command_filters)
+}).on('click', '.btn-unbound-command-filter', function () {
+    var unbound_command_filter = $(this).data('gid');
+    var origin_command_filters = $.map($(".bdg-command-filters"), function (s) {
+        return $(s).data('gid')
+    });
+    var command_filters = $.grep(origin_command_filters, function (n, i) {
+        return n !== unbound_command_filter
+    });
+    updateCommandFilters(command_filters)
 })
 </script>
 {% endblock %}
