@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-12 18:37+0800\n"
+"POT-Creation-Date: 2018-10-13 22:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -435,7 +435,7 @@ msgstr "创建日期"
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:72
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
 #: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:71
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:20
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:15
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_list.html:22
 #: xpack/templates/orgs/org_list.html:14
@@ -578,7 +578,7 @@ msgstr "每行一个命令"
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:29
 #: xpack/plugins/cloud/templates/cloud/account_list.html:16
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:21
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:16
 #: xpack/plugins/orgs/templates/orgs/org_list.html:23
 #: xpack/templates/orgs/org_list.html:15
 msgid "Action"
@@ -1020,7 +1020,7 @@ msgstr "更新"
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:29
 #: xpack/plugins/cloud/templates/cloud/account_list.html:40
 #: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:32
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:49
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:44
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
 #: xpack/plugins/orgs/templates/orgs/org_list.html:87
 #: xpack/templates/orgs/org_list.html:45
@@ -1629,8 +1629,7 @@ msgstr "文件名"
 
 #: audits/models.py:22 audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:66
-#: users/templates/users/user_detail.html:452 xpack/plugins/cloud/api.py:60
-#: xpack/plugins/cloud/api.py:89
+#: users/templates/users/user_detail.html:452 xpack/plugins/cloud/api.py:61
 msgid "Success"
 msgstr "成功"
 
@@ -2076,7 +2075,7 @@ msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
 #: common/views.py:19 common/views.py:45 common/views.py:71 common/views.py:101
-#: common/views.py:129 templates/_nav.html:108
+#: common/views.py:129 templates/_nav.html:116
 msgid "Settings"
 msgstr "系统设置"
 
@@ -2320,7 +2319,7 @@ msgid "Versions"
 msgstr "版本"
 
 #: ops/templates/ops/task_list.html:71
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:47
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:42
 msgid "Run"
 msgstr "执行"
 
@@ -2333,7 +2332,8 @@ msgstr "任务开始: "
 msgid "Ops"
 msgstr "作业中心"
 
-#: ops/views.py:37 templates/_nav.html:67
+#: ops/views.py:37 templates/_nav.html:67 templates/_nav.html:103
+#: xpack/plugins/cloud/views.py:85
 msgid "Task list"
 msgstr "任务列表"
 
@@ -2605,13 +2605,9 @@ msgstr "作业中心"
 msgid "XPack"
 msgstr ""
 
-#: templates/_nav.html:100 xpack/plugins/cloud/views.py:26
+#: templates/_nav.html:102 xpack/plugins/cloud/views.py:26
 msgid "Account list"
 msgstr "账户列表"
-
-#: templates/_nav.html:101 xpack/plugins/cloud/views.py:85
-msgid "Sync task list"
-msgstr "同步任务列表"
 
 #: templates/_pagination.html:59
 msgid ""
@@ -4042,17 +4038,9 @@ msgstr "MFA 解绑成功"
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
-#: xpack/plugins/cloud/api.py:59 xpack/plugins/cloud/providers/provider.py:75
+#: xpack/plugins/cloud/api.py:60 xpack/plugins/cloud/providers/provider.py:75
 msgid "Account unavailable"
 msgstr "账户无效"
-
-#: xpack/plugins/cloud/api.py:84
-msgid "Get sync task error"
-msgstr "获取同步任务"
-
-#: xpack/plugins/cloud/api.py:87
-msgid "New provider error"
-msgstr ""
 
 #: xpack/plugins/cloud/forms.py:13
 msgid "Access Key ID"
@@ -4087,8 +4075,8 @@ msgstr "选择管理员"
 #: xpack/plugins/cloud/views.py:71 xpack/plugins/cloud/views.py:84
 #: xpack/plugins/cloud/views.py:100 xpack/plugins/cloud/views.py:121
 #: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:179
-msgid "Cloud"
-msgstr "云管理"
+msgid "Cloud center"
+msgstr "云管中心"
 
 #: xpack/plugins/cloud/models.py:25
 msgid "Aliyun"
@@ -4140,7 +4128,7 @@ msgstr "实例"
 
 #: xpack/plugins/cloud/models.py:130
 #: xpack/plugins/cloud/templates/cloud/sync_task_detail.html:75
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:19
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:14
 msgid "Date last sync"
 msgstr "最后同步日期"
 
@@ -4243,7 +4231,7 @@ msgstr "存在"
 msgid "Create sync task"
 msgstr "创建同步任务"
 
-#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:84
+#: xpack/plugins/cloud/templates/cloud/sync_task_list.html:79
 msgid "Sync success"
 msgstr "同步成功"
 
@@ -4294,6 +4282,9 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "Get sync task error"
+#~ msgstr "获取同步任务"
 
 #~ msgid ""
 #~ "Are you sure to remove authentication information for the system user ?"
