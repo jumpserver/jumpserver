@@ -225,3 +225,133 @@ class SecuritySettingForm(BaseForm):
                     'and resets must contain special characters')
     )
 
+
+class StorageSettingForm(forms.Form):
+    """存储的配置"""
+    TYPE_CHOICES = (
+        ('server', _('Server')),
+        ('s3', _('S3')),
+        ('oss', _('OSS')),
+        ('elasticsearch', _('ELASTICSEARCH')),
+        ('es', _('ES')),
+    )
+    # name
+    NAME = forms.CharField(
+        max_length=128, label=_(" Name "), initial='default'
+    )
+    SETTING_NAME = forms.CharField(widget=forms.HiddenInput())
+    # type
+    TYPE = forms.ChoiceField(
+        choices=TYPE_CHOICES, initial='server', label=_(" Type ")
+    )
+    # bucket
+    BUCKET = forms.CharField(
+        max_length=128, label=_(" Bucket "), initial="jumpserver",
+        required=False
+    )
+    # access_key
+    ACCESS_KEY = forms.CharField(
+        max_length=128, label=_(" Access Key "), initial="",
+        required=False
+    )
+    # secret_key
+    SECRET_KEY = forms.CharField(
+        max_length=128, label=_(" Secret Key "), initial="",
+        required=False
+    )
+    # region
+    REGION = forms.CharField(
+        max_length=128, label=_(" Region "), initial="cn-north-1",
+        required=False
+    )
+    # endpoint
+    ENDPOINT = forms.CharField(
+        max_length=128, label=_(" Endpoint "), initial="http://oss-cn-hangzhou.aliyuncs.com",
+        required=False
+    )
+    # hosts
+    HOSTS = forms.CharField(
+        max_length=128, label=_(" Hosts "), initial="http://elastic:changeme@localhost:9200",
+        required=False
+    )
+
+    def __init__(self,  *args, **kw):
+        """初始化"""
+        super().__init__(*args, **kw)
+        self.storage_settings = dict()
+
+    def set_setting_name(self, in_name):
+        """设置该类对应的列名"""
+        self.fields["SETTING_NAME"].initial = in_name
+
+    def init_storage_setting(self, setting_name):
+        # print(setting_name)
+        db_value = getattr(common_settings, setting_name)
+
+        if db_value:
+            self.storage_settings = db_value
+
+    def set_initial(self, in_dict):
+        """设置Form的各个initial"""
+        for name in in_dict:
+            setting_tmp = in_dict.get(name, {})
+            self.fields["NAME"].initial = name
+
+            for filed_name in self.fields:
+                if filed_name == "NAME" or filed_name == "SETTING_NAME":
+                    continue
+
+                value_tmp = setting_tmp.get(filed_name, "")
+                self.fields[filed_name].initial = value_tmp
+            break
+
+    def get_setting_info(self):
+        """获取配置信息"""
+        ret_info = dict()
+        if not self.is_valid():
+            return ret_info
+
+        info_tmp = dict()
+        for field_name in self.cleaned_data:
+            if field_name == "NAME" or field_name == "SETTING_NAME":
+                continue
+
+            value = self.cleaned_data[field_name]
+            info_tmp[field_name] = value
+
+        name_key = self.cleaned_data["NAME"]
+        ret_info[name_key] = info_tmp
+
+        return ret_info
+
+    def get_storage_settings(self):
+        """获取存储配置"""
+        return self.storage_settings
+
+    def update_storage_settings(self, setting_data):
+        """更新存储配置"""
+        self.storage_settings.update(setting_data)
+
+    def save(self, category="default"):
+        if not self.is_bound:
+            raise ValueError("Form is not bound")
+
+        if not self.is_valid():
+            raise ValueError(self.errors)
+
+        setting_name = self.cleaned_data["SETTING_NAME"]
+        new_setting_data = self.get_setting_info()
+        self.init_storage_setting(setting_name)
+        self.update_storage_settings(new_setting_data)
+
+        with transaction.atomic():
+            encrypted = True
+            try:
+                setting = Setting.objects.get(name=setting_name)
+            except Setting.DoesNotExist:
+                setting = Setting()
+            setting.name = setting_name
+            setting.category = category
+            setting.encrypted = encrypted
+            setting.cleaned_value = self.storage_settings
+            setting.save()

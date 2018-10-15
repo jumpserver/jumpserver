@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^ldap/$', views.LDAPSettingView.as_view(), name='ldap-setting'),
     url(r'^terminal/$', views.TerminalSettingView.as_view(), name='terminal-setting'),
     url(r'^security/$', views.SecuritySettingView.as_view(), name='security-setting'),
+    url(r'^storage/$', views.StorageSettingView.as_view(), name='storage-setting'),
 ]

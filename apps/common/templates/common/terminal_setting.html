@@ -35,7 +35,7 @@
                     <div class="tab-content">
                         <div class="col-sm-12" style="padding-left:0">
                             <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
-                                <form action="" method="post" class="form-horizontal">
+                                <form action="" method="post" class="form-horizontal" id="terminal_form">
                                     {% if form.non_field_errors %}
                                         <div class="alert alert-danger">
                                             {{ form.non_field_errors }}
@@ -66,36 +66,72 @@
                                     <div class="hr-line-dashed"></div>
 
                                     <h3>{% trans "Command storage" %}</h3>
-                                    <table class="table table-hover " id="task-history-list-table">
+                                    <div class="uc pull-left m-r-5">
+                                          <button onclick='EditStorageClick("cmd_storage_list", "TERMINAL_COMMAND_STORAGE")' class="btn btn-default" type="button"> {% trans ' Add/Edit ' %}</button>
+                                    </div>
+                                    <table class="table table-hover " id="cmd_storage_list">
                                         <thead>
                                         <tr>
+                                            <th>{% trans 'Choose' %}</th>
                                             <th>{% trans 'Name' %}</th>
                                             <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Bucket' %}</th>
+                                            <th>{% trans 'Access Key' %}</th>
+                                            <th>{% trans 'Secret Key' %}</th>
+                                            <th>{% trans 'Region' %}</th>
+                                            <th>{% trans 'Endpoint' %}</th>
+                                            <th>{% trans 'Hosts' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {% for name, setting in command_storage.items %}
                                             <tr>
-                                                <td>{{ name }}</td>
-                                                <td>{{ setting.TYPE }}</td>
+                                                <td title="radio"><input name="radio" type="radio"/></td>
+                                                <td class="dbclicktd" title="NAME">{{ name }}</td>
+                                                <td class="dbclicktd" title="TYPE">{{ setting.TYPE }}</td>
+                                                <td class="dbclicktd" title="BUCKET">{{ setting.BUCKET }}</td>
+                                                <td class="dbclicktd" title="ACCESS_KEY">{{ setting.ACCESS_KEY }}</td>
+                                                <td class="dbclicktd" title="SECRET_KEY">{{ setting.SECRET_KEY }}</td>
+                                                <td class="dbclicktd" title="REGIN">{{ setting.REGION }}</td>
+                                                <td class="dbclicktd" title="ENDPOINT">{{ setting.ENDPOINT }}</td>
+                                                <td class="dbclicktd" title="HOSTS">{{ setting.HOSTS }}</td>
+                                                <!--<td>{{ name }}</td>-->
+                                                <!--<td>{{ setting.TYPE }}</td>-->
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans "Replay storage" %}</h3>
-                                    <table class="table table-hover " id="task-history-list-table">
+                                    <div class="uc pull-left m-r-5">
+                                        <button onclick='EditStorageClick("replay_storage_list", "TERMINAL_REPLAY_STORAGE")' class="btn btn-default" type="button"> {% trans ' Add/Edit ' %}</button>
+                                    </div>
+                                    <table class="table table-hover " id="replay_storage_list">
                                         <thead>
                                         <tr>
+                                            <th>{% trans 'Choose' %}</th>
                                             <th>{% trans 'Name' %}</th>
                                             <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Bucket' %}</th>
+                                            <th>{% trans 'Access Key' %}</th>
+                                            <th>{% trans 'Secret Key' %}</th>
+                                            <th>{% trans 'Region' %}</th>
+                                            <th>{% trans 'Endpoint' %}</th>
+                                            <th>{% trans 'Hosts' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {% for name, setting in replay_storage.items %}
                                             <tr>
-                                                <td>{{ name }}</td>
-                                                <td>{{ setting.TYPE }}</td>
+                                                <td title="radio"><input name="radio" type="radio"/></td>
+                                                <td class="dbclicktd" title="NAME">{{ name }}</td>
+                                                <td class="dbclicktd" title="TYPE">{{ setting.TYPE }}</td>
+                                                <td class="dbclicktd" title="BUCKET">{{ setting.BUCKET }}</td>
+                                                <td class="dbclicktd" title="ACCESS_KEY">{{ setting.ACCESS_KEY }}</td>
+                                                <td class="dbclicktd" title="SECRET_KEY">{{ setting.SECRET_KEY }}</td>
+                                                <td class="dbclicktd" title="REGIN">{{ setting.REGION }}</td>
+                                                <td class="dbclicktd" title="ENDPOINT">{{ setting.ENDPOINT }}</td>
+                                                <td class="dbclicktd" title="HOSTS">{{ setting.HOSTS }}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -122,14 +158,127 @@
     <script>
         $(document).ready(function () {
         })
-            .on("click", ".btn-test", function () {
+        function SaveStorageClick(in_table_id, out_em_id)
+        {
+            alert("aaa")
+            var cmd_storage = {};
+            var tb = document.getElementById(in_table_id);    // table 的 id
+            var rows = tb.rows;// 获取表格所有行
+
+            for(var i = 0; i<rows.length; i++ ){
+                var name_em = rows[i].cells[0];
+                if (name_em.getAttribute("title") == null)
+                {
+                    continue;
+                }
+                var ratio_em = rows[i].cells[0].getElementsByTagName("input");
+
+                alert(ratio_em[0]);
+                alert(ratio_em[0]);
+                if (ratio_em[0].checked)
+                {
+                    alert("get ratio");
+                }
+                else{
+                    return;
+                }
+
+                var name = name_em.innerHTML.toString();
+                var setting_dict = {};
+
+                for(var j = 2; j<rows[i].cells.length; j++ ){    // 遍历该行的 td
+                    var em = rows[i].cells[j];
+                    var setting_key = em.getAttribute("title");
+
+                    if (setting_key == null)
+                    {
+                        continue;
+                    }
+                    var setting_value = em.innerHTML.toString();
+                    setting_dict[setting_key] = setting_value;
+                   // alert("第"+(i+1)+"行，第"+(j+1)+"个td的值："+rows[i].cells[j].innerHTML+"。");           // 输出每个td的内容
+                }
+                cmd_storage[name] = setting_dict;
+
+            }
+            var tmse = document.getElementById(out_em_id);
+            // alert("获取到的value：" + tmse.value+" ,"+$("#id_TERMINAL_COMMAND_STORAGE").val()); //获取
+
+            tmse.value = JSON.stringify(cmd_storage);
+            document.getElementById("terminal_form").submit()
+            // alert("设置后的value：" + tmse.value); //设置后的
+        }
+
+        function EditStorageClick(in_table_id,in_type) {
+            console.log('Edit storage click')
+            var storage_data = {};
+            var tb = document.getElementById(in_table_id);    // table 的 id
+            var rows = tb.rows;// 获取表格所有行
+
+            for(var i = 0; i<rows.length; i++ ){
+                var first_cell = rows[i].cells[0];
+                if (first_cell.getAttribute("title") == null)
+                {
+                    continue;
+                }
+                var ratio_em = first_cell.getElementsByTagName("input");
+                if (ratio_em[0].checked == false)
+                {
+                    continue;
+                }
+
+                var name = rows[i].cells[1].innerHTML.toString();
+                var setting_dict = {};
+
+                for(var j = 2; j<rows[i].cells.length; j++ ){    // 遍历该行的 td
+                    var em = rows[i].cells[j];
+                    var setting_key = em.getAttribute("title");
+
+                    if (setting_key == null)
+                    {
+                        continue;
+                    }
+                    var setting_value = em.innerHTML.toString();
+                    setting_dict[setting_key] = setting_value;
+                   // alert("第"+(i+1)+"行，第"+(j+1)+"个td的值："+rows[i].cells[j].innerHTML+"。");           // 输出每个td的内容
+                }
+                storage_data[name] = setting_dict;
+
+            }
+
+            var the_url = "{% url 'settings:storage-setting' %}";
+            var storage_info = JSON.stringify(storage_data);
+            the_url +="?setting_name=" + in_type + "&storage_info=" + storage_info;
+            // alert(the_url);
+            window.open(the_url, "_self");
+
+            //
+            // $.ajax({
+            //     type: 'GET',
+            //     url: the_url,
+            //     data: data,
+            //     success: success,
+            //     dataType: "html"
+            // });
+
+            // APIUpdateAttr({
+            //     url: the_url,
+            //     body: JSON.stringify(data),
+            //     method: "POST",
+            //     flash_message: false,
+            //     success: success,
+            //     error: error
+            // });
+        }
+
+/*            .on("click", ".btn-test", function () {
                 var data = {};
                 var form = $("form").serializeArray();
                 $.each(form, function (i, field) {
                     data[field.name] = field.value;
                 });
 
-                var the_url = "{% url 'api-common:ldap-testing' %}";
+                var the_url = "{% url 'settings:storage-setting' %}";
 
                 function error(message) {
                     toastr.error(message)
@@ -150,6 +299,21 @@
             })
             .on('click', '', function () {
 
-            })
+            })*/
+
+$(".table").find(".dbclicktd").bind("dblclick", function () {
+        // var input = "<input type='text' id='temp' style='width:130px;' value=" + $(this).text() + " >";
+        // var input = "<input type='text' id='temp' style='" + $(this).width() + "' value=" + $(this).text() + " >";
+        // $(this).text("");
+        // $(this).append(input);
+        // $("input#temp").focus();
+        // $("input").blur(function () {
+        //     if ($(this).val() == "") {
+        //         $(this).remove();
+        //     } else {
+        //         $(this).closest("td").text($(this).val());
+        //     }
+        // });
+    });
     </script>
 {% endblock %}
