@@ -224,8 +224,9 @@
 
 ::
 
-    # 同创建 Linux 资产一样。
-    # 创建 Windows 资产，系统平台请选择正确的 Windows，默认 RDP 端口号为3389，IP 和 管理用户请正确选择，
+    # Windows 7/8/2008/2012 系统平台选择 Windows
+    # Windows 10/2016 系统平台选择 Windows(2016)
+    # 创建 Windows 资产，系统平台请选择正确的 Windows，默认 RDP 端口号为3389，IP 和 管理用户请正确选择
     注：确保管理用户能正确登录到指定的 IP 主机上
 
 .. image:: _static/img/create_windows_asset.jpg
