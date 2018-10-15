@@ -95,7 +95,17 @@
     </a>
     <ul class="nav nav-second-level">
         {% for plugin in XPACK_PLUGINS %}
-        <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
+            {% ifequal plugin.name 'cloud'%}
+                <li id="{{ plugin.name }}">
+                    <a href="#"><span class="nav-label">{% trans plugin.verbose_name %}</span><span class="fa arrow"></span></a>
+                    <ul class="nav nav-third-level">
+                        <li id="account"><a href="{% url 'xpack:cloud:account-list' %}">{% trans 'Account list' %}</a></li>
+                        <li id="sync-task"><a href="{% url 'xpack:cloud:sync-task-list' %}">{% trans 'Task list' %}</a></li>
+                    </ul>
+                </li>
+            {% else %}
+                <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
+            {% endifequal %}
         {% endfor %}
     </ul>
 </li>
