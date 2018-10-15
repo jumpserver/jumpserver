@@ -21,13 +21,21 @@
     一般是由于网络不好，导致下载文件失败，重新执行命令即可
     如果多次重试均无效，请更换网络环境
 
-4. bash make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
+4. pip install 提示 Could not find a version that satisfies the requirement xxxxxx==x.x.xx(版本)
+
+::
+
+    一般是由于镜像源未同步，-i 指定官方源即可，如：
+    $ pip install -r requirement.txt -i https://pypi.org/simple
+    $ pip install xxxxx==x.x.xx -i https://pypi.org/simple
+
+5. bash make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
 
 ::
 
     这是由于 config.py 里面的内容格式不对，请参考安装文档的说明，把提示的内容与上一行对齐即可
 
-5. bash make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
+6. bash make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
 ::
 
@@ -42,7 +50,7 @@
     $ pip install -r requirements.txt
     # 然后重新执行 bash make_migrations.sh
 
-6.  sh make_migrations.sh 报错 CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
+7.  sh make_migrations.sh 报错 CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
 
 ::
 
@@ -51,14 +59,14 @@
     $ pip uninstall django-celery-beat
     $ pip install django-celery-beat
 
-7. 执行 ./jms start all 后一直卡在 beat: Waking up in 1.00 minute.
+8. 执行 ./jms start all 后一直卡在 beat: Waking up in 1.00 minute.
 
 ::
 
     如果没有error提示进程无法启动，那么这是正常现象
     如果不想在前台启动，可以使用 ./jms start all -d 在后台启动
 
-8. 执行 ./jms start all 后提示 xxx is stopped
+9. 执行 ./jms start all 后提示 xxx is stopped
 
 ::
 
@@ -66,20 +74,20 @@
     # xxx is stopped
     $ ./jms restart xxx  # 如 ./jms restart gunicorn
 
-9. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
+10. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
 
 ::
 
     这是严格模式的警告，可以参考后面的url解决，或者忽略
 
-10. 启动 jumpserver 后，访问 8080 端口页面显示不正常
+11. 启动 jumpserver 后，访问 8080 端口页面显示不正常
 
 ::
 
     这是因为你在 config.py 里面设置了 DEBUG = False
     跟着教程继续操作，后面搭建 nginx 代理即可正常访问
 
-11. 执行 ./cocod start 后提示 No module named 'jms'
+12. 执行 ./cocod start 后提示 No module named 'jms'
 
 ::
 
@@ -94,7 +102,7 @@
     $ pip install -r requirements/requirements.txt
     # 然后重新执行 ./cocod start 即可
 
-12. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
+13. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
 
 ::
 
@@ -104,7 +112,7 @@
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
-13. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
+14. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
 
 ::
 
@@ -118,7 +126,7 @@
 
     # 保存后重新执行 ./cocod start 即可
 
-14. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/keys/.access_key'
+15. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/keys/.access_key'
 
 ::
 
@@ -128,7 +136,7 @@
 
     # 保存后重新执行 ./cocod start 即可
 
-15. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
+16. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
 
 ::
 
@@ -184,7 +192,7 @@
 
     ...
 
-16. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
+17. 访问 luna 页面提示 Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发...
 
 ::
 
