@@ -27,6 +27,8 @@ SSH 协议资产连接错误排查思路
 
     # 如果重启后 coco 任然不在线，请重新注册
     # 在Jumpserver后台 会话管理-终端管理 删掉 coco 的注册
+    # 必须到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
+    # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
     $ cd /opt/coco && ./cocod stop
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在，直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
