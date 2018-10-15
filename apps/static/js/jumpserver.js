@@ -145,7 +145,14 @@ function activeNav() {
     var resource = url_array[2];
     if (app === ''){
         $('#index').addClass('active');
-    } else {
+    }
+    else if (app === 'xpack') {
+        var item = url_array[3];
+        $("#" + app).addClass('active');
+        $('#' + app + ' #' + resource).addClass('active');
+        $('#' + app + ' #' + resource + ' #' + item + ' a').css('color', '#ffffff');
+    }
+    else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
     }
