@@ -108,6 +108,8 @@
 
     # 这是由于 coco 注册未成功造成的，需要重新注册 (能正常访问 jumpserver 页面后再处理)
     # 到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
+    # 必须到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
+    # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
     $ cd /opt/coco && ./cocod stop
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
