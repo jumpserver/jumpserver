@@ -138,7 +138,7 @@ class Node(OrgModelMixin):
             args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
         else:
             kwargs['nodes__key__regex'] = pattern
-        assets = Asset.objects.filter(*args, **kwargs)
+        assets = Asset.objects.filter(*args, **kwargs).distinct()
         return assets
 
     def get_all_valid_assets(self):
