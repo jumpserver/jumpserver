@@ -106,3 +106,8 @@ def to_dict(data):
 def sort(data):
     print(data)
     return sorted(data)
+
+
+@register.filter
+def subtract(value, arg):
+    return value - arg
