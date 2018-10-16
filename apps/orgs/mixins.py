@@ -4,7 +4,6 @@
 from werkzeug.local import Local
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
 from django.shortcuts import redirect
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden

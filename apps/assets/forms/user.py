@@ -150,7 +150,7 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             'name': '* required',
             'username': '* required',
             'auto_push': _('Auto push system user to asset'),
-            'priority': _('High level will be using login asset as default, '
+            'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),
             'login_mode': _('If you choose manual login mode, you do not '
                             'need to fill in the username and password.')

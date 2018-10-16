@@ -31,6 +31,8 @@ class Node(OrgModelMixin):
         return self.full_value
 
     def __eq__(self, other):
+        if not other:
+            return False
         return self.key == other.key
 
     def __gt__(self, other):
@@ -136,7 +138,7 @@ class Node(OrgModelMixin):
             args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
         else:
             kwargs['nodes__key__regex'] = pattern
-        assets = Asset.objects.filter(*args, **kwargs)
+        assets = Asset.objects.filter(*args, **kwargs).distinct()
         return assets
 
     def get_all_valid_assets(self):
@@ -201,13 +203,16 @@ class Node(OrgModelMixin):
         # 如果使用current_org 在set_current_org时会死循环
         _current_org = get_current_org()
         with transaction.atomic():
-            if _current_org.is_default():
+            if _current_org.is_root():
                 key = '0'
+            elif _current_org.is_default():
+                key = '1'
             else:
                 set_current_org(Organization.root())
                 org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
-                org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True) or [0]
-                key = str(max([int(k) for k in org_nodes_roots_keys]) + 1)
+                org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True) or ['1']
+                key = max([int(k) for k in org_nodes_roots_keys])
+                key = str(key + 1) if key != 0 else '2'
                 set_current_org(_current_org)
             root = cls.objects.create(key=key, value=_current_org.name)
             return root
@@ -223,7 +228,7 @@ class Node(OrgModelMixin):
     @classmethod
     def default_node(cls):
         defaults = {'value': 'Default'}
-        return cls.objects.get_or_create(defaults=defaults, key='0')
+        return cls.objects.get_or_create(defaults=defaults, key='1')
 
     @classmethod
     def get_tree_name_ref(cls):

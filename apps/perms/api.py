@@ -96,7 +96,7 @@ class UserGrantedNodesApi(ListAPIView):
     """
     查询用户授权的所有节点的API, 如果是超级用户或者是 app，切换到root org
     """
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeSerializer
     
     def change_org_if_need(self):

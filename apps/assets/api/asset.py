@@ -74,7 +74,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             .select_related('admin_user')
         self.filter_admin_user_id()
         self.filter_node()
-        return self.queryset
+        return self.queryset.distinct()
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
