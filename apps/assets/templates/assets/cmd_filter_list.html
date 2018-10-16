@@ -1,6 +1,16 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
 {% block table_search %}{% endblock %}
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    {% trans 'System user bound some command filter, each command filter has some rules,'%}
+    {% trans 'When user login asset with this system user, then run a command,' %}
+    {% trans 'The command will be filter by rules, higher priority(lower number) rule run first,' %}
+    {% trans 'When a rule matched, if rule action is allow, then allow command execute,' %}
+    {% trans 'else if action is deny, then command with be deny,' %}
+    {% trans 'else match next rule, if none matched, allowed' %}
+    </div>
+{% endblock %}
 {% block table_container %}
 <div class="uc pull-left  m-r-5">
     <a href="{% url 'assets:cmd-filter-create' %}" class="btn btn-sm btn-primary"> {% trans "Create command filter" %} </a>
