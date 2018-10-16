@@ -18,6 +18,9 @@ class BaseForm(forms.Form):
             db_value = getattr(common_settings, name)
             django_value = getattr(settings, name) if hasattr(settings, name) else None
 
+            if db_value is None and django_value is None:
+                continue
+
             if db_value is False or db_value:
                 if isinstance(db_value, dict):
                     db_value = json.dumps(db_value)
