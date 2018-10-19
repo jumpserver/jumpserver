@@ -26,7 +26,7 @@ class CommandFilterRuleViewSet(BulkModelViewSet):
         fpk = self.kwargs.get('filter_pk')
         if not fpk:
             return CommandFilterRule.objects.none()
-        group = get_object_or_404(CommandFilter, pk=fpk)
-        return group.rules.all().order_by('priority')
+        cmd_filter = get_object_or_404(CommandFilter, pk=fpk)
+        return cmd_filter.rules.all()
 
 
