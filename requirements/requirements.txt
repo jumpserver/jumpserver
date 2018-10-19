@@ -7,7 +7,7 @@ boto3==1.6.5
 botocore==1.9.5
 celery==4.1.0
 certifi==2018.1.18
-cffi==1.11.2
+cffi==1.11.5
 chardet==3.0.4
 configparser==3.5.0
 coreapi==2.3.3
@@ -35,7 +35,7 @@ eventlet==0.24.1
 ForgeryPy==0.1
 greenlet==0.4.14
 gunicorn==19.9.0
-idna==2.6
+idna==2.7
 itsdangerous==0.24
 itypes==1.1.0
 Jinja2==2.10
@@ -50,7 +50,7 @@ paramiko==2.4.1
 passlib==1.7.1
 Pillow==4.3.0
 pyasn1==0.4.2
-pycparser==2.18
+pycparser==2.19
 pycrypto==2.6.1
 pyldap==2.4.45
 pyotp==2.2.6
@@ -65,7 +65,7 @@ jms-storage==0.0.18
 s3transfer==0.1.13
 simplejson==3.13.2
 six==1.11.0
-sshpubkeys==2.2.0
+sshpubkeys==3.1.0
 uritemplate==3.0.0
 urllib3==1.22
 vine==1.1.4
