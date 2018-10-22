@@ -156,7 +156,7 @@
 
     # 运行 coco
     $ cd /opt/coco
-    $ mkdir keys
+    $ mkdir keys logs
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
     # 新版本更新了运行脚本，使用方式./cocod start|stop|status 后台运行请添加 -d 参数
 

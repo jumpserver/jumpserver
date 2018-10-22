@@ -201,7 +201,7 @@ CentOS 7 安装文档
 
     # 修改 Coco 配置文件
     $ cd /opt/coco
-    $ mkdir keys
+    $ mkdir keys logs
     $ cp conf_example.py conf.py
     $ vi conf.py
 

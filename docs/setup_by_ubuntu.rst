@@ -256,7 +256,7 @@
 ::
 
     $ cd /opt/coco
-    $ mkdir keys
+    $ mkdir keys logs
     $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
     $ vi conf.py
 
