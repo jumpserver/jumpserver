@@ -387,6 +387,49 @@ def get_request_ip(request):
     return login_ip
 
 
+def get_command_storage_or_create_default_storage():
+    from common.models import common_settings, Setting
+    name = 'TERMINAL_COMMAND_STORAGE'
+    default = {'default': {'TYPE': 'server'}}
+    command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    if command_storage is None:
+        obj = Setting()
+        obj.name = name
+        obj.encrypted = True
+        obj.cleaned_value = default
+        obj.save()
+    if isinstance(command_storage, dict) and not command_storage:
+        obj = Setting.objects.get(name=name)
+        value = obj.cleaned_value
+        value.update(default)
+        obj.cleaned_value = value
+        obj.save()
+    command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    return command_storage
+
+
+def get_replay_storage_or_create_default_storage():
+    from common.models import common_settings, Setting
+    name = 'TERMINAL_REPLAY_STORAGE'
+    default = {'default': {'TYPE': 'server'}}
+    replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    if replay_storage is None:
+        obj = Setting()
+        obj.name = name
+        obj.encrypted = True
+        obj.cleaned_value = default
+        obj.save()
+        replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    if isinstance(replay_storage, dict) and not replay_storage:
+        obj = Setting.objects.get(name=name)
+        value = obj.cleaned_value
+        value.update(default)
+        obj.cleaned_value = value
+        obj.save()
+    replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    return replay_storage
+
+
 class TeeObj:
     origin_stdout = sys.stdout
 
