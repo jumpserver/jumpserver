@@ -11,6 +11,8 @@ SSH 协议资产连接错误排查思路
 
 1. 检查终端是否在线
 
+.. image:: _static/img/faq_linux_01.jpg
+
 ::
 
     # 确定已经在Jumpserver后台 会话管理-终端管理 里接受 coco 的注册
@@ -32,8 +34,6 @@ SSH 协议资产连接错误排查思路
     $ cd /opt/coco && ./cocod stop
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在，直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
-
-.. image:: _static/img/faq_linux_01.jpg
 
 2. 访问 luna 界面不显示资产信息
 

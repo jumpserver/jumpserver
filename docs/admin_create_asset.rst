@@ -24,8 +24,9 @@
 ::
 
     # 点击页面上边的"邮件设置" TAB ，进入邮件设置页面
-    # 配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到
-    您的 SMTP 账号邮箱里面，确定收到测试邮件后点击保存即可使用。
+    # 默认使用 25 端口，不勾选 SSL 和 TLS；如果需要勾选 SSL，端口需要修改成 465；如果需要勾选 TLS，端口需要改成 587
+    # 不可以同时勾选 SSL 和 TLS，
+    配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面，确定收到测试邮件后点击保存即可使用
 
 .. image:: _static/img/smtp_setting.jpg
 
@@ -37,18 +38,19 @@
     # 先测试通过才能保存
     # DN 和 OU 一定要完整(如DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org)
     注：可借用第三方 gui 工具查看 ldap 用户的属性，新版本已经支持中文名登录，即cn=中文也可正常使用
+    详细设置请参考`LDAP 使用说明 <faq_ldap.html>`_
 
 1.4 终端设置
 
 ::
 
-    # 命令记录保存到 elastic
+    # 命令记录保存到 elastic （命令记录需要所有地址都正常可用，否则 历史会话 和 命令记录 页面无法正常访问，如果不清楚，请勿修改命令记录设置）
     {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
 
     # 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
     {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
 
-    注：修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录，然后重启 Jumpserver 服务
+    修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录，然后重启 Jumpserver 服务
 
 1.5 安全设置
 
