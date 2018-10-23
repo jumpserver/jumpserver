@@ -13,6 +13,8 @@ RDP 协议资产连接错误排查思路
 
 1. 检查终端是否在线
 
+.. image:: _static/img/faq_windows_01.jpg
+
 ::
 
     注：连接 Windows 资产提示连接错误，您没有权限访问此连接，请按照此步骤解决
@@ -35,8 +37,6 @@ RDP 协议资产连接错误排查思路
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
     $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
-
-.. image:: _static/img/faq_windows_01.jpg
 
 2. 登录要连接的windows资产，检查远程设置和防火墙设置
 
