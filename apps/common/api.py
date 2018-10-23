@@ -116,11 +116,7 @@ class ReplayStorageCreateAPI(APIView):
         storage = jms_storage.get_object_storage(storage_data)
         target = 'tests.py'
         src = os.path.join(settings.BASE_DIR, 'common', target)
-        ok, msg = storage.upload(src=src, target=target)
-        if not ok:
-            return False
-        storage.delete(path=target)
-        return True
+        return storage.is_valid(src, target)
 
 
 class ReplayStorageDeleteAPI(APIView):

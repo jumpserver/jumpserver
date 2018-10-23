@@ -45,7 +45,6 @@
                                 <div class="col-md-9">
                                     <input id="id_name" class="form-control" type="text" name="NAME" value="">
                                     <div class="help-block">* required</div>
-{#                                    <div id="id_error" style="display: none; color: red;">{% trans 'Error: Account invalid' %}</div>#}
                                     <div id="id_error" style="color: red;"></div>
                                 </div>
                             </div>
@@ -53,77 +52,84 @@
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_host">{% trans "Host" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_host" class="form-control" type="text" name="HOSTNAME" value="">
+                                    <input id="id_host" class="form-control" type="text" name="HOSTNAME" value="" placeholder="Host">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_port">{% trans "Port" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_port" class="form-control" type="text" name="PORT" value="">
+                                    <input id="id_port" class="form-control" type="text" name="PORT" value="" placeholder="7480">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_bucket">{% trans "Bucket" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_bucket" class="form-control" type="text" name="BUCKET" value="">
+                                    <input id="id_bucket" class="form-control" type="text" name="BUCKET" value="" placeholder="Bucket">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_access_key">{% trans "Access key" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_access_key" class="form-control" type="text" name="ACCESS_KEY" value="">
+                                    <input id="id_access_key" class="form-control" type="text" name="ACCESS_KEY" value="" placeholder="Access key">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_secret_key">{% trans "Secret key" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_secret_key" class="form-control" type="text" name="SECRET_KEY" value="">
+                                    <input id="id_secret_key" class="form-control" type="text" name="SECRET_KEY" value="", placeholder="Secret key">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_container_name">{% trans "Container name" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_container_name" class="form-control" type="text" name="CONTAINER_NAME" value="">
+                                    <input id="id_container_name" class="form-control" type="text" name="CONTAINER_NAME" value="" placeholder="Container">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_account_name">{% trans "Account name" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_account_name" class="form-control" type="text" name="ACCOUNT_NAME" value="">
+                                    <input id="id_account_name" class="form-control" type="text" name="ACCOUNT_NAME" value="" placeholder="Account name">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_account_key">{% trans "Account key" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_account_key" class="form-control" type="text" name="ACCOUNT_KEY" value="">
+                                    <input id="id_account_key" class="form-control" type="text" name="ACCOUNT_KEY" value="" placeholder="Account key">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_endpoint">{% trans "Endpoint" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_endpoint" class="form-control" type="text" name="ENDPOINT" value="">
+                                    <input id="id_endpoint" class="form-control" type="text" name="ENDPOINT" value="" placeholder="Endpoint">
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_endpoint_suffix">{% trans "Endpoint suffix" %}</label>
+{#                                <div class="col-md-9">#}
+{#                                    <input id="id_endpoint_suffix" class="form-control" type="text" name="ENDPOINT_SUFFIX" value="">#}
+{#                                    <div class="help-block">{% trans '' %}</div>#}
+{#                                </div>#}
                                 <div class="col-md-9">
-                                    <input id="id_endpoint_suffix" class="form-control" type="text" name="ENDPOINT_SUFFIX" value="">
+                                    <select id="id_endpoint_suffix" name="ENDPOINT_SUFFIX" class="endpoint-suffix-selector form-control">
+                                        <option value="core.chinacloudapi.cn" selected="selected">core.chinacloudapi.cn</option>
+                                        <option value="core.windows.net">core.windows.net</option>
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_region">{% trans "Region" %}</label>
                                 <div class="col-md-9">
-                                    <input id="id_region" class="form-control" type="text" name="REGION" value="">
+                                    <input id="id_region" class="form-control" type="text" name="REGION" value="" placeholder="">
                                 </div>
                             </div>
 
