@@ -128,13 +128,13 @@
 
     # 保存后重新执行 ./cocod start 即可
 
-15. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/keys/.access_key'
+15. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
 
 ::
 
     # 这是一个小 bug，之后的版本会修复掉
     $ cd /opt/coco
-    $ mkdir keys
+    $ mkdir keys logs
 
     # 保存后重新执行 ./cocod start 即可
 
