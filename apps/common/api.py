@@ -144,7 +144,11 @@ class CommandStorageCreateAPI(APIView):
     def is_valid(storage_data):
         if storage_data.get('TYPE') == 'server':
             return True
-        storage = jms_storage.get_log_storage(storage_data)
+        try:
+            storage = jms_storage.get_log_storage(storage_data)
+        except Exception:
+            return False
+
         return storage.ping()
 
 
