@@ -121,7 +121,7 @@ class Node(OrgModelMixin):
     def get_assets(self):
         from .asset import Asset
         if self.is_default_node():
-            assets = Asset.objects.filter(nodes__isnull=True)
+            assets = Asset.objects.filter(Q(nodes__id=self.id) | Q(nodes__isnull=True))
         else:
             assets = Asset.objects.filter(nodes__id=self.id)
         return assets
