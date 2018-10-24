@@ -148,7 +148,7 @@ function deleteStorage($this, the_url){
         var method = 'POST';
         var success = function(){
             $this.parent().parent().remove();
-            toastr.success("{% trans 'Delete success' %}");
+            toastr.success("{% trans 'Delete succeed' %}");
         };
         var error = function(){
             toastr.error("{% trans 'Delete failed' %}}");

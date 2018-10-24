@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-23 20:30+0800\n"
+"POT-Creation-Date: 2018-10-24 11:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -852,7 +852,7 @@ msgstr "其它"
 #: assets/templates/assets/gateway_create_update.html:58
 #: assets/templates/assets/label_create_update.html:18
 #: common/templates/common/basic_setting.html:61
-#: common/templates/common/command_storage_create.html:81
+#: common/templates/common/command_storage_create.html:80
 #: common/templates/common/email_setting.html:62
 #: common/templates/common/ldap_setting.html:62
 #: common/templates/common/replay_storage_create.html:139
@@ -885,7 +885,7 @@ msgstr "重置"
 #: assets/templates/assets/gateway_create_update.html:59
 #: assets/templates/assets/label_create_update.html:19
 #: common/templates/common/basic_setting.html:62
-#: common/templates/common/command_storage_create.html:82
+#: common/templates/common/command_storage_create.html:81
 #: common/templates/common/email_setting.html:63
 #: common/templates/common/ldap_setting.html:63
 #: common/templates/common/replay_storage_create.html:140
@@ -1754,7 +1754,7 @@ msgstr "改密日志"
 
 #: audits/views.py:183 templates/_nav.html:10 users/views/group.py:28
 #: users/views/group.py:44 users/views/group.py:60 users/views/group.py:76
-#: users/views/group.py:92 users/views/login.py:327 users/views/user.py:68
+#: users/views/group.py:92 users/views/login.py:328 users/views/user.py:68
 #: users/views/user.py:83 users/views/user.py:111 users/views/user.py:193
 #: users/views/user.py:354 users/views/user.py:404 users/views/user.py:439
 msgid "Users"
@@ -1788,7 +1788,8 @@ msgstr ""
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: common/api.py:127 common/api.py:157
+#: common/api.py:127 common/api.py:161
+#: common/templates/common/terminal_setting.html:151
 msgid "Delete succeed"
 msgstr "删除成功"
 
@@ -1927,79 +1928,79 @@ msgstr "单位: 秒"
 msgid "List sort by"
 msgstr "资产列表排序"
 
-#: common/forms.py:172
+#: common/forms.py:160
 msgid "MFA Secondary certification"
 msgstr "MFA 二次认证"
 
-#: common/forms.py:174
+#: common/forms.py:162
 msgid ""
 "After opening, the user login must use MFA secondary authentication (valid "
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: common/forms.py:181
+#: common/forms.py:169
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: common/forms.py:186
+#: common/forms.py:174
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: common/forms.py:188
+#: common/forms.py:176
 msgid ""
 "Tip :(unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示: (单位: 分钟) 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
 
-#: common/forms.py:194
+#: common/forms.py:182
 msgid "Connection max idle time"
 msgstr "SSH最大空闲时间"
 
-#: common/forms.py:196
+#: common/forms.py:184
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
 msgstr "提示: (单位: 分钟) 如果超过该配置没有操作，连接会被断开(仅ssh) "
 
-#: common/forms.py:202
+#: common/forms.py:190
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:208
+#: common/forms.py:196
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:210
+#: common/forms.py:198
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:216
+#: common/forms.py:204
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:217
+#: common/forms.py:205
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:223
+#: common/forms.py:211
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:224
+#: common/forms.py:212
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:230
+#: common/forms.py:218
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:231
+#: common/forms.py:219
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -2069,11 +2070,11 @@ msgstr "主机"
 msgid "Tips: If there are multiple hosts, separate them with a comma (,)"
 msgstr "提示: 如果有多台主机，请使用逗号 ( , ) 进行分割"
 
-#: common/templates/common/command_storage_create.html:65
+#: common/templates/common/command_storage_create.html:64
 msgid "Index"
 msgstr "索引"
 
-#: common/templates/common/command_storage_create.html:72
+#: common/templates/common/command_storage_create.html:71
 msgid "Doc type"
 msgstr "文档类型"
 
@@ -2129,7 +2130,7 @@ msgstr "用户登录设置"
 msgid "Password check rule"
 msgstr "密码校验规则"
 
-#: common/templates/common/terminal_setting.html:76 terminal/forms.py:33
+#: common/templates/common/terminal_setting.html:76 terminal/forms.py:27
 #: terminal/models.py:22
 msgid "Command storage"
 msgstr "命令存储"
@@ -2146,16 +2147,10 @@ msgstr "命令存储"
 msgid "Add"
 msgstr "添加"
 
-#: common/templates/common/terminal_setting.html:98 terminal/forms.py:38
+#: common/templates/common/terminal_setting.html:98 terminal/forms.py:32
 #: terminal/models.py:23
 msgid "Replay storage"
 msgstr "录像存储"
-
-#: common/templates/common/terminal_setting.html:151
-#, fuzzy
-#| msgid "Delete succeed"
-msgid "Delete success"
-msgstr "删除成功"
 
 #: common/templates/common/terminal_setting.html:154
 msgid "Delete failed"
@@ -2882,12 +2877,12 @@ msgstr "输入"
 msgid "Session"
 msgstr "会话"
 
-#: terminal/forms.py:34
+#: terminal/forms.py:28
 msgid "Command can store in server db or ES, default to server, more see docs"
 msgstr ""
 "命令支持存储到服务器端数据库、ES中，默认存储的服务器端数据库，更多查看文档"
 
-#: terminal/forms.py:39
+#: terminal/forms.py:33
 msgid ""
 "Replay file can store in server disk, AWS S3, Aliyun OSS, default to server, "
 "more see docs"
@@ -4020,56 +4015,56 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:69
+#: users/views/login.py:70
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:175 users/views/user.py:526 users/views/user.py:551
+#: users/views/login.py:176 users/views/user.py:526 users/views/user.py:551
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: users/views/login.py:204
+#: users/views/login.py:205
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:205
+#: users/views/login.py:206
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:221
+#: users/views/login.py:222
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:234
+#: users/views/login.py:235
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:235
+#: users/views/login.py:236
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:248
+#: users/views/login.py:249
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:249
+#: users/views/login.py:250
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:270 users/views/login.py:283
+#: users/views/login.py:271 users/views/login.py:284
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:279
+#: users/views/login.py:280
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:289 users/views/user.py:127 users/views/user.py:422
+#: users/views/login.py:290 users/views/user.py:127 users/views/user.py:422
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:327
+#: users/views/login.py:328
 msgid "First login"
 msgstr "首次登陆"
 
@@ -4427,6 +4422,11 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#, fuzzy
+#~| msgid "Delete succeed"
+#~ msgid "Delete success"
+#~ msgstr "删除成功"
 
 #~ msgid ""
 #~ "Set terminal storage setting, `default` is the using as default,You can "
