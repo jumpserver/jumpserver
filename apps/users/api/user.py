@@ -9,6 +9,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.pagination import LimitOffsetPagination
 
 from ..serializers import UserSerializer, UserPKUpdateSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
@@ -28,10 +29,12 @@ __all__ = [
 
 
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
+    filter_fields = ('username', 'email', 'name', 'id')
+    search_fields = filter_fields
     queryset = User.objects.exclude(role="App")
     serializer_class = UserSerializer
     permission_classes = (IsOrgAdmin,)
-    filter_fields = ('username', 'email', 'name', 'id')
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
