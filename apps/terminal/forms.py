@@ -10,21 +10,15 @@ from .models import Terminal
 def get_all_command_storage():
     from common import utils
     command_storage = utils.get_command_storage_or_create_default_storage()
-    command_storage_choice = []
     for k, v in command_storage.items():
-        command_storage_choice.append((k, k))
-
-    return command_storage_choice
+        yield (k, k)
 
 
 def get_all_replay_storage():
     from common import utils
     replay_storage = utils.get_replay_storage_or_create_default_storage()
-    replay_storage_choice = []
     for k, v in replay_storage.items():
-        replay_storage_choice.append((k, k))
-
-    return replay_storage_choice
+        yield (k, k)
 
 
 class TerminalForm(forms.ModelForm):
