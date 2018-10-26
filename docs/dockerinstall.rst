@@ -1,22 +1,25 @@
 Docker 安装
 ==========================
 
-Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集成了所需要的组件(Windows组件未暂未集成)，也支持使用外置 Database 和 Redis
+Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集成了所需要的组件，支持使用外置 Database 和 Redis
 
-Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中了，不是Docker最佳实践，
+数据库要求
+```````````````
+- mysql 版本需要大于等于 5.6
+- mariadb 版本需要大于等于 5.5.6
+- PostgreSQL 版本需要大于等于 9.4
+- 数据库编码要求 uft8
+
+Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中了，不是Docker最佳实践,
 生产中请使用 详细安装 `CentOS <step_by_step.rst>`_  `Ubuntu <setup_by_ubuntu.rst>`_
-
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 快速启动
 ```````````````
 使用 root 命令行输入::
 
-    # 1.0.0 版本
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:1.0.0
-
-    # 1.4.3 版本（新）
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.3
+    # 1.4.3 版本（最新）
+    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
 
 访问
 ```````````````
@@ -48,8 +51,7 @@ XShell等工具请添加connection连接，ssh 端口 2222
 
  ::
 
-   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  registry.jumpserver.org/public/jumpserver:1.0.0
-   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.3
+   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
 
 
 仓库地址
