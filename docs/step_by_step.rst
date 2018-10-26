@@ -415,45 +415,47 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 五. 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-因为手动安装 guacamole 组件比较复杂，这里提供打包好的 docker 使用, 启动 guacamole
-
-5.1 Docker安装 (仅针对CentOS7，CentOS6安装Docker相对比较复杂)
-
 ::
 
-    $ yum remove docker-latest-logrotate docker-logrotate docker-selinux dockdocker-engine
-    $ yum install -y yum-utils device-mapper-persistent-data lvm2
+    $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+    $ rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+    $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
 
-    # 添加docker官方源
-    $ yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    $ yum makecache fast
-    $ yum install docker-ce
+    $ yum install -y git gcc java-1.8.0-openjdk libtool
+    $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
+    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
 
+    $ yum install -y tomcat  # 安装 tomcat
 
-    # 国内部分用户可能无法连接docker官网提供的源，这里提供阿里云的镜像节点供测试使用
-    $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-    $ rpm --import http://mirrors.aliyun.com/docker-ce/linux/centos/gpg
-    $ yum makecache fast
-    $ yum -y install docker-ce
+    $ cd /opt
+    $ git clone https://github.com/jumpserver/docker-guacamole.git
 
-    $ systemctl start docker
-    $ systemctl status docker
+    $ cd /opt/docker-guacamole/
+    $ tar -xf guacamole-server-0.9.14.tar.gz
+    $ cd guacamole-server-0.9.14
+    $ autoreconf -fi
+    $ ./configure --with-init-dir=/etc/init.d
+    $ make && make install
+    $ cd ..
+    $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
+    $ ldconfig
 
-5.2 启动 Guacamole
+    $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
+    $ rm -rf /var/lib/tomcat/webapps/*
+    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /var/lib/tomcat/webapps/ROOT.war  # guacamole client
+    $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
+    $ chown -R tomcat:tomcat /config  # 修改目录权限
 
-这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义
+    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /etc/tomcat/server.xml`  # 修改默认端口为 8081
+    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /etc/tomcat/logging.properties`  # 修改 log 等级为 WARNING
+    $ echo 'JUMPSERVER_KEY_DIR=/config/guacamole/keys' >> /etc/tomcat/tomcat.conf
+    $ echo 'GUACAMOLE_HOME=/config/guacamole' >> /etc/tomcat/tomcat.conf
+    $ echo 'JUMPSERVER_SERVER=http://127.0.0.1:8080' >> /etc/tomcat/tomcat.conf  # http://127.0.0.1:8080 指 jumpserver 访问地址
 
-.. code:: shell
-
-
-    # 注意：这里需要修改下 http://<填写jumpserver的url地址> 例: http://192.168.244.144, 否则会出错, 带宽有限, 下载时间可能有点长，可以喝杯咖啡，撩撩对面的妹子
-    # 不能使用 127.0.0.1 ，可以更换 registry.jumpserver.org/public/guacamole:latest
-
-    $ docker run --name jms_guacamole -d \
-      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      jumpserver/guacamole:latest
+    $ /etc/init.d/guacd start
+    $ systemctl start tomcat
+    $ systemctl enable tomcat
 
 启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
 
@@ -563,7 +565,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ ./cocod status  # 确定jumpserver已经运行，如果没有运行请重新启动coco
 
     # 如果安装了 Guacamole
-    $ docker ps  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
+    $ systemctl status tomcat  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
 
 服务全部启动后，访问 http://192.168.244.144，访问nginx代理的端口，不要再通过8080端口访问
 
