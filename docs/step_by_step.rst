@@ -403,7 +403,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
 
-4.1 解压 Luna
+**4.1 解压 Luna **
 
 ::
 
@@ -415,6 +415,10 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 五. 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Guacamole 需要 Tomcat 来运行
+
+**5.1 安装依赖**
+
 ::
 
     $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
@@ -425,9 +429,12 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
 
+**5.2 编译安装 guacamole 服务**
+
+::
+
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
-
     $ cd /opt/docker-guacamole/
     $ tar -xf guacamole-server-0.9.14.tar.gz
     $ cd guacamole-server-0.9.14
@@ -437,6 +444,10 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ cd ..
     $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
     $ ldconfig
+
+**5.3 配置 Tomcat **
+
+::
 
     $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
@@ -452,12 +463,20 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
     $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
 
+**5.4 配置环境变量**
+
+::
+
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
     $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
+
+**5.5 启动 Guacamole **
+
+::
 
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
@@ -467,14 +486,14 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-6.1 安装 Nginx 根据喜好选择安装方式和版本
+**6.1 安装 Nginx **
 
 .. code:: shell
 
     $ yum -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf
+**6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 
 ::
 
@@ -541,7 +560,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
         }
     }
 
-6.3 运行 Nginx
+**6.3 运行 Nginx**
 
 ::
 
@@ -556,21 +575,9 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ service nginx start
     $ chkconfig nginx on
 
-6.4 开始使用 Jumpserver
+**6.4 开始使用 Jumpserver**
 
 检查应用是否已经正常运行
-
-::
-
-
-    $ cd /opt/jumpserver
-    $ ./jms status  # 确定jumpserver已经运行，如果没有运行请重新启动jumpserver
-
-    $ cd /opt/coco
-    $ ./cocod status  # 确定jumpserver已经运行，如果没有运行请重新启动coco
-
-    # 如果安装了 Guacamole
-    $ systemctl status tomcat  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
 
 服务全部启动后，访问 http://192.168.244.144，访问nginx代理的端口，不要再通过8080端口访问
 
