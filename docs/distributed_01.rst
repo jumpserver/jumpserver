@@ -17,16 +17,7 @@
 -  Nginx 代理 IP: 192.168.100.100
 
 
-
-数据库服务器运行 mariadb 服务
-
-Jumpserver 服务器运行 jumpserver、redis 服务
-
-Coco 服务器运行 coco 服务
-
-Guacamole 服务器运行 docker 服务
-
-Nginx 代理服务器运行 nginx 服务，注意 upstream 的负载模式，需要解决 session 问题
+Nginx 多组件注意 upstream 的负载模式，需要解决 session 问题
 
 安全
 ~~~~~~~
