@@ -403,7 +403,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
 
-**4.1 解压 Luna **
+**4.1 解压 Luna**
 
 ::
 
@@ -445,7 +445,7 @@ Guacamole 需要 Tomcat 来运行
     $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
     $ ldconfig
 
-**5.3 配置 Tomcat **
+**5.3 配置 Tomcat**
 
 ::
 
@@ -474,7 +474,7 @@ Guacamole 需要 Tomcat 来运行
     $ export GUACAMOLE_HOME=/config/guacamole
     $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
 
-**5.5 启动 Guacamole **
+**5.5 启动 Guacamole**
 
 ::
 
@@ -486,7 +486,7 @@ Guacamole 需要 Tomcat 来运行
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**6.1 安装 Nginx **
+**6.1 安装 Nginx**
 
 .. code:: shell
 
