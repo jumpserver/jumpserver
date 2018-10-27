@@ -367,7 +367,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
 
-4.1 解压 Luna
+**4.1 解压 Luna**
 
 ::
 
@@ -409,7 +409,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/
     $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
 
-**5.3 配置 Tomcat **
+**5.3 配置 Tomcat**
 
 ::
 
@@ -434,7 +434,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ export GUACAMOLE_HOME=/config/guacamole
     $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
 
-**5.5 启动 Guacamole **
+**5.5 启动 Guacamole**
 
 ::
 
@@ -449,14 +449,14 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**6.1 安装 Nginx 根据喜好选择安装方式和版本**
+**6.1 安装 Nginx**
 
 ::
 
     $ apt-get -y install nginx
 
 
-**6.2 准备配置文件 修改 /etc/nginx/site-enabled/default **
+**6.2 准备配置文件 修改 /etc/nginx/site-enabled/default**
 
 
 ::
@@ -526,7 +526,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     }
 
-**6.3 重启 Nginx **
+**6.3 重启 Nginx**
 
 ::
 
@@ -534,7 +534,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ service nginx restart
 
 
-**6.4 开始使用 Jumpserver **
+**6.4 开始使用 Jumpserver**
 
 服务全部启动后，访问 http://192.168.244.144
 
