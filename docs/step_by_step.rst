@@ -425,8 +425,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
 
-    $ yum install -y tomcat  # 安装 tomcat
-
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
 
@@ -441,21 +439,28 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ ldconfig
 
     $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
-    $ rm -rf /var/lib/tomcat/webapps/*
-    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /var/lib/tomcat/webapps/ROOT.war  # guacamole client
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
     $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
-    $ chown -R tomcat:tomcat /config  # 修改目录权限
 
-    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /etc/tomcat/server.xml`  # 修改默认端口为 8081
-    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /etc/tomcat/logging.properties`  # 修改 log 等级为 WARNING
-    $ echo 'JUMPSERVER_KEY_DIR=/config/guacamole/keys' >> /etc/tomcat/tomcat.conf
-    $ echo 'GUACAMOLE_HOME=/config/guacamole' >> /etc/tomcat/tomcat.conf
-    $ echo 'JUMPSERVER_SERVER=http://127.0.0.1:8080' >> /etc/tomcat/tomcat.conf  # http://127.0.0.1:8080 指 jumpserver 访问地址
+    $ cd /config
+    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
+    $ tar xf apache-tomcat-8.5.34.tar.gz
+    $ rm -rf apache-tomcat-8.5.34.tar.gz
+    $ mv apache-tomcat-8.5.34 tomcat8
+    $ rm -rf /var/lib/tomcat/webapps/*
+    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
+    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl"8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
+    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
+
+    $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
+    $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> .bashrc
+    $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
+    $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> .bashrc
+    $ export GUACAMOLE_HOME=/config/guacamole
+    $ echo "export GUACAMOLE_HOME=/config/guacamole" >> .bashrc
 
     $ /etc/init.d/guacd start
-    $ systemctl start tomcat
-    $ systemctl enable tomcat
+    $ sh /config/tomcat8/bin/startup.sh
 
 启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
 

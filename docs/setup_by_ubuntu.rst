@@ -387,8 +387,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get -y install default-jre
     $ apt-get -y install default-jdk
 
-    $ apt-get -y install tomcat8  # 安装 tomcat8
-
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
     $ cd docker-guacamole
@@ -401,21 +399,29 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14 \
     $ ldconfig
 
-    $ rm -rf /var/lib/tomcat8/webapps/*
-    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /var/lib/tomcat8/webapps/ROOT.war  # guacamole client
-    $ mkdir -p /opt/guacamole /opt/guacamole/lib /opt/guacamole/extensions  # 创建 guacamole 目录
-    $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /opt/guacamole/extensions/
-    $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /opt/guacamole/  # guacamole 配置文件
-    $ chown -R tomcat8:tomcat8 /opt/guacamole  # 修改目录权限
+    $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
+    $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/
+    $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
 
-    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl"8080"' -rl /var/lib/tomcat8/conf/server.xml`  # 修改默认端口为 8081
-    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /var/lib/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
-    $ echo "JUMPSERVER_SERVER=http://127.0.0.1:8080" >> /etc/default/tomcat8  # http://127.0.0.1:8080 指 jumpserver 访问地址
-    $ echo "JUMPSERVER_KEY_DIR=/opt/guacamole/keys" >> /etc/default/tomcat8
-    $ echo "GUACAMOLE_HOME=/opt/guacamole" >> /etc/default/tomcat8
+    $ cd /config
+    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
+    $ tar xf apache-tomcat-8.5.34.tar.gz
+    $ rm -rf apache-tomcat-8.5.34.tar.gz
+    $ mv apache-tomcat-8.5.34 tomcat8
+    $ rm -rf /config/tomcat8/webapps/*
+    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
+    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl"8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
+    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
+
+    $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
+    $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> .bashrc
+    $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
+    $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> .bashrc
+    $ export GUACAMOLE_HOME=/config/guacamole
+    $ echo "export GUACAMOLE_HOME=/config/guacamole" >> .bashrc
 
     $ /etc/init.d/guacd restart
-    $ /etc/init.d/tomcat8 restart
+    $ sh /config/tomcat8/bin/startup.sh
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081，若与主机上其他端口冲突请自定义一下。
 
@@ -511,20 +517,6 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
 
 6.4 开始使用 Jumpserver
-
-检查应用是否已经正常运行
-
-::
-
-
-    $ cd /opt/jumpserver
-    $ ./jms status  # 确定jumpserver已经运行，如果没有运行请重新启动jumpserver
-
-    $ cd /opt/coco
-    $ ./cocod status  # 确定jumpserver已经运行，如果没有运行请重新启动coco
-
-    # 如果安装了 Guacamole
-    $ /etc/init.d/tomcat8 status  # 检查容器是否已经正常运行，如果没有运行请重新启动Guacamole
 
 服务全部启动后，访问 http://192.168.244.144
 
