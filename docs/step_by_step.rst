@@ -447,17 +447,17 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ tar xf apache-tomcat-8.5.34.tar.gz
     $ rm -rf apache-tomcat-8.5.34.tar.gz
     $ mv apache-tomcat-8.5.34 tomcat8
-    $ rm -rf /var/lib/tomcat/webapps/*
+    $ rm -rf /config/tomcat8/webapps/*
     $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
-    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl"8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
+    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
     $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
-    $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> .bashrc
+    $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
-    $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> .bashrc
+    $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
-    $ echo "export GUACAMOLE_HOME=/config/guacamole" >> .bashrc
+    $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
 
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
