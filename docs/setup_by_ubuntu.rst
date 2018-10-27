@@ -379,6 +379,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 五. 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**5.1 安装依赖**
+
 ::
 
     $ apt-get -y install libtool autoconf
@@ -386,6 +388,10 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get -y install libavcodec-dev libavutil-dev libswscale-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
     $ apt-get -y install default-jre
     $ apt-get -y install default-jdk
+
+**5.2 编译安装 guacamole 服务**
+
+::
 
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
@@ -403,6 +409,10 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/
     $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
 
+**5.3 配置 Tomcat **
+
+::
+
     $ cd /config
     $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
     $ tar xf apache-tomcat-8.5.34.tar.gz
@@ -413,12 +423,20 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
     $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
 
+**5.4 配置环境变量**
+
+::
+
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
     $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
+
+**5.5 启动 Guacamole **
+
+::
 
     $ /etc/init.d/guacd restart
     $ sh /config/tomcat8/bin/startup.sh
@@ -431,14 +449,14 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-6.1 安装 Nginx 根据喜好选择安装方式和版本
+**6.1 安装 Nginx 根据喜好选择安装方式和版本**
 
 ::
 
     $ apt-get -y install nginx
 
 
-6.2 准备配置文件 修改 /etc/nginx/site-enabled/default
+**6.2 准备配置文件 修改 /etc/nginx/site-enabled/default **
 
 
 ::
@@ -508,7 +526,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     }
 
-6.3 重启 Nginx
+**6.3 重启 Nginx **
 
 ::
 
@@ -516,7 +534,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ service nginx restart
 
 
-6.4 开始使用 Jumpserver
+**6.4 开始使用 Jumpserver **
 
 服务全部启动后，访问 http://192.168.244.144
 
