@@ -11,7 +11,7 @@ from django.core.mail import get_connection, send_mail
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .permissions import IsOrgAdmin
+from .permissions import IsOrgAdmin, IsSuperUser
 from .serializers import MailTestSerializer, LDAPTestSerializer
 from .models import Setting
 
@@ -90,7 +90,7 @@ class LDAPTestingAPI(APIView):
 
 
 class ReplayStorageCreateAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
 
     def post(self, request):
         storage_data = request.data
@@ -120,6 +120,7 @@ class ReplayStorageCreateAPI(APIView):
 
 
 class ReplayStorageDeleteAPI(APIView):
+    permission_classes = (IsSuperUser,)
 
     def post(self, request):
         storage_name = str(request.data.get('name'))
@@ -128,7 +129,7 @@ class ReplayStorageDeleteAPI(APIView):
 
 
 class CommandStorageCreateAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
 
     def post(self, request):
         storage_data = request.data
@@ -153,7 +154,7 @@ class CommandStorageCreateAPI(APIView):
 
 
 class CommandStorageDeleteAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
 
     def post(self, request):
         storage_name = str(request.data.get('name'))
