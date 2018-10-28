@@ -14,12 +14,20 @@ Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中
 生产中请使用 详细安装 `CentOS <step_by_step.rst>`_  `Ubuntu <setup_by_ubuntu.rst>`_
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
+创建数据库
+``````````````````
+创建数据库命令行::
+
+    # mysql
+    $ create database jumpserver default charset 'utf8';
+    $ grant all on jumpserver.* to 'jumpserver'@'%' identified by 'weakPassword';
+
 快速启动
 ```````````````
 使用 root 命令行输入::
 
     # 1.4.3 版本（最新）
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
+    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.x.x -e DB_PORT=3306 -e DB_USER=jumpserver -e DB_PASSWORD=weakPassword -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
 
 访问
 ```````````````
@@ -31,23 +39,23 @@ SSH访问: ssh -p 2222 <容器所在服务器IP>
 XShell等工具请添加connection连接，ssh 端口 2222
 
 
-
 额外环境变量
 ```````````````
 
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
 - DB_PORT = 3306
-- DB_USER = xxx
-- DB_PASSWORD = xxxx
+- DB_USER = jumpserver
+- DB_PASSWORD = weakPassword
 - DB_NAME = jumpserver
 
-- REDIS_HOST = <redis-host>
-- REDIS_PORT = <redis-port>
+- REDIS_HOST = 127.0.0.1
+- REDIS_PORT = 6379
 - REDIS_PASSWORD =
 
 - VOLUME /opt/jumpserver/data
 - VOLUME /opt/coco/keys
+- VOLUME /config/guacamole/keys
 
  ::
 
