@@ -10,7 +10,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.utils import set_or_append_attr_bulk
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
-from .utils import AssetPermissionUtil, is_obj_attr_has
+from .utils import AssetPermissionUtil, is_obj_attr_has, sort_assets
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
@@ -87,10 +87,27 @@ class UserGrantedAssetsApi(ListAPIView):
             k.system_users_granted = system_users_granted
             queryset.append(k)
 
-        queryset = self.filter_search(queryset)
         return queryset
 
-    def filter_search(self, queryset):
+    def filter_queryset(self, queryset):
+        # super().filter_queryset()
+        queryset = self.search_assets(queryset)
+        queryset = self.sort_assets(queryset)
+        return queryset
+
+    def sort_assets(self, queryset):
+        order_by = self.request.query_params.get('order')
+        if not order_by:
+            order_by = 'hostname'
+
+        if order_by.startswith('-'):
+            order_by = order_by.lstrip('-')
+            queryset = sort_assets(queryset, order_by=order_by, reverse=True)
+        else:
+            queryset = sort_assets(queryset, order_by=order_by)
+        return queryset
+
+    def search_assets(self, queryset):
         value = self.request.query_params.get('search')
         if not value:
             return queryset

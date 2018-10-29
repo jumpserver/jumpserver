@@ -167,3 +167,12 @@ def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
         if str(v).find(val) != -1:
             return True
     return False
+
+
+def sort_assets(assets, order_by='hostname', reverse=False):
+    if order_by == 'ip':
+        assets = sorted(assets, key=lambda asset: [int(d) for d in asset.ip.split('.') if d.isdigit()], reverse=reverse)
+    else:
+        assets = sorted(assets, key=lambda asset: getattr(asset, order_by), reverse=reverse)
+    return assets
+
