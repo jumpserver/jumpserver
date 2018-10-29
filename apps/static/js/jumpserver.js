@@ -152,6 +152,9 @@ function activeNav() {
         $('#' + app + ' #' + resource).addClass('active');
         $('#' + app + ' #' + resource + ' #' + item + ' a').css('color', '#ffffff');
     }
+    else if (app === 'settings'){
+        $("#" + app).addClass('active');
+    }
     else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');

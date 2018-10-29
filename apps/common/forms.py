@@ -135,30 +135,22 @@ class TerminalSettingForm(BaseForm):
         ('hostname', _('Hostname')),
         ('ip', _('IP')),
     )
-    TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
-        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
-    )
-    TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
-        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
-    )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Password auth")
     )
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Public key auth")
     )
-    TERMINAL_COMMAND_STORAGE = FormEncryptDictField(
-        label=_("Command storage"), help_text=_(
-            "Set terminal storage setting, `default` is the using as default,"
-            "You can set other storage and some terminal using"
-        )
+    TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
+        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
     )
-    TERMINAL_REPLAY_STORAGE = FormEncryptDictField(
-        label=_("Replay storage"), help_text=_(
-            "Set replay storage setting, `default` is the using as default,"
-            "You can set other storage and some terminal using"
-        )
+    TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
+        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
     )
+
+
+class TerminalCommandStorage(BaseForm):
+    pass
 
 
 class SecuritySettingForm(BaseForm):

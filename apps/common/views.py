@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+from common.models import common_settings
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
 from common.permissions import SuperUserRequiredMixin
 from .signals import ldap_auth_enable
+from . import utils
 
 
 class BasicSettingView(SuperUserRequiredMixin, TemplateView):
@@ -95,14 +97,15 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
     template_name = "common/terminal_setting.html"
 
     def get_context_data(self, **kwargs):
-        command_storage = settings.TERMINAL_COMMAND_STORAGE
-        replay_storage = settings.TERMINAL_REPLAY_STORAGE
+        command_storage = utils.get_command_storage_or_create_default_storage()
+        replay_storage = utils.get_replay_storage_or_create_default_storage()
+
         context = {
             'app': _('Settings'),
             'action': _('Terminal setting'),
             'form': self.form_class(),
             'replay_storage': replay_storage,
-            'command_storage': command_storage,
+            'command_storage': command_storage
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -118,6 +121,30 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
             context = self.get_context_data()
             context.update({"form": form})
             return render(request, self.template_name, context)
+
+
+class ReplayStorageCreateView(SuperUserRequiredMixin, TemplateView):
+    template_name = 'common/replay_storage_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Create replay storage')
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class CommandStorageCreateView(SuperUserRequiredMixin, TemplateView):
+    template_name = 'common/command_storage_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Create command storage')
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class SecuritySettingView(SuperUserRequiredMixin, TemplateView):

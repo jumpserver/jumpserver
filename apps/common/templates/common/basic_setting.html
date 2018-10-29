@@ -76,31 +76,5 @@
 <script>
 $(document).ready(function () {
 })
-.on("click", ".btn-test", function () {
-    var data = {};
-    var form = $("form").serializeArray();
-    $.each(form, function (i, field) {
-        data[field.name] = field.value;
-    });
-
-    var the_url = "{% url 'api-common:mail-testing' %}";
-
-    function error(message) {
-        toastr.error(message)
-    }
-
-    function success(message) {
-        toastr.success(message.msg)
-    }
-    APIUpdateAttr({
-        url: the_url,
-        body: JSON.stringify(data),
-        method: "POST",
-        flash_message: false,
-        success: success,
-        error: error
-    });
-
-})
 </script>
 {% endblock %}
