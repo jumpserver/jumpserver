@@ -90,7 +90,6 @@ class UserGrantedAssetsApi(ListAPIView):
         return queryset
 
     def filter_queryset(self, queryset):
-        # super().filter_queryset()
         queryset = self.search_assets(queryset)
         queryset = self.sort_assets(queryset)
         return queryset
@@ -102,9 +101,11 @@ class UserGrantedAssetsApi(ListAPIView):
 
         if order_by.startswith('-'):
             order_by = order_by.lstrip('-')
-            queryset = sort_assets(queryset, order_by=order_by, reverse=True)
+            reverse = True
         else:
-            queryset = sort_assets(queryset, order_by=order_by)
+            reverse = False
+
+        queryset = sort_assets(queryset, order_by=order_by, reverse=reverse)
         return queryset
 
     def search_assets(self, queryset):
@@ -214,6 +215,7 @@ class UserGrantedNodeAssetsApi(ListAPIView):
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
+    pagination_class = LimitOffsetPagination
 
     def change_org_if_need(self):
         if self.request.user.is_superuser or \
@@ -236,7 +238,40 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
+
         return assets
+
+    def paginate_queryset(self, queryset):
+        if self.paginator is None:
+            return None
+        queryset = self.paginator.paginate_queryset(list(queryset), self.request, view=self)
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = self.search_assets(queryset)
+        queryset = self.sort_assets(queryset)
+        return queryset
+
+    def search_assets(self, queryset):
+        value = self.request.query_params.get('search')
+        if not value:
+            return queryset
+        queryset = [asset for asset in queryset if is_obj_attr_has(asset, value)]
+        return queryset
+
+    def sort_assets(self, queryset):
+        order_by = self.request.query_params.get('order')
+        if not order_by:
+            order_by = 'hostname'
+
+        if order_by.startswith('-'):
+            order_by = order_by.lstrip('-')
+            reverse = True
+        else:
+            reverse = False
+
+        queryset = sort_assets(queryset, order_by=order_by, reverse=reverse)
+        return queryset
 
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
