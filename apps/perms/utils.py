@@ -156,3 +156,14 @@ class AssetPermissionUtil:
         return tree.nodes
 
 
+def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
+    if not attrs:
+        vals = [val for val in obj.__dict__.values() if isinstance(val, (str, int))]
+    else:
+        vals = [getattr(obj, attr) for attr in attrs if
+                hasattr(obj, attr) and isinstance(hasattr(obj, attr), (str, int))]
+
+    for v in vals:
+        if str(v).find(val) != -1:
+            return True
+    return False

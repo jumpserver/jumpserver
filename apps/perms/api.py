@@ -10,7 +10,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.utils import set_or_append_attr_bulk
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
-from .utils import AssetPermissionUtil
+from .utils import AssetPermissionUtil, is_obj_attr_has
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
@@ -86,6 +86,15 @@ class UserGrantedAssetsApi(ListAPIView):
             system_users_granted = [s for s in v if s.protocol == k.protocol]
             k.system_users_granted = system_users_granted
             queryset.append(k)
+
+        queryset = self.filter_search(queryset)
+        return queryset
+
+    def filter_search(self, queryset):
+        value = self.request.query_params.get('search')
+        if not value:
+            return queryset
+        queryset = [asset for asset in queryset if is_obj_attr_has(asset, value)]
         return queryset
 
     def get_permissions(self):
