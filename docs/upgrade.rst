@@ -1,4 +1,4 @@
-在线更新升级
+更新升级
 -------------
 
 说明
@@ -37,6 +37,7 @@
     $ cp config_example.py config.py
     $ vim config.py  # 参考安装文档进行修改
 
+    # 所有版本都需要执行此步骤
     $ pip install -r requirements/requirements.txt
     $ cd utils && sh make_migrations.sh
 
@@ -52,6 +53,7 @@
     # 任意版本升级到 1.4.0 版本，需要执行（升级前版本小于 1.4.0 需要执行此步骤）
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
 
+    # 启动 jumpserver
     $ cd ../ && ./jms start all
 
     # 任意版本升级到 1.4.2 版本，需要修改 nginx 配置 （升级前版本小于 1.4.2 需要执行此步骤）
@@ -116,19 +118,24 @@
 
 ::
 
-    $ docker pull jumpserver/guacamole:latest
-    # 如果镜像不是 jumpserver/guacamole，请修改成 registry.jumpserver.org/public/guacamole
-    $ docker stop jms_guacamole  # 或者写guacamole的容器ID
-    $ docker rename jms_guacamole jms_guacamole_bak  # 如果名称不正确请手动修改
-    $ docker run --name jms_guacamole -d \
-      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写Jumpserver的url地址> \
-      jumpserver/guacamole:latest
+    /etc/init.d/guacd stop
+    sh /config/tomcat8/bin/shutdown.sh
+    $ cd /opt/docker-guacamole
+    $ git pull
+    $ tar -xf guacamole-server-0.9.14.tar.gz
+    $ cd guacamole-server-0.9.14
+    $ autoreconf -fi
+    $ ./configure --with-init-dir=/etc/init.d
+    $ make && make install
+    $ cd ..
+    $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
+    $ ldconfig
+    $ cp guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ cp root/app/guacamole/guacamole.properties /config/guacamole/
+    $ cp guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
 
-    # 确定升级完成后，可以删除备份容器
-    $ docker rm jms_guacamole_bak
-
+    $ /etc/init.d/guacd start
+    $ sh /config/tomcat8/bin/startup.sh
 
 切换分支或releases包升级
 -------------------------------
@@ -248,4 +255,4 @@ coco 是无状态的，备份 keys 目录即可
 
 **Guacamole**
 
-直接参考上面的升级即可, 需要注意的是如果更换机器，请备份
+直接参考上面的升级即可

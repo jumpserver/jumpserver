@@ -10,7 +10,7 @@
 - **yumaojun03 <喻茂峻>** DevOps 资深开发者，擅长 Python、Go 以及 PaaS 平台开发
 - **kelianchun <柯连春>** DevOps 资产开发者，修复了很多 Bugs
 - **小彧 <李磊>** Django 资深开发者，为用户模块贡献了很多代码
-- **sofia <周小侠>** 资深前端工程师, 前端代码贡献者 
+- **sofia <周小侠>** 资深前端工程师, 前端代码贡献者
 - **q4speed <莫鹍>** 架构师，贡献了 Windows 远程桌面登录大部分代码
 - **ZhangFengyi <张峰毅>** 贡献了 新版文档
 - **Aaron3S <沈晨阳>** 贡献了 新版文档

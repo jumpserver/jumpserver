@@ -10,7 +10,7 @@
 一、系统设置
 ````````````````````
 
-1.1 基本设置
+**1.1 基本设置**
 
 ::
 
@@ -19,7 +19,7 @@
 
 .. image:: _static/img/basic_setting.jpg
 
-1.2 邮件设置
+**1.2 邮件设置**
 
 ::
 
@@ -30,7 +30,7 @@
 
 .. image:: _static/img/smtp_setting.jpg
 
-1.3 LDAP设置
+**1.3 LDAP设置**
 
 ::
 
@@ -40,7 +40,7 @@
     注：可借用第三方 gui 工具查看 ldap 用户的属性，新版本已经支持中文名登录，即cn=中文也可正常使用
     详细设置请参考`LDAP 使用说明 <faq_ldap.html>`_
 
-1.4 终端设置
+**1.4 终端设置**
 
 ::
 
@@ -52,12 +52,12 @@
 
     修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录，然后重启 Jumpserver 服务
 
-1.5 安全设置
+**1.5 安全设置**
 
 二、创建用户
 `````````````````````
 
-2.1 创建 Jumpserver 用户
+**2.1 创建 Jumpserver 用户**
 
 ::
 
@@ -74,9 +74,9 @@
 三、创建资产
 ``````````````````
 
-3.1 创建 Linux 资产
+**3.1 创建 Linux 资产**
 
-3.1.1 编辑资产树
+**3.1.1 编辑资产树**
 
 ::
 
@@ -85,7 +85,7 @@
 
 .. image:: _static/img/asset_tree.jpg
 
-3.1.2 创建管理用户
+**3.1.2 创建管理用户**
 
 ::
 
@@ -121,7 +121,7 @@
 
 .. image:: _static/img/create_asset_admin_user.jpg
 
-3.1.3 创建系统用户
+**3.1.3 创建系统用户**
 
 ::
 
@@ -152,7 +152,7 @@
 
 .. image:: _static/img/create_asset_system_user.jpg
 
-3.1.4 创建资产
+**3.1.4 创建资产**
 
 ::
 
@@ -174,7 +174,44 @@
 
 参考 `Linux 资产连接说明 <faq_linux.html>`_
 
-3.1.5 网域列表
+**3.2 创建 Windows 资产**
+
+**3.2.1 创建 Windows 系统管理用户**
+
+::
+
+    注：同 Linux 系统的管理用户一样，名称可以按资产树来命名，用户名是管理员用户名，密码是管理员的密码
+
+.. image:: _static/img/create_windows_admin.jpg
+
+**3.2.2 创建 Windows 系统系统用户**
+
+::
+
+    # 目前 Windows 暂不支持自动推送，用户必须在系统中存在且有权限使用远程连接，请确认资产的防火墙已经开放
+    注：Windows 资产协议务必选择 rdp
+
+    # 如果想让用户登录资产时自己输入密码，可以点击系统用户的名称 点击清除认证信息
+
+.. image:: _static/img/create_windows_user.jpg
+
+**3.2.3 创建 Windows 资产**
+
+::
+
+    # Windows 7/8/2008/2012 系统平台选择 Windows
+    # Windows 10/2016 系统平台选择 Windows(2016)
+    # 创建 Windows 资产，系统平台请选择正确的 Windows，默认 RDP 端口号为3389，IP 和 管理用户请正确选择
+    注：确保管理用户能正确登录到指定的 IP 主机上
+
+.. image:: _static/img/create_windows_asset.jpg
+
+参考 `Windows 资产连接说明 <faq_windows.html>`_
+
+四、 网域网关
+``````````````````````
+
+**4.1 网域列表**
 
 ::
 
@@ -200,44 +237,10 @@
 
 .. image:: _static/img/create_asset02.jpg
 
-3.2 创建 Windows 资产
-
-3.2.1 创建 Windows 系统管理用户
-
-::
-
-    注：同 Linux 系统的管理用户一样，名称可以按资产树来命名，用户名是管理员用户名，密码是管理员的密码
-
-.. image:: _static/img/create_windows_admin.jpg
-
-3.2.2 创建 Windows 系统系统用户
-
-::
-
-    # 目前 Windows 暂不支持自动推送，用户必须在系统中存在且有权限使用远程连接，请确认资产的防火墙已经开放
-    注：Windows 资产协议务必选择 rdp
-
-    # 如果想让用户登录资产时自己输入密码，可以点击系统用户的名称 点击清除认证信息
-
-.. image:: _static/img/create_windows_user.jpg
-
-3.2.3 创建 Windows 资产
-
-::
-
-    # Windows 7/8/2008/2012 系统平台选择 Windows
-    # Windows 10/2016 系统平台选择 Windows(2016)
-    # 创建 Windows 资产，系统平台请选择正确的 Windows，默认 RDP 端口号为3389，IP 和 管理用户请正确选择
-    注：确保管理用户能正确登录到指定的 IP 主机上
-
-.. image:: _static/img/create_windows_asset.jpg
-
-参考 `Windows 资产连接说明 <faq_windows.html>`_
-
-四、资产节点管理
+五、资产节点管理
 ``````````````````````
 
-4.1 为资产树节点分配资产
+**5.1 为资产树节点分配资产**
 
 ::
 
@@ -251,7 +254,7 @@
 
 .. image:: _static/img/select_asset_to_node.jpg
 
-4.2 删除节点资产
+**5.2 删除节点资产**
 
 ::
 
@@ -259,8 +262,10 @@
 
 .. image:: _static/img/delete_asset_from_node.jpg
 
-五、创建授权规则
+六、创建授权规则
 `````````````````````
+
+**6.1 为用户分配资产**
 
 ::
 
@@ -289,10 +294,10 @@
     # 职责不同，权限就不同，按照职责制定系统用户
     # 这样授权就不会乱
 
-六、用户使用资产
+七、用户使用资产
 `````````````````````
 
-6.1 登录 Jumpserver
+**7.1 登录 Jumpserver**
 
 ::
 
@@ -300,9 +305,9 @@
 
 .. image:: _static/img/user_login_success.jpg
 
-6.2 使用资产
+**7.2 使用资产**
 
-6.2.1 连接资产
+**7.2.1 连接资产**
 
 ::
 
@@ -323,7 +328,7 @@
 
 .. image:: _static/img/windows_assert.jpg
 
-6.2.2 断开资产
+**7.2.2 断开资产**
 
 ::
 

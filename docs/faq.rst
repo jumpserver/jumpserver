@@ -6,6 +6,7 @@ FAQ
    LDAP 使用说明 <faq_ldap.rst>
    SFTP 使用说明 <faq_sftp.rst>
    TELNET 使用说明 <faq_telnet.rst>
+   Docker 使用说明 <faq_docker.rst>
    安装过程 常见问题 <faq_install.rst>
    RDP 协议资产连接说明 <faq_rdp.rst>
    SSH 协议资产连接说明 <faq_ssh.rst>
@@ -128,8 +129,8 @@ FAQ
 
 ::
 
-    # 资产授权就是把 系统用户关联到用户 并授权到 对应的资产
-    # 用户只能看到自己被授权的资产
+    资产授权就是把 系统用户关联到用户 并授权到 对应的资产
+    用户只能看到自己被授权的资产
 
 11. Web Terminal 页面经常需要重新刷新页面才能连接资产
 
