@@ -6,6 +6,7 @@ FAQ
    LDAP 使用说明 <faq_ldap.rst>
    SFTP 使用说明 <faq_sftp.rst>
    TELNET 使用说明 <faq_telnet.rst>
+   Docker 使用说明 <faq_docker.rst>
    安装过程 常见问题 <faq_install.rst>
    RDP 协议资产连接说明 <faq_rdp.rst>
    SSH 协议资产连接说明 <faq_ssh.rst>
