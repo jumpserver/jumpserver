@@ -16,9 +16,9 @@ sftp 使用说明
     $ cd 你的系统用户
     # 此处即是当前资产的 home 目录
 
-    # 如果需要修改 home 为其他目录
+    # 如果需要修改 /tmp 为其他目录
     $ vim coco/coco/sftp.py
 
     class SFTPServer(paramiko.SFTPServerInterface):
-        root = 'home'
+        root = '/tmp'
         # 修改 home 为你要指定的目录，如: root = '/'
