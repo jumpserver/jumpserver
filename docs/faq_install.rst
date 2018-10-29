@@ -156,7 +156,7 @@
 ::
 
     这是因为你没有按照教程进行安装，修改了安装目录，需要在 nginx 的配置文件里面修改资源路径
-    $ vim /etc/nginx/nginx.conf
+    $ vim /etc/nginx/conf.d/jumpserver.conf
 
     ...
 
@@ -187,6 +187,14 @@
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
+        }
+
+        location /coco/ {
+            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器，请填写它的ip
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
         }
 
         location /guacamole/ {
