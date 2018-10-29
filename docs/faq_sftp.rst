@@ -20,5 +20,5 @@ sftp 使用说明
     $ vim coco/coco/sftp.py
 
     class SFTPServer(paramiko.SFTPServerInterface):
-        root = 'home'
+        root = '/tmp'
         # 修改 home 为你要指定的目录，如: root = '/'
