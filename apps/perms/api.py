@@ -183,6 +183,25 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
             queryset.append(node)
         return queryset
 
+    def filter_queryset(self, queryset):
+        queryset = self.sort_assets(queryset)
+        return queryset
+
+    def sort_assets(self, queryset):
+        order_by = self.request.query_params.get('order')
+        if not order_by:
+            order_by = 'hostname'
+
+        if order_by.startswith('-'):
+            order_by = order_by.lstrip('-')
+            reverse = True
+        else:
+            reverse = False
+
+        for node in queryset:
+            node.assets_granted = sort_assets(node.assets_granted, order_by=order_by, reverse=reverse)
+        return queryset
+
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
@@ -195,7 +214,7 @@ class UserGrantedNodeAssetsApi(ListAPIView):
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
-    
+
     def change_org_if_need(self):
         if self.request.user.is_superuser or \
                 self.request.user.is_app or \
