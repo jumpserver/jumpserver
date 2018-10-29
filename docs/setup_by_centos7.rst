@@ -312,7 +312,7 @@ CentOS 7 安装文档
     $ yum install -y git gcc java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
-    $ cd /op
+    $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
     $ cd /opt/docker-guacamole/
     $ tar -xf guacamole-server-0.9.14.tar.gz
