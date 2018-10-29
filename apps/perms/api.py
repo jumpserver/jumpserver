@@ -160,18 +160,8 @@ class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
         return queryset
 
     def sort_assets(self, queryset):
-        order_by = self.request.query_params.get('order')
-        if not order_by:
-            order_by = 'hostname'
-
-        if order_by.startswith('-'):
-            order_by = order_by.lstrip('-')
-            reverse = True
-        else:
-            reverse = False
-
         for node in queryset:
-            node.assets_granted = sort_assets(node.assets_granted, order_by=order_by, reverse=reverse)
+            node.assets_granted = super().sort_assets(node.assets_granted)
         return queryset
 
     def get_permissions(self):
