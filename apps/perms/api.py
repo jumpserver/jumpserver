@@ -8,9 +8,10 @@ from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk
+from common.mixins import AssetsFilterMixin
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
-from .utils import AssetPermissionUtil, is_obj_attr_has, sort_assets
+from .utils import AssetPermissionUtil, sort_assets
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
@@ -57,7 +58,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return permissions
 
 
-class UserGrantedAssetsApi(ListAPIView):
+class UserGrantedAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     用户授权的所有资产
     """
@@ -87,32 +88,6 @@ class UserGrantedAssetsApi(ListAPIView):
             k.system_users_granted = system_users_granted
             queryset.append(k)
 
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = self.search_assets(queryset)
-        queryset = self.sort_assets(queryset)
-        return queryset
-
-    def sort_assets(self, queryset):
-        order_by = self.request.query_params.get('order')
-        if not order_by:
-            order_by = 'hostname'
-
-        if order_by.startswith('-'):
-            order_by = order_by.lstrip('-')
-            reverse = True
-        else:
-            reverse = False
-
-        queryset = sort_assets(queryset, order_by=order_by, reverse=reverse)
-        return queryset
-
-    def search_assets(self, queryset):
-        value = self.request.query_params.get('search')
-        if not value:
-            return queryset
-        queryset = [asset for asset in queryset if is_obj_attr_has(asset, value)]
         return queryset
 
     def get_permissions(self):
@@ -151,7 +126,7 @@ class UserGrantedNodesApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(ListAPIView):
+class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     用户授权的节点并带着节点下资产的api
     """
@@ -184,10 +159,6 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
             queryset.append(node)
         return queryset
 
-    def filter_queryset(self, queryset):
-        queryset = self.sort_assets(queryset)
-        return queryset
-
     def sort_assets(self, queryset):
         order_by = self.request.query_params.get('order')
         if not order_by:
@@ -209,7 +180,7 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodeAssetsApi(ListAPIView):
+class UserGrantedNodeAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
     """
@@ -239,39 +210,8 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
 
+        assets = list(assets.keys())
         return assets
-
-    def paginate_queryset(self, queryset):
-        if self.paginator is None:
-            return None
-        queryset = self.paginator.paginate_queryset(list(queryset), self.request, view=self)
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = self.search_assets(queryset)
-        queryset = self.sort_assets(queryset)
-        return queryset
-
-    def search_assets(self, queryset):
-        value = self.request.query_params.get('search')
-        if not value:
-            return queryset
-        queryset = [asset for asset in queryset if is_obj_attr_has(asset, value)]
-        return queryset
-
-    def sort_assets(self, queryset):
-        order_by = self.request.query_params.get('order')
-        if not order_by:
-            order_by = 'hostname'
-
-        if order_by.startswith('-'):
-            order_by = order_by.lstrip('-')
-            reverse = True
-        else:
-            reverse = False
-
-        queryset = sort_assets(queryset, order_by=order_by, reverse=reverse)
-        return queryset
 
     def get_permissions(self):
         if self.kwargs.get('pk') is None:

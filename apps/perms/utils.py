@@ -175,4 +175,3 @@ def sort_assets(assets, order_by='hostname', reverse=False):
     else:
         assets = sorted(assets, key=lambda asset: getattr(asset, order_by), reverse=reverse)
     return assets
-
