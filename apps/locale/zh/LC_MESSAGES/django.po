@@ -2477,8 +2477,8 @@ msgstr "用户或用户组"
 #: perms/templates/perms/asset_permission_asset.html:27
 #: perms/templates/perms/asset_permission_detail.html:27
 #: perms/templates/perms/asset_permission_user.html:27
-msgid "Assets and asset groups"
-msgstr "资产或资产组"
+msgid "Assets and node"
+msgstr "资产或节点"
 
 #: perms/templates/perms/asset_permission_asset.html:80
 msgid "Add asset to this permission"
