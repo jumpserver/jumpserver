@@ -309,7 +309,11 @@ CentOS 7 安装文档
     $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
     $ yum install -y git gcc java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
-    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
+    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
+    $ ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
     $ cd /opt/docker-guacamole/

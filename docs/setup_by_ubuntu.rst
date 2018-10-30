@@ -385,7 +385,8 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
 
     $ apt-get -y install libtool autoconf
     $ apt-get -y install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libossp-uuid-dev
-    $ apt-get -y install libavcodec-dev libavutil-dev libswscale-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
+    $ apt-get -y install libavcodec-dev libavutil-dev libswscale-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev ghostscript
+    $ ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/freerdp
     $ apt-get -y install default-jre
     $ apt-get -y install default-jdk
 

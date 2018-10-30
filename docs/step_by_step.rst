@@ -421,7 +421,11 @@ Guacamole 需要 Tomcat 来运行
 
     $ yum install -y git gcc java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
-    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
+    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
+    $ ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/
+    $ ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/
 
 **5.2 编译安装 guacamole 服务**
 
