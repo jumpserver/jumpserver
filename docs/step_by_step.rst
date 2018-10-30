@@ -463,6 +463,8 @@ Guacamole 需要 Tomcat 来运行
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
+    $ export JUMPSERVER_ENABLE_DRIVE=true
+    $ echo "export JUMPSERVER_ENABLE_DRIVE=true " >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
