@@ -92,7 +92,7 @@ class Node(OrgModelMixin):
             return child
 
     def get_children(self, with_self=False):
-        pattern = r'^{0}$|^{}:[0-9]+$' if with_self else r'^{}:[0-9]+$'
+        pattern = r'^{0}$|^{0}:[0-9]+$' if with_self else r'^{0}:[0-9]+$'
         return self.__class__.objects.filter(
             key__regex=pattern.format(self.key)
         )

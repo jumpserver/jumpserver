@@ -17,6 +17,15 @@ from orgs.utils import set_to_root_org
 from . import serializers
 
 
+__all__ = [
+    'AssetPermissionViewSet', 'UserGrantedAssetsApi', 'UserGrantedNodesApi',
+    'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi', 'UserGroupGrantedAssetsApi',
+    'UserGroupGrantedNodesApi', 'UserGroupGrantedNodesWithAssetsApi', 'UserGroupGrantedNodeAssetsApi',
+    'ValidateUserAssetPermissionApi', 'AssetPermissionRemoveUserApi', 'AssetPermissionAddUserApi',
+    'AssetPermissionRemoveAssetApi', 'AssetPermissionAddAssetApi', 'UserGrantedNodeChildrenApi',
+]
+
+
 class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     资产授权列表的增删改查api
@@ -152,6 +161,8 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
                 system_users_granted = [s for s in v if s.protocol == k.protocol]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
+            if not node.assets_granted:
+                continue
             queryset.append(node)
         return queryset
 
@@ -274,7 +285,7 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         return assets
 
 
-class ValidateUserAssetPermissionView(RootOrgViewMixin, APIView):
+class ValidateUserAssetPermissionApi(RootOrgViewMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     @staticmethod
@@ -367,3 +378,81 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
+
+
+class UserGrantedNodeChildrenApi(ListAPIView):
+    permission_classes = (IsValidUser,)
+    serializer_class = serializers.AssetPermissionNodeSerializer
+
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+
+    def get_children_queryset(self):
+        util = AssetPermissionUtil(self.request.user)
+        node_id = self.request.query_params.get('id')
+        nodes_granted = util.get_nodes_with_assets()
+        if nodes_granted:
+            first_node = sorted(nodes_granted, reverse=True)[0]
+        else:
+            return []
+        if node_id and node_id in [str(node.id) for node in nodes_granted]:
+            node = [node for node in nodes_granted if str(node.id) == node_id][0]
+        else:
+            node = first_node
+        queryset = []
+        if node == first_node:
+            node.assets_amount = len(nodes_granted[node])
+            queryset.append(node)
+
+        children = []
+        for child in node.get_children():
+            if child in nodes_granted:
+                child.assets_amount = len(nodes_granted[node])
+                children.append(child)
+        children = sorted(children, key=lambda x: x.value)
+        queryset.extend(children)
+        fake_nodes = []
+        for asset, system_users in nodes_granted[node].items():
+            fake_node = asset.as_node()
+            fake_node.assets_amount = 0
+            fake_node.asset.system_users_granted = system_users
+            fake_node.key = node.key + ':0'
+            fake_nodes.append(fake_node)
+        fake_nodes = sorted(fake_nodes, key=lambda x: x.value)
+        queryset.extend(fake_nodes)
+        return queryset
+
+    def get_search_queryset(self, keyword):
+        util = AssetPermissionUtil(self.request.user)
+        nodes_granted = util.get_nodes_with_assets()
+        queryset = []
+        for node, assets in nodes_granted.items():
+            matched_assets = []
+            node_matched = node.value.lower().find(keyword.lower()) >= 0
+            asset_has_matched = False
+            for asset, system_users in assets.items():
+                asset_matched = (asset.hostname.lower().find(keyword.lower()) >= 0) \
+                                or (asset.ip.find(keyword.lower()) >= 0)
+                if node_matched or asset_matched:
+                    asset_has_matched = True
+                    fake_node = asset.as_node()
+                    fake_node.assets_amount = 0
+                    fake_node.asset.system_users_granted = system_users
+                    fake_node.key = node.key + ':0'
+                    matched_assets.append(fake_node)
+            if asset_has_matched:
+                node.assets_amount = len(matched_assets)
+                queryset.append(node)
+                queryset.extend(sorted(matched_assets, key=lambda x: x.value))
+        return queryset
+
+    def get_queryset(self):
+        self.change_org_if_need()
+        keyword = self.request.query_params.get('search')
+        if keyword:
+            return self.get_search_queryset(keyword)
+        else:
+            return self.get_children_queryset()
