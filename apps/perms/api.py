@@ -11,7 +11,7 @@ from common.utils import set_or_append_attr_bulk
 from common.mixins import AssetsFilterMixin
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
-from .utils import AssetPermissionUtil, sort_assets
+from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
