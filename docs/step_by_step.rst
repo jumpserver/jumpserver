@@ -52,7 +52,7 @@
 
 ::
 
-    $ yum -y install python36 python3-devel
+    $ yum -y install python36 python36-devel
 
 **1.3 建立 Python 虚拟环境**
 
