@@ -68,6 +68,30 @@ class Setting(models.Model):
             raise ValueError("Json dump error: {}".format(str(e)))
 
     @classmethod
+    def save_storage(cls, name, data):
+        obj = cls.objects.filter(name=name).first()
+        if not obj:
+            obj = cls()
+            obj.name = name
+            obj.encrypted = True
+            obj.cleaned_value = data
+        else:
+            value = obj.cleaned_value
+            value.update(data)
+            obj.cleaned_value = value
+        obj.save()
+        return obj
+
+    @classmethod
+    def delete_storage(cls, name, storage_name):
+        obj = cls.objects.get(name=name)
+        value = obj.cleaned_value
+        value.pop(storage_name, '')
+        obj.cleaned_value = value
+        obj.save()
+        return True
+
+    @classmethod
     def refresh_all_settings(cls):
         try:
             settings_list = cls.objects.all()
