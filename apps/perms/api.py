@@ -8,7 +8,6 @@ from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk
-from common.mixins import AssetsFilterMixin
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
 from .utils import AssetPermissionUtil
@@ -17,6 +16,7 @@ from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
 from orgs.utils import set_to_root_org
 from . import serializers
+from .mixins import AssetsFilterMixin
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
