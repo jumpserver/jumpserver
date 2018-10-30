@@ -217,7 +217,8 @@ function initTable() {
         select: {},
         op_html: $('#actions').html()
     };
-    table = jumpserver.initDataTable(options);
+    {#table = jumpserver.initDataTable(options);#}
+    table = jumpserver.initServerSideDataTable(options);
     return table
 }
 

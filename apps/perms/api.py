@@ -25,6 +25,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
 
     def get_serializer_class(self):
@@ -34,10 +35,16 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        search = self.request.query_params.get('search')
         asset_id = self.request.query_params.get('asset')
         node_id = self.request.query_params.get('node')
         inherit_nodes = set()
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
         if not asset_id and not node_id:
+            queryset = list(queryset.filter())
             return queryset
 
         permissions = set()
@@ -55,7 +62,8 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             _permissions = queryset.filter(nodes=n)
             set_or_append_attr_bulk(_permissions, "inherit", n.value)
             permissions.update(_permissions)
-        return permissions
+
+        return list(permissions)
 
 
 class UserGrantedAssetsApi(AssetsFilterMixin, ListAPIView):
