@@ -34,7 +34,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().all()
         search = self.request.query_params.get('search')
         asset_id = self.request.query_params.get('asset')
         node_id = self.request.query_params.get('node')
@@ -44,7 +44,6 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(name__icontains=search)
 
         if not asset_id and not node_id:
-            queryset = list(queryset.filter())
             return queryset
 
         permissions = set()
