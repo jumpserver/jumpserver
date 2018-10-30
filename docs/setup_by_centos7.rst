@@ -63,10 +63,8 @@ CentOS 7 安装文档
     $ yum -y install nginx
     $ systemctl enable nginx
 
-    # 下载编译 Python3.6.1
-    $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
-    $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
-    $ ./configure && make && make install
+    # 安装 Python3.6
+    $ yum -y install python36 python3-devel
 
     # 配置并载入 Python3 虚拟环境
     $ cd /opt

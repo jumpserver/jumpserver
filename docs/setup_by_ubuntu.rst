@@ -30,13 +30,13 @@
     $ apt-get install language-pack-zh-hans
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
 
-**1.2 编译安装**
+**1.2 安装 Python3.6**
 
 ::
 
-    $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
-    $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
-    $ ./configure && make && make install
+    $ add-apt-repository ppa:jonathonf/python-3.6 -y
+    $ apt-get update
+    $ apt-get -y install python3.6 python3.6-dev python3.6-venv
 
 **1.3 建立 Python 虚拟环境**
 
