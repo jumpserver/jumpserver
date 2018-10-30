@@ -95,7 +95,8 @@ function initTable() {
         ],
         op_html: $('#actions').html()
     };
-    jumpserver.initDataTable(options);
+    {#jumpserver.initDataTable(options);#}
+    jumpserver.initServerSideDataTable(options);
 }
 $(document).ready(function(){
     initTable();
