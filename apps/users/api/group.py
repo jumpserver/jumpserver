@@ -3,6 +3,7 @@
 
 from rest_framework import generics
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.pagination import LimitOffsetPagination
 
 from ..serializers import UserGroupSerializer, \
     UserGroupUpdateMemeberSerializer
@@ -15,9 +16,12 @@ __all__ = ['UserGroupViewSet', 'UserGroupUpdateUserApi']
 
 
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
+    filter_fields = ("name",)
+    search_fields = filter_fields
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permission_classes = (IsOrgAdmin,)
+    pagination_class = LimitOffsetPagination
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
