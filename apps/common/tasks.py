@@ -3,6 +3,7 @@ from django.conf import settings
 from celery import shared_task
 from .utils import get_logger
 from .models import Setting
+from common.models import common_settings
 
 
 logger = get_logger(__file__)
@@ -28,7 +29,7 @@ def send_mail_async(*args, **kwargs):
 
     if len(args) == 3:
         args = list(args)
-        args[0] = settings.EMAIL_SUBJECT_PREFIX + args[0]
+        args[0] = common_settings.EMAIL_SUBJECT_PREFIX + args[0]
         args.insert(2, settings.EMAIL_HOST_USER)
         args = tuple(args)
 

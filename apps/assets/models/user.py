@@ -7,6 +7,7 @@ import logging
 from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import get_signer
 from ..const import SYSTEM_USER_CONN_CACHE_KEY
@@ -111,7 +112,8 @@ class SystemUser(AssetUser):
 
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
-    priority = models.IntegerField(default=10, verbose_name=_("Priority"))
+    priority = models.IntegerField(default=20, verbose_name=_("Priority"),
+                                   validators=[MinValueValidator(1), MaxValueValidator(100)])
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/bin/whoami', verbose_name=_('Sudo'))
@@ -168,7 +170,7 @@ class SystemUser(AssetUser):
         from .cmd_filter import CommandFilterRule
         rules = CommandFilterRule.objects.filter(
             filter__in=self.cmd_filters.all()
-        ).order_by('priority').distinct()
+        ).distinct()
         return rules
 
     @classmethod

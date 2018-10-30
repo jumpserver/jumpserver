@@ -53,14 +53,14 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             if show_current_asset:
                 self.queryset = self.queryset.filter(
                     Q(nodes=node_id) | Q(nodes__isnull=True)
-                ).distinct()
+                )
             return
         if show_current_asset:
-            self.queryset = self.queryset.filter(nodes=node).distinct()
+            self.queryset = self.queryset.filter(nodes=node)
         else:
             self.queryset = self.queryset.filter(
                 nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
-            ).distinct()
+            )
 
     def filter_admin_user_id(self):
         admin_user_id = self.request.query_params.get('admin_user_id')
@@ -74,7 +74,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
             .select_related('admin_user')
         self.filter_admin_user_id()
         self.filter_node()
-        return self.queryset
+        return self.queryset.distinct()
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):

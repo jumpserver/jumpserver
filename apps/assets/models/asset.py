@@ -34,7 +34,8 @@ def default_cluster():
 def default_node():
     try:
         from .node import Node
-        return Node.root()
+        root = Node.root()
+        return root
     except:
         return None
 
