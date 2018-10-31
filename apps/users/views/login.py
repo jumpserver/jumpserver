@@ -79,12 +79,15 @@ class UserLoginView(FormView):
     def form_invalid(self, form):
         # write login failed log
         username = form.cleaned_data.get('username')
+        exist = User.objects.filter(username=username).first()
+        reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
         data = {
             'username': username,
             'mfa': LoginLog.MFA_UNKNOWN,
-            'reason': LoginLog.REASON_PASSWORD,
+            'reason': reason,
             'status': False
         }
+
         self.write_login_log(data)
 
         # limit user login failed count
