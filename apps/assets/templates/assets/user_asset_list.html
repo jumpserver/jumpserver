@@ -183,6 +183,21 @@ $(document).ready(function () {
     $('#asset_detail_tbody').html(trs)
 });
 
+function toggle() {
+    if ($("#split-left").is(':visible')) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+}
+
 </script>
 
 {% endblock %}
