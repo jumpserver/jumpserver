@@ -30,7 +30,7 @@
     source $Project/py3/bin/activate
     cd $Project/jumpserver && ./jms start -d
     /etc/init.d/guacd start
-    sh /config/tomcat8/bin/startup.sh
+    cd /config/tomcat8/bin && ./startup.sh
     cd $Project/coco && ./cocod start -d
 
     exit 0
@@ -49,7 +49,7 @@
     source $Project/py3/bin/activate
     cd $Project/coco && ./cocod stop
     /etc/init.d/guacd stop
-    sh /config/tomcat8/bin/shutdown.sh
+    cd /config/tomcat8/bin && ./shutdown.sh
     cd $Project/jumpserver && ./jms stop
 
     exit 0
