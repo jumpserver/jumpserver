@@ -88,3 +88,14 @@ Docker 使用说明
     jumpserver/guacamole   test    e0c2ec53a8fd    13 days ago    1.23GB
 
     $ docker rmi e0c2ec53a8fd
+
+9. 更新镜像
+
+::
+
+    $ docker pull <镜像地址:版本>
+
+    # 例:
+    $ docker pull wojiushixiaobai/jumpserver:latest
+    $ docker pull wojiushixiaobai/coco:1.4.3
+    $ docker pull wojiushixiaobai/guacamole:1.4.3
