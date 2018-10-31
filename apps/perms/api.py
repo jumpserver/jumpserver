@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import set_or_append_attr_bulk
 from common.permissions import IsValidUser, IsOrgAdmin, IsOrgAdminOrAppUser
@@ -15,6 +16,7 @@ from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
     NodeGrantedSerializer, SystemUser, NodeSerializer
 from orgs.utils import set_to_root_org
 from . import serializers
+from .mixins import AssetsFilterMixin
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
@@ -23,6 +25,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
 
     def get_serializer_class(self):
@@ -31,10 +34,15 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().all()
+        search = self.request.query_params.get('search')
         asset_id = self.request.query_params.get('asset')
         node_id = self.request.query_params.get('node')
         inherit_nodes = set()
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
         if not asset_id and not node_id:
             return queryset
 
@@ -53,15 +61,17 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             _permissions = queryset.filter(nodes=n)
             set_or_append_attr_bulk(_permissions, "inherit", n.value)
             permissions.update(_permissions)
-        return permissions
+
+        return list(permissions)
 
 
-class UserGrantedAssetsApi(ListAPIView):
+class UserGrantedAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     用户授权的所有资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
+    pagination_class = LimitOffsetPagination
     
     def change_org_if_need(self):
         if self.request.user.is_superuser or \
@@ -84,6 +94,7 @@ class UserGrantedAssetsApi(ListAPIView):
             system_users_granted = [s for s in v if s.protocol == k.protocol]
             k.system_users_granted = system_users_granted
             queryset.append(k)
+
         return queryset
 
     def get_permissions(self):
@@ -122,7 +133,7 @@ class UserGrantedNodesApi(ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(ListAPIView):
+class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     用户授权的节点并带着节点下资产的api
     """
@@ -155,19 +166,25 @@ class UserGrantedNodesWithAssetsApi(ListAPIView):
             queryset.append(node)
         return queryset
 
+    def sort_assets(self, queryset):
+        for node in queryset:
+            node.assets_granted = super().sort_assets(node.assets_granted)
+        return queryset
+
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
 
 
-class UserGrantedNodeAssetsApi(ListAPIView):
+class UserGrantedNodeAssetsApi(AssetsFilterMixin, ListAPIView):
     """
     查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AssetGrantedSerializer
-    
+    pagination_class = LimitOffsetPagination
+
     def change_org_if_need(self):
         if self.request.user.is_superuser or \
                 self.request.user.is_app or \
@@ -189,6 +206,8 @@ class UserGrantedNodeAssetsApi(ListAPIView):
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
+
+        assets = list(assets.keys())
         return assets
 
     def get_permissions(self):

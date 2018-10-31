@@ -1363,7 +1363,7 @@ msgstr "创建命令过滤器"
 #: assets/templates/assets/cmd_filter_rule_list.html:33
 #: assets/views/cmd_filter.py:98
 msgid "Command filter rule list"
-msgstr "命令过滤器列表"
+msgstr "命令过滤器规则列表"
 
 #: assets/templates/assets/cmd_filter_rule_list.html:50
 msgid "Create rule"
@@ -2477,8 +2477,8 @@ msgstr "用户或用户组"
 #: perms/templates/perms/asset_permission_asset.html:27
 #: perms/templates/perms/asset_permission_detail.html:27
 #: perms/templates/perms/asset_permission_user.html:27
-msgid "Assets and asset groups"
-msgstr "资产或资产组"
+msgid "Assets and node"
+msgstr "资产或节点"
 
 #: perms/templates/perms/asset_permission_asset.html:80
 msgid "Add asset to this permission"
