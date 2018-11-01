@@ -29,11 +29,12 @@
     $ firewall-cmd --reload
 
     # 安装 docker
-    $ sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+    $ yum install -y yum-utils device-mapper-persistent-data lvm2
     $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     $ yum makecache fast
     $ yum -y install docker-ce
     $ systemctl start docker
+    $ systemctl enable docker
 
     # 通过 docker 部署
     $ docker run --name jms_coco -d \
