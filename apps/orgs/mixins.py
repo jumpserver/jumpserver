@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 
+from rest_framework.serializers import ModelSerializer
+from rest_framework import status
+from rest_framework.views import Response
+from rest_framework_bulk import BulkModelViewSet
 from werkzeug.local import Local
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +14,10 @@ from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
 
 
+from users.models import User
 from common.utils import get_logger
+from common.permissions import IsSuperUserOrAppUser
+from common.mixins import BulkSerializerMixin
 from .utils import current_org, set_current_org, set_to_root_org
 from .models import Organization
 
@@ -19,7 +26,8 @@ tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
-    'RootOrgViewMixin',
+    'RootOrgViewMixin', 'OrgMembershipModelViewSetMixin',
+    'OrgMembershipSerializerMixin'
 ]
 
 
@@ -176,3 +184,35 @@ class OrgModelForm(ModelForm):
                 continue
             model = field.queryset.model
             field.queryset = model.objects.all()
+
+
+class OrgMembershipSerializerMixin(BulkSerializerMixin, ModelSerializer):
+    def run_validation(self, initial_data=None):
+        initial_data['organization'] = str(self.context['org'].id)
+        return super().run_validation(initial_data)
+
+
+class OrgMembershipModelViewSetMixin(BulkModelViewSet):
+    org = None
+    membership_class = None
+    permission_classes = (IsSuperUserOrAppUser, )
+
+    def dispatch(self, request, *args, **kwargs):
+        self.org = Organization.objects.get(pk=kwargs.get('org_id'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['org'] = self.org
+        return context
+
+    def get_queryset(self):
+        return self.membership_class.objects.filter(organization=self.org)
+
+    def destroy(self, request, *args, **kwargs):
+        user = User.objects.get(pk=kwargs.get('pk'))
+        membership = Organization.admins.through.objects.filter(
+            organization=self.org, user=user
+        )
+        membership.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

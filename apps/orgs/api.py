@@ -7,6 +7,7 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import IsSuperUserOrAppUser
 from .models import Organization
+from .mixins import OrgMembershipModelViewSetMixin
 from .serializers import OrgSerializer, OrgReadSerializer, \
     OrgMembershipUserSerializer, OrgMembershipAdminSerializer
 from users.models import User, UserGroup
@@ -14,6 +15,7 @@ from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from orgs.utils import current_org
 from common.utils import get_logger
+
 
 logger = get_logger(__file__)
 
@@ -55,37 +57,11 @@ class OrgViewSet(BulkModelViewSet):
             return Response({'msg': True}, status=status.HTTP_200_OK)
 
 
-class OrgMembershipMixin(BulkModelViewSet):
-    org = None
-    membership_class = None
-    permission_classes = (IsSuperUserOrAppUser, )
-
-    def dispatch(self, request, *args, **kwargs):
-        self.org = Organization.objects.get(pk=kwargs.get('org_id'))
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['org'] = self.org
-        return context
-
-    def get_queryset(self):
-        return self.membership_class.objects.filter(organization=self.org)
-
-    def destroy(self, request, *args, **kwargs):
-        user = User.objects.get(pk=kwargs.get('pk'))
-        membership = Organization.admins.through.objects.filter(
-            organization=self.org, user=user
-        )
-        membership.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class OrgMembershipAdminsViewSet(OrgMembershipMixin):
+class OrgMembershipAdminsViewSet(OrgMembershipModelViewSetMixin):
     serializer_class = OrgMembershipAdminSerializer
     membership_class = Organization.admins.through
 
 
-class OrgMembershipUsersViewSet(OrgMembershipMixin):
+class OrgMembershipUsersViewSet(OrgMembershipModelViewSetMixin):
     serializer_class = OrgMembershipUserSerializer
     membership_class = Organization.users.through

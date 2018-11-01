@@ -3,12 +3,12 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer
 
-from users.models import User, UserGroup
+from users.models import UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
-from common.mixins import BulkSerializerMixin
 from .utils import set_current_org, get_current_org
 from .models import Organization
+from .mixins import OrgMembershipSerializerMixin
 
 
 class OrgSerializer(ModelSerializer):
@@ -65,12 +65,6 @@ class OrgReadSerializer(ModelSerializer):
 
     def get_perms(self, obj):
         return self.get_data_from_model(obj, AssetPermission)
-
-
-class OrgMembershipSerializerMixin(BulkSerializerMixin, serializers.ModelSerializer):
-    def run_validation(self, initial_data=None):
-        initial_data['organization'] = str(self.context['org'].id)
-        return super().run_validation(initial_data)
 
 
 class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin):
