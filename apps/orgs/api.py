@@ -55,7 +55,7 @@ class OrgViewSet(BulkModelViewSet):
             return Response({'msg': True}, status=status.HTTP_200_OK)
 
 
-class OrgMembershipMixin(BulkModelViewSet):
+class OrgMembershipModelViewSetMixin(BulkModelViewSet):
     org = None
     membership_class = None
     permission_classes = (IsSuperUserOrAppUser, )
@@ -81,11 +81,11 @@ class OrgMembershipMixin(BulkModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class OrgMembershipAdminsViewSet(OrgMembershipMixin):
+class OrgMembershipAdminsViewSet(OrgMembershipModelViewSetMixin):
     serializer_class = OrgMembershipAdminSerializer
     membership_class = Organization.admins.through
 
 
-class OrgMembershipUsersViewSet(OrgMembershipMixin):
+class OrgMembershipUsersViewSet(OrgMembershipModelViewSetMixin):
     serializer_class = OrgMembershipUserSerializer
     membership_class = Organization.users.through

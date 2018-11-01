@@ -8,9 +8,10 @@ from django.shortcuts import redirect
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
-
+from rest_framework import serializers
 
 from common.utils import get_logger
+from common.mixins import BulkSerializerMixin
 from .utils import current_org, set_current_org, set_to_root_org
 from .models import Organization
 
@@ -19,7 +20,7 @@ tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
-    'RootOrgViewMixin',
+    'RootOrgViewMixin', 'OrgMembershipSerializerMixin'
 ]
 
 
@@ -176,3 +177,9 @@ class OrgModelForm(ModelForm):
                 continue
             model = field.queryset.model
             field.queryset = model.objects.all()
+
+
+class OrgMembershipSerializerMixin(BulkSerializerMixin, serializers.ModelSerializer):
+    def run_validation(self, initial_data=None):
+        initial_data['organization'] = str(self.context['org'].id)
+        return super().run_validation(initial_data)
