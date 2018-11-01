@@ -23,10 +23,9 @@
     # 安装依赖包
     $ yum install -y yum-utils device-mapper-persistent-data lvm2
 
-    # 设置 selinux 与 防火墙
-    $ setenforce 0
-    $ sed -i "s/enforcing/disabled/g" `grep enforcing -rl /etc/selinux/config`
-    $ firewall-cmd --zone=public --add-port=8081/tcp --permanent
+    # 设置防火墙，开放 8081 端口 给 nginx 和 jumpserver 访问
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.11" port protocol="tcp" port="8081" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8081" accept"
     $ firewall-cmd --reload
 
     # 安装 docker
@@ -39,9 +38,9 @@
 
     # 通过 docker 部署
     $ docker run --name jms_guacamole -d \
-        -p 8081:8080 \
+        -p 8081:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-        -e JUMPSERVER_SERVER=http://192.168.100.11 \
+        -e JUMPSERVER_SERVER=http://192.168.100.11:8080 \
         wojiushixiaobai/guacamole:1.4.3
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
@@ -52,12 +51,13 @@
 
 ::
 
-    $ firewall-cmd --zone=public --add-port=8082/tcp --permanent
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.11" port protocol="tcp" port="8082" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8082" accept"
     $ firewall-cmd --reload
     $ docker run --name jms_guacamole1 -d \
-        -p 8082:8080 \
+        -p 8082:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-        -e JUMPSERVER_SERVER=http://192.168.100.11 \
+        -e JUMPSERVER_SERVER=http://192.168.100.11:8080 \
         wojiushixiaobai/guacamole:1.4.3
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
