@@ -18,22 +18,23 @@ SSH 协议资产连接错误排查思路
     # 确定已经在Jumpserver后台 会话管理-终端管理 里接受 coco 的注册
 
     # 如果不在线请检查 Linux 组件是否正常运行，箭头指示处 绿色表示正常，红色表示异常
-    $ ps -ef | grep cocod | grep -v grep
-    $ cat /opt/coco/logs/coco.log  # 检查有没有 error
-
-    # 如果不在线可以尝试重启 coco
-    $ source /opt/py3/bin/activate
-    $ cd /opt/coco
-    $ ./cocod stop  # 请用 ps 命令确定 coco 进程已经退出后再继续操作
-    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
 
     # 如果重启后 coco 任然不在线，请重新注册
     # 在Jumpserver后台 会话管理-终端管理 删掉 coco 的注册
     # 必须到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
     # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
+
+    # 正常部署请参照此步骤解决
     $ cd /opt/coco && ./cocod stop
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的，key应该在这里，如果不存在，直接下一步
-    $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
+    $ ./cocod start -d
+
+    # docker 部署请直接删除容器后重建，记得一定要先在 终端管理 删除不在线的组件
+    $ docker stop jms_coco
+    $ docker rm jms_coco
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.3
+
+    # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
 2. 访问 luna 界面不显示资产信息
 
