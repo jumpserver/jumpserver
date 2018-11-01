@@ -3,18 +3,25 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer
 
-from common.mixins import BulkSerializerMixin
-
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
+from common.mixins import BulkSerializerMixin
 from .utils import set_current_org, get_current_org
 from .models import Organization
 
 
-class OrgSerializer(BulkSerializerMixin, ModelSerializer):
-    admins = serializers.SerializerMethodField()
-    users = serializers.SerializerMethodField()
+class OrgSerializer(ModelSerializer):
+    class Meta:
+        model = Organization
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
+        read_only_fields = ['id', 'created_by', 'date_created']
+
+
+class OrgReadSerializer(ModelSerializer):
+    admins = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    users = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     user_groups = serializers.SerializerMethodField()
     assets = serializers.SerializerMethodField()
     domains = serializers.SerializerMethodField()
@@ -25,9 +32,7 @@ class OrgSerializer(BulkSerializerMixin, ModelSerializer):
 
     class Meta:
         model = Organization
-        list_serializer_class = BulkListSerializer
         fields = '__all__'
-        read_only_fields = ['id', 'created_by', 'date_created']
 
     @staticmethod
     def get_data_from_model(obj, model):
@@ -39,14 +44,6 @@ class OrgSerializer(BulkSerializerMixin, ModelSerializer):
             data = [o.name for o in model.objects.filter(org_id=obj.id)]
         set_current_org(current_org)
         return data
-
-    @staticmethod
-    def get_users(obj):
-        return [user.name for user in obj.users.all()]
-
-    @staticmethod
-    def get_admins(obj):
-        return [admin.name for admin in obj.admins.all()]
 
     def get_user_groups(self, obj):
         return self.get_data_from_model(obj, UserGroup)
@@ -70,21 +67,21 @@ class OrgSerializer(BulkSerializerMixin, ModelSerializer):
         return self.get_data_from_model(obj, AssetPermission)
 
 
-class OrgUpdateUserSerializer(serializers.ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=User.objects.all()
-    )
+class OrgMembershipSerializerMixin(BulkSerializerMixin, serializers.ModelSerializer):
+    def run_validation(self, initial_data=None):
+        initial_data['organization'] = str(self.context['org'].id)
+        return super().run_validation(initial_data)
 
+
+class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin):
     class Meta:
-        model = Organization
-        fields = ['id', 'users']
+        model = Organization.admins.through
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
 
 
-class OrgUpdateAdminSerializer(serializers.ModelSerializer):
-    admins = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=User.objects.all()
-    )
-
+class OrgMembershipUserSerializer(OrgMembershipSerializerMixin):
     class Meta:
-        model = Organization
-        fields = ['id', 'admins']
+        model = Organization.users.through
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'

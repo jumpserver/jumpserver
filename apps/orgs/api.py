@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework_bulk import BulkModelViewSet
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.views import Response
+from rest_framework_bulk import BulkModelViewSet
 
-from common.mixins import IDInFilterMixin
 from common.permissions import IsSuperUserOrAppUser
 from .models import Organization
-from .serializers import OrgSerializer, OrgUpdateAdminSerializer, \
-    OrgUpdateUserSerializer
+from .serializers import OrgSerializer, OrgReadSerializer, \
+    OrgMembershipUserSerializer, OrgMembershipAdminSerializer
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
@@ -19,11 +18,17 @@ from common.utils import get_logger
 logger = get_logger(__file__)
 
 
-class OrgViewSet(IDInFilterMixin, BulkModelViewSet):
+class OrgViewSet(BulkModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrgSerializer
     permission_classes = (IsSuperUserOrAppUser,)
     org = None
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return OrgReadSerializer
+        else:
+            return super().get_serializer_class()
 
     def get_data_from_model(self, model):
         if model == User:
@@ -50,57 +55,37 @@ class OrgViewSet(IDInFilterMixin, BulkModelViewSet):
             return Response({'msg': True}, status=status.HTTP_200_OK)
 
 
-class OrgUpdateUsersApi(generics.RetrieveUpdateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrgUpdateUserSerializer
+class OrgMembershipMixin(BulkModelViewSet):
+    org = None
+    membership_class = None
     permission_classes = (IsSuperUserOrAppUser, )
-    http_method_names = ['get', 'post', 'put', 'patch', 'head', 'options']
 
-    def post(self, *args, **kwargs):
-        org = self.get_object()
+    def dispatch(self, request, *args, **kwargs):
+        self.org = Organization.objects.get(pk=kwargs.get('org_id'))
+        return super().dispatch(request, *args, **kwargs)
 
-        users = []
-        users_id = self.request.data.get('users', [])
-        for _id in users_id:
-            try:
-                user = User.objects.get(pk=_id)
-                users.append(user)
-            except Exception as e:
-                logger.error(e)
-                data = {"error": "User({}) not found.".format(_id)}
-                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['org'] = self.org
+        return context
 
-        for user in users:
-            org.users.add(user)
+    def get_queryset(self):
+        return self.membership_class.objects.filter(organization=self.org)
 
-        users = [user.id for user in org.users.all()]
-        data = {"id": org.id, "users": users}
-        return Response(data=data, status=status.HTTP_200_OK)
+    def destroy(self, request, *args, **kwargs):
+        user = User.objects.get(pk=kwargs.get('pk'))
+        membership = Organization.admins.through.objects.filter(
+            organization=self.org, user=user
+        )
+        membership.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class OrgUpdateAdminsApi(generics.RetrieveUpdateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrgUpdateAdminSerializer
-    permission_classes = (IsSuperUserOrAppUser, )
-    http_method_names = ['get', 'post', 'put', 'patch', 'head', 'options']
+class OrgMembershipAdminsViewSet(OrgMembershipMixin):
+    serializer_class = OrgMembershipAdminSerializer
+    membership_class = Organization.admins.through
 
-    def post(self, *args, **kwargs):
-        org = self.get_object()
 
-        users = []
-        admins_id = self.request.data.get('admins', [])
-        for _id in admins_id:
-            try:
-                user = User.objects.get(pk=_id)
-                users.append(user)
-            except Exception as e:
-                logger.error(e)
-                data = {"error": "Admin user({}) not found.".format(_id)}
-                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-
-        for user in users:
-            org.admins.add(user)
-
-        admins = [admin.id for admin in org.admins.all()]
-        data = {"id": org.id, "admins": admins}
-        return Response(data=data, status=status.HTTP_200_OK)
+class OrgMembershipUsersViewSet(OrgMembershipMixin):
+    serializer_class = OrgMembershipUserSerializer
+    membership_class = Organization.users.through

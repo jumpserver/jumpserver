@@ -8,12 +8,17 @@ from .. import api
 
 app_name = 'orgs'
 router = DefaultRouter()
+
+router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/admins',
+                api.OrgMembershipAdminsViewSet, 'membership-admins')
+
+router.register(r'orgs/(?P<org_id>[0-9a-zA-Z\-]{36})/membership/users',
+                api.OrgMembershipUsersViewSet,'membership-users'),
+
 router.register(r'orgs', api.OrgViewSet, 'org')
 
 
 urlpatterns = [
-    path('orgs/<uuid:pk>/admins/', api.OrgUpdateAdminsApi.as_view(), name='update-admins'),
-    path('orgs/<uuid:pk>/users/', api.OrgUpdateUsersApi.as_view(), name='update-users'),
 ]
 
 urlpatterns += router.urls
