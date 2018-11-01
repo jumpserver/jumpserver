@@ -145,7 +145,20 @@
     server {
         listen 80;
         server_name www.jumpserver.org;  # 自行修改成你的域名
+        return https://www.jumpserver.org$request_uri;  # 自行修改成你的域名
     }
+
+    server {
+        # 推荐使用 https 访问，如果不使用 https 请自行注释下面的选项
+        listen 443;
+        server_name www.jumpserver.org;  # 自行修改成你的域名
+        ssl on;
+        ssl_certificate   /etc/nginx/sslkey/1_jumpserver.org_bundle.crt;  # 自行设置证书
+        ssl_certificate_key  /etc/nginx/sslkey/2_jumpserver.org.key;  # 自行设置证书
+        ssl_session_timeout 5m;
+        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_prefer_server_ciphers on;
 
         client_max_body_size 100m;  # 录像上传大小限制
 

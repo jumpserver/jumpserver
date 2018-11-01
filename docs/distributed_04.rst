@@ -23,8 +23,10 @@
     # 安装依赖包
     $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
 
-    # 设置防火墙，开放 80 端口
-    $ firewall-cmd --zone=public --add-port=80/tcp --permanent
+    # 设置防火墙，开放 80 端口给 nginx 访问，开放 8080 端口给 coco 和 guacamole 访问
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="80" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.12" port protocol="tcp" port="8080" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.13" port protocol="tcp" port="8080" accept"
     $ firewall-cmd --reload
 
     # 安装 redis
@@ -119,9 +121,9 @@
         DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
         DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
-        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
+        # Django 监听的ip和端口
         # ./manage.py runserver 127.0.0.1:8080
-        HTTP_BIND_HOST = '127.0.0.1'
+        HTTP_BIND_HOST = '0.0.0.0'
         HTTP_LISTEN_PORT = 8080
 
         # Redis 相关设置
