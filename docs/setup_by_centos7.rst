@@ -60,6 +60,14 @@ CentOS 7 安装文档
     > flush privileges;
 
     # 安装 Nginx ，用作代理服务器整合 Jumpserver 与各个组件
+    $ vim /etc/yum.repos.d/nginx.repo
+
+    [nginx]
+    name=nginx repo
+    baseurl=http://nginx.org/packages/centos/7/$basearch/
+    gpgcheck=0
+    enabled=1
+
     $ yum -y install nginx
     $ systemctl enable nginx
 
@@ -74,29 +82,16 @@ CentOS 7 安装文档
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，载入环境后默认以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-    # 自动载入 Python3 虚拟环境
-    $ cd /opt
-    $ git clone https://github.com/kennethreitz/autoenv.git
-    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
-    $ source ~/.bashrc
-
-    # 下载 Jumpserver 与 Coco
+    # 下载 Jumpserver
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master && git pull
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
-
-    $ cd /opt/
-    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master && git pull
-    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
+    $ git clone https://github.com/jumpserver/jumpserver.git
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
-    $ yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt)
 
     # 安装 Python 库依赖
     $ pip install --upgrade pip
     $ pip install -r /opt/jumpserver/requirements/requirements.txt
-    $ pip install -r /opt/coco/requirements/requirements.txt
 
 ::
 
@@ -105,8 +100,6 @@ CentOS 7 安装文档
     $ cd /opt/jumpserver
     $ cp config_example.py config.py
     $ vi config.py
-
-    # 注意对齐，不要直接复制本文档的内容，实际内容以文件为准，本文仅供参考
 
 **注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
 
@@ -195,107 +188,30 @@ CentOS 7 安装文档
 
 ::
 
+    # 生成数据库表结构和初始化数据
+    $ cd /opt/jumpserver/utils
+    $ bash make_migrations.sh
 
-    # 修改 Coco 配置文件
-    $ cd /opt/coco
-    $ mkdir keys logs
-    $ cp conf_example.py conf.py
-    $ vi conf.py
-
-    # 注意对齐，不要直接复制本文档的内容
-
-**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+    # 运行 Jumpserver
+    $ cd /opt/jumpserver
+    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
+    # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 ::
 
-    #!/usr/bin/env python3
-    # -*- coding: utf-8 -*-
-    #
+    # 安装 docker 部署 coco 与 guacamole
+    $ yum install -y yum-utils device-mapper-persistent-data lvm2
+    $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+    $ yum makecache fast
+    $ yum -y install docker-ce
+    $ systemctl start docker
+    $ systemctl enable docker
 
-    import os
-
-    BASE_DIR = os.path.dirname(__file__)
-
-
-    class Config:
-        """
-        Coco config file, coco also load config from server update setting below
-        """
-        # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-        # NAME = "localhost"
-        NAME = "coco"
-
-        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
-        # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
-        CORE_HOST = 'http://127.0.0.1:8080'
-
-        # 启动时绑定的ip, 默认 0.0.0.0
-        # BIND_HOST = '0.0.0.0'
-
-        # 监听的SSH端口号, 默认2222
-        # SSHD_PORT = 2222
-
-        # 监听的HTTP/WS端口号，默认5000
-        # HTTPD_PORT = 5000
-
-        # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
-        # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
-        # ACCESS_KEY = None
-
-        # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-        # ACCESS_KEY_STORE = os.path.join(BASE_DIR, 'keys', '.access_key')
-
-        # 加密密钥
-        # SECRET_KEY = None
-
-        # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
-        # LOG_LEVEL = 'INFO'
-        LOG_LEVEL = 'WARN'
-
-        # 日志存放的目录
-        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
-
-        # Session录像存放目录
-        # SESSION_DIR = os.path.join(BASE_DIR, 'sessions')
-
-        # 资产显示排序方式, ['ip', 'hostname']
-        # ASSET_LIST_SORT_BY = 'ip'
-
-        # 登录是否支持密码认证
-        # PASSWORD_AUTH = True
-
-        # 登录是否支持秘钥认证
-        # PUBLIC_KEY_AUTH = True
-
-        # SSH白名单
-        # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
-
-        # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
-        # BLOCK_SSH_USER = []
-
-        # 和Jumpserver 保持心跳时间间隔
-        # HEARTBEAT_INTERVAL = 5
-
-        # Admin的名字，出问题会提示给用户
-        # ADMINS = ''
-        COMMAND_STORAGE = {
-            "TYPE": "server"
-        }
-        REPLAY_STORAGE = {
-            "TYPE": "server"
-        }
-
-        # SSH连接超时时间 (default 15 seconds)
-        # SSH_TIMEOUT = 15
-
-        # 语言 = en
-        LANGUAGE_CODE = 'zh'
-
-
-    config = Config()
+    # 注意，<Jumpserver_url> 请自行修改成 jumpserver 对外的访问地址，如 192.168.100.100:8080
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.3
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.3
 
 ::
-
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
     $ cd /opt
@@ -303,53 +219,10 @@ CentOS 7 安装文档
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
-    # 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
-    $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
-    $ rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
-    $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
-    $ yum install -y git gcc java-1.8.0-openjdk libtool
-    $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
-    $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
-    $ ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/
-    $ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
-    $ ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/
-    $ ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/
-    $ cd /opt
-    $ git clone https://github.com/jumpserver/docker-guacamole.git
-    $ cd /opt/docker-guacamole/
-    $ tar -xf guacamole-server-0.9.14.tar.gz
-    $ cd guacamole-server-0.9.14
-    $ autoreconf -fi
-    $ ./configure --with-init-dir=/etc/init.d
-    $ make && make install
-    $ cd ..
-    $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
-    $ ldconfig
-    $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
-    $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
-    $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
-    $ cd /config
-    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz
-    $ tar xf apache-tomcat-8.5.34.tar.gz
-    $ rm -rf apache-tomcat-8.5.34.tar.gz
-    $ mv apache-tomcat-8.5.34 tomcat8
-    $ rm -rf /config/tomcat8/webapps/*
-    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
-    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
-    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
-    $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
-    $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
-    $ export JUMPSERVER_ENABLE_DRIVE=true
-    $ echo "export JUMPSERVER_ENABLE_DRIVE=true " >> ~/.bashrc
-    $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
-    $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
-    $ export GUACAMOLE_HOME=/config/guacamole
-    $ echo "export GUACAMOLE_HOME=/config/guacamole" >> ~/.bashrc
-
 ::
 
-
     # 配置 Nginx 整合各组件
+    $ rm -rf /etc/nginx/conf.d/default.conf
     $ vim /etc/nginx/conf.d/jumpserver.conf
 
     server {
@@ -411,26 +284,8 @@ CentOS 7 安装文档
         }
     }
 
+
 ::
-
-
-    # 生成数据库表结构和初始化数据
-    $ cd /opt/jumpserver/utils
-    $ bash make_migrations.sh
-
-    # 运行 Jumpserver
-    $ cd /opt/jumpserver
-    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
-    # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
-
-    # 运行 Coco
-    $ cd /opt/coco
-    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
-    # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
-
-    # 运行 Guacamole
-    $ /etc/init.d/guacd start
-    $ sh /config/tomcat8/bin/startup.sh
 
     # 运行 Nginx
     $ nginx -t   # 确保配置没有问题, 有问题请先解决
@@ -451,9 +306,6 @@ CentOS 7 安装文档
 
     # sftp默认上传的位置在资产的 /tmp 目录下
     # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
-
-    # 其他的ssh及sftp客户端这里就不多做说明，自行搜索使用
-
 
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

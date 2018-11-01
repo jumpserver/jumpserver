@@ -18,25 +18,26 @@ RDP 协议资产连接错误排查思路
 ::
 
     注：连接 Windows 资产提示连接错误，您没有权限访问此连接，请按照此步骤解决
-    # 如果终端不在线，请检查 Windows 组件是否已经正常运行，可用 docker ps 命令查询，安装文档有说明
+    # 如果终端不在线，请检查 Windows 组件是否已经正常运行
 
-    # 重新注册 Windows 组件
+    # 如果重启后任然不在线，请重新注册 Windows 组件
     # 在Jumpserver后台 会话管理-终端管理 删掉 guacamole 的注册
-    $ docker stop jms_guacamole  # 如果名称更改过或者不对，请使用docker ps 查询容器的 CONTAINER ID ，然后docker stop <CONTAINER ID>
-    $ docker rm jms_guacamole  # 如果名称更改过或者不对，请使用docker ps -a 查询容器的 CONTAINER ID ，然后docker rm <CONTAINER ID>
-    $ rm /opt/guacamole/key/*  # guacamole, 如果你是按文档安装的，key应该在这里，如果不存在直接下一步
-    $ systemctl stop docker
-    $ systemctl start docker
-    $ docker run --name jms_guacamole -d \
-      -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-      -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-      -e JUMPSERVER_SERVER=http://<填写jumpserver的url地址> \
-      jumpserver/guacamole:latest
+    # 必须到 Jumpserver后台 会话管理-终端管理  删掉 guacamole 的注册
+    # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 guacamole 的注册
 
-    # 如果镜像不是jumpserver/guacamole 请更换 registry.jumpserver.org/public/guacamole
+    # 正常部署参照此步骤解决
+    $ /etc/init.d/guacd stop
+    $ sh /config/tomcat8/bin/shutdown.sh
+    $ rm -rf /config/guacamole/keys/*
+    $ /etc/init.d/guacd start
+    $ sh /config/tomcat8/bin/startup.sh
+
+    # docker 部署请直接删除容器后重建，记得一定要先在 终端管理 删除不在线的组件
+    $ docker stop jms_guacamole
+    $ docker rm jms_guacamole
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.3
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
-    $ docker restart jms_guacamole  # 如果接受注册后显示不在线，重启gua就好了
 
 2. 登录要连接的windows资产，检查远程设置和防火墙设置
 
@@ -47,7 +48,7 @@ RDP 协议资产连接错误排查思路
 
     # Windows防火墙-高级设置-入站规则 把远程桌面开头的选项 右键-启用规则
     # Windows 7/2008 启用 远程桌面(TCP-In)
-    # Windows 8/10/2012 启用 远程桌面-用户模式(TCP-In) 远程桌面-用户模式(UDP-In)
+    # Windows 8/10/2012 启用 远程桌面-用户模式(TCP-In)
 
 3. 登录要连接的windows资产，检查用户和IP信息（Windows目前还不支持推送，所以必须使用资产上面已存在的用户进行登录）
 
@@ -103,12 +104,5 @@ RDP 协议资产连接错误排查思路
     # 下载在 luna 页面，按 ctrl+alt+shift ，选择文件下载即可
 
 .. image:: _static/img/faq_windows_08.jpg
-
-10. Windows 无法录像
-
-::
-
-    # 把 docker stop 后重新启动就好了，记得启动 guacamole
-
 
 其他问题可参考 `FAQ <faq.html>`_

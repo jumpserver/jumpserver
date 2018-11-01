@@ -45,17 +45,8 @@
     $ python3.6 -m venv /opt/py3
     $ source /opt/py3/bin/activate
 
-    # 配置 autoenv
-    $ git clone git://github.com/kennethreitz/autoenv.git
-    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
-    $ source ~/.bashrc
-
     # 下载 Jumpserver
     $ git clone https://github.com/jumpserver/jumpserver.git
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env
-    $ cd /opt/jumpserver && git checkout master && git pull
-    # 首次进入 jumpserver 文件夹会有提示，按 y 即可
-    # Are you sure you want to allow this? (y/N) y
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)

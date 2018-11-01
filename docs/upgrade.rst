@@ -137,6 +137,23 @@
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
+5. Docker 部署 coco guacamole 升级说明
+
+::
+
+    # 先到 Web 会话管理 - 终端管理 删掉所有组件
+    $ docker sop jms_coco
+    $ docker stop jms_guacamole
+    $ docker rm jms_coco
+    $ docker rm jms_guacamole
+    $ docker pull docker pull wojiushixiaobai/coco:1.4.3
+    $ docker pull wojiushixiaobai/guacamole:1.4.3
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.3
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.3
+
+    # 到 Web 会话管理 - 终端管理 接受新的注册
+
+
 切换分支或releases包升级
 -------------------------------
 
