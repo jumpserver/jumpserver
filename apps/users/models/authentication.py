@@ -61,7 +61,7 @@ class LoginLog(models.Model):
         (REASON_NOTHING, _('-')),
         (REASON_PASSWORD, _('Username/password check failed')),
         (REASON_MFA, _('MFA authentication failed')),
-        (REASON_NOT_EXIST, _("User does not exist")),
+        (REASON_NOT_EXIST, _("Username does not exist")),
     )
 
     STATUS_CHOICE = (
