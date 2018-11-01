@@ -35,10 +35,11 @@
     $ yum makecache fast
     $ yum -y install docker-ce
     $ systemctl start docker
+    $ systemctl enable docker
 
     # 通过 docker 部署
     $ docker run --name jms_guacamole -d \
-        -p 8081:8080
+        -p 8081:8080 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.11 \
         wojiushixiaobai/guacamole:1.4.3
@@ -54,7 +55,7 @@
     $ firewall-cmd --zone=public --add-port=8082/tcp --permanent
     $ firewall-cmd --reload
     $ docker run --name jms_guacamole1 -d \
-        -p 8082:8080
+        -p 8082:8080 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.11 \
         wojiushixiaobai/guacamole:1.4.3
