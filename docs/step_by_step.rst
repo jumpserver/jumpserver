@@ -61,7 +61,7 @@
 ::
 
     $ cd /opt
-    $ python3 -m venv py3
+    $ python3.6 -m venv py3
     $ source /opt/py3/bin/activate
 
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行

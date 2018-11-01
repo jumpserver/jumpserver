@@ -68,7 +68,7 @@ CentOS 7 安装文档
 
     # 配置并载入 Python3 虚拟环境
     $ cd /opt
-    $ python3 -m venv py3  # py3 为虚拟环境名称，可自定义
+    $ python3.6 -m venv py3  # py3 为虚拟环境名称，可自定义
     $ source /opt/py3/bin/activate  # 退出虚拟环境可以使用 deactivate 命令
 
     # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，载入环境后默认以下所有命令均在该虚拟环境中运行
