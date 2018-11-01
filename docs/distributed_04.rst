@@ -36,13 +36,11 @@
     $ yum -y install nginx
     $ systemctl enable nginx
 
-    # 安装 Python3.6.1
-    $ wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
-    $ tar xvf Python-3.6.1.tar.xz  && cd Python-3.6.1
-    $ ./configure && make && make install
+    # 安装 Python3.6
+    $ yum -y install python36 python36-devel
 
     # 配置 py3 虚拟环境
-    $ python3 -m venv /opt/py3
+    $ python3.6 -m venv /opt/py3
     $ source /opt/py3/bin/activate
 
     # 配置 autoenv
