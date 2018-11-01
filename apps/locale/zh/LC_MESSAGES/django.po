@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-01 11:58+0800\n"
+"POT-Creation-Date: 2018-11-01 13:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -666,8 +666,8 @@ msgstr "手动登录"
 #: assets/views/domain.py:29 assets/views/domain.py:45
 #: assets/views/domain.py:61 assets/views/domain.py:74
 #: assets/views/domain.py:98 assets/views/domain.py:126
-#: assets/views/domain.py:145 assets/views/label.py:26 assets/views/label.py:42
-#: assets/views/label.py:58 assets/views/system_user.py:28
+#: assets/views/domain.py:145 assets/views/label.py:26 assets/views/label.py:43
+#: assets/views/label.py:69 assets/views/system_user.py:28
 #: assets/views/system_user.py:44 assets/views/system_user.py:60
 #: assets/views/system_user.py:74 templates/_nav.html:19
 msgid "Assets"
@@ -1424,7 +1424,7 @@ msgstr "JMS => 网域网关 => 目标资产"
 msgid "Create domain"
 msgstr "创建网域"
 
-#: assets/templates/assets/label_list.html:6 assets/views/label.py:43
+#: assets/templates/assets/label_list.html:6 assets/views/label.py:44
 msgid "Create label"
 msgstr "创建标签"
 
@@ -1592,7 +1592,11 @@ msgstr "创建网关"
 msgid "Label list"
 msgstr "标签列表"
 
-#: assets/views/label.py:59
+#: assets/views/label.py:53
+msgid "Tips: Avoid using label names reserved internally: {}"
+msgstr "提示: 请避免使用内部预留标签名: {}"
+
+#: assets/views/label.py:70
 msgid "Update label"
 msgstr "更新标签"
 
