@@ -493,6 +493,33 @@ Guacamole 需要 Tomcat 来运行
 
     $ yum -y install nginx
 
+    $ vim /etc/nginx/nginx.conf
+
+    ... 原内容
+    include /etc/nginx/conf.d/*.conf;
+
+    # 注释掉整个server {}
+    # server {
+        # listen       80 default_server;
+        # listen       [::]:80 default_server;
+        # server_name  _;
+        # root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        # include /etc/nginx/default.d/*.conf;
+
+        # location / {
+        # }
+
+        # error_page 404 /404.html;
+            # location = /40x.html {
+        # }
+
+        # error_page 500 502 503 504 /50x.html;
+            # location = /50x.html {
+        # }
+    # }
+    ... 原内容
 
 **6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 

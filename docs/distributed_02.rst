@@ -82,9 +82,10 @@
         open_log_file_cache off;
 
         upstream cocossh {
-            server 192.168.100.12:2222 max_fails=1 fail_timeout=5s;
-            # server ip:port max_fails=1 fail_timeout=5s;
-            # 这里是 coco ssh 的后端ip ，max_fails=1 fail_timeout=5s 是 HA 参数
+            server 192.168.100.12:2222 weight=1;
+            server 192.168.100.12:2223 weight=1;  # 多节点
+            # 这里是 coco ssh 的后端ip
+            least_conn;
         }
         server {
             listen 2222;
@@ -123,41 +124,28 @@
     $ vim /etc/nginx/conf.d/jumpserver.conf
 
     upstream jumpserver {
-        server 192.168.100.11:80 max_fails=1 fail_timeout=10s;
-        # server ip:port max_fails=1 fail_timeout=10s;
-        # 这里是 jumpserver 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
+        server 192.168.100.11:80;
+        # 这里是 jumpserver 的后端ip
     }
 
     upstream cocows {
-        server 192.168.100.12:5000 max_fails=1 fail_timeout=10s;
-        # server ip:port max_fails=1 fail_timeout=10s;
-        # 这里是 coco ws 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
+        server 192.168.100.12:5000 weight=1;
+        server 192.168.100.12:5001 weight=1;  # 多节点
+        # 这里是 coco ws 的后端ip
+        ip_hash;
     }
 
     upstream guacamole {
-        server 192.168.100.13:8081 max_fails=1 fail_timeout=10s;
-        # server ip:port max_fails=1 fail_timeout=10s;
-        # 这里是 guacamole 的后端ip ，max_fails=1 fail_timeout=10s 是 HA 参数
+        server 192.168.100.13:8081 weight=1;
+        server 192.168.100.13:8082 weight=1;  # 多节点
+        # 这里是 guacamole 的后端ip
+        ip_hash;
     }
 
     server {
         listen 80;
         server_name www.jumpserver.org;  # 自行修改成你的域名
-        return https://www.jumpserver.org$request_uri;
     }
-
-    server {
-
-        # 推荐使用 https 访问，如果不使用 https 请自行注释下面的选项
-        listen 443;
-        server_name www.jumpserver.org;  # 自行修改成你的域名
-        ssl on;
-        ssl_certificate   /etc/nginx/sslkey/1_jumpserver.org_bundle.crt;  # 自行设置证书
-        ssl_certificate_key  /etc/nginx/sslkey/2_jumpserver.org.key;  # 自行设置证书
-        ssl_session_timeout 5m;
-        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
-        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-        ssl_prefer_server_ciphers on;
 
         client_max_body_size 100m;  # 录像上传大小限制
 
@@ -185,7 +173,6 @@
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
-            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
         location /coco/ {
@@ -206,7 +193,6 @@
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
-            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
     }
 
