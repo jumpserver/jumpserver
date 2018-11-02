@@ -17,13 +17,18 @@
 
 -  系统: CentOS 7
 -  IP: 192.168.244.144
--  关闭 selinux 和防火墙
+-  设置 selinux 和防火墙
 
 ::
 
     # CentOS 7
-    $ setenforce 0  # 临时关闭，重启后失效
-    $ systemctl stop firewalld.service  # 临时关闭，重启后失效
+    $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
+    $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
+
+    $ firewall-cmd --reload  # 重新载入规则
+
+    $ setenforce 0
+    $ sed -i "s/enforcing/disabled/g" `grep enforcing -rl /etc/selinux/config`
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -88,7 +93,7 @@
 ::
 
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
@@ -138,10 +143,11 @@
 
 ::
 
-    $ mysql
+    $ mysql -uroot
     > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
+    > quit
 
 **2.7 修改 Jumpserver 配置文件**
 
@@ -243,7 +249,7 @@
 ::
 
     $ cd /opt/jumpserver/utils
-    $ bash make_migrations.sh
+    $ sh make_migrations.sh
 
 **2.9 运行 Jumpserver**
 
@@ -267,7 +273,7 @@
 
     $ cd /opt
     $ source /opt/py3/bin/activate
-    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
+    $ git clone https://github.com/jumpserver/coco.git
     $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
     # 首次进入 coco 文件夹会有提示，按 y 即可
@@ -415,11 +421,11 @@ Guacamole 需要 Tomcat 来运行
 
 ::
 
-    $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
     $ rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
     $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+    $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
 
-    $ yum install -y git gcc java-1.8.0-openjdk libtool
+    $ yum install -y java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
 
@@ -441,7 +447,7 @@ Guacamole 需要 Tomcat 来运行
     $ ./configure --with-init-dir=/etc/init.d
     $ make && make install
     $ cd ..
-    $ rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14
+    $ rm -rf guacamole-server-0.9.14
     $ ldconfig
 
 **5.3 配置 Tomcat**
@@ -468,8 +474,6 @@ Guacamole 需要 Tomcat 来运行
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
-    $ export JUMPSERVER_ENABLE_DRIVE=true
-    $ echo "export JUMPSERVER_ENABLE_DRIVE=true " >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
@@ -493,7 +497,7 @@ Guacamole 需要 Tomcat 来运行
 
     $ yum -y install nginx
 
-    $ vim /etc/nginx/nginx.conf
+    $ vi /etc/nginx/nginx.conf
 
     ... 原内容
     include /etc/nginx/conf.d/*.conf;
@@ -525,7 +529,7 @@ Guacamole 需要 Tomcat 来运行
 
 ::
 
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf
     # 注意注释 nginx.conf 里面的 server {} 内容 ，CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     server {
