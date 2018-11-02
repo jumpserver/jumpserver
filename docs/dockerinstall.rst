@@ -27,7 +27,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 使用 root 命令行输入::
 
     # 1.4.3 版本（最新）
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.x.x -e DB_PORT=3306 -e DB_USER=jumpserver -e DB_PASSWORD=weakPassword -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
+    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
 
 访问
 ```````````````
@@ -56,11 +56,24 @@ XShell等工具请添加connection连接，ssh 端口 2222
 - VOLUME /opt/jumpserver/data
 - VOLUME /opt/coco/keys
 - VOLUME /config/guacamole/keys
+- VOLUME /var/lib/mysql
 
  ::
 
-   docker run --name jms_server -d -p 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:latest
-
+    $ docker run --name jms_server -d \
+        -v /opt/mysql:/var/lib/mysql
+        -p 80:80 \
+        -p 2222:2222 \
+        -e DB_ENGINE=mysql \
+        -e DB_HOST=192.168.x.x \
+        -e DB_PORT=3306 \
+        -e DB_USER=root \
+        -e DB_PASSWORD=xxx \
+        -e DB_NAME=jumpserver \
+        -e REDIS_HOST=192.168.x.x \
+        -e REDIS_PORT=6379 \
+        -e REDIS_PASSWORD=xxx \
+        wojiushixiaobai/jumpserver:latest
 
 仓库地址
 ```````````````
