@@ -7,7 +7,7 @@
 ::
 
     # 启动
-    $ vim /opt/start_jms.sh
+    $ vi /opt/start_jms.sh
 
     #!/bin/bash
     set -e
@@ -28,10 +28,19 @@
     fi
 
     echo -e "\033[31m 正常启动 Jumpserver ... \033[0m"
+
+    # jumpserver
     source $Project/py3/bin/activate
     cd $Project/jumpserver && ./jms start -d
+
+    # guacamole
+    export GUACAMOLE_HOME=/config/guacamole
+    export JUMPSERVER_KEY_DIR=/config/guacamole/keys
+    export JUMPSERVER_SERVER=http://127.0.0.1:8080
     /etc/init.d/guacd start
     cd /config/tomcat8/bin && ./startup.sh
+
+    # coco
     cd $Project/coco && ./cocod start -d
 
     exit 0
@@ -39,7 +48,7 @@
 ::
 
     # 停止
-    $ vim /opt/stop_jms.sh
+    $ vi /opt/stop_jms.sh
 
     #!/bin/bash
     set -e
@@ -68,7 +77,7 @@ Docker 组件部署设置自启
 ::
 
     # 启动
-    $ vim /opt/start_jms.sh
+    $ vi /opt/start_jms.sh
 
     #!/bin/bash
     set -e
@@ -99,7 +108,7 @@ Docker 组件部署设置自启
 ::
 
     # 停止
-    $ vim /opt/stop_jms.sh
+    $ vi /opt/stop_jms.sh
 
     #!/bin/bash
     set -e
