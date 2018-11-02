@@ -25,7 +25,7 @@
     $ yum install -y install mariadb mariadb-devel mariadb-server
 
     # 设置防火墙，开放 3306 端口 给 jumpserver 访问
-    $ $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.11" port protocol="tcp" port="3306" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.11" port protocol="tcp" port="3306" accept"
     $ firewall-cmd --reload
 
     # 设置 mariadb 服务
