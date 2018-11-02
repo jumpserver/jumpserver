@@ -8,10 +8,8 @@ from django.shortcuts import redirect
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
-from rest_framework import serializers
 
 from common.utils import get_logger
-from common.mixins import BulkSerializerMixin
 from .utils import current_org, set_current_org, set_to_root_org
 from .models import Organization
 
@@ -20,7 +18,7 @@ tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
-    'RootOrgViewMixin', 'OrgMembershipSerializerMixin'
+    'RootOrgViewMixin', 'OrgMembershipSerializerMixin', 'OrgMembershipModelViewSetMixin'
 ]
 
 
@@ -179,7 +177,27 @@ class OrgModelForm(ModelForm):
             field.queryset = model.objects.all()
 
 
-class OrgMembershipSerializerMixin(BulkSerializerMixin, serializers.ModelSerializer):
+class OrgMembershipSerializerMixin:
     def run_validation(self, initial_data=None):
         initial_data['organization'] = str(self.context['org'].id)
         return super().run_validation(initial_data)
+
+
+class OrgMembershipModelViewSetMixin:
+    org = None
+    membership_class = None
+    lookup_field = 'user'
+    lookup_url_kwarg = 'user_id'
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+
+    def dispatch(self, request, *args, **kwargs):
+        self.org = Organization.objects.get(pk=kwargs.get('org_id'))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['org'] = self.org
+        return context
+
+    def get_queryset(self):
+        return self.membership_class.objects.filter(organization=self.org)

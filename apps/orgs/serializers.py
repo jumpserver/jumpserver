@@ -67,14 +67,14 @@ class OrgReadSerializer(ModelSerializer):
         return self.get_data_from_model(obj, AssetPermission)
 
 
-class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin):
+class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
         model = Organization.admins.through
         list_serializer_class = BulkListSerializer
         fields = '__all__'
 
 
-class OrgMembershipUserSerializer(OrgMembershipSerializerMixin):
+class OrgMembershipUserSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
         model = Organization.users.through
         list_serializer_class = BulkListSerializer
