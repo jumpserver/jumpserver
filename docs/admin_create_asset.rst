@@ -172,7 +172,7 @@
 
 .. image:: _static/img/check_asset_connect.jpg
 
-参考 `Linux 资产连接说明 <faq_linux.html>`_
+参考 `SSH协议 资产连接说明 <faq_ssh.html>`_
 
 **3.2 创建 Windows 资产**
 
@@ -206,7 +206,7 @@
 
 .. image:: _static/img/create_windows_asset.jpg
 
-参考 `Windows 资产连接说明 <faq_windows.html>`_
+参考 `RDP协议 资产连接说明 <faq_rdp.html>`_
 
 四、 网域网关
 ``````````````````````
