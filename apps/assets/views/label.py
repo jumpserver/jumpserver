@@ -36,6 +36,7 @@ class LabelCreateView(AdminUserRequiredMixin, CreateView):
     form_class = LabelForm
     success_url = reverse_lazy('assets:label-list')
     success_message = create_success_msg
+    disable_name = ['draw', 'search', 'limit', 'offset', '_']
 
     def get_context_data(self, **kwargs):
         context = {
@@ -44,6 +45,16 @@ class LabelCreateView(AdminUserRequiredMixin, CreateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        name = form.cleaned_data.get('name')
+        if name in self.disable_name:
+            msg = _(
+                'Tips: Avoid using label names reserved internally: {}'
+            ).format(', '.join(self.disable_name))
+            form.add_error("name", msg)
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
 
 class LabelUpdateView(AdminUserRequiredMixin, UpdateView):

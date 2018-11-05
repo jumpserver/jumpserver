@@ -42,9 +42,16 @@ class SystemUserViewSet(BulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """
+    filter_fields = ("name", "username")
+    search_fields = filter_fields
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset().all()
+        return queryset
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):

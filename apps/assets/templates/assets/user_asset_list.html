@@ -62,7 +62,7 @@
 
 {% block custom_foot_js %}
 <script>
-var zTree, asset_table;
+var zTree, asset_table, show=0;
 var inited = false;
 var url;
 function initTable() {
@@ -102,7 +102,7 @@ function initTable() {
             {data: "system_users_granted", orderable: false}
         ]
     };
-    asset_table = jumpserver.initDataTable(options);
+    asset_table = jumpserver.initServerSideDataTable(options);
     return asset_table
 }
 
@@ -182,6 +182,21 @@ $(document).ready(function () {
     });
     $('#asset_detail_tbody').html(trs)
 });
+
+function toggle() {
+    if (show === 0) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+}
 
 </script>
 

@@ -17,6 +17,7 @@ from django.db import transaction
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
+from rest_framework.pagination import LimitOffsetPagination
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
@@ -37,9 +38,17 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
+
+    filter_fields = ("name", "username")
+    search_fields = filter_fields
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset().all()
+        return queryset
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):
