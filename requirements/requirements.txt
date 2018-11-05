@@ -74,3 +74,4 @@ Werkzeug==0.14.1
 drf-nested-routers==0.90.2
 aliyun-python-sdk-core-v3==2.9.1    
 aliyun-python-sdk-ecs==4.10.1   
+tencentcloud-sdk-python==3.0.32
