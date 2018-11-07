@@ -11,9 +11,10 @@
 
 -  系统: CentOS 7
 -  数据库 IP: 192.168.100.10
--  Jumpserver IP: 192.168.100.11
--  Coco IP: 192.168.100.12
--  Guacamole IP: 192.168.100.13
+-  Redis ip: 192.168.100.20
+-  Jumpserver IP: 192.168.100.30
+-  Coco IP: 192.168.100.40
+-  Guacamole IP: 192.168.100.50
 -  Nginx 代理 IP: 192.168.100.100
 
 

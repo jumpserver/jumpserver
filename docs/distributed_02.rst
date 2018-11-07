@@ -21,7 +21,7 @@
     $ yum upgrade -y
 
     # 获取 epel-release 源
-    $ yum -y install epel-release vim
+    $ yum -y install epel-release
 
     # 设置防火墙，开放 80 443 2222 端口
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
@@ -31,11 +31,12 @@
 
     # 设置 http 访问权限
     $ setsebool -P httpd_can_network_connect 1
+    $ semanage port -a -t http_port_t -p tcp 2222
 
 ::
 
     # 安装 nginx
-    $ vim /etc/yum.repos.d/nginx.repo
+    $ vi /etc/yum.repos.d/nginx.repo
 
     [nginx]
     name=nginx repo
@@ -59,7 +60,7 @@
 ::
 
     # 配置 Nginx
-    $ vim /etc/nginx/nginx.conf
+    $ vi /etc/nginx/nginx.conf
 
     user  nginx;
     worker_processes  auto;
@@ -82,8 +83,8 @@
         open_log_file_cache off;
 
         upstream cocossh {
-            server 192.168.100.12:2222 weight=1;
-            server 192.168.100.12:2223 weight=1;  # 多节点
+            server 192.168.100.40:2222 weight=1;
+            server 192.168.100.40:2223 weight=1;  # 多节点
             # 这里是 coco ssh 的后端ip
             least_conn;
         }
@@ -121,23 +122,23 @@
     # 备份默认的配置文件
     $ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.bak
 
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf
 
     upstream jumpserver {
-        server 192.168.100.11:80;
+        server 192.168.100.30:80;
         # 这里是 jumpserver 的后端ip
     }
 
     upstream cocows {
-        server 192.168.100.12:5000 weight=1;
-        server 192.168.100.12:5001 weight=1;  # 多节点
+        server 192.168.100.40:5000 weight=1;
+        server 192.168.100.40:5001 weight=1;  # 多节点
         # 这里是 coco ws 的后端ip
         ip_hash;
     }
 
     upstream guacamole {
-        server 192.168.100.13:8081 weight=1;
-        server 192.168.100.13:8082 weight=1;  # 多节点
+        server 192.168.100.50:8081 weight=1;
+        server 192.168.100.50:8082 weight=1;  # 多节点
         # 这里是 guacamole 的后端ip
         ip_hash;
     }

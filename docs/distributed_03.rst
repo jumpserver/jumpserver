@@ -25,7 +25,7 @@
     $ yum install -y install mariadb mariadb-devel mariadb-server
 
     # 设置防火墙，开放 3306 端口 给 jumpserver 访问
-    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.11" port protocol="tcp" port="3306" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.30" port protocol="tcp" port="3306" accept"
     $ firewall-cmd --reload
 
     # 设置 mariadb 服务
@@ -35,10 +35,10 @@
     # 推荐使用该命令进行一些安全设置（可跳过）
     $ mysql_secure_installation
 
-    # 创建数据库及授权，192.168.100.11 是 jumpserver 服务器的 ip
+    # 创建数据库及授权，192.168.100.30 是 jumpserver 服务器的 ip
     $ mysql -uroot
     > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'192.168.100.11' identified by 'weakPassword';
+    > grant all on jumpserver.* to 'jumpserver'@'192.168.100.30' identified by 'weakPassword';
     > flush privileges;
     > quit
 

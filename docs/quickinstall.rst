@@ -33,6 +33,7 @@
    环境说明 <distributed_01.rst>
    nginx 代理部署 <distributed_02.rst>
    数据库 部署 <distributed_03.rst>
-   jumpserver 部署 <distributed_04.rst>
-   coco 部署 <distributed_05.rst>
-   guacamole 部署 <distributed_06.rst>
+   redis 部署 <distributed_04.rst>
+   jumpserver 部署 <distributed_05.rst>
+   coco 部署 <distributed_06.rst>
+   guacamole 部署 <distributed_07.rst>
