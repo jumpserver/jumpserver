@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
+    'authentication.apps.AuthenticationConfig',  # authentication
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -94,6 +95,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -388,6 +390,24 @@ AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
+
+# openid
+# Auth OpenID settings
+BASE_SITE_URL = CONFIG.BASE_SITE_URL
+AUTH_OPENID = CONFIG.AUTH_OPENID
+AUTH_OPENID_SERVER_URL = CONFIG.AUTH_OPENID_SERVER_URL
+AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
+AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
+AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
+AUTH_OPENID_BACKENDS = [
+    'authentication.openid.auth.backends.OpenIDAuthorizationCodeBackend',
+    'authentication.openid.auth.backends.OpenIDAuthorizationCocoBackend'
+]
+
+if AUTH_OPENID:
+    AUTHENTICATION_BACKENDS.extend(AUTH_OPENID_BACKENDS)
+    LOGIN_URL = reverse_lazy("authentication:openid-login")
+    LOGOUT_URL = reverse_lazy("authentication:openid-logout")
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {

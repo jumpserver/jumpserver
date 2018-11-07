@@ -199,6 +199,8 @@ class UserLogoutView(TemplateView):
     template_name = 'flash_message_standalone.html'
 
     def get(self, request, *args, **kwargs):
+        if settings.AUTH_OPENID:
+            return redirect(to=reverse("authentication:openid-logout"))
         auth_logout(request)
         response = super().get(request, *args, **kwargs)
         return response
