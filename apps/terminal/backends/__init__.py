@@ -3,7 +3,6 @@ from django.conf import settings
 from .command.serializers import SessionCommandSerializer
 
 from common import utils
-from common.models import common_settings, Setting
 
 TYPE_ENGINE_MAPPING = {
     'elasticsearch': 'terminal.backends.command.es',

@@ -392,7 +392,10 @@ def get_command_storage_or_create_default_storage():
     from common.models import common_settings, Setting
     name = 'TERMINAL_COMMAND_STORAGE'
     default = {'default': {'TYPE': 'server'}}
-    command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    try:
+        command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    except Exception:
+        return default
     if command_storage is None:
         obj = Setting()
         obj.name = name
@@ -413,7 +416,10 @@ def get_replay_storage_or_create_default_storage():
     from common.models import common_settings, Setting
     name = 'TERMINAL_REPLAY_STORAGE'
     default = {'default': {'TYPE': 'server'}}
-    replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    try:
+        replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    except Exception:
+        return default
     if replay_storage is None:
         obj = Setting()
         obj.name = name
