@@ -21,11 +21,15 @@ from .models import Nonce
 logger = logging.getLogger(__name__)
 
 
+def get_base_site_url():
+    return settings.BASE_SITE_URL
+
+
 class LoginView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         nonce = Nonce(
-            redirect_uri=settings.BASE_SITE_URL + reverse(
+            redirect_uri=get_base_site_url() + reverse(
                 "authentication:openid-login-complete"),
             next_path=self.request.GET.get('next')
         )
@@ -33,7 +37,7 @@ class LoginView(RedirectView):
 
         self.request.session['oidc_state'] = str(nonce.state)
 
-        authorization_url = self.request.client.openid_api_client.\
+        authorization_url = self.request.client.openid_connect_api_client.\
             authorization_url(
                 redirect_uri=nonce.redirect_uri, scope='code',
                 state=str(nonce.state)
@@ -76,13 +80,14 @@ class LoginCompleteView(RedirectView):
 class LogoutView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
+
         query = QueryDict('', mutable=True)
         query.update({
-            'redirect_uri': settings.BASE_SITE_URL
+            'redirect_uri': get_base_site_url()
         })
 
         openid_logout_url = "%s?%s" % (
-            self.request.client.openid_api_client.get_url(
+            self.request.client.openid_connect_api_client.get_url(
                 name='end_session_endpoint'),
             query.urlencode()
         )

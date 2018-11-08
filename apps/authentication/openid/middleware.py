@@ -2,15 +2,13 @@
 #
 
 from django.conf import settings
-from django.utils.functional import SimpleLazyObject
-from django.contrib.auth import authenticate
-from django.utils.deprecation import MiddlewareMixin
-from django.contrib.auth import BACKEND_SESSION_KEY
-from requests.exceptions import HTTPError
 from django.contrib.auth import logout
+from django.utils.functional import SimpleLazyObject
+from django.utils.deprecation import MiddlewareMixin
+from requests.exceptions import HTTPError
 
 from authentication.openid.services import client
-from .models import OIDC_ACCESS_TOKEN
+from authentication.openid.models import OIDC_ACCESS_TOKEN
 
 
 def get_client(request):
@@ -35,31 +33,25 @@ class OpenIDAuthenticationMiddleware(BaseOpenIDMiddleware):
 
     def process_request(self, request):
 
-        # 不用 openid auth
-
+        # Don't need openid auth
         if not settings.AUTH_OPENID:
-            return None
+            return
 
-        # 启用 openid auth
+        # coco app Don't need openid auth
+        if self.header_key in request.META:
+            print('[INFO] Coco App')
+            return
+
+        # auth openid
         super(OpenIDAuthenticationMiddleware, self).process_request(request)
 
-        # api
-
-        # coco 用户 authenticate
-        if False:
-            user = authenticate(request=request, username='xiaobai', password='xiaobai')
-            return
-            # return HttpResponse(user)
-
-        # core
-        # 检验用户有效(使用access_token)
-        # 用户还没有认证
+        # user not authenticated don't need check single logout
         if not request.user.is_authenticated:
             return
 
-        # 判断openid用户是否单点退出
+        # Check openid user single logout or not with access_token
         try:
-            userinfo = request.client.openid_api_client.userinfo(
+            request.client.openid_connect_api_client.userinfo(
                 token=request.session.get(OIDC_ACCESS_TOKEN))
         except HTTPError:
             logout(request)

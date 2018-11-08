@@ -93,6 +93,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
         user, msg = check_user_valid(
+            request=request,
             username=username, password=password,
             public_key=public_key
         )

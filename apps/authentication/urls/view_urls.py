@@ -2,7 +2,7 @@
 #
 
 from django.urls import path
-from ..openid import views
+from authentication.openid import views
 
 app_name = 'authentication'
 

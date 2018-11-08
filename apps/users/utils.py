@@ -131,7 +131,21 @@ def send_reset_ssh_key_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def check_openid_user_valid(**kwargs):
+    request = kwargs.pop('request', None)
+    password = kwargs.pop('password', None)
+    username = kwargs.pop('username', None)
+    # auth username and password
+    user = authenticate(request=request, username=username, password=password)
+    return user, ''
+    # TODO: auth public key
+
+
 def check_user_valid(**kwargs):
+    # openid auth
+    if settings.AUTH_OPENID:
+        return check_openid_user_valid(**kwargs)
+
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
     email = kwargs.pop('email', None)

@@ -93,9 +93,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -352,7 +352,8 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
+    'authentication.auth.backends.JMSModelBackend',  # 集成了openid认证
+    # 'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Custom User Auth model
@@ -399,15 +400,12 @@ AUTH_OPENID_SERVER_URL = CONFIG.AUTH_OPENID_SERVER_URL
 AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
-AUTH_OPENID_BACKENDS = [
-    'authentication.openid.auth.backends.OpenIDAuthorizationCodeBackend',
-    'authentication.openid.auth.backends.OpenIDAuthorizationCocoBackend'
-]
+AUTH_OPENID_BACKENDS = \
+    'authentication.openid.auth.backends.OpenIDAuthorizationCodeBackend'
 
 if AUTH_OPENID:
-    AUTHENTICATION_BACKENDS.extend(AUTH_OPENID_BACKENDS)
     LOGIN_URL = reverse_lazy("authentication:openid-login")
-    LOGOUT_URL = reverse_lazy("authentication:openid-logout")
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS)
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {

@@ -4,7 +4,23 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
-from ..models import OpenIdConnectProfile
+from authentication.openid.models import OpenIDTokenProfile
+
+
+def update_or_create_from_username_password(username, password, client):
+    """
+    Update or create an user based on an authentication username and password.
+
+    :param authentication.openid.models.Client client:
+    :param str username: authentication username
+    :param str password: authentication password
+    :return: authentication.models.OpenIDTokenProfile
+    """
+    token_response = client.openid_api_client.token(
+        username=username, password=password
+    )
+
+    return _update_or_create(client, token_response=token_response)
 
 
 def update_or_create_from_code(code, client, redirect_uri):
@@ -17,10 +33,10 @@ def update_or_create_from_code(code, client, redirect_uri):
     :param authentication.openid.models.Client client:
     :param str code: authentication code
     :param str redirect_uri:
-    :rtype: authentication.models.OpenIdConnectProfile
+    :rtype: authentication.models.OpenIDTokenProfile
     """
 
-    token_response = client.openid_api_client.authorization_code(
+    token_response = client.openid_connect_api_client.authorization_code(
         code=code, redirect_uri=redirect_uri)
 
     return _update_or_create(client=client, token_response=token_response)
@@ -40,10 +56,10 @@ def _update_or_create(client, token_response):
 
     :param authentication.openid.models.Client client:
     :param dict token_response:
-    :rtype: authentication.openid.models.OpenIdConnectProfile
+    :rtype: authentication.openid.models.OpenIDTokenProfile
     """
 
-    userinfo = client.openid_api_client.userinfo(
+    userinfo = client.openid_connect_api_client.userinfo(
         token=token_response['access_token'])
 
     with transaction.atomic():
@@ -56,11 +72,11 @@ def _update_or_create(client, token_response):
             }
         )
 
-        oidc_profile = OpenIdConnectProfile(
+        oidt_profile = OpenIDTokenProfile(
             user=user,
             access_token=token_response['access_token'],
             refresh_token=token_response['refresh_token'],
         )
-        client.oidc_profile = oidc_profile
+        client.oidt_profile = oidt_profile
 
-    return oidc_profile
+    return oidt_profile
