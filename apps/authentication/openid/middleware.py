@@ -37,9 +37,9 @@ class OpenIDAuthenticationMiddleware(BaseOpenIDMiddleware):
         if not settings.AUTH_OPENID:
             return
 
-        # coco app Don't need openid auth
+        # coco app / coco api  Don't need openid auth
+        # (except coco user auth|api auth not header_key )
         if self.header_key in request.META:
-            print('[INFO] Coco App')
             return
 
         # auth openid

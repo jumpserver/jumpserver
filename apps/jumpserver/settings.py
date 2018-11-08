@@ -352,8 +352,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'authentication.auth.backends.JMSModelBackend',  # 集成了openid认证
-    # 'django.contrib.auth.backends.ModelBackend',
+    'authentication.auth.backends.JMSModelBackend',  # 集成了openid coco/api 认证
 ]
 
 # Custom User Auth model
