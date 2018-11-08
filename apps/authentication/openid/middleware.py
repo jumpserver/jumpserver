@@ -5,10 +5,12 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.functional import SimpleLazyObject
 from django.utils.deprecation import MiddlewareMixin
-from requests.exceptions import HTTPError
 
+from common.utils import get_logger
 from authentication.openid.services import client
 from authentication.openid.models import OIDC_ACCESS_TOKEN
+
+logger = get_logger(__file__)
 
 
 def get_client(request):
@@ -53,5 +55,6 @@ class OpenIDAuthenticationMiddleware(BaseOpenIDMiddleware):
         try:
             request.client.openid_connect_api_client.userinfo(
                 token=request.session.get(OIDC_ACCESS_TOKEN))
-        except HTTPError:
+        except Exception as e:
             logout(request)
+            logger.error(e)
