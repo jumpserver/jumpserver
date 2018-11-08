@@ -110,6 +110,7 @@
 
 ::
 
+    $ pip install --upgrade pip setuptools
     $ pip install -r requirements.txt
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**

@@ -27,7 +27,8 @@
     $ apt-get -y install wget libkrb5-dev libsqlite3-dev gcc make automake libssl-dev zlib1g-dev libmysqlclient-dev libffi-dev git xz-utils
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
-    $ apt-get install language-pack-zh-hans
+    $ apt-get -y install language-pack-zh-hans
+    $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
 
 **1.2 安装 Python3.6**
@@ -72,7 +73,7 @@
 ::
 
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git && cd jumpserver && git checkout master
+    $ git clone https://github.com/jumpserver/jumpserver.git
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
     # 首次进入 jumpserver 文件夹会有提示，按 y 即可
@@ -89,6 +90,7 @@
 
 ::
 
+    $ pip install --upgrade pip setuptools
     $ pip install -r requirements.txt
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
@@ -109,10 +111,11 @@
 
 ::
 
-    $ mysql -uroot -p
+    $ mysql -uroot
     > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
+    > quit
 
 **2.7 修改 Jumpserver 配置文件**
 
@@ -120,7 +123,7 @@
 
     $ cd /opt/jumpserver
     $ cp config_example.py config.py
-    $ vi config.py
+    $ vim config.py
 
     # 注意对齐，不要直接复制本文档的内容
 
@@ -387,8 +390,7 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ apt-get -y install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libossp-uuid-dev
     $ apt-get -y install libavcodec-dev libavutil-dev libswscale-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev ghostscript
     $ ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/freerdp
-    $ apt-get -y install default-jre
-    $ apt-get -y install default-jdk
+    $ apt-get -y install default-jre default-jdk
 
 **5.2 编译安装 guacamole 服务**
 
