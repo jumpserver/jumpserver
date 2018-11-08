@@ -12,7 +12,7 @@ UserModel = get_user_model()
 
 logger = get_logger(__file__)
 
-BACKEND_OPENID__AUTH_CODE = \
+BACKEND_OPENID_AUTH_CODE = \
     'authentication.openid.backends.OpenIDAuthorizationCodeBackend'
 
 
@@ -39,7 +39,7 @@ class BaseOpenIDAuthorizationBackend(object):
 class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
 
     def authenticate(self, request, **kwargs):
-        print('1.openid code backend')
+        logger.info('1.openid code backend')
 
         code = kwargs.get('code')
         redirect_uri = kwargs.get('redirect_uri')
@@ -68,7 +68,7 @@ class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
 class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
-        print('2.openid password backend')
+        logger.info('2.openid password backend')
 
         if not settings.AUTH_OPENID:
             return None
@@ -77,7 +77,7 @@ class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
             return None
 
         try:
-            oidt_profile = client.update_or_create_from_username_password(
+            oidt_profile = client.update_or_create_from_password(
                 username=username, password=password
             )
 

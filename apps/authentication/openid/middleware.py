@@ -8,7 +8,7 @@ from django.contrib.auth import BACKEND_SESSION_KEY
 
 from . import client
 from common.utils import get_logger
-from .backends import BACKEND_OPENID__AUTH_CODE
+from .backends import BACKEND_OPENID_AUTH_CODE
 from authentication.openid.models import OIDT_ACCESS_TOKEN
 
 logger = get_logger(__file__)
@@ -29,7 +29,7 @@ class OpenIDAuthenticationMiddleware(MiddlewareMixin):
         if not request.user.is_authenticated:
             return
 
-        elif request.session[BACKEND_SESSION_KEY] != BACKEND_OPENID__AUTH_CODE:
+        elif request.session[BACKEND_SESSION_KEY] != BACKEND_OPENID_AUTH_CODE:
             return
 
         # Check openid user single logout or not with access_token

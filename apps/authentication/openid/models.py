@@ -22,7 +22,7 @@ class OpenIDTokenProfile(object):
         self.refresh_token = refresh_token
 
     def __str__(self):
-        return self.user.username
+        return "{}'s OpenID token profile".format(self.user.username)
 
 
 class Client(object):
@@ -35,6 +35,17 @@ class Client(object):
         self.realm = self.new_realm()
         self.openid_client = self.new_openid_client()
         self.openid_connect_client = self.new_openid_connect_client()
+
+    def new_realm(self):
+        """
+        :param authentication.openid.models.Realm realm:
+        :return keycloak.realm.Realm:
+        """
+        return KeycloakRealm(
+            server_url=self.server_url,
+            realm_name=self.realm_name,
+            headers={}
+        )
 
     def new_openid_connect_client(self):
         """
@@ -58,18 +69,7 @@ class Client(object):
             client_secret_key=self.client_secret,
         )
 
-    def new_realm(self):
-        """
-        :param authentication.openid.models.Realm realm:
-        :return keycloak.realm.Realm:
-        """
-        return KeycloakRealm(
-            server_url=self.server_url,
-            realm_name=self.realm_name,
-            headers={}
-        )
-
-    def update_or_create_from_username_password(self, username, password):
+    def update_or_create_from_password(self, username, password):
         """
         Update or create an user based on an authentication username and password.
 

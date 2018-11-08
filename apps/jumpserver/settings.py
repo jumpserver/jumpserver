@@ -404,7 +404,6 @@ AUTH_OPENID_BACKENDS = [
     'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
 ]
 
-
 if AUTH_OPENID:
     LOGIN_URL = reverse_lazy("authentication:openid-login")
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])

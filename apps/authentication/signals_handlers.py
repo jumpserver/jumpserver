@@ -7,6 +7,9 @@ from .openid import client
 
 @receiver(user_logged_out)
 def on_user_logged_out(sender, request, user, **kwargs):
+    if not settings.AUTH_OPENID:
+        return
+
     query = QueryDict('', mutable=True)
     query.update({
         'redirect_uri': settings.BASE_SITE_URL
