@@ -132,6 +132,7 @@ class UserLoginView(FormView):
     def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
+            'AUTH_OPENID': settings.AUTH_OPENID,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

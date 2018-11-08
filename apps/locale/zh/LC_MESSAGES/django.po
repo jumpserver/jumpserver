@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-01 13:58+0800\n"
+"POT-Creation-Date: 2018-11-08 19:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -115,7 +115,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:243 assets/templates/assets/admin_user_list.html:28
+#: assets/models/asset.py:253 assets/templates/assets/admin_user_list.html:28
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
@@ -1758,7 +1758,7 @@ msgstr "改密日志"
 
 #: audits/views.py:187 templates/_nav.html:10 users/views/group.py:28
 #: users/views/group.py:44 users/views/group.py:60 users/views/group.py:76
-#: users/views/group.py:92 users/views/login.py:331 users/views/user.py:68
+#: users/views/group.py:92 users/views/login.py:334 users/views/user.py:68
 #: users/views/user.py:83 users/views/user.py:111 users/views/user.py:193
 #: users/views/user.py:354 users/views/user.py:404 users/views/user.py:439
 msgid "Users"
@@ -2438,7 +2438,7 @@ msgstr "任务列表"
 msgid "Task run history"
 msgstr "执行历史"
 
-#: orgs/mixins.py:78 orgs/models.py:24
+#: orgs/mixins.py:77 orgs/models.py:24
 msgid "Organization"
 msgstr "组织管理"
 
@@ -3092,11 +3092,11 @@ msgstr "登录频繁, 稍后重试"
 msgid "Please carry seed value and conduct MFA secondary certification"
 msgstr "请携带seed值, 进行MFA二次认证"
 
-#: users/api/auth.py:195
+#: users/api/auth.py:196
 msgid "Please verify the user name and password first"
 msgstr "请先进行用户名和密码验证"
 
-#: users/api/auth.py:207
+#: users/api/auth.py:208
 msgid "MFA certification failed"
 msgstr "MFA认证失败"
 
@@ -3448,7 +3448,7 @@ msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
 #: users/templates/users/forgot_password.html:27
-#: users/templates/users/login.html:79
+#: users/templates/users/login.html:81
 msgid "Forgot password"
 msgstr "忘记密码"
 
@@ -3496,6 +3496,14 @@ msgstr "改变世界，从一点点开始。"
 #: users/templates/users/login.html:55
 msgid "Captcha invalid"
 msgstr "验证码错误"
+
+#: users/templates/users/login.html:87
+msgid "More login options"
+msgstr "更多登录方式"
+
+#: users/templates/users/login.html:91
+msgid "Keycloak"
+msgstr ""
 
 #: users/templates/users/login_otp.html:46
 #: users/templates/users/user_detail.html:91
@@ -3995,19 +4003,19 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:148
+#: users/utils.py:162
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:150
+#: users/utils.py:164
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:163
+#: users/utils.py:177
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/utils.py:286 users/utils.py:296
+#: users/utils.py:300 users/utils.py:310
 msgid "Bit"
 msgstr " 位"
 
@@ -4027,52 +4035,52 @@ msgstr "用户组授权资产"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:179 users/views/user.py:526 users/views/user.py:551
+#: users/views/login.py:180 users/views/user.py:526 users/views/user.py:551
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: users/views/login.py:208
+#: users/views/login.py:211
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:209
+#: users/views/login.py:212
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:225
+#: users/views/login.py:228
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:238
+#: users/views/login.py:241
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:239
+#: users/views/login.py:242
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:252
+#: users/views/login.py:255
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:253
+#: users/views/login.py:256
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:274 users/views/login.py:287
+#: users/views/login.py:277 users/views/login.py:290
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:283
+#: users/views/login.py:286
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:293 users/views/user.py:127 users/views/user.py:422
+#: users/views/login.py:296 users/views/user.py:127 users/views/user.py:422
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:331
+#: users/views/login.py:334
 msgid "First login"
 msgstr "首次登陆"
 
