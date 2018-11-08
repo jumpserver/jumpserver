@@ -3,7 +3,6 @@
 
 from requests.exceptions import HTTPError
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
 
 from authentication.openid.models import OIDC_ACCESS_TOKEN
 
@@ -36,7 +35,7 @@ class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
         import authentication.openid.services.oidt_profile
 
         if not hasattr(request, 'client'):
-            return AnonymousUser()
+            return None
 
         try:
             oidt_profile = authentication.openid.services.oidt_profile.\
@@ -46,7 +45,7 @@ class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
                     redirect_uri=redirect_uri
                 )
         except HTTPError:
-            return AnonymousUser()
+            return None
 
         # Check openid user single logout or not with access_token at middleware
         request.session[OIDC_ACCESS_TOKEN] = oidt_profile.access_token

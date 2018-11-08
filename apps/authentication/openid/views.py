@@ -69,8 +69,7 @@ class LoginCompleteView(RedirectView):
             redirect_uri=nonce.redirect_uri
         )
 
-        if not isinstance(user, AnonymousUser):
-            login(self.request, user)
+        login(self.request, user)
 
         cache.delete(str(nonce.state))
 
