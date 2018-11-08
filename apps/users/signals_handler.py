@@ -9,6 +9,8 @@ from common.utils import get_logger
 from .signals import post_user_create
 # from .models import User
 
+from django.db import IntegrityError
+from django.db import transaction
 logger = get_logger(__file__)
 
 
@@ -35,5 +37,8 @@ def on_user_create(sender, user=None, **kwargs):
 def on_ldap_create_user(sender, user, ldap_user, **kwargs):
     if user:
         user.source = user.SOURCE_LDAP
-        user.save()
-
+        try:
+            with transaction.atomic():
+                user.save()
+        except IntegrityError:
+            pass
