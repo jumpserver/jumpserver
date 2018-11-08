@@ -11,7 +11,6 @@ urlpatterns = [
     path('openid/login/', views.LoginView.as_view(), name='openid-login'),
     path('openid/login/complete/', views.LoginCompleteView.as_view(),
          name='openid-login-complete'),
-    path('openid/logout/', views.LogoutView.as_view(), name='openid-logout')
 
     # other
 ]

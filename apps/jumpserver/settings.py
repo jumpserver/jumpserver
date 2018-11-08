@@ -352,7 +352,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    'authentication.auth.backends.JMSModelBackend',  # 集成了openid coco/api 认证
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Custom User Auth model
@@ -399,12 +399,16 @@ AUTH_OPENID_SERVER_URL = CONFIG.AUTH_OPENID_SERVER_URL
 AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
-AUTH_OPENID_BACKENDS = \
-    'authentication.openid.auth.backends.OpenIDAuthorizationCodeBackend'
+AUTH_OPENID_BACKENDS = [
+    'authentication.openid.backends.OpenIDAuthorizationPasswordBackend',
+    'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
+]
+
 
 if AUTH_OPENID:
     LOGIN_URL = reverse_lazy("authentication:openid-login")
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS)
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {

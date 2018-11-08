@@ -143,9 +143,6 @@ def check_openid_user_valid(**kwargs):
 
 def check_user_valid(**kwargs):
     # openid auth
-    if settings.AUTH_OPENID:
-        return check_openid_user_valid(**kwargs)
-
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
     email = kwargs.pop('email', None)

@@ -5,4 +5,4 @@ class AuthenticationConfig(AppConfig):
     name = 'authentication'
 
     def ready(self):
-        return super().ready()
+        from . import signals_handlers

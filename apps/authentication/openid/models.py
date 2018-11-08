@@ -1,36 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils.functional import cached_property
+from django.db import transaction
+from django.contrib.auth import get_user_model
+from keycloak.realm import KeycloakRealm
+from keycloak.keycloak_openid import KeycloakOpenID
 
-OIDC_ACCESS_TOKEN = 'oidc_access_token'
-
-
-class Server(object):
-
-    def __init__(self, url):
-        self.url = url
-
-    def __str__(self):
-        return self.url
-
-
-class Realm(object):
-
-    def __init__(self, server_url, name):
-        self.server = Server(server_url)
-        self.name = name
-
-    def __str__(self):
-        return self.name
-
-    @cached_property
-    def realm_api_client(self):
-        """
-        :rtype: keycloak.realm.Realm
-        """
-        import authentication.openid.services.realm
-        return authentication.openid.services.realm.get_realm_api_client(realm=self)
+OIDT_ACCESS_TOKEN = 'oidt_access_token'
 
 
 class OpenIDTokenProfile(object):
@@ -50,42 +26,116 @@ class OpenIDTokenProfile(object):
 
 
 class Client(object):
-    """
-    request.client
-    """
 
     def __init__(self, server_url, realm_name, client_id, client_secret):
-        self.realm = Realm(server_url, realm_name)
+        self.server_url = server_url
+        self.realm_name = realm_name
         self.client_id = client_id
-        self.secret = client_secret
-        self._oidt_profile = None
+        self.client_secret = client_secret
+        self.realm = self.new_realm()
+        self.openid_client = self.new_openid_client()
+        self.openid_connect_client = self.new_openid_connect_client()
 
-    @property
-    def oidt_profile(self):
-        return self._oidt_profile
-
-    @oidt_profile.setter
-    def oidt_profile(self, profile):
-        """
-        :param authentication.openid.models.OpenIDTokenProfile profile:
-        """
-        self._oidt_profile = profile
-
-    @cached_property
-    def openid_api_client(self):
-        """
-        :rtype: keycloak.keycloak_openid.KeycloakOpenID
-        """
-        import authentication.openid.services.client
-        return authentication.openid.services.client.get_openid_client(self)
-
-    @cached_property
-    def openid_connect_api_client(self):
+    def new_openid_connect_client(self):
         """
         :rtype: keycloak.openid_connect.KeycloakOpenidConnect
         """
-        import authentication.openid.services.client
-        return authentication.openid.services.client.get_openid_connect_client(self)
+        openid_connect = self.realm.open_id_connect(
+            client_id=self.client_id,
+            client_secret=self.client_secret
+        )
+        return openid_connect
+
+    def new_openid_client(self):
+        """
+        :rtype: keycloak.keycloak_openid.KeycloakOpenID
+        """
+
+        return KeycloakOpenID(
+            server_url='%sauth/' % self.server_url,
+            realm_name=self.realm_name,
+            client_id=self.client_id,
+            client_secret_key=self.client_secret,
+        )
+
+    def new_realm(self):
+        """
+        :param authentication.openid.models.Realm realm:
+        :return keycloak.realm.Realm:
+        """
+        return KeycloakRealm(
+            server_url=self.server_url,
+            realm_name=self.realm_name,
+            headers={}
+        )
+
+    def update_or_create_from_username_password(self, username, password):
+        """
+        Update or create an user based on an authentication username and password.
+
+        :param str username: authentication username
+        :param str password: authentication password
+        :return: authentication.models.OpenIDTokenProfile
+        """
+        token_response = self.openid_client.token(
+            username=username, password=password
+        )
+
+        return self._update_or_create(token_response=token_response)
+
+    def update_or_create_from_code(self, code, redirect_uri):
+        """
+        Update or create an user based on an authentication code.
+        Response as specified in:
+
+        https://tools.ietf.org/html/rfc6749#section-4.1.4
+
+        :param str code: authentication code
+        :param str redirect_uri:
+        :rtype: authentication.models.OpenIDTokenProfile
+        """
+
+        token_response = self.openid_connect_client.authorization_code(
+            code=code, redirect_uri=redirect_uri)
+
+        return self._update_or_create(token_response=token_response)
+
+    def _update_or_create(self, token_response):
+        """
+        Update or create an user based on a token response.
+
+        `token_response` contains the items returned by the OpenIDConnect Token API
+        end-point:
+         - id_token
+         - access_token
+         - expires_in
+         - refresh_token
+         - refresh_expires_in
+
+        :param dict token_response:
+        :rtype: authentication.openid.models.OpenIDTokenProfile
+        """
+
+        userinfo = self.openid_connect_client.userinfo(
+            token=token_response['access_token'])
+
+        with transaction.atomic():
+            user, _ = get_user_model().objects.update_or_create(
+                username=userinfo.get('preferred_username', ''),
+                defaults={
+                    'email': userinfo.get('email', ''),
+                    'first_name': userinfo.get('given_name', ''),
+                    'last_name': userinfo.get('family_name', '')
+                }
+            )
+
+            oidt_profile = OpenIDTokenProfile(
+                user=user,
+                access_token=token_response['access_token'],
+                refresh_token=token_response['refresh_token'],
+            )
+
+        return oidt_profile
 
     def __str__(self):
         return self.client_id
@@ -102,3 +152,4 @@ class Nonce(object):
         self.state = uuid.uuid4()
         self.redirect_uri = redirect_uri
         self.next_path = next_path
+

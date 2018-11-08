@@ -3,58 +3,40 @@
 
 from django.conf import settings
 from django.contrib.auth import logout
-from django.utils.functional import SimpleLazyObject
 from django.utils.deprecation import MiddlewareMixin
+from django.contrib.auth import BACKEND_SESSION_KEY
 
+from . import client
 from common.utils import get_logger
-from authentication.openid.services import client
-from authentication.openid.models import OIDC_ACCESS_TOKEN
+from .backends import BACKEND_OPENID__AUTH_CODE
+from authentication.openid.models import OIDT_ACCESS_TOKEN
 
 logger = get_logger(__file__)
 
 
-def get_client(request):
-    if not hasattr(request, '_cache_client'):
-        request._cache_client = client.new_client()
-    return request._cache_client
-
-
-class BaseOpenIDMiddleware(MiddlewareMixin):
-
-    def process_request(self, request):
-        """
-        Adds Client to request.
-        :param request: django request
-        """
-        request.client = SimpleLazyObject(lambda: get_client(request))
-
-
-class OpenIDAuthenticationMiddleware(BaseOpenIDMiddleware):
-
-    header_key = "HTTP_AUTHORIZATION"
+class OpenIDAuthenticationMiddleware(MiddlewareMixin):
+    """
+    Check openid user single logout (with access_token)
+    """
 
     def process_request(self, request):
 
-        # Don't need openid auth
+        # Don't need openid auth if AUTH_OPENID is False
         if not settings.AUTH_OPENID:
             return
 
-        # coco app / coco api  Don't need openid auth
-        # (except coco user auth|api auth not header_key )
-        if self.header_key in request.META:
+        # Don't need check single logout if user not authenticated
+        if not request.user.is_authenticated:
             return
 
-        # auth openid
-        super(OpenIDAuthenticationMiddleware, self).process_request(request)
-
-        # user not authenticated don't need check single logout
-        if not request.user.is_authenticated:
+        elif request.session[BACKEND_SESSION_KEY] != BACKEND_OPENID__AUTH_CODE:
             return
 
         # Check openid user single logout or not with access_token
         try:
-            request.client.openid_connect_api_client.userinfo(
-                token=request.session.get(OIDC_ACCESS_TOKEN))
+            client.openid_connect_client.userinfo(
+                token=request.session.get(OIDT_ACCESS_TOKEN))
+
         except Exception as e:
             logout(request)
             logger.error(e)
