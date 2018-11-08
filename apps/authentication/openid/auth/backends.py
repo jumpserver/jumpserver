@@ -1,12 +1,14 @@
 # coding:utf-8
 #
 
-from requests.exceptions import HTTPError
 from django.contrib.auth import get_user_model
 
+from common.utils import get_logger
 from authentication.openid.models import OIDC_ACCESS_TOKEN
 
 UserModel = get_user_model()
+
+logger = get_logger(__file__)
 
 
 class BaseOpenIDAuthorizationBackend(object):
@@ -44,12 +46,14 @@ class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
                     code=code,
                     redirect_uri=redirect_uri
                 )
-        except HTTPError:
-            return None
 
-        # Check openid user single logout or not with access_token at middleware
-        request.session[OIDC_ACCESS_TOKEN] = oidt_profile.access_token
+        except Exception as e:
+            logger.error(e)
 
-        user = oidt_profile.user
+        else:
+            # Check openid user single logout or not with access_token
+            request.session[OIDC_ACCESS_TOKEN] = oidt_profile.access_token
 
-        return user if self.user_can_authenticate(user) else None
+            user = oidt_profile.user
+
+            return user if self.user_can_authenticate(user) else None
