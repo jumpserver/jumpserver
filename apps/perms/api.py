@@ -437,6 +437,7 @@ class UserGrantedNodeChildrenApi(ListAPIView):
         for asset, system_users in nodes_granted[node].items():
             fake_node = asset.as_node()
             fake_node.assets_amount = 0
+            system_users = [s for s in system_users if s.protocol == asset.protocol]
             fake_node.asset.system_users_granted = system_users
             fake_node.key = node.key + ':0'
             fake_nodes.append(fake_node)
@@ -459,6 +460,8 @@ class UserGrantedNodeChildrenApi(ListAPIView):
                     asset_has_matched = True
                     fake_node = asset.as_node()
                     fake_node.assets_amount = 0
+                    system_users = [s for s in system_users if
+                                    s.protocol == asset.protocol]
                     fake_node.asset.system_users_granted = system_users
                     fake_node.key = node.key + ':0'
                     matched_assets.append(fake_node)
