@@ -132,6 +132,7 @@ class UserLoginView(FormView):
     def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
+            'AUTH_OPENID': settings.AUTH_OPENID,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -200,6 +201,9 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
+        next_uri = request.COOKIES.get("next")
+        if next_uri:
+            return redirect(next_uri)
         response = super().get(request, *args, **kwargs)
         return response
 
