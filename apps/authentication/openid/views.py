@@ -16,6 +16,9 @@ from django.http.response import (
 
 from . import client
 from .models import Nonce
+from users.models import LoginLog
+from users.tasks import write_login_log_async
+from common.utils import get_request_ip
 
 logger = logging.getLogger(__name__)
 
@@ -77,4 +80,23 @@ class LoginCompleteView(RedirectView):
 
         login(self.request, user)
 
+        data = {
+            'username': user.username,
+            'mfa': int(user.otp_enabled),
+            'reason': LoginLog.REASON_NOTHING,
+            'status': True
+        }
+        self.write_login_log(data)
+
         return HttpResponseRedirect(nonce.next_path or '/')
+
+    def write_login_log(self, data):
+        login_ip = get_request_ip(self.request)
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        tmp_data = {
+            'ip': login_ip,
+            'type': 'W',
+            'user_agent': user_agent
+        }
+        data.update(tmp_data)
+        write_login_log_async.delay(**data)
