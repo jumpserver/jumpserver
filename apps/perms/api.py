@@ -172,8 +172,6 @@ class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
                 system_users_granted = [s for s in v if s.protocol == k.protocol]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
-            if not node.assets_granted:
-                continue
             queryset.append(node)
         return queryset
 
