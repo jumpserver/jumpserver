@@ -6,3 +6,5 @@ class AuthenticationConfig(AppConfig):
 
     def ready(self):
         from . import signals_handlers
+        super().ready()
+

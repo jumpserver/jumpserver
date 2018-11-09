@@ -3,6 +3,7 @@ from django.contrib.auth.signals import user_logged_out
 from django.dispatch import receiver
 from django.conf import settings
 from .openid import client
+from .signals import post_create_openid_user
 
 
 @receiver(user_logged_out)
@@ -22,3 +23,11 @@ def on_user_logged_out(sender, request, user, **kwargs):
     )
 
     request.COOKIES['next'] = openid_logout_url
+
+
+@receiver(post_create_openid_user)
+def on_post_create_openid_user(sender, user=None,  **kwargs):
+    if user and user.username != 'admin':
+        user.source = user.SOURCE_OPENID
+        user.save()
+

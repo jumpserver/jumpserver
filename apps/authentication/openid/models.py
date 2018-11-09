@@ -5,6 +5,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from keycloak.realm import KeycloakRealm
 from keycloak.keycloak_openid import KeycloakOpenID
+from ..signals import post_create_openid_user
 
 OIDT_ACCESS_TOKEN = 'oidt_access_token'
 
@@ -134,6 +135,9 @@ class Client(object):
                 access_token=token_response['access_token'],
                 refresh_token=token_response['refresh_token'],
             )
+
+            if user:
+                post_create_openid_user.send(sender=user.__class__, user=user)
 
         return oidt_profile
 

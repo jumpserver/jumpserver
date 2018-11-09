@@ -40,9 +40,11 @@ class User(AbstractUser):
     )
     SOURCE_LOCAL = 'local'
     SOURCE_LDAP = 'ldap'
+    SOURCE_OPENID = 'openid'
     SOURCE_CHOICES = (
         (SOURCE_LOCAL, 'Local'),
         (SOURCE_LDAP, 'LDAP/AD'),
+        (SOURCE_OPENID, 'OpenID'),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
