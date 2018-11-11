@@ -35,7 +35,7 @@ eventlet==0.24.1
 ForgeryPy==0.1
 greenlet==0.4.14
 gunicorn==19.9.0
-idna==2.7
+idna==2.6
 itsdangerous==0.24
 itypes==1.1.0
 Jinja2==2.10
@@ -61,7 +61,7 @@ pytz==2018.3
 PyYAML==3.12
 redis==2.10.6
 requests==2.18.4
-jms-storage==0.0.19
+jms-storage==0.0.20
 s3transfer==0.1.13
 simplejson==3.13.2
 six==1.11.0
@@ -74,4 +74,5 @@ Werkzeug==0.14.1
 drf-nested-routers==0.90.2
 aliyun-python-sdk-core-v3==2.9.1    
 aliyun-python-sdk-ecs==4.10.1   
-tencentcloud-sdk-python==3.0.32
+python-keycloak==0.13.3
+python-keycloak-client==0.1.3

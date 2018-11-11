@@ -63,6 +63,14 @@
                                         {% endif %}
                                     {% endfor %}
 
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+                                            <button id="submit_button" class="btn btn-primary"
+                                                    type="submit">{% trans 'Submit' %}</button>
+                                        </div>
+                                    </div>
+
                                     <div class="hr-line-dashed"></div>
 
                                     <h3>{% trans "Command storage" %}</h3>
@@ -71,6 +79,7 @@
                                         <tr>
                                             <th>{% trans 'Name' %}</th>
                                             <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Action' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -78,10 +87,13 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
+                                    <a href="{% url 'common:command-storage-create' %}" class="btn btn-primary">{% trans 'Add' %}</a>
+
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans "Replay storage" %}</h3>
                                     <table class="table table-hover " id="task-history-list-table">
@@ -89,6 +101,7 @@
                                         <tr>
                                             <th>{% trans 'Name' %}</th>
                                             <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Action' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -96,18 +109,14 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
+                                    <a href="{% url 'common:replay-storage-create' %}" class="btn btn-primary">{% trans 'Add' %}</a>
+
                                     <div class="hr-line-dashed"></div>
-                                    <div class="form-group">
-                                        <div class="col-sm-4 col-sm-offset-2">
-                                            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-                                            <button id="submit_button" class="btn btn-primary"
-                                                    type="submit">{% trans 'Submit' %}</button>
-                                        </div>
-                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -116,40 +125,63 @@
             </div>
         </div>
     </div>
-    </div>
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-        })
-            .on("click", ".btn-test", function () {
-                var data = {};
-                var form = $("form").serializeArray();
-                $.each(form, function (i, field) {
-                    data[field.name] = field.value;
-                });
+<script>
 
-                var the_url = "{% url 'api-common:ldap-testing' %}";
+function ajaxAPI(url, data, success, error, method){
+    $.ajax({
+        url: url,
+        data: data,
+        method: method,
+        contentType: 'application/json; charset=utf-8',
+        success: success,
+        error: error
+    })
+}
 
-                function error(message) {
-                    toastr.error(message)
-                }
+function deleteStorage($this, the_url){
+    var name = $this.data('name');
+    function doDelete(){
+        console.log('delete storage');
+        var data = {"name": name};
+        var method = 'POST';
+        var success = function(){
+            $this.parent().parent().remove();
+            toastr.success("{% trans 'Delete succeed' %}");
+        };
+        var error = function(){
+            toastr.error("{% trans 'Delete failed' %}}");
+        };
+        ajaxAPI(the_url, JSON.stringify(data), success, error, method);
+    }
+    swal({
+        title: "{% trans  'Are you sure about deleting it?' %}",
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: "{% trans 'Cancel' %}",
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: true
+    }, function () {
+        doDelete()
+    });
+}
 
-                function success(message) {
-                    toastr.success(message.msg)
-                }
+$(document).ready(function () {
 
-                APIUpdateAttr({
-                    url: the_url,
-                    body: JSON.stringify(data),
-                    method: "POST",
-                    flash_message: false,
-                    success: success,
-                    error: error
-                });
-            })
-            .on('click', '', function () {
+})
+.on('click', '.btn-del-replay', function(){
+    var $this = $(this);
+    var the_url = "{% url 'api-common:replay-storage-delete' %}";
+    deleteStorage($this, the_url);
+})
+.on('click', '.btn-del-command', function() {
+    var $this = $(this);
+    var the_url = "{% url 'api-common:command-storage-delete' %}";
+    deleteStorage($this, the_url)
+});
 
-            })
-    </script>
+</script>
 {% endblock %}

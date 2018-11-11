@@ -50,7 +50,7 @@ class JMSInventory(BaseInventory):
     def convert_to_ansible(self, asset, run_as_admin=False):
         info = {
             'id': asset.id,
-            'hostname': asset.hostname,
+            'hostname': asset.fullname,
             'ip': asset.ip,
             'port': asset.port,
             'vars': dict(),

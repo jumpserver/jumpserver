@@ -219,6 +219,16 @@ class Asset(OrgModelMixin):
                 'become': self.admin_user.become_info,
             }
 
+    def as_node(self):
+        from .node import Node
+        fake_node = Node()
+        fake_node.id = self.id
+        fake_node.key = self.id
+        fake_node.value = self.hostname
+        fake_node.asset = self
+        fake_node.is_node = False
+        return fake_node
+
     def _to_secret_json(self):
         """
         Ansible use it create inventory, First using asset user,

@@ -75,9 +75,23 @@
                         </p>
                         {% endif %}
 
-                        <a href="{% url 'users:forgot-password' %}">
-                            <small>{% trans 'Forgot password' %}?</small>
-                        </a>
+                        <div class="text-muted text-center">
+                        <div>
+                            <a href="{% url 'users:forgot-password' %}">
+                                <small>{% trans 'Forgot password' %}?</small>
+                            </a>
+                        </div>
+
+                        {% if AUTH_OPENID %}
+                        <div class="hr-line-dashed"></div>
+                        <p class="text-muted text-center">{% trans "More login options" %}</p>
+                        <div>
+                            <button type="button" class="btn btn-default btn-sm btn-block" onclick="location.href='{% url 'authentication:openid-login' %}'">
+                                <i class="fa fa-openid"></i>
+                                {% trans 'Keycloak' %}
+                            </button>
+                        </div>
+                        {% endif %}
 
                     </form>
                     <p class="m-t">

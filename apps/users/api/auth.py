@@ -43,10 +43,13 @@ class UserAuthApi(RootOrgViewMixin, APIView):
 
         user, msg = self.check_user_valid(request)
         if not user:
+            username = request.data.get('username', '')
+            exist = User.objects.filter(username=username).first()
+            reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
             data = {
-                'username': request.data.get('username', ''),
+                'username': username,
                 'mfa': LoginLog.MFA_UNKNOWN,
-                'reason': LoginLog.REASON_PASSWORD,
+                'reason': reason,
                 'status': False
             }
             self.write_login_log(request, data)
