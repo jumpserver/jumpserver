@@ -508,7 +508,7 @@ jumpserver.initServerSideDataTable = function (options) {
                 if (data.order !== null && data.order.length === 1) {
                     var col = data.order[0].column;
                     var order = options.columns[col].data;
-                    if (data.order[0].dir = "desc") {
+                    if (data.order[0].dir === "desc") {
                         order = "-" + order;
                     }
                     data.order = order;
