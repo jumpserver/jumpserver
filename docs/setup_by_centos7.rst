@@ -208,14 +208,14 @@ CentOS 7 安装文档
     $ systemctl enable docker
 
     # 注意，<Jumpserver_url> 请自行修改成 jumpserver 对外的访问地址，如 192.168.100.100:8080
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.3
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.3
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
 
 ::
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 

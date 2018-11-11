@@ -41,7 +41,7 @@
         -p 8081:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.30:8080 \
-        wojiushixiaobai/guacamole:1.4.3
+        wojiushixiaobai/guacamole:1.4.4
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
 
@@ -58,6 +58,6 @@
         -p 8082:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.30:8080 \
-        wojiushixiaobai/guacamole:1.4.3
+        wojiushixiaobai/guacamole:1.4.4
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
