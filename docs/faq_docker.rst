@@ -97,5 +97,5 @@ Docker 使用说明
 
     # 例:
     $ docker pull wojiushixiaobai/jumpserver:latest
-    $ docker pull wojiushixiaobai/coco:1.4.3
-    $ docker pull wojiushixiaobai/guacamole:1.4.3
+    $ docker pull wojiushixiaobai/coco:1.4.4
+    $ docker pull wojiushixiaobai/guacamole:1.4.4

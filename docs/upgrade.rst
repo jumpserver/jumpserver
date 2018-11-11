@@ -108,7 +108,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
@@ -118,10 +118,10 @@
 
 ::
 
-    /etc/init.d/guacd stop
-    sh /config/tomcat8/bin/shutdown.sh
     $ cd /opt/docker-guacamole
-    $ git pull
+    $ git pull  # 如果没有代码更新，无需升级 guacamole
+    $ /etc/init.d/guacd stop
+    $ sh /config/tomcat8/bin/shutdown.sh
     $ tar -xf guacamole-server-0.9.14.tar.gz
     $ cd guacamole-server-0.9.14
     $ autoreconf -fi
@@ -146,10 +146,10 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull docker pull wojiushixiaobai/coco:1.4.3
-    $ docker pull wojiushixiaobai/guacamole:1.4.3
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.3
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.3
+    $ docker pull docker pull wojiushixiaobai/coco:1.4.4
+    $ docker pull wojiushixiaobai/guacamole:1.4.4
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
 
     # 到 Web 会话管理 - 终端管理 接受新的注册
 

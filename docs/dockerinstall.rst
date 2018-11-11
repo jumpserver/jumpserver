@@ -14,7 +14,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 ::
 
-    # 1.4.3 版本（最新）
+    # 1.4.4 版本（最新）
     $ docker run --name jms_server -d -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
 
 访问
