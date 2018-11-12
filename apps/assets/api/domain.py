@@ -39,7 +39,7 @@ class DomainViewSet(BulkModelViewSet):
 
 
 class GatewayViewSet(BulkModelViewSet):
-    filter_fields = ("domain__name", "name", "username", "ip")
+    filter_fields = ("domain__name", "name", "username", "ip", "domain")
     search_fields = filter_fields
     queryset = Gateway.objects.all()
     permission_classes = (IsOrgAdmin,)
