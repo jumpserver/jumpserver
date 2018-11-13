@@ -51,7 +51,7 @@
 
 ::
 
-    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
+    $ yum -y install wget gcc epel-release git
 
 **1.2 安装 Python3.6**
 
@@ -468,6 +468,11 @@ Guacamole 需要 Tomcat 来运行
     $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
     $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
+
+    $ cd /config
+    $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+    $ tar xf linux-amd64.tar.gz -C /bin/
+    $ chmod +x /bin/ssh-forward
 
 **5.4 配置环境变量**
 

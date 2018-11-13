@@ -42,7 +42,7 @@ CentOS 7 安装文档
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # 安装依赖包
-    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
+    $ yum -y install wget gcc epel-release git
 
     # 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke
     $ yum -y install redis
