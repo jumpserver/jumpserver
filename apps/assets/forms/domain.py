@@ -36,6 +36,10 @@ class DomainForm(forms.ModelForm):
 
 
 class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
+    protocol = forms.ChoiceField(
+        choices=[Gateway.PROTOCOL_CHOICES[0]],
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         password_field = self.fields.get('password')
