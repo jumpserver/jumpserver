@@ -26,7 +26,8 @@
     # 点击页面上边的"邮件设置" TAB ，进入邮件设置页面
     # 默认使用 25 端口，不勾选 SSL 和 TLS；如果需要勾选 SSL，端口需要修改成 465；如果需要勾选 TLS，端口需要改成 587
     # 不可以同时勾选 SSL 和 TLS，
-    配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面，确定收到测试邮件后点击保存即可使用
+    # 配置邮件服务后，点击页面的"测试连接"按钮，如果配置正确，Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面，确定收到测试邮件后点击保存即可使用
+    设置后立即生效
 
 .. image:: _static/img/smtp_setting.jpg
 
@@ -39,20 +40,27 @@
     # DN 和 OU 一定要完整(如DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org)
     注：可借用第三方 gui 工具查看 ldap 用户的属性，新版本已经支持中文名登录，即cn=中文也可正常使用
     详细设置请参考`LDAP 使用说明 <faq_ldap.html>`_
+    设置后重启 Jumpserver 才能生效
 
 **1.4 终端设置**
 
 ::
 
-    # 命令记录保存到 elastic （命令记录需要所有地址都正常可用，否则 历史会话 和 命令记录 页面无法正常访问，如果不清楚，请勿修改命令记录设置）
-    {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
+    # 密码认证 和 密钥认证 是 SSH 连接跳板机时所使用的认证方式（都不选会造成无法使用 SSH 方式连接登录跳板机，不影响 web 登录）
 
-    # 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
-    {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
-
-    修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录，然后重启 Jumpserver 服务
+    # 命令记录录像存储位置设置
+    # 修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录，然后重启 Jumpserver 服务
+    设置后重启 Jumpserver 才能生效
 
 **1.5 安全设置**
+
+::
+
+    # MAF 二次认证勾选会开启全局强制MFA，所有 Jumpserver 用户必须使用动态口令进行认证登录（及时生效）
+    # 限制登录失败和时间设置需要重启  Jumpserver 才能生效
+    # SSH 最大空闲时间设置需要重启 Jumpserver 才能生效
+
+    密码校验规则设置立即生效
 
 二、创建用户
 `````````````````````

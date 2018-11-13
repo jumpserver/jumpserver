@@ -59,11 +59,7 @@ FAQ
 
     # 默认录像存储位置在jumpserver/data/media  可以通过映射或者软连接方式来使用其他目录
 
-    # 录像存储在 oss，Jumpserver 系统设置-终端设置 录像存储
-    {"default": {"TYPE": "server"}, "cn-north-1": {"TYPE": "s3", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "REGION": "cn-north-1"}, "ali-oss": {"TYPE": "oss", "BUCKET": "jumpserver", "ACCESS_KEY": "", "SECRET_KEY": "", "ENDPOINT": "http://oss-cn-hangzhou.aliyuncs.com"}}
-
-    # 命令记录保存到 elastic
-    {"default": {"TYPE":"server"}, "ali-es": {"TYPE": "elasticsearch", "HOSTS": ["http://elastic:changeme@localhost:9200"]}}
+    # 录像和命令记录存储到其他位置，可以到 Jumpserver 系统设置-终端设置 里面进行设置
 
     # 修改后，需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
     # 注意，命令记录需要所有保存地址都正常可用，否则 历史会话 和 命令记录 页面无法正常访问
@@ -87,6 +83,7 @@ FAQ
     $ vim /opt/coco/conf.py
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
+    SSH_TIMEOUT = 60
 
 7. 升级提示 Table 'xxx' already exists
 
