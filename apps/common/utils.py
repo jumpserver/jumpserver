@@ -38,7 +38,8 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
 
     if external:
         from common.models import common_settings
-        url = common_settings.SITE_URL.strip('/') + url
+        site_url = common_settings.SITE_URL or settings.SITE_URL
+        url = site_url.strip('/') + url
     return url
 
 
