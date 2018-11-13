@@ -1,4 +1,4 @@
-FROM registry.fit2cloud.com/jumpserver/python:v3
+FROM registry.fit2cloud.com/public/python:v3
 MAINTAINER Jumpserver Team <ibuler@qq.com>
 
 WORKDIR /opt/jumpserver
