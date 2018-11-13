@@ -475,6 +475,8 @@ DEFAULT_PASSWORD_MIN_LENGTH = 6
 DEFAULT_LOGIN_LIMIT_COUNT = 7
 DEFAULT_LOGIN_LIMIT_TIME = 30  # Unit: minute
 DEFAULT_SECURITY_MAX_IDLE_TIME = 30  # Unit: minute
+DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME = 30
+
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

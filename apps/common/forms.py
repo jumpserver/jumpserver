@@ -186,9 +186,9 @@ class SecuritySettingForm(BaseForm):
             'Unit: minute'
         ),
     )
-    # password expiration time
-    SECURITY_PASSWORD_EXPIRATION = forms.IntegerField(
-        initial=30, label=_("Password expiration time"),
+    # password expiration interval time
+    SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME = forms.IntegerField(
+        initial=30, label=_("Password expiration interval time"),
         min_value=1, help_text=_("Tip :(unit/day)")
     )
     # min length

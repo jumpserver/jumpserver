@@ -36,4 +36,3 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
     if user:
         user.source = user.SOURCE_LDAP
         user.save()
-

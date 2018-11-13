@@ -348,6 +348,21 @@ class User(AbstractUser):
         self.date_password_last_updated = timezone.now()
         self.save()
 
+    def get_password_expired_remain_days(self):
+        interval = common_settings.SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME \
+                   or \
+                   settings.DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME
+        date_expired = self.date_password_last_updated + timezone.timedelta(
+            days=int(interval))
+        date_remain = date_expired - self.date_password_last_updated
+        return date_remain.days
+
+    def check_password_expired(self):
+        remain = self.get_password_expired_remain_days()
+        if remain <= 0:
+            return True
+        return False
+
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
