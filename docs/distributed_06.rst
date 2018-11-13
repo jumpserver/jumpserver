@@ -21,7 +21,7 @@
     $ yum upgrade -y
 
     # 安装依赖包
-    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
+    $ yum -y install gcc epel-release git
 
     # 设置防火墙，开放 2222 5000 端口 给 nginx 和 jumpserver 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.30" port protocol="tcp" port="2222" accept"

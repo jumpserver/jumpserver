@@ -21,7 +21,7 @@
     $ yum upgrade -y
 
     # 安装依赖包
-    $ yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git
+    $ yum -y install gcc epel-release git
 
     # 设置防火墙，开放 80 端口给 nginx 访问，开放 8080 端口给 coco 和 guacamole 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="80" accept"

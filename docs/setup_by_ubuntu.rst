@@ -24,7 +24,7 @@
 ::
 
     $ apt-get update && apt-get -y upgrade
-    $ apt-get -y install wget libkrb5-dev libsqlite3-dev gcc make automake libssl-dev zlib1g-dev libmysqlclient-dev libffi-dev git xz-utils
+    $ apt-get -y install wget libffi-dev git
 
     # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
     $ apt-get -y install language-pack-zh-hans
@@ -411,6 +411,11 @@ Luna 已改为纯前端，需要 Nginx 来运行访问
     $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/
     $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
+
+    $ cd /config
+    $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+    $ tar xf linux-amd64.tar.gz -C /bin/
+    $ chmod +x /bin/ssh-forward
 
 **5.3 配置 Tomcat**
 

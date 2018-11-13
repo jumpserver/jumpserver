@@ -134,6 +134,11 @@
     $ cp root/app/guacamole/guacamole.properties /config/guacamole/
     $ cp guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
 
+    $ cd /config
+    $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+    $ tar xf linux-amd64.tar.gz -C /bin/
+    $ chmod +x /bin/ssh-forward
+
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
