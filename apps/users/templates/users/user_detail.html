@@ -120,6 +120,10 @@
                                             <td><b>{{ user_object.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Last password updated' %}:</td>
+                                            <td><b>{{ user_object.date_password_last_updated|date:"Y-m-j H:i:s" }}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Comment' %}:</td>
                                             <td><b>{{ user_object.comment }}</b></td>
                                         </tr>

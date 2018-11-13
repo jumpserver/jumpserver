@@ -97,6 +97,10 @@ class User(AbstractUser):
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
         verbose_name=_('Source')
     )
+    date_password_last_updated = models.DateTimeField(
+        auto_now_add=True, blank=True, null=True,
+        verbose_name=_('Date password last updated')
+    )
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -259,7 +263,7 @@ class User(AbstractUser):
         return False
 
     def check_public_key(self, public_key):
-        if self.ssH_public_key == public_key:
+        if self.ssh_public_key == public_key:
             return True
         return False
 
@@ -341,6 +345,7 @@ class User(AbstractUser):
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.date_password_last_updated = timezone.now()
         self.save()
 
     def delete(self, using=None, keep_parents=False):

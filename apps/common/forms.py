@@ -177,6 +177,7 @@ class SecuritySettingForm(BaseForm):
             "number of times, no login is allowed during this time interval."
         )
     )
+    # ssh max idle time
     SECURITY_MAX_IDLE_TIME = forms.IntegerField(
         initial=30, required=False,
         label=_("Connection max idle time"),
@@ -184,6 +185,11 @@ class SecuritySettingForm(BaseForm):
             'If idle time more than it, disconnect connection(only ssh now) '
             'Unit: minute'
         ),
+    )
+    # password expiration time
+    SECURITY_PASSWORD_EXPIRATION = forms.IntegerField(
+        initial=30, label=_("Password expiration time"),
+        min_value=1, help_text=_("Tip :(unit/day)")
     )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(

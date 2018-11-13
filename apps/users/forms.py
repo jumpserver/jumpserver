@@ -217,8 +217,7 @@ class UserPasswordForm(forms.Form):
 
     def save(self):
         password = self.cleaned_data['new_password']
-        self.instance.set_password(password)
-        self.instance.save()
+        self.instance.reset_password(new_password=password)
         return self.instance
 
 
