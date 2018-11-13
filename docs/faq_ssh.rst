@@ -134,15 +134,6 @@ SSH 协议资产连接错误排查思路
 
 ::
 
-    # 提示 to use the 'ssh' connection type with passwords, you mast install the sshpass program
-    # Centos
-    $ yum -y install sshpass
-
-    # Ubuntu
-    $ apt-get -y install sshpass
-
-    # 注意，在 coco 服务器上面安装完成后需要重启服务。
-
     # 提示 Authentication failure
     # 一般都是资产的管理用户不正确
 

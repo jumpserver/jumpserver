@@ -15,6 +15,7 @@
     >>> user.set_password('PassWord')
     >>> user.save()
     >>> dev_org.admins.add(user)
+    >>> dev_org.users.add(user)
     >>> exit()
 
     # 然后使用 user 用户登录 jumpserver 即可
