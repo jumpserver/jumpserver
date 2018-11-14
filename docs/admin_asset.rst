@@ -63,7 +63,7 @@
 
 4.1 创建系统用户
 
-系统用户是 Jumpserver 跳转登录资产时使用的用户,可以理解为登录资产用户,如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`); 简单来说是 用户使用自己的用户名登录 Jumpserver, Jumpserver 使用系统用户登录资产。
+系统用户是 Jumpserver 跳转登录资产时使用的用户,可以理解为登录资产用户,如 web, sa, dba('ssh web@some-host'), 而不是使用某个用户的用户名跳转登录服务器('ssh xiaoming@some-host'); 简单来说是 用户使用自己的用户名登录 Jumpserver, Jumpserver 使用系统用户登录资产。
 
 系统用户创建时,如果选择了自动推送 Jumpserver 会使用 Ansible 自动推送系统用户到资产中,如果资产(交换机、Windows)不支持 Ansible, 请手动填写账号密码。
 
@@ -106,5 +106,3 @@ IP 地址和管理用户要确保正确,确保所选的管理用户的用户名�
 创建 Windows 资产,系统平台请选择正确的 Windows,端口号为3389,IP 和 管理用户请正确选择,确保管理用户能正确登录到指定的 IP 主机上。
 
 .. image:: _static/img/create_windows_asset.jpg
-
-
