@@ -177,7 +177,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Jumpserver', u'Jumpserver 文档',
-     author, 'Jumpserver', u' Jumpserver是全球首款完全开源的堡垒机，是符合 4A 的专业运维审计系统',
+     author, 'Jumpserver', u' Jumpserver是全球首款完全开源的堡垒机,是符合 4A 的专业运维审计系统',
      'Miscellaneous'),
 ]
 

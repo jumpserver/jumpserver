@@ -3,25 +3,25 @@ Docker 使用说明
 
 1. 查看所有镜像
 
-::
+.. code-block:: shell
 
     $ docker images
 
 2. 查看所有创建的容器
 
-::
+.. code-block:: shell
 
     $ docker ps -a
 
 3. 查看正在运行的容器
 
-::
+.. code-block:: shell
 
     $ docker ps
 
 4. 进入正在运行的容器
 
-::
+.. code-block:: shell
 
     $ docker exec -it <容器的 CONTAINER ID 或者 容器 NAMES > /bin/bash
 
@@ -34,7 +34,7 @@ Docker 使用说明
 
 5. 开始 停止 重启 容器
 
-::
+.. code-block:: shell
 
     $ docker start <容器的 CONTAINER ID 或者 容器 NAMES >
     $ docker stop <容器的 CONTAINER ID 或者 容器 NAMES >
@@ -51,7 +51,7 @@ Docker 使用说明
 
 6. 查看容器 log
 
-::
+.. code-block:: shell
 
     $ docker logs -f <容器的 CONTAINER ID 或者 容器 NAMES >
 
@@ -64,7 +64,7 @@ Docker 使用说明
 
 7. 删除容器
 
-::
+.. code-block:: shell
 
     $ docker rm <容器的 CONTAINER ID 或者 容器 NAMES >
 
@@ -78,7 +78,7 @@ Docker 使用说明
 8. 删除镜像
 
 
-::
+.. code-block:: shell
 
     $ docker rmi <镜像的 CONTAINER ID>
 
@@ -91,7 +91,7 @@ Docker 使用说明
 
 9. 更新镜像
 
-::
+.. code-block:: shell
 
     $ docker pull <镜像地址:版本>
 

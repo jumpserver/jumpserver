@@ -2,7 +2,7 @@
 ------------------------------------------------------
 - jumpserver 1.4.0 或之后版本
 
-::
+.. code-block:: shell
 
     $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps

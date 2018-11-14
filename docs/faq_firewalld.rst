@@ -3,13 +3,13 @@ Firewalld 使用说明
 
 1. 打开 firewalld
 
-::
+.. code-block:: shell
 
     $ systemctl start firewalld
 
 2. 端口允许被某固定 IP 访问
 
-::
+.. code-block:: shell
 
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="允许访问的IP" port protocol="tcp" port="端口" accept"
     $ firewall-cmd --reload  # 重载规则, 才能生效
@@ -37,7 +37,7 @@ Firewalld 使用说明
 
 3. 端口允许所有 IP 访问
 
-::
+.. code-block:: shell
 
     $ firewall-cmd --zone=public --add-port=端口/tcp --permanent
     $ firewall-cmd --reload  # 重载规则, 才能生效

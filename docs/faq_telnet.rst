@@ -3,12 +3,14 @@ Telnet 使用说明
 
 资产的创建与系统用户的创建与ssh大同小异
 
-1. telnet 连不上，提示 No existing session
+1. telnet 连不上,提示 No existing session
 
-::
+.. code-block:: shell
 
-    # 这是因为coco无法判断telnet的返回状态导致的，需要修改如下代码
-    $ vim /opt/coco/coco/connection.py  # 第160行
+    # 这是因为coco无法判断telnet的返回状态导致的,需要修改如下代码
+    $ vi /opt/coco/coco/connection.py  # 第 174 行
+
+.. code-block:: python
 
     class TelnetConnection:
 
@@ -31,6 +33,8 @@ Telnet 使用说明
                 r'Last\s*login|success|成功', re.I
             )
 
+.. code-block:: vim
+
     # 在 'incorrect|failed|失败|错误|在这里加入你设备登录失败的提示符|可以多个|可以正则匹配'
     # 在 'Last\s*login|success|成功|在这里加入你设备登录成功的提示符|可以多个|可以正则匹配'
     例：XX路由器  登录成功提示符#   登录失败提示Error
@@ -39,4 +43,4 @@ Telnet 使用说明
 
     # 保存后需要重启coco组件
 
-    # 你也可以把你的设备登录成功和登录失败的信息发到jumpserver的项目问题里面，我们会在下个版本更新代码以支持你的设备
+    # 你也可以把你的设备登录成功和登录失败的信息发到jumpserver的项目问题里面,我们会在下个版本更新代码以支持你的设备

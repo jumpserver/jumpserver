@@ -1,7 +1,7 @@
 一步一步安装(CentOS)
 --------------------------
 
-本文档旨在帮助用户了解各组件之间的关系，如果已经接触过之前的版本，可参考 `进阶安装文档 <quickinstall.html>`_
+本文档旨在帮助用户了解各组件之间的关系,如果已经接触过之前的版本,可参考 `进阶安装文档 <quickinstall.html>`_
 
 安装过程中遇到问题可参考 `安装过程中常见的问题 <faq_install.html>`_
 
@@ -19,7 +19,7 @@
 -  IP: 192.168.244.144
 -  设置 selinux 和防火墙
 
-::
+.. code-block:: shell
 
     # CentOS 7
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
@@ -30,16 +30,16 @@
     $ setenforce 0
     $ sed -i "s/enforcing/disabled/g" `grep enforcing -rl /etc/selinux/config`
 
-    # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
+    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
     # CentOS6
-    $ setenforce 0  # 临时关闭，重启后失效
-    $ service iptables stop  # 临时关闭，重启后失效
+    $ setenforce 0  # 临时关闭,重启后失效
+    $ service iptables stop  # 临时关闭,重启后失效
 
-    # 修改字符集，否则可能报 input/output error的问题，因为日志里打印了中文
+    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
@@ -49,7 +49,7 @@
 
 **1.1 安装依赖包**
 
-::
+.. code-block:: shell
 
     $ yum -y install wget gcc epel-release git
 
@@ -61,22 +61,22 @@
 
 **1.3 建立 Python 虚拟环境**
 
-因为 CentOS 6/7 自带的是 Python2，而 Yum 等工具依赖原来的 Python，为了不扰乱原来的环境我们来使用 Python 虚拟环境
+因为 CentOS 6/7 自带的是 Python2,而 Yum 等工具依赖原来的 Python,为了不扰乱原来的环境我们来使用 Python 虚拟环境
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ python3.6 -m venv py3
     $ source /opt/py3/bin/activate
 
-    # 看到下面的提示符代表成功，以后运行 Jumpserver 都要先运行以上 source 命令，以下所有命令均在该虚拟环境中运行
+    # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
 **1.4 自动载入 Python 虚拟环境配置**
 
-此项仅为懒癌晚期的人员使用，防止运行 Jumpserver 时忘记载入 Python 虚拟环境导致程序无法运行。使用autoenv
+此项仅为懒癌晚期的人员使用,防止运行 Jumpserver 时忘记载入 Python 虚拟环境导致程序无法运行。使用autoenv
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ git clone https://github.com/kennethreitz/autoenv.git
@@ -88,34 +88,34 @@
 
 **2.1 下载或 Clone 项目**
 
-项目提交较多 git clone 时较大，你可以选择去 Github 项目页面直接下载zip包。
+项目提交较多 git clone 时较大,你可以选择去 Github 项目页面直接下载zip包。
 
-::
+.. code-block:: shell
 
     $ cd /opt/
     $ git clone https://github.com/jumpserver/jumpserver.git
     $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
 
-    # 首次进入 jumpserver 文件夹会有提示，按 y 即可
+    # 首次进入 jumpserver 文件夹会有提示,按 y 即可
     # Are you sure you want to allow this? (y/N) y
 
 **2.2 安装依赖 RPM 包**
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver/requirements
     $ yum -y install $(cat rpm_requirements.txt)  # 如果没有任何报错请继续
 
 **2.3 安装 Python 库依赖**
 
-::
+.. code-block:: shell
 
     $ pip install --upgrade pip setuptools
     $ pip install -r requirements.txt
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
-::
+.. code-block:: shell
 
     $ yum -y install redis
     $ systemctl enable redis
@@ -129,20 +129,20 @@
 
 **2.5 安装 MySQL**
 
-本教程使用 Mysql 作为数据库，如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
+本教程使用 Mysql 作为数据库,如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
 
-::
+.. code-block:: shell
 
     # centos7
     $ yum -y install mariadb mariadb-devel mariadb-server # centos7下安装的是mariadb
     $ systemctl enable mariadb
     $ systemctl start mariadb
 
-    # centos6 自带的 mysql5.1 不支持，请在其他服务器上创建 jumpserver 数据库连接
+    # centos6 自带的 mysql5.1 不支持,请在其他服务器上创建 jumpserver 数据库连接
 
 **2.6 创建数据库 Jumpserver 并授权**
 
-::
+.. code-block:: shell
 
     $ mysql -uroot
     > create database jumpserver default charset 'utf8';
@@ -152,17 +152,17 @@
 
 **2.7 修改 Jumpserver 配置文件**
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver
     $ cp config_example.py config.py
     $ vi config.py
 
-    # 注意对齐，不要直接复制本文档的内容，实际内容以文件为准，本文仅供参考
+    # 注意对齐,不要直接复制本文档的内容,实际内容以文件为准,本文仅供参考
 
-**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+**注意: 配置文件是 Python 格式,不要用 TAB,而要用空格**
 
-::
+.. code-block:: python
 
     """
         jumpserver.config
@@ -181,29 +181,29 @@
     class Config:
         # Use it to encrypt or decrypt data
 
-        # Jumpserver 使用 SECRET_KEY 进行加密，请务必修改以下设置
+        # Jumpserver 使用 SECRET_KEY 进行加密,请务必修改以下设置
         # SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
-        SECRET_KEY = '请随意输入随机字符串（推荐字符大于等于 50位）'
+        SECRET_KEY = '请随意输入随机字符串(推荐字符大于等于 50位)'
 
         # Django security setting, if your disable debug model, you should setting that
         ALLOWED_HOSTS = ['*']
 
-        # DEBUG 模式 True为开启 False为关闭，默认开启，生产环境推荐关闭
-        # 注意：如果设置了DEBUG = False，访问8080端口页面会显示不正常，需要搭建 nginx 代理才可以正常访问
+        # DEBUG 模式 True为开启 False为关闭,默认开启,生产环境推荐关闭
+        # 注意：如果设置了DEBUG = False,访问8080端口页面会显示不正常,需要搭建 nginx 代理才可以正常访问
         DEBUG = os.environ.get("DEBUG") or True
 
-        # 日志级别，默认为DEBUG，可调整为INFO, WARNING, ERROR, CRITICAL，默认INFO
+        # 日志级别,默认为DEBUG,可调整为INFO, WARNING, ERROR, CRITICAL,默认INFO
         LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'WARNING'
         LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
-        # 使用的数据库配置，支持sqlite3, mysql, postgres等，默认使用sqlite3
+        # 使用的数据库配置,支持sqlite3, mysql, postgres等,默认使用sqlite3
         # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # 默认使用SQLite3，如果使用其他数据库请注释下面两行
+        # 默认使用SQLite3,如果使用其他数据库请注释下面两行
         # DB_ENGINE = 'sqlite3'
         # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
-        # 如果需要使用mysql或postgres，请取消下面的注释并输入正确的信息,本例使用mysql做演示(mariadb也是mysql)
+        # 如果需要使用mysql或postgres,请取消下面的注释并输入正确的信息,本例使用mysql做演示(mariadb也是mysql)
         DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
         DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
         DB_PORT = os.environ.get("DB_PORT") or 3306
@@ -211,7 +211,7 @@
         DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
         DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
-        # Django 监听的ip和端口，生产环境推荐把0.0.0.0修改成127.0.0.1，这里的意思是允许x.x.x.x访问，127.0.0.1表示仅允许自身访问
+        # Django 监听的ip和端口,生产环境推荐把0.0.0.0修改成127.0.0.1,这里的意思是允许x.x.x.x访问,127.0.0.1表示仅允许自身访问
         # ./manage.py runserver 127.0.0.1:8080
         HTTP_BIND_HOST = '0.0.0.0'
         HTTP_LISTEN_PORT = 8080
@@ -247,42 +247,42 @@
 
 **2.8 生成数据库表结构和初始化数据**
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver/utils
     $ sh make_migrations.sh
 
 **2.9 运行 Jumpserver**
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
 
-    # 新版本更新了运行脚本，使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错，请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理，继续往下操作，后面搭建 nginx 代理后即可正常访问，原因是因为 django 无法在非 debug 模式下加载静态资源
+运行不报错,请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理,继续往下操作,后面搭建 nginx 代理后即可正常访问,原因是因为 django 无法在非 debug 模式下加载静态资源
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **3.1 下载或 Clone 项目**
 
-新开一个终端，别忘了 source /opt/py3/bin/activate
+新开一个终端,别忘了 source /opt/py3/bin/activate
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git
     $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
 
-    # 首次进入 coco 文件夹会有提示，按 y 即可
+    # 首次进入 coco 文件夹会有提示,按 y 即可
     # Are you sure you want to allow this? (y/N) y
 
 **3.2 安装依赖**
 
-::
+.. code-block:: shell
 
     $ cd /opt/coco/requirements
     $ yum -y  install $(cat rpm_requirements.txt)
@@ -290,18 +290,18 @@
 
 **3.3 修改配置文件并运行**
 
-::
+.. code-block:: shell
 
     $ cd /opt/coco
     $ mkdir keys logs
-    $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署，请手动修改 conf.py
+    $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署,请手动修改 conf.py
     $ vi conf.py
 
-    # 注意对齐，不要直接复制本文档的内容
+    # 注意对齐,不要直接复制本文档的内容
 
-**注意: 配置文件是 Python 格式，不要用 TAB，而要用空格**
+**注意: 配置文件是 Python 格式,不要用 TAB,而要用空格**
 
-::
+.. code-block:: python
 
     #!/usr/bin/env python3
     # -*- coding: utf-8 -*-
@@ -320,7 +320,7 @@
         # NAME = "localhost"
         NAME = "coco"
 
-        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080，请修改此处
+        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
         CORE_HOST = 'http://127.0.0.1:8080'
 
@@ -330,7 +330,7 @@
         # 监听的SSH端口号, 默认2222
         # SSHD_PORT = 2222
 
-        # 监听的HTTP/WS端口号，默认5000
+        # 监听的HTTP/WS端口号,默认5000
         # HTTPD_PORT = 5000
 
         # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
@@ -365,13 +365,13 @@
         # SSH白名单
         # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
 
-        # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
+        # SSH黑名单, 如果用户同时在白名单和黑名单,黑名单优先生效
         # BLOCK_SSH_USER = []
 
         # 和Jumpserver 保持心跳时间间隔
         # HEARTBEAT_INTERVAL = 5
 
-        # Admin的名字，出问题会提示给用户
+        # Admin的名字,出问题会提示给用户
         # ADMINS = ''
         COMMAND_STORAGE = {
             "TYPE": "server"
@@ -389,38 +389,38 @@
 
     config = Config()
 
-::
+.. code-block:: shell
 
     $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
 
-    # 新版本更新了运行脚本，使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受coco的注册
+启动成功后去Jumpserver 会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Luna 已改为纯前端，需要 Nginx 来运行访问
+Luna 已改为纯前端,需要 Nginx 来运行访问
 
-访问（https://github.com/jumpserver/luna/releases）下载对应版本的 release 包，直接解压，不需要编译
+访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
 
 **4.1 解压 Luna**
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
-五. 安装 Windows 支持组件（如果不需要管理 windows 资产，可以直接跳过这一步）
+五. 安装 Windows 支持组件(如果不需要管理 windows 资产,可以直接跳过这一步)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Guacamole 需要 Tomcat 来运行
 
 **5.1 安装依赖**
 
-::
+.. code-block:: shell
 
     $ rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
     $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
@@ -437,7 +437,7 @@ Guacamole 需要 Tomcat 来运行
 
 **5.2 编译安装 guacamole 服务**
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ git clone https://github.com/jumpserver/docker-guacamole.git
@@ -453,7 +453,7 @@ Guacamole 需要 Tomcat 来运行
 
 **5.3 配置 Tomcat**
 
-::
+.. code-block:: shell
 
     $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
     $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
@@ -476,7 +476,7 @@ Guacamole 需要 Tomcat 来运行
 
 **5.4 配置环境变量**
 
-::
+.. code-block:: shell
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
@@ -487,21 +487,23 @@ Guacamole 需要 Tomcat 来运行
 
 **5.5 启动 Guacamole**
 
-::
+.. code-block:: shell
 
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
-启动成功后去Jumpserver 会话管理-终端管理（http://192.168.244.144:8080/terminal/terminal/）接受[Gua]开头的一个注册
+启动成功后去Jumpserver 会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受[Gua]开头的一个注册
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **6.1 安装 Nginx**
 
-.. code:: shell
+.. code-block:: shell
 
     $ yum -y install nginx
+
+.. code-block:: nginx
 
     $ vi /etc/nginx/nginx.conf
 
@@ -533,33 +535,33 @@ Guacamole 需要 Tomcat 来运行
 
 **6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 
-::
+.. code-block:: nginx
 
     $ vi /etc/nginx/conf.d/jumpserver.conf
-    # 注意注释 nginx.conf 里面的 server {} 内容 ，CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
+    # 注意注释 nginx.conf 里面的 server {} 内容 ,CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     server {
-        listen 80;  # 代理端口，以后将通过此端口进行访问，不再通过8080端口
+        listen 80;  # 代理端口,以后将通过此端口进行访问,不再通过8080端口
         server_name demo.jumpserver.org;  # 修改成你的域名
 
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
+            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;  # 录像位置，如果修改安装目录，此处需要修改
+            root /opt/jumpserver/data/;  # 录像位置,如果修改安装目录,此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;  # 静态资源，如果修改安装目录，此处需要修改
+            root /opt/jumpserver/data/;  # 静态资源,如果修改安装目录,此处需要修改
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器,请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -571,7 +573,7 @@ Guacamole 需要 Tomcat 来运行
         }
 
         location /coco/ {
-            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器,请填写它的ip
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -579,7 +581,7 @@ Guacamole 需要 Tomcat 来运行
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器，请填写它的ip
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器,请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -591,7 +593,7 @@ Guacamole 需要 Tomcat 来运行
         }
 
         location / {
-            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器，请填写它的ip
+            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器,请填写它的ip
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -600,7 +602,7 @@ Guacamole 需要 Tomcat 来运行
 
 **6.3 运行 Nginx**
 
-::
+.. code-block:: shell
 
     nginx -t   # 确保配置没有问题, 有问题请先解决
 
@@ -617,22 +619,22 @@ Guacamole 需要 Tomcat 来运行
 
 检查应用是否已经正常运行
 
-服务全部启动后，访问 http://192.168.244.144，访问nginx代理的端口，不要再通过8080端口访问
+服务全部启动后,访问 http://192.168.244.144,访问nginx代理的端口,不要再通过8080端口访问
 
 默认账号: admin 密码: admin
 
-如果部署过程中没有接受应用的注册，需要到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
+如果部署过程中没有接受应用的注册,需要到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
 
 **测试连接**
 
-::
+.. code-block:: shell
 
-    如果登录客户端是 macOS 或 Linux ，登录语法如下
+    如果登录客户端是 macOS 或 Linux ,登录语法如下
     $ ssh -p2222 admin@192.168.244.144
     $ sftp -P2222 admin@192.168.244.144
     密码: admin
 
-    如果登录客户端是 Windows ，Xshell Terminal 登录语法如下
+    如果登录客户端是 Windows ,Xshell Terminal 登录语法如下
     $ ssh admin@192.168.244.144 2222
     $ sftp admin@192.168.244.144 2222
     密码: admin
