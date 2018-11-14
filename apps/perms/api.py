@@ -411,18 +411,22 @@ class UserGrantedNodeChildrenApi(ListAPIView):
         util = AssetPermissionUtil(self.request.user)
         node_id = self.request.query_params.get('id')
         nodes_granted = util.get_nodes_with_assets()
-        if nodes_granted:
-            first_node = sorted(nodes_granted, reverse=True)[0]
-        else:
+        if not nodes_granted:
             return []
+        root_nodes = [node for node in nodes_granted.keys() if node.is_root()]
+
+        queryset = []
         if node_id and node_id in [str(node.id) for node in nodes_granted]:
             node = [node for node in nodes_granted if str(node.id) == node_id][0]
-        else:
-            node = first_node
-        queryset = []
-        if node == first_node:
+        elif len(root_nodes) == 1:
+            node = root_nodes[0]
             node.assets_amount = len(nodes_granted[node])
             queryset.append(node)
+        else:
+            for node in root_nodes:
+                node.assets_amount = len(nodes_granted[node])
+                queryset.append(node)
+            return queryset
 
         children = []
         for child in node.get_children():
