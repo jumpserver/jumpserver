@@ -56,7 +56,7 @@ class LoginLog(models.Model):
     REASON_PASSWORD = 1
     REASON_MFA = 2
     REASON_NOT_EXIST = 3
-    REASON_PASSWORD_EXPIRED = 3
+    REASON_PASSWORD_EXPIRED = 4
 
     REASON_CHOICE = (
         (REASON_NOTHING, _('-')),
