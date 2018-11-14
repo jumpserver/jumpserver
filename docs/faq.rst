@@ -23,8 +23,10 @@ FAQ
 .. code-block:: vim
 
     # 用户管理里面的用户列表 是用来登录jumpserver平台的用户,用户需要先登录jumpserver平台,才能管理或者连接资产
-    # 资产管理里面的管理用户 是jumpserver用来管理资产需要的服务账户,Linux资产需要root或 NOPASSWD: ALL sudo权限,Jumpserver使用该用户来 '推送系统用户'、'获取资产硬件信息'等。Windows资产随意指定一个,暂无作用
-    # 资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户,Linux资产可以自动推送该系统用户到资产上,Windows需要指定资产上已经创建的系统用户
+    # 资产管理里面的管理用户 是jumpserver用来管理资产需要的服务账户,Linux资产需要root或 NOPASSWD: ALL sudo
+    权限,Jumpserver使用该用户来 '推送系统用户'、'获取资产硬件信息'等。Windows资产随意指定一个,暂无作用
+    # 资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户,Linux资产可以自动推送该系统用户到资产上,
+    Windows需要指定资产上已经创建的系统用户
 
 2. input/output error, 通常jumpserver所在服务器字符集问题
 
@@ -50,7 +52,7 @@ FAQ
 
 .. code-block:: vim
 
-    # Luna 打开网页提示403 Forbidden错误,一般是nginx配置文件的luna路径不正确或者luna下载了源代码,请重新下载编译好的代码
+    # Luna 打开网页提示403 Forbidden错误,一般是nginx配置文件的luna路径不正确或者下载了源代码,请重新下载编译好的代码
     # Luna 打开网页提示502 Bad Gateway错误,一般是selinux和防火墙的问题,请根据nginx的errorlog来检查
 
 4. 录像问题
