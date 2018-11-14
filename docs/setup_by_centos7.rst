@@ -262,7 +262,7 @@ CentOS 7 安装文档
             server localhost:2222 weight=1;
             server localhost:2223 weight=1;  # 多节点
             # 这里是 coco ssh 的后端ip
-            least_conn;  # 优先连接连接数最少的后端服务
+            hash $remote_addr;
         }
         server {
             listen 2222;

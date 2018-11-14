@@ -86,7 +86,7 @@
             server 192.168.100.40:2222 weight=1;
             server 192.168.100.40:2223 weight=1;  # 多节点
             # 这里是 coco ssh 的后端ip
-            least_conn;
+            hash $remote_addr;
         }
         server {
             listen 2222;
