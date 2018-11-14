@@ -228,6 +228,21 @@ class User(AbstractUser):
     @property
     def is_local_source(self):
         return self.source == self.SOURCE_LOCAL
+    
+    @property
+    def date_password_expired(self):
+        interval = common_settings.SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME \
+                   or \
+                   settings.DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME
+        date_expired = self.date_password_last_updated + timezone.timedelta(
+            days=int(interval))
+        return date_expired
+
+    @property
+    def password_expired_remain_days(self):
+        date_remain = self.date_password_expired - timezone.now()
+        print('remain: ', date_remain.days)
+        return date_remain.days
 
     def save(self, *args, **kwargs):
         if not self.name:
@@ -352,21 +367,11 @@ class User(AbstractUser):
         self.date_password_last_updated = timezone.now()
         self.save()
 
-    def get_password_expired_remain_days(self):
-        interval = common_settings.SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME \
-                   or \
-                   settings.DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME
-        date_expired = self.date_password_last_updated + timezone.timedelta(
-            days=int(interval))
-        date_remain = date_expired - timezone.now()
-        return date_remain.days
-
     def check_password_expired(self):
         if not self.is_local_source:
             return False
 
-        remain = self.get_password_expired_remain_days()
-        if remain < 0:
+        if self.password_expired_remain_days < 0:
             return True
 
         return False

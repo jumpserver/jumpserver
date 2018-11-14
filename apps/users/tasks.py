@@ -22,10 +22,9 @@ def write_login_log_async(*args, **kwargs):
 def check_password_expired():
     users = User.objects.exclude(role=User.ROLE_APP)
     for user in users:
-        remain_days = user.get_password_expired_remain_days()
-        if remain_days < 5:
+        if user.password_expired_remain_days < 5:
             logger.info("The user {} password expires in {} days".format(
-                user, remain_days))
+                user, user.password_expired_remain_days))
             send_reset_password_mail(user)
             continue
         logger.info('User {} password no expired'.format(user))
