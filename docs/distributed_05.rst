@@ -145,7 +145,7 @@
 .. code-block:: nginx
 
     # 修改 nginx 配置文件(如果无法正常访问,请注释掉 nginx.conf 的 server 所有字段)
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf
 
     server {
         listen 80;

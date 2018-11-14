@@ -17,7 +17,7 @@ sftp 使用说明
     # 此处即是当前资产的 home 目录
 
     # 如果需要修改 /tmp 为其他目录
-    $ vim coco/coco/sftp.py
+    $ vi coco/coco/sftp.py
 
 .. code-block:: python
 
