@@ -112,7 +112,7 @@
 
     (3). 打开RSA验证相关设置
 
-      $ vim /etc/ssh/sshd_config
+      $ vi /etc/ssh/sshd_config
 
       RSAAuthentication yes
       PubkeyAuthentication yes

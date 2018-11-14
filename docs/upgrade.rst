@@ -11,7 +11,7 @@
 
 0. 检查数据库表结构文件是否完整
 
-::
+.. code-block:: shell
 
     # 为了保证能顺利升级,请先检查数据库表结构文件是否完整
     $ cd /opt/jumpserver/apps
@@ -26,7 +26,7 @@
 
 1. 备份 Jumpserver 数据库表结构 (通过releases包升级需要还原这些文件)
 
-::
+.. code-block:: shell
 
     $ jumpserver_backup=/tmp/jumpserver_backup
     $ mkdir -p $jumpserver_backup
@@ -38,6 +38,8 @@
         fi
       done
 
+.. code-block:: shell
+
     # 还原代码 (通过releases包升级需要还原这些文件,通过git pull升级不需要执行)
     $ cd $jumpserver_backup/
     $ for d in $(ls);do
@@ -48,7 +50,7 @@
 
 2. 升级 Jumpserver
 
-::
+.. code-block:: shell
 
     # 升级前请做好 jumpserver 与 数据库 备份,谨防意外,具体的备份命令可以参考离线升级
     $ cd /opt/jumpserver
@@ -56,14 +58,20 @@
     $ git pull
     $ ./jms stop
 
+.. code-block:: shell
+
     # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py (升级前版本小于 1.3 需要执行此步骤,否则跳过)
     $ mv config.py config.bak
     $ cp config_example.py config.py
-    $ vim config.py  # 参考安装文档进行修改
+    $ vi config.py  # 参考安装文档进行修改
+
+.. code-block:: shell
 
     # 所有版本都需要执行此步骤
     $ pip install -r requirements/requirements.txt
     $ cd utils && sh make_migrations.sh
+
+.. code-block:: shell
 
     # 如果执行 sh make_migrations.sh 时有红色文字提示 Run 'manage.py make_migrations' 和 'manage.py migrate' ,则需要执行下面4条命令,没有则忽略这一步
     $ cd /opt/jumpserver/apps
@@ -71,17 +79,26 @@
     $ python manage.py migrate
     $ cd ../utils && sh make_migrations.sh
 
+.. code-block:: shell
+
     # 1.0.x 升级到最新版本需要执行迁移脚本 (新版本授权管理更新,升级前版本不是 1.0.x 请跳过)
     $ sh 2018_04_11_migrate_permissions.sh
+
+.. code-block:: shell
 
     # 任意版本升级到 1.4.0 版本,需要执行(升级前版本小于 1.4.0 需要执行此步骤)
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
 
+.. code-block:: shell
+
     # 启动 jumpserver
-    $ cd ../ && ./jms start all
+    $ cd ../
+    $ ./jms start all
+
+.. code-block:: vim
 
     # 任意版本升级到 1.4.2 版本,需要修改 nginx 配置 (升级前版本小于 1.4.2 需要执行此步骤)
-    $ vim /etc/nginx/conf.d/jumpserver.conf  # 部分用户的配置文件是/etc/nginx/nginx.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf  # 部分用户的配置文件是/etc/nginx/nginx.conf
 
     ...
 
@@ -105,12 +122,14 @@
 
     ...
 
+.. code-block:: shell
+
     # 保存后重新载入配置
     $ nginx -s reload
 
 3. 升级 Coco (docker 部署的请忽略往下看)
 
-::
+.. code-block:: shell
 
     # 如果 coco 目录非默认位置请手动修改
     $ cd /opt/coco
@@ -119,16 +138,18 @@
     $ ./cocod stop
     $ pip install -r requirements/requirements.txt
 
+.. code-block:: shell
+
     # coco 升级前版本小于 1.4.1 升级到最新版本请使用新的 conf.py (升级前版本小于 1.4.1 需要执行此步骤)
     $ mv conf.py coco.bak
     $ cp conf_example.py conf.py
-    $ vim conf.py  # 参考安装文档进行修改
+    $ vi conf.py  # 参考安装文档进行修改
 
     $ ./cocod start
 
 4. 升级 guacamole (docker 部署的请忽略往下看)
 
-::
+.. code-block:: shell
 
     $ cd /opt/docker-guacamole
     $ git pull
@@ -148,7 +169,7 @@
 
 重新下载 release 包(https://github.com/jumpserver/luna/releases)
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ rm -rf luna
@@ -160,7 +181,7 @@
 
 6. Docker 部署 coco guacamole 升级说明
 
-::
+.. code-block:: shell
 
     # 先到 Web 会话管理 - 终端管理 删掉所有组件
     $ docker sop jms_coco
@@ -183,7 +204,7 @@
 
 **Jumpserver**
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver
     $ git pull
@@ -204,24 +225,20 @@
 
 说明: Docker 部署的请跳过
 
-::
+.. code-block:: shell
 
     $ cd /opt/coco
     $ git pull
     $ source /opt/py3/bin/activate
     $ ./cocod stop
-
-
     $ pip install -r requirements/requirements.txt
-
     $ ./cocod start
-
 
 **Guacamole**
 
 说明: Docker 部署的请跳过
 
-::
+.. code-block:: shell
 
     $ cd /opt/docker-guacamole
     $ git pull
@@ -241,7 +258,7 @@
 
 说明: 直接下载 release 包
 
-::
+.. code-block:: shell
 
     $ cd /opt
     $ rm -rf luna
@@ -253,7 +270,7 @@
 
 说明: Docker 部署的 coco 与 guacamole 升级说明
 
-::
+.. code-block:: shell
 
     # 先到 Web 会话管理 - 终端管理 删掉所有组件
     $ docker sop jms_coco

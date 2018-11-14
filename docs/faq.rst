@@ -82,7 +82,7 @@ FAQ
 
 .. code-block:: shell
 
-    $ vim /opt/coco/conf.py
+    $ vi /opt/coco/conf.py
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
     SSH_TIMEOUT = 60
@@ -108,7 +108,7 @@ FAQ
 
 .. code-block:: shell
 
-    $ vim /opt/jumpserver/apps/jumpserver/settings.py
+    $ vi /opt/jumpserver/apps/jumpserver/settings.py
 
 .. code-block:: python
 
@@ -141,7 +141,7 @@ FAQ
     # 具体表现为在luna页面一会可以连接资产,一会就不行,需要多次刷新页面
     # 如果从开发者工具里面看,可以看到部分不正常的 502 socket.io
     # 此问题一般是由最前端一层的nginx反向代理造成的,需要在每层的代理上添加(注意是每层)
-    $ vim /etc/nginx/conf.d/jumpserver.conf  # 配置文件所在目录,自行修改
+    $ vi /etc/nginx/conf.d/jumpserver.conf  # 配置文件所在目录,自行修改
 
     ...  # 省略
 
@@ -171,7 +171,7 @@ FAQ
     ...
 
     # 为了便于理解,附上一份 demo 网站的配置文件参考
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf
     server {
 
         listen 80;

@@ -9,7 +9,7 @@
 ::
 
     $ cd /opt/jumpserver
-    $ vim config.py
+    $ vi config.py
 
     # 调整 debug 模式和 log_level
     ...
@@ -20,7 +20,7 @@
 
 
     $ cd /opt/coco
-    $ vim conf.py
+    $ vi conf.py
 
     # 调整 log_level
     ...
@@ -42,7 +42,7 @@
 
     # 在最前端的 nginx 代理服务器上进行设置
     $ cd /etc/nginx
-    $ vim conf.d/jumpserver.conf
+    $ vi conf.d/jumpserver.conf
 
     ...
     # 根据自己的 OSS 所在地域和 域名,自行替换 yourBucket 和 yourEndPoint

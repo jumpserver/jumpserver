@@ -120,7 +120,7 @@
 
     这是因为当前系统的 hostname 有 coco 不支持的字符,需要手动指定 coco 的 NAME
     $ cd /opt/coco/
-    $ vim conf.py
+    $ vi conf.py
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
     # NAME = "localhost"
@@ -156,7 +156,7 @@
 .. code-block:: nginx
 
     这是因为你没有按照教程进行安装,修改了安装目录,需要在 nginx 的配置文件里面修改资源路径
-    $ vim /etc/nginx/conf.d/jumpserver.conf
+    $ vi /etc/nginx/conf.d/jumpserver.conf
 
     ...
 
