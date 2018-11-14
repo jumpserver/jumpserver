@@ -6,7 +6,7 @@
 配置文件调整
 ~~~~~~~~~~~~~~
 
-::
+.. code-block:: shell
 
     $ cd /opt/jumpserver
     $ vi config.py
@@ -18,6 +18,7 @@
     LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'ERROR'
     ...
 
+.. code-block:: shell
 
     $ cd /opt/coco
     $ vi conf.py
@@ -32,7 +33,7 @@
 静态资源 OSS 加速访问
 ~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: shell
 
     # 先把静态资源上传或同步到 OSS,如果使用其他工具上传,注意设置文件 HTTP 头
     # 静态文件夹包括 jumpserver/data/static 和 luna
@@ -43,6 +44,8 @@
     # 在最前端的 nginx 代理服务器上进行设置
     $ cd /etc/nginx
     $ vi conf.d/jumpserver.conf
+
+.. code-block:: nginx
 
     ...
     # 根据自己的 OSS 所在地域和 域名,自行替换 yourBucket 和 yourEndPoint
@@ -58,4 +61,7 @@
                 access_log off;
     }
 
+.. code-block:: shell
+
     # 设置完成后重启 nginx
+    $ nginx -s reload
