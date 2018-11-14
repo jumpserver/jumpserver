@@ -72,7 +72,7 @@ CentOS 7 安装文档
     $ systemctl enable nginx
 
     # 安装 Python3.6
-    $ yum -y install python36 python3-devel
+    $ yum -y install python36 python36-devel
 
     # 配置并载入 Python3 虚拟环境
     $ cd /opt
