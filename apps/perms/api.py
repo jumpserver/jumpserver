@@ -417,8 +417,7 @@ class UserGrantedNodeChildrenApi(ListAPIView):
 
         queryset = []
         if node_id and node_id in [str(node.id) for node in nodes_granted]:
-            node = [node for node in nodes_granted if str(node.id) == node_id][
-                0]
+            node = [node for node in nodes_granted if str(node.id) == node_id][0]
         elif len(root_nodes) == 1:
             node = root_nodes[0]
             node.assets_amount = len(nodes_granted[node])
