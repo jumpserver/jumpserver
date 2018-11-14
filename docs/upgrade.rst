@@ -95,7 +95,7 @@
     $ cd ../
     $ ./jms start all
 
-.. code-block:: vim
+.. code-block:: nginx
 
     # 任意版本升级到 1.4.2 版本,需要修改 nginx 配置 (升级前版本小于 1.4.2 需要执行此步骤)
     $ vi /etc/nginx/conf.d/jumpserver.conf  # 部分用户的配置文件是/etc/nginx/nginx.conf
@@ -103,7 +103,7 @@
     ...
 
     location /socket.io/ {
-        ... 原来的内容,请参考安装文档 nginx 部分
+        # 原来的内容,请参考安装文档 nginx 部分
     }
 
     # 加入下面内容
@@ -117,7 +117,7 @@
     # 到此结束
 
     location /guacamole/ {
-        ... 原来的内容,请参考安装文档 nginx 部分
+        # 原来的内容,请参考安装文档 nginx 部分
     }
 
     ...
