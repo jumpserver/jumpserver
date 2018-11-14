@@ -1,7 +1,7 @@
 API 文档
 ==========================
 
-::
+.. code-block:: shell
 
     通过访问 http://Jumpserver的URL地址/docs 来访问( 如 http://192.168.244.144/docs )
     注：需要打开 debug 模式,
@@ -14,7 +14,7 @@ API 文档
 
 - 手动调用 api 的方法
 
-::
+.. code-block:: shell
 
     $ curl -X POST -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}' http://localhost/api/users/v1/token/  # 获取token
     {"Token":"937b38011acf499eb474e2fecb424ab3","KeyWord":"Bearer"}%  # 获取到的token
@@ -24,7 +24,7 @@ API 文档
 
 - python代码示例
 
-::
+.. code-block:: python
 
     import requests
     import json
