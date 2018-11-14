@@ -225,6 +225,10 @@ class User(AbstractUser):
     def is_staff(self, value):
         pass
 
+    @property
+    def is_local_source(self):
+        return self.source == self.SOURCE_LOCAL
+
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
@@ -354,13 +358,17 @@ class User(AbstractUser):
                    settings.DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval))
-        date_remain = date_expired - self.date_password_last_updated
+        date_remain = date_expired - timezone.now()
         return date_remain.days
 
     def check_password_expired(self):
+        if not self.is_local_source:
+            return False
+
         remain = self.get_password_expired_remain_days()
-        if remain <= 0:
+        if remain < 0:
             return True
+
         return False
 
     def delete(self, using=None, keep_parents=False):
