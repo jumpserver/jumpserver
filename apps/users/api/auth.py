@@ -57,6 +57,19 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
+            if user.check_password_expired():
+                data = {
+                    'username': user.username,
+                    'mfa': int(user.otp_enabled),
+                    'reason': LoginLog.REASON_PASSWORD_EXPIRED,
+                    'status': False
+                }
+                self.write_login_log(request, data)
+                msg = _("The user {} password has expired, please update.".format(
+                    user.username))
+                logger.info(msg)
+                return Response({'msg': msg}, status=401)
+
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
