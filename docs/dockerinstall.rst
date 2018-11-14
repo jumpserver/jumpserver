@@ -1,9 +1,9 @@
 Docker 安装
 ==========================
 
-Jumpserver 封装了一个 All in one Docker，可以快速启动。该镜像集成了所需要的组件，支持使用外置 Database 和 Redis
+Jumpserver 封装了一个 All in one Docker,可以快速启动。该镜像集成了所需要的组件,支持使用外置 Database 和 Redis
 
-Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中了，不是Docker最佳实践,
+Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中了,不是Docker最佳实践,
 生产中请使用 详细安装 `CentOS <step_by_step.rst>`_  `Ubuntu <setup_by_ubuntu.rst>`_
 Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
@@ -12,9 +12,9 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 ```````````````
 使用 root 命令行输入
 
-::
+.. code-block:: shell
 
-    # 1.4.4 版本（最新）
+    # 1.4.4 版本(最新)
     $ docker run --name jms_server -d -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
 
 访问
@@ -24,7 +24,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 SSH访问: ssh -p 2222 <容器所在服务器IP>
 
-XShell等工具请添加connection连接，ssh 端口 2222
+XShell等工具请添加connection连接,ssh 端口 2222
 
 
 外置数据库要求
@@ -38,7 +38,7 @@ XShell等工具请添加connection连接，ssh 端口 2222
 ``````````````````
 创建数据库命令行
 
-::
+.. code-block:: shell
 
     # mysql
     $ create database jumpserver default charset 'utf8';
@@ -64,7 +64,7 @@ XShell等工具请添加connection连接，ssh 端口 2222
 - VOLUME /config/guacamole/keys
 - VOLUME /var/lib/mysql
 
- ::
+.. code-block:: shell
 
     $ docker run --name jms_server -d \
         -v /opt/mysql:/var/lib/mysql

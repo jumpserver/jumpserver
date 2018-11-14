@@ -15,7 +15,7 @@
 开始安装
 ~~~~~~~~~~~~
 
-::
+.. code-block:: shell
 
     # 升级系统
     $ yum upgrade -y
@@ -23,7 +23,7 @@
     # 获取 epel-release 源
     $ yum -y install epel-release
 
-    # 设置防火墙，开放 80 443 2222 端口
+    # 设置防火墙,开放 80 443 2222 端口
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
     $ firewall-cmd --zone=public --add-port=443/tcp --permanent
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent
@@ -33,7 +33,7 @@
     $ setsebool -P httpd_can_network_connect 1
     $ semanage port -a -t http_port_t -p tcp 2222
 
-::
+.. code-block:: shell
 
     # 安装 nginx
     $ vi /etc/yum.repos.d/nginx.repo
@@ -46,7 +46,7 @@
 
     # 非 Centos7 请参考 http://nginx.org/en/linux_packages.html#stable
 
-::
+.. code-block:: shell
 
     $ yum -y install nginx
     $ systemctl enable nginx
@@ -57,7 +57,7 @@
     $ tar xvf luna.tar.gz
     $ chown -R root:root luna
 
-::
+.. code-block:: nginx
 
     # 配置 Nginx
     $ vi /etc/nginx/nginx.conf
@@ -117,7 +117,7 @@
         include /etc/nginx/conf.d/*.conf;
     }
 
-::
+.. code-block:: nginx
 
     # 备份默认的配置文件
     $ mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.bak
@@ -150,7 +150,7 @@
     }
 
     server {
-        # 推荐使用 https 访问，如果不使用 https 请自行注释下面的选项
+        # 推荐使用 https 访问,如果不使用 https 请自行注释下面的选项
         listen 443;
         server_name www.jumpserver.org;  # 自行修改成你的域名
         ssl on;
@@ -174,7 +174,7 @@
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;  # luna 路径，如果修改安装目录，此处需要修改
+            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
         }
 
         location /socket.io/ {
@@ -210,9 +210,9 @@
         }
     }
 
-::
+.. code-block:: shell
 
-    # nginx 测试并启动，如果报错请按报错提示自行解决
+    # nginx 测试并启动,如果报错请按报错提示自行解决
     $ nginx -t
     $ systemctl start nginx
 
@@ -223,7 +223,7 @@
     $ sftp -P2222 admin@192.168.100.100
     密码: admin
 
-    # 如果是用在 Windows 下，Xshell Terminal 登录语法如下
+    # 如果是用在 Windows 下,Xshell Terminal 登录语法如下
     $ ssh admin@192.168.100.100 2222
     $ sftp admin@192.168.100.100 2222
     密码: admin
