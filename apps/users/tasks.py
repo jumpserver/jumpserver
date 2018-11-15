@@ -9,7 +9,7 @@ from ops.celery.utils import (
 )
 from .models import User
 from common.utils import get_logger
-from .utils import write_login_log, send_password_expiration_reminder_mail, send_reset_password_mail
+from .utils import write_login_log, send_password_expiration_reminder_mail
 
 
 logger = get_logger(__file__)

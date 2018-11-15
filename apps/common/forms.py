@@ -193,8 +193,8 @@ class SecuritySettingForm(BaseForm):
         help_text=_(
             "Tip: (unit/day) "
             "If the user does not update the password during the interval, "
-            "the user password will automatically expire; "
-            "The reset password message will be automatic sent to the user "
+            "the user password will expire failure;"
+            "The password expiration reminder mail will be automatic sent to the user "
             "by system within 5 days (daily) before the password expires"
         )
     )
