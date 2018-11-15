@@ -173,7 +173,7 @@ class SecuritySettingForm(BaseForm):
         initial=30, min_value=5,
         label=_("No logon interval"),
         help_text=_(
-            "Tip :(unit/minute) if the user has failed to log in for a limited "
+            "Tip: (unit/minute) if the user has failed to log in for a limited "
             "number of times, no login is allowed during this time interval."
         )
     )
@@ -189,7 +189,14 @@ class SecuritySettingForm(BaseForm):
     # password expiration interval time
     SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME = forms.IntegerField(
         initial=30, label=_("Password expiration interval time"),
-        min_value=1, help_text=_("Tip :(unit/day)")
+        min_value=1,
+        help_text=_(
+            "Tip: (unit/day) "
+            "If the user does not update the password during the interval, "
+            "the user password will automatically expire; "
+            "The reset password message will be automatic sent to the user "
+            "by system within 5 days (daily) before the password expires"
+        )
     )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
