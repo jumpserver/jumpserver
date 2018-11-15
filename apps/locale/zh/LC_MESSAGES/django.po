@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 19:29+0800\n"
+"POT-Creation-Date: 2018-11-15 19:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1967,18 +1967,18 @@ msgid ""
 msgstr "提示: (单位: 分钟) 如果超过该配置没有操作，连接会被断开(仅ssh) "
 
 #: common/forms.py:191
-msgid "Password expiration interval time"
-msgstr "密码过期间隔时间"
+msgid "Password expiration time"
+msgstr "密码过期时间"
 
 #: common/forms.py:194
 msgid ""
-"Tip: (unit/day) If the user does not update the password during the "
-"interval, the user password will expire failure;The password expiration "
-"reminder mail will be automatic sent to the user by system within 5 days "
-"(daily) before the password expires"
+"Tip: (unit/day) If the user does not update the password during the time, "
+"the user password will expire failure;The password expiration reminder mail "
+"will be automatic sent to the user by system within 5 days (daily) before "
+"the password expires"
 msgstr ""
-"提示: (单位: 天) 如果用户在此间隔时间内没有更新密码，则用户密码将过期失效；系"
-"统会在密码到期前5天内（每天）自动将密码过期提醒邮件发送给用户."
+"提示: (单位: 天) 如果用户在此时间内没有更新密码，则用户密码将过期失效；系统会"
+"在密码到期前5天内（每天）自动将密码过期提醒邮件发送给用户."
 
 #: common/forms.py:203
 msgid "Password minimum length"
@@ -2647,8 +2647,12 @@ msgstr ""
 "        "
 
 #: templates/_message.html:14
-msgid "Your password will expire at"
-msgstr "您的密码即将过期，"
+msgid "Your password will at"
+msgstr "您的密码将于"
+
+#: templates/_message.html:14
+msgid "expired. "
+msgstr "过期。"
 
 #: templates/_message.html:15
 #, python-format
@@ -3717,6 +3721,7 @@ msgid "Last login"
 msgstr "最后登录"
 
 #: users/templates/users/user_detail.html:123
+#: users/templates/users/user_profile.html:112
 msgid "Last password updated"
 msgstr "最后更新密码"
 
@@ -3889,12 +3894,6 @@ msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接
 #: users/templates/users/user_profile.html:95
 msgid "Administrator Settings force MFA login"
 msgstr "管理员设置强制使用MFA登录"
-
-#: users/templates/users/user_profile.html:112
-#, fuzzy
-#| msgid "Last password updated"
-msgid "Last Password updated"
-msgstr "最后更新密码"
 
 #: users/templates/users/user_profile.html:120 users/views/user.py:230
 #: users/views/user.py:284
@@ -4561,11 +4560,6 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
-
-#, fuzzy
-#~| msgid "Delete succeed"
-#~ msgid "Delete success"
-#~ msgstr "删除成功"
 
 #~ msgid ""
 #~ "Set terminal storage setting, `default` is the using as default,You can "

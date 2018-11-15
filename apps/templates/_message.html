@@ -11,7 +11,7 @@
         </div>
     {% elif request.user.password_will_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
-            {% trans 'Your password will expire at' %} <b> {{ request.user.date_password_expired }} .</b>
+            {% trans 'Your password will at' %} {{ request.user.date_password_expired }} {% trans 'expired. ' %}
             {% blocktrans %}
                 please click <a href="{{ user_password_update_url }}"> this link </a> to update your password.
             {% endblocktrans %}

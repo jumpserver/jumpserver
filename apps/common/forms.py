@@ -188,11 +188,11 @@ class SecuritySettingForm(BaseForm):
     )
     # password expiration interval time
     SECURITY_INTERVAL_TIME_PASSWORD_EXPIRATION = forms.IntegerField(
-        initial=30, label=_("Password expiration interval time"),
+        initial=9999, label=_("Password expiration time"),
         min_value=1,
         help_text=_(
             "Tip: (unit/day) "
-            "If the user does not update the password during the interval, "
+            "If the user does not update the password during the time, "
             "the user password will expire failure;"
             "The password expiration reminder mail will be automatic sent to the user "
             "by system within 5 days (daily) before the password expires"
