@@ -39,8 +39,8 @@ def check_password_expired_periodic():
     tasks = {
         'check_password_expired_periodic': {
             'task': check_password_expired.name,
-            'interval': 24*3600,
-            'crontab': None,
+            'interval': None,
+            'crontab': '0 10 * * *',
             'enabled': True,
         }
     }
