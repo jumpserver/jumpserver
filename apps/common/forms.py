@@ -187,7 +187,7 @@ class SecuritySettingForm(BaseForm):
         ),
     )
     # password expiration interval time
-    SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME = forms.IntegerField(
+    SECURITY_INTERVAL_TIME_PASSWORD_EXPIRATION = forms.IntegerField(
         initial=30, label=_("Password expiration interval time"),
         min_value=1,
         help_text=_(

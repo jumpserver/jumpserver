@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 12:32+0800\n"
+"POT-Creation-Date: 2018-11-15 16:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -487,7 +487,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:400
+#: users/models/user.py:399
 msgid "System"
 msgstr "系统"
 
@@ -621,7 +621,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:311
-#: users/models/user.py:33 users/models/user.py:388
+#: users/models/user.py:33 users/models/user.py:387
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:385
 #: xpack/plugins/orgs/forms.py:26
@@ -1977,8 +1977,8 @@ msgid ""
 "message will be automatic sent to the user by system within 5 days (daily) "
 "before the password expires"
 msgstr ""
-"提示: (单位: 天) 如果用户在此间隔时间内没有更新密码，则用户密码将自动过期；"
-"系统会在密码到期前5天内（每天）自动将重置密码邮件发送给用户."
+"提示: (单位: 天) 如果用户在此间隔时间内没有更新密码，则用户密码将自动过期；系"
+"统会在密码到期前5天内（每天）自动将重置密码邮件发送给用户."
 
 #: common/forms.py:203
 msgid "Password minimum length"
@@ -2646,11 +2646,11 @@ msgstr ""
 "\"%(user_password_update_url)s\"> 链接 </a> 更新密码\n"
 "        "
 
-#: templates/_message.html:15
+#: templates/_message.html:14
 msgid "Your password will expire at"
 msgstr "您的密码即将过期，"
 
-#: templates/_message.html:16
+#: templates/_message.html:15
 #, python-format
 msgid ""
 "\n"
@@ -2663,7 +2663,7 @@ msgstr ""
 "新密码\n"
 "        "
 
-#: templates/_message.html:28
+#: templates/_message.html:27
 #, python-format
 msgid ""
 "\n"
@@ -2676,7 +2676,7 @@ msgstr ""
 "</a> 补充完整\n"
 "                "
 
-#: templates/_message.html:41
+#: templates/_message.html:40
 #, python-format
 msgid ""
 "\n"
@@ -3362,7 +3362,7 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
-#: users/models/user.py:32 users/models/user.py:396
+#: users/models/user.py:32 users/models/user.py:395
 msgid "Administrator"
 msgstr "管理员"
 
@@ -3408,7 +3408,7 @@ msgstr "用户来源"
 msgid "Date password last updated"
 msgstr "最后更新密码"
 
-#: users/models/user.py:399
+#: users/models/user.py:398
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -3625,7 +3625,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:371 users/utils.py:80
+#: users/templates/users/user_detail.html:371 users/utils.py:81
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -3951,11 +3951,11 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:41
+#: users/utils.py:42
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:43
+#: users/utils.py:44
 #, python-format
 msgid ""
 "\n"
@@ -4000,7 +4000,7 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:82
+#: users/utils.py:83
 #, python-format
 msgid ""
 "\n"
@@ -4044,11 +4044,65 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:113
+#: users/utils.py:114
+msgid "Security notice"
+msgstr "安全通知"
+
+#: users/utils.py:116
+#, python-format
+msgid ""
+"\n"
+"    Hello %(name)s:\n"
+"    </br>\n"
+"    Your password will expire in %(date_password_expired)s,\n"
+"    </br>\n"
+"    For your account security, please click on the link below to update your "
+"password in time\n"
+"    </br>\n"
+"    <a href=\"%(update_password_url)s\">Click here update password</a>\n"
+"    </br>\n"
+"    If your password has expired, please click \n"
+"    <a href=\"%(forget_password_url)s?email=%(email)s\">Password expired</"
+"a> \n"
+"    to apply for a password reset email.\n"
+"\n"
+"    </br>\n"
+"    ---\n"
+"\n"
+"    </br>\n"
+"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"\n"
+"    </br>\n"
+"    "
+msgstr ""
+"\n"
+"    您好 %(name)s:\n"
+"    </br>\n"
+"    您的密码会在 %(date_password_expired)s 过期，\n"
+"    </br>\n"
+"    为了您的账号安全，请点击下面的链接及时更新密码\n"
+"    </br>\n"
+"    <a href=\"%(update_password_url)s\">请点击这里更新密码</a>\n"
+"    </br>\n"
+"    如果您的密码已经过期，请点击 \n"
+"    <a href=\"%(forget_password_url)s?email=%(email)s\">密码过期</"
+"a> \n"
+"    申请一份重置密码邮件。\n"
+"\n"
+"    </br>\n"
+"    ---\n"
+"\n"
+"    </br>\n"
+"    <a href=\"%(login_url)s\">直接登录</a>\n"
+"\n"
+"    </br>\n"
+"    "
+
+#: users/utils.py:152
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:115
+#: users/utils.py:154
 #, python-format
 msgid ""
 "\n"
@@ -4073,19 +4127,19 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:148
+#: users/utils.py:187
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:150
+#: users/utils.py:189
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:163
+#: users/utils.py:202
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/utils.py:286 users/utils.py:296
+#: users/utils.py:325 users/utils.py:335
 msgid "Bit"
 msgstr " 位"
 

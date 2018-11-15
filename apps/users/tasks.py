@@ -9,7 +9,7 @@ from ops.celery.utils import (
 )
 from .models import User
 from common.utils import get_logger
-from .utils import write_login_log, send_reset_password_mail
+from .utils import write_login_log, send_password_expiration_reminder_mail, send_reset_password_mail
 
 
 logger = get_logger(__file__)
@@ -24,12 +24,13 @@ def write_login_log_async(*args, **kwargs):
 def check_password_expired():
     users = User.objects.exclude(role=User.ROLE_APP)
     for user in users:
-        if user.password_will_expired:
-            logger.info("The user {} password expires in {} days".format(
-                user, user.password_expired_remain_days))
-            send_reset_password_mail(user)
+        if not user.password_will_expired:
             continue
-        logger.info('User {} password no expired'.format(user))
+
+        send_password_expiration_reminder_mail(user)
+        logger.info("The user {} password expires in {} days".format(
+            user, user.password_expired_remain_days)
+        )
 
 
 @shared_task

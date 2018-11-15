@@ -231,9 +231,8 @@ class User(AbstractUser):
     
     @property
     def date_password_expired(self):
-        interval = common_settings.SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME \
-                   or \
-                   settings.DEFAULT_SECURITY_PASSWORD_EXPIRATION_INTERVAL_TIME
+        interval = common_settings.SECURITY_INTERVAL_TIME_PASSWORD_EXPIRATION or\
+                   settings.DEFAULT_SECURITY_INTERVAL_TIME_PASSWORD_EXPIRATION
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval))
         return date_expired

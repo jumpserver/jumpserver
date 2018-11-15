@@ -16,6 +16,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
+from datetime import datetime
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
@@ -99,6 +100,44 @@ def send_reset_password_mail(user):
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
+        'forget_password_url': reverse('users:forgot-password', external=True),
+        'email': user.email,
+        'login_url': reverse('users:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+def send_password_expiration_reminder_mail(user):
+    subject = _('Security notice')
+    recipient_list = [user.email]
+    message = _("""
+    Hello %(name)s:
+    </br>
+    Your password will expire in %(date_password_expired)s,
+    </br>
+    For your account security, please click on the link below to update your password in time
+    </br>
+    <a href="%(update_password_url)s">Click here update password</a>
+    </br>
+    If your password has expired, please click 
+    <a href="%(forget_password_url)s?email=%(email)s">Password expired</a> 
+    to apply for a password reset email.
+
+    </br>
+    ---
+
+    </br>
+    <a href="%(login_url)s">Login direct</a>
+
+    </br>
+    """) % {
+        'name': user.name,
+        'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
+            user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
+        'update_password_url': reverse('users:user-password-update', external=True),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('users:login', external=True),
