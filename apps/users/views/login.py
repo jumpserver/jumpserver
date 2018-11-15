@@ -72,7 +72,7 @@ class UserLoginView(FormView):
         user = form.get_user()
 
         # user password expired
-        if user.check_password_expired():
+        if user.password_has_expired:
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),

@@ -57,7 +57,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
-            if user.check_password_expired():
+            if user.password_has_expired:
                 data = {
                     'username': user.username,
                     'mfa': int(user.otp_enabled),

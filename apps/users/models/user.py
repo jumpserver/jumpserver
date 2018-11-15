@@ -226,7 +226,7 @@ class User(AbstractUser):
         pass
 
     @property
-    def is_local_source(self):
+    def is_local(self):
         return self.source == self.SOURCE_LOCAL
     
     @property
@@ -241,8 +241,19 @@ class User(AbstractUser):
     @property
     def password_expired_remain_days(self):
         date_remain = self.date_password_expired - timezone.now()
-        print('remain: ', date_remain.days)
         return date_remain.days
+
+    @property
+    def password_has_expired(self):
+        if self.is_local and self.password_expired_remain_days < 0:
+            return True
+        return False
+
+    @property
+    def password_will_expired(self):
+        if self.is_local and self.password_expired_remain_days < 5:
+            return True
+        return False
 
     def save(self, *args, **kwargs):
         if not self.name:
@@ -366,15 +377,6 @@ class User(AbstractUser):
         self.set_password(new_password)
         self.date_password_last_updated = timezone.now()
         self.save()
-
-    def check_password_expired(self):
-        if not self.is_local_source:
-            return False
-
-        if self.password_expired_remain_days < 0:
-            return True
-
-        return False
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':

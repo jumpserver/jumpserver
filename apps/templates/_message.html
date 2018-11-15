@@ -2,19 +2,17 @@
 
 {% block password_expired_message %}
     {% url 'users:user-password-update' as user_password_update_url %}
-    {% if request.user.check_password_expired  %}
+    {% if request.user.password_has_expired  %}
         <div class="alert alert-danger help-message alert-dismissable">
             {% blocktrans %}
                 Your password has expired, please click <a href="{{ user_password_update_url }}"> this link </a> update password.
             {% endblocktrans %}
             <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
         </div>
-    {% elif request.user.password_expired_remain_days < 5 %}
+    {% elif request.user.password_will_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
-            {% blocktrans %}
-                Your password will expire at
-            {% endblocktrans %}
-            <b class=""> {{ request.user.date_password_expired }} .</b>
+            {# 您的密码过期时间为 #}
+            {% trans 'Your password will expire at' %} <b> {{ request.user.date_password_expired }} .</b>
             {% blocktrans %}
                 please click <a href="{{ user_password_update_url }}"> this link </a> to update your password.
             {% endblocktrans %}
@@ -30,7 +28,6 @@
         {% blocktrans %}
         Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
         {% endblocktrans %}
-
         <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
     </div>
     {% endif %}
