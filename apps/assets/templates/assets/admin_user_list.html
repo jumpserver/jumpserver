@@ -93,7 +93,7 @@ $(document).ready(function(){
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" },
                   {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }]
     };
-    jumpserver.initDataTable(options);
+    jumpserver.initServerSideDataTable(options)
 })
 
 .on('click', '.btn_admin_user_delete', function () {

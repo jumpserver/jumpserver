@@ -37,7 +37,9 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
                      kwargs=kwargs, current_app=current_app)
 
     if external:
-        url = settings.SITE_URL.strip('/') + url
+        from common.models import common_settings
+        site_url = common_settings.SITE_URL or settings.SITE_URL
+        url = site_url.strip('/') + url
     return url
 
 
@@ -385,6 +387,55 @@ def get_request_ip(request):
     else:
         login_ip = request.META.get('REMOTE_ADDR', '')
     return login_ip
+
+
+def get_command_storage_or_create_default_storage():
+    from common.models import common_settings, Setting
+    name = 'TERMINAL_COMMAND_STORAGE'
+    default = {'default': {'TYPE': 'server'}}
+    try:
+        command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    except Exception:
+        return default
+    if command_storage is None:
+        obj = Setting()
+        obj.name = name
+        obj.encrypted = True
+        obj.cleaned_value = default
+        obj.save()
+    if isinstance(command_storage, dict) and not command_storage:
+        obj = Setting.objects.get(name=name)
+        value = obj.cleaned_value
+        value.update(default)
+        obj.cleaned_value = value
+        obj.save()
+    command_storage = common_settings.TERMINAL_COMMAND_STORAGE
+    return command_storage
+
+
+def get_replay_storage_or_create_default_storage():
+    from common.models import common_settings, Setting
+    name = 'TERMINAL_REPLAY_STORAGE'
+    default = {'default': {'TYPE': 'server'}}
+    try:
+        replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    except Exception:
+        return default
+    if replay_storage is None:
+        obj = Setting()
+        obj.name = name
+        obj.encrypted = True
+        obj.cleaned_value = default
+        obj.save()
+        replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    if isinstance(replay_storage, dict) and not replay_storage:
+        obj = Setting.objects.get(name=name)
+        value = obj.cleaned_value
+        value.update(default)
+        obj.cleaned_value = value
+        obj.save()
+    replay_storage = common_settings.TERMINAL_REPLAY_STORAGE
+    return replay_storage
 
 
 class TeeObj:

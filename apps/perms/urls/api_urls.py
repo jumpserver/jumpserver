@@ -19,6 +19,8 @@ urlpatterns = [
          api.UserGrantedNodesApi.as_view(), name='user-nodes'),
     path('user/nodes/', api.UserGrantedNodesApi.as_view(),
          name='my-nodes'),
+    path('user/nodes/children/', api.UserGrantedNodeChildrenApi.as_view(),
+         name='my-node-children'),
     path('user/<uuid:pk>/nodes/<uuid:node_id>/assets/',
          api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
     path('user/nodes/<uuid:node_id>/assets/',
@@ -55,7 +57,7 @@ urlpatterns = [
          name='asset-permission-add-asset'),
 
     # 验证用户是否有某个资产和系统用户的权限
-    path('asset-permission/user/validate/', api.ValidateUserAssetPermissionView.as_view(),
+    path('asset-permission/user/validate/', api.ValidateUserAssetPermissionApi.as_view(),
          name='validate-user-asset-permission'),
 ]
 

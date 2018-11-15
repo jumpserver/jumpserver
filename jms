@@ -42,10 +42,26 @@ try:
 except:
     pass
 
+def check_database_connection():
+    os.chdir(os.path.join(BASE_DIR, 'apps'))
+    for i in range(60):
+        print("Check database connection ...")
+        code = subprocess.call("python manage.py showmigrations users ", shell=True)
+        if code == 0:
+            print("Database connect success")
+            return
+        time.sleep(1)
+    print("Connection database failed, exist")
+    sys.exit(10)
+
 
 def make_migrations():
     print("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
+    if len(os.listdir('assets/migrations')) < 4:
+        print("Make database migrations ...")
+        subprocess.call('python3 manage.py makemigrations', shell=True)
+    print("Migrate model change to database ...")
     subprocess.call('python3 manage.py migrate', shell=True)
 
 
@@ -56,6 +72,7 @@ def collect_static():
 
 
 def prepare():
+    check_database_connection()
     make_migrations()
     collect_static()
 
@@ -112,7 +129,6 @@ def parse_service(s):
 
 def start_gunicorn():
     print("\n- Start Gunicorn WSGI HTTP Server")
-    prepare()
     service = 'gunicorn'
     bind = '{}:{}'.format(HTTP_HOST, HTTP_PORT)
     log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
@@ -162,7 +178,7 @@ def start_celery():
         '-A',  'ops',
         '-l', LOG_LEVEL.lower(),
         '--pidfile', pid_file,
-        '-c', str(WORKERS),
+        '--autoscale', '20,4',
     ]
     if DAEMON:
         cmd.extend([
@@ -205,6 +221,7 @@ def start_service(s):
     print(time.ctime())
     print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
         __version__))
+    prepare()
 
     services_handler = {
          "gunicorn": start_gunicorn,

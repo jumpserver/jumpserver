@@ -160,8 +160,12 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
         return users
 
     def get_queryset(self):
-        users = self.get_org_users()
-        queryset = super().get_queryset().filter(username__in=users)
+        if current_org.is_default():
+            queryset = super().get_queryset()
+        else:
+            users = self.get_org_users()
+            queryset = super().get_queryset().filter(username__in=users)
+
         self.user = self.request.GET.get('user', '')
         self.keyword = self.request.GET.get("keyword", '')
 

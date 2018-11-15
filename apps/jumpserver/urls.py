@@ -75,6 +75,7 @@ app_view_patterns = [
     path('ops/', include('ops.urls.view_urls', namespace='ops')),
     path('audits/', include('audits.urls.view_urls', namespace='audits')),
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
+    path('auth/', include('authentication.urls.view_urls'), name='auth'),
 ]
 
 if settings.XPACK_ENABLED:

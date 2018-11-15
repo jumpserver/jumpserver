@@ -90,12 +90,16 @@ function initTable() {
              }}],
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [
-            {data: "id"}, {data: "name" }, {data: "username" }, {data: "get_role_display" },
-            {data: "groups_display" }, {data: "get_source_display" }, {data: "is_valid" }, {data: "id" }
+            {data: "id"}, {data: "name" }, {data: "username" },
+            {data: "get_role_display", orderable: false},
+            {data: "groups_display", orderable: false},
+            {data: "get_source_display", orderable: false},
+            {data: "is_valid", orderable: false},
+            {data: "id", orderable: false}
         ],
         op_html: $('#actions').html()
     };
-    table = jumpserver.initDataTable(options);
+    var table = jumpserver.initServerSideDataTable(options);
     return table
 }
 

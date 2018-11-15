@@ -92,7 +92,7 @@ class Node(OrgModelMixin):
             return child
 
     def get_children(self, with_self=False):
-        pattern = r'^{0}$|^{}:[0-9]+$' if with_self else r'^{}:[0-9]+$'
+        pattern = r'^{0}$|^{0}:[0-9]+$' if with_self else r'^{0}:[0-9]+$'
         return self.__class__.objects.filter(
             key__regex=pattern.format(self.key)
         )
@@ -121,10 +121,10 @@ class Node(OrgModelMixin):
     def get_assets(self):
         from .asset import Asset
         if self.is_default_node():
-            assets = Asset.objects.filter(nodes__isnull=True)
+            assets = Asset.objects.filter(Q(nodes__id=self.id) | Q(nodes__isnull=True))
         else:
             assets = Asset.objects.filter(nodes__id=self.id)
-        return assets
+        return assets.distinct()
 
     def get_valid_assets(self):
         return self.get_assets().valid()

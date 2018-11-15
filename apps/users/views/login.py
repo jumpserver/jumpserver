@@ -21,6 +21,7 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
 from common.utils import get_object_or_none, get_request_ip
+from common.models import common_settings
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
@@ -78,12 +79,15 @@ class UserLoginView(FormView):
     def form_invalid(self, form):
         # write login failed log
         username = form.cleaned_data.get('username')
+        exist = User.objects.filter(username=username).first()
+        reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
         data = {
             'username': username,
             'mfa': LoginLog.MFA_UNKNOWN,
-            'reason': LoginLog.REASON_PASSWORD,
+            'reason': reason,
             'status': False
         }
+
         self.write_login_log(data)
 
         # limit user login failed count
@@ -128,6 +132,7 @@ class UserLoginView(FormView):
     def get_context_data(self, **kwargs):
         context = {
             'demo_mode': os.environ.get("DEMO_MODE"),
+            'AUTH_OPENID': settings.AUTH_OPENID,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -196,6 +201,9 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
+        next_uri = request.COOKIES.get("next")
+        if next_uri:
+            return redirect(next_uri)
         response = super().get(request, *args, **kwargs)
         return response
 
@@ -318,7 +326,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': settings.USER_GUIDE_URL
+            'user_guide_url': common_settings.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 
