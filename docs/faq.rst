@@ -87,24 +87,7 @@ FAQ
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
     SSH_TIMEOUT = 60
 
-7. 升级提示 Table 'xxx' already exists
-
-.. code-block:: shell
-
-    # 数据库表结构文件丢失,请参考离线升级文档,把备份的数据库表文件还原
-
-    # 可以使用如下命令检查丢失了什么表结构
-    $ cd /opt/jumpserver/apps
-    $ for d in $(ls); do if [ -d $d ] && [ -d $d/migrations ]; then ll ${d}/migrations/*.py | grep -v __init__.py; fi; done
-
-    # 新开一个终端
-    $ mysql -uroot -p
-    > use jumpserver;
-    > select app,name from django_migrations where app in('assets','audits','common','ops','orgs','perms','terminal','users') order by app asc;
-
-    # 对比即可知道丢失什么文件,把文件从备份目录拷贝即可
-
-8. 设置浏览器过期
+7. 设置浏览器过期
 
 .. code-block:: shell
 
@@ -119,22 +102,14 @@ FAQ
     # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-9. MFA遗失无法登陆
-
-.. code-block:: vim
-
-    普通用户联系管理员关闭MFA,登录成功后用户在个人信息里面重新绑定.
-    如果管理员遗失无法登陆, 修改数据库 users_user 表对应用户的 otp_level 为 0 , 重新登陆绑定即可
-    如果在系统设置里面开启的 MFA 二次认证 ,需要修改数据库 settings 表 SECURITY_MFA_AUTH 的 value 值为 false
-
-10. 资产授权说明
+8. 资产授权说明
 
 .. code-block:: vim
 
     资产授权就是把 系统用户关联到用户 并授权到 对应的资产
     用户只能看到自己被授权的资产
 
-11. Web Terminal 页面经常需要重新刷新页面才能连接资产
+9. Web Terminal 页面经常需要重新刷新页面才能连接资产
 
 .. code-block:: nginx
 
@@ -211,7 +186,7 @@ FAQ
         }
     }
 
-12. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
+10. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
 
 .. code-block:: shell
 
@@ -231,7 +206,7 @@ FAQ
     >>> exit()
 
 
-13. 重启服务器后无法访问 Jumpserver,页面提示502 或者 403等
+11. 重启服务器后无法访问 Jumpserver,页面提示502 或者 403等
 
 .. code-block:: shell
 
@@ -253,7 +228,7 @@ FAQ
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
     $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
-14. 生成随机 SECRET_KEY
+12. 生成随机 SECRET_KEY
 
 .. code-block:: shell
 
@@ -263,7 +238,7 @@ FAQ
     >>> from django.core.management.utils import get_random_secret_key
     >>> get_random_secret_key()
 
-15. 传递明文数据到 Jumpserver 数据库(数据导入)
+13. 传递明文数据到 Jumpserver 数据库(数据导入)
 
 .. code-block:: shell
 
