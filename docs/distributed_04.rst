@@ -48,6 +48,6 @@
 .. code-block:: shell
 
     # 启动 redis
-    $ systemctl start mariadb
+    $ systemctl start redis
 
     # redis 的主从设置请参考其官方,之后会补上
