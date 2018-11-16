@@ -331,7 +331,7 @@ CentOS 7 安装文档
         }
 
         location /socket.io/ {
-            proxy_pass       http://cocows:5000/socket.io/;
+            proxy_pass       http://cocows/socket.io/;
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -343,7 +343,7 @@ CentOS 7 安装文档
         }
 
         location /coco/ {
-            proxy_pass       http://cocows:5000/coco/;
+            proxy_pass       http://cocows/coco/;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -351,7 +351,7 @@ CentOS 7 安装文档
         }
 
         location /guacamole/ {
-            proxy_pass       http://guacamole:8081/;
+            proxy_pass       http://guacamole/;
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
