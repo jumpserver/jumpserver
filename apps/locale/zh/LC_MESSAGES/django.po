@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-15 19:50+0800\n"
+"POT-Creation-Date: 2018-11-16 12:07+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -620,7 +620,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:311
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:312
 #: users/models/user.py:33 users/models/user.py:387
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:385
@@ -1706,7 +1706,7 @@ msgstr "Agent"
 msgid "City"
 msgstr "城市"
 
-#: audits/templates/audits/login_log_list.html:54 users/forms.py:169
+#: audits/templates/audits/login_log_list.html:54 users/forms.py:170
 #: users/models/authentication.py:79 users/models/user.py:75
 #: users/templates/users/first_login.html:45
 msgid "MFA"
@@ -2459,7 +2459,7 @@ msgstr "组织管理"
 #: perms/forms.py:31 perms/models.py:30 perms/models.py:80
 #: perms/templates/perms/asset_permission_list.html:55
 #: perms/templates/perms/asset_permission_list.html:145 templates/_nav.html:14
-#: users/forms.py:281 users/models/group.py:26 users/models/user.py:59
+#: users/forms.py:282 users/models/group.py:26 users/models/user.py:59
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:211
 #: users/templates/users/user_list.html:26
@@ -2601,7 +2601,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:9 users/forms.py:148
+#: templates/_header_bar.html:89 templates/_nav_user.html:9 users/forms.py:149
 #: users/templates/users/_user.html:39
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -3219,11 +3219,11 @@ msgstr "MFA 验证码"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:55 users/forms.py:227
+#: users/forms.py:55 users/forms.py:228
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:56 users/forms.py:228
+#: users/forms.py:56 users/forms.py:229
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
@@ -3235,15 +3235,15 @@ msgstr "复制用户公钥到这里"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:110 users/forms.py:242
+#: users/forms.py:110 users/forms.py:243
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:114 users/forms.py:246 users/serializers.py:49
+#: users/forms.py:114 users/forms.py:247 users/serializers.py:49
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:154
+#: users/forms.py:155
 msgid ""
 "Tip: when enabled, you will enter the MFA binding process the next time you "
 "log in. you can also directly bind in \"personal information -> quick "
@@ -3252,11 +3252,11 @@ msgstr ""
 "提示：启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修"
 "改->更改MFA设置）中直接绑定!"
 
-#: users/forms.py:164
+#: users/forms.py:165
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全."
 
-#: users/forms.py:174
+#: users/forms.py:175
 msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
@@ -3265,41 +3265,41 @@ msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
 "设置复杂密码，启用MFA认证）"
 
-#: users/forms.py:181 users/templates/users/first_login.html:48
+#: users/forms.py:182 users/templates/users/first_login.html:48
 #: users/templates/users/first_login.html:107
 #: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
 
-#: users/forms.py:187
+#: users/forms.py:188
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:192
+#: users/forms.py:193
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:197
+#: users/forms.py:198
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:207
+#: users/forms.py:208
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:215
+#: users/forms.py:216
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:225
+#: users/forms.py:226
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms.py:229
+#: users/forms.py:230
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:257 users/models/user.py:83
+#: users/forms.py:258 users/models/user.py:83
 #: users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
@@ -3308,7 +3308,7 @@ msgstr "复制你的公钥到这里"
 msgid "Public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:264 users/forms.py:269 users/forms.py:315
+#: users/forms.py:265 users/forms.py:270 users/forms.py:316
 #: xpack/plugins/orgs/forms.py:30
 msgid "Select users"
 msgstr "选择用户"
@@ -3554,8 +3554,8 @@ msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
 #: users/templates/users/login.html:54
-msgid "The user password has expired, please update."
-msgstr "用户密码已经过期，请更新"
+msgid "The user password has expired"
+msgstr "用户密码已过期"
 
 #: users/templates/users/login.html:57
 msgid "Captcha invalid"
