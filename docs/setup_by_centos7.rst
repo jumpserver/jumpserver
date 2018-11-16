@@ -215,14 +215,6 @@ CentOS 7 安装文档
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.2" port protocol="tcp" port="8080" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.3" port protocol="tcp" port="8080" accept"
 
-    # 组件多节点部署
-    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
-    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
-
-    # 允许 容器ip 访问宿主 8080 端口,(容器的 ip 可以进入容器查看)
-    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.4" port protocol="tcp" port="8080" accept"
-    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.5" port protocol="tcp" port="8080" accept"
-
     # 172.17.0.x 是docker容器默认的IP池
 
 .. code-block:: shell
@@ -236,80 +228,11 @@ CentOS 7 安装文档
 .. code-block:: shell
 
     # 配置 Nginx 整合各组件
-    $ vi /etc/nginx/nginx.conf
-
-    user  nginx;
-    worker_processes  auto;
-
-    error_log  /var/log/nginx/error.log warn;
-    pid        /var/run/nginx.pid;
-
-
-    events {
-        worker_connections  1024;
-    }
-
-    stream {
-        log_format  proxy  '$remote_addr [$time_local] '
-                           '$protocol $status $bytes_sent $bytes_received '
-                           '$session_time "$upstream_addr" '
-                           '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
-
-        access_log /var/log/nginx/tcp-access.log  proxy;
-        open_log_file_cache off;
-
-        upstream cocossh {
-            server localhost:2222 weight=1;
-            server localhost:2223 weight=1;  # 多节点
-            # 这里是 coco ssh 的后端ip
-            hash $remote_addr;
-        }
-        server {
-            listen 2222;
-            proxy_pass cocossh;
-            proxy_connect_timeout 10s;
-            proxy_timeout 24h;   #代理超时
-        }
-    }
-
-    http {
-        include       /etc/nginx/mime.types;
-        default_type  application/octet-stream;
-
-        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                          '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for"';
-
-        access_log  /var/log/nginx/access.log  main;
-
-        sendfile        on;
-        # tcp_nopush     on;
-
-        keepalive_timeout  65;
-
-        # 关闭版本显示
-        server_tokens off;
-
-        include /etc/nginx/conf.d/*.conf;
-    }
+    $ rm /etc/nginx/conf.d/default.conf
 
 .. code-block:: shell
 
     $ vi /etc/nginx/conf.d/jumpserver.conf
-
-    upstream cocows {
-        server localhost:5000 weight=1;
-        server localhost:5001 weight=1;  # 多节点
-        # 这里是 coco ws 的后端ip
-        ip_hash;
-    }
-
-    upstream guacamole {
-        server localhost:8081 weight=1;
-        server localhost:8082 weight=1;  # 多节点
-        # 这里是 guacamole 的后端ip
-        ip_hash;
-    }
 
     server {
         listen 80;
@@ -331,7 +254,7 @@ CentOS 7 安装文档
         }
 
         location /socket.io/ {
-            proxy_pass       http://cocows/socket.io/;
+            proxy_pass       http://localhost:5000/socket.io/;
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -343,7 +266,7 @@ CentOS 7 安装文档
         }
 
         location /coco/ {
-            proxy_pass       http://cocows/coco/;
+            proxy_pass       http://localhost:5000/coco/;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -351,7 +274,7 @@ CentOS 7 安装文档
         }
 
         location /guacamole/ {
-            proxy_pass       http://guacamole/;
+            proxy_pass       http://localhost:8081;
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
