@@ -73,14 +73,6 @@
 
 .. code-block:: shell
 
-    # 如果执行 sh make_migrations.sh 时有红色文字提示 Run 'manage.py make_migrations' 和 'manage.py migrate' ,则需要执行下面4条命令,没有则忽略这一步
-    $ cd /opt/jumpserver/apps
-    $ python manage.py makemigrations
-    $ python manage.py migrate
-    $ cd ../utils && sh make_migrations.sh
-
-.. code-block:: shell
-
     # 1.0.x 升级到最新版本需要执行迁移脚本 (新版本授权管理更新,升级前版本不是 1.0.x 请跳过)
     $ sh 2018_04_11_migrate_permissions.sh
 
