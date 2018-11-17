@@ -14,7 +14,9 @@
 - Jumpserver 默认端口为 8080/tcp 配置文件在 jumpserver/config.py
 - Coco 默认 SSH 端口为 2222/tcp ,默认 Web Terminal 端口为 5000/tcp 配置文件在 coco/conf.py
 - Guacamole 默认端口为 8081/tcp 在 docker run 时指定
-- Nginx 默认端口为 80/tcp 配置在 nginx/nginx.conf 中指定
+- Nginx 默认端口为 80/tcp
+- Redis 默认端口为 6379/tcp
+- Mysql 默认端口为 3306/tcp
 
 +------------+-----------------+------------+------------------------+
 |  Protocol  |   Server name   |    Port    |         Used By        |
@@ -29,7 +31,7 @@
 +------------+-----------------+------------+------------------------+
 |     TCP    |       Redis     |    6379    |        Jumpserver      |
 +------------+-----------------+------------+------------------------+
-|     TCP    |       Nginx     |     80     |           All          |
+|     TCP    |       Nginx     |  80, 2222  |           All          |
 +------------+-----------------+------------+------------------------+
 
 一体化部署文档(基于CentOS 7)
