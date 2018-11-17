@@ -12,6 +12,12 @@
 -  系统: CentOS 7
 -  IP: 192.168.100.50
 
++----------+------------+-----------------+---------------+------------------------+
+| Protocol | ServerName |        IP       |      Port     |         Used By        |
++==========+============+=================+===============+========================+
+|    TCP   | Guacamole  | 192.168.100.40  |      8081     |          Nginx         |
++----------+------------+-----------------+---------------+------------------------+
+
 开始安装
 ~~~~~~~~~~~~
 
@@ -23,8 +29,7 @@
     # 安装依赖包
     $ yum install -y yum-utils device-mapper-persistent-data lvm2
 
-    # 设置防火墙,开放 8081 端口 给 nginx 和 jumpserver 访问
-    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.30" port protocol="tcp" port="8081" accept"
+    # 设置防火墙,开放 8081 端口 给 nginx 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8081" accept"
     $ firewall-cmd --reload
 
@@ -51,7 +56,6 @@
 
 .. code-block:: shell
 
-    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.30" port protocol="tcp" port="8082" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8082" accept"
     $ firewall-cmd --reload
     $ docker run --name jms_guacamole1 -d \
