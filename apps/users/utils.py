@@ -307,8 +307,7 @@ def check_password_rules(password):
     lower_field_name = 'SECURITY_PASSWORD_LOWER_CASE'
     number_field_name = 'SECURITY_PASSWORD_NUMBER'
     special_field_name = 'SECURITY_PASSWORD_SPECIAL_CHAR'
-    min_length = getattr(common_settings, min_field_name) or \
-                 settings.DEFAULT_PASSWORD_MIN_LENGTH
+    min_length = getattr(common_settings, min_field_name)
 
     password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
     if not password_setting:
@@ -340,8 +339,7 @@ def increase_login_failed_count(username, ip):
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
-        settings.DEFAULT_LOGIN_LIMIT_TIME
+    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME
     cache.set(key_limit, count, int(limit_time)*60)
 
 
@@ -357,10 +355,8 @@ def is_block_login(username, ip):
     key_block = key_prefix_block.format(username)
     count = cache.get(key_limit, 0)
 
-    limit_count = common_settings.SECURITY_LOGIN_LIMIT_COUNT or \
-        settings.DEFAULT_LOGIN_LIMIT_COUNT
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
-        settings.DEFAULT_LOGIN_LIMIT_TIME
+    limit_count = common_settings.SECURITY_LOGIN_LIMIT_COUNT
+    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME
 
     if count >= limit_count:
         cache.set(key_block, 1, int(limit_time)*60)

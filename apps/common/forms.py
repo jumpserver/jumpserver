@@ -4,11 +4,10 @@ import json
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
-from django.conf import settings
 
 from .models import Setting, common_settings
 from .fields import FormDictField, FormEncryptCharField, \
-    FormEncryptMixin, FormEncryptDictField
+    FormEncryptMixin
 
 
 class BaseForm(forms.Form):
@@ -16,17 +15,17 @@ class BaseForm(forms.Form):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             db_value = getattr(common_settings, name)
-            django_value = getattr(settings, name) if hasattr(settings, name) else None
+            # django_value = getattr(settings, name) if hasattr(settings, name) else None
 
-            if db_value is None and django_value is None:
+            if db_value is None: # and django_value is None:
                 continue
 
-            if db_value is False or db_value:
+            if db_value is not None:
                 if isinstance(db_value, dict):
                     db_value = json.dumps(db_value)
                 initial_value = db_value
-            elif django_value is False or django_value:
-                initial_value = django_value
+            # elif django_value is False or django_value:
+            #     initial_value = django_value
             else:
                 initial_value = ''
             field.initial = initial_value

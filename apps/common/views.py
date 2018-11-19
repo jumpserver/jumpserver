@@ -2,9 +2,7 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django.conf import settings
 
-from common.models import common_settings
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
 from common.permissions import SuperUserRequiredMixin
@@ -97,8 +95,8 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
     template_name = "common/terminal_setting.html"
 
     def get_context_data(self, **kwargs):
-        command_storage = utils.get_command_storage_or_create_default_storage()
-        replay_storage = utils.get_replay_storage_or_create_default_storage()
+        command_storage = utils.get_command_storage_setting()
+        replay_storage = utils.get_replay_storage_setting()
 
         context = {
             'app': _('Settings'),

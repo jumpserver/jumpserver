@@ -9,14 +9,14 @@ from .models import Terminal
 
 def get_all_command_storage():
     from common import utils
-    command_storage = utils.get_command_storage_or_create_default_storage()
+    command_storage = utils.get_command_storage_setting()
     for k, v in command_storage.items():
         yield (k, k)
 
 
 def get_all_replay_storage():
     from common import utils
-    replay_storage = utils.get_replay_storage_or_create_default_storage()
+    replay_storage = utils.get_replay_storage_setting()
     for k, v in replay_storage.items():
         yield (k, k)
 
