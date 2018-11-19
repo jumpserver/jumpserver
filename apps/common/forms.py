@@ -14,16 +14,16 @@ class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            db_value = getattr(common_settings, name)
+            value = getattr(common_settings, name)
             # django_value = getattr(settings, name) if hasattr(settings, name) else None
 
-            if db_value is None: # and django_value is None:
+            if value is None:  # and django_value is None:
                 continue
 
-            if db_value is not None:
-                if isinstance(db_value, dict):
-                    db_value = json.dumps(db_value)
-                initial_value = db_value
+            if value is not None:
+                if isinstance(value, dict):
+                    value = json.dumps(value)
+                initial_value = value
             # elif django_value is False or django_value:
             #     initial_value = django_value
             else:
