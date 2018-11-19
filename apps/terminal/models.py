@@ -10,6 +10,7 @@ from django.conf import settings
 from users.models import User
 from orgs.mixins import OrgModelMixin
 from common.models import common_settings
+from common.utils import get_command_storage_setting, get_replay_storage_setting
 from .backends.command.models import AbstractSessionCommand
 
 
@@ -40,7 +41,7 @@ class Terminal(models.Model):
             self.user.save()
 
     def get_common_storage(self):
-        storage_all = settings.TERMINAL_COMMAND_STORAGE
+        storage_all = get_command_storage_setting()
         if self.command_storage in storage_all:
             storage = storage_all.get(self.command_storage)
         else:
@@ -48,7 +49,7 @@ class Terminal(models.Model):
         return {"TERMINAL_COMMAND_STORAGE": storage}
 
     def get_replay_storage(self):
-        storage_all = settings.TERMINAL_REPLAY_STORAGE
+        storage_all = get_replay_storage_setting()
         if self.replay_storage in storage_all:
             storage = storage_all.get(self.replay_storage)
         else:
@@ -60,7 +61,7 @@ class Terminal(models.Model):
         configs = {}
         for k in dir(settings):
             if k.startswith('TERMINAL'):
-                configs[k] = getattr(settings, k)
+                configs[k] = getattr(common_settings, k)
         configs.update(self.get_common_storage())
         configs.update(self.get_replay_storage())
         configs.update({
@@ -70,7 +71,9 @@ class Terminal(models.Model):
 
     def create_app_user(self):
         random = uuid.uuid4().hex[:6]
-        user, access_key = User.create_app_user(name="{}-{}".format(self.name, random), comment=self.comment)
+        user, access_key = User.create_app_user(
+            name="{}-{}".format(self.name, random), comment=self.comment
+        )
         self.user = user
         self.save()
         return user, access_key
