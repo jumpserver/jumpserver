@@ -40,7 +40,8 @@ class Setting(models.Model):
         return self.name
 
     def __getattr__(self, item):
-        default = getattr(settings, item, None)
+        # default = getattr(settings, item, None)
+        default = None
         try:
             instances = self.__class__.objects.filter(name=item)
         except Exception:

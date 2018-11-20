@@ -12,21 +12,21 @@ from django.core.files.storage import default_storage
 from django.http.response import HttpResponseRedirectBase
 from django.http import HttpResponseNotFound
 from django.conf import settings
-
-import jms_storage
-
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 from rest_framework_bulk import BulkModelViewSet
+from rest_condition import Or
+import jms_storage
+
 
 from common.utils import get_object_or_none, is_uuid
+from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
 from .hands import SystemUser
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer, ReplaySerializer
-from common.permissions import IsAppUser, IsOrgAdminOrAppUser
 from .backends import get_command_storage, get_multi_command_storage, \
     SessionCommandSerializer
 
@@ -36,7 +36,7 @@ logger = logging.getLogger(__file__)
 class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = TerminalSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsSuperUser,)
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name')

@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 import re
-import os
 
 from django.urls import path, include, re_path
 from django.conf import settings
@@ -17,19 +16,9 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from .views import IndexView, LunaView, I18NView
+from .swagger import swagger_view
 
-schema_view = get_schema_view(
-   openapi.Info(
-      title="Jumpserver API Docs",
-      default_version='v1',
-      description="Jumpserver Restful api docs",
-      terms_of_service="https://www.jumpserver.org",
-      contact=openapi.Contact(email="support@fit2cloud.com"),
-      license=openapi.License(name="GPLv2 License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-)
+
 api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
 
 
@@ -56,7 +45,7 @@ def redirect_format_api(request, *args, **kwargs):
         return Response({"msg": "Redirect url failed: {}".format(_path)}, status=404)
 
 
-v1_api_patterns = [
+api_v1_patterns = [
     path('users/v1/', include('users.urls.api_urls', namespace='api-users')),
     path('assets/v1/', include('assets.urls.api_urls', namespace='api-assets')),
     path('perms/v1/', include('perms.urls.api_urls', namespace='api-perms')),
@@ -65,6 +54,10 @@ v1_api_patterns = [
     path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
     path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
     path('common/v1/', include('common.urls.api_urls', namespace='api-common')),
+]
+
+api_v2_patterns = [
+    path('terminal/v2/', include('terminal.urls.api_v2_urls', namespace='api-terminal')),
 ]
 
 app_view_patterns = [
@@ -77,6 +70,7 @@ app_view_patterns = [
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
 ]
+
 
 if settings.XPACK_ENABLED:
     app_view_patterns.append(path('xpack/', include('xpack.urls', namespace='xpack')))
@@ -92,7 +86,7 @@ urlpatterns = [
     path('settings/', include('common.urls.view_urls', namespace='settings')),
     path('common/', include('common.urls.view_urls', namespace='common')),
     path('api/v1/', redirect_format_api),
-    path('api/', include(v1_api_patterns)),
+    path('api/', include(api_v1_patterns)),
 
     # External apps url
     path('captcha/', include('captcha.urls')),
@@ -103,8 +97,11 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
 urlpatterns += js_i18n_patterns
 
 if settings.DEBUG:
-    urlpatterns += [
-        re_path('swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
-        path('docs/', schema_view.with_ui('swagger', cache_timeout=None), name="docs"),
-        path('redoc/', schema_view.with_ui('redoc', cache_timeout=None), name='redoc'),
-    ]
+    pass
+    # urlpatterns += [
+    #     re_path('^(?P<version>v1|v2)/swagger(?P<format>\.json|\.yaml)$',
+    #             swagger_view.without_ui(cache_timeout=1), name='schema-json'),
+    #     path('docs/', schema_view.with_ui('swagger', cache_timeout=1), name="docs"),
+    #     path('docs/v2/', schema_view_v2.with_ui('swagger', cache_timeout=1), name="docs"),
+    #     path('redoc/', schema_view.with_ui('redoc', cache_timeout=1), name='redoc'),
+    # ]

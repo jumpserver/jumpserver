@@ -17,6 +17,10 @@ class Config:
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
+    # Coco or Guacamole bootstrap will be using pre share bootstrap token register service account
+    # If not have will be error
+    BOOTSTRAP_TOKEN = os.environ.get('BOOTSTRAP_TOKEN') or 'PleaseChangeMe'
+
     # Django security setting, if your disable debug model, you should setting that
     ALLOWED_HOSTS = ['*']
 

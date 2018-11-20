@@ -76,3 +76,4 @@ aliyun-python-sdk-core-v3==2.9.1
 aliyun-python-sdk-ecs==4.10.1   
 python-keycloak==0.13.3
 python-keycloak-client==0.1.3
+rest_condition==1.0.3

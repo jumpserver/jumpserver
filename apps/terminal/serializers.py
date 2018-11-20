@@ -2,7 +2,6 @@
 #
 
 from django.core.cache import cache
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
