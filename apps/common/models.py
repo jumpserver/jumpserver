@@ -40,11 +40,15 @@ class Setting(models.Model):
         return self.name
 
     def __getattr__(self, item):
-        instances = self.__class__.objects.filter(name=item)
+        default = getattr(settings, item, None)
+        try:
+            instances = self.__class__.objects.filter(name=item)
+        except Exception:
+            return default
         if len(instances) == 1:
             return instances[0].cleaned_value
         else:
-            return None
+            return default
 
     @property
     def cleaned_value(self):

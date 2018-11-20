@@ -64,8 +64,7 @@ class Terminal(models.Model):
         configs.update(self.get_common_storage())
         configs.update(self.get_replay_storage())
         configs.update({
-            'SECURITY_MAX_IDLE_TIME': common_settings.SECURITY_MAX_IDLE_TIME or
-                settings.DEFAULT_SECURITY_MAX_IDLE_TIME,
+            'SECURITY_MAX_IDLE_TIME': common_settings.SECURITY_MAX_IDLE_TIME
         })
         return configs
 
