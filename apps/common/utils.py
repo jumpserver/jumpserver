@@ -37,8 +37,7 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
                      kwargs=kwargs, current_app=current_app)
 
     if external:
-        from common.models import common_settings
-        site_url = common_settings.SITE_URL
+        site_url = settings.SITE_URL
         url = site_url.strip('/') + url
     return url
 
@@ -390,17 +389,15 @@ def get_request_ip(request):
 
 
 def get_command_storage_setting():
-    from common.models import common_settings
-    default = settings.TERMINAL_COMMAND_STORAGE
-    value = common_settings.TERMINAL_COMMAND_STORAGE
+    default = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
+    value = settings.TERMINAL_COMMAND_STORAGE
     value.update(default)
     return value
 
 
 def get_replay_storage_setting():
-    from common.models import common_settings
-    default = settings.TERMINAL_REPLAY_STORAGE
-    value = common_settings.TERMINAL_REPLAY_STORAGE
+    default = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
+    value = settings.TERMINAL_REPLAY_STORAGE
     value.update(default)
     return value
 

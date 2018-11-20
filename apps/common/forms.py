@@ -5,7 +5,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
 
-from .models import Setting, common_settings
+from .models import Setting, settings
 from .fields import FormDictField, FormEncryptCharField, \
     FormEncryptMixin
 
@@ -14,7 +14,7 @@ class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            value = getattr(common_settings, name)
+            value = getattr(settings, name, None)
             # django_value = getattr(settings, name) if hasattr(settings, name) else None
 
             if value is None:  # and django_value is None:
@@ -43,7 +43,7 @@ class BaseForm(forms.Form):
                 field = self.fields[name]
                 if isinstance(field.widget, forms.PasswordInput) and not value:
                     continue
-                if value == getattr(common_settings, name):
+                if value == getattr(settings, name):
                     continue
 
                 encrypted = True if isinstance(field, FormEncryptMixin) else False

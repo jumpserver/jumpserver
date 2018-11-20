@@ -2,13 +2,14 @@
 #
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
-from django.conf import settings
+from django.conf import LazySettings, empty
 from django.db.utils import ProgrammingError, OperationalError
+from django.core.cache import cache
 
 from jumpserver.utils import current_request
 from .models import Setting
 from .utils import get_logger
-from .signals import django_ready, ldap_auth_enable
+from .signals import django_ready
 
 logger = get_logger(__file__)
 
@@ -25,23 +26,31 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 def refresh_all_settings_on_django_ready(sender, **kwargs):
     logger.debug("Receive django ready signal")
     logger.debug("  - fresh all settings")
+
+    def monkey_patch_getattr(self, name):
+        cached = cache.get(name)
+        if cached is not None:
+            return cached
+        if self._wrapped is empty:
+            self._setup(name)
+        val = getattr(self._wrapped, name)
+        # self.__dict__[name] = val  # Never set it
+        return val
+
+    def monkey_patch_setattr(self, name, value):
+        cache.set(name, value, 0)
+        if name == '_wrapped':
+            self.__dict__.clear()
+        else:
+            self.__dict__.pop(name, None)
+        super(LazySettings, self).__setattr__(name, value)
+
     try:
+        LazySettings.__getattr__ = monkey_patch_getattr
+        LazySettings.__setattr__ = monkey_patch_setattr
         Setting.refresh_all_settings()
     except (ProgrammingError, OperationalError):
         pass
-
-
-@receiver(ldap_auth_enable, dispatch_uid="my_unique_identifier")
-def ldap_auth_on_changed(sender, enabled=True, **kwargs):
-    if enabled:
-        logger.debug("Enable LDAP auth")
-        if settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
-            settings.AUTHENTICATION_BACKENDS.insert(0, settings.AUTH_LDAP_BACKEND)
-
-    else:
-        logger.debug("Disable LDAP auth")
-        if settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
-            settings.AUTHENTICATION_BACKENDS.remove(settings.AUTH_LDAP_BACKEND)
 
 
 @receiver(pre_save, dispatch_uid="my_unique_identifier")

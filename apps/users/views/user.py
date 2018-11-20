@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -33,7 +34,6 @@ from django.contrib.auth import logout as auth_logout
 from common.const import create_success_msg, update_success_msg
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
-from common.models import Setting, common_settings
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
 from .. import forms
@@ -362,7 +362,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
-        mfa_setting = common_settings.SECURITY_MFA_AUTH
+        mfa_setting = settings.SECURITY_MFA_AUTH
         context = {
             'action': _('Profile'),
             'mfa_setting': mfa_setting if mfa_setting is not None else False,
