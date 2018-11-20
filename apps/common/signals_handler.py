@@ -26,9 +26,11 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 def refresh_all_settings_on_django_ready(sender, **kwargs):
     logger.debug("Receive django ready signal")
     logger.debug("  - fresh all settings")
+    CACHE_KEY_PREFIX = '_SETTING_'
 
     def monkey_patch_getattr(self, name):
-        cached = cache.get(name)
+        key = CACHE_KEY_PREFIX + name
+        cached = cache.get(key)
         if cached is not None:
             return cached
         if self._wrapped is empty:
@@ -38,16 +40,24 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
         return val
 
     def monkey_patch_setattr(self, name, value):
-        cache.set(name, value, 0)
+        key = CACHE_KEY_PREFIX + name
+        cache.set(key, value, 0)
         if name == '_wrapped':
             self.__dict__.clear()
         else:
             self.__dict__.pop(name, None)
         super(LazySettings, self).__setattr__(name, value)
 
+    def monkey_patch_delattr(self, name):
+        super(LazySettings, self).__delattr__(name)
+        self.__dict__.pop(name, None)
+        key = CACHE_KEY_PREFIX + name
+        cache.delete(key)
+
     try:
         LazySettings.__getattr__ = monkey_patch_getattr
         LazySettings.__setattr__ = monkey_patch_setattr
+        LazySettings.__delattr__ = monkey_patch_delattr
         Setting.refresh_all_settings()
     except (ProgrammingError, OperationalError):
         pass
