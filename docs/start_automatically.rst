@@ -132,3 +132,74 @@ Docker 组件部署设置自启
     # 写入 rc.local
     $ chmod +x /etc/rc.local
     $ echo "sh /opt/start_jms.sh" >> /etc/rc.local
+
+
+Systemd 管理启动 Jumpserver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: shell
+
+    # 适合按照一步一步文档进行安装的用户, Centos 7
+
+    # Jumpserver
+    # sed -i "s/START_TIMEOUT = 15/START_TIMEOUT = 30/g" /opt/jumpserver/jms
+    $ cat << EOF > /usr/lib/systemd/system/jms.service
+    [Unit]
+    Description=jms
+    After=network.target mariadb.service redis.service
+
+    [Service]
+    Type=forking
+    Environment="PATH=/opt/py3/bin"
+    ExecStart=/opt/jumpserver/jms start all -d
+    ExecReload=
+    ExecStop=/opt/jumpserver/jms stop
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+
+    # Coco
+    $ cat << EOF > /usr/lib/systemd/system/coco.service
+    [Unit]
+    Description=coco
+    After=network.target jms.service
+
+    [Service]
+    Type=forking
+    Environment="PATH=/opt/py3/bin"
+    ExecStart=/opt/coco/cocod start -d
+    ExecReload=
+    ExecStop=/opt/coco/cocod stop
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+
+    # Guacamole
+    $ chkconfig guacd on
+    $ sed -i '143i CATALINA_PID="$CATALINA_BASE/tomcat.pid"' /config/tomcat8/bin/catalina.sh
+    $ cat << EOF > /usr/lib/systemd/system/tomcat.service
+    [Unit]
+    Description=Apache Tomcat 8
+    After=network.target jms.service
+
+    [Service]
+    Type=forking
+    PIDFile=/config/tomcat8/tomcat.pid
+    Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole"
+    ExecStart=/config/tomcat8/bin/startup.sh
+    ExecReload=
+    ExecStop=/config/tomcat8/bin/shutdown.sh
+
+    [Install]
+    WantedBy=multi-user.target
+
+    EOF
+
+    # 开机自启设置
+    $ systemctl enable jms
+    $ systemctl enable coco
+    $ systemctl enable tomcat
