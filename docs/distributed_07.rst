@@ -29,9 +29,6 @@
     # 升级系统
     $ yum upgrade -y
 
-    # 安装依赖包
-    $ yum install -y yum-utils device-mapper-persistent-data lvm2
-
     # 设置防火墙,开放 8081 端口 给 nginx 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8081" accept"
     $ firewall-cmd --reload
@@ -41,8 +38,9 @@
     $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     $ yum makecache fast
     $ yum -y install docker-ce
-    $ systemctl start docker
+    $ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
     $ systemctl enable docker
+    $ systemctl start docker
 
     # 通过 docker 部署
     $ docker run --name jms_guacamole -d \

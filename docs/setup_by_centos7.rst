@@ -25,6 +25,8 @@ CentOS 7 安装文档
 
 .. code-block:: shell
 
+    $ yum update -y
+
     # 防火墙 与 selinux 设置说明,如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置
     $ systemctl start firewalld
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
@@ -58,6 +60,7 @@ CentOS 7 安装文档
     > create database jumpserver default charset 'utf8';
     > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
     > flush privileges;
+    > quit;
 
     # 安装 Nginx ,用作代理服务器整合 Jumpserver 与各个组件
     $ vi /etc/yum.repos.d/nginx.repo
