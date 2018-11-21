@@ -168,13 +168,16 @@ class DjangoSettingsAPI(APIView):
             return Response("Not in debug mode")
 
         data = {}
-        for k, v in settings.__dict__.items():
-            if k and k.isupper():
-                try:
-                    json.dumps(v)
-                    data[k] = v
-                except (json.JSONDecodeError, TypeError):
-                    data[k] = str(v)
+        for i in [settings, getattr(settings, '_wrapped')]:
+            if not i:
+                continue
+            for k, v in i.__dict__.items():
+                if k and k.isupper():
+                    try:
+                        json.dumps(v)
+                        data[k] = v
+                    except (json.JSONDecodeError, TypeError):
+                        data[k] = str(v)
         return Response(data)
 
 

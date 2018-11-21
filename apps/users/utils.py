@@ -19,8 +19,8 @@ from django.core.cache import cache
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
-from common.models import common_settings, Setting
 from common.forms import SecuritySettingForm
+from common.models import Setting
 from .models import User, LoginLog
 
 
@@ -257,7 +257,7 @@ def check_otp_code(otp_secret_key, otp_code):
 
 def get_password_check_rules():
     check_rules = []
-    min_length = settings.DEFAULT_PASSWORD_MIN_LENGTH
+    min_length = settings.SECURITY_PASSWORD_MIN_LENGTH
     min_name = 'SECURITY_PASSWORD_MIN_LENGTH'
     base_filed = SecuritySettingForm.base_fields
     password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
@@ -289,7 +289,7 @@ def check_password_rules(password):
     lower_field_name = 'SECURITY_PASSWORD_LOWER_CASE'
     number_field_name = 'SECURITY_PASSWORD_NUMBER'
     special_field_name = 'SECURITY_PASSWORD_SPECIAL_CHAR'
-    min_length = getattr(common_settings, min_field_name)
+    min_length = getattr(settings, min_field_name)
 
     password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
     if not password_setting:
@@ -321,7 +321,7 @@ def increase_login_failed_count(username, ip):
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
     cache.set(key_limit, count, int(limit_time)*60)
 
 
@@ -337,8 +337,8 @@ def is_block_login(username, ip):
     key_block = key_prefix_block.format(username)
     count = cache.get(key_limit, 0)
 
-    limit_count = common_settings.SECURITY_LOGIN_LIMIT_COUNT
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME
+    limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
     if count >= limit_count:
         cache.set(key_block, 1, int(limit_time)*60)
