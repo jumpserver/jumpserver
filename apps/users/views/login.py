@@ -268,13 +268,11 @@ class UserResetPasswordView(TemplateView):
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token')
         user = User.validate_reset_token(token)
-
-        check_rules, min_length = get_password_check_rules()
-        password_rules = {'password_check_rules': check_rules, 'min_length': min_length}
-        kwargs.update(password_rules)
-
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
+        else:
+            check_rules = get_password_check_rules()
+            kwargs.update({'password_check_rules': check_rules})
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
