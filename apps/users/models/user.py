@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.core import signing
 from django.core.cache import cache
 from django.db import models

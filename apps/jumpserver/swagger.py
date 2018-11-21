@@ -12,7 +12,7 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         return super().get_tags(operation_keys)
 
 
-def swagger_view(request, version="v1", *args, **kwargs):
+def get_swagger_view(version='v1'):
     from .urls import api_v1_patterns, api_v2_patterns
     if version == "v2":
         patterns = api_v2_patterns
@@ -32,3 +32,4 @@ def swagger_view(request, version="v1", *args, **kwargs):
         permission_classes=(permissions.AllowAny,),
     )
     return schema_view
+

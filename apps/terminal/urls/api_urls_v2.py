@@ -5,12 +5,12 @@
 from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
-from .. import api_v2
+from ..api import v2 as api
 
 app_name = 'terminal'
 
 router = BulkRouter()
-router.register(r'terminal', api_v2.TerminalViewSet, 'terminal')
+router.register(r'terminal', api.TerminalViewSet, 'terminal')
 
 
 urlpatterns = [
