@@ -6,7 +6,6 @@ from django.utils.translation import ugettext as _
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
 from common.permissions import SuperUserRequiredMixin
-from .signals import ldap_auth_enable
 from . import utils
 
 
@@ -79,8 +78,6 @@ class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            if "AUTH_LDAP" in form.cleaned_data:
-                ldap_auth_enable.send(sender=self.__class__, enabled=form.cleaned_data["AUTH_LDAP"])
             msg = _("Update setting successfully, please restart program")
             messages.success(request, msg)
             return redirect('settings:ldap-setting')

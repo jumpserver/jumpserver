@@ -17,11 +17,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from formtools.wizard.views import SessionWizardView
 from django.conf import settings
+from formtools.wizard.views import SessionWizardView
 
 from common.utils import get_object_or_none, get_request_ip
-from common.models import common_settings
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
@@ -269,13 +268,11 @@ class UserResetPasswordView(TemplateView):
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token')
         user = User.validate_reset_token(token)
-
-        check_rules, min_length = get_password_check_rules()
-        password_rules = {'password_check_rules': check_rules, 'min_length': min_length}
-        kwargs.update(password_rules)
-
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
+        else:
+            check_rules = get_password_check_rules()
+            kwargs.update({'password_check_rules': check_rules})
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -326,7 +323,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': common_settings.USER_GUIDE_URL
+            'user_guide_url': settings.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 

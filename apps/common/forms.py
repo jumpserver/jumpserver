@@ -5,7 +5,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
 
-from .models import Setting, common_settings
+from .models import Setting, settings
 from .fields import FormDictField, FormEncryptCharField, \
     FormEncryptMixin
 
@@ -14,7 +14,7 @@ class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            value = getattr(common_settings, name)
+            value = getattr(settings, name, None)
             # django_value = getattr(settings, name) if hasattr(settings, name) else None
 
             if value is None:  # and django_value is None:
@@ -43,7 +43,7 @@ class BaseForm(forms.Form):
                 field = self.fields[name]
                 if isinstance(field.widget, forms.PasswordInput) and not value:
                     continue
-                if value == getattr(common_settings, name):
+                if value == getattr(settings, name):
                     continue
 
                 encrypted = True if isinstance(field, FormEncryptMixin) else False
@@ -69,7 +69,6 @@ class BasicSettingForm(BaseForm):
     )
     EMAIL_SUBJECT_PREFIX = forms.CharField(
         max_length=1024, label=_("Email Subject Prefix"),
-        initial="[Jumpserver] "
     )
 
 
@@ -97,21 +96,21 @@ class EmailSettingForm(BaseForm):
 
 class LDAPSettingForm(BaseForm):
     AUTH_LDAP_SERVER_URI = forms.CharField(
-        label=_("LDAP server"), initial='ldap://localhost:389'
+        label=_("LDAP server"),
     )
     AUTH_LDAP_BIND_DN = forms.CharField(
-        label=_("Bind DN"), initial='cn=admin,dc=jumpserver,dc=org'
+        label=_("Bind DN"),
     )
     AUTH_LDAP_BIND_PASSWORD = FormEncryptCharField(
-        label=_("Password"), initial='',
+        label=_("Password"),
         widget=forms.PasswordInput, required=False
     )
     AUTH_LDAP_SEARCH_OU = forms.CharField(
-        label=_("User OU"), initial='ou=tech,dc=jumpserver,dc=org',
+        label=_("User OU"),
         help_text=_("Use | split User OUs")
     )
     AUTH_LDAP_SEARCH_FILTER = forms.CharField(
-        label=_("User search filter"), initial='(cn=%(user)s)',
+        label=_("User search filter"),
         help_text=_("Choice may be (cn|uid|sAMAccountName)=%(user)s)")
     )
     AUTH_LDAP_USER_ATTR_MAP = FormDictField(
@@ -119,14 +118,14 @@ class LDAPSettingForm(BaseForm):
         help_text=_(
             "User attr map present how to map LDAP user attr to jumpserver, "
             "username,name,email is jumpserver attr"
-        )
+        ),
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
     AUTH_LDAP_START_TLS = forms.BooleanField(
-        label=_("Use SSL"), initial=False, required=False
+        label=_("Use SSL"), required=False
     )
-    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), initial=False, required=False)
+    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), required=False)
 
 
 class TerminalSettingForm(BaseForm):
