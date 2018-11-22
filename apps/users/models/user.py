@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
-from common.models import common_settings
 from orgs.mixins import OrgManager
 from orgs.utils import current_org
 
@@ -231,7 +230,7 @@ class User(AbstractUser):
     
     @property
     def date_password_expired(self):
-        interval = common_settings.SECURITY_INTERVAL_TIME_PASSWORD_EXPIRATION
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval))
         return date_expired
@@ -316,7 +315,7 @@ class User(AbstractUser):
 
     @property
     def otp_force_enabled(self):
-        if common_settings.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH:
             return True
         return self.otp_level == 2
 

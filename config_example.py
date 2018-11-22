@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
     jumpserver.config
     ~~~~~~~~~~~~~~~~~
@@ -13,48 +15,63 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Config:
-    # Use it to encrypt or decrypt data
-    # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+    """
+    Jumpserver Config File
+    Jumpserver 配置文件
 
-    # Django security setting, if your disable debug model, you should setting that
-    ALLOWED_HOSTS = ['*']
+    Jumpserver use this config for drive django framework running,
+    You can set is value or set the same envirment value,
+    Jumpserver look for config order: file => env => default
+
+    Jumpserver使用配置来驱动Django框架的运行，
+    你可以在该文件中设置，或者设置同样名称的环境变量,
+    Jumpserver使用配置的顺序: 文件 => 环境变量 => 默认值
+    """
+    # SECURITY WARNING: keep the secret key used in production secret!
+    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
     # Development env open this, when error occur display the full process track, Production disable it
-    DEBUG = os.environ.get("DEBUG") or True
+    # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
+    # DEBUG = True
 
     # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
-    LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'DEBUG'
-    LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    # 日志级别
+    # LOG_LEVEL = 'DEBUG'
+    # LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
     # Database setting, Support sqlite3, mysql, postgres ....
+    # 数据库设置
     # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
     # SQLite setting:
-    DB_ENGINE = 'sqlite3'
-    DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
+    # 使用单文件sqlite数据库
+    # DB_ENGINE = 'sqlite3'
+    # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
     # MySQL or postgres setting like:
-    # DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
-    # DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
-    # DB_PORT = os.environ.get("DB_PORT") or 3306
-    # DB_USER = os.environ.get("DB_USER") or 'jumpserver'
-    # DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
-    # DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
+    # 使用Mysql作为数据库
+    DB_ENGINE = 'mysql'
+    DB_HOST = '127.0.0.1'
+    DB_PORT = 3306
+    DB_USER = 'jumpserver'
+    DB_PASSWORD = ''
+    DB_NAME = 'jumpserver'
 
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
+    # 运行时绑定端口
     HTTP_BIND_HOST = '0.0.0.0'
     HTTP_LISTEN_PORT = 8080
 
     # Use Redis as broker for celery and web socket
-    REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
-    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
-    REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
-    REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
-    REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
+    # Redis配置
+    REDIS_HOST = '127.0.0.1'
+    REDIS_PORT = 6379
+    REDIS_PASSWORD = ''
 
     # Use OpenID authorization
+    # 使用OpenID 来进行认证设置
     # BASE_SITE_URL = 'http://localhost:8080'
     # AUTH_OPENID = False  # True or False
     # AUTH_OPENID_SERVER_URL = 'https://openid-auth-server.com/'
