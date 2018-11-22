@@ -17,24 +17,12 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
+from .conf import load_user_config
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
-
-sys.path.append(PROJECT_DIR)
-
-# Import project config setting
-try:
-    from config import config as CONFIG
-except ImportError:
-    msg = """
-    
-    Error: No config file found.
-    
-    You can run `cp config_example.py config.py`, and edit it.
-    """
-    raise ImportError(msg)
-    # CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
+CONFIG = load_user_config()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -43,15 +31,15 @@ except ImportError:
 SECRET_KEY = CONFIG.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = CONFIG.DEBUG or False
+DEBUG = CONFIG.DEBUG
 
 # Absolute url for some case, for example email link
-SITE_URL = CONFIG.SITE_URL or 'http://localhost'
+SITE_URL = CONFIG.SITE_URL
 
 # LOG LEVEL
-LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
+LOG_LEVEL = CONFIG.LOG_LEVEL
 
-ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -152,9 +140,9 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
 
-SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
-CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -436,10 +424,10 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-            'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
-            'host': CONFIG.REDIS_HOST or '127.0.0.1',
-            'port': CONFIG.REDIS_PORT or 6379,
-            'db': CONFIG.REDIS_DB_CACHE or 4,
+            'password': CONFIG.REDIS_PASSWORD,
+            'host': CONFIG.REDIS_HOST,
+            'port': CONFIG.REDIS_PORT,
+            'db': CONFIG.REDIS_DB_CACHE,
         }
     }
 }
@@ -503,8 +491,8 @@ BOOTSTRAP3 = {
     'success_css_class': '',
 }
 
-TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
-DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
+TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
+DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
 

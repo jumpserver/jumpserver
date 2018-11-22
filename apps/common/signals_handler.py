@@ -41,7 +41,7 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
 
     def monkey_patch_setattr(self, name, value):
         key = CACHE_KEY_PREFIX + name
-        cache.set(key, value, 0)
+        cache.set(key, value, None)
         if name == '_wrapped':
             self.__dict__.clear()
         else:
