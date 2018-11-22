@@ -286,10 +286,12 @@ class Config(dict):
 
 
 defaults = {
+    'SECRET_KEY': '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x',
     'BOOTSTRAP_TOKEN': 'PleaseChangeMe',
     'DEBUG': True,
     'SITE_URL': 'http://localhost',
     'LOG_LEVEL': 'DEBUG',
+    'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
     'DB_ENGINE': 'mysql',
     'DB_NAME': 'jumpserver',
     'DB_HOST': '127.0.0.1',
@@ -305,6 +307,10 @@ defaults = {
     'TOKEN_EXPIRATION': 3600,
     'DISPLAY_PER_PAGE': 25,
     'DEFAULT_EXPIRED_YEARS': 70,
+    'SESSION_COOKIE_DOMAIN': None,
+    'CSRF_COOKIE_DOMAIN': None,
+    'SESSION_COOKIE_AGE': 3600 * 24,
+    'AUTH_OPENID': False,
 }
 
 

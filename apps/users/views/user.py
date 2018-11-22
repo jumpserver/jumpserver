@@ -106,12 +106,11 @@ class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
-        check_rules, min_length = get_password_check_rules()
+        check_rules = get_password_check_rules()
         context = {
             'app': _('Users'),
             'action': _('Update user'),
             'password_check_rules': check_rules,
-            'min_length': min_length
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -399,12 +398,11 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_context_data(self, **kwargs):
-        check_rules, min_length = get_password_check_rules()
+        check_rules = get_password_check_rules()
         context = {
             'app': _('Users'),
             'action': _('Password update'),
             'password_check_rules': check_rules,
-            'min_length': min_length,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

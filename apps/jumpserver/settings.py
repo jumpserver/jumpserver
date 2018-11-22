@@ -22,21 +22,7 @@ from .conf import load_user_config
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
-
 CONFIG = load_user_config()
-
-# Import project config setting
-#try:
-#    from config import config as CONFIG
-#except ImportError:
-#    msg = """
-#
-#    Error: No config file found.
-#
-#    You can run `cp config_example.py config.py`, and edit it.
-#    """
-#    raise ImportError(msg)
-    # CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -48,13 +34,13 @@ SECRET_KEY = CONFIG.SECRET_KEY
 BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = CONFIG.DEBUG or os.environ.get('DEBUG') or False
+DEBUG = CONFIG.DEBUG
 
 # Absolute url for some case, for example email link
-SITE_URL = CONFIG.SITE_URL or 'http://localhost'
+SITE_URL = CONFIG.SITE_URL
 
 # LOG LEVEL
-LOG_LEVEL = 'DEBUG' if DEBUG else (CONFIG.LOG_LEVEL or 'WARNING')
+LOG_LEVEL = CONFIG.LOG_LEVEL
 
 ALLOWED_HOSTS = ['*']
 
@@ -157,9 +143,9 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
 
-SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
-CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -441,10 +427,10 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-            'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
-            'host': CONFIG.REDIS_HOST or '127.0.0.1',
-            'port': CONFIG.REDIS_PORT or 6379,
-            'db': CONFIG.REDIS_DB_CACHE or 4,
+            'password': CONFIG.REDIS_PASSWORD,
+            'host': CONFIG.REDIS_HOST,
+            'port': CONFIG.REDIS_PORT,
+            'db': CONFIG.REDIS_DB_CACHE,
         }
     }
 }
@@ -482,10 +468,21 @@ TERMINAL_REPLAY_STORAGE = {
 }
 
 SECURITY_MFA_AUTH = False
-SECURITY_PASSWORD_MIN_LENGTH = 6
 SECURITY_LOGIN_LIMIT_COUNT = 7
 SECURITY_LOGIN_LIMIT_TIME = 30  # Unit: minute
 SECURITY_MAX_IDLE_TIME = 30  # Unit: minute
+SECURITY_PASSWORD_MIN_LENGTH = 6
+SECURITY_PASSWORD_UPPER_CASE = False
+SECURITY_PASSWORD_LOWER_CASE = False
+SECURITY_PASSWORD_NUMBER = False
+SECURITY_PASSWORD_SPECIAL_CHAR = False
+SECURITY_PASSWORD_RULES = [
+    'SECURITY_PASSWORD_MIN_LENGTH',
+    'SECURITY_PASSWORD_UPPER_CASE',
+    'SECURITY_PASSWORD_LOWER_CASE',
+    'SECURITY_PASSWORD_NUMBER',
+    'SECURITY_PASSWORD_SPECIAL_CHAR'
+]
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
@@ -497,8 +494,8 @@ BOOTSTRAP3 = {
     'success_css_class': '',
 }
 
-TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
-DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
+TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
+DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
 
