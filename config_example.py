@@ -15,6 +15,18 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Config:
+    """
+    Jumpserver Config File
+    Jumpserver 配置文件
+
+    Jumpserver use this config for drive django framework running,
+    You can set is value or set the same envirment value,
+    Jumpserver look for config order: file => env => default
+
+    Jumpserver使用配置来驱动Django框架的运行，
+    你可以在该文件中设置，或者设置同样名称的环境变量,
+    Jumpserver使用配置的顺序: 文件 => 环境变量 => 默认值
+    """
     # SECURITY WARNING: keep the secret key used in production secret!
     # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
     SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
