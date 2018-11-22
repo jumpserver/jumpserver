@@ -26,7 +26,7 @@ class BasicSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:basic-setting')
         else:
@@ -78,7 +78,7 @@ class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:ldap-setting')
         else:
@@ -109,7 +109,7 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:terminal-setting')
         else:
@@ -159,7 +159,7 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:security-setting')
         else:

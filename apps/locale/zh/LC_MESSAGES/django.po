@@ -2188,8 +2188,8 @@ msgstr "系统设置"
 
 #: common/views.py:29 common/views.py:55 common/views.py:81 common/views.py:112
 #: common/views.py:162
-msgid "Update setting successfully, please restart program"
-msgstr "更新设置成功, 请手动重启程序"
+msgid "Update setting successfully"
+msgstr "更新设置成功"
 
 #: common/views.py:127
 msgid "Create replay storage"
