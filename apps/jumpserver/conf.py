@@ -291,6 +291,7 @@ defaults = {
     'DEBUG': True,
     'SITE_URL': 'http://localhost',
     'LOG_LEVEL': 'DEBUG',
+    'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
     'DB_ENGINE': 'mysql',
     'DB_NAME': 'jumpserver',
     'DB_HOST': '127.0.0.1',
@@ -309,6 +310,7 @@ defaults = {
     'SESSION_COOKIE_DOMAIN': None,
     'CSRF_COOKIE_DOMAIN': None,
     'SESSION_COOKIE_AGE': 3600 * 24,
+    'AUTH_OPENID': False,
 }
 
 
