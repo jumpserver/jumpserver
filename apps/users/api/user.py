@@ -35,15 +35,16 @@ __all__ = [
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
-    queryset = User.objects.exclude(role="App")
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users()
-        queryset = queryset.filter(id__in=org_users)
+        if current_org.is_real():
+            org_users = current_org.get_org_users()
+            queryset = queryset.filter(id__in=org_users)
         return queryset
 
     def get_permissions(self):

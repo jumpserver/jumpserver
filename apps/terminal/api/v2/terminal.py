@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_condition import Or, And
 
 from common.permissions import IsAppUser, IsSuperUser
+from common.utils import get_request_ip
 from ...models import Terminal
 from ...serializers import v2 as serializers
 
@@ -27,6 +28,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
         instance.is_accepted = True
         instance.user = self.request.user
+        instance.remote_addr = get_request_ip(self.request)
         instance.save()
 
     def get_permissions(self):

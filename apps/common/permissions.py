@@ -102,5 +102,7 @@ class SuperUserRequiredMixin(UserPassesTestMixin):
 class WithBootstrapToken(permissions.BasePermission):
     def has_permission(self, request, view):
         authorization = request.META.get('HTTP_AUTHORIZATION', '')
+        if not authorization:
+            return False
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token

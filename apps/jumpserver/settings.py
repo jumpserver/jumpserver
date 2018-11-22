@@ -17,23 +17,25 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
+from .conf import load_user_config
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 
-sys.path.append(PROJECT_DIR)
+CONFIG = load_user_config()
 
 # Import project config setting
-try:
-    from config import config as CONFIG
-except ImportError:
-    msg = """
-    
-    Error: No config file found.
-    
-    You can run `cp config_example.py config.py`, and edit it.
-    """
-    raise ImportError(msg)
+#try:
+#    from config import config as CONFIG
+#except ImportError:
+#    msg = """
+#
+#    Error: No config file found.
+#
+#    You can run `cp config_example.py config.py`, and edit it.
+#    """
+#    raise ImportError(msg)
     # CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
 # Quick-start development settings - unsuitable for production
@@ -42,16 +44,19 @@ except ImportError:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = CONFIG.SECRET_KEY
 
+# SECURITY WARNING: keep the token secret, remove it if all coco, guacamole ok
+BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = CONFIG.DEBUG or False
+DEBUG = CONFIG.DEBUG or os.environ.get('DEBUG') or False
 
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL or 'http://localhost'
 
 # LOG LEVEL
-LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
+LOG_LEVEL = 'DEBUG' if DEBUG else (CONFIG.LOG_LEVEL or 'WARNING')
 
-ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -496,7 +501,6 @@ TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
 DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
-BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
 
 
 SWAGGER_SETTINGS = {
