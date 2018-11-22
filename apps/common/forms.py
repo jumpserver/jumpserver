@@ -171,10 +171,11 @@ class SecuritySettingForm(BaseForm):
         initial=30, min_value=5,
         label=_("No logon interval"),
         help_text=_(
-            "Tip :(unit/minute) if the user has failed to log in for a limited "
+            "Tip: (unit/minute) if the user has failed to log in for a limited "
             "number of times, no login is allowed during this time interval."
         )
     )
+    # ssh max idle time
     SECURITY_MAX_IDLE_TIME = forms.IntegerField(
         initial=30, required=False,
         label=_("Connection max idle time"),
@@ -182,6 +183,18 @@ class SecuritySettingForm(BaseForm):
             'If idle time more than it, disconnect connection(only ssh now) '
             'Unit: minute'
         ),
+    )
+    # password expiration time
+    SECURITY_PASSWORD_EXPIRATION_TIME = forms.IntegerField(
+        initial=9999, label=_("Password expiration time"),
+        min_value=1,
+        help_text=_(
+            "Tip: (unit/day) "
+            "If the user does not update the password during the time, "
+            "the user password will expire failure;"
+            "The password expiration reminder mail will be automatic sent to the user "
+            "by system within 5 days (daily) before the password expires"
+        )
     )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(

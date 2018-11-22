@@ -50,6 +50,8 @@
 
                         {% if block_login %}
                             <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
+                        {% elif password_expired %}
+                            <p class="red-fonts">{% trans 'The user password has expired' %}</p>
                         {% elif form.errors %}
                             {% if 'captcha' in form.errors %}
                                 <p class="red-fonts">{% trans 'Captcha invalid' %}</p>

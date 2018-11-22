@@ -81,7 +81,9 @@ class Setting(models.Model):
 
     @classmethod
     def delete_storage(cls, name, storage_name):
-        obj = cls.objects.get(name=name)
+        obj = cls.objects.filter(name=name).first()
+        if not obj:
+            return False
         value = obj.cleaned_value
         value.pop(storage_name, '')
         obj.cleaned_value = value

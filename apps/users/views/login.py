@@ -68,7 +68,20 @@ class UserLoginView(FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
 
-        set_tmp_user_to_cache(self.request, form.get_user())
+        user = form.get_user()
+
+        # user password expired
+        if user.password_has_expired:
+            data = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_PASSWORD_EXPIRED,
+                'status': False
+            }
+            self.write_login_log(data)
+            return self.render_to_response(self.get_context_data(password_expired=True))
+
+        set_tmp_user_to_cache(self.request, user)
         username = form.cleaned_data.get('username')
         ip = get_request_ip(self.request)
         # 登陆成功，清除缓存计数
@@ -86,7 +99,6 @@ class UserLoginView(FormView):
             'reason': reason,
             'status': False
         }
-
         self.write_login_log(data)
 
         # limit user login failed count

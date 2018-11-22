@@ -151,7 +151,7 @@ function deleteStorage($this, the_url){
             toastr.success("{% trans 'Delete succeed' %}");
         };
         var error = function(){
-            toastr.error("{% trans 'Delete failed' %}}");
+            toastr.error("{% trans 'Delete failed' %}");
         };
         ajaxAPI(the_url, JSON.stringify(data), success, error, method);
     }

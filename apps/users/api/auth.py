@@ -56,6 +56,19 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             increase_login_failed_count(username, ip)
             return Response({'msg': msg}, status=401)
 
+        if user.password_has_expired:
+            data = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_PASSWORD_EXPIRED,
+                'status': False
+            }
+            self.write_login_log(request, data)
+            msg = _("The user {} password has expired, please update.".format(
+                user.username))
+            logger.info(msg)
+            return Response({'msg': msg}, status=401)
+
         if not user.otp_enabled:
             data = {
                 'username': user.username,
@@ -68,10 +81,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             clean_failed_count(username, ip)
             token = generate_token(request, user)
             return Response(
-                {
-                    'token': token,
-                    'user': self.serializer_class(user).data
-                }
+                {'token': token, 'user': self.serializer_class(user).data}
             )
 
         seed = uuid.uuid4().hex

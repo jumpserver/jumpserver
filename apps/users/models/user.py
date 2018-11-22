@@ -96,6 +96,10 @@ class User(AbstractUser):
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
         verbose_name=_('Source')
     )
+    date_password_last_updated = models.DateTimeField(
+        auto_now_add=True, blank=True, null=True,
+        verbose_name=_('Date password last updated')
+    )
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -220,6 +224,34 @@ class User(AbstractUser):
     def is_staff(self, value):
         pass
 
+    @property
+    def is_local(self):
+        return self.source == self.SOURCE_LOCAL
+    
+    @property
+    def date_password_expired(self):
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        date_expired = self.date_password_last_updated + timezone.timedelta(
+            days=int(interval))
+        return date_expired
+
+    @property
+    def password_expired_remain_days(self):
+        date_remain = self.date_password_expired - timezone.now()
+        return date_remain.days
+
+    @property
+    def password_has_expired(self):
+        if self.is_local and self.password_expired_remain_days < 0:
+            return True
+        return False
+
+    @property
+    def password_will_expired(self):
+        if self.is_local and self.password_expired_remain_days < 5:
+            return True
+        return False
+
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
@@ -258,7 +290,7 @@ class User(AbstractUser):
         return False
 
     def check_public_key(self, public_key):
-        if self.ssH_public_key == public_key:
+        if self.ssh_public_key == public_key:
             return True
         return False
 
@@ -340,6 +372,7 @@ class User(AbstractUser):
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.date_password_last_updated = timezone.now()
         self.save()
 
     def delete(self, using=None, keep_parents=False):

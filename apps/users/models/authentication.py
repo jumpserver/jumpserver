@@ -56,12 +56,14 @@ class LoginLog(models.Model):
     REASON_PASSWORD = 1
     REASON_MFA = 2
     REASON_NOT_EXIST = 3
+    REASON_PASSWORD_EXPIRED = 4
 
     REASON_CHOICE = (
         (REASON_NOTHING, _('-')),
         (REASON_PASSWORD, _('Username/password check failed')),
         (REASON_MFA, _('MFA authentication failed')),
         (REASON_NOT_EXIST, _("Username does not exist")),
+        (REASON_PASSWORD_EXPIRED, _("Password expired")),
     )
 
     STATUS_CHOICE = (

@@ -109,6 +109,10 @@
                                                 <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
                                             <tr>
+                                                <td class="text-navy">{% trans 'Last password updated' %}</td>
+                                                <td>{{ user.date_password_last_updated|date:"Y-m-d H:i:s" }}</td>
+                                            </tr>
+                                            <tr>
                                                 <td class="text-navy">{% trans 'Date expired' %}</td>
                                                 <td>{{ user.date_expired|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
