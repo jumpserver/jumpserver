@@ -277,7 +277,7 @@ CentOS 7 安装文档
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081;
+            proxy_pass       http://localhost:8081/;
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
