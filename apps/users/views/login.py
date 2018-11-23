@@ -237,8 +237,11 @@ class UserForgotPasswordView(TemplateView):
         email = request.POST.get('email')
         user = get_object_or_none(User, email=email)
         if not user:
-            return self.get(request, errors=_('Email address invalid, '
-                                              'please input again'))
+            error = _('Email address invalid, please input again')
+            return self.get(request, errors=error)
+        elif not user.is_local:
+            error = _('User auth from {}, go there change password'.format(user.source))
+            return self.get(request, errors=error)
         else:
             send_reset_password_mail(user)
             return HttpResponseRedirect(
@@ -270,8 +273,7 @@ class UserResetPasswordSuccessView(TemplateView):
             'auto_redirect': True,
         }
         kwargs.update(context)
-        return super()\
-            .get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserResetPasswordView(TemplateView):

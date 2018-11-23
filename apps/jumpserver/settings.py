@@ -314,7 +314,7 @@ EMAIL_HOST_USER = 'noreply@jumpserver.org'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_SSL = False
 EMAIL_USE_TLS = False
-EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
+EMAIL_SUBJECT_PREFIX = '[JMS] '
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

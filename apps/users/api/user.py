@@ -32,7 +32,7 @@ __all__ = [
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(role=User.ROLE_APP)
     serializer_class = UserSerializer
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination

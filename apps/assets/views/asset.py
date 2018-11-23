@@ -277,7 +277,8 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                         v = ''
                 elif k == 'domain':
                     v = get_object_or_none(Domain, name=v)
-
+                elif k == 'platform':
+                    v = v.lower().capitalize()
                 if v != '':
                     asset_dict[k] = v
 

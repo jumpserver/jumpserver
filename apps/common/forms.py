@@ -69,6 +69,7 @@ class BasicSettingForm(BaseForm):
     )
     EMAIL_SUBJECT_PREFIX = forms.CharField(
         max_length=1024, label=_("Email Subject Prefix"),
+        help_text=_("Tips: Some word will be intercept by mail provider")
     )
 
 
