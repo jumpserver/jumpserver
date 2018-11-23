@@ -168,7 +168,7 @@ Systemd 管理启动 Jumpserver
 
     [Service]
     Type=forking
-    Environment="PATH=/opt/py3/bin"
+    Environment="PATH=/opt/py3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
     ExecStart=/opt/coco/cocod start -d
     ExecReload=
     ExecStop=/opt/coco/cocod stop
@@ -203,3 +203,13 @@ Systemd 管理启动 Jumpserver
     $ systemctl enable jms
     $ systemctl enable coco
     $ systemctl enable tomcat
+
+    # 启动
+    $ systemctl start jms
+    $ systemctl start coco
+    $ systemctl start tomcat
+
+    # 停止
+    $ systemctl stop jms
+    $ systemctl stop coco
+    $ systemctl stop tomcat
