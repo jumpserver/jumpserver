@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -8,6 +9,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.utils.encoding import iri_to_uri
 
 from users.models import User
 from assets.models import Asset
@@ -188,3 +193,29 @@ class I18NView(View):
         response = HttpResponseRedirect(referer_url)
         response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang)
         return response
+
+
+api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
+
+
+class HttpResponseTemporaryRedirect(HttpResponse):
+    status_code = 307
+
+    def __init__(self, redirect_to):
+        HttpResponse.__init__(self)
+        self['Location'] = iri_to_uri(redirect_to)
+
+
+@csrf_exempt
+def redirect_format_api(request, *args, **kwargs):
+    _path, query = request.path, request.GET.urlencode()
+    matched = api_url_pattern.match(_path)
+    if matched:
+        version, app, extra = matched.groups()
+        _path = '/api/{app}/{version}/{extra}?{query}'.format(**{
+            "app": app, "version": version, "extra": extra,
+            "query": query
+        })
+        return HttpResponseTemporaryRedirect(_path)
+    else:
+        return Response({"msg": "Redirect url failed: {}".format(_path)}, status=404)

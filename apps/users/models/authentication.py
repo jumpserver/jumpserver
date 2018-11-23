@@ -17,13 +17,16 @@ class AccessKey(models.Model):
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, verbose_name='User',
-                             on_delete=models.CASCADE, related_name='access_key')
+                             on_delete=models.CASCADE, related_name='access_keys')
 
     def get_id(self):
         return str(self.id)
 
     def get_secret(self):
         return str(self.secret)
+
+    def get_full_value(self):
+        return '{}:{}'.format(self.id, self.secret)
 
     def __str__(self):
         return str(self.id)

@@ -11,13 +11,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
+from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, \
+    IsOrgAdminOrAppUser
+from common.mixins import IDInFilterMixin
+from common.utils import get_logger
+from orgs.utils import current_org
 from ..serializers import UserSerializer, UserPKUpdateSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from ..models import User
-from orgs.utils import current_org
-from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
-from common.mixins import IDInFilterMixin
-from common.utils import get_logger
 
 
 logger = get_logger(__name__)
@@ -31,15 +32,16 @@ __all__ = [
 class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
-    queryset = User.objects.exclude(role="App")
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users()
-        queryset = queryset.filter(id__in=org_users)
+        if current_org.is_real():
+            org_users = current_org.get_org_users()
+            queryset = queryset.filter(id__in=org_users)
         return queryset
 
     def get_permissions(self):

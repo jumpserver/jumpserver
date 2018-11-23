@@ -1,12 +1,10 @@
 import json
 
-import ldap
 from django.db import models
 from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
 from .utils import get_signer
 

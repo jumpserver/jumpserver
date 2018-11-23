@@ -30,6 +30,9 @@ CONFIG = load_user_config()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = CONFIG.SECRET_KEY
 
+# SECURITY WARNING: keep the token secret, remove it if all coco, guacamole ok
+BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG
 
@@ -494,6 +497,7 @@ USER_GUIDE_URL = ""
 
 
 SWAGGER_SETTINGS = {
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'jumpserver.swagger.CustomSwaggerAutoSchema',
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'

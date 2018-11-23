@@ -16,7 +16,7 @@ from .backends.command.models import AbstractSessionCommand
 class Terminal(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=32, verbose_name=_('Name'))
-    remote_addr = models.CharField(max_length=128, verbose_name=_('Remote Address'))
+    remote_addr = models.CharField(max_length=128, blank=True, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
     command_storage = models.CharField(max_length=128, verbose_name=_("Command storage"), default='default')
@@ -67,6 +67,10 @@ class Terminal(models.Model):
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
         return configs
+
+    @property
+    def service_account(self):
+        return self.user
 
     def create_app_user(self):
         random = uuid.uuid4().hex[:6]
