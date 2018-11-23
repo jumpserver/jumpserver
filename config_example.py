@@ -31,6 +31,10 @@ class Config:
     # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
     SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
+    # SECURITY WARNING: keep the bootstrap token used in production secret!
+    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    BOOTSTRAP_TOKEN = 'PleaseChangeMe'
+
     # Development env open this, when error occur display the full process track, Production disable it
     # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
     # DEBUG = True
