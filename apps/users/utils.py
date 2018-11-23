@@ -202,24 +202,6 @@ def check_user_valid(**kwargs):
     return None, _('Password or SSH public key invalid')
 
 
-def refresh_token(token, user, expiration=settings.TOKEN_EXPIRATION or 3600):
-    cache.set(token, user.id, expiration)
-
-
-def generate_token(request, user):
-    expiration = settings.TOKEN_EXPIRATION or 3600
-    remote_addr = request.META.get('REMOTE_ADDR', '')
-    if not isinstance(remote_addr, bytes):
-        remote_addr = remote_addr.encode("utf-8")
-    remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-    token = cache.get('%s_%s' % (user.id, remote_addr))
-    if not token:
-        token = uuid.uuid4().hex
-        cache.set(token, user.id, expiration)
-        cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
-    return token
-
-
 def validate_ip(ip):
     try:
         ipaddress.ip_address(ip)

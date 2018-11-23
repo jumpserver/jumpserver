@@ -1,0 +1,21 @@
+1. 安装依赖包
+$ pip install requests
+
+2. 设置账号密码和地址
+$ vim bulk_create_user.py # 设置为正确的值
+admin_username = 'admin'
+admin_password = 'admin'
+domain_url = 'http://localhost:8081'
+
+3. 配置需要添加的系统用户
+$ vim system_users.txt
+# 名称 用户名 密码
+test123 testq12 test123123123
+
+3. 配置需要添加的系统用户
+$ vim system_users.txt
+# 名称 用户名 密码 协议[ssh,rdp] 自动推送[0不推送，1自动推送]
+test123 test123 test123123123 ssh 0
+
+4. 运行
+$ python bulk_create_user.py

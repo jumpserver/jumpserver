@@ -17,8 +17,8 @@ from orgs.mixins import RootOrgViewMixin
 from ..serializers import UserSerializer
 from ..tasks import write_login_log_async
 from ..models import User, LoginLog
-from ..utils import check_user_valid, generate_token, \
-    check_otp_code, increase_login_failed_count, is_block_login, \
+from ..utils import check_user_valid, check_otp_code, \
+    increase_login_failed_count, is_block_login, \
     clean_failed_count
 from ..hands import Asset, SystemUser
 
@@ -79,7 +79,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             self.write_login_log(request, data)
             # 登陆成功，清除原来的缓存计数
             clean_failed_count(username, ip)
-            token = generate_token(request, user)
+            token = user.create_bearer_token(request)
             return Response(
                 {'token': token, 'user': self.serializer_class(user).data}
             )
@@ -123,7 +123,6 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             'user_agent': user_agent,
         }
         data.update(tmp_data)
-
         write_login_log_async.delay(**data)
 
 
@@ -185,7 +184,7 @@ class UserToken(APIView):
             user = request.user
             msg = None
         if user:
-            token = generate_token(request, user)
+            token = user.create_bearer_token(request)
             return Response({'Token': token, 'Keyword': 'Bearer'}, status=200)
         else:
             return Response({'error': msg}, status=406)
@@ -223,7 +222,7 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
             'status': True
         }
         self.write_login_log(request, data)
-        token = generate_token(request, user)
+        token = user.create_bearer_token(request)
         return Response(
             {
                 'token': token,
