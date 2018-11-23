@@ -14,7 +14,7 @@ import os
 import sys
 
 import ldap
-from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+# from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
 from .conf import load_user_config
@@ -362,11 +362,11 @@ AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'
 AUTH_LDAP_SEARCH_FILTER = '(cn=%(user)s)'
 AUTH_LDAP_START_TLS = False
 AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail"}
-AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
-AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-   AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
-)
+# AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
+# AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
+# AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+#    AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
+# )
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_TIMEOUT: 5
 }
@@ -397,10 +397,10 @@ if AUTH_OPENID:
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
-    'host': CONFIG.REDIS_HOST or '127.0.0.1',
-    'port': CONFIG.REDIS_PORT or 6379,
-    'db': CONFIG.REDIS_DB_CELERY_BROKER or 3,
+    'password': CONFIG.REDIS_PASSWORD,
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+    'db': CONFIG.REDIS_DB_CELERY_BROKER,
 }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
