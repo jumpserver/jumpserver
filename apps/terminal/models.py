@@ -68,6 +68,10 @@ class Terminal(models.Model):
         })
         return configs
 
+    @property
+    def service_account(self):
+        return self.user
+
     def create_app_user(self):
         random = uuid.uuid4().hex[:6]
         user, access_key = User.create_app_user(

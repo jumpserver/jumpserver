@@ -272,6 +272,10 @@ class User(AbstractUser):
         access_key = AccessKey.objects.create(user=self)
         return access_key
 
+    @property
+    def access_key(self):
+        return self.access_keys.first()
+
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
             return True

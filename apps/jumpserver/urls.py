@@ -27,7 +27,7 @@ api_v1_patterns = [
 api_v2_patterns = [
     path('api/', include([
         path('terminal/v2/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
-        # path('users/v2/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
+        path('users/v2/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
     ]))
 ]
 

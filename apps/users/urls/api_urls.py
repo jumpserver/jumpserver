@@ -3,7 +3,7 @@
 #
 from __future__ import absolute_import
 
-from django.urls import path, include
+from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 from .. import api
 
@@ -11,7 +11,6 @@ app_name = 'users'
 
 router = BulkRouter()
 router.register(r'users', api.UserViewSet, 'user')
-router.register(r'service-account', api.ServiceAccountViewSet, 'service-account')
 router.register(r'groups', api.UserGroupViewSet, 'user-group')
 
 

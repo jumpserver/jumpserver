@@ -7,8 +7,8 @@ from drf_yasg import openapi
 
 class CustomSwaggerAutoSchema(SwaggerAutoSchema):
     def get_tags(self, operation_keys):
-        if len(operation_keys) > 4 and operation_keys[2].startswith('v'):
-            return [operation_keys[3]]
+        if len(operation_keys) > 2 and operation_keys[1].startswith('v'):
+            return [operation_keys[2]]
         return super().get_tags(operation_keys)
 
 

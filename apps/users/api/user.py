@@ -10,17 +10,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
-from rest_condition import Or
 
-from ..serializers import UserSerializer, UserPKUpdateSerializer, \
-    UserUpdateGroupSerializer, ChangeUserPasswordSerializer, \
-    ServiceAccountSerializer
-from ..models import User
-from orgs.utils import current_org
 from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, \
-    IsOrgAdminOrAppUser, WithBootstrapToken
+    IsOrgAdminOrAppUser
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
+from orgs.utils import current_org
+from ..serializers import UserSerializer, UserPKUpdateSerializer, \
+    UserUpdateGroupSerializer, ChangeUserPasswordSerializer
+from ..models import User
 
 
 logger = get_logger(__name__)
@@ -28,7 +26,6 @@ __all__ = [
     'UserViewSet', 'UserChangePasswordApi', 'UserUpdateGroupApi',
     'UserResetPasswordApi', 'UserResetPKApi', 'UserUpdatePKApi',
     'UserUnblockPKApi', 'UserProfileApi', 'UserResetOTPApi',
-    'ServiceAccountViewSet',
 ]
 
 
@@ -51,14 +48,6 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
         if self.action == "retrieve":
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
-
-
-class ServiceAccountViewSet(BulkModelViewSet):
-    serializer_class = ServiceAccountSerializer
-    permission_classes = (Or(IsOrgAdmin, WithBootstrapToken),)
-
-    def get_queryset(self):
-        return User.objects.filter(role='App')
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
