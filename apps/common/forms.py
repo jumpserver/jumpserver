@@ -190,7 +190,7 @@ class SecuritySettingForm(BaseForm):
         initial=9999, label=_("Password expiration time"),
         min_value=1,
         help_text=_(
-            "Tip: (unit/day) "
+            "Tip: (unit: day) "
             "If the user does not update the password during the time, "
             "the user password will expire failure;"
             "The password expiration reminder mail will be automatic sent to the user "

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-23 16:19+0800\n"
+"POT-Creation-Date: 2018-11-23 16:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1959,7 +1959,7 @@ msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
-"提示: (单位: 分钟) 当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录."
+"提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
 #: common/forms.py:182
 msgid "Connection max idle time"
@@ -1968,7 +1968,7 @@ msgstr "SSH最大空闲时间"
 #: common/forms.py:184
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
-msgstr "提示: (单位: 分钟) 如果超过该配置没有操作，连接会被断开(仅ssh) "
+msgstr "提示：（单位：分）如果超过该配置没有操作，连接会被断开（仅ssh）"
 
 #: common/forms.py:190
 msgid "Password expiration time"
@@ -1976,11 +1976,13 @@ msgstr "密码过期时间"
 
 #: common/forms.py:193
 msgid ""
-"Tip: (unit/day) If the user does not update the password during the time, "
+"Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
 "will be automatic sent to the user by system within 5 days (daily) before "
 "the password expires"
 msgstr ""
+"提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期提醒"
+"邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
 #: common/forms.py:202
 msgid "Password minimum length"
@@ -2076,6 +2078,7 @@ msgstr "终端设置"
 #: common/templates/common/email_setting.html:27
 #: common/templates/common/ldap_setting.html:27
 #: common/templates/common/security_setting.html:27
+#: common/templates/common/security_setting.html:42
 #: common/templates/common/terminal_setting.html:31 common/views.py:152
 msgid "Security setting"
 msgstr "安全设置"
@@ -2141,10 +2144,6 @@ msgstr "端点后缀"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
 msgid "Region"
 msgstr "地域"
-
-#: common/templates/common/security_setting.html:42
-msgid "User login settings"
-msgstr "用户登录设置"
 
 #: common/templates/common/security_setting.html:46
 msgid "Password check rule"
@@ -4568,6 +4567,9 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "User login settings"
+#~ msgstr "用户登录设置"
 
 #~ msgid "Bit"
 #~ msgstr " 位"
