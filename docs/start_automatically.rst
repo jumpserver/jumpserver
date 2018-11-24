@@ -150,7 +150,7 @@ Systemd 管理启动 Jumpserver
 
     [Service]
     Type=forking
-    Environment="PATH=/opt/py3/bin"
+    Environment="PATH=/opt/py3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
     ExecStart=/opt/jumpserver/jms start all -d
     ExecReload=
     ExecStop=/opt/jumpserver/jms stop
@@ -168,7 +168,7 @@ Systemd 管理启动 Jumpserver
 
     [Service]
     Type=forking
-    Environment="PATH=/opt/py3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin"
+    Environment="PATH=/opt/py3/bin"
     ExecStart=/opt/coco/cocod start -d
     ExecReload=
     ExecStop=/opt/coco/cocod stop
