@@ -199,7 +199,6 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ git pull
     $ source /opt/py3/bin/activate
     $ ./jms stop
 
