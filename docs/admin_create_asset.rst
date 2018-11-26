@@ -3,7 +3,7 @@
 
 说明
 ``````````
-- 到 Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+- 到 Jumpserver 会话管理-终端管理 查看 Coco Guacamole 等应用是否在线
 
 一、系统设置
 ````````````````````
