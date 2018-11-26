@@ -213,7 +213,7 @@
     $ for d in $(ls);do
         if [ -d $d ] && [ -d $d/migrations ];then
           mkdir -p $jumpserver_backup/${d}/migrations
-          mv ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
+          cp ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
         fi
       done
 
