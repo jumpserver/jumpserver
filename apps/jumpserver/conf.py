@@ -301,7 +301,7 @@ defaults = {
     'REDIS_HOST': '127.0.0.1',
     'REDIS_PORT': 6379,
     'REDIS_PASSWORD': '',
-    'REDIS_DB_CELERY_BROKER': 3,
+    'REDIS_DB_CELERY': 3,
     'REDIS_DB_CACHE': 4,
     'CAPTCHA_TEST_MODE': None,
     'TOKEN_EXPIRATION': 3600,
