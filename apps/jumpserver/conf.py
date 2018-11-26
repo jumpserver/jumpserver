@@ -301,7 +301,7 @@ defaults = {
     'REDIS_HOST': '127.0.0.1',
     'REDIS_PORT': 6379,
     'REDIS_PASSWORD': '',
-    'REDIS_DB_CELERY_BROKER': 3,
+    'REDIS_DB_CELERY': 3,
     'REDIS_DB_CACHE': 4,
     'CAPTCHA_TEST_MODE': None,
     'TOKEN_EXPIRATION': 3600,
@@ -310,6 +310,7 @@ defaults = {
     'SESSION_COOKIE_DOMAIN': None,
     'CSRF_COOKIE_DOMAIN': None,
     'SESSION_COOKIE_AGE': 3600 * 24,
+    'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
     'EMAIL_SUFFIX': 'jumpserver.org'
 }

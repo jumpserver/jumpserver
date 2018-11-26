@@ -44,6 +44,11 @@ class Config:
     # LOG_LEVEL = 'DEBUG'
     # LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
+    # Session expiration setting, Default 24 hour, Also set expired on on browser close
+    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # SESSION_COOKIE_AGE = 3600 * 24
+    # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
     # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
