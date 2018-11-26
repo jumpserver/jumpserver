@@ -213,9 +213,11 @@
     $ for d in $(ls);do
         if [ -d $d ] && [ -d $d/migrations ];then
           mkdir -p $jumpserver_backup/${d}/migrations
-          cp ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
+          mv ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
         fi
       done
+
+    $ sh utils/clean_migrations.sh
 
 .. code-block:: shell
 
@@ -263,12 +265,14 @@
 
         # Development env open this, when error occur display the full process track, Production disable it
         # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
-        # DEBUG = False
+        # DEBUG = True
+        DEBUG = False
 
         # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
         # 日志级别
-        # LOG_LEVEL = 'ERROR'
+        # LOG_LEVEL = 'DEBUG'
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
+        LOG_LEVEL = 'ERROR'
 
         # Database setting, Support sqlite3, mysql, postgres ....
         # 数据库设置
@@ -379,13 +383,14 @@
         # NAME = "localhost"
         NAME = "coco"
 
-        # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
-        # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
-        # BOOTSTRAP_TOKEN = "9JO4#n!Xup2zKZ6V"
-
         # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
         CORE_HOST = 'http://127.0.0.1:8080'
+
+        # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
+        # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
+        # BOOTSTRAP_TOKEN = "PleaseChangeMe"
+        BOOTSTRAP_TOKEN = "9JO4#n!Xup2zKZ6V"
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -408,7 +413,7 @@
 
         # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
         # LOG_LEVEL = 'INFO'
-        LOG_LEVEL = 'WARN'
+        LOG_LEVEL = 'ERROR'
 
         # 日志存放的目录
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
