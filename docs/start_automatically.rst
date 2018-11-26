@@ -147,6 +147,7 @@ Systemd 管理启动 Jumpserver
     [Unit]
     Description=jms
     After=network.target mariadb.service redis.service
+    Wants=mariadb.service redis.service
 
     [Service]
     Type=forking
@@ -165,6 +166,7 @@ Systemd 管理启动 Jumpserver
     [Unit]
     Description=coco
     After=network.target jms.service
+    Wants=jms.service
 
     [Service]
     Type=forking
@@ -183,8 +185,9 @@ Systemd 管理启动 Jumpserver
     $ sed -i '143i CATALINA_PID="$CATALINA_BASE/tomcat.pid"' /config/tomcat8/bin/catalina.sh
     $ cat << EOF > /usr/lib/systemd/system/tomcat.service
     [Unit]
-    Description=Apache Tomcat 8
+    Description=guacamole
     After=network.target jms.service
+    Wants=jms.service
 
     [Service]
     Type=forking
@@ -202,14 +205,14 @@ Systemd 管理启动 Jumpserver
     # 开机自启设置
     $ systemctl enable jms
     $ systemctl enable coco
-    $ systemctl enable tomcat
+    $ systemctl enable guacamole
 
     # 启动
     $ systemctl start jms
     $ systemctl start coco
-    $ systemctl start tomcat
+    $ systemctl start guacamole
 
     # 停止
     $ systemctl stop jms
     $ systemctl stop coco
-    $ systemctl stop tomcat
+    $ systemctl stop guacamole
