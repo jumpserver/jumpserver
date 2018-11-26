@@ -166,7 +166,6 @@ Systemd 管理启动 Jumpserver
     [Unit]
     Description=coco
     After=network.target jms.service
-    Wants=jms.service
 
     [Service]
     Type=forking
