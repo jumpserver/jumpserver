@@ -310,6 +310,7 @@ defaults = {
     'SESSION_COOKIE_DOMAIN': None,
     'CSRF_COOKIE_DOMAIN': None,
     'SESSION_COOKIE_AGE': 3600 * 24,
+    'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
     'EMAIL_SUFFIX': 'jumpserver.org'
 }
