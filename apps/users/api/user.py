@@ -39,7 +39,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org.is_real():
+        if current_org.is_real() or current_org.is_default():
             org_users = current_org.get_org_users()
             queryset = queryset.filter(id__in=org_users)
         return queryset
