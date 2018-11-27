@@ -64,6 +64,11 @@ class Setting(models.Model):
 
     @classmethod
     def save_storage(cls, name, data):
+        """
+        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
+        :param data: {}
+        :return: Setting object
+        """
         obj = cls.objects.filter(name=name).first()
         if not obj:
             obj = cls()
@@ -79,6 +84,11 @@ class Setting(models.Model):
 
     @classmethod
     def delete_storage(cls, name, storage_name):
+        """
+        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
+        :param storage_name: ""
+        :return: bool
+        """
         obj = cls.objects.filter(name=name).first()
         if not obj:
             return False

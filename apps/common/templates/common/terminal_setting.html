@@ -87,7 +87,7 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command"  {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -109,7 +109,7 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
