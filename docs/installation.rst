@@ -11,3 +11,4 @@
    setup_by_optimization
    start_automatically
    upgrade
+   migration
