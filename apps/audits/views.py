@@ -121,8 +121,16 @@ class PasswordChangeLogList(AdminUserRequiredMixin, DatetimeSearchMixin, ListVie
     user = ''
     date_from = date_to = None
 
+    @staticmethod
+    def get_org_users():
+        users = current_org.get_org_users().values_list('username', flat=True)
+        return users
+
     def get_queryset(self):
-        self.queryset = super().get_queryset()
+        users = current_org.get_org_users()
+        self.queryset = super().get_queryset().filter(
+            user__in=[user.__str__() for user in users]
+        )
         self.user = self.request.GET.get('user')
 
         filter_kwargs = dict()
