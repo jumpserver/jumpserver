@@ -58,7 +58,6 @@
         {% endif %}
     </ul>
 </li>
-{% if request.user.is_superuser %}
 <li id="ops">
     <a>
         <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
@@ -67,7 +66,6 @@
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
     </ul>
 </li>
-{% endif %}
 <li id="audits">
     <a>
         <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>

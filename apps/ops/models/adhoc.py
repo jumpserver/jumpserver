@@ -34,14 +34,14 @@ class Task(models.Model):
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
     crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
     is_periodic = models.BooleanField(default=False)
     callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
-    created_by = models.CharField(max_length=128, blank=True, null=True, default='')
+    created_by = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
     __latest_adhoc = None
 
@@ -94,7 +94,7 @@ class Task(models.Model):
              update_fields=None):
         from ..tasks import run_ansible_task
         super().save(
-            force_insert=force_insert,  force_update=force_update,
+            force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields,
         )
 
@@ -108,7 +108,7 @@ class Task(models.Model):
                 crontab = self.crontab
 
             tasks = {
-                self.name: {
+                self.__str__(): {
                     "task": run_ansible_task.name,
                     "interval": interval,
                     "crontab": crontab,
@@ -119,11 +119,11 @@ class Task(models.Model):
             }
             create_or_update_celery_periodic_tasks(tasks)
         else:
-            disable_celery_periodic_task(self.name)
+            disable_celery_periodic_task(self.__str__())
 
     def delete(self, using=None, keep_parents=False):
         super().delete(using=using, keep_parents=keep_parents)
-        delete_celery_periodic_task(self.name)
+        delete_celery_periodic_task(self.__str__())
 
     @property
     def schedule(self):
@@ -133,10 +133,11 @@ class Task(models.Model):
             return None
 
     def __str__(self):
-        return self.name
+        return self.name + '@' + str(self.created_by)
 
     class Meta:
         db_table = 'ops_task'
+        unique_together = ('name', 'created_by')
         get_latest_by = 'date_created'
 
 

@@ -10,11 +10,10 @@ def get_task_by_id(task_id):
 
 
 def update_or_create_ansible_task(
-        task_name, hosts, tasks,
+        task_name, hosts, tasks, created_by,
         interval=None, crontab=None, is_periodic=False,
         callback=None, pattern='all', options=None,
         run_as_admin=False, run_as="", become_info=None,
-        created_by=None,
     ):
     if not hosts or not tasks or not task_name:
         return
@@ -30,7 +29,7 @@ def update_or_create_ansible_task(
 
     created = False
     task, _ = Task.objects.update_or_create(
-        defaults=defaults, name=task_name,
+        defaults=defaults, name=task_name, created_by=created_by
     )
 
     adhoc = task.latest_adhoc

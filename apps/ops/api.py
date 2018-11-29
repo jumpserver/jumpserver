@@ -9,6 +9,7 @@ from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
 from common.permissions import IsOrgAdmin
+from orgs.utils import current_org
 from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
 from .serializers import TaskSerializer, AdHocSerializer, \
     AdHocRunHistorySerializer
@@ -19,8 +20,12 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsOrgAdmin,)
-    # label = None
-    # help_text = ''
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if current_org:
+            queryset = queryset.filter(created_by=current_org.id)
+        return queryset
 
 
 class TaskRun(generics.RetrieveAPIView):
