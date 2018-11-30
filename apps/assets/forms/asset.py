@@ -142,14 +142,14 @@ class AssetBulkUpdateForm(OrgModelForm):
                         if k in changed_fields}
         assets = cleaned_data.pop('assets')
         labels = cleaned_data.pop('labels', [])
-        nodes = cleaned_data.pop('nodes')
+        nodes = cleaned_data.pop('nodes', None)
         assets = Asset.objects.filter(id__in=[asset.id for asset in assets])
         assets.update(**cleaned_data)
 
         if labels:
-            for label in labels:
-                label.assets.add(*tuple(assets))
+            for asset in assets:
+                asset.labels.set(labels)
         if nodes:
-            for node in nodes:
-                node.assets.add(*tuple(assets))
+            for asset in assets:
+                asset.nodes.set(nodes)
         return assets
