@@ -42,7 +42,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
     success_result = result_raw.get('ok', {})
 
     for asset in assets:
-        hostname = asset.fullname
+        hostname = asset.hostname
         info = success_result.get(hostname, {})
         info = info.get('setup', {}).get('ansible_facts', {})
         if not info:
@@ -95,7 +95,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     if task_name is None:
         task_name = _("Update some assets hardware info")
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
-    hostname_list = []
+    hosts = []
     for asset in assets:
         if not asset.is_active:
             msg = _("Asset has been disabled, skipped: {}").format(asset)
@@ -105,13 +105,13 @@ def update_assets_hardware_info_util(assets, task_name=None):
             msg = _("Asset may not be support ansible, skipped: {}").format(asset)
             logger.info(msg)
             continue
-        hostname_list.append(asset.fullname)
-    if not hostname_list:
+        hosts.append(str(asset.id))
+    if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
     created_by = str(assets[0].org_id)
     task, created = update_or_create_ansible_task(
-        task_name, hosts=hostname_list, tasks=tasks, created_by=created_by,
+        task_name, hosts=hosts, tasks=tasks, created_by=created_by,
         pattern='all', options=const.TASK_OPTIONS, run_as_admin=True,
     )
     result = task.run()
@@ -148,7 +148,7 @@ def update_assets_hardware_info_period():
     # for org_id in orgs:
     #     org_id = str(org_id)
     #     hostname_list = [
-    #         asset.fullname for asset in Asset.objects.all()
+    #         str(asset.id) for asset in Asset.objects.all()
     #         if asset.is_active and asset.is_unixlike()
     #     ]
     #     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
@@ -194,10 +194,20 @@ def test_admin_user_connectability_util(admin_user, task_name):
     from ops.utils import update_or_create_ansible_task
 
     assets = admin_user.get_related_assets()
-    hosts = [asset.fullname for asset in assets
-             if asset.is_active and asset.is_unixlike()]
+    hosts = []
+    for asset in assets:
+        if not asset.is_active:
+            msg = _("Asset has been disabled, skipped: {}").format(asset)
+            logger.info(msg)
+            continue
+        if not asset.support_ansible():
+            msg = _("Asset may not be support ansible, skipped: {}").format(asset)
+            logger.info(msg)
+            continue
+        hosts.append(str(asset.id))
     if not hosts:
-        return
+        logger.info(_("No assets matched, stop task"))
+        return {}
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -248,7 +258,7 @@ def test_asset_connectability_util(assets, task_name=None):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(asset.fullname)
+        hosts.append(str(asset.id))
     if not hosts:
         logger.info(_("No assets, task stop"))
         return {}
@@ -313,14 +323,14 @@ def test_system_user_connectability_util(system_user, assets, task_name):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(asset.fullname)
+        hosts.append(str(asset.id))
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
-        run_as=system_user.name, created_by=system_user.org_id,
+        run_as=str(system_user.id), created_by=system_user.org_id,
     )
     result = task.run()
     set_system_user_connectablity_info(result, system_user=system_user.fullname)
@@ -423,7 +433,7 @@ def push_system_user_util(system_user, assets, task_name):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(asset.fullname)
+        hosts.append(str(asset.id))
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
@@ -445,7 +455,7 @@ def push_system_user_to_assets_manual(system_user):
 @shared_task
 def push_system_user_a_asset_manual(system_user, asset):
     task_name = _("Push system users to asset: {} => {}").format(
-        system_user.name, asset.fullname
+        system_user.name, str(asset.id)
     )
     return push_system_user_util(system_user, [asset], task_name=task_name)
 

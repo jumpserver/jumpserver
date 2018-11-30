@@ -133,3 +133,7 @@ class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
 class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
     template_name = 'ops/celery_task_log.html'
     model = CeleryTask
+
+
+class CommandExecutionView(ListView):
+    pass
