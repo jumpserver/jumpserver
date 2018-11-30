@@ -158,8 +158,9 @@ class AdHoc(models.Model):
     pattern = models.CharField(max_length=64, default='{}', verbose_name=_('Pattern'))
     _options = models.CharField(max_length=1024, default='', verbose_name=_('Options'))
     _hosts = models.TextField(blank=True, verbose_name=_('Hosts'))  # ['hostname1', 'hostname2']
+    hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
-    run_as = models.CharField(max_length=128, default='', verbose_name=_("Run as"))
+    run_as = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True)
@@ -176,14 +177,6 @@ class AdHoc(models.Model):
             raise SyntaxError('Tasks should be a list: {}'.format(item))
 
     @property
-    def hosts(self):
-        return json.loads(self._hosts)
-
-    @hosts.setter
-    def hosts(self, item):
-        self._hosts = json.dumps(item)
-
-    @property
     def inventory(self):
         if self.become:
             become_info = {
@@ -195,7 +188,7 @@ class AdHoc(models.Model):
             become_info = None
 
         inventory = JMSInventory(
-            self.hosts, run_as_admin=self.run_as_admin,
+            self.hosts.all(), run_as_admin=self.run_as_admin,
             run_as=self.run_as, become_info=become_info
         )
         return inventory

@@ -27,7 +27,6 @@ def on_app_ready(sender=None, headers=None, body=None, **kwargs):
     if cache.get("CELERY_APP_READY", 0) == 1:
         return
     cache.set("CELERY_APP_READY", 1, 10)
-    logger.debug("App ready signal recv")
     tasks = get_after_app_ready_tasks()
     logger.debug("Start need start task: [{}]".format(
         ", ".join(tasks))

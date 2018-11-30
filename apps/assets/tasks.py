@@ -4,6 +4,7 @@ import re
 import os
 
 from celery import shared_task
+from ops.celery import app as celery_app
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
@@ -105,7 +106,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
             msg = _("Asset may not be support ansible, skipped: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(str(asset.id))
+        hosts.append(asset)
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
@@ -148,7 +149,7 @@ def update_assets_hardware_info_period():
     # for org_id in orgs:
     #     org_id = str(org_id)
     #     hostname_list = [
-    #         str(asset.id) for asset in Asset.objects.all()
+    #         asset for asset in Asset.objects.all()
     #         if asset.is_active and asset.is_unixlike()
     #     ]
     #     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
@@ -204,7 +205,7 @@ def test_admin_user_connectability_util(admin_user, task_name):
             msg = _("Asset may not be support ansible, skipped: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(str(asset.id))
+        hosts.append(asset)
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
@@ -220,14 +221,10 @@ def test_admin_user_connectability_util(admin_user, task_name):
 
 @shared_task
 @register_as_period_task(interval=3600)
-@after_app_ready_start
 def test_admin_user_connectability_period():
     """
     A period task that update the ansible task period
     """
-    # if PERIOD_TASK != "on":
-    #     logger.debug("Period task disabled, test admin user connectability pass")
-    #     return
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
         task_name = _("Test admin user connectability period: {}").format(admin_user.name)
@@ -258,7 +255,7 @@ def test_asset_connectability_util(assets, task_name=None):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(str(asset.id))
+        hosts.append(asset)
     if not hosts:
         logger.info(_("No assets, task stop"))
         return {}
@@ -298,7 +295,7 @@ def set_system_user_connectablity_info(result, **kwargs):
     system_user = kwargs.get("system_user")
     if system_user is None:
         system_user = task_name.split(":")[-1]
-    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY.format(system_user)
+    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY.format(str(system_user.id))
     cache.set(cache_key, summary, CACHE_MAX_TIME)
 
 
@@ -323,17 +320,17 @@ def test_system_user_connectability_util(system_user, assets, task_name):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(str(asset.id))
+        hosts.append(asset)
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
-        run_as=str(system_user.id), created_by=system_user.org_id,
+        run_as=system_user, created_by=system_user.org_id,
     )
     result = task.run()
-    set_system_user_connectablity_info(result, system_user=system_user.fullname)
+    set_system_user_connectablity_info(result, system_user=system_user)
     return result
 
 
@@ -353,14 +350,10 @@ def test_system_user_connectability_a_asset(system_user, asset):
 
 
 @shared_task
-@register_as_period_task(interval=3600)
-@after_app_ready_start
-@after_app_shutdown_clean
 def test_system_user_connectability_period():
     if PERIOD_TASK != "on":
         logger.debug("Period task disabled, test system user connectability pass")
         return
-    set_to_root_org()
     system_users = SystemUser.objects.all()
     for system_user in system_users:
         task_name = _("Test system user connectability period: {}").format(system_user)
@@ -433,7 +426,7 @@ def push_system_user_util(system_user, assets, task_name):
             msg = _("Asset may not be support ansible, skip: {}").format(asset)
             logger.info(msg)
             continue
-        hosts.append(str(asset.id))
+        hosts.append(asset)
     if not hosts:
         logger.info(_("No assets matched, stop task"))
         return {}
@@ -455,7 +448,7 @@ def push_system_user_to_assets_manual(system_user):
 @shared_task
 def push_system_user_a_asset_manual(system_user, asset):
     task_name = _("Push system users to asset: {} => {}").format(
-        system_user.name, str(asset.id)
+        system_user.name, asset
     )
     return push_system_user_util(system_user, [asset], task_name=task_name)
 

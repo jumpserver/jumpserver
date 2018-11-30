@@ -28,6 +28,7 @@ class AdHocResultCallback(CallbackModule):
         super().__init__()
         if file_obj is not None:
             sys.stdout = TeeObj(file_obj)
+        self._display.columns = 72
 
     def gather_result(self, t, res):
         self._clean_results(res._result, res._task.action)
