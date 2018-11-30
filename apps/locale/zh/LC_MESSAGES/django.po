@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-26 18:31+0800\n"
+"POT-Creation-Date: 2018-11-30 10:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -115,7 +115,7 @@ msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:253 assets/templates/assets/admin_user_list.html:28
+#: assets/models/asset.py:260 assets/templates/assets/admin_user_list.html:28
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
@@ -713,47 +713,84 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
+#: assets/tasks.py:49
+msgid "Get asset info failed: {}"
+msgstr "获取资产信息失败：{}"
+
 #: assets/tasks.py:96
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:116
-msgid "Update asset hardware info"
-msgstr "更新资产硬件信息"
+#: assets/tasks.py:101
+msgid "Asset has been disabled, skipped: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:135
+#: assets/tasks.py:105
+msgid "Asset may not be support ansible, skipped: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
+
+#: assets/tasks.py:110 assets/tasks.py:318 assets/tasks.py:428
+msgid "No assets matched, stop task"
+msgstr "没有匹配到资产，结束任务"
+
+#: assets/tasks.py:126
+msgid "Update asset hardware info: {}"
+msgstr "更新资产硬件信息: {}"
+
+#: assets/tasks.py:147
 msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
-#: assets/tasks.py:213
+#: assets/tasks.py:223
 msgid "Test admin user connectability period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:220
+#: assets/tasks.py:229
 msgid "Test admin user connectability: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:230
+#: assets/tasks.py:239
 msgid "Test assets connectability"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:302
+#: assets/tasks.py:244 assets/tasks.py:309 assets/tasks.py:419
+msgid "Asset has been disabled, skip: {}"
+msgstr "资产被禁用，跳过：{}"
+
+#: assets/tasks.py:248 assets/tasks.py:313 assets/tasks.py:423
+msgid "Asset may not be support ansible, skip: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
+
+#: assets/tasks.py:253
+msgid "No assets, task stop"
+msgstr "没有匹配到资产，结束任务"
+
+#: assets/tasks.py:273
+msgid "Test assets connectability: {}"
+msgstr "测试资产可连接性: {}"
+
+#: assets/tasks.py:332
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:309
+#: assets/tasks.py:339
 msgid "Test system user connectability: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:326
+#: assets/tasks.py:356
 msgid "Test system user connectability period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:407 assets/tasks.py:422
+#: assets/tasks.py:410
+msgid ""
+"Push system user task skip, auto push not enable or protocol is not ssh: {}"
+msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh: {}"
+
+#: assets/tasks.py:441 assets/tasks.py:455
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:413
+#: assets/tasks.py:447
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
@@ -1740,19 +1777,19 @@ msgid "Datetime"
 msgstr "日期"
 
 #: audits/views.py:66 audits/views.py:110 audits/views.py:143
-#: templates/_nav.html:73
+#: templates/_nav.html:71
 msgid "Audits"
 msgstr "日志审计"
 
-#: audits/views.py:67 templates/_nav.html:77
+#: audits/views.py:67 templates/_nav.html:75
 msgid "FTP log"
 msgstr "FTP日志"
 
-#: audits/views.py:111 templates/_nav.html:78
+#: audits/views.py:111 templates/_nav.html:76
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/views.py:144 templates/_nav.html:79
+#: audits/views.py:144 templates/_nav.html:77
 msgid "Password change log"
 msgstr "改密日志"
 
@@ -1764,7 +1801,7 @@ msgstr "改密日志"
 msgid "Users"
 msgstr "用户管理"
 
-#: audits/views.py:188 templates/_nav.html:76
+#: audits/views.py:188 templates/_nav.html:74
 msgid "Login log"
 msgstr "登录日志"
 
@@ -2084,7 +2121,7 @@ msgid "Security setting"
 msgstr "安全设置"
 
 #: common/templates/common/command_storage_create.html:50
-#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:53
+#: ops/models/adhoc.py:160 ops/templates/ops/adhoc_detail.html:53
 #: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:38
 msgid "Hosts"
 msgstr "主机"
@@ -2185,7 +2222,7 @@ msgstr "不能包含特殊字符"
 
 #: common/views.py:18 common/views.py:44 common/views.py:70 common/views.py:99
 #: common/views.py:126 common/views.py:138 common/views.py:151
-#: templates/_nav.html:116
+#: templates/_nav.html:114
 msgid "Settings"
 msgstr "系统设置"
 
@@ -2212,7 +2249,7 @@ msgstr ""
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
 
-#: ops/api.py:81
+#: ops/api.py:86
 msgid "Waiting ..."
 msgstr ""
 
@@ -2232,69 +2269,69 @@ msgstr ""
 msgid "Callback"
 msgstr "回调"
 
-#: ops/models/adhoc.py:156 ops/templates/ops/adhoc_detail.html:114
+#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:114
 msgid "Tasks"
 msgstr "任务"
 
-#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:57
+#: ops/models/adhoc.py:158 ops/templates/ops/adhoc_detail.html:57
 #: ops/templates/ops/task_adhoc.html:60
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:158 ops/templates/ops/adhoc_detail.html:61
+#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:61
 msgid "Options"
 msgstr "选项"
 
-#: ops/models/adhoc.py:160
+#: ops/models/adhoc.py:161
 msgid "Run as admin"
 msgstr "再次执行"
 
-#: ops/models/adhoc.py:161 ops/templates/ops/adhoc_detail.html:72
+#: ops/models/adhoc.py:162 ops/templates/ops/adhoc_detail.html:72
 #: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
 msgid "Run as"
 msgstr "用户"
 
-#: ops/models/adhoc.py:162 ops/templates/ops/adhoc_detail.html:82
+#: ops/models/adhoc.py:163 ops/templates/ops/adhoc_detail.html:82
 #: ops/templates/ops/task_adhoc.html:62
 msgid "Become"
 msgstr "Become"
 
-#: ops/models/adhoc.py:163 users/templates/users/user_group_detail.html:59
+#: ops/models/adhoc.py:164 users/templates/users/user_group_detail.html:59
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:327
+#: ops/models/adhoc.py:328
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:328
+#: ops/models/adhoc.py:329
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:329 ops/templates/ops/adhoc_history.html:57
+#: ops/models/adhoc.py:330 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:41
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:330 ops/templates/ops/adhoc_detail.html:106
+#: ops/models/adhoc.py:331 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/adhoc_history_detail.html:69
 #: ops/templates/ops/task_detail.html:83 ops/templates/ops/task_history.html:61
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:331 ops/templates/ops/adhoc_history.html:56
+#: ops/models/adhoc.py:332 ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/task_history.html:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models/adhoc.py:332
+#: ops/models/adhoc.py:333
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:333
+#: ops/models/adhoc.py:334
 msgid "Adhoc result summary"
 msgstr "汇总"
 
@@ -2304,7 +2341,7 @@ msgid "Version detail"
 msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:22
-#: ops/templates/ops/adhoc_history.html:22 ops/views.py:105
+#: ops/templates/ops/adhoc_history.html:22 ops/views.py:114
 msgid "Version run history"
 msgstr "执行历史"
 
@@ -2361,7 +2398,7 @@ msgstr "失败/成功/总"
 msgid "Version"
 msgstr "版本"
 
-#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:118
+#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:127
 msgid "Run history detail"
 msgstr "执行历史详情"
 
@@ -2392,12 +2429,12 @@ msgid "Success assets"
 msgstr "成功资产"
 
 #: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:19
-#: ops/templates/ops/task_history.html:19 ops/views.py:53
+#: ops/templates/ops/task_history.html:19 ops/views.py:62
 msgid "Task detail"
 msgstr "任务详情"
 
 #: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:22
-#: ops/templates/ops/task_history.html:22 ops/views.py:66
+#: ops/templates/ops/task_history.html:22 ops/views.py:75
 msgid "Task versions"
 msgstr "任务各版本"
 
@@ -2440,16 +2477,16 @@ msgstr "执行"
 msgid "Task start: "
 msgstr "任务开始: "
 
-#: ops/views.py:36 ops/views.py:52 ops/views.py:65 ops/views.py:78
-#: ops/views.py:91 ops/views.py:104 ops/views.py:117
+#: ops/views.py:39 ops/views.py:61 ops/views.py:74 ops/views.py:87
+#: ops/views.py:100 ops/views.py:113 ops/views.py:126
 msgid "Ops"
 msgstr "作业中心"
 
-#: ops/views.py:37 templates/_nav.html:67
+#: ops/views.py:40 templates/_nav.html:66
 msgid "Task list"
 msgstr "任务列表"
 
-#: ops/views.py:79
+#: ops/views.py:88
 msgid "Task run history"
 msgstr "执行历史"
 
@@ -2733,19 +2770,19 @@ msgstr "文件管理"
 msgid "Terminal"
 msgstr "终端管理"
 
-#: templates/_nav.html:64
+#: templates/_nav.html:63
 msgid "Job Center"
 msgstr "作业中心"
 
-#: templates/_nav.html:94
+#: templates/_nav.html:92
 msgid "XPack"
 msgstr ""
 
-#: templates/_nav.html:102 xpack/plugins/cloud/views.py:26
+#: templates/_nav.html:100 xpack/plugins/cloud/views.py:26
 msgid "Account list"
 msgstr "账户列表"
 
-#: templates/_nav.html:103
+#: templates/_nav.html:101
 msgid "Sync instance"
 msgstr "同步实例"
 
