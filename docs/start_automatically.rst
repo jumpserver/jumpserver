@@ -182,7 +182,7 @@ Systemd 管理启动 Jumpserver
     # Guacamole
     $ chkconfig guacd on
     $ sed -i '143i CATALINA_PID="$CATALINA_BASE/tomcat.pid"' /config/tomcat8/bin/catalina.sh
-    $ cat << EOF > /usr/lib/systemd/system/tomcat.service
+    $ cat << EOF > /usr/lib/systemd/system/guacamole.service
     [Unit]
     Description=guacamole
     After=network.target jms.service
