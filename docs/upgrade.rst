@@ -260,7 +260,7 @@
 
         # SECURITY WARNING: keep the bootstrap token used in production secret!
         # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-        BOOTSTRAP_TOKEN = '9JO4#n!Xup2zKZ6V'
+        BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvm'
 
         # Development env open this, when error occur display the full process track, Production disable it
         # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
@@ -272,6 +272,12 @@
         # LOG_LEVEL = 'DEBUG'
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
         LOG_LEVEL = 'ERROR'
+
+        # Session expiration setting, Default 24 hour, Also set expired on on browser close
+        # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+        # SESSION_COOKIE_AGE = 3600 * 24
+        # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
         # Database setting, Support sqlite3, mysql, postgres ....
         # 数据库设置
@@ -389,7 +395,7 @@
         # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
         # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
         # BOOTSTRAP_TOKEN = "PleaseChangeMe"
-        BOOTSTRAP_TOKEN = "9JO4#n!Xup2zKZ6V"
+        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmV"
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -478,8 +484,8 @@
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
-    $ export BOOTSTRAP_TOKEN=9JO4#n!Xup2zKZ6V
-    $ echo "export BOOTSTRAP_TOKEN=9JO4#n!Xup2zKZ6V" >> ~/.bashrc
+    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
+    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
 
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
@@ -509,8 +515,8 @@
     $ docker rm jms_guacamole
     $ docker pull wojiushixiaobai/coco:1.4.5
     $ docker pull wojiushixiaobai/guacamole:1.4.5
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=9JO4#n!Xup2zKZ6V wojiushixiaobai/coco:1.4.5
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=9JO4#n!Xup2zKZ6V wojiushixiaobai/guacamole:1.4.5
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 

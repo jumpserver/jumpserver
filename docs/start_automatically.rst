@@ -169,6 +169,7 @@ Systemd 管理启动 Jumpserver
 
     [Service]
     Type=forking
+    PIDFile=/opt/coco/coco.pid
     Environment="PATH=/opt/py3/bin"
     ExecStart=/opt/coco/cocod start -d
     ExecReload=
