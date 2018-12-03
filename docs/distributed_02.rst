@@ -152,7 +152,7 @@
     server {
         listen 80;
         server_name www.jumpserver.org;  # 自行修改成你的域名
-        return https://www.jumpserver.org$request_uri;  # 自行修改成你的域名
+        return 301 https://$server_name$request_uri;
     }
 
     server {
@@ -175,7 +175,6 @@
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             access_log off;
-            # proxy_next_upstream http_500 http_502 http_503 http_504 http_404;
         }
 
         location /luna/ {
