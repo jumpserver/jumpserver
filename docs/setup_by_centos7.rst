@@ -319,5 +319,168 @@ CentOS 7 安装文档
     # sftp默认上传的位置在资产的 /tmp 目录下
     # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
 
+多组件负载说明
+
+.. code-block:: shell
+
+    # coco 服务默认运行在单核心下面, 当负载过高时会导致用户访问变慢, 这时可运行多个 docker 容器缓解
+    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
+    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
+    ...
+
+    # guacamole 也是一样
+    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
+    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
+    ...
+
+    # 注意开放防火墙, ip 请根据实际情况修改
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.4" port protocol="tcp" port="8080" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.5" port protocol="tcp" port="8080" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.6" port protocol="tcp" port="8080" accept"
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.7" port protocol="tcp" port="8080" accept"
+    ...
+
+    $firewall-cmd --reload
+
+    # nginx 代理设置
+    $ vi /etc/nginx.conf
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+    # 加入 tcp 代理
+    stream {
+        log_format  proxy  '$remote_addr [$time_local] '
+                           '$protocol $status $bytes_sent $bytes_received '
+                           '$session_time "$upstream_addr" '
+                           '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
+        access_log /var/log/nginx/tcp-access.log  proxy;
+        open_log_file_cache off;
+
+        upstream cocossh {
+            server localhost:2222 weight=1;
+            server localhost:2223 weight=1;  # 多节点
+            server localhost:2224 weight=1;  # 多节点
+            # 这里是 coco ssh 的后端ip
+            hash $remote_addr;
+        }
+        server {
+            listen 2220;  # 不能使用已经使用的端口, 自行修改, 用户ssh登录时的端口
+            proxy_pass cocossh;
+            proxy_connect_timeout 10s;
+            proxy_timeout 24h;   #代理超时
+        }
+    }
+    # 到此结束
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        # tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        # 关闭版本显示
+        server_tokens off;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+    $ firewall-cmd --zone=public --add-port=2220/tcp --permanent
+    $ firewall-cmd --reload
+
+    $ vi /etc/nginx/conf.d/jumpserver.conf
+    upstream jumpserver {
+        server localhost:80;
+        # 这里是 jumpserver 的后端ip
+    }
+
+    upstream cocows {
+        server localhost:5000 weight=1;
+        server localhost:5001 weight=1;  # 多节点
+        server localhost:5002 weight=1;  # 多节点
+        # 这里是 coco ws 的后端ip
+        ip_hash;
+    }
+
+    upstream guacamole {
+        server localhost:8081 weight=1;
+        server localhost:8082 weight=1;  # 多节点
+        server localhost:8083 weight=1;  # 多节点
+        # 这里是 guacamole 的后端ip
+        ip_hash;
+    }
+
+    server {
+        listen 80;
+        server_name demo.jumpserver.org;  # 自行修改成你的域名
+
+        client_max_body_size 100m;  # 录像上传大小限制
+
+        location / {
+            proxy_pass http://jumpserver;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location /luna/ {
+            try_files $uri / /index.html;
+            alias /opt/luna/;
+        }
+
+        location /socket.io/ {
+            proxy_pass       http://cocows/socket.io/;  # coco
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location /coco/ {
+            proxy_pass       http://cocows/coco/;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location /guacamole/ {
+            proxy_pass       http://guacamole/;  #  guacamole
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+    }
+
+    $ nginx -t
+    $ nginx -s reload
+
 后续的使用请参考 `快速入门 <admin_create_asset.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_
