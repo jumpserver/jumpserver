@@ -2,12 +2,13 @@
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, CreateView
 
 from common.mixins import DatetimeSearchMixin
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
-from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
+from .models import Task, AdHoc, AdHocRunHistory, CeleryTask, CommandExecution
+from .forms import CommandExecutionForm
 
 
 class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
@@ -135,5 +136,38 @@ class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
     model = CeleryTask
 
 
-class CommandExecutionView(ListView):
-    pass
+class CommandExecutionListView(DatetimeSearchMixin, ListView):
+    template_name = 'ops/command_execution_list.html'
+    model = CommandExecution
+    paginate_by = settings.DISPLAY_PER_PAGE
+    ordering = ('-date_created',)
+    context_object_name = 'task_list'
+    keyword = ''
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ops'),
+            'action': _('Command execution list'),
+            'date_from': self.date_from,
+            'date_to': self.date_to,
+            'keyword': self.keyword,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class CommandExecutionStartView(TemplateView):
+    template_name = 'ops/command_execution_create.html'
+    form_class = CommandExecutionForm
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ops'),
+            'action': _('Command execution'),
+            'form': self.get_form(),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+    def get_form(self):
+        return self.form_class()

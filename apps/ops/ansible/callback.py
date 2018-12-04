@@ -77,7 +77,7 @@ class CommandResultCallback(AdHocResultCallback):
     """
     Command result callback
     """
-    def __init__(self, display=None):
+    def __init__(self, display=None, **kwargs):
         # results_command: {
         #   "cmd": "",
         #   "stderr": "",

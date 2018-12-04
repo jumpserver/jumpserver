@@ -17,7 +17,7 @@ from common.utils import get_logger
 from .exceptions import AnsibleError
 
 
-__all__ = ["AdHocRunner", "PlayBookRunner"]
+__all__ = ["AdHocRunner", "PlayBookRunner", "CommandRunner"]
 C.HOST_KEY_CHECKING = False
 logger = get_logger(__name__)
 
@@ -229,11 +229,9 @@ class CommandRunner(AdHocRunner):
     results_callback_class = CommandResultCallback
     modules_choices = ('shell', 'raw', 'command', 'script')
 
-    def execute(self, cmd, pattern, module=None):
+    def execute(self, cmd, pattern, module='shell'):
         if module and module not in self.modules_choices:
             raise AnsibleError("Module should in {}".format(self.modules_choices))
-        else:
-            module = "shell"
 
         tasks = [
             {"action": {"module": module, "args": cmd}}

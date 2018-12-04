@@ -3,7 +3,8 @@
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, get_object_or_404, \
+    RetrieveUpdateAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -184,6 +185,29 @@ class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesWithAssetsApi):
+    serializer_class = serializers.UserGrantedNodeWithAssetsAsTreeSerializer
+
+    def get_queryset(self):
+        queryset = []
+        nodes = super().get_queryset()
+        for node in nodes:
+            name = '{} ({})'.format(node.value, len())
+            data = {
+                'id': node.id,
+                'name': node['name'],
+                'title': node['name'],
+                'value': node['value'],
+                'pId': node['parent'],
+                'ip': '',
+                'assets_amount': node['assets_amount'],
+                'isParent': True,
+                'open': node['key'] == '0'
+            }
+
+
 
 
 class UserGrantedNodeAssetsApi(AssetsFilterMixin, ListAPIView):

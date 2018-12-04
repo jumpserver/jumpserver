@@ -6,7 +6,7 @@ from rest_framework import serializers
 from common.fields import StringManyToManyField
 from .models import AssetPermission
 from assets.models import Node
-from assets.serializers import AssetGrantedSerializer
+from assets.serializers import AssetGrantedSerializer, AssetSystemUserSerializer
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -74,3 +74,28 @@ class AssetPermissionNodeSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_tree_parent(obj):
         return obj.parent_key
+
+
+class UserGrantedNodeWithAssetsAsTreeSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    pId = serializers.CharField(max_length=128)
+    isParent = serializers.BooleanField(default=False)
+    open = serializers.SerializerMethodField()
+    system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
+    iconSkin = serializers.CharField(max_length=128)
+
+    class Meta:
+        model = Node
+        fields = [
+            'id' 'name', 'title', 'pId', 'isParent', 'open',
+            'system_users_granted', 'iconSkin'
+        ]
+
+    @staticmethod
+    def get_title(obj):
+        if obj.is_node:
+            return obj.value
+        else:
+            return obj.ip
+
+

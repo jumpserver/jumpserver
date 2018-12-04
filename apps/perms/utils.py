@@ -49,6 +49,78 @@ class Tree:
             self.add_node(node)
 
 
+class GrantedNode:
+    def __init__(self, raw, tree):
+        self.raw = raw
+        self.tree = tree
+        self.system_users = set()
+        self.assets = set()
+
+    def add_assets(self, assets):
+        self.assets.update(set(assets))
+
+    def add_system_users(self, system_users):
+        self.system_users.update(set(system_users))
+
+    def __getattr__(self, item):
+        return getattr(self.raw, item)
+
+
+class GrantedNodeTree:
+    __all_nodes = None
+    nodes = None
+
+    def __init__(self, permissions):
+        """
+        self.nodes = {
+            "node_key": "GrantedNodeInstance"
+        }
+        """
+        self.__all_raw_nodes = {node.key: node for node in Node.objects.all()}
+        self._raw_nodes = {}  # {'node': set(system_users),}
+        self._raw_assets = {}  # {'asset': set(system_users),}
+        self.permissions = permissions
+        self.nodes = {}
+        self.add_nodes_from_permissions(permissions)
+
+    def parse_permission_resource(self, permissions):
+        for permission in permissions:
+            assets = permission.assets.all().filter(is_active=True)
+            system_users = permissions.system_users.all()
+            nodes = permissions.nodes.all()
+
+    def add_nodes_from_permissions(self, permissions):
+        pass
+
+    def add_assets_from_permissions(self, permissions):
+        pass
+
+    def find_raw_parent(self, raw):
+        parent_key = raw.parent_key()
+        return self.__all_raw_nodes.get(parent_key)
+
+    def add_raw_and_parents(self, node):
+        if node.key in self.nodes:
+            return
+        self.nodes[node.key] = GrantedNode(node, self)
+        parent = self.find_raw_parent(node)
+        if parent:
+            self.add_raw_and_parents(parent)
+
+    def add_asset(self, asset, system_users):
+        pass
+
+    def get_node_info(self, node):
+        return self.nodes.get(node.key)
+
+    def add_node(self, node, system_users):
+        if node.key not in self.nodes:
+            self.add_node_and_parents(node)
+        node_info = self.get_node_info(node)
+        system_users_info = node_info['system_users']
+        system_users_info.update(set(system_users))
+
+
 def get_user_permissions(user, include_group=True):
     if include_group:
         groups = user.groups.all()

@@ -18,4 +18,7 @@ urlpatterns = [
     path('adhoc/<uuid:pk>/history/', views.AdHocHistoryView.as_view(), name='adhoc-history'),
     path('adhoc/history/<uuid:pk>/', views.AdHocHistoryDetailView.as_view(), name='adhoc-history-detail'),
     path('celery/task/<uuid:pk>/log/', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
+
+    path('command-execution/', views.CommandExecutionListView.as_view(), name='command-execution-list'),
+    path('command-execution/start/', views.CommandExecutionStartView.as_view(), name='command-execution-start'),
 ]
