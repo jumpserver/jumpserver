@@ -1618,7 +1618,7 @@ msgstr "资产管理"
 
 #: assets/views/system_user.py:97
 msgid "System user asset"
-msgstr "系统用户集群资产"
+msgstr "系统用户资产"
 
 #: audits/models.py:17 audits/models.py:40 audits/models.py:51
 #: audits/templates/audits/ftp_log_list.html:73
