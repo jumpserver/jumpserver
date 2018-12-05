@@ -13,32 +13,19 @@
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
+    <link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
 	<style type="text/css">
-        div#rMenu {
-            position:absolute;
-            visibility:hidden;
-            text-align: left;
-            {#top: 100%;#}
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            {#float: left;#}
-            padding: 0 0;
-            margin: 2px 0 0;
-            list-style: none;
-            background-clip: padding-box;
-         }
-        .dataTables_wrapper .dataTables_processing {
-            opacity: .9;
-            border: none;
+        .xterm-rows {
+            {#padding: 15px;#}
+            font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;
+            font-size: 13px;
         }
-        div#rMenu li{
-        	margin: 1px 0;
-        	cursor: pointer;
-        	list-style: none outside none;
-         }
-        .dropdown a:hover {
-            background-color: #f1f1f1
+
+        .terminal .xterm-viewport {
+            background-color: black;
+            overflow-y: scroll;
         }
 	</style>
 
@@ -64,7 +51,7 @@
                </div>
            </div>
            <div class="mail-box-header">
-               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
+               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" id="execution-form">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
@@ -72,97 +59,28 @@
                         </div>
                     {% endif %}
                     {% bootstrap_field form.run_as layout="horizontal" %}
+                    {% bootstrap_field form.script layout="horizontal" %}
                     <div class="form-group">
                         <div class="col-sm-4 col-sm-offset-2">
-                            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                            <button id="submit_button" class="btn btn-primary" type="button">{% trans 'Execute' %}</button>
                         </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div id="term" style="height: 100%;width: 100%"></div>
                     </div>
                 </form>
            </div>
        </div>
    </div>
 </div>
-
-<div id="rMenu">
-    <ul class="dropdown-menu">
-        <li class="divider"></li>
-        <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a><i class="fa fa-plus-square-o"></i> {% trans 'Add node' %}</a></li>
-        <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a><i class="fa fa-pencil-square-o"></i> {% trans 'Rename node' %}</a></li>
-        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a><i class="fa fa-minus-square"></i> {% trans 'Delete node' %}</a></li>
-        <li class="divider"></li>
-        <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-copy"></i> {% trans 'Add assets to node' %}</a></li>
-        <li id="menu_asset_move" class="btn-move-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-cut"></i> {% trans 'Move assets to node' %}</a></li>
-        <li class="divider"></li>
-        <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
-        <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
-        <li class="divider"></li>
-        <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
-        <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
-    </ul>
-</div>
 {% endblock %}
 
 {% block custom_foot_js %}
+<script src="{% static 'js/plugins/codemirror/codemirror.js' %}"></script>
+<script src="{% static 'js/plugins/codemirror/mode/shell/shell.js' %}"></script>
 <script>
-var zTree, rMenu, asset_table, show = 0;
-
-function OnRightClick(event, treeId, treeNode) {
-    if (!treeNode && event.target.tagName.toLowerCase() !== "button" && $(event.target).parents("a").length === 0) {
-		zTree.cancelSelectedNode();
-		showRMenu("root", event.clientX, event.clientY);
-	} else if (treeNode && !treeNode.noR) {
-		zTree.selectNode(treeNode);
-		showRMenu("node", event.clientX, event.clientY);
-	}
-}
-
-function showRMenu(type, x, y) {
-	$("#rMenu ul").show();
-    x -= 220;
-    x += document.body.scrollLeft;
-    y += document.body.scrollTop+document.documentElement.scrollTop;
-    rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
-
-	$("body").bind("mousedown", onBodyMouseDown);
-}
-
-function beforeClick(treeId, treeNode, clickFlag) {
-    return true;
-}
-
-function hideRMenu() {
-	if (rMenu) rMenu.css({"visibility": "hidden"});
-	$("body").unbind("mousedown", onBodyMouseDown);
-}
-
-function onBodyMouseDown(event){
-	if (!(event.target.id === "rMenu" || $(event.target).parents("#rMenu").length>0)) {
-		rMenu.css({"visibility" : "hidden"});
-	}
-}
-
-function onSelected(event, treeNode) {
-
-}
-
-function selectQueryNode() {
-    var query_node_id = $.getUrlParam("node");
-    var cookie_node_id = getCookie('node_selected');
-    var node;
-    var node_id;
-
-    if (query_node_id !== null) {
-        node_id = query_node_id
-    } else if (cookie_node_id !== null) {
-        node_id = cookie_node_id;
-    }
-
-    node = zTree.getNodesByParam("node_id", node_id, null);
-    if (node){
-        zTree.selectNode(node[0]);
-    }
-}
+var zTree, show = 0;
 
 function initTree() {
     var setting = {
@@ -188,9 +106,6 @@ function initTree() {
             }
         },
         callback: {
-            onRightClick: OnRightClick,
-            beforeClick: beforeClick,
-            onSelected: onSelected
         }
     };
 
@@ -212,8 +127,6 @@ function initTree() {
         zTree = $.fn.zTree.getZTreeObj("assetTree");
         var root = zTree.getNodes()[0];
         zTree.expandNode(root);
-		rMenu = $("#rMenu");
-		selectQueryNode();
     });
 }
 
@@ -232,8 +145,69 @@ function toggle() {
     }
 }
 
+var term = null;
+
+function initResultTerminal() {
+    term = new Terminal({
+        cursorBlink: false,
+        screenKeys: false
+    });
+    term.open(document.getElementById('term'));
+    term.resize(80, 24);
+}
+
+var editor = null;
+
 $(document).ready(function(){
     initTree();
+    editor = CodeMirror.fromTextArea(
+        document.getElementById("id_script"),
+        {
+            lineNumbers: true,
+            matchBrackets: true,
+            styleActiveLine: true
+        });
+    editor.setSize(null, 100)
+}).on('click', '#submit_button', function () {
+    if (!term) {
+        initResultTerminal()
+    }
+    var url = '{% url "api-ops:command-execution-list" %}';
+    var run_as = $('#id_run_as').val();
+    var script = editor.getValue();
+    var hosts = ['1394eb13-6110-44ae-943b-eb26d91bcd48'];
+    var data = {
+        hosts: hosts,
+        run_as: run_as,
+        script: script
+    };
+    var int = null;
+    var id = null;
+    function getExecutionResult() {
+        var detailUrl = "{% url 'api-ops:command-execution-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", id);
+        APIUpdateAttr({
+            url: detailUrl,
+            method: 'GET',
+            flash_message: false,
+            success: function (data) {
+                console.log(data);
+                if (data.is_finished) {
+                    clearInterval(int)
+                }
+                term.write(data.result)
+            }
+        })
+    }
+    APIUpdateAttr({
+        url: url,
+        body: JSON.stringify(data),
+        method: 'POST',
+        success: function (data) {
+            term.write("Run script: " + script);
+            id = data.id;
+            int = setInterval(getExecutionResult, 500)
+        }
+    })
 })
 </script>
 

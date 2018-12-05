@@ -145,7 +145,7 @@ class AdHocRunner:
         )
 
     def get_result_callback(self, file_obj=None):
-        return self.__class__.results_callback_class(file_obj=file_obj)
+        return self.__class__.results_callback_class()
 
     @staticmethod
     def check_module_args(module_name, module_args=''):
@@ -177,17 +177,16 @@ class AdHocRunner:
             options = self.__class__.default_options
         return options
 
-    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no', file_obj=None):
+    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no'):
         """
         :param tasks: [{'action': {'module': 'shell', 'args': 'ls'}, ...}, ]
         :param pattern: all, *, or others
         :param play_name: The play name
         :param gather_facts:
-        :param file_obj: logging to file_obj
         :return:
         """
         self.check_pattern(pattern)
-        self.results_callback = self.get_result_callback(file_obj)
+        self.results_callback = self.get_result_callback()
         cleaned_tasks = self.clean_tasks(tasks)
 
         play_source = dict(

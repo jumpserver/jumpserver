@@ -2,7 +2,17 @@
 from __future__ import unicode_literals
 from rest_framework import serializers
 
-from .models import Task, AdHoc, AdHocRunHistory
+from .models import Task, AdHoc, AdHocRunHistory, CommandExecution
+
+
+class CeleryResultSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    result = serializers.JSONField()
+    state = serializers.CharField(max_length=16)
+
+
+class CeleryTaskSerializer(serializers.Serializer):
+    pass
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -51,3 +61,18 @@ class AdHocRunHistorySerializer(serializers.ModelSerializer):
         fields = super().get_field_names(declared_fields, info)
         fields.extend(['summary', 'short_id'])
         return fields
+
+
+class CommandExecutionSerializer(serializers.ModelSerializer):
+    result = serializers.JSONField(read_only=True)
+
+    class Meta:
+        model = CommandExecution
+        fields = [
+            'id', 'hosts', 'run_as', 'script', 'result',
+            'is_finished', 'date_created', 'date_finished'
+        ]
+        read_only_fields = [
+            'id', 'result', 'is_finished', 'date_created',
+            'date_finished'
+        ]

@@ -2,18 +2,20 @@
 import uuid
 import os
 
+from celery.result import AsyncResult
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
-from common.permissions import IsOrgAdmin
+from common.permissions import IsOrgAdmin, IsValidUser
 from orgs.utils import current_org
-from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
+from .models import Task, AdHoc, AdHocRunHistory, CeleryTask, CommandExecution
 from .serializers import TaskSerializer, AdHocSerializer, \
-    AdHocRunHistorySerializer
-from .tasks import run_ansible_task
+    AdHocRunHistorySerializer, CommandExecutionSerializer, \
+    CeleryResultSerializer
+from .tasks import run_ansible_task, run_command_execution
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -23,8 +25,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org:
+        if current_org.is_real():
             queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
         return queryset
 
 
@@ -96,3 +100,28 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
                 self.end = True
             return Response({"data": data, 'end': self.end, 'mark': mark})
 
+
+class CeleryResultApi(generics.RetrieveAPIView):
+    permission_classes = (IsValidUser,)
+    serializer_class = CeleryResultSerializer
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return AsyncResult(pk)
+
+
+class CommandExecutionViewSet(viewsets.ModelViewSet):
+    serializer_class = CommandExecutionSerializer
+    permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        return CommandExecution.objects.filter(
+            user_id=str(self.request.user.id)
+        )
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.user_id = self.request.user.id
+        instance.save()
+        instance.run()
+        return

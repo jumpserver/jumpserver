@@ -1,6 +1,7 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
 {% load static %}
+{% load common_tags %}
 
 {% block content_left_head %}
     <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-start" href="{% url 'ops:command-execution-start' %}"> {% trans "Start" %} </a></div>
@@ -34,25 +35,23 @@
     <th class="text-center">{% trans 'Hosts' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Output' %}</th>
+    <th class="text-center">{% trans 'Finished' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
-    <th class="text-center">{% trans 'Datetime' %}</th>
+    <th class="text-center">{% trans 'Date start' %}</th>
+    <th class="text-center">{% trans 'Date finshed' %}</th>
 {% endblock %}
 
 {% block table_body %}
     {% for object in object_list %}
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"></td>
-            <td class="text-center">{{ object.matched_hosts | length }}</td>
-            <td class="text-center">{{ object.cmd | truncatechars:16 }}</td>
+            <td class="text-center">{{ object.hosts.count }}</td>
+            <td class="text-center">{{ object.script | truncatechars:16 }}</td>
             <td class="text-center">查看</td>
-            <td class="text-center">
-                {% if object.is_success %}
-                    <i class="fa fa-check text-navy"></i>
-                {% else %}
-                    <i class="fa fa-times text-danger"></i>
-                {% endif %}
-            </td>
-            <td class="text-center">{{ object.date_created }}</td>
+            <td class="text-center">{{ object.is_finished | state_show | safe }}</td>
+            <td class="text-center">{{ object.is_success | state_show | safe }}</td>
+            <td class="text-center">{{ object.date_start }}</td>
+            <td class="text-center">{{ object.date_finished }}</td>
         </tr>
     {% endfor %}
 {% endblock %}

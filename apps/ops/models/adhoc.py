@@ -236,14 +236,13 @@ class AdHoc(models.Model):
             history.timedelta = time.time() - time_start
             history.save()
 
-    def _run_only(self, file_obj=None):
+    def _run_only(self):
         runner = AdHocRunner(self.inventory, options=self.options)
         try:
             result = runner.run(
                 self.tasks,
                 self.pattern,
                 self.task.name,
-                file_obj=file_obj,
             )
             return result.results_raw, result.results_summary
         except AnsibleError as e:

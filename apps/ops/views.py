@@ -21,8 +21,11 @@ class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org:
+        if current_org.is_real():
             queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
+
         self.keyword = self.request.GET.get('keyword', '')
         queryset = queryset.filter(
             date_created__gt=self.date_from,
