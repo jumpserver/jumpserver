@@ -134,7 +134,6 @@ def register_as_period_task(crontab=None, interval=None):
         raise SyntaxError("Must set crontab or interval one")
 
     def decorate(func):
-        print("Regist func: {}".format(func))
         if crontab is None and interval is None:
             raise SyntaxError("Interval and crontab must set one")
 

@@ -13,6 +13,10 @@ logger = get_logger(__file__)
 
 class Tree:
     def __init__(self):
+        """
+        nodes: {"node_instance": {"asset_instance": set("system_user")}
+        :param assets:
+        """
         self.__all_nodes = Node.objects.all().prefetch_related('assets')
         self.__node_asset_map = defaultdict(set)
         self.nodes = defaultdict(dict)

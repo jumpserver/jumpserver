@@ -5,6 +5,7 @@ import json
 
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.db import models
 
 from ..ansible.runner import CommandRunner
@@ -15,16 +16,16 @@ class CommandExecution(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     hosts = models.ManyToManyField('assets.Asset')
     run_as = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE)
-    script = models.TextField(verbose_name=_("Command"))
+    command = models.TextField(verbose_name=_("Command"))
     _result = models.TextField(blank=True, null=True, verbose_name=_('Result'))
-    user_id = models.CharField(max_length=128, verbose_name=_("User id"))
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, null=True)
     is_finished = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_start = models.DateTimeField(null=True)
     date_finished = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.script[:10]
+        return self.command[:10]
 
     @property
     def inventory(self):
@@ -48,14 +49,23 @@ class CommandExecution(models.Model):
         return True
 
     def run(self):
+        print('-'*10 + ' ' + ugettext('Task start') + ' ' + '-'*10)
         self.date_start = timezone.now()
-        runner = CommandRunner(self.inventory)
-        try:
-            result = runner.execute(self.script, 'all')
-            self.result = result.results_command
-        except Exception as e:
-            self.result = {"error": str(e)}
+        ok, msg = self.run_as.is_command_can_run(self.command)
+        if ok:
+            runner = CommandRunner(self.inventory)
+            try:
+                result = runner.execute(self.command, 'all')
+                self.result = result.results_command
+            except Exception as e:
+                print("Error occur: {}".format(e))
+                self.result = {"error": str(e)}
+        else:
+            msg = _("Command `{}` is forbidden ........").format(self.command)
+            print('\033[31m' + msg + '\033[0m')
+            self.result = {"error":  msg}
         self.is_finished = True
         self.date_finished = timezone.now()
         self.save()
+        print('-'*10 + ' ' + ugettext('Task end') + ' ' + '-'*10)
         return self.result

@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 from rest_framework import serializers
+from django.shortcuts import reverse
 
 from .models import Task, AdHoc, AdHocRunHistory, CommandExecution
 
@@ -65,14 +66,19 @@ class AdHocRunHistorySerializer(serializers.ModelSerializer):
 
 class CommandExecutionSerializer(serializers.ModelSerializer):
     result = serializers.JSONField(read_only=True)
+    log_url = serializers.SerializerMethodField()
 
     class Meta:
         model = CommandExecution
         fields = [
-            'id', 'hosts', 'run_as', 'script', 'result',
+            'id', 'hosts', 'run_as', 'command', 'result', 'log_url',
             'is_finished', 'date_created', 'date_finished'
         ]
         read_only_fields = [
-            'id', 'result', 'is_finished', 'date_created',
+            'id', 'result', 'is_finished', 'log_url', 'date_created',
             'date_finished'
         ]
+
+    @staticmethod
+    def get_log_url(obj):
+        return reverse('api-ops:celery-task-log', kwargs={'pk': obj.id})

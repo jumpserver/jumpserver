@@ -38,7 +38,7 @@
     <th class="text-center">{% trans 'Finished' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
-    <th class="text-center">{% trans 'Date finshed' %}</th>
+    <th class="text-center">{% trans 'Date finished' %}</th>
 {% endblock %}
 
 {% block table_body %}
@@ -46,8 +46,8 @@
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"></td>
             <td class="text-center">{{ object.hosts.count }}</td>
-            <td class="text-center">{{ object.script | truncatechars:16 }}</td>
-            <td class="text-center">查看</td>
+            <td class="text-center">{{ object.command| truncatechars:16 }}</td>
+            <td class="text-center"><a href="{% url "ops:celery-task-log" pk=object.id %}" target="_blank">查看</a></td>
             <td class="text-center">{{ object.is_finished | state_show | safe }}</td>
             <td class="text-center">{{ object.is_success | state_show | safe }}</td>
             <td class="text-center">{{ object.date_start }}</td>

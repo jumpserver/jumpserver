@@ -20,6 +20,8 @@ class CommandExecutionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        instance.user_id = self.request.user.id
+        instance.user = self.request.user
         instance.save()
-        run_command_execution.delay(instance.id)
+        run_command_execution.apply_async(
+            args=(instance.id,), task_id=str(instance.id)
+        )

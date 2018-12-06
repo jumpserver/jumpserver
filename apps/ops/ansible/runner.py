@@ -210,10 +210,6 @@ class AdHocRunner:
             stdout_callback=self.results_callback,
             passwords=self.options.passwords,
         )
-        print("Get matched hosts: {}".format(
-            self.inventory.get_matched_hosts(pattern)
-        ))
-
         try:
             tqm.run(play)
             return self.results_callback
@@ -236,6 +232,6 @@ class CommandRunner(AdHocRunner):
             {"action": {"module": module, "args": cmd}}
         ]
         hosts = self.inventory.get_hosts(pattern=pattern)
-        name = "Run command {} on {}".format(cmd, ", ".join([host.name for host in hosts]))
+        name = "Run command {} on {}'s hosts".format(cmd, len(hosts))
         return self.run(tasks, pattern, play_name=name)
 

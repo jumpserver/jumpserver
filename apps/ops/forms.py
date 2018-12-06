@@ -9,7 +9,7 @@ from .models import CommandExecution
 class CommandExecutionForm(forms.ModelForm):
     class Meta:
         model = CommandExecution
-        fields = ['run_as', 'script']
+        fields = ['run_as', 'command']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -93,11 +93,11 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
         self.gather_result("failed", result)
 
         if result._task.action in C.MODULE_NO_JSON:
-            super(CMDCallBackModule, self).v2_runner_on_failed(
+            CMDCallBackModule.v2_runner_on_failed(self,
                 result, ignore_errors=ignore_errors
             )
         else:
-            super(CMDCallBackModule, self).v2_runner_on_failed(
+            super().v2_runner_on_failed(
                 result, ignore_errors=ignore_errors
             )
 
