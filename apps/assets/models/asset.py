@@ -264,7 +264,8 @@ class Asset(OrgModelMixin):
         from random import seed, choice
         import forgery_py
         from django.db import IntegrityError
-
+        from .node import Node
+        nodes = list(Node.objects.all())
         seed()
         for i in range(count):
             ip = [str(i) for i in random.sample(range(255), 4)]
@@ -275,6 +276,11 @@ class Asset(OrgModelMixin):
                         created_by='Fake')
             try:
                 asset.save()
+                if nodes and len(nodes) > 3:
+                    _nodes = random.sample(nodes, 3)
+                else:
+                    _nodes = [Node.default_node()]
+                asset.nodes.set(_nodes)
                 asset.system_users = [choice(SystemUser.objects.all()) for i in range(3)]
                 logger.debug('Generate fake asset : %s' % asset.ip)
             except IntegrityError:

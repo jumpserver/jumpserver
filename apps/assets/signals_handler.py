@@ -58,7 +58,7 @@ def on_system_user_nodes_change(sender, instance=None, **kwargs):
 def on_system_user_assets_change(sender, instance=None, **kwargs):
     if instance and kwargs["action"] == "post_add":
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        push_system_user_to_assets(instance, assets)
+        push_system_user_to_assets.delay(instance, assets)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

@@ -65,6 +65,8 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
 
 @receiver(pre_save, dispatch_uid="my_unique_identifier")
 def on_create_set_created_by(sender, instance=None, **kwargs):
+    if getattr(instance, '_ignore_auto_created_by', False) is True:
+        return
     if hasattr(instance, 'created_by') and not instance.created_by:
         if current_request and current_request.user.is_authenticated:
             instance.created_by = current_request.user.name

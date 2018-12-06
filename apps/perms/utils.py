@@ -11,118 +11,47 @@ from .hands import Node
 logger = get_logger(__file__)
 
 
-class Tree:
+class GenerateTree:
     def __init__(self):
         """
-        nodes: {"node_instance": {"asset_instance": set("system_user")}
-        :param assets:
+        nodes: {"node_instance": {
+            "asset_instance": set("system_user")
+        }
         """
-        self.__all_nodes = Node.objects.all().prefetch_related('assets')
+        self.__all_nodes = Node.objects.all()
         self.__node_asset_map = defaultdict(set)
         self.nodes = defaultdict(dict)
-        self.root = Node.root()
-        self.init_node_asset_map()
-
-    def init_node_asset_map(self):
-        for node in self.__all_nodes:
-            assets = [a.id for a in node.assets.all()]
-            for asset in assets:
-                self.__node_asset_map[str(asset)].add(node)
 
     def add_asset(self, asset, system_users):
-        nodes = self.__node_asset_map.get(str(asset.id), [])
+        nodes = asset.nodes.all()
         self.add_nodes(nodes)
         for node in nodes:
             self.nodes[node][asset].update(system_users)
+
+    def get_nodes(self):
+        for node in self.nodes:
+            assets = set(self.nodes.get(node).keys())
+            for n in self.nodes.keys():
+                if n.key.startswith(node.key + ':'):
+                    assets.update(set(self.nodes[n].keys()))
+            node.assets_amount = len(assets)
+        return self.nodes
 
     def add_node(self, node):
         if node in self.nodes:
             return
         else:
             self.nodes[node] = defaultdict(set)
-        if node.key == self.root.key:
+        if node.is_root():
             return
-        parent_key = ':'.join(node.key.split(':')[:-1])
         for n in self.__all_nodes:
-            if n.key == parent_key:
+            if n.key == node.parent_key:
                 self.add_node(n)
                 break
 
     def add_nodes(self, nodes):
         for node in nodes:
             self.add_node(node)
-
-
-class GrantedNode:
-    def __init__(self, raw, tree):
-        self.raw = raw
-        self.tree = tree
-        self.system_users = set()
-        self.assets = set()
-
-    def add_assets(self, assets):
-        self.assets.update(set(assets))
-
-    def add_system_users(self, system_users):
-        self.system_users.update(set(system_users))
-
-    def __getattr__(self, item):
-        return getattr(self.raw, item)
-
-
-class GrantedNodeTree:
-    __all_nodes = None
-    nodes = None
-
-    def __init__(self, permissions):
-        """
-        self.nodes = {
-            "node_key": "GrantedNodeInstance"
-        }
-        """
-        self.__all_raw_nodes = {node.key: node for node in Node.objects.all()}
-        self._raw_nodes = {}  # {'node': set(system_users),}
-        self._raw_assets = {}  # {'asset': set(system_users),}
-        self.permissions = permissions
-        self.nodes = {}
-        self.add_nodes_from_permissions(permissions)
-
-    def parse_permission_resource(self, permissions):
-        for permission in permissions:
-            assets = permission.assets.all().filter(is_active=True)
-            system_users = permissions.system_users.all()
-            nodes = permissions.nodes.all()
-
-    def add_nodes_from_permissions(self, permissions):
-        pass
-
-    def add_assets_from_permissions(self, permissions):
-        pass
-
-    def find_raw_parent(self, raw):
-        parent_key = raw.parent_key()
-        return self.__all_raw_nodes.get(parent_key)
-
-    def add_raw_and_parents(self, node):
-        if node.key in self.nodes:
-            return
-        self.nodes[node.key] = GrantedNode(node, self)
-        parent = self.find_raw_parent(node)
-        if parent:
-            self.add_raw_and_parents(parent)
-
-    def add_asset(self, asset, system_users):
-        pass
-
-    def get_node_info(self, node):
-        return self.nodes.get(node.key)
-
-    def add_node(self, node, system_users):
-        if node.key not in self.nodes:
-            self.add_node_and_parents(node)
-        node_info = self.get_node_info(node)
-        system_users_info = node_info['system_users']
-        system_users_info.update(set(system_users))
 
 
 def get_user_permissions(user, include_group=True):
@@ -226,10 +155,10 @@ class AssetPermissionUtil:
         :return:
         """
         assets = self.get_assets()
-        tree = Tree()
+        tree = GenerateTree()
         for asset, system_users in assets.items():
             tree.add_asset(asset, system_users)
-        return tree.nodes
+        return tree.get_nodes()
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):

@@ -44,6 +44,7 @@ class Task(models.Model):
     created_by = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
     __latest_adhoc = None
+    _ignore_auto_created_by = True
 
     @property
     def short_id(self):
