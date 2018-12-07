@@ -189,7 +189,7 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Users'),
+            'app': _('Audits'),
             'action': _('Login log'),
             'date_from': self.date_from,
             'date_to': self.date_to,
@@ -220,7 +220,7 @@ class CommandExecutionListView(UserCommandExecutionListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Audit'),
+            'app': _('Audits'),
             'action': _('Command execution list'),
             'date_from': self.date_from,
             'date_to': self.date_to,
