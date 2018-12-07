@@ -52,7 +52,7 @@
 
 .. code-block:: shell
 
-    # 升级前请做好 jumpserver 与 数据库 备份,谨防意外,具体的备份命令可以参考离线升级
+    # 升级前请做好 jumpserver 目录与 数据库 备份,谨防意外
     $ cd /opt/jumpserver
     $ source /opt/py3/bin/activate
     $ git pull
