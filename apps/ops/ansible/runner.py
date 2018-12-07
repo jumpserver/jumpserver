@@ -45,7 +45,7 @@ def get_default_options():
         listtasks=False,
         listhosts=False,
         syntax=False,
-        timeout=60,
+        timeout=30,
         connection='ssh',
         module_path='',
         forks=10,

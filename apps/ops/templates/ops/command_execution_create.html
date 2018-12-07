@@ -6,6 +6,7 @@
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.exhide.min.js' %}"></script>
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
@@ -13,12 +14,12 @@
     <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 	<style type="text/css">
-       .xterm .xterm-screen canvas {
-           position: absolute;
-           left: 0;
-           top: 0;
-           padding: 10px;
-       }
+        .xterm .xterm-screen canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 10px;
+        }
         .select2-container .select2-selection--single {
             height: 34px;
         }
@@ -51,8 +52,12 @@
                    </div>
                    <div class="row">
                        <div class="col-lg-2">
-                       <select class="select2 form-control">
-                           <option value="1">web</option>
+                       <select class="select2 form-control" id="system-users-select">
+                           {% for s in system_users %}
+                               {% if s.protocol == 'ssh' and s.login_mode == 'auto' %}
+                                   <option value="{{ s.id }}">{{ s }}</option>
+                               {% endif %}
+                           {% endfor %}
                        </select>
                    </div>
                    <div class="col-lg-10">
@@ -74,7 +79,7 @@
 {% block custom_foot_js %}
 <script>
 var zTree, show = 0;
-
+var systemUserId = null;
 
 function initTree() {
     var setting = {
@@ -103,34 +108,38 @@ function initTree() {
             onCheck: onCheck
         }
     };
+    var url = "{% url 'api-perms:my-nodes-assets-as-tree' %}";
+    if (systemUserId) {
+        url += '?system_user=' + systemUserId
+    }
 
-    var zNodes = [];
-    $.get("{% url 'api-assets:node-list' %}", function(data, status){
-        $.each(data, function (index, value) {
-            value["node_id"] = value["id"];
-            value["id"] = value["tree_id"];
-            if (value["tree_id"] !== value["tree_parent"]){
-                value["pId"] = value["tree_parent"];
-            } else {
-                value["isParent"] = true;
-            }
-            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
-            value['value'] = value['value'];
-        });
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+    $.get(url, function(data, status){
+        $.fn.zTree.init($("#assetTree"), setting, data);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
-        var root = zTree.getNodes()[0];
-        zTree.expandNode(root);
     });
 }
 
-function onCheck(e, treeId, treeNode) {
-	var nodes = zTree.getCheckedNodes(true);
-	var message = "已选择资产: ";
-	var nodes_names = nodes.map(function (node) {
-        return node.name
+function getSelectedAssetsNode() {
+    var nodes = zTree.getCheckedNodes(true);
+    var assetsNodeId = [];
+	var assetsNode = [];
+	nodes.forEach(function (node) {
+	    if (node.meta.type === 'asset' && !node.isHidden && node.meta.asset.protocol === 'ssh') {
+	        if (assetsNodeId.indexOf(node.id) === -1) {
+	            assetsNodeId.push(node.id);
+                assetsNode.push(node)
+            }
+        }
     });
+	return assetsNode;
+}
+
+function onCheck(e, treeId, treeNode) {
+    var nodes = getSelectedAssetsNode();
+    var nodes_names = nodes.map(function (node) {
+        return node.name;
+    });
+    var message = "已选择资产: ";
 	message += nodes_names.join(", ");
 	message += "\r\n";
 	message += "总共: " + nodes_names.length + "个\r\n";
@@ -172,17 +181,24 @@ function initResultTerminal() {
 }
 
 $(document).ready(function(){
+    systemUserId = $('#system-users-select').val();
+    $(".select2").select2().on('select2:select', function(evt) {
+         var data = evt.params.data;
+         systemUserId = data.id;
+         initTree();
+    });
     initTree();
     initResultTerminal();
-    $(".select2").select2();
 }).on('click', '.btn-execute', function () {
     if (!term) {
         initResultTerminal()
     }
     var url = '{% url "api-ops:command-execution-list" %}';
-    var run_as = 'f78cfcb2-d473-43b6-a72a-8cc18979aabd';
+    var run_as = systemUserId;
     var command = $("#command-text").val();
-    var hosts = ['1394eb13-6110-44ae-943b-eb26d91bcd48'];
+    var hosts = getSelectedAssetsNode().map(function (node) {
+        return node.id;
+    });
     var data = {
         hosts: hosts,
         run_as: run_as,
@@ -224,9 +240,9 @@ $(document).ready(function(){
         body: JSON.stringify(data),
         method: 'POST',
         flash_message: false,
-        success: function (data) {
-            term.write("{% trans 'Pending' %}" + ".....\r\n");
-            log_url = data.log_url;
+        success: function (resp) {
+            term.write("{% trans 'Pending' %}" + "...\r\n");
+            log_url = resp.log_url;
             int = setInterval(function () {
                 writeExecutionOutput()
             }, interval);

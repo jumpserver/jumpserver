@@ -18,7 +18,7 @@ __all__ = ['CeleryTaskLogApi', 'CeleryResultApi']
 
 
 class CeleryTaskLogApi(generics.RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsValidUser,)
     buff_size = 1024 * 10
     end = False
     queryset = CeleryTask.objects.all()

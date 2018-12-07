@@ -8,6 +8,7 @@ from common.permissions import AdminUserRequiredMixin
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
+from users.models import User
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 
@@ -198,8 +199,21 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
 
 class CommandExecutionListView(UserCommandExecutionListView):
+    user_id = None
+
     def get_queryset(self):
-        return self.model.objects.all()
+        queryset = self._get_queryset()
+        self.user_id = self.request.GET.get('user')
+        org_users = self.get_user_list()
+        if self.user_id:
+            queryset = queryset.filter(user=self.user_id)
+        else:
+            queryset = queryset.filter(user__in=org_users)
+        return queryset
+
+    def get_user_list(self):
+        users = current_org.get_org_users()
+        return users
 
     def get_context_data(self, **kwargs):
         context = {
@@ -207,7 +221,9 @@ class CommandExecutionListView(UserCommandExecutionListView):
             'action': _('Command execution list'),
             'date_from': self.date_from,
             'date_to': self.date_to,
+            'user_list': self.get_user_list(),
             'keyword': self.keyword,
+            'user_id': self.user_id,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -5,8 +5,15 @@ from rest_framework import serializers
 
 from common.fields import StringManyToManyField
 from .models import AssetPermission
-from assets.models import Node
-from assets.serializers import AssetGrantedSerializer, AssetSystemUserSerializer
+from assets.models import Node, Asset, SystemUser
+from assets.serializers import AssetGrantedSerializer
+
+__all__ = [
+    'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
+    'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
+    'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
+    'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
+]
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -76,26 +83,27 @@ class AssetPermissionNodeSerializer(serializers.ModelSerializer):
         return obj.parent_key
 
 
-class UserGrantedNodeWithAssetsAsTreeSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
-    pId = serializers.CharField(max_length=128)
-    isParent = serializers.BooleanField(default=False)
-    open = serializers.SerializerMethodField()
-    system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
-    iconSkin = serializers.CharField(max_length=128)
-
+class GrantedNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
-            'id' 'name', 'title', 'pId', 'isParent', 'open',
-            'system_users_granted', 'iconSkin'
+            'id', 'name', 'key', 'value',
         ]
 
-    @staticmethod
-    def get_title(obj):
-        if obj.is_node:
-            return obj.value
-        else:
-            return obj.ip
+
+class GrantedAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'hostname', 'ip', 'port', 'protocol', 'platform',
+            'domain', 'is_active', 'comment'
+        ]
 
 
+class GrantedSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = [
+            'id', 'name', 'username', 'protocol', 'priority',
+            'login_mode', 'comment'
+        ]

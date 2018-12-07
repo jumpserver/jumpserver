@@ -112,6 +112,9 @@ class AssetPermissionUtil:
         self._permissions = permissions
         return permissions
 
+    def filter_permission_with_system_user(self, system_user):
+        self._permissions = self.permissions.filter(system_users=system_user)
+
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
@@ -159,6 +162,13 @@ class AssetPermissionUtil:
         for asset, system_users in assets.items():
             tree.add_asset(asset, system_users)
         return tree.get_nodes()
+
+    def get_system_users(self):
+        system_users = set()
+        permissions = self.permissions.prefetch_related('system_users')
+        for perm in permissions:
+            system_users.update(perm.system_users.all())
+        return system_users
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):

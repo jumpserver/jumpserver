@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
+from rest_framework import serializers
+
 
 class TreeNode:
     id = ""
@@ -43,12 +45,16 @@ class TreeNode:
     __repr__ = __str__
 
     def __gt__(self, other):
+        if self.isParent and not other.isParent:
+            return False
         return self.id > other.id
 
     def __eq__(self, other):
         return self.id == other.id
 
     def __lt__(self, other):
+        if self.isParent and not other.isParent:
+            return True
         return self.id < other.id
 
 
@@ -76,3 +82,14 @@ class Tree:
 
     def get_node(self, tid):
         return self.nodes.get(tid) or TreeNode.root()
+
+
+class TreeNodeSerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=128)
+    name = serializers.CharField(max_length=128)
+    title = serializers.CharField(max_length=128)
+    pId = serializers.CharField(max_length=128)
+    isParent = serializers.BooleanField(default=False)
+    open = serializers.BooleanField(default=False)
+    iconSkin = serializers.CharField(max_length=128, allow_blank=True)
+    meta = serializers.JSONField()

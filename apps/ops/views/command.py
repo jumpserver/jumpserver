@@ -55,16 +55,19 @@ class CommandExecutionStartView(TemplateView):
     form_class = CommandExecutionForm
 
     def get_user_system_users(self):
-        from assets.models import SystemUser
+        from perms.utils import AssetPermissionUtil
         user = self.request.user
-        return SystemUser.objects.all()
+        util = AssetPermissionUtil(user)
+        system_users = [s for s in util.get_system_users() if s.protocol == 'ssh']
+        return system_users
 
     def get_context_data(self, **kwargs):
+        system_users = self.get_user_system_users()
         context = {
             'app': _('Ops'),
             'action': _('Command execution'),
             'form': self.get_form(),
-            'system_users': self.get_user_system_users()
+            'system_users': system_users
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
