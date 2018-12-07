@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-07 17:47+0800\n"
+"POT-Creation-Date: 2018-12-07 17:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1659,7 +1659,7 @@ msgstr "资产管理"
 
 #: assets/views/system_user.py:97
 msgid "System user asset"
-msgstr "系统用户集群资产"
+msgstr "系统用户资产"
 
 #: audits/models.py:17 audits/models.py:40 audits/models.py:51
 #: audits/templates/audits/ftp_log_list.html:73
@@ -4520,7 +4520,7 @@ msgstr ""
 
 #: xpack/plugins/cloud/providers/qcloud.py:14
 msgid "Qcloud"
-msgstr ""
+msgstr "腾讯云"
 
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:22
 #: xpack/plugins/cloud/views.py:72

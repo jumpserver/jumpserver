@@ -535,7 +535,7 @@ jumpserver.initServerSideDataTable = function (options) {
         if (type === 'row') {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
-                if (row.id){
+                if (row.id && $.inArray(row.id, table.selected) === -1){
                     table.selected.push(row.id)
                 }
             })
