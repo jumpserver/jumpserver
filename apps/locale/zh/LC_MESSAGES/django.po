@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-07 17:49+0800\n"
+"POT-Creation-Date: 2018-12-07 18:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -4473,50 +4473,6 @@ msgstr "AWS (中国)"
 #: xpack/plugins/cloud/providers/aws.py:12
 msgid "AWS (International)"
 msgstr "AWS (国际)"
-
-#: xpack/plugins/cloud/providers/base.py:76
-msgid "任务执行开始: {}\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:79
-msgid "检测账户有效性: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:82
-msgid "账户无效!\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:86
-msgid "账户有效!\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:90
-msgid ""
-"\n"
-"任务执行结束!\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:91
-msgid ""
-"查看任务详细信息路径: XPack -> 云管中心 -> 任务列表 -> 任务详情(点击任务名"
-"称) -> 查看同步历史列表/实例列表\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:126
-msgid "同步实例列表: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:135
-msgid "同步地域列表: {}\n"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:138
-msgid "地域: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:148
-msgid "实例: {}, 地域: {}"
-msgstr ""
 
 #: xpack/plugins/cloud/providers/qcloud.py:14
 msgid "Qcloud"
