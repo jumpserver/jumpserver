@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-26 18:31+0800\n"
+"POT-Creation-Date: 2018-12-07 18:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -44,7 +44,7 @@ msgstr "节点管理"
 #: assets/forms/asset.py:116 assets/models/asset.py:88
 #: assets/models/cluster.py:19 assets/models/user.py:73
 #: assets/templates/assets/asset_detail.html:77 templates/_nav.html:24
-#: xpack/plugins/cloud/models.py:137
+#: xpack/plugins/cloud/models.py:123
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:67
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
 msgid "Admin user"
@@ -63,7 +63,7 @@ msgstr "标签"
 
 #: assets/forms/asset.py:37 assets/forms/asset.py:76 assets/models/asset.py:79
 #: assets/models/domain.py:24 assets/models/domain.py:50
-#: assets/templates/assets/user_asset_list.html:168
+#: assets/templates/assets/user_asset_list.html:157
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
 msgstr "网域"
@@ -75,7 +75,7 @@ msgstr "网域"
 #: perms/forms.py:44 perms/models.py:79
 #: perms/templates/perms/asset_permission_list.html:57
 #: perms/templates/perms/asset_permission_list.html:151
-#: xpack/plugins/cloud/models.py:136
+#: xpack/plugins/cloud/models.py:122
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:63
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:66
 msgid "Node"
@@ -109,13 +109,13 @@ msgstr "选择资产"
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/domain_gateway_list.html:58
 #: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/user_asset_list.html:163
+#: assets/templates/assets/user_asset_list.html:152
 #: common/templates/common/replay_storage_create.html:60
 msgid "Port"
 msgstr "端口"
 
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:253 assets/templates/assets/admin_user_list.html:28
+#: assets/models/asset.py:260 assets/templates/assets/admin_user_list.html:28
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
@@ -131,7 +131,7 @@ msgstr "端口"
 #: terminal/templates/terminal/command_list.html:73
 #: terminal/templates/terminal/session_list.html:41
 #: terminal/templates/terminal/session_list.html:72
-#: xpack/plugins/cloud/models.py:207
+#: xpack/plugins/cloud/models.py:186
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
 #: xpack/plugins/orgs/templates/orgs/org_list.html:16
 msgid "Asset"
@@ -143,7 +143,7 @@ msgstr "不能包含特殊字符"
 
 #: assets/forms/domain.py:59 assets/forms/user.py:80 assets/forms/user.py:143
 #: assets/models/base.py:22 assets/models/cluster.py:18
-#: assets/models/cmd_filter.py:19 assets/models/domain.py:18
+#: assets/models/cmd_filter.py:20 assets/models/domain.py:18
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/templates/assets/admin_user_detail.html:56
 #: assets/templates/assets/admin_user_list.html:26
@@ -159,7 +159,7 @@ msgstr "不能包含特殊字符"
 #: common/templates/common/replay_storage_create.html:44
 #: common/templates/common/terminal_setting.html:80
 #: common/templates/common/terminal_setting.html:102 ops/models/adhoc.py:37
-#: ops/templates/ops/task_detail.html:59 ops/templates/ops/task_list.html:35
+#: ops/templates/ops/task_detail.html:60 ops/templates/ops/task_list.html:35
 #: orgs/models.py:12 perms/models.py:28
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:53
@@ -173,7 +173,7 @@ msgstr "不能包含特殊字符"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
-#: xpack/plugins/cloud/models.py:40 xpack/plugins/cloud/models.py:132
+#: xpack/plugins/cloud/models.py:48 xpack/plugins/cloud/models.py:118
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:52
 #: xpack/plugins/cloud/templates/cloud/account_list.html:12
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:55
@@ -264,7 +264,7 @@ msgstr "如果选择手动登录模式，用户名和密码可以不填写"
 #: assets/templates/assets/domain_gateway_list.html:57
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/user_asset_list.html:46
-#: assets/templates/assets/user_asset_list.html:162
+#: assets/templates/assets/user_asset_list.html:151
 #: audits/templates/audits/login_log_list.html:52 common/forms.py:135
 #: perms/templates/perms/asset_permission_asset.html:55
 #: users/templates/users/user_granted_asset.html:45
@@ -278,7 +278,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:92
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:45
-#: assets/templates/assets/user_asset_list.html:161 common/forms.py:134
+#: assets/templates/assets/user_asset_list.html:150 common/forms.py:134
 #: perms/templates/perms/asset_permission_asset.html:54
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
@@ -290,20 +290,20 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:59
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:31
-#: assets/templates/assets/user_asset_list.html:164
+#: assets/templates/assets/user_asset_list.html:153
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
 
 #: assets/models/asset.py:77 assets/templates/assets/asset_detail.html:101
-#: assets/templates/assets/user_asset_list.html:165
+#: assets/templates/assets/user_asset_list.html:154
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:84 assets/models/cmd_filter.py:20
+#: assets/models/asset.py:84 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:52 assets/models/label.py:21
 #: assets/templates/assets/asset_detail.html:109
-#: assets/templates/assets/user_asset_list.html:169
+#: assets/templates/assets/user_asset_list.html:158
 msgid "Is active"
 msgstr "激活"
 
@@ -356,7 +356,7 @@ msgid "Disk info"
 msgstr "硬盘信息"
 
 #: assets/models/asset.py:115 assets/templates/assets/asset_detail.html:105
-#: assets/templates/assets/user_asset_list.html:166
+#: assets/templates/assets/user_asset_list.html:155
 msgid "OS"
 msgstr "操作系统"
 
@@ -379,8 +379,8 @@ msgid "Labels"
 msgstr "标签管理"
 
 #: assets/models/asset.py:127 assets/models/base.py:30
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:24
-#: assets/models/cmd_filter.py:54 assets/models/group.py:21
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:25
+#: assets/models/cmd_filter.py:55 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:121
 #: assets/templates/assets/cmd_filter_detail.html:77
@@ -389,7 +389,7 @@ msgstr "标签管理"
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:37
 #: perms/models.py:84 perms/templates/perms/asset_permission_detail.html:98
 #: users/models/user.py:94 users/templates/users/user_detail.html:111
-#: xpack/plugins/cloud/models.py:46 xpack/plugins/cloud/models.py:140
+#: xpack/plugins/cloud/models.py:54 xpack/plugins/cloud/models.py:126
 msgid "Created by"
 msgstr "创建者"
 
@@ -399,12 +399,12 @@ msgstr "创建者"
 #: assets/templates/assets/cmd_filter_detail.html:69
 #: assets/templates/assets/domain_detail.html:68
 #: assets/templates/assets/system_user_detail.html:96
-#: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:63
+#: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:64
 #: orgs/models.py:16 perms/models.py:38 perms/models.py:85
 #: perms/templates/perms/asset_permission_detail.html:94
 #: terminal/templates/terminal/terminal_detail.html:59 users/models/group.py:17
 #: users/templates/users/user_group_detail.html:63
-#: xpack/plugins/cloud/models.py:47 xpack/plugins/cloud/models.py:141
+#: xpack/plugins/cloud/models.py:55 xpack/plugins/cloud/models.py:127
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:68
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:79
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:60
@@ -412,8 +412,8 @@ msgid "Date created"
 msgstr "创建日期"
 
 #: assets/models/asset.py:132 assets/models/base.py:27
-#: assets/models/cluster.py:29 assets/models/cmd_filter.py:21
-#: assets/models/cmd_filter.py:51 assets/models/domain.py:19
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:22
+#: assets/models/cmd_filter.py:52 assets/models/domain.py:19
 #: assets/models/domain.py:51 assets/models/group.py:23
 #: assets/models/label.py:22 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:32
@@ -426,7 +426,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:37
-#: assets/templates/assets/user_asset_list.html:170 common/models.py:34
+#: assets/templates/assets/user_asset_list.html:159 common/models.py:34
 #: ops/models/adhoc.py:43 orgs/models.py:17 perms/models.py:39
 #: perms/models.py:86 perms/templates/perms/asset_permission_detail.html:102
 #: terminal/models.py:28 terminal/templates/terminal/terminal_detail.html:63
@@ -434,8 +434,8 @@ msgstr "创建日期"
 #: users/templates/users/user_detail.html:127
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
-#: users/templates/users/user_profile.html:134 xpack/plugins/cloud/models.py:45
-#: xpack/plugins/cloud/models.py:138
+#: users/templates/users/user_profile.html:134 xpack/plugins/cloud/models.py:53
+#: xpack/plugins/cloud/models.py:124
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:72
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:71
@@ -511,11 +511,12 @@ msgstr "北京电信"
 msgid "BGP full netcom"
 msgstr "BGP全网通"
 
-#: assets/models/cmd_filter.py:34
+#: assets/models/cmd_filter.py:35
 msgid "Regex"
 msgstr "正则表达式"
 
-#: assets/models/cmd_filter.py:35 terminal/models.py:144
+#: assets/models/cmd_filter.py:36 ops/models/command.py:19
+#: ops/templates/ops/command_execution_list.html:46 terminal/models.py:144
 #: terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
 #: terminal/templates/terminal/session_detail.html:48
@@ -523,19 +524,19 @@ msgstr "正则表达式"
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:40
+#: assets/models/cmd_filter.py:41
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:41
+#: assets/models/cmd_filter.py:42
 msgid "Allow"
 msgstr "允许"
 
-#: assets/models/cmd_filter.py:45
+#: assets/models/cmd_filter.py:46
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:46
+#: assets/models/cmd_filter.py:47
 #: assets/templates/assets/cmd_filter_rule_list.html:58
 #: audits/templates/audits/login_log_list.html:50
 #: common/templates/common/command_storage_create.html:31
@@ -545,25 +546,25 @@ msgstr "过滤器"
 msgid "Type"
 msgstr "类型"
 
-#: assets/models/cmd_filter.py:47 assets/models/user.py:115
+#: assets/models/cmd_filter.py:48 assets/models/user.py:115
 #: assets/templates/assets/cmd_filter_rule_list.html:60
 msgid "Priority"
 msgstr "优先级"
 
-#: assets/models/cmd_filter.py:47
+#: assets/models/cmd_filter.py:48
 msgid "1-100, the higher will be match first"
 msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
-#: assets/models/cmd_filter.py:49
+#: assets/models/cmd_filter.py:50
 #: assets/templates/assets/cmd_filter_rule_list.html:59
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:49
+#: assets/models/cmd_filter.py:50
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:50
+#: assets/models/cmd_filter.py:51
 #: assets/templates/assets/admin_user_list.html:33
 #: assets/templates/assets/asset_list.html:97
 #: assets/templates/assets/cmd_filter_list.html:28
@@ -611,7 +612,9 @@ msgstr "默认资产组"
 #: audits/templates/audits/operate_log_list.html:33
 #: audits/templates/audits/operate_log_list.html:66
 #: audits/templates/audits/password_change_log_list.html:33
-#: audits/templates/audits/password_change_log_list.html:50 perms/forms.py:28
+#: audits/templates/audits/password_change_log_list.html:50
+#: ops/templates/ops/command_execution_list.html:22
+#: ops/templates/ops/command_execution_list.html:45 perms/forms.py:28
 #: perms/models.py:29
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/asset_permission_list.html:54
@@ -692,7 +695,7 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:191 assets/templates/assets/user_asset_list.html:167
+#: assets/models/user.py:200 assets/templates/assets/user_asset_list.html:156
 #: audits/models.py:19 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:40
 #: perms/models.py:33 perms/models.py:81
@@ -713,47 +716,85 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/tasks.py:96
+#: assets/tasks.py:50
+msgid "Get asset info failed: {}"
+msgstr "获取资产信息失败：{}"
+
+#: assets/tasks.py:97
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:116
-msgid "Update asset hardware info"
-msgstr "更新资产硬件信息"
+#: assets/tasks.py:102 assets/tasks.py:201
+msgid "Asset has been disabled, skipped: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:135
+#: assets/tasks.py:106 assets/tasks.py:205
+msgid "Asset may not be support ansible, skipped: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
+
+#: assets/tasks.py:111 assets/tasks.py:210 assets/tasks.py:325
+#: assets/tasks.py:431
+msgid "No assets matched, stop task"
+msgstr "没有匹配到资产，结束任务"
+
+#: assets/tasks.py:127
+msgid "Update asset hardware info: {}"
+msgstr "更新资产硬件信息: {}"
+
+#: assets/tasks.py:148
 msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
-#: assets/tasks.py:213
+#: assets/tasks.py:230
 msgid "Test admin user connectability period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:220
+#: assets/tasks.py:236
 msgid "Test admin user connectability: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:230
+#: assets/tasks.py:246
 msgid "Test assets connectability"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:302
+#: assets/tasks.py:251 assets/tasks.py:316 assets/tasks.py:422
+msgid "Asset has been disabled, skip: {}"
+msgstr "资产被禁用，跳过：{}"
+
+#: assets/tasks.py:255 assets/tasks.py:320 assets/tasks.py:426
+msgid "Asset may not be support ansible, skip: {}"
+msgstr "资产或许不支持ansible, 跳过: {}"
+
+#: assets/tasks.py:260
+msgid "No assets, task stop"
+msgstr "没有匹配到资产，结束任务"
+
+#: assets/tasks.py:280
+msgid "Test assets connectability: {}"
+msgstr "测试资产可连接性: {}"
+
+#: assets/tasks.py:339
 msgid "Test system user connectability: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:309
+#: assets/tasks.py:346
 msgid "Test system user connectability: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:326
+#: assets/tasks.py:359
 msgid "Test system user connectability period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:407 assets/tasks.py:422
+#: assets/tasks.py:413
+msgid ""
+"Push system user task skip, auto push not enable or protocol is not ssh: {}"
+msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh: {}"
+
+#: assets/tasks.py:444 assets/tasks.py:458
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:413
+#: assets/tasks.py:450
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
@@ -1544,7 +1585,7 @@ msgstr "批量更新资产"
 msgid "Update asset"
 msgstr "更新资产"
 
-#: assets/views/asset.py:292
+#: assets/views/asset.py:293
 msgid "already exists"
 msgstr "已经存在"
 
@@ -1639,6 +1680,7 @@ msgid "Filename"
 msgstr "文件名"
 
 #: audits/models.py:22 audits/templates/audits/ftp_log_list.html:76
+#: ops/templates/ops/command_execution_list.html:49
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:73
 #: users/templates/users/user_detail.html:456 xpack/plugins/cloud/api.py:61
 msgid "Success"
@@ -1664,6 +1706,7 @@ msgstr "修改者"
 #: audits/templates/audits/ftp_log_list.html:77
 #: ops/templates/ops/adhoc_history.html:52
 #: ops/templates/ops/adhoc_history_detail.html:61
+#: ops/templates/ops/command_execution_list.html:50
 #: ops/templates/ops/task_history.html:58 perms/models.py:35
 #: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:148
 #: terminal/templates/terminal/session_list.html:78
@@ -1679,6 +1722,8 @@ msgstr "选择用户"
 #: audits/templates/audits/login_log_list.html:40
 #: audits/templates/audits/operate_log_list.html:58
 #: audits/templates/audits/password_change_log_list.html:42
+#: ops/templates/ops/command_execution_list.html:30
+#: ops/templates/ops/command_execution_list.html:35
 #: ops/templates/ops/task_list.html:21 ops/templates/ops/task_list.html:26
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
@@ -1691,7 +1736,7 @@ msgstr "搜索"
 #: audits/templates/audits/login_log_list.html:48
 #: ops/templates/ops/adhoc_detail.html:49
 #: ops/templates/ops/adhoc_history_detail.html:49
-#: ops/templates/ops/task_detail.html:55
+#: ops/templates/ops/task_detail.html:56
 #: terminal/templates/terminal/session_list.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:64
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
@@ -1713,14 +1758,14 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/templates/audits/login_log_list.html:55
-#: users/models/authentication.py:83 xpack/plugins/cloud/models.py:192
+#: users/models/authentication.py:83 xpack/plugins/cloud/models.py:171
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:69
 msgid "Reason"
 msgstr "原因"
 
 #: audits/templates/audits/login_log_list.html:56
-#: users/models/authentication.py:84 xpack/plugins/cloud/models.py:191
-#: xpack/plugins/cloud/models.py:208
+#: users/models/authentication.py:84 xpack/plugins/cloud/models.py:170
+#: xpack/plugins/cloud/models.py:187
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:67
 msgid "Status"
@@ -1739,34 +1784,30 @@ msgstr "日期"
 msgid "Datetime"
 msgstr "日期"
 
-#: audits/views.py:66 audits/views.py:110 audits/views.py:143
-#: templates/_nav.html:73
+#: audits/views.py:68 audits/views.py:112 audits/views.py:148
+#: audits/views.py:192 audits/views.py:223 templates/_nav.html:71
 msgid "Audits"
 msgstr "日志审计"
 
-#: audits/views.py:67 templates/_nav.html:77
+#: audits/views.py:69 templates/_nav.html:75
 msgid "FTP log"
 msgstr "FTP日志"
 
-#: audits/views.py:111 templates/_nav.html:78
+#: audits/views.py:113 templates/_nav.html:76
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/views.py:144 templates/_nav.html:79
+#: audits/views.py:149 templates/_nav.html:77
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/views.py:187 templates/_nav.html:10 users/views/group.py:28
-#: users/views/group.py:44 users/views/group.py:60 users/views/group.py:76
-#: users/views/group.py:92 users/views/login.py:346 users/views/user.py:68
-#: users/views/user.py:83 users/views/user.py:111 users/views/user.py:192
-#: users/views/user.py:353 users/views/user.py:403 users/views/user.py:437
-msgid "Users"
-msgstr "用户管理"
-
-#: audits/views.py:188 templates/_nav.html:76
+#: audits/views.py:193 templates/_nav.html:74
 msgid "Login log"
 msgstr "登录日志"
+
+#: audits/views.py:224 ops/views/command.py:44
+msgid "Command execution list"
+msgstr "命令执行列表"
 
 #: common/api.py:22
 msgid "Test mail sent to {}, please check"
@@ -2084,7 +2125,8 @@ msgid "Security setting"
 msgstr "安全设置"
 
 #: common/templates/common/command_storage_create.html:50
-#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:53
+#: ops/models/adhoc.py:161 ops/templates/ops/adhoc_detail.html:53
+#: ops/templates/ops/command_execution_list.html:44
 #: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:38
 msgid "Hosts"
 msgstr "主机"
@@ -2102,7 +2144,7 @@ msgid "Doc type"
 msgstr "文档类型"
 
 #: common/templates/common/replay_storage_create.html:53
-#: templates/index.html:91
+#: ops/models/adhoc.py:162 templates/index.html:91
 msgid "Host"
 msgstr "主机"
 
@@ -2139,7 +2181,7 @@ msgid "Endpoint suffix"
 msgstr "端点后缀"
 
 #: common/templates/common/replay_storage_create.html:130
-#: xpack/plugins/cloud/models.py:206
+#: xpack/plugins/cloud/models.py:185
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:83
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
 msgid "Region"
@@ -2185,7 +2227,7 @@ msgstr "不能包含特殊字符"
 
 #: common/views.py:18 common/views.py:44 common/views.py:70 common/views.py:99
 #: common/views.py:126 common/views.py:138 common/views.py:151
-#: templates/_nav.html:116
+#: templates/_nav.html:106
 msgid "Settings"
 msgstr "系统设置"
 
@@ -2212,7 +2254,7 @@ msgstr ""
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
 
-#: ops/api.py:81
+#: ops/api/celery.py:32
 msgid "Waiting ..."
 msgstr ""
 
@@ -2232,71 +2274,82 @@ msgstr ""
 msgid "Callback"
 msgstr "回调"
 
-#: ops/models/adhoc.py:156 ops/templates/ops/adhoc_detail.html:114
+#: ops/models/adhoc.py:158 ops/templates/ops/adhoc_detail.html:114
 msgid "Tasks"
 msgstr "任务"
 
-#: ops/models/adhoc.py:157 ops/templates/ops/adhoc_detail.html:57
+#: ops/models/adhoc.py:159 ops/templates/ops/adhoc_detail.html:57
 #: ops/templates/ops/task_adhoc.html:60
 msgid "Pattern"
 msgstr "模式"
 
-#: ops/models/adhoc.py:158 ops/templates/ops/adhoc_detail.html:61
+#: ops/models/adhoc.py:160 ops/templates/ops/adhoc_detail.html:61
 msgid "Options"
 msgstr "选项"
 
-#: ops/models/adhoc.py:160
+#: ops/models/adhoc.py:163
 msgid "Run as admin"
 msgstr "再次执行"
 
-#: ops/models/adhoc.py:161 ops/templates/ops/adhoc_detail.html:72
-#: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
-msgid "Run as"
-msgstr "用户"
-
-#: ops/models/adhoc.py:162 ops/templates/ops/adhoc_detail.html:82
+#: ops/models/adhoc.py:165 ops/templates/ops/adhoc_detail.html:82
 #: ops/templates/ops/task_adhoc.html:62
 msgid "Become"
 msgstr "Become"
 
-#: ops/models/adhoc.py:163 users/templates/users/user_group_detail.html:59
+#: ops/models/adhoc.py:166 users/templates/users/user_group_detail.html:59
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:327
+#: ops/models/adhoc.py:321
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:328
+#: ops/models/adhoc.py:322
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:329 ops/templates/ops/adhoc_history.html:57
+#: ops/models/adhoc.py:323 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:41
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:330 ops/templates/ops/adhoc_detail.html:106
+#: ops/models/adhoc.py:324 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/adhoc_history_detail.html:69
-#: ops/templates/ops/task_detail.html:83 ops/templates/ops/task_history.html:61
+#: ops/templates/ops/task_detail.html:84 ops/templates/ops/task_history.html:61
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:331 ops/templates/ops/adhoc_history.html:56
+#: ops/models/adhoc.py:325 ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/task_history.html:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models/adhoc.py:332
+#: ops/models/adhoc.py:326
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:333
+#: ops/models/adhoc.py:327
 msgid "Adhoc result summary"
 msgstr "汇总"
+
+#: ops/models/command.py:20 xpack/plugins/cloud/models.py:169
+msgid "Result"
+msgstr "结果"
+
+#: ops/models/command.py:52
+msgid "Task start"
+msgstr "任务开始: "
+
+#: ops/models/command.py:64
+msgid "Command `{}` is forbidden ........"
+msgstr "命令 `{}` 不允许被执行 ......."
+
+#: ops/models/command.py:70
+msgid "Task end"
+msgstr "任务结束"
 
 #: ops/templates/ops/adhoc_detail.html:19
 #: ops/templates/ops/adhoc_history.html:19
@@ -2304,44 +2357,49 @@ msgid "Version detail"
 msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:22
-#: ops/templates/ops/adhoc_history.html:22 ops/views.py:105
+#: ops/templates/ops/adhoc_history.html:22 ops/views/adhoc.py:124
 msgid "Version run history"
 msgstr "执行历史"
+
+#: ops/templates/ops/adhoc_detail.html:72
+#: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
+msgid "Run as"
+msgstr "用户"
 
 #: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:36
 msgid "Run times"
 msgstr "执行次数"
 
-#: ops/templates/ops/adhoc_detail.html:98 ops/templates/ops/task_detail.html:75
+#: ops/templates/ops/adhoc_detail.html:98 ops/templates/ops/task_detail.html:76
 msgid "Last run"
 msgstr "最后运行"
 
 #: ops/templates/ops/adhoc_detail.html:102
 #: ops/templates/ops/adhoc_history_detail.html:65
-#: ops/templates/ops/task_detail.html:79
+#: ops/templates/ops/task_detail.html:80
 msgid "Time delta"
 msgstr "运行时间"
 
 #: ops/templates/ops/adhoc_detail.html:110
 #: ops/templates/ops/adhoc_history_detail.html:73
-#: ops/templates/ops/task_detail.html:87
+#: ops/templates/ops/task_detail.html:88
 msgid "Is success "
 msgstr "成功"
 
 #: ops/templates/ops/adhoc_detail.html:131
-#: ops/templates/ops/task_detail.html:108
+#: ops/templates/ops/task_detail.html:109
 msgid "Last run failed hosts"
 msgstr "最后运行失败主机"
 
 #: ops/templates/ops/adhoc_detail.html:151
 #: ops/templates/ops/adhoc_detail.html:176
-#: ops/templates/ops/task_detail.html:128
-#: ops/templates/ops/task_detail.html:153
+#: ops/templates/ops/task_detail.html:129
+#: ops/templates/ops/task_detail.html:154
 msgid "No hosts"
 msgstr "没有主机"
 
 #: ops/templates/ops/adhoc_detail.html:161
-#: ops/templates/ops/task_detail.html:138
+#: ops/templates/ops/task_detail.html:139
 msgid "Last run success hosts"
 msgstr "最后运行成功主机"
 
@@ -2361,11 +2419,12 @@ msgstr "失败/成功/总"
 msgid "Version"
 msgstr "版本"
 
-#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:118
+#: ops/templates/ops/adhoc_history_detail.html:19 ops/views/adhoc.py:137
 msgid "Run history detail"
 msgstr "执行历史详情"
 
 #: ops/templates/ops/adhoc_history_detail.html:22
+#: ops/templates/ops/command_execution_list.html:47
 #: terminal/backends/command/models.py:16
 msgid "Output"
 msgstr "输出"
@@ -2391,22 +2450,40 @@ msgstr "没有资产"
 msgid "Success assets"
 msgstr "成功资产"
 
-#: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:19
-#: ops/templates/ops/task_history.html:19 ops/views.py:53
+#: ops/templates/ops/command_execution_create.html:67
+#: terminal/templates/terminal/session_detail.html:91
+#: terminal/templates/terminal/session_detail.html:100
+msgid "Go"
+msgstr ""
+
+#: ops/templates/ops/command_execution_create.html:244
+msgid "Pending"
+msgstr ""
+
+#: ops/templates/ops/command_execution_list.html:48
+msgid "Finished"
+msgstr "结束"
+
+#: ops/templates/ops/command_execution_list.html:51
+msgid "Date finished"
+msgstr "结束日期"
+
+#: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:20
+#: ops/templates/ops/task_history.html:19 ops/views/adhoc.py:72
 msgid "Task detail"
 msgstr "任务详情"
 
-#: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:22
-#: ops/templates/ops/task_history.html:22 ops/views.py:66
+#: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:23
+#: ops/templates/ops/task_history.html:22 ops/views/adhoc.py:85
 msgid "Task versions"
 msgstr "任务各版本"
 
-#: ops/templates/ops/task_adhoc.html:25 ops/templates/ops/task_detail.html:25
+#: ops/templates/ops/task_adhoc.html:25 ops/templates/ops/task_detail.html:26
 #: ops/templates/ops/task_history.html:25
 msgid "Run history"
 msgstr "执行历史"
 
-#: ops/templates/ops/task_adhoc.html:28 ops/templates/ops/task_detail.html:28
+#: ops/templates/ops/task_adhoc.html:28 ops/templates/ops/task_detail.html:29
 #: ops/templates/ops/task_history.html:28
 msgid "Last run output"
 msgstr "输出"
@@ -2415,15 +2492,15 @@ msgstr "输出"
 msgid "Versions of "
 msgstr "版本"
 
-#: ops/templates/ops/task_detail.html:67
+#: ops/templates/ops/task_detail.html:68
 msgid "Total versions"
 msgstr "版本数量"
 
-#: ops/templates/ops/task_detail.html:71
+#: ops/templates/ops/task_detail.html:72
 msgid "Latest version"
 msgstr "最新版本"
 
-#: ops/templates/ops/task_detail.html:91
+#: ops/templates/ops/task_detail.html:92
 msgid "Contents"
 msgstr "内容"
 
@@ -2440,18 +2517,27 @@ msgstr "执行"
 msgid "Task start: "
 msgstr "任务开始: "
 
-#: ops/views.py:36 ops/views.py:52 ops/views.py:65 ops/views.py:78
-#: ops/views.py:91 ops/views.py:104 ops/views.py:117
+#: ops/utils.py:51
+msgid "Update task content: {}"
+msgstr "更新任务内容: {}"
+
+#: ops/views/adhoc.py:49 ops/views/adhoc.py:71 ops/views/adhoc.py:84
+#: ops/views/adhoc.py:97 ops/views/adhoc.py:110 ops/views/adhoc.py:123
+#: ops/views/adhoc.py:136 ops/views/command.py:43 ops/views/command.py:67
 msgid "Ops"
 msgstr "作业中心"
 
-#: ops/views.py:37 templates/_nav.html:67
+#: ops/views/adhoc.py:50 templates/_nav.html:66
 msgid "Task list"
 msgstr "任务列表"
 
-#: ops/views.py:79
+#: ops/views/adhoc.py:98
 msgid "Task run history"
 msgstr "执行历史"
+
+#: ops/views/command.py:68 templates/_nav.html:78 templates/_nav_user.html:9
+msgid "Command execution"
+msgstr "命令执行"
 
 #: orgs/mixins.py:77 orgs/models.py:24
 msgid "Organization"
@@ -2602,7 +2688,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:9 users/forms.py:147
+#: templates/_header_bar.html:89 templates/_nav_user.html:14 users/forms.py:147
 #: users/templates/users/_user.html:39
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -2694,6 +2780,14 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
+#: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
+#: users/views/group.py:60 users/views/group.py:76 users/views/group.py:92
+#: users/views/login.py:346 users/views/user.py:68 users/views/user.py:83
+#: users/views/user.py:111 users/views/user.py:192 users/views/user.py:353
+#: users/views/user.py:403 users/views/user.py:437
+msgid "Users"
+msgstr "用户管理"
+
 #: templates/_nav.html:13 users/views/user.py:69
 msgid "User list"
 msgstr "用户列表"
@@ -2718,11 +2812,11 @@ msgstr "历史会话"
 msgid "Commands"
 msgstr "命令记录"
 
-#: templates/_nav.html:48 templates/_nav_user.html:14
+#: templates/_nav.html:48 templates/_nav_user.html:19
 msgid "Web terminal"
 msgstr "Web终端"
 
-#: templates/_nav.html:53 templates/_nav_user.html:19
+#: templates/_nav.html:53 templates/_nav_user.html:24
 msgid "File manager"
 msgstr "文件管理"
 
@@ -2733,19 +2827,19 @@ msgstr "文件管理"
 msgid "Terminal"
 msgstr "终端管理"
 
-#: templates/_nav.html:64
+#: templates/_nav.html:63
 msgid "Job Center"
 msgstr "作业中心"
 
-#: templates/_nav.html:94
+#: templates/_nav.html:84
 msgid "XPack"
 msgstr ""
 
-#: templates/_nav.html:102 xpack/plugins/cloud/views.py:26
+#: templates/_nav.html:92 xpack/plugins/cloud/views.py:26
 msgid "Account list"
 msgstr "账户列表"
 
-#: templates/_nav.html:103
+#: templates/_nav.html:93
 msgid "Sync instance"
 msgstr "同步实例"
 
@@ -3021,11 +3115,6 @@ msgstr "该会话没有命令记录"
 msgid "Replay session"
 msgstr "回放会话"
 
-#: terminal/templates/terminal/session_detail.html:91
-#: terminal/templates/terminal/session_detail.html:100
-msgid "Go"
-msgstr ""
-
 #: terminal/templates/terminal/session_detail.html:97
 msgid "Monitor session"
 msgstr "监控"
@@ -3153,7 +3242,7 @@ msgstr "请先进行用户名和密码验证"
 msgid "MFA certification failed"
 msgstr "MFA认证失败"
 
-#: users/api/user.py:140
+#: users/api/user.py:137
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
@@ -3342,8 +3431,8 @@ msgstr "用户名不存在"
 msgid "Password expired"
 msgstr "密码过期"
 
-#: users/models/authentication.py:74 xpack/plugins/cloud/models.py:184
-#: xpack/plugins/cloud/models.py:198
+#: users/models/authentication.py:74 xpack/plugins/cloud/models.py:163
+#: xpack/plugins/cloud/models.py:177
 msgid "Failed"
 msgstr "失败"
 
@@ -3427,7 +3516,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:44 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:51
-#: xpack/plugins/cloud/models.py:51 xpack/plugins/cloud/models.py:133
+#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:119
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:59
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:13
 msgid "Account"
@@ -4255,7 +4344,7 @@ msgstr "MFA 解绑成功"
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
-#: xpack/plugins/cloud/api.py:60 xpack/plugins/cloud/providers/base.py:83
+#: xpack/plugins/cloud/api.py:60 xpack/plugins/cloud/providers/base.py:84
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -4295,145 +4384,99 @@ msgstr "选择管理员"
 msgid "Cloud center"
 msgstr "云管中心"
 
-#: xpack/plugins/cloud/models.py:30
-msgid "Aliyun"
-msgstr "阿里云"
-
-#: xpack/plugins/cloud/models.py:31
-msgid "AWS (China)"
-msgstr "AWS (中国)"
-
-#: xpack/plugins/cloud/models.py:32
-msgid "AWS (International)"
-msgstr "AWS (国际)"
-
-#: xpack/plugins/cloud/models.py:35
+#: xpack/plugins/cloud/models.py:43
 msgid "Available"
 msgstr "有效"
 
-#: xpack/plugins/cloud/models.py:36
+#: xpack/plugins/cloud/models.py:44
 msgid "Unavailable"
 msgstr "无效"
 
-#: xpack/plugins/cloud/models.py:41
+#: xpack/plugins/cloud/models.py:49
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:56
 #: xpack/plugins/cloud/templates/cloud/account_list.html:13
 msgid "Provider"
 msgstr "云服务商"
 
-#: xpack/plugins/cloud/models.py:42
+#: xpack/plugins/cloud/models.py:50
 msgid "Access key id"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:43
+#: xpack/plugins/cloud/models.py:51
 msgid "Access key secret"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:44
+#: xpack/plugins/cloud/models.py:52
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:60
 #: xpack/plugins/cloud/templates/cloud/account_list.html:14
 msgid "Validity"
 msgstr "账户状态"
 
-#: xpack/plugins/cloud/models.py:134
+#: xpack/plugins/cloud/models.py:120
 msgid "Regions"
 msgstr "地域"
 
-#: xpack/plugins/cloud/models.py:135
+#: xpack/plugins/cloud/models.py:121
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:139
+#: xpack/plugins/cloud/models.py:125
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:75
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:17
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:145 xpack/plugins/cloud/models.py:189
+#: xpack/plugins/cloud/models.py:131 xpack/plugins/cloud/models.py:168
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:185 xpack/plugins/cloud/models.py:199
+#: xpack/plugins/cloud/models.py:164 xpack/plugins/cloud/models.py:178
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/models.py:186
+#: xpack/plugins/cloud/models.py:165
 msgid "Partial succeed"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:190
-msgid "Result"
-msgstr "结果"
-
-#: xpack/plugins/cloud/models.py:193 xpack/plugins/cloud/models.py:209
+#: xpack/plugins/cloud/models.py:172 xpack/plugins/cloud/models.py:188
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:71
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:68
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:200
+#: xpack/plugins/cloud/models.py:179
 msgid "Exist"
 msgstr "存在"
 
-#: xpack/plugins/cloud/models.py:203
+#: xpack/plugins/cloud/models.py:182
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:204
+#: xpack/plugins/cloud/models.py:183
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:205
+#: xpack/plugins/cloud/models.py:184
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:91
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
 msgid "Instance"
 msgstr "实例"
 
-#: xpack/plugins/cloud/providers/base.py:73
-msgid "任务执行开始: {}"
-msgstr ""
+#: xpack/plugins/cloud/providers/aliyun.py:14
+msgid "Aliyun"
+msgstr "阿里云"
 
-#: xpack/plugins/cloud/providers/base.py:77
-msgid "检测账户有效性: {}"
-msgstr ""
+#: xpack/plugins/cloud/providers/aws.py:11
+msgid "AWS (China)"
+msgstr "AWS (中国)"
 
-#: xpack/plugins/cloud/providers/base.py:80
-msgid "账户无效!"
-msgstr ""
+#: xpack/plugins/cloud/providers/aws.py:12
+msgid "AWS (International)"
+msgstr "AWS (国际)"
 
-#: xpack/plugins/cloud/providers/base.py:85
-msgid "账户有效!"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:91
-msgid "任务执行结束!"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:93
-msgid ""
-"查看任务详细信息路径: XPack -> 云管中心 -> 任务列表 -> 任务详情(点击任务名"
-"称) -> 查看同步历史列表/实例列表"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:130
-msgid "同步实例列表: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:139
-msgid "同步地域列表: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:143
-msgid "地域: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:154
-msgid "实例: {}, 地域: {}"
-msgstr ""
-
-#: xpack/plugins/cloud/providers/base.py:160
-msgid "正在创建资产..."
-msgstr ""
+#: xpack/plugins/cloud/providers/qcloud.py:14
+msgid "Qcloud"
+msgstr "腾讯云"
 
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:22
 #: xpack/plugins/cloud/views.py:72
@@ -4561,6 +4604,20 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#, fuzzy
+#~| msgid "Audits"
+#~ msgid "Audit"
+#~ msgstr "日志审计"
+
+#~ msgid "User id"
+#~ msgstr "用户"
+
+#~ msgid "Start execute"
+#~ msgstr "开始执行"
+
+#~ msgid "Start"
+#~ msgstr "开始"
 
 #, fuzzy
 #~| msgid "Update setting successfully"

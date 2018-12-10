@@ -1,26 +1,32 @@
-# ~*~ coding: utf-8 ~*~
-import uuid
-import os
+# -*- coding: utf-8 -*-
+#
 
-from django.core.cache import cache
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext as _
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
 from common.permissions import IsOrgAdmin
-from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
-from .serializers import TaskSerializer, AdHocSerializer, \
+from orgs.utils import current_org
+from ..models import Task, AdHoc, AdHocRunHistory
+from ..serializers import TaskSerializer, AdHocSerializer, \
     AdHocRunHistorySerializer
-from .tasks import run_ansible_task
+from ..tasks import run_ansible_task
+
+__all__ = [
+    'TaskViewSet', 'TaskRun', 'AdHocViewSet', 'AdHocRunHistoryViewSet'
+]
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsOrgAdmin,)
-    # label = None
-    # help_text = ''
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if current_org:
+            queryset = queryset.filter(created_by=current_org.id)
+        return queryset
 
 
 class TaskRun(generics.RetrieveAPIView):
@@ -47,7 +53,7 @@ class AdHocViewSet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class AdHocRunHistorySet(viewsets.ModelViewSet):
+class AdHocRunHistoryViewSet(viewsets.ModelViewSet):
     queryset = AdHocRunHistory.objects.all()
     serializer_class = AdHocRunHistorySerializer
     permission_classes = (IsOrgAdmin,)
@@ -66,28 +72,6 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class CeleryTaskLogApi(generics.RetrieveAPIView):
-    permission_classes = (IsOrgAdmin,)
-    buff_size = 1024 * 10
-    end = False
-    queryset = CeleryTask.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        mark = request.query_params.get("mark") or str(uuid.uuid4())
-        task = self.get_object()
-        log_path = task.full_log_path
 
-        if not log_path or not os.path.isfile(log_path):
-            return Response({"data": _("Waiting ...")}, status=203)
-
-        with open(log_path, 'r') as f:
-            offset = cache.get(mark, 0)
-            f.seek(offset)
-            data = f.read(self.buff_size).replace('\n', '\r\n')
-            mark = str(uuid.uuid4())
-            cache.set(mark, f.tell(), 5)
-
-            if data == '' and task.is_finished():
-                self.end = True
-            return Response({"data": data, 'end': self.end, 'mark': mark})
 

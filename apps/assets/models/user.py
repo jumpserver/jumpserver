@@ -173,6 +173,15 @@ class SystemUser(AssetUser):
         ).distinct()
         return rules
 
+    def is_command_can_run(self, command):
+        for rule in self.cmd_filter_rules:
+            action, matched_cmd = rule.match(command)
+            if action == rule.ACTION_ALLOW:
+                return True, None
+            elif action == rule.ACTION_DENY:
+                return False, matched_cmd
+        return True, None
+
     @classmethod
     def get_system_user_by_id_or_cached(cls, sid):
         cached = cache.get(cls.cache_key.format(sid))
