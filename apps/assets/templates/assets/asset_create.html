@@ -86,6 +86,9 @@ $(document).ready(function () {
         allowClear: true,
         templateSelection: format
     });
+    $('#id_nodes.select2').select2({
+        closeOnSelect: false
+    });
     $("#id_protocol").change(function (){
         var protocol = $("#id_protocol option:selected").text();
         var port = 22;
