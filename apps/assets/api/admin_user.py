@@ -24,7 +24,7 @@ from common.utils import get_logger
 from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
 from .. import serializers
-from ..tasks import test_admin_user_connectability_manual
+from ..tasks import test_admin_user_connectivity_manual
 
 
 logger = get_logger(__file__)
@@ -81,12 +81,12 @@ class ReplaceNodesAdminUserApi(generics.UpdateAPIView):
 
 class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
     """
-    Test asset admin user connectivity
+    Test asset admin user assets_connectivity
     """
     queryset = AdminUser.objects.all()
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()
-        task = test_admin_user_connectability_manual.delay(admin_user)
+        task = test_admin_user_connectivity_manual.delay(admin_user)
         return Response({"task": task.id})

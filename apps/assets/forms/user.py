@@ -99,8 +99,8 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
-        if login_mode == SystemUser.MANUAL_LOGIN or \
-                protocol in [SystemUser.RDP_PROTOCOL, SystemUser.TELNET_PROTOCOL]:
+        if login_mode == SystemUser.LOGIN_MANUAL or \
+                protocol in [SystemUser.PROTOCOL_RDP, SystemUser.PROTOCOL_TELNET]:
             system_user.auto_push = 0
             auto_generate_key = False
             system_user.save()
@@ -124,7 +124,7 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         validated = super().is_valid()
         username = self.cleaned_data.get('username')
         login_mode = self.cleaned_data.get('login_mode')
-        if login_mode == SystemUser.AUTO_LOGIN and not username:
+        if login_mode == SystemUser.LOGIN_AUTO and not username:
             self.add_error(
                 "username", _('* Automatic login mode,'
                               ' must fill in the username.')

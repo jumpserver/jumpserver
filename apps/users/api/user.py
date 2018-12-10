@@ -46,6 +46,9 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return qs.count() == filtered.count()
+
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)

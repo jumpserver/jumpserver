@@ -27,11 +27,11 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_unreachable_assets(obj):
-        return obj.unreachable_assets
+        return obj.assets_unreachable
 
     @staticmethod
     def get_reachable_assets(obj):
-        return obj.reachable_assets
+        return obj.assets_reachable
 
     def get_unreachable_amount(self, obj):
         return len(self.get_unreachable_assets(obj))
@@ -41,7 +41,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return len(obj.get_assets())
+        return len(obj.get_related_assets())
 
 
 class SystemUserAuthSerializer(AuthSerializer):

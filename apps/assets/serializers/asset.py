@@ -25,7 +25,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
         fields.extend([
-            'hardware_info', 'is_connective', 'org_name'
+            'hardware_info', 'connectivity', 'org_name'
         ])
         return fields
 
