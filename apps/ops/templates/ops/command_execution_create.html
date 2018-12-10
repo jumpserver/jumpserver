@@ -46,7 +46,7 @@
                </div>
            </div>
            <div class="mail-box-header" style="padding-top: 5px;">
-               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="">
+               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" onsubmit="return execute()">
                    <div class="form-group">
                        <div id="term" style="height: 100%;width: 100%"></div>
                    </div>
@@ -180,16 +180,7 @@ function initResultTerminal() {
     term.write("选择左侧资产, 选择运行的系统用户，批量执行命令\r\n")
 }
 
-$(document).ready(function(){
-    systemUserId = $('#system-users-select').val();
-    $(".select2").select2().on('select2:select', function(evt) {
-         var data = evt.params.data;
-         systemUserId = data.id;
-         initTree();
-    });
-    initTree();
-    initResultTerminal();
-}).on('click', '.btn-execute', function () {
+function execute() {
     if (!term) {
         initResultTerminal()
     }
@@ -247,8 +238,21 @@ $(document).ready(function(){
                 writeExecutionOutput()
             }, interval);
         }
-    })
+    });
+    return false;
+}
+
+$(document).ready(function(){
+    systemUserId = $('#system-users-select').val();
+    $(".select2").select2().on('select2:select', function(evt) {
+         var data = evt.params.data;
+         systemUserId = data.id;
+         initTree();
+    });
+    initTree();
+    initResultTerminal();
+}).on('click', '.btn-execute', function () {
+    execute()
 })
 </script>
-
 {% endblock %}

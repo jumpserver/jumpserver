@@ -139,22 +139,32 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
 class CommandResultCallback(AdHocResultCallback):
     """
     Command result callback
+
+    results_command: {
+      "cmd": "",
+      "stderr": "",
+      "stdout": "",
+      "rc": 0,
+      "delta": 0:0:0.123
+    }
     """
     def __init__(self, display=None, **kwargs):
-        # results_command: {
-        #   "cmd": "",
-        #   "stderr": "",
-        #   "stdout": "",
-        #   "rc": 0,
-        #   "delta": 0:0:0.123
-        # }
-        #
+
         self.results_command = dict()
         super().__init__(display)
 
     def gather_result(self, t, res):
         super().gather_result(t, res)
         self.gather_cmd(t, res)
+
+    def v2_playbook_on_play_start(self, play):
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        msg = '$ {} ({})'.format('echo', now)
+        self._play = play
+        self._display.banner(msg)
+
+    def _print_task_banner(self, task):
+        pass
 
     def gather_cmd(self, t, res):
         host = res._host.get_name()
