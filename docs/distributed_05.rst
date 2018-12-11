@@ -85,8 +85,8 @@
         # Use it to encrypt or decrypt data
 
         # Jumpserver 使用 SECRET_KEY 进行加密,请务必修改以下设置
-        # SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
-        SECRET_KEY = '请随意输入随机字符串(推荐字符大于等于 50位)'
+        # SECRET_KEY = '请随意输入随机字符串(推荐字符大于等于 50位)'
+        SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
         # Django security setting, if your disable debug model, you should setting that
         ALLOWED_HOSTS = ['*']
