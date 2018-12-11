@@ -60,7 +60,7 @@
     # 下载 luna
     $ cd /opt
     $ wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
 .. code-block:: nginx
