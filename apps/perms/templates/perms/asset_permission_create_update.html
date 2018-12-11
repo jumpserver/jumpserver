@@ -113,7 +113,7 @@ $(document).ready(function () {
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
 
-    $('.select2').val(assets).trigger('change');
+    $('#id_assets').val(assets).trigger('change');
 
     $("#asset_list_modal").modal('hide');
 });
