@@ -22,26 +22,21 @@
     > use jumpserver;
     > select app,name from django_migrations where app in('assets','audits','common','ops','orgs','perms','terminal','users') order by app asc;
 
-    # 如果左右对比信息不一致,请勿升级,升级必然失败
+    # 如果左右对比信息不一致, 通过升级常见问题解决
 
-1. 备份 Jumpserver 数据库表结构 (通过releases包升级需要还原这些文件)
+丢失表结构文件参考 `升级常见问题 <faq_upgrade.html>`_
 
-.. code-block:: shell
-
-    $ jumpserver_backup=/tmp/jumpserver_backup
-    $ mkdir -p $jumpserver_backup
-    $ cd /opt/jumpserver/apps
-    $ for d in $(ls);do
-        if [ -d $d ] && [ -d $d/migrations ];then
-          mkdir -p $jumpserver_backup/${d}/migrations
-          cp ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
-        fi
-      done
+1. 备份 Jumpserver
 
 .. code-block:: shell
 
-    # 还原代码 (通过releases包升级需要还原这些文件,通过git pull升级不需要执行)
-    $ cd $jumpserver_backup/
+    $ cp -r /opt/jumpserver /opt/jumpserver_bak
+    $ mysqldump -uroot -p jumpserver --ignore-table=jumpserver.django_migrations > /opt/jumpserver.sql
+
+.. code-block:: shell
+
+    # 通过 releases 包升级需要还原这些文件,通过 git pull 升级不需要执行
+    $ cd /opt/jumpserver_bak/apps
     $ for d in $(ls);do
         if [ -d $d ] && [ -d $d/migrations ];then
           cp ${d}/migrations/*.py /opt/jumpserver/apps/${d}/migrations/
@@ -55,8 +50,9 @@
     # 升级前请做好 jumpserver 目录与 数据库 备份,谨防意外
     $ cd /opt/jumpserver
     $ source /opt/py3/bin/activate
-    $ git pull
     $ ./jms stop
+    $ git pull
+    $ git checkout 1.4.4
 
 .. code-block:: shell
 
@@ -78,7 +74,7 @@
 
 .. code-block:: shell
 
-    # 任意版本升级到 1.4.0 版本,需要执行(升级前版本小于 1.4.0 需要执行此步骤)
+    # 任意版本升级到 1.4.0 版本,需要执行(升级前版本小于 1.4.0 需要执行此步骤, 没有此文件则跳过)
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
 
 .. code-block:: shell
@@ -166,10 +162,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
-    # 注意把浏览器缓存刷新下
+    # 注意把浏览器缓存清理下
 
 6. Docker 部署 coco guacamole 升级说明
 
@@ -188,7 +184,7 @@
     # 到 Web 会话管理 - 终端管理 接受新的注册
 
 
-1.4.4 升级到 1.4.5 (未开放, 等待更新)
+1.4.4 升级到 1.4.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - 当前版本必须是 1.4.4 版本,否则请先升级到 1.4.4
@@ -204,26 +200,19 @@
 
 .. code-block:: shell
 
-    # 备份数据库表结构文件
-    $ jumpserver_backup=/tmp/jumpserver_backup
-    $ mkdir -p $jumpserver_backup
-    $ mv config.py $jumpserver_backup/
-    $ cd /opt/jumpserver/apps
-    $ for d in $(ls);do
-        if [ -d $d ] && [ -d $d/migrations ];then
-          mkdir -p $jumpserver_backup/${d}/migrations
-          cp ${d}/migrations/*.py $jumpserver_backup/${d}/migrations/
-        fi
-      done
-
+    # 备份 Jumpserver
+    $ cp -r /opt/jumpserver /opt/jumpserver_bak
+    $ cd /opt/jumpserver
     $ sh utils/clean_migrations.sh
 
 .. code-block:: shell
 
     $ cd /opt/jumpserver
+    $ git checkout master
     $ git pull
 
     # 更新 config.py ,请根据你原备份的 config.py 内容进行修改
+    $ mv config.py config_1.4.4.bak
     $ cp config_example.py config.py
     $ vi config.py
 
@@ -247,9 +236,11 @@
         """
         Jumpserver Config File
         Jumpserver 配置文件
+
         Jumpserver use this config for drive django framework running,
         You can set is value or set the same envirment value,
         Jumpserver look for config order: file => env => default
+
         Jumpserver使用配置来驱动Django框架的运行，
         你可以在该文件中设置，或者设置同样名称的环境变量,
         Jumpserver使用配置的顺序: 文件 => 环境变量 => 默认值
@@ -499,7 +490,7 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/v1.4.5/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
 **Docker Coco Guacamole**

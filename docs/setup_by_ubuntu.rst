@@ -378,7 +378,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
     $ cd /opt/
     $ wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz
-    $ tar xvf luna.tar.gz
+    $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
 五. 安装 Windows 支持组件(如果不需要管理 windows 资产,可以直接跳过这一步)
