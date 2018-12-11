@@ -34,7 +34,7 @@ http://www.jumpserver.org
 Demo
 ~~~~~~~~
 
-http://demo.jumpserver.org
+https://demo.jumpserver.org
 
 
 邮件
