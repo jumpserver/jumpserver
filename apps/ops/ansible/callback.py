@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 import datetime
+import json
 from collections import defaultdict
 
 from ansible import constants as C
@@ -162,6 +163,28 @@ class CommandResultCallback(AdHocResultCallback):
         msg = '$ {} ({})'.format(play.name, now)
         self._play = play
         self._display.banner(msg)
+
+    def v2_runner_on_unreachable(self, result):
+        self.results_summary['success'] = False
+        self.gather_result("unreachable", result)
+        msg = result._result.get("msg")
+        if not msg:
+            msg = json.dumps(result._result, indent=4)
+        self._display.display("%s | FAILED! => \n%s" % (
+            result._host.get_name(),
+            msg,
+        ), color=C.COLOR_ERROR)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.results_summary['success'] = False
+        self.gather_result("failed", result)
+        msg = result._result.get("msg") or result._result.get("module_stdout")
+        if not msg:
+            msg = json.dumps(result._result, indent=4)
+        self._display.display("%s | FAILED! => \n%s" % (
+            result._host.get_name(),
+            msg,
+        ), color=C.COLOR_ERROR)
 
     def _print_task_banner(self, task):
         pass
