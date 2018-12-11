@@ -2364,7 +2364,7 @@ msgstr "执行历史"
 #: ops/templates/ops/adhoc_detail.html:72
 #: ops/templates/ops/adhoc_detail.html:77 ops/templates/ops/task_adhoc.html:61
 msgid "Run as"
-msgstr "用户"
+msgstr "运行用户"
 
 #: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:36
 msgid "Run times"

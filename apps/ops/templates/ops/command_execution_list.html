@@ -44,6 +44,7 @@
     <th class="text-center">{% trans 'Hosts' %}</th>
     <th class="text-center">{% trans 'User' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
+    <th class="text-center">{% trans 'Run as' %}</th>
     <th class="text-center">{% trans 'Output' %}</th>
     <th class="text-center">{% trans 'Finished' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
@@ -55,9 +56,10 @@
     {% for object in object_list %}
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"></td>
-            <td class="text-center">{{ object.hosts.count }}</td>
+            <td class="text-center hosts">{{ object.get_hosts_names }}</td>
             <td class="text-center">{{ object.user }}</td>
             <td class="text-center">{{ object.command| truncatechars:16 }}</td>
+            <td class="text-center">{{ object.run_as }}</td>
             <td class="text-center"><a href="{% url "ops:celery-task-log" pk=object.id %}" target="_blank">查看</a></td>
             <td class="text-center">{{ object.is_finished | state_show | safe }}</td>
             <td class="text-center">{{ object.is_success | state_show | safe }}</td>
@@ -89,6 +91,17 @@ $(document).ready(function() {
         calendarWeeks: true,
         autoclose: true
     });
+    $(".hosts").each(function (i) {
+        var data = $(this).text();
+        var data_list = data.split(",");
+        if (data_list.length === 1 && data_list[0] === "") {
+            data_list.pop();
+        }
+        var html = createPopover(data_list);
+        $(this).html(html);
+    });
+    $('[data-toggle="popover"]').popover();
+
 })
 </script>
 {% endblock %}
