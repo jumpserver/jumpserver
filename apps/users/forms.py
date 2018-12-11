@@ -81,7 +81,6 @@ class UserCreateUpdateForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         super(UserCreateUpdateForm, self).__init__(*args, **kwargs)
-        print(self.fields['date_expired'].initial())
 
         roles = []
         # Super admin user
