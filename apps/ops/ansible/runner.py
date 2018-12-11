@@ -250,7 +250,5 @@ class CommandRunner(AdHocRunner):
         tasks = [
             {"action": {"module": module, "args": cmd}}
         ]
-        hosts = self.inventory.get_hosts(pattern=pattern)
-        name = "Run command {} on {}'s hosts".format(cmd, len(hosts))
-        return self.run(tasks, pattern, play_name=name)
+        return self.run(tasks, pattern, play_name=cmd)
 

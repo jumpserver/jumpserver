@@ -159,7 +159,7 @@ class CommandResultCallback(AdHocResultCallback):
 
     def v2_playbook_on_play_start(self, play):
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        msg = '$ {} ({})'.format('echo', now)
+        msg = '$ {} ({})'.format(play.name, now)
         self._play = play
         self._display.banner(msg)
 
