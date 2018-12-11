@@ -52,7 +52,7 @@
     $ source /opt/py3/bin/activate
     $ ./jms stop
     $ git pull
-    $ git checkout v1.4.4
+    $ git checkout 1.4.4
 
 .. code-block:: shell
 
