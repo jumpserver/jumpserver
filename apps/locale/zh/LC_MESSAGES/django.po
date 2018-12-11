@@ -2341,7 +2341,7 @@ msgstr "结果"
 
 #: ops/models/command.py:52
 msgid "Task start"
-msgstr "任务开始: "
+msgstr "任务开始"
 
 #: ops/models/command.py:64
 msgid "Command `{}` is forbidden ........"
