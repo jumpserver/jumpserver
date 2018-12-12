@@ -18,7 +18,7 @@ def get_command_storage():
 
 def get_terminal_command_storages():
     storage_list = {}
-    command_storage = utils.get_command_storage_or_create_default_storage()
+    command_storage = utils.get_command_storage_setting()
 
     for name, params in command_storage.items():
         tp = params['TYPE']

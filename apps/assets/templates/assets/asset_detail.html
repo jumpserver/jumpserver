@@ -159,7 +159,7 @@
                                               </span>
                                           </td>
                                         </tr>
-                                        {% if asset.is_unixlike %}
+                                        {% if asset.protocol == 'ssh' %}
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
                                             <td>

@@ -17,11 +17,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from formtools.wizard.views import SessionWizardView
 from django.conf import settings
+from formtools.wizard.views import SessionWizardView
 
 from common.utils import get_object_or_none, get_request_ip
-from common.models import common_settings
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail, check_otp_code, \
     redirect_user_first_login_or_index, get_user_or_tmp_user, \
@@ -69,7 +68,20 @@ class UserLoginView(FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
 
-        set_tmp_user_to_cache(self.request, form.get_user())
+        user = form.get_user()
+
+        # user password expired
+        if user.password_has_expired:
+            data = {
+                'username': user.username,
+                'mfa': int(user.otp_enabled),
+                'reason': LoginLog.REASON_PASSWORD_EXPIRED,
+                'status': False
+            }
+            self.write_login_log(data)
+            return self.render_to_response(self.get_context_data(password_expired=True))
+
+        set_tmp_user_to_cache(self.request, user)
         username = form.cleaned_data.get('username')
         ip = get_request_ip(self.request)
         # 登陆成功，清除缓存计数
@@ -87,7 +99,6 @@ class UserLoginView(FormView):
             'reason': reason,
             'status': False
         }
-
         self.write_login_log(data)
 
         # limit user login failed count
@@ -226,8 +237,11 @@ class UserForgotPasswordView(TemplateView):
         email = request.POST.get('email')
         user = get_object_or_none(User, email=email)
         if not user:
-            return self.get(request, errors=_('Email address invalid, '
-                                              'please input again'))
+            error = _('Email address invalid, please input again')
+            return self.get(request, errors=error)
+        elif not user.is_local:
+            error = _('User auth from {}, go there change password'.format(user.source))
+            return self.get(request, errors=error)
         else:
             send_reset_password_mail(user)
             return HttpResponseRedirect(
@@ -259,8 +273,7 @@ class UserResetPasswordSuccessView(TemplateView):
             'auto_redirect': True,
         }
         kwargs.update(context)
-        return super()\
-            .get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserResetPasswordView(TemplateView):
@@ -269,13 +282,11 @@ class UserResetPasswordView(TemplateView):
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token')
         user = User.validate_reset_token(token)
-
-        check_rules, min_length = get_password_check_rules()
-        password_rules = {'password_check_rules': check_rules, 'min_length': min_length}
-        kwargs.update(password_rules)
-
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
+        else:
+            check_rules = get_password_check_rules()
+            kwargs.update({'password_check_rules': check_rules})
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -326,7 +337,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': common_settings.USER_GUIDE_URL
+            'user_guide_url': settings.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 

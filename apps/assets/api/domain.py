@@ -9,7 +9,6 @@ from django.views.generic.detail import SingleObjectMixin
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsAppUser, IsOrgAdminOrAppUser
 from ..models import Domain, Gateway
-from ..utils import test_gateway_connectability
 from .. import serializers
 
 
@@ -54,7 +53,7 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(Gateway.objects.all())
-        ok, e = test_gateway_connectability(self.object)
+        ok, e = self.object.test_connective()
         if ok:
             return Response("ok")
         else:

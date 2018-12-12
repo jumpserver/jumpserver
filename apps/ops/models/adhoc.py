@@ -34,16 +34,17 @@ class Task(models.Model):
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
     crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
     is_periodic = models.BooleanField(default=False)
     callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
-    created_by = models.CharField(max_length=128, blank=True, null=True, default='')
+    created_by = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
     __latest_adhoc = None
+    _ignore_auto_created_by = True
 
     @property
     def short_id(self):
@@ -94,7 +95,7 @@ class Task(models.Model):
              update_fields=None):
         from ..tasks import run_ansible_task
         super().save(
-            force_insert=force_insert,  force_update=force_update,
+            force_insert=force_insert, force_update=force_update,
             using=using, update_fields=update_fields,
         )
 
@@ -108,7 +109,7 @@ class Task(models.Model):
                 crontab = self.crontab
 
             tasks = {
-                self.name: {
+                self.__str__(): {
                     "task": run_ansible_task.name,
                     "interval": interval,
                     "crontab": crontab,
@@ -119,11 +120,11 @@ class Task(models.Model):
             }
             create_or_update_celery_periodic_tasks(tasks)
         else:
-            disable_celery_periodic_task(self.name)
+            disable_celery_periodic_task(self.__str__())
 
     def delete(self, using=None, keep_parents=False):
         super().delete(using=using, keep_parents=keep_parents)
-        delete_celery_periodic_task(self.name)
+        delete_celery_periodic_task(self.__str__())
 
     @property
     def schedule(self):
@@ -133,10 +134,11 @@ class Task(models.Model):
             return None
 
     def __str__(self):
-        return self.name
+        return self.name + '@' + str(self.created_by)
 
     class Meta:
         db_table = 'ops_task'
+        unique_together = ('name', 'created_by')
         get_latest_by = 'date_created'
 
 
@@ -157,8 +159,9 @@ class AdHoc(models.Model):
     pattern = models.CharField(max_length=64, default='{}', verbose_name=_('Pattern'))
     _options = models.CharField(max_length=1024, default='', verbose_name=_('Options'))
     _hosts = models.TextField(blank=True, verbose_name=_('Hosts'))  # ['hostname1', 'hostname2']
+    hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
-    run_as = models.CharField(max_length=128, default='', verbose_name=_("Run as"))
+    run_as = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True)
@@ -175,14 +178,6 @@ class AdHoc(models.Model):
             raise SyntaxError('Tasks should be a list: {}'.format(item))
 
     @property
-    def hosts(self):
-        return json.loads(self._hosts)
-
-    @hosts.setter
-    def hosts(self, item):
-        self._hosts = json.dumps(item)
-
-    @property
     def inventory(self):
         if self.become:
             become_info = {
@@ -194,7 +189,7 @@ class AdHoc(models.Model):
             become_info = None
 
         inventory = JMSInventory(
-            self.hosts, run_as_admin=self.run_as_admin,
+            self.hosts.all(), run_as_admin=self.run_as_admin,
             run_as=self.run_as, become_info=become_info
         )
         return inventory
@@ -242,14 +237,13 @@ class AdHoc(models.Model):
             history.timedelta = time.time() - time_start
             history.save()
 
-    def _run_only(self, file_obj=None):
+    def _run_only(self):
         runner = AdHocRunner(self.inventory, options=self.options)
         try:
             result = runner.run(
                 self.tasks,
                 self.pattern,
                 self.task.name,
-                file_obj=file_obj,
             )
             return result.results_raw, result.results_summary
         except AnsibleError as e:

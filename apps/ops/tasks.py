@@ -2,7 +2,7 @@
 from celery import shared_task, subtask
 
 from common.utils import get_logger, get_object_or_none
-from .models import Task
+from .models import Task, CommandExecution
 
 logger = get_logger(__file__)
 
@@ -26,6 +26,12 @@ def run_ansible_task(tid, callback=None, **kwargs):
         return result
     else:
         logger.error("No task found")
+
+
+@shared_task
+def run_command_execution(cid, **kwargs):
+    execution = get_object_or_none(CommandExecution, id=cid)
+    return execution.run()
 
 
 @shared_task

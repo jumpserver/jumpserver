@@ -87,12 +87,12 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command"  {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="{% url 'common:command-storage-create' %}" class="btn btn-primary">{% trans 'Add' %}</a>
+                                    <a href="{% url 'common:command-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
 
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans "Replay storage" %}</h3>
@@ -109,12 +109,12 @@
                                             <tr>
                                                 <td>{{ name }}</td>
                                                 <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="{% url 'common:replay-storage-create' %}" class="btn btn-primary">{% trans 'Add' %}</a>
+                                    <a href="{% url 'common:replay-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
 
                                     <div class="hr-line-dashed"></div>
                                 </form>
@@ -151,7 +151,7 @@ function deleteStorage($this, the_url){
             toastr.success("{% trans 'Delete succeed' %}");
         };
         var error = function(){
-            toastr.error("{% trans 'Delete failed' %}}");
+            toastr.error("{% trans 'Delete failed' %}");
         };
         ajaxAPI(the_url, JSON.stringify(data), success, error, method);
     }

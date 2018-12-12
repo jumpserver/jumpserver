@@ -1,0 +1,4 @@
+# 名称 用户名 密码 协议[ssh,rdp] 自动推送[0不推送，1自动推送]
+test123 test123 test123123123 ssh 0
+test1323 test123 test123123123 ssh 0
+

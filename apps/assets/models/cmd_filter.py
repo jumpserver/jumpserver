@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+import re
 
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -35,7 +36,7 @@ class CommandFilterRule(OrgModelMixin):
         (TYPE_COMMAND, _('Command')),
     )
 
-    ACTION_DENY, ACTION_ALLOW = range(2)
+    ACTION_DENY, ACTION_ALLOW, ACTION_UNKNOWN = range(3)
     ACTION_CHOICES = (
         (ACTION_DENY, _('Deny')),
         (ACTION_ALLOW, _('Allow')),
@@ -53,8 +54,34 @@ class CommandFilterRule(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=128, blank=True, default='', verbose_name=_('Created by'))
 
+    __pattern = None
+
     class Meta:
         ordering = ('-priority', 'action')
+
+    @property
+    def _pattern(self):
+        if self.__pattern:
+            return self.__pattern
+        if self.type == 'command':
+            regex = []
+            for cmd in self.content.split('\r\n'):
+                cmd = cmd.replace(' ', '\s+')
+                regex.append(r'\b{0}\b'.format(cmd))
+            self.__pattern = re.compile(r'{}'.format('|'.join(regex)))
+        else:
+            self.__pattern = re.compile(r'{0}'.format(self.content))
+        return self.__pattern
+
+    def match(self, data):
+        found = self._pattern.search(data)
+        if not found:
+            return self.ACTION_UNKNOWN, ''
+
+        if self.action == self.ACTION_ALLOW:
+            return self.ACTION_ALLOW, found.group()
+        else:
+            return self.ACTION_DENY, found.group()
 
     def __str__(self):
         return '{} % {}'.format(self.type, self.content)

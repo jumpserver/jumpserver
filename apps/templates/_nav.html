@@ -58,16 +58,15 @@
         {% endif %}
     </ul>
 </li>
-{% if request.user.is_superuser %}
 <li id="ops">
     <a>
         <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
+        <li id="command-execution"><a href="{% url 'ops:command-execution-start' %}">{% trans 'Command execution' %}</a></li>
     </ul>
 </li>
-{% endif %}
 <li id="audits">
     <a>
         <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
@@ -77,17 +76,9 @@
         <li id="ftp-log"><a href="{% url 'audits:ftp-log-list' %}">{% trans 'FTP log' %}</a></li>
         <li id="operate-log"><a href="{% url 'audits:operate-log-list' %}">{% trans 'Operate log' %}</a></li>
         <li id="password-change-log"><a href="{% url 'audits:password-change-log-list' %}">{% trans 'Password change log' %}</a></li>
+        <li id="command-execution-log"><a href="{% url 'audits:command-execution-log-list' %}">{% trans 'Command execution' %}</a></li>
     </ul>
 </li>
-{#<li id="">#}
-{#    <a href="#">#}
-{#        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>#}
-{#    </a>#}
-{#    <ul class="nav nav-second-level">#}
-{#        <li id="upload"><a href="">{% trans 'File upload' %}</a></li>#}
-{#        <li id="download"><a href="">{% trans 'File download' %}</a></li>#}
-{#    </ul>#}
-{#</li>#}
 {% if XPACK_PLUGINS %}
 <li id="xpack">
     <a>

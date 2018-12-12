@@ -120,8 +120,7 @@ class UserCreateUpdateForm(OrgModelForm):
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)
         if password:
-            user.set_password(password)
-            user.save()
+            user.reset_password(password)
         if otp_level:
             user.otp_level = otp_level
             user.save()
@@ -132,6 +131,10 @@ class UserCreateUpdateForm(OrgModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    username = forms.CharField(disabled=True)
+    name = forms.CharField(disabled=True)
+    email = forms.CharField(disabled=True)
+
     class Meta:
         model = User
         fields = [
@@ -217,8 +220,7 @@ class UserPasswordForm(forms.Form):
 
     def save(self):
         password = self.cleaned_data['new_password']
-        self.instance.set_password(password)
-        self.instance.save()
+        self.instance.reset_password(new_password=password)
         return self.instance
 
 

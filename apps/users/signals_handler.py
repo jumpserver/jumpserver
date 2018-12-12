@@ -2,7 +2,6 @@
 #
 
 from django.dispatch import receiver
-from django_auth_ldap.backend import populate_user
 # from django.db.models.signals import post_save
 
 from common.utils import get_logger
@@ -29,11 +28,4 @@ def on_user_create(sender, user=None, **kwargs):
     logger.info("   - Sending welcome mail ...".format(user.name))
     if user.email:
         send_user_created_mail(user)
-
-
-@receiver(populate_user)
-def on_ldap_create_user(sender, user, ldap_user, **kwargs):
-    if user:
-        user.source = user.SOURCE_LDAP
-        user.save()
 

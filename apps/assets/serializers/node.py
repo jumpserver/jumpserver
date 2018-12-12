@@ -68,6 +68,8 @@ class NodeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
+        if hasattr(obj, 'assets_amount'):
+            return obj.assets_amount
         return obj.get_all_assets().count()
 
     @staticmethod
@@ -86,7 +88,7 @@ class NodeSerializer(serializers.ModelSerializer):
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset = Asset.objects.all())
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
         model = Node

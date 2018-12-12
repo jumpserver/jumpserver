@@ -2,13 +2,10 @@ from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django.conf import settings
 
-from common.models import common_settings
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
 from common.permissions import SuperUserRequiredMixin
-from .signals import ldap_auth_enable
 from . import utils
 
 
@@ -29,7 +26,7 @@ class BasicSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:basic-setting')
         else:
@@ -55,7 +52,7 @@ class EmailSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:email-setting')
         else:
@@ -81,9 +78,7 @@ class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            if "AUTH_LDAP" in form.cleaned_data:
-                ldap_auth_enable.send(sender=self.__class__, enabled=form.cleaned_data["AUTH_LDAP"])
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:ldap-setting')
         else:
@@ -97,8 +92,8 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
     template_name = "common/terminal_setting.html"
 
     def get_context_data(self, **kwargs):
-        command_storage = utils.get_command_storage_or_create_default_storage()
-        replay_storage = utils.get_replay_storage_or_create_default_storage()
+        command_storage = utils.get_command_storage_setting()
+        replay_storage = utils.get_replay_storage_setting()
 
         context = {
             'app': _('Settings'),
@@ -114,7 +109,7 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:terminal-setting')
         else:
@@ -164,7 +159,7 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:security-setting')
         else:

@@ -7,6 +7,8 @@ from common.mixins import DatetimeSearchMixin
 from common.permissions import AdminUserRequiredMixin
 
 from orgs.utils import current_org
+from ops.views import CommandExecutionListView as UserCommandExecutionListView
+from users.models import User
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 
@@ -122,7 +124,10 @@ class PasswordChangeLogList(AdminUserRequiredMixin, DatetimeSearchMixin, ListVie
     date_from = date_to = None
 
     def get_queryset(self):
-        self.queryset = super().get_queryset()
+        users = current_org.get_org_users()
+        self.queryset = super().get_queryset().filter(
+            user__in=[user.__str__() for user in users]
+        )
         self.user = self.request.GET.get('user')
 
         filter_kwargs = dict()
@@ -184,13 +189,44 @@ class LoginLogListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Users'),
+            'app': _('Audits'),
             'action': _('Login log'),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user': self.user,
             'keyword': self.keyword,
             'user_list': self.get_org_users(),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class CommandExecutionListView(UserCommandExecutionListView):
+    user_id = None
+
+    def get_queryset(self):
+        queryset = self._get_queryset()
+        self.user_id = self.request.GET.get('user')
+        org_users = self.get_user_list()
+        if self.user_id:
+            queryset = queryset.filter(user=self.user_id)
+        else:
+            queryset = queryset.filter(user__in=org_users)
+        return queryset
+
+    def get_user_list(self):
+        users = current_org.get_org_users()
+        return users
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Audits'),
+            'action': _('Command execution list'),
+            'date_from': self.date_from,
+            'date_to': self.date_to,
+            'user_list': self.get_user_list(),
+            'keyword': self.keyword,
+            'user_id': self.user_id,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

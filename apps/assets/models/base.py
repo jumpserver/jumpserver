@@ -105,6 +105,9 @@ class AssetUser(OrgModelMixin):
         if update_fields:
             self.save(update_fields=update_fields)
 
+    def get_auth(self, asset=None):
+        pass
+
     def clear_auth(self):
         self._password = ''
         self._private_key = ''

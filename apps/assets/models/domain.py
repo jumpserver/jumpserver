@@ -4,6 +4,8 @@
 import uuid
 import random
 
+import paramiko
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -57,3 +59,37 @@ class Gateway(AssetUser):
     class Meta:
         unique_together = [('name', 'org_id')]
         verbose_name = _("Gateway")
+
+    def test_connective(self):
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        proxy = paramiko.SSHClient()
+        proxy.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        try:
+            proxy.connect(self.ip, port=self.port,
+                          username=self.username,
+                          password=self.password,
+                          pkey=self.private_key_obj)
+        except(paramiko.AuthenticationException,
+               paramiko.BadAuthenticationType,
+               paramiko.SSHException) as e:
+            return False, str(e)
+
+        sock = proxy.get_transport().open_channel(
+            'direct-tcpip', ('127.0.0.1', self.port), ('127.0.0.1', 0)
+        )
+
+        try:
+            client.connect("127.0.0.1", port=self.port,
+                           username=self.username,
+                           password=self.password,
+                           key_filename=self.private_key_file,
+                           sock=sock,
+                           timeout=5)
+        except (paramiko.SSHException, paramiko.ssh_exception.SSHException,
+                paramiko.AuthenticationException, TimeoutError) as e:
+            return False, str(e)
+        finally:
+            client.close()
+        return True, None

@@ -4,6 +4,11 @@
         <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
+<li id="ops">
+    <a href="{% url 'ops:command-execution-start' %}">
+        <i class="fa fa-terminal" style="width: 14px"></i> <span class="nav-label">{% trans 'Command execution' %}</span><span class="label label-info pull-right"></span>
+    </a>
+</li>
 <li id="users">
     <a href="{% url 'users:user-profile' %}">
         <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>

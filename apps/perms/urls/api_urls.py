@@ -29,6 +29,11 @@ urlpatterns = [
          api.UserGrantedNodesWithAssetsApi.as_view(), name='user-nodes-assets'),
     path('user/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view(),
          name='my-nodes-assets'),
+    path('user/<uuid:pk>/nodes-assets/tree/',
+         api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='user-nodes-assets-as-tree'),
+    path('user/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(),
+         name='my-nodes-assets-as-tree'),
+
 
     # 查询某个用户组授权的资产和资产组
     path('user-group/<uuid:pk>/assets/',

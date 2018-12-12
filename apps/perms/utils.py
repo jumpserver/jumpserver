@@ -11,36 +11,41 @@ from .hands import Node
 logger = get_logger(__file__)
 
 
-class Tree:
+class GenerateTree:
     def __init__(self):
-        self.__all_nodes = Node.objects.all().prefetch_related('assets')
+        """
+        nodes: {"node_instance": {
+            "asset_instance": set("system_user")
+        }
+        """
+        self.__all_nodes = Node.objects.all()
         self.__node_asset_map = defaultdict(set)
         self.nodes = defaultdict(dict)
-        self.root = Node.root()
-        self.init_node_asset_map()
-
-    def init_node_asset_map(self):
-        for node in self.__all_nodes:
-            assets = [a.id for a in node.assets.all()]
-            for asset in assets:
-                self.__node_asset_map[str(asset)].add(node)
 
     def add_asset(self, asset, system_users):
-        nodes = self.__node_asset_map.get(str(asset.id), [])
+        nodes = asset.nodes.all()
         self.add_nodes(nodes)
         for node in nodes:
             self.nodes[node][asset].update(system_users)
+
+    def get_nodes(self):
+        for node in self.nodes:
+            assets = set(self.nodes.get(node).keys())
+            for n in self.nodes.keys():
+                if n.key.startswith(node.key + ':'):
+                    assets.update(set(self.nodes[n].keys()))
+            node.assets_amount = len(assets)
+        return self.nodes
 
     def add_node(self, node):
         if node in self.nodes:
             return
         else:
             self.nodes[node] = defaultdict(set)
-        if node.key == self.root.key:
+        if node.is_root():
             return
-        parent_key = ':'.join(node.key.split(':')[:-1])
         for n in self.__all_nodes:
-            if n.key == parent_key:
+            if n.key == node.parent_key:
                 self.add_node(n)
                 break
 
@@ -107,6 +112,9 @@ class AssetPermissionUtil:
         self._permissions = permissions
         return permissions
 
+    def filter_permission_with_system_user(self, system_user):
+        self._permissions = self.permissions.filter(system_users=system_user)
+
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
@@ -150,10 +158,17 @@ class AssetPermissionUtil:
         :return:
         """
         assets = self.get_assets()
-        tree = Tree()
+        tree = GenerateTree()
         for asset, system_users in assets.items():
             tree.add_asset(asset, system_users)
-        return tree.nodes
+        return tree.get_nodes()
+
+    def get_system_users(self):
+        system_users = set()
+        permissions = self.permissions.prefetch_related('system_users')
+        for perm in permissions:
+            system_users.update(perm.system_users.all())
+        return system_users
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
