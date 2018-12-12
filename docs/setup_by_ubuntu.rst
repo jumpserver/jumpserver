@@ -166,7 +166,7 @@
 
         # SECURITY WARNING: keep the bootstrap token used in production secret!
         # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-        BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvm'
+        BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvmV'
 
         # Development env open this, when error occur display the full process track, Production disable it
         # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
@@ -329,7 +329,7 @@
         # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
         # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
         # BOOTSTRAP_TOKEN = "PleaseChangeMe"
-        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmV"
+        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmVV"
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -478,8 +478,8 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
-    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm
-    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm" >> ~/.bashrc
+    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
+    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
