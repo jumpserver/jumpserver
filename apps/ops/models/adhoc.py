@@ -229,7 +229,7 @@ class AdHoc(models.Model):
             history.result = raw
             history.summary = summary
             return raw, summary
-        except IndexError as e:
+        except Exception as e:
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
             # f.close()
