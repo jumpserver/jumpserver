@@ -139,6 +139,9 @@ CentOS 7 安装文档
         # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
         SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
+        # Django security setting, if your disable debug model, you should setting that
+        ALLOWED_HOSTS = ['*']
+
         # SECURITY WARNING: keep the bootstrap token used in production secret!
         # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
         BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvmV'
