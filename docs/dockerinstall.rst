@@ -14,7 +14,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 .. code-block:: shell
 
-    # 1.4.4 版本(最新)
+    # 1.4.5 版本(最新)
     $ docker run --name jms_server -d -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
 
 访问
@@ -47,7 +47,7 @@ XShell等工具请添加connection连接,ssh 端口 2222
 
 额外环境变量
 ```````````````
-
+- BOOTSTRAP_TOKEN = nwv4RdXpM82LtSvm
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
 - DB_PORT = 3306
@@ -70,6 +70,7 @@ XShell等工具请添加connection连接,ssh 端口 2222
         -v /opt/mysql:/var/lib/mysql
         -p 80:80 \
         -p 2222:2222 \
+        -e BOOTSTRAP_TOKEN=xxx
         -e DB_ENGINE=mysql \
         -e DB_HOST=192.168.x.x \
         -e DB_PORT=3306 \

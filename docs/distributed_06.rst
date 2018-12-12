@@ -47,7 +47,8 @@
         -p 2222:2222 \
         -p 5000:5000 \
         -e CORE_HOST=http://192.168.100.30:8080 \
-        wojiushixiaobai/coco:1.4.4
+        -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm \
+        wojiushixiaobai/coco:1.4.5
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 coco 注册
 
@@ -65,6 +66,7 @@
         -p 2223:2222 \
         -p 5001:5000 \
         -e CORE_HOST=http://192.168.100.30:8080 \
-        wojiushixiaobai/coco:1.4.4
+        -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm \
+        wojiushixiaobai/coco:1.4.5
 
     # 访问 http://192.168.100.100/terminal/terminal/ 接受 coco 注册
