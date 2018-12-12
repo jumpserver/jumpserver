@@ -171,7 +171,7 @@ function initResultTerminal() {
         cursorBlink: false,
         screenKeys: false,
         fontFamily: '"Monaco", "Consolas", "monospace"',
-        fontSize: 12,
+        fontSize: 13,
         rightClickSelectsWord: true,
         disableStdin: true,
         theme: {
@@ -180,6 +180,10 @@ function initResultTerminal() {
     });
     term.open(document.getElementById('term'));
     term.write("选择左侧资产, 选择运行的系统用户，批量执行命令\r\n")
+}
+
+function wrapperError(msg) {
+    return '\033[31m' + msg + '\033[0m' + '\r\n';
 }
 
 function execute() {
@@ -192,6 +196,18 @@ function execute() {
     var hosts = getSelectedAssetsNode().map(function (node) {
         return node.id;
     });
+    if (hosts.length === 0) {
+        term.write(wrapperError('没有选中资产'));
+        return
+    }
+    if (!command) {
+        term.write(wrapperError('没有输入命令'));
+        return
+    }
+    if (!run_as) {
+        term.write(wrapperError('没有选择运行用户'));
+        return
+    }
     var data = {
         hosts: hosts,
         run_as: run_as,
