@@ -219,7 +219,7 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver/utils
-    $ bash make_migrations.sh
+    $ sh make_migrations.sh
 
 **2.9 运行 Jumpserver**
 

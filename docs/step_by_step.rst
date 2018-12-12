@@ -261,7 +261,7 @@
 
     # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错,请浏览器访问 http://192.168.244.144:8080/  默认账号: admin 密码: admin 页面显示不正常先不用处理,继续往下操作,后面搭建 nginx 代理后即可正常访问,原因是因为 django 无法在非 debug 模式下加载静态资源
+运行不报错, 请继续往下操作
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -395,8 +395,6 @@
 
     # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
-启动成功后去Jumpserver 会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册
-
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -489,8 +487,6 @@ Guacamole 需要 Tomcat 来运行
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
-启动成功后去Jumpserver 会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受[Gua]开头的一个注册
-
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -498,48 +494,36 @@ Guacamole 需要 Tomcat 来运行
 
 .. code-block:: shell
 
+    # CentOS7
+    $ vi /etc/yum.repos.d/nginx.repo
+
+    [nginx]
+    name=nginx repo
+    baseurl=http://nginx.org/packages/centos/7/$basearch/
+    gpgcheck=0
+    enabled=1
+
+    # CentOS6
+    $ vi /etc/yum.repos.d/nginx.repo
+
+    [nginx]
+    name=nginx repo
+    baseurl=http://nginx.org/packages/centos/6/$basearch/
+    gpgcheck=0
+    enabled=1
+
     $ yum -y install nginx
-
-.. code-block:: nginx
-
-    $ vi /etc/nginx/nginx.conf
-
-    ... 原内容
-    include /etc/nginx/conf.d/*.conf;
-
-    # 注释掉整个server {}
-    # server {
-        # listen       80 default_server;
-        # listen       [::]:80 default_server;
-        # server_name  _;
-        # root         /usr/share/nginx/html;
-
-        # Load configuration files for the default server block.
-        # include /etc/nginx/default.d/*.conf;
-
-        # location / {
-        # }
-
-        # error_page 404 /404.html;
-            # location = /40x.html {
-        # }
-
-        # error_page 500 502 503 504 /50x.html;
-            # location = /50x.html {
-        # }
-    # }
-    ... 原内容
+    $ rm -rf /etc/nginx/conf.d/default.conf
 
 **6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 
 .. code-block:: nginx
 
     $ vi /etc/nginx/conf.d/jumpserver.conf
-    # 注意注释 nginx.conf 里面的 server {} 内容 ,CentOS 6 需要修改文件 /etc/nginx/cond.f/default.conf
 
     server {
         listen 80;  # 代理端口,以后将通过此端口进行访问,不再通过8080端口
-        server_name demo.jumpserver.org;  # 修改成你的域名
+        # server_name demo.jumpserver.org;  # 修改成你的域名或者注释掉
 
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
@@ -620,7 +604,7 @@ Guacamole 需要 Tomcat 来运行
 
 默认账号: admin 密码: admin
 
-如果部署过程中没有接受应用的注册,需要到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
+到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
 
 **测试连接**
 
