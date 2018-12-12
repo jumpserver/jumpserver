@@ -178,7 +178,13 @@ class CommandResultCallback(AdHocResultCallback):
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.results_summary['success'] = False
         self.gather_result("failed", result)
-        msg = result._result.get("msg") or result._result.get("module_stdout")
+        msg = result._result.get("msg", '')
+        stderr = result._result.get("stderr")
+        if stderr:
+            msg += '\n' + stderr
+        module_stdout = result._result.get("module_stdout")
+        if module_stdout:
+            msg += '\n' + module_stdout
         if not msg:
             msg = json.dumps(result._result, indent=4)
         self._display.display("%s | FAILED! => \n%s" % (
