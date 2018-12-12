@@ -329,7 +329,7 @@
         # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
         # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
         # BOOTSTRAP_TOKEN = "PleaseChangeMe"
-        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmVV"
+        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmV"
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'

@@ -618,7 +618,7 @@
         # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
         # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
         # BOOTSTRAP_TOKEN = "PleaseChangeMe"
-        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmVV"
+        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmV"
 
         # 启动时绑定的ip, 默认 0.0.0.0
         # BIND_HOST = '0.0.0.0'
@@ -707,8 +707,8 @@
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
-    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmVV
-    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmVV" >> ~/.bashrc
+    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
+    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
 
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
@@ -738,8 +738,8 @@
     $ docker rm jms_guacamole
     $ docker pull wojiushixiaobai/coco:1.4.5
     $ docker pull wojiushixiaobai/guacamole:1.4.5
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmVV wojiushixiaobai/coco:1.4.5
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmVV wojiushixiaobai/guacamole:1.4.5
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
