@@ -203,17 +203,14 @@ class Node(OrgModelMixin):
         # 如果使用current_org 在set_current_org时会死循环
         _current_org = get_current_org()
         with transaction.atomic():
-            if _current_org.is_root():
-                key = '0'
-            elif _current_org.is_default():
-                key = '1'
-            else:
-                set_current_org(Organization.root())
-                org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
-                org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True) or ['1']
-                key = max([int(k) for k in org_nodes_roots_keys])
-                key = str(key + 1) if key != 0 else '2'
-                set_current_org(_current_org)
+            if not _current_org.is_real():
+                return cls.default_node()
+            set_current_org(Organization.root())
+            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
+            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True) or ['1']
+            key = max([int(k) for k in org_nodes_roots_keys])
+            key = str(key + 1) if key != 0 else '2'
+            set_current_org(_current_org)
             root = cls.objects.create(key=key, value=_current_org.name)
             return root
 

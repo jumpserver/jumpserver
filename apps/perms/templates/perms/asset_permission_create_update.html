@@ -54,9 +54,15 @@
                                 <div class="col-sm-9">
                                     <div class="input-daterange input-group" id="datepicker">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                        <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value|date:'Y-m-d H:i' }}">
-                                        <span class="input-group-addon">to</span>
-                                        <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
+                                        {% if form.errors %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value }}">
+                                        {% else %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value|date:'Y-m-d H:i' }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
+                                        {% endif %}
                                     </div>
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                     <span class="help-block ">{{ form.date_start.errors }}</span>
@@ -113,7 +119,7 @@ $(document).ready(function () {
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
 
-    $('.select2').val(assets).trigger('change');
+    $('#id_assets').val(assets).trigger('change');
 
     $("#asset_list_modal").modal('hide');
 });
