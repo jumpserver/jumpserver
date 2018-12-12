@@ -165,6 +165,8 @@ class AdHocRunner:
             )
 
     def clean_args(self, module, args):
+        if not args:
+            return ''
         if module not in self.command_modules_choices:
             return args
         if isinstance(args, str):
