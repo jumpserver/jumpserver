@@ -39,7 +39,7 @@
     export GUACAMOLE_HOME=/config/guacamole
     export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     export JUMPSERVER_SERVER=http://127.0.0.1:8080
-    export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm
+    export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
     /etc/init.d/guacd start
     cd /config/tomcat8/bin && ./startup.sh
 
@@ -193,7 +193,7 @@ Systemd 管理启动 Jumpserver
     [Service]
     Type=forking
     PIDFile=/config/tomcat8/tomcat.pid
-    Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole" "BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvm"
+    Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole" "BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV"
     ExecStart=/config/tomcat8/bin/startup.sh
     ExecReload=
     ExecStop=/config/tomcat8/bin/shutdown.sh
