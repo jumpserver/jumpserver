@@ -368,7 +368,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -409,14 +409,14 @@
 
     # 备份 Jumpserver
     $ cp -r /opt/jumpserver /opt/jumpserver_1.4.4_bak
-    $ cd /opt/jumpserver
-    $ sh utils/clean_migrations.sh
 
 .. code-block:: shell
 
     $ cd /opt/jumpserver
     $ git checkout master
     $ git pull
+    $ git clean -df  # 清除未跟踪文件, 请一定要做好备份后再操作此步骤
+    $ git reset --hard  # 还原所有修改, 请一定要做好备份后再操作此步骤
 
     # 更新 config.py ,请根据你原备份的 config.py 内容进行修改
     $ mv config.py config_1.4.4.bak
@@ -544,6 +544,31 @@
 
     $ pip install -r requirements/requirements.txt
     $ cd utils
+    $ vi 1.4.4_to_1.4.5_migrations.sh
+
+.. code-block:: vim
+
+    #!/bin/bash
+    #
+
+    host=127.0.0.1  # 修改成 Jumpserver 数据库服务器IP
+    port=3306  # 修改成 Jumpserver 数据库服务器端口
+    username=root  # 修改成有权限对数据库进行删改的用户
+    db=jumpserver  # 修改成 Jumpserver 数据库名称
+
+    echo "备份原来的 migrations"
+    mysqldump -u${username} -h${host} -P${port} -p ${db} django_migrations > django_migrations.sql.bak
+    ret=$?
+
+    if [ ${ret} == "0" ];then
+        echo "开始使用新的migrations文件"
+        mysql -u${username} -h${host} -P${port} -p ${db} < django_migrations.sql
+    else
+        echo "Not valid"
+    fi
+
+.. code-block:: shell
+
     $ sh 1.4.4_to_1.4.5_migrations.sh
     $ sh make_migrations.sh
 
@@ -696,7 +721,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.5/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.5/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
