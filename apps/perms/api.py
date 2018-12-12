@@ -227,8 +227,9 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
 
     @staticmethod
     def parse_asset_to_tree_node(node, asset, system_users):
+        system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
         system_user_serializer = serializers.GrantedSystemUserSerializer(
-            system_users, many=True
+            system_users_protocol_matched, many=True
         )
         asset_serializer = serializers.GrantedAssetSerializer(asset)
         icon_skin = 'file'
