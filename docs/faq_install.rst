@@ -29,13 +29,13 @@
     $ pip install -r requirement.txt -i https://pypi.org/simple
     $ pip install xxxxx==x.x.xx -i https://pypi.org/simple
 
-5. bash make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
+5. sh make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
 
 .. code-block:: vim
 
     # 这是由于 config.py 里面的内容格式不对,请参考安装文档的说明,把提示的内容与上一行对齐即可
 
-6. bash make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
+6. sh make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
 .. code-block:: shell
 
@@ -48,7 +48,7 @@
     # 如果已经在 py3 虚拟环境下,任然报 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
     $ cd /opt/jumpserver/requirements
     $ pip install -r requirements.txt
-    # 然后重新执行 bash make_migrations.sh
+    # 然后重新执行 sh make_migrations.sh
 
 7.  sh make_migrations.sh 报错 CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
 

@@ -47,7 +47,6 @@
 
 .. code-block:: shell
 
-    # 升级前请做好 jumpserver 目录与 数据库 备份,谨防意外
     $ cd /opt/jumpserver
     $ source /opt/py3/bin/activate
     $ ./jms stop
@@ -56,14 +55,95 @@
 
 .. code-block:: shell
 
-    # jumpserver 版本小于 1.3 升级到最新版本请使用新的 config.py (升级前版本小于 1.3 需要执行此步骤,否则跳过)
-    $ mv config.py config.bak
+    $ mv config.py config_old.bak
     $ cp config_example.py config.py
-    $ vi config.py  # 参考安装文档进行修改
+    $ vi config.py
+
+.. code-block:: python
+
+    """
+        jumpserver.config
+        ~~~~~~~~~~~~~~~~~
+
+        Jumpserver project setting file
+
+        :copyright: (c) 2014-2017 by Jumpserver Team
+        :license: GPL v2, see LICENSE for more details.
+    """
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+    class Config:
+        # Use it to encrypt or decrypt data
+
+        # Jumpserver 使用 SECRET_KEY 进行加密,请务必修改以下设置
+        # 保持与你原来的 SECRET_KEY 一致, 可查看 config_old.bak
+        SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+
+        # Django security setting, if your disable debug model, you should setting that
+        ALLOWED_HOSTS = ['*']
+
+        # DEBUG 模式 True为开启 False为关闭,默认开启,生产环境推荐关闭
+        # 注意：如果设置了DEBUG = False,访问8080端口页面会显示不正常,需要搭建 nginx 代理才可以正常访问
+        DEBUG = os.environ.get("DEBUG") or False
+
+        # 日志级别,默认为DEBUG,可调整为INFO, WARNING, ERROR, CRITICAL,默认INFO
+        LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'WARNING'
+        LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
+        # 使用的数据库配置,支持sqlite3, mysql, postgres等,默认使用sqlite3
+        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+        # 默认使用SQLite3,如果使用其他数据库请注释下面两行
+        # DB_ENGINE = 'sqlite3'
+        # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
+
+        # 请手动修改下面数据库设置, 保持与你原来的设置一致, 可查看config_old.bak
+        DB_ENGINE = os.environ.get("DB_ENGINE") or 'mysql'
+        DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
+        DB_PORT = os.environ.get("DB_PORT") or 3306
+        DB_USER = os.environ.get("DB_USER") or 'jumpserver'
+        DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
+        DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
+
+        # Django 监听的ip和端口
+        # ./manage.py runserver 127.0.0.1:8080
+        HTTP_BIND_HOST = '0.0.0.0'
+        HTTP_LISTEN_PORT = 8080
+
+        # 请手动修改下面 Redis 设置, 保持与你原来的设置一致, 可查看config_old.bak
+        REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
+        REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+        REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
+        REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
+        REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
+
+        def __init__(self):
+            pass
+
+        def __getattr__(self, item):
+            return None
+
+
+    class DevelopmentConfig(Config):
+        pass
+
+
+    class TestConfig(Config):
+        pass
+
+
+    class ProductionConfig(Config):
+        pass
+
+
+    # Default using Config settings, you can write if/else for different env
+    config = DevelopmentConfig()
 
 .. code-block:: shell
 
-    # 所有版本都需要执行此步骤
     $ pip install -r requirements/requirements.txt
     $ cd utils && sh make_migrations.sh
 
@@ -81,34 +161,71 @@
 
     # 启动 jumpserver
     $ cd ../
-    $ ./jms start all
+    $ ./jms start all -d
 
 .. code-block:: nginx
 
     # 任意版本升级到 1.4.2 版本,需要修改 nginx 配置 (升级前版本小于 1.4.2 需要执行此步骤)
     $ vi /etc/nginx/conf.d/jumpserver.conf  # 部分用户的配置文件是/etc/nginx/nginx.conf
 
-    ...
+    server {
+        listen 80;
 
-    location /socket.io/ {
-        # 原来的内容,请参考安装文档 nginx 部分
+        client_max_body_size 100m;  # 录像及文件上传大小限制
+
+        location /luna/ {
+            try_files $uri / /index.html;
+            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
+        }
+
+        location /media/ {
+            add_header Content-Encoding gzip;
+            root /opt/jumpserver/data/;  # 录像位置,如果修改安装目录,此处需要修改
+        }
+
+        location /static/ {
+            root /opt/jumpserver/data/;  # 静态资源,如果修改安装目录,此处需要修改
+        }
+
+        location /socket.io/ {
+            proxy_pass       http://localhost:5000/socket.io/;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location /coco/ {
+            proxy_pass       http://localhost:5000/coco/;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location /guacamole/ {
+            proxy_pass       http://localhost:8081/;
+            proxy_buffering off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $http_connection;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            access_log off;
+        }
+
+        location / {
+            proxy_pass http://localhost:8080;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
     }
-
-    # 加入下面内容
-    location /coco/ {
-        proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器,请填写它的ip
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        access_log off;
-    }
-    # 到此结束
-
-    location /guacamole/ {
-        # 原来的内容,请参考安装文档 nginx 部分
-    }
-
-    ...
 
 .. code-block:: shell
 
@@ -131,9 +248,99 @@
     # coco 升级前版本小于 1.4.1 升级到最新版本请使用新的 conf.py (升级前版本小于 1.4.1 需要执行此步骤)
     $ mv conf.py coco.bak
     $ cp conf_example.py conf.py
-    $ vi conf.py  # 参考安装文档进行修改
+    $ vi conf.py
 
-    $ ./cocod start
+.. code-block:: python
+
+    #!/usr/bin/env python3
+    # -*- coding: utf-8 -*-
+    #
+
+    import os
+
+    BASE_DIR = os.path.dirname(__file__)
+
+
+    class Config:
+        """
+        Coco config file, coco also load config from server update setting below
+        """
+        # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
+        # NAME = "localhost"
+        NAME = "coco"
+
+        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
+        # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
+        CORE_HOST = 'http://127.0.0.1:8080'
+
+        # 启动时绑定的ip, 默认 0.0.0.0
+        # BIND_HOST = '0.0.0.0'
+
+        # 监听的SSH端口号, 默认2222
+        # SSHD_PORT = 2222
+
+        # 监听的HTTP/WS端口号,默认5000
+        # HTTPD_PORT = 5000
+
+        # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
+        # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
+        # ACCESS_KEY = None
+
+        # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
+        # ACCESS_KEY_STORE = os.path.join(BASE_DIR, 'keys', '.access_key')
+
+        # 加密密钥
+        # SECRET_KEY = None
+
+        # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+        # LOG_LEVEL = 'INFO'
+        LOG_LEVEL = 'WARN'
+
+        # 日志存放的目录
+        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
+        # Session录像存放目录
+        # SESSION_DIR = os.path.join(BASE_DIR, 'sessions')
+
+        # 资产显示排序方式, ['ip', 'hostname']
+        # ASSET_LIST_SORT_BY = 'ip'
+
+        # 登录是否支持密码认证
+        # PASSWORD_AUTH = True
+
+        # 登录是否支持秘钥认证
+        # PUBLIC_KEY_AUTH = True
+
+        # SSH白名单
+        # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
+
+        # SSH黑名单, 如果用户同时在白名单和黑名单,黑名单优先生效
+        # BLOCK_SSH_USER = []
+
+        # 和Jumpserver 保持心跳时间间隔
+        # HEARTBEAT_INTERVAL = 5
+
+        # Admin的名字,出问题会提示给用户
+        # ADMINS = ''
+        COMMAND_STORAGE = {
+            "TYPE": "server"
+        }
+        REPLAY_STORAGE = {
+            "TYPE": "server"
+        }
+
+        # SSH连接超时时间 (default 15 seconds)
+        # SSH_TIMEOUT = 15
+
+        # 语言 = en
+        LANGUAGE_CODE = 'zh'
+
+
+    config = Config()
+
+.. code-block:: shell
+
+    $ ./cocod start -d
 
 4. 升级 guacamole (docker 部署的请忽略往下看)
 
@@ -201,7 +408,7 @@
 .. code-block:: shell
 
     # 备份 Jumpserver
-    $ cp -r /opt/jumpserver /opt/jumpserver_bak
+    $ cp -r /opt/jumpserver /opt/jumpserver_1.4.4_bak
     $ cd /opt/jumpserver
     $ sh utils/clean_migrations.sh
 

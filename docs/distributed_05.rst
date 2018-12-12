@@ -183,7 +183,7 @@
 
     # 生成数据库表结构和初始化数据
     $ cd /opt/jumpserver/utils
-    $ bash make_migrations.sh
+    $ sh make_migrations.sh
 
     # 运行 Jumpserver
     $ cd /opt/jumpserver
