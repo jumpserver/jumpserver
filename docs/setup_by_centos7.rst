@@ -156,6 +156,7 @@ CentOS 7 安装文档
         # LOG_LEVEL = 'DEBUG'
         # LOG_DIR = os.path.join(BASE_DIR, 'logs')
         LOG_LEVEL = 'ERROR'
+        LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
         # Session expiration setting, Default 24 hour, Also set expired on on browser close
         # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
