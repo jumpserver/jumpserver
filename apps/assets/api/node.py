@@ -20,11 +20,10 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
-from django.db.models import Count
 
 from common.utils import get_logger, get_object_or_none
 from ..hands import IsOrgAdmin
-from ..models import Node
+from ..models import Node, Asset
 from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
 from .. import serializers
 

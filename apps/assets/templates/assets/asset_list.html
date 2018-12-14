@@ -305,6 +305,9 @@ function onSelected(event, treeNode) {
 }
 
 function selectQueryNode() {
+    // TODO: 是否应该添加
+    // 暂时忽略之前选中的内容
+    return
     var query_node_id = $.getUrlParam("node");
     var cookie_node_id = getCookie('node_selected');
     var node;
@@ -355,6 +358,9 @@ function onDrop(event, treeId, treeNodes, targetNode, moveType) {
 }
 
 function initTree() {
+    if (zTree) {
+        return
+    }
     var setting = {
         view: {
             dblClickExpand: false,
@@ -387,6 +393,7 @@ function initTree() {
     };
 
     var zNodes = [];
+    console.log("Get assets")
     $.get("{% url 'api-assets:node-list' %}", function(data, status){
         $.each(data, function (index, value) {
             value["node_id"] = value["id"];
