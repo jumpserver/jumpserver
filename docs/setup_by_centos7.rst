@@ -244,9 +244,11 @@ CentOS 7 安装文档
     $ yum install -y yum-utils device-mapper-persistent-data lvm2
     $ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
     $ yum makecache fast
+    $ rpm --import https://mirrors.aliyun.com/docker-ce/linux/centos/gpg
     $ yum -y install docker-ce
     $ systemctl enable docker
-    $ systemctl start docker
+    $ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
+    $ systemctl restart docker
 
     # 注意,<Jumpserver_url> 请自行修改成 jumpserver 对外的访问地址,如 192.168.100.100:8080
     $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
@@ -255,8 +257,10 @@ CentOS 7 安装文档
     # 允许 容器ip 访问宿主 8080 端口,(容器的 ip 可以进入容器查看)
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.2" port protocol="tcp" port="8080" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.3" port protocol="tcp" port="8080" accept"
-
     # 172.17.0.x 是docker容器默认的IP池
+
+    $ firewall-cmd --reload
+    $ docker restart jms_coco jms_guacamole
 
 .. code-block:: shell
 
@@ -378,7 +382,8 @@ CentOS 7 安装文档
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.7" port protocol="tcp" port="8080" accept"
     ...
 
-    $firewall-cmd --reload
+    $ firewall-cmd --reload
+    $ docker restart jms_coco01 jms_coco02 jms_guacamole01 jms_guacamole02
 
     # nginx 代理设置
     $ vi /etc/nginx.conf

@@ -50,7 +50,7 @@
         -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
         wojiushixiaobai/guacamole:1.4.5
 
-    # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
+    # 访问 http://192.168.100.100/terminal/terminal/ 检查 guacamole 注册
 
 
 多节点部署
@@ -67,4 +67,4 @@
         -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
         wojiushixiaobai/guacamole:1.4.5
 
-    # 访问 http://192.168.100.100/terminal/terminal/ 接受 guacamole 注册
+    # 访问 http://192.168.100.100/terminal/terminal/ 检查 guacamole 注册
