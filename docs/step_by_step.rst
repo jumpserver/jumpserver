@@ -649,7 +649,7 @@ Guacamole 需要 Tomcat 来运行
 
 默认账号: admin 密码: admin
 
-到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册。
+到Jumpserver 会话管理-终端管理 检查 Coco Guacamole 等应用的注册。
 
 **测试连接**
 

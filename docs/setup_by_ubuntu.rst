@@ -268,7 +268,7 @@
 
     # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错,请浏览器访问 http://192.168.244.144:8080/ 默认账号: admin 密码: admin 页面显示不正常先不用处理,继续往下操作
+运行不报错,请继续往下操作
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,8 +406,6 @@
 
     # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart 后台运行请添加 -d 参数
 
-启动成功后去Jumpserver 会话管理-终端管理(http://192.168.244.144:8080/terminal/terminal/)接受coco的注册,如果页面显示不正常可以等部署完成后再处理
-
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -497,9 +495,6 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ sh /config/tomcat8/bin/startup.sh
 
 这里所需要注意的是 guacamole 暴露出来的端口是 8081,若与主机上其他端口冲突请自定义一下。
-
-启动成功后去 Jumpserver-会话管理-终端管理 接受[Gua]开头的一个注册,如果页面显示不正常可以等部署完成后再处理
-
 
 六. 配置 Nginx 整合各组件
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -595,7 +590,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
 默认账号: admin 密码: admin
 
-如果部署过程中没有接受应用的注册,需要到Jumpserver 会话管理-终端管理 接受 Coco Guacamole 等应用的注册
+到Jumpserver 会话管理-终端管理 检查 Coco Guacamole 等应用的注册
 
 **测试连接**
 
