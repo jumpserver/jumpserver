@@ -16,8 +16,8 @@ API 文档
 
 .. code-block:: shell
 
-    $ curl -X POST -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}' http://localhost/api/users/v1/token/  # 获取token
-    {"Token":"937b38011acf499eb474e2fecb424ab3","KeyWord":"Bearer"}%  # 获取到的token
+    $ curl -X POST -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}' http://localhost/api/users/v1/auth/  # 获取token
+    {"Token":"937b38011acf499eb474e2fecb424ab3"}%  # 获取到的token
 
     $ curl -H 'Authorization: Bearer 937b38011acf499eb474e2fecb424ab3' -H "Content-Type:application/json" http://localhost/api/users/v1/users/
     # 使用token访问,token有效期 1小时
@@ -32,7 +32,7 @@ API 文档
 
     def get_token():
 
-        url = 'https://jumpserver.tk/api/users/v1/token/'
+        url = 'https://jumpserver.tk/api/users/v1/auth/'
 
         query_args = {
             "username": "admin",
@@ -53,6 +53,6 @@ API 文档
 
         response = requests.get(url, headers=header_info)
 
-        pprint(json.loads(response.text))
+        print(json.loads(response.text))
 
     get_user_info()
