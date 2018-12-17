@@ -134,6 +134,12 @@ class TerminalSettingForm(BaseForm):
         ('hostname', _('Hostname')),
         ('ip', _('IP')),
     )
+    PAGE_SIZE_CHOICES = (
+        ('all', _('All')),
+        ('auto', _('Auto')),
+        (10, 10),
+        (20, 20)
+    )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Password auth")
     )
@@ -145,6 +151,9 @@ class TerminalSettingForm(BaseForm):
     )
     TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
         choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
+    )
+    TERMINAL_ASSET_LIST_PAGE_SIZE = forms.ChoiceField(
+        choices=PAGE_SIZE_CHOICES, initial='auto', label=_("List page size"),
     )
 
 
