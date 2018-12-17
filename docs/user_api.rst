@@ -53,6 +53,6 @@ API 文档
 
         response = requests.get(url, headers=header_info)
 
-        print(json.loads(response.text))
+        pprint(json.loads(response.text))
 
     get_user_info()
