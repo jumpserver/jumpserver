@@ -5,6 +5,7 @@ import uuid
 from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.core.cache import cache
 
 from orgs.mixins import OrgModelMixin
@@ -103,6 +104,15 @@ class Node(OrgModelMixin):
         key = self._full_value_cache_key.format(self.key)
         cache.delete_pattern(key+'*')
 
+    @classmethod
+    def expire_nodes_full_value(cls, nodes=None):
+        if nodes:
+            for node in nodes:
+                node.expire_full_value()
+            return
+        key = cls._full_value_cache_key.format('*')
+        cache.delete_pattern(key+'*')
+
     @property
     def level(self):
         return len(self.key.split(':'))
@@ -112,6 +122,17 @@ class Node(OrgModelMixin):
         self.child_mark += 1
         self.save()
         return "{}:{}".format(self.key, mark)
+
+    def get_next_child_preset_name(self):
+        name = ugettext("New node")
+        values = [
+            child.value[child.value.rfind(' '):]
+            for child in self.get_children()
+            if child.value.startswith(name)
+        ]
+        values = [int(value) for value in values if value.strip().isdigit()]
+        count = max(values) + 1 if values else 1
+        return '{} {}'.format(name, count)
 
     def create_child(self, value):
         with transaction.atomic():
@@ -162,7 +183,7 @@ class Node(OrgModelMixin):
         pattern = r'^{0}$|^{0}:'.format(self.key)
         args = []
         kwargs = {}
-        if self.is_default_node():
+        if self.is_root():
             args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
         else:
             kwargs['nodes__key__regex'] = pattern
@@ -255,6 +276,26 @@ class Node(OrgModelMixin):
     def default_node(cls):
         defaults = {'value': 'Default'}
         return cls.objects.get_or_create(defaults=defaults, key='1')
+
+    def as_tree_node(self):
+        from common.tree import TreeNode
+        from ..serializers import NodeSerializer
+        name = '{} ({})'.format(self.value, self.assets_amount)
+        node_serializer = NodeSerializer(instance=self)
+        data = {
+            'id': self.key,
+            'name': name,
+            'title': name,
+            'pId': self.parent_key,
+            'isParent': True,
+            'open': self.is_root(),
+            'meta': {
+                'node': node_serializer.data,
+                'type': 'node'
+            }
+        }
+        tree_node = TreeNode(**data)
+        return tree_node
 
     @classmethod
     def generate_fake(cls, count=100):
