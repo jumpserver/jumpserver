@@ -312,7 +312,12 @@ defaults = {
     'SESSION_COOKIE_AGE': 3600 * 24,
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
-    'EMAIL_SUFFIX': 'jumpserver.org'
+    'EMAIL_SUFFIX': 'jumpserver.org',
+    'TERMINAL_PASSWORD_AUTH': True,
+    'TERMINAL_PUBLIC_KEY_AUTH': True,
+    'TERMINAL_HEARTBEAT_INTERVAL': 5,
+    'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
+    'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
 }
 
 
