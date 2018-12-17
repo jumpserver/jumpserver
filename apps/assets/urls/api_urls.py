@@ -53,6 +53,8 @@ urlpatterns = [
     path('system-user/<uuid:pk>/cmd-filter-rules/',
          api.SystemUserCommandFilterRuleListApi.as_view(), name='system-user-cmd-filter-rule-list'),
 
+    path('nodes/tree/', api.NodeListAsTreeApi.as_view(), name='node-tree'),
+    path('nodes/children/tree/', api.NodeChildrenAsTreeApi.as_view(), name='node-children-tree'),
     path('nodes/<uuid:pk>/children/',
          api.NodeChildrenApi.as_view(), name='node-children'),
     path('nodes/children/', api.NodeChildrenApi.as_view(), name='node-children-2'),

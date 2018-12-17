@@ -292,7 +292,8 @@ def check_otp_code(otp_secret_key, otp_code):
     if not otp_secret_key or not otp_code:
         return False
     totp = pyotp.TOTP(otp_secret_key)
-    return totp.verify(otp_code)
+    otp_valid_window = settings.OTP_VALID_WINDOW or 0
+    return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 
 
 def get_password_check_rules():

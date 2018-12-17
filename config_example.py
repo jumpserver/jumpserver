@@ -90,6 +90,9 @@ class Config:
     # AUTH_OPENID_CLIENT_ID = 'client-id'
     # AUTH_OPENID_CLIENT_SECRET = 'client-secret'
 
+    #
+    # OTP_VALID_WINDOW = 0
+
     def __init__(self):
         pass
 

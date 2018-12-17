@@ -9,6 +9,7 @@ from .system_user import AssetSystemUserSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
+    'AssetAsNodeSerializer',
 ]
 
 
@@ -22,12 +23,25 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         fields = '__all__'
         validators = []
 
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.prefetch_related('labels', 'nodes')\
+            .select_related('admin_user')
+        return queryset
+
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
         fields.extend([
             'hardware_info', 'is_connective', 'org_name'
         ])
         return fields
+
+
+class AssetAsNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = ['id', 'hostname', 'ip', 'port', 'platform', 'protocol']
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
