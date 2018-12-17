@@ -138,7 +138,9 @@ class TerminalSettingForm(BaseForm):
         ('all', _('All')),
         ('auto', _('Auto')),
         (10, 10),
-        (20, 20)
+        (15, 15),
+        (25, 25),
+        (50, 50),
     )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Password auth")
