@@ -255,6 +255,36 @@ class Asset(OrgModelMixin):
             })
         return data
 
+    def as_tree_node(self, parent_node):
+        from common.tree import TreeNode
+        icon_skin = 'file'
+        if self.platform.lower() == 'windows':
+            icon_skin = 'windows'
+        elif self.platform.lower() == 'linux':
+            icon_skin = 'linux'
+        data = {
+            'id': str(self.id),
+            'name': self.hostname,
+            'title': self.ip,
+            'pId': parent_node.key,
+            'isParent': False,
+            'open': False,
+            'iconSkin': icon_skin,
+            'meta': {
+                'type': 'asset',
+                'asset': {
+                    'id': self.id,
+                    'hostname': self.hostname,
+                    'ip': self.ip,
+                    'port': self.port,
+                    'platform': self.platform,
+                    'protocol': self.protocol,
+                }
+            }
+        }
+        tree_node = TreeNode(**data)
+        return tree_node
+
     class Meta:
         unique_together = [('org_id', 'hostname')]
         verbose_name = _("Asset")
