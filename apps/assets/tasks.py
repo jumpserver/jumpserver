@@ -141,11 +141,11 @@ def update_assets_hardware_info_period():
         logger.debug("Period task disabled, update assets hardware info pass")
         return
 
-    from ops.utils import update_or_create_ansible_task
-    from orgs.models import Organization
-    orgs = Organization.objects.all().values_list('id', flat=True)
-    orgs.append('')
-    task_name = _("Update assets hardware info period")
+    # from ops.utils import update_or_create_ansible_task
+    # from orgs.models import Organization
+    # orgs = Organization.objects.all().values_list('id', flat=True)
+    # orgs.append('')
+    # task_name = _("Update assets hardware info period")
     # for org_id in orgs:
     #     org_id = str(org_id)
     #     hostname_list = [
@@ -354,11 +354,12 @@ def test_system_user_connectability_period():
     if PERIOD_TASK != "on":
         logger.debug("Period task disabled, test system user connectability pass")
         return
-    system_users = SystemUser.objects.all()
-    for system_user in system_users:
-        task_name = _("Test system user connectability period: {}").format(system_user)
-        # task_name = _("定期测试系统用户可连接性: {}".format(system_user))
-        test_system_user_connectability_util(system_user, task_name)
+    # Todo: 暂时禁用定期测试
+    # system_users = SystemUser.objects.all()
+    # for system_user in system_users:
+    #     task_name = _("Test system user connectability period: {}").format(system_user)
+    #     # task_name = _("定期测试系统用户可连接性: {}".format(system_user))
+    #     test_system_user_connectability_util(system_user, task_name)
 
 
 ####  Push system user tasks ####
