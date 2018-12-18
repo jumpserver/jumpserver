@@ -17,7 +17,6 @@ RDP 协议资产连接错误排查思路
 
 .. code-block:: shell
 
-    注：连接 Windows 资产提示连接错误,您没有权限访问此连接,请按照此步骤解决
     # 如果终端不在线,请检查 Windows 组件是否已经正常运行
 
     # 如果重启后任然不在线,请重新注册 Windows 组件
@@ -50,6 +49,8 @@ RDP 协议资产连接错误排查思路
     # Windows 7/2008 启用 远程桌面(TCP-In)
     # Windows 8/10/2012 启用 远程桌面-用户模式(TCP-In)
 
+.. image:: _static/img/faq_windows_firewalld.jpg
+
 3. 登录要连接的windows资产,检查用户和IP信息(Windows目前还不支持推送,所以必须使用资产上面已存在的用户进行登录)
 
 .. code-block:: vim
@@ -76,7 +77,7 @@ RDP 协议资产连接错误排查思路
     # 域用户的用户名格式为 user@domain.com,如 administrator@jumpserver.org
     # 如果想让用户登录资产时自己输入资产的账户密码,可以点击系统用户的名称 点击清除认证信息
     # 此处必须输入能正确登录 windows 资产的 账户密码
-    # 如不确实是不是因为密码或者账户信息错误导致的无法登录,可以使用清除认证信息或者手动登录功能(在系统用户处设置)
+    # 如不确实是不是因为密码或者账户信息错误导致的无法登录,可以使用手动登录功能(在系统用户处设置)
 
 .. image:: _static/img/faq_windows_04.jpg
 

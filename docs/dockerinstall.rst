@@ -15,7 +15,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 .. code-block:: shell
 
     # 1.4.5 版本(最新)
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 jumpserver/jms_all:latest
+    $ docker run --name jms_all -d -p 80:80 -p 2222:2222 jumpserver/jms_all:latest
 
 访问
 ```````````````
@@ -66,7 +66,7 @@ XShell等工具请添加connection连接,ssh 端口 2222
 
 .. code-block:: shell
 
-    $ docker run --name jms_server -d \
+    $ docker run --name jms_all -d \
         -v /opt/mysql:/var/lib/mysql
         -p 80:80 \
         -p 2222:2222 \

@@ -368,7 +368,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.5/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -728,6 +728,8 @@
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.5/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
+
+    # 注意把浏览器缓存清理下
 
 **Docker Coco Guacamole**
 
