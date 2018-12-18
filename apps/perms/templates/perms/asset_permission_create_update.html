@@ -102,35 +102,6 @@ var dateOptions = {
         format: 'YYYY-MM-DD HH:mm'
     }
 };
-function initSelectedAssets2Table(){
-    // 解决input框中的资产和弹出表格中资产的显示不一致
-    var inputAssets = $('#id_assets').val();
-    var selectedAssets = asset_table2.selected.concat();
-
-    // input assets无，table assets选中，则取消勾选(再次click)
-    if (selectedAssets.length !== 0){
-        $.each(selectedAssets, function (index, assetId){
-            if ($.inArray(assetId, inputAssets) === -1){
-                $('#'+assetId).trigger('click');  // 取消勾选
-             }
-        });
-    }
-
-    // input assets有，table assets没选，则选中(click)
-    if (inputAssets !== null){
-        asset_table2.selected = inputAssets;
-        $.each(inputAssets, function(index, assetId){
-            var dom = document.getElementById(assetId);
-            if (dom !== null){
-                var selected = dom.parentElement.parentElement.className.indexOf('selected')
-            }
-            if (selected === -1){
-                $('#'+assetId).trigger('click');
-            }
-        });
-    }
-}
-
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
@@ -141,8 +112,8 @@ $(document).ready(function () {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
             e.preventDefault();
             e.stopPropagation();
-            initSelectedAssets2Table();
             $("#asset_list_modal").modal();
+            initSelectedAssets2Table();
         }
     })
 })
