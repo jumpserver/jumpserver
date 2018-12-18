@@ -812,3 +812,32 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
     $idPassword.pwstrength(options);
     popoverPasswordRules(password_check_rules, $el);
 }
+
+// 解决input框中的资产和弹出表格中资产的显示不一致
+function initSelectedAssets2Table(){
+    var inputAssets = $('#id_assets').val();
+    var selectedAssets = asset_table2.selected.concat();
+
+    // input assets无，table assets选中，则取消勾选(再次click)
+    if (selectedAssets.length !== 0){
+        $.each(selectedAssets, function (index, assetId){
+            if ($.inArray(assetId, inputAssets) === -1){
+                $('#'+assetId).trigger('click');  // 取消勾选
+            }
+        });
+    }
+
+    // input assets有，table assets没选，则选中(click)
+    if (inputAssets !== null){
+        asset_table2.selected = inputAssets;
+        $.each(inputAssets, function(index, assetId){
+            var dom = document.getElementById(assetId);
+            if (dom !== null){
+                var selected = dom.parentElement.parentElement.className.indexOf('selected')
+            }
+            if (selected === -1){
+                $('#'+assetId).trigger('click');
+            }
+        });
+    }
+}

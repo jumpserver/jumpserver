@@ -32,6 +32,7 @@ $(document).ready(function () {
 }).on('click', '.select2-selection__rendered', function (e) {
     e.preventDefault();
     $("#asset_list_modal").modal();
+    initSelectedAssets2Table();
 })
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
