@@ -17,7 +17,6 @@ RDP 协议资产连接错误排查思路
 
 .. code-block:: shell
 
-    注：连接 Windows 资产提示连接错误,您没有权限访问此连接,请按照此步骤解决
     # 如果终端不在线,请检查 Windows 组件是否已经正常运行
 
     # 如果重启后任然不在线,请重新注册 Windows 组件
@@ -49,6 +48,8 @@ RDP 协议资产连接错误排查思路
     # Windows防火墙-高级设置-入站规则 把远程桌面开头的选项 右键-启用规则
     # Windows 7/2008 启用 远程桌面(TCP-In)
     # Windows 8/10/2012 启用 远程桌面-用户模式(TCP-In)
+
+.. image:: _static/img/faq_windows_firewalld.jpg
 
 3. 登录要连接的windows资产,检查用户和IP信息(Windows目前还不支持推送,所以必须使用资产上面已存在的用户进行登录)
 
