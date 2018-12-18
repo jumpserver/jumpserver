@@ -17,7 +17,7 @@ from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
-    test_asset_connectability_manual
+    test_asset_connectivity_manual
 from ..utils import LabelFilter
 
 
@@ -109,7 +109,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
 
 class AssetAdminUserTestApi(generics.RetrieveAPIView):
     """
-    Test asset admin user connectivity
+    Test asset admin user assets_connectivity
     """
     queryset = Asset.objects.all()
     permission_classes = (IsOrgAdmin,)
@@ -117,7 +117,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        task = test_asset_connectability_manual.delay(asset)
+        task = test_asset_connectivity_manual.delay(asset)
         return Response({"task": task.id})
 
 

@@ -24,7 +24,7 @@ from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
 from ..hands import IsOrgAdmin
 from ..models import Node
-from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
+from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
 from .. import serializers
 
 
@@ -273,5 +273,5 @@ class TestNodeConnectiveApi(APIView):
         assets = node.assets.all()
         # task_name = _("测试节点下资产是否可连接: {}".format(node.name))
         task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
-        task = test_asset_connectability_util.delay(assets, task_name=task_name)
+        task = test_asset_connectivity_util.delay(assets, task_name=task_name)
         return Response({"task": task.id})

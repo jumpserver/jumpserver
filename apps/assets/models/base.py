@@ -29,6 +29,13 @@ class AssetUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
+    UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
+    CONNECTIVITY_CHOICES = (
+        (UNREACHABLE, _("Unreachable")),
+        (REACHABLE, _('Reachable')),
+        (UNKNOWN, _("Unknown")),
+    )
+
     @property
     def password(self):
         if self._password:
