@@ -228,15 +228,22 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
     @staticmethod
     def parse_asset_to_tree_node(node, asset, system_users):
         system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
-        system_user_serializer = serializers.GrantedSystemUserSerializer(
-            system_users_protocol_matched, many=True
-        )
-        asset_serializer = serializers.GrantedAssetSerializer(asset)
         icon_skin = 'file'
         if asset.platform.lower() == 'windows':
             icon_skin = 'windows'
         elif asset.platform.lower() == 'linux':
             icon_skin = 'linux'
+        system_users = []
+        for system_user in system_users_protocol_matched:
+            system_users.append({
+                'id': system_user.id,
+                'name': system_user.name,
+                'username': system_user.username,
+                'protocol': system_user.protocol,
+                'priority': system_user.priority,
+                'login_mode': system_user.login_mode,
+                'comment': system_user.comment,
+            })
         data = {
             'id': str(asset.id),
             'name': asset.hostname,
@@ -246,9 +253,19 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
             'open': False,
             'iconSkin': icon_skin,
             'meta': {
-                'system_users': system_user_serializer.data,
+                'system_users': system_users,
                 'type': 'asset',
-                'asset': asset_serializer.data
+                'asset': {
+                    'id': asset.id,
+                    'hostname': asset.hostname,
+                    'ip': asset.ip,
+                    'port': asset.port,
+                    'protocol': asset.protocol,
+                    'platform': asset.platform,
+                    'domain': None if not asset.domain else asset.domain.id,
+                    'is_active': asset.is_active,
+                    'comment': asset.comment
+                },
             }
         }
         tree_node = TreeNode(**data)
