@@ -15,7 +15,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 .. code-block:: shell
 
     # 1.4.5 版本(最新)
-    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
+    $ docker run --name jms_server -d -p 80:80 -p 2222:2222 jumpserver/jms_all:latest
 
 访问
 ```````````````
@@ -80,7 +80,7 @@ XShell等工具请添加connection连接,ssh 端口 2222
         -e REDIS_HOST=192.168.x.x \
         -e REDIS_PORT=6379 \
         -e REDIS_PASSWORD=xxx \
-        wojiushixiaobai/jumpserver:latest
+        jumpserver/jms_all:latest
 
 仓库地址
 ```````````````

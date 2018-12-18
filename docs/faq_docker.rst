@@ -96,6 +96,6 @@ Docker 使用说明
     $ docker pull <镜像地址:版本>
 
     # 例:
-    $ docker pull wojiushixiaobai/jumpserver:latest
-    $ docker pull wojiushixiaobai/coco:1.4.5
-    $ docker pull wojiushixiaobai/guacamole:1.4.5
+    $ docker pull jumpserver/jms_all:latest
+    $ docker pull jumpserver/jms_coco:1.4.5
+    $ docker pull jumpserver/jms_guacamole:1.4.5

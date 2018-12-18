@@ -251,8 +251,8 @@ CentOS 7 安装文档
     $ systemctl restart docker
 
     # 注意,<Jumpserver_url> 请自行修改成 jumpserver 对外的访问地址,如 192.168.100.100:8080
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.5
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
 
     # 允许 容器ip 访问宿主 8080 端口,(容器的 ip 可以进入容器查看)
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.2" port protocol="tcp" port="8080" accept"
@@ -366,13 +366,13 @@ CentOS 7 安装文档
 .. code-block:: shell
 
     # coco 服务默认运行在单核心下面, 当负载过高时会导致用户访问变慢, 这时可运行多个 docker 容器缓解
-    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
-    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
+    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.5
+    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.5
     ...
 
     # guacamole 也是一样
-    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
-    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
+    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
+    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
     ...
 
     # 注意开放防火墙, ip 请根据实际情况修改

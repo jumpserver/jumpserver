@@ -383,10 +383,10 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull wojiushixiaobai/coco:1.4.4
-    $ docker pull wojiushixiaobai/guacamole:1.4.4
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> wojiushixiaobai/coco:1.4.4
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> wojiushixiaobai/guacamole:1.4.4
+    $ docker pull jumpserver/jms_coco:1.4.4
+    $ docker pull jumpserver/jms_guacamole:1.4.4
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> jumpserver/jms_coco:1.4.4
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> jumpserver/jms_guacamole:1.4.4
 
     # 到 Web 会话管理 - 终端管理 接受新的注册
 
@@ -740,10 +740,10 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull wojiushixiaobai/coco:1.4.5
-    $ docker pull wojiushixiaobai/guacamole:1.4.5
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/coco:1.4.5
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV wojiushixiaobai/guacamole:1.4.5
+    $ docker pull jumpserver/jms_coco:1.4.5
+    $ docker pull jumpserver/jms_guacamole:1.4.5
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.5
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
