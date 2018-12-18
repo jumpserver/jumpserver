@@ -100,6 +100,9 @@ class Config:
     }
     AUTH_LDAP_START_TLS = False
 
+    #
+    # OTP_VALID_WINDOW = 0
+
     def __init__(self):
         pass
 
@@ -198,6 +201,10 @@ class DockerConfig(Config):
     }
     # 是否启用TLS加密
     AUTH_LDAP_START_TLS = False
+
+
+    #
+    OTP_VALID_WINDOW = int(os.environ.get("OTP_VALID_WINDOW")) if os.environ.get("OTP_VALID_WINDOW") else 0
 
 
 # Default using Config settings, you can write if/else for different env

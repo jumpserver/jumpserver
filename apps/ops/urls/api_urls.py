@@ -11,6 +11,7 @@ app_name = "ops"
 router = DefaultRouter()
 router.register(r'tasks', api.TaskViewSet, 'task')
 router.register(r'adhoc', api.AdHocViewSet, 'adhoc')
+router.register(r'history', api.AdHocRunHistoryViewSet, 'history')
 router.register(r'command-executions', api.CommandExecutionViewSet, 'command-execution')
 
 urlpatterns = [

@@ -15,8 +15,6 @@ class BaseForm(forms.Form):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             value = getattr(settings, name, None)
-            # django_value = getattr(settings, name) if hasattr(settings, name) else None
-
             if value is None:  # and django_value is None:
                 continue
 
@@ -24,8 +22,6 @@ class BaseForm(forms.Form):
                 if isinstance(value, dict):
                     value = json.dumps(value)
                 initial_value = value
-            # elif django_value is False or django_value:
-            #     initial_value = django_value
             else:
                 initial_value = ''
             field.initial = initial_value
@@ -156,6 +152,11 @@ class TerminalSettingForm(BaseForm):
     )
     TERMINAL_ASSET_LIST_PAGE_SIZE = forms.ChoiceField(
         choices=PAGE_SIZE_CHOICES, initial='auto', label=_("List page size"),
+    )
+    TERMINAL_SESSION_KEEP_DURATION = forms.IntegerField(
+        label=_("Session keep duration"),
+        help_text=_("Units: days, Session, record, command will be delete "
+                    "if more than duration, only in database")
     )
 
 

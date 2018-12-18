@@ -143,6 +143,18 @@ class User(AbstractUser):
         return False
 
     @property
+    def groups_display(self):
+        return ' '.join(self.groups.all().values_list('name', flat=True))
+
+    @property
+    def role_display(self):
+        return self.get_role_display()
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
+
+    @property
     def is_expired(self):
         if self.date_expired and self.date_expired < timezone.now():
             return True
