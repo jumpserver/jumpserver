@@ -47,7 +47,7 @@
     # bind 127.0.0.1  # 注释这行,新增如下内容
     bind 0.0.0.0
     requirepass weakPassword  # redis 连接密码
-    maxmemory-policy allkeys-lr  # 清理策略,优先移除最近未使用的key
+    maxmemory-policy allkeys-lru  # 清理策略,优先移除最近未使用的key
 
     ...
 
