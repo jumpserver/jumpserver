@@ -3,6 +3,18 @@
 {% load static %}
 {% load common_tags %}
 
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
 {% block content_left_head %}
 {% endblock %}
 
@@ -39,44 +51,49 @@
     </form>
 {% endblock %}
 
-{% block table_head %}
-    <th class="text-center"></th>
-    <th class="text-center">{% trans 'Hosts' %}</th>
-    <th class="text-center">{% trans 'User' %}</th>
-    <th class="text-center">{% trans 'Command' %}</th>
-    <th class="text-center">{% trans 'Output' %}</th>
-    <th class="text-center">{% trans 'Finished' %}</th>
-    <th class="text-center">{% trans 'Success' %}</th>
-    <th class="text-center">{% trans 'Date start' %}</th>
-    <th class="text-center">{% trans 'Date finished' %}</th>
-{% endblock %}
-
-{% block table_body %}
+{% block table_container %}
+    <table class="footable table table-stripped table-bordered toggle-arrow-tiny" data-page="false" >
+    <thead>
+        <th class="text-center"></th>
+        <th class="text-center">{% trans 'Hosts' %}</th>
+        <th class="text-center">{% trans 'User' %}</th>
+        <th class="text-center">{% trans 'Command' %}</th>
+        <th class="text-center">{% trans 'Run as' %}</th>
+        <th class="text-center">{% trans 'Output' %}</th>
+        <th class="text-center">{% trans 'Finished' %}</th>
+        <th class="text-center">{% trans 'Success' %}</th>
+        <th class="text-center">{% trans 'Date start' %}</th>
+    </thead>
+    <tbody>
     {% for object in object_list %}
         <tr class="gradeX">
-            <td class="text-center"><input type="checkbox" class="cbx-term"></td>
-            <td class="text-center">{{ object.hosts.count }}</td>
-            <td class="text-center">{{ object.user }}</td>
+            <td>{{ forloop.counter }}</td>
+            <td class="text-center hosts" value="{{ object.get_hosts_names }}"></td>
+            <td class="text-center">{{ object.user.name }}</td>
             <td class="text-center">{{ object.command| truncatechars:16 }}</td>
+            <td class="text-center">{{ object.run_as.username }}</td>
             <td class="text-center"><a href="{% url "ops:celery-task-log" pk=object.id %}" target="_blank">查看</a></td>
             <td class="text-center">{{ object.is_finished | state_show | safe }}</td>
             <td class="text-center">{{ object.is_success | state_show | safe }}</td>
             <td class="text-center">{{ object.date_start }}</td>
-            <td class="text-center">{{ object.date_finished }}</td>
         </tr>
     {% endfor %}
+    </tbody>
+    </table>
 {% endblock %}
 
 {% block custom_foot_js %}
 <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
 <script>
 $(document).ready(function() {
-    $('table').DataTable({
-        "searching": false,
-        "paging": false,
-        "bInfo" : false,
-        "order": []
-    });
+    {#$('table').DataTable({#}
+    {#    "searching": false,#}
+    {#    "paging": false,#}
+    {#    "bInfo" : false,#}
+    {#    "order": []#}
+    {# });#}
+    {#$('.footable').footable();#}
     $('.select2').select2({
         dropdownAutoWidth : true,
         width: 'auto'
@@ -89,6 +106,16 @@ $(document).ready(function() {
         calendarWeeks: true,
         autoclose: true
     });
+    $(".hosts").each(function (i) {
+        var data = $(this).attr('value');
+        var data_list = data.split(",");
+        if (data_list.length === 1 && data_list[0] === "") {
+            data_list.pop();
+        }
+        var html = createPopover(data_list);
+        $(this).html(html);
+    });
+    $('[data-toggle="popover"]').popover();
 })
 </script>
 {% endblock %}

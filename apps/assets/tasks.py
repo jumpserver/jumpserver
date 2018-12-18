@@ -38,6 +38,8 @@ def clean_hosts(assets):
             logger.info(msg)
             continue
         clean_assets.append(asset)
+    if not clean_assets:
+        logger.info(_("No assets matched, stop task"))
     return clean_assets
 
 
@@ -116,7 +118,6 @@ def update_assets_hardware_info_util(assets, task_name=None):
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
     hosts = clean_hosts(assets)
     if not hosts:
-        logger.info(_("No assets matched, stop task"))
         return {}
     created_by = str(assets[0].org_id)
     task, created = update_or_create_ansible_task(
@@ -144,68 +145,12 @@ def update_assets_hardware_info_period():
     Update asset hardware period task
     :return:
     """
-    pass
+    if PERIOD_TASK != "on":
+        logger.debug("Period task disabled, update assets hardware info pass")
+        return
 
 
 ##  ADMIN USER CONNECTIVE  ##
-
-def set_admin_user_connectivity_info(admin_user, result):
-    raw, summary = result
-    cache_key = const.ADMIN_USER_CONN_CACHE_KEY.format(admin_user)
-    cache.set(cache_key, summary, CACHE_MAX_TIME)
-
-    for i in summary.get('contacted', []):
-        asset_conn_cache_key = const.ASSET_ADMIN_CONN_CACHE_KEY.format(i)
-        cache.set(asset_conn_cache_key, 1, CACHE_MAX_TIME)
-
-    for i, msg in summary.get('dark', {}).items():
-        asset_conn_cache_key = const.ASSET_ADMIN_CONN_CACHE_KEY.format(i)
-        cache.set(asset_conn_cache_key, 0, CACHE_MAX_TIME)
-        logger.error(msg)
-
-
-@shared_task
-def test_admin_user_connectivity_util(admin_user, task_name):
-    """
-    Test asset admin user can connect or not. Using ansible api do that
-    :param admin_user:
-    :param task_name:
-    :return:
-    """
-    from ops.utils import update_or_create_ansible_task
-
-    assets = admin_user.get_related_assets()
-    hosts = clean_hosts(assets)
-    if not hosts:
-        logger.info(_("No assets matched, stop task"))
-        return {}
-    tasks = const.TEST_ADMIN_USER_CONN_TASKS
-    task, created = update_or_create_ansible_task(
-        task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS, run_as_admin=True, created_by=admin_user.org_id,
-    )
-    result = task.run()
-    set_admin_user_connectivity_info(admin_user, result)
-    return result
-
-
-@shared_task
-@register_as_period_task(interval=3600)
-def test_admin_user_connectivity_period():
-    """
-    A period task that update the ansible task period
-    """
-    admin_users = AdminUser.objects.all()
-    for admin_user in admin_users:
-        task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
-        test_admin_user_connectivity_util(admin_user, task_name)
-
-
-@shared_task
-def test_admin_user_connectivity_manual(admin_user):
-    task_name = _("Test admin user connectivity: {}").format(admin_user.name)
-    # task_name = _("测试管理行号可连接性: {}").format(admin_user.name)
-    return test_admin_user_connectivity_util(admin_user, task_name)
 
 
 @shared_task
@@ -216,7 +161,6 @@ def test_asset_connectivity_util(assets, task_name=None):
         task_name = _("Test assets connectivity")
     hosts = clean_hosts(assets)
     if not hosts:
-        logger.info(_("No assets, task stop"))
         return {}
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     created_by = assets[0].org_id
@@ -227,9 +171,9 @@ def test_asset_connectivity_util(assets, task_name=None):
     result = task.run()
     summary = result[1]
     for asset in assets:
-        if asset.hostname in summary.get('dark'):
+        if asset.hostname in summary.get('dark', {}):
             asset.connectivity = asset.UNREACHABLE
-        elif asset.hostname in summary.get('contacted'):
+        elif asset.hostname in summary.get('contacted', []):
             asset.connectivity = asset.REACHABLE
         else:
             asset.connectivity = asset.UNKNOWN
@@ -247,21 +191,50 @@ def test_asset_connectivity_manual(asset):
         return True, ""
 
 
+@shared_task
+def test_admin_user_connectivity_util(admin_user, task_name):
+    """
+    Test asset admin user can connect or not. Using ansible api do that
+    :param admin_user:
+    :param task_name:
+    :return:
+    """
+    assets = admin_user.get_related_assets()
+    hosts = clean_hosts(assets)
+    if not hosts:
+        return {}
+    summary = test_asset_connectivity_util(hosts, task_name)
+    return summary
+
+
+@shared_task
+@register_as_period_task(interval=3600)
+def test_admin_user_connectivity_period():
+    """
+    A period task that update the ansible task period
+    """
+    admin_users = AdminUser.objects.all()
+    for admin_user in admin_users:
+        task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
+        test_admin_user_connectivity_util(admin_user, task_name)
+
+
+@shared_task
+def test_admin_user_connectivity_manual(admin_user):
+    task_name = _("Test admin user connectivity: {}").format(admin_user.name)
+    return test_admin_user_connectivity_util(admin_user, task_name)
+
+
 ##  System user connective ##
 
 @shared_task
-def set_system_user_connectablity_info(result, **kwargs):
+def set_system_user_connectivity_info(system_user, result):
     summary = result[1]
-    task_name = kwargs.get("task_name")
-    system_user = kwargs.get("system_user")
-    if system_user is None:
-        system_user = task_name.split(":")[-1]
-    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY.format(str(system_user.id))
-    cache.set(cache_key, summary, CACHE_MAX_TIME)
+    system_user.connectivity = summary
 
 
 @shared_task
-def test_system_user_connectability_util(system_user, assets, task_name):
+def test_system_user_connectivity_util(system_user, assets, task_name):
     """
     Test system cant connect his assets or not.
     :param system_user:
@@ -270,20 +243,9 @@ def test_system_user_connectability_util(system_user, assets, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    hosts = []
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    for asset in assets:
-        if not asset.is_active:
-            msg = _("Asset has been disabled, skip: {}").format(asset)
-            logger.info(msg)
-            continue
-        if not asset.support_ansible():
-            msg = _("Asset may not be support ansible, skip: {}").format(asset)
-            logger.info(msg)
-            continue
-        hosts.append(asset)
+    hosts = clean_hosts(assets)
     if not hosts:
-        logger.info(_("No assets matched, stop task"))
         return {}
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -291,35 +253,35 @@ def test_system_user_connectability_util(system_user, assets, task_name):
         run_as=system_user, created_by=system_user.org_id,
     )
     result = task.run()
-    set_system_user_connectablity_info(result, system_user=system_user)
+    set_system_user_connectivity_info(system_user, result)
     return result
 
 
 @shared_task
-def test_system_user_connectability_manual(system_user):
-    task_name = _("Test system user connectability: {}").format(system_user)
+def test_system_user_connectivity_manual(system_user):
+    task_name = _("Test system user connectivity: {}").format(system_user)
     assets = system_user.get_related_assets()
-    return test_system_user_connectability_util(system_user, assets, task_name)
+    return test_system_user_connectivity_util(system_user, assets, task_name)
 
 
 @shared_task
-def test_system_user_connectability_a_asset(system_user, asset):
-    task_name = _("Test system user connectability: {} => {}").format(
+def test_system_user_connectivity_a_asset(system_user, asset):
+    task_name = _("Test system user connectivity: {} => {}").format(
         system_user, asset
     )
-    return test_system_user_connectability_util(system_user, [asset], task_name)
+    return test_system_user_connectivity_util(system_user, [asset], task_name)
 
 
 @shared_task
-def test_system_user_connectability_period():
+def test_system_user_connectivity_period():
     if PERIOD_TASK != "on":
         logger.debug("Period task disabled, test system user connectivity pass")
         return
     system_users = SystemUser.objects.all()
     for system_user in system_users:
         task_name = _("Test system user connectivity period: {}").format(system_user)
-        # task_name = _("定期测试系统用户可连接性: {}".format(system_user))
-        test_system_user_connectability_util(system_user, task_name)
+        assets = system_user.get_related_assets()
+        test_system_user_connectivity_util(system_user, assets, task_name)
 
 
 ####  Push system user tasks ####
@@ -341,6 +303,24 @@ def get_push_system_user_tasks(system_user):
                 ),
             }
         })
+        tasks.extend([
+            {
+               'name': 'Check home dir exists',
+               'action': {
+                   'module': 'stat',
+                   'args': 'path=/home/{}'.format(system_user.username)
+               },
+               'register': 'home_existed'
+            },
+            {
+                'name': "Set home dir permission",
+                'action': {
+                    'module': 'file',
+                    'args': "path=/home/{0} owner={0} group={0} mode=700".format(system_user.username)
+                },
+                'when': 'home_existed.stat.exists == true'
+            }
+        ])
     if system_user.public_key:
         tasks.append({
             'name': 'Set {} authorized key'.format(system_user.username),
@@ -377,19 +357,8 @@ def push_system_user_util(system_user, assets, task_name):
         return
 
     tasks = get_push_system_user_tasks(system_user)
-    hosts = []
-    for asset in assets:
-        if not asset.is_active:
-            msg = _("Asset has been disabled, skip: {}").format(asset)
-            logger.info(msg)
-            continue
-        if not asset.support_ansible():
-            msg = _("Asset may not be support ansible, skip: {}").format(asset)
-            logger.info(msg)
-            continue
-        hosts.append(asset)
+    hosts = clean_hosts(assets)
     if not hosts:
-        logger.info(_("No assets matched, stop task"))
         return {}
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',

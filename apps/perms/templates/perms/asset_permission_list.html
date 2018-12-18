@@ -78,58 +78,24 @@ var zTree, table, show = 0;
 function onSelected(event, treeNode) {
     setCookie('node_selected', treeNode.id);
     var url = table.ajax.url();
-    if (treeNode.is_node) {
+    if (treeNode.meta.type === 'node') {
         url = setUrlParam(url, 'asset', "");
-        url = setUrlParam(url, 'node', treeNode.node_id)
+        url = setUrlParam(url, 'node', treeNode.meta.node.id)
     } else {
         url = setUrlParam(url, 'node', "");
-        url = setUrlParam(url, 'asset', treeNode.node_id)
+        url = setUrlParam(url, 'asset', treeNode.meta.asset.id)
     }
     setCookie('node_selected', treeNode.node_id);
     table.ajax.url(url);
     table.ajax.reload();
 }
 
-function selectQueryNode() {
-    var query_node_id = $.getUrlParam("node");
-    var cookie_node_id = getCookie('node_selected');
-    var node;
-    var node_id;
-
-    if (query_node_id !== null) {
-        node_id = query_node_id
-    } else if (cookie_node_id !== null) {
-        node_id = cookie_node_id;
-    }
-
-    node = zTree.getNodesByParam("id", node_id, null);
-    if (node){
-        zTree.selectNode(node[0]);
-        node.open = true;
-    }
-}
-
-function filter(treeId, parentNode, childNodes) {
-    $.each(childNodes, function (index, value) {
-        value["node_id"] = value["id"];
-        value["id"] = value["tree_id"];
-        if (value["tree_id"] !== value["tree_parent"]) {
-            value["pId"] = value["tree_parent"];
-        } else {
-            value["isParent"] = true;
-        }
-        value['name'] = value['value'];
-        value["iconSkin"] = value["is_node"] ? null : 'file';
-
-        {#value["pId"] = value["parent"];#}
-        {#value["name"] = value["value"];#}
-        value["isParent"] = value["is_node"];
-    });
-    return childNodes;
-}
 
 function beforeAsync(treeId, treeNode) {
-    return treeNode.is_node
+    if (treeNode) {
+        return treeNode.meta.type === 'node'
+    }
+    return true
 }
 
 function makeLabel(data) {
@@ -235,9 +201,8 @@ function initTree() {
         },
         async: {
 			enable: true,
-			url: "{% url 'api-assets:node-children-2' %}?assets=1&all=",
-			autoParam:["node_id=id", "name=n", "level=lv"],
-			dataFilter: filter,
+			url: "{% url 'api-assets:node-children-tree' %}?assets=1",
+			autoParam:["id=key", "name=n", "level=lv"],
             type: 'get'
 		},
         callback: {
@@ -245,25 +210,7 @@ function initTree() {
             beforeAsync: beforeAsync
         }
     };
-
-    var zNodes = [];
-    $.get("{% url 'api-assets:node-children-2' %}?assets=1", function(data, status){
-        $.each(data, function (index, value) {
-            value["node_id"] = value["id"];
-            value["id"] = value["tree_id"];
-            if (value["tree_id"] !== value["tree_parent"]) {
-                value["pId"] = value["tree_parent"];
-            }
-            value["isParent"] = value["is_node"];
-            value['name'] = value['value'];
-            value["iconSkin"] = value["is_node"] ? null : 'file';
-        });
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree"), setting, zNodes);
-        zTree = $.fn.zTree.getZTreeObj("assetTree");
-        var root = zTree.getNodes()[0];
-        zTree.expandNode(root);
-    });
+    zTree = $.fn.zTree.init($("#assetTree"), setting);
 }
 
 function toggle() {
@@ -299,10 +246,10 @@ $(document).ready(function(){
     var _nodes = [];
     var _assets = [];
     $.each(nodes, function (id, node) {
-        if (node.is_node) {
-            _nodes.push(node.node_id)
+        if (node.meta.type === 'node') {
+            _nodes.push(node.meta.node.id)
         } else {
-            _assets.push(node.node_id)
+            _assets.push(node.meta.asset.id)
         }
     });
     url += "?assets=" + _assets.join(",") + "&nodes=" + _nodes.join(",");

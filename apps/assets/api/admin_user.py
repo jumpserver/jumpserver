@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
@@ -31,6 +32,7 @@ logger = get_logger(__file__)
 __all__ = [
     'AdminUserViewSet', 'ReplaceNodesAdminUserApi',
     'AdminUserTestConnectiveApi', 'AdminUserAuthApi',
+    'AdminUserAssetsListView',
 ]
 
 
@@ -90,3 +92,20 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
         admin_user = self.get_object()
         task = test_admin_user_connectivity_manual.delay(admin_user)
         return Response({"task": task.id})
+
+
+class AdminUserAssetsListView(generics.ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.AssetSimpleSerializer
+    pagination_class = LimitOffsetPagination
+    filter_fields = ("hostname", "ip")
+    http_method_names = ['get']
+    search_fields = filter_fields
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(AdminUser, pk=pk)
+
+    def get_queryset(self):
+        admin_user = self.get_object()
+        return admin_user.get_related_assets()

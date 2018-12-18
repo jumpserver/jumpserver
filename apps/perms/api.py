@@ -16,7 +16,7 @@ from orgs.utils import set_to_root_org
 from .utils import AssetPermissionUtil
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, Asset, Node, \
-    NodeGrantedSerializer, SystemUser, NodeSerializer
+    SystemUser, NodeSerializer
 from . import serializers
 from .mixins import AssetsFilterMixin
 
@@ -150,7 +150,7 @@ class UserGrantedNodesWithAssetsApi(AssetsFilterMixin, ListAPIView):
     用户授权的节点并带着节点下资产的api
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = NodeGrantedSerializer
+    serializer_class = serializers.NodeGrantedSerializer
     
     def change_org_if_need(self):
         if self.request.user.is_superuser or \
@@ -227,8 +227,9 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
 
     @staticmethod
     def parse_asset_to_tree_node(node, asset, system_users):
+        system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
         system_user_serializer = serializers.GrantedSystemUserSerializer(
-            system_users, many=True
+            system_users_protocol_matched, many=True
         )
         asset_serializer = serializers.GrantedAssetSerializer(asset)
         icon_skin = 'file'
@@ -359,7 +360,7 @@ class UserGroupGrantedNodesApi(ListAPIView):
 
 class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = NodeGrantedSerializer
+    serializer_class = serializers.NodeGrantedSerializer
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')

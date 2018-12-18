@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import SystemUser
+from ..models import SystemUser, Asset
 from .base import AuthSerializer
 
 
@@ -21,7 +21,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
         fields.extend([
-            'get_login_mode_display',
+            'login_mode_display',
         ])
         return fields
 
@@ -76,3 +76,6 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')
+
+
+

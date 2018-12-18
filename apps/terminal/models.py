@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
 
+import os
 import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
+from django.core.files.storage import default_storage
 
 from users.models import User
 from orgs.mixins import OrgModelMixin
@@ -147,6 +149,36 @@ class Session(OrgModelMixin):
     date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
+
+    upload_to = 'replay'
+
+    def get_rel_replay_path(self, version=2):
+        """
+        获取session日志的文件路径
+        :param version: 原来后缀是 .gz，为了统一新版本改为 .replay.gz
+        :return:
+        """
+        suffix = '.replay.gz'
+        if version == 1:
+            suffix = '.gz'
+        date = self.date_start.strftime('%Y-%m-%d')
+        return os.path.join(date, str(self.id) + suffix)
+
+    def get_local_path(self, version=2):
+        rel_path = self.get_rel_replay_path(version=version)
+        if version == 2:
+            local_path = os.path.join(self.upload_to, rel_path)
+        else:
+            local_path = rel_path
+        return local_path
+
+    def save_to_storage(self, f):
+        local_path = self.get_local_path()
+        try:
+            name = default_storage.save(local_path, f)
+            return name, None
+        except OSError as e:
+            return None, e
 
     class Meta:
         db_table = "terminal_session"

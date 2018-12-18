@@ -49,13 +49,13 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         node = get_object_or_404(Node, id=node_id)
         show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
-        if node.is_root():
-            if show_current_asset:
-                queryset = queryset.filter(
-                    Q(nodes=node_id) | Q(nodes__isnull=True)
-                )
-            return queryset
-        if show_current_asset:
+        if node.is_root() and show_current_asset:
+            queryset = queryset.filter(
+                Q(nodes=node_id) | Q(nodes__isnull=True)
+            )
+        elif node.is_root() and not show_current_asset:
+            pass
+        elif not node.is_root() and show_current_asset:
             queryset = queryset.filter(nodes=node)
         else:
             queryset = queryset.filter(
@@ -65,25 +65,22 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
 
     def filter_admin_user_id(self, queryset):
         admin_user_id = self.request.query_params.get('admin_user_id')
-        if admin_user_id:
-            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-            queryset = queryset.filter(admin_user=admin_user)
+        if not admin_user_id:
+            return queryset
+        admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+        queryset = queryset.filter(admin_user=admin_user)
         return queryset
 
     def filter_queryset(self, queryset):
-        queryset = self.filter_admin_user_id(queryset)
-        queryset = self.filter_node(queryset)
         queryset = super().filter_queryset(queryset)
+        queryset = self.filter_node(queryset)
+        queryset = self.filter_admin_user_id(queryset)
         return queryset
 
     def get_queryset(self):
-        queryset = super().get_queryset()\
-            .prefetch_related('labels', 'nodes')\
-            .select_related('admin_user')
-        return queryset.distinct()
-
-    def allow_bulk_destroy(self, qs, filtered):
-        return qs.count() != filtered.count()
+        queryset = super().get_queryset().distinct()
+        queryset = self.get_serializer_class().setup_eager_loading(queryset)
+        return queryset
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):

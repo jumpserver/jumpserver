@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 import datetime
+import json
 from collections import defaultdict
 
 from ansible import constants as C
@@ -139,22 +140,60 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
 class CommandResultCallback(AdHocResultCallback):
     """
     Command result callback
+
+    results_command: {
+      "cmd": "",
+      "stderr": "",
+      "stdout": "",
+      "rc": 0,
+      "delta": 0:0:0.123
+    }
     """
     def __init__(self, display=None, **kwargs):
-        # results_command: {
-        #   "cmd": "",
-        #   "stderr": "",
-        #   "stdout": "",
-        #   "rc": 0,
-        #   "delta": 0:0:0.123
-        # }
-        #
+
         self.results_command = dict()
         super().__init__(display)
 
     def gather_result(self, t, res):
         super().gather_result(t, res)
         self.gather_cmd(t, res)
+
+    def v2_playbook_on_play_start(self, play):
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        msg = '$ {} ({})'.format(play.name, now)
+        self._play = play
+        self._display.banner(msg)
+
+    def v2_runner_on_unreachable(self, result):
+        self.results_summary['success'] = False
+        self.gather_result("unreachable", result)
+        msg = result._result.get("msg")
+        if not msg:
+            msg = json.dumps(result._result, indent=4)
+        self._display.display("%s | FAILED! => \n%s" % (
+            result._host.get_name(),
+            msg,
+        ), color=C.COLOR_ERROR)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.results_summary['success'] = False
+        self.gather_result("failed", result)
+        msg = result._result.get("msg", '')
+        stderr = result._result.get("stderr")
+        if stderr:
+            msg += '\n' + stderr
+        module_stdout = result._result.get("module_stdout")
+        if module_stdout:
+            msg += '\n' + module_stdout
+        if not msg:
+            msg = json.dumps(result._result, indent=4)
+        self._display.display("%s | FAILED! => \n%s" % (
+            result._host.get_name(),
+            msg,
+        ), color=C.COLOR_ERROR)
+
+    def _print_task_banner(self, task):
+        pass
 
     def gather_cmd(self, t, res):
         host = res._host.get_name()

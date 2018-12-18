@@ -48,6 +48,9 @@ class CommandExecution(models.Model):
             return False
         return True
 
+    def get_hosts_names(self):
+        return ','.join(self.hosts.all().values_list('hostname', flat=True))
+
     def run(self):
         print('-'*10 + ' ' + ugettext('Task start') + ' ' + '-'*10)
         self.date_start = timezone.now()

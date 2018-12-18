@@ -45,6 +45,8 @@ class Setting(models.Model):
     def cleaned_value(self):
         try:
             value = self.value
+            if not isinstance(value, (str, bytes)):
+                return value
             if self.encrypted:
                 value = signer.unsign(value)
             value = json.loads(value)

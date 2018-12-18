@@ -83,7 +83,7 @@ class TerminalTokenApi(APIView):
         if not terminal.is_accepted:
             return Response("Terminal was not accepted yet", status=400)
 
-        if not terminal.user or not terminal.user.access_key.all():
+        if not terminal.user or not terminal.user.access_key:
             return Response("No access key generate", status=401)
 
         access_key = terminal.user.access_key.first()

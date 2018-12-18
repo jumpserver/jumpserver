@@ -143,6 +143,18 @@ class User(AbstractUser):
         return False
 
     @property
+    def groups_display(self):
+        return ' '.join(self.groups.all().values_list('name', flat=True))
+
+    @property
+    def role_display(self):
+        return self.get_role_display()
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
+
+    @property
     def is_expired(self):
         if self.date_expired and self.date_expired < timezone.now():
             return True
@@ -260,8 +272,6 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
-        if current_org and current_org.is_real():
-            self.orgs.add(current_org.id)
 
     @property
     def private_token(self):

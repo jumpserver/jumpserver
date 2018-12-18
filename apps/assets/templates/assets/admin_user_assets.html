@@ -45,13 +45,11 @@
                                     <table class="table table-striped table-bordered table-hover" id="asset_list_table">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">
-                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
-                                                </th>
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Reachable' %}</th>
+                                                <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -91,26 +89,36 @@
 <script>
 
 function initTable() {
+    var reachable = {{ admin_user.REACHABLE }};
+    var unreachable = {{ admin_user.UNREACHABLE }};
     var options = {
 		ele: $('#asset_list_table'),
 		buttons: [],
 		order: [],
 		columnDefs: [
-			{targets: 1, createdCell: function (td, cellData, rowData) {
+			{targets: 0, createdCell: function (td, cellData, rowData) {
 				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
 				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
-			{targets: 4, createdCell: function (td, cellData) {
-				if (!cellData) {
+			{targets: 3, createdCell: function (td, cellData) {
+				if (cellData === unreachable) {
 					$(td).html('<i class="fa fa-times text-danger"></i>')
-				} else {
+				} else if (cellData === reachable) {
 					$(td).html('<i class="fa fa-check text-navy"></i>')
-				}
-			}}],
-		ajax_url: '{% url "api-assets:asset-list" %}?admin_user_id={{ admin_user.id }}',
+				} else {
+                    $(td).html('')
+                }
+			}},
+            {targets: 4, createdCell: function (td, cellData) {
+                var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                $(td).html(test_btn);
+			}}
+        ],
+
+		ajax_url: '{% url "api-assets:admin-user-assets" pk=admin_user.id %}',
 		columns: [
-		    {data: function(){return ""}}, {data: "hostname" }, {data: "ip" },
-            {data: "port" },  {data: "is_connective" }],
+		    {data: "hostname" }, {data: "ip" },
+            {data: "port" },  {data: "connectivity" }, {data: "id"}],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initServerSideDataTable(options);
@@ -118,6 +126,21 @@ function initTable() {
 
 $(document).ready(function () {
 	initTable();
+})
+.on('click', '.btn-test-asset', function () {
+    var asset_id = $(this).data('uid');
+    var the_url = "{% url 'api-assets:asset-alive-test' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', asset_id);
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
 })
 .on('click', '.btn-test-connective', function () {
     var the_url = "{% url 'api-assets:admin-user-connective' pk=admin_user.id %}";

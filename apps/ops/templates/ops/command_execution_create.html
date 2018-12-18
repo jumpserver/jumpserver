@@ -11,6 +11,10 @@
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
+    <script src="{% static 'js/plugins/codemirror/codemirror.js' %}"></script>
+    <script src="{% static 'js/plugins/codemirror/mode/shell/shell.js' %}"></script>
+    <link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/codemirror/ambiance.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 	<style type="text/css">
@@ -46,28 +50,26 @@
                </div>
            </div>
            <div class="mail-box-header" style="padding-top: 5px;">
-               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="">
+               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" onsubmit="return execute()">
                    <div class="form-group">
                        <div id="term" style="height: 100%;width: 100%"></div>
                    </div>
                    <div class="row">
+                       <div class="col-lg-10">
+                       <div class="input-group" style="height: 100%; width: 100%">
+                           <textarea class="form-control" id="command-text"></textarea>
+                       </div>
+                       </div>
                        <div class="col-lg-2">
-                       <select class="select2 form-control" id="system-users-select">
-                           {% for s in system_users %}
+                            <select class="select2 form-control" id="system-users-select">
+                            {% for s in system_users %}
                                {% if s.protocol == 'ssh' and s.login_mode == 'auto' %}
                                    <option value="{{ s.id }}">{{ s }}</option>
                                {% endif %}
-                           {% endfor %}
-                       </select>
-                   </div>
-                   <div class="col-lg-10">
-                       <div class="input-group" style="height: 100%">
-                           <input type="text" id="command-text" class="form-control">
-                           <span class="input-group-btn">
-                              <button type="button" class="btn btn-primary btn-execute">{% trans 'Go' %}</button>
-                           </span>
+                            {% endfor %}
+                            </select>
+                           <button type="button" class="btn btn-primary btn-execute" style="margin-top: 30px; width: 100%">{% trans 'Go' %}</button>
                        </div>
-                   </div>
                    </div>
                 </form>
            </div>
@@ -169,7 +171,7 @@ function initResultTerminal() {
         cursorBlink: false,
         screenKeys: false,
         fontFamily: '"Monaco", "Consolas", "monospace"',
-        fontSize: 12,
+        fontSize: 13,
         rightClickSelectsWord: true,
         disableStdin: true,
         theme: {
@@ -180,25 +182,32 @@ function initResultTerminal() {
     term.write("选择左侧资产, 选择运行的系统用户，批量执行命令\r\n")
 }
 
-$(document).ready(function(){
-    systemUserId = $('#system-users-select').val();
-    $(".select2").select2().on('select2:select', function(evt) {
-         var data = evt.params.data;
-         systemUserId = data.id;
-         initTree();
-    });
-    initTree();
-    initResultTerminal();
-}).on('click', '.btn-execute', function () {
+function wrapperError(msg) {
+    return '\033[31m' + msg + '\033[0m' + '\r\n';
+}
+
+function execute() {
     if (!term) {
         initResultTerminal()
     }
     var url = '{% url "api-ops:command-execution-list" %}';
     var run_as = systemUserId;
-    var command = $("#command-text").val();
+    var command = editor.getValue();
     var hosts = getSelectedAssetsNode().map(function (node) {
         return node.id;
     });
+    if (hosts.length === 0) {
+        term.write(wrapperError('没有选中资产'));
+        return
+    }
+    if (!command) {
+        term.write(wrapperError('没有输入命令'));
+        return
+    }
+    if (!run_as) {
+        term.write(wrapperError('没有选择运行用户'));
+        return
+    }
     var data = {
         hosts: hosts,
         run_as: run_as,
@@ -247,8 +256,38 @@ $(document).ready(function(){
                 writeExecutionOutput()
             }, interval);
         }
-    })
+    });
+    return false;
+}
+
+var editor;
+$(document).ready(function(){
+    systemUserId = $('#system-users-select').val();
+    $(".select2").select2({
+        dropdownAutoWidth : true,
+        width: 'auto'
+    }).on('select2:select', function(evt) {
+         var data = evt.params.data;
+         systemUserId = data.id;
+         initTree();
+    });
+    editor = CodeMirror.fromTextArea(document.getElementById("command-text"), {
+        lineNumbers: true,
+        lineWrapping: true,
+        mode: "shell"
+    });
+    editor.setSize(600, 100);
+    var charWidth = editor.defaultCharWidth(), basePadding = 4;
+    editor.on("renderLine", function(cm, line, elt) {
+        var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * charWidth;
+        elt.style.textIndent = "-" + off + "px";
+        elt.style.paddingLeft = (basePadding + off) + "px";
+    });
+    editor.refresh();
+    initTree();
+    initResultTerminal();
+}).on('click', '.btn-execute', function () {
+    execute()
 })
 </script>
-
 {% endblock %}

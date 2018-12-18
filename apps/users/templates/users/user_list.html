@@ -25,7 +25,7 @@
             <th class="text-center">{% trans 'Role' %}</th>
             <th class="text-center">{% trans 'User group' %}</th>
             <th class="text-center">{% trans 'Source' %}</th>
-            <th class="text-center">{% trans 'Active' %}</th>
+            <th class="text-center">{% trans 'Validity' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
@@ -66,11 +66,14 @@ function initTable() {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},
-            {targets: 6, createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else {
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                if (cellData) {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
+                } else if (!rowData.is_active) {
+
+                    $(td).html('<i class="fa fa-times text-danger inactive"></i>')
+                } else if (rowData.is_expired) {
+                    $(td).html('<i class="fa fa-times text-danger expired"></i>')
                 }
              }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
@@ -91,9 +94,9 @@ function initTable() {
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [
             {data: "id"}, {data: "name" }, {data: "username" },
-            {data: "get_role_display", orderable: false},
+            {data: "role_display", orderable: false},
             {data: "groups_display", orderable: false},
-            {data: "get_source_display", orderable: false},
+            {data: "source_display", orderable: false},
             {data: "is_valid", orderable: false},
             {data: "id", orderable: false}
         ],
@@ -246,6 +249,13 @@ $(document).ready(function(){
     var uid = $this.data('uid');
     var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
     objectDelete($this, name, the_url);
+}).on('click', '.expired', function () {
+    var msg = '{% trans "User is expired" %}';
+    toastr.error(msg)
+}).on('click', '.inactive', function () {
+    var msg = '{% trans 'User is inactive' %}';
+    toastr.error(msg)
+
 })
 </script>
 {% endblock %}

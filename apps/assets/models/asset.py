@@ -13,7 +13,6 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
-from ..const import ASSET_ADMIN_CONN_CACHE_KEY
 from .user import AdminUser, SystemUser
 from orgs.mixins import OrgModelMixin, OrgManager
 
@@ -186,13 +185,13 @@ class Asset(OrgModelMixin):
         if not self.is_unixlike():
             return self.UNKNOWN
         key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        return cache.get(key) or self.UNKNOWN
+        cached = cache.get(key, None)
+        return cached if cached is not None else self.UNKNOWN
 
     @connectivity.setter
     def connectivity(self, value):
-        if value in dict(self.CONNECTIVITY_CHOICES):
-            key = ASSET_ADMIN_CONN_CACHE_KEY.format(str(self.id))
-            cache.set(key, value, 3600*2)
+        key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
+        cache.set(key, value, 3600*2)
 
     def get_auth_info(self):
         if self.admin_user:
@@ -240,6 +239,36 @@ class Asset(OrgModelMixin):
                 'groups': [node.value for node in self.nodes.all()],
             })
         return data
+
+    def as_tree_node(self, parent_node):
+        from common.tree import TreeNode
+        icon_skin = 'file'
+        if self.platform.lower() == 'windows':
+            icon_skin = 'windows'
+        elif self.platform.lower() == 'linux':
+            icon_skin = 'linux'
+        data = {
+            'id': str(self.id),
+            'name': self.hostname,
+            'title': self.ip,
+            'pId': parent_node.key,
+            'isParent': False,
+            'open': False,
+            'iconSkin': icon_skin,
+            'meta': {
+                'type': 'asset',
+                'asset': {
+                    'id': self.id,
+                    'hostname': self.hostname,
+                    'ip': self.ip,
+                    'port': self.port,
+                    'platform': self.platform,
+                    'protocol': self.protocol,
+                }
+            }
+        }
+        tree_node = TreeNode(**data)
+        return tree_node
 
     class Meta:
         unique_together = [('org_id', 'hostname')]

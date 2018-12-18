@@ -131,6 +131,10 @@ class UserCreateUpdateForm(OrgModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    username = forms.CharField(disabled=True)
+    name = forms.CharField(disabled=True)
+    email = forms.CharField(disabled=True)
+
     class Meta:
         model = User
         fields = [

@@ -135,6 +135,7 @@ class AdHocRunner:
     loader_class = DataLoader
     variable_manager_class = VariableManager
     default_options = get_default_options()
+    command_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
     def __init__(self, inventory, options=None):
         self.options = self.update_options(options)
@@ -163,10 +164,30 @@ class AdHocRunner:
                 "pattern: %s  dose not match any hosts." % pattern
             )
 
+    def clean_args(self, module, args):
+        if not args:
+            return ''
+        if module not in self.command_modules_choices:
+            return args
+        if isinstance(args, str):
+            if args.startswith('executable='):
+                _args = args.split(' ')
+                executable, command = _args[0].split('=')[1], ' '.join(_args[1:])
+                args = {'executable': executable, '_raw_params':  command}
+            else:
+                args = {'_raw_params':  args}
+            return args
+        else:
+            return args
+
     def clean_tasks(self, tasks):
         cleaned_tasks = []
         for task in tasks:
-            self.check_module_args(task['action']['module'], task['action'].get('args'))
+            module = task['action']['module']
+            args = task['action'].get('args')
+            cleaned_args = self.clean_args(module, args)
+            task['action']['args'] = cleaned_args
+            self.check_module_args(module, cleaned_args)
             cleaned_tasks.append(task)
         return cleaned_tasks
 
@@ -231,7 +252,5 @@ class CommandRunner(AdHocRunner):
         tasks = [
             {"action": {"module": module, "args": cmd}}
         ]
-        hosts = self.inventory.get_hosts(pattern=pattern)
-        name = "Run command {} on {}'s hosts".format(cmd, len(hosts))
-        return self.run(tasks, pattern, play_name=name)
+        return self.run(tasks, pattern, play_name=cmd)
 

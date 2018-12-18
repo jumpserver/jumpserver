@@ -69,10 +69,21 @@ class AdminUser(AssetUser):
         return self.get_related_assets().count()
 
     @property
-    def assets_connectivity(self):
-        key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
-        _result = cache.get(key, {})
-        return _result
+    def connectivity(self):
+        from .asset import Asset
+        assets = self.get_related_assets().values_list('id', 'hostname', flat=True)
+        data = {
+            'unreachable': [],
+            'reachable': [],
+        }
+        for asset_id, hostname in assets:
+            key = Asset.CONNECTIVITY_CACHE_KEY.format(str(self.id))
+            value = cache.get(key, Asset.UNKNOWN)
+            if value == Asset.REACHABLE:
+                data['reachable'].append(hostname)
+            elif value == Asset.UNREACHABLE:
+                data['unreachable'].append(hostname)
+        return data
 
     class Meta:
         ordering = ['name']
@@ -127,7 +138,8 @@ class SystemUser(AssetUser):
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
     cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
 
-    cache_key = "__SYSTEM_USER_CACHED_{}"
+    SYSTEM_USER_CACHE_KEY = "__SYSTEM_USER_CACHED_{}"
+    CONNECTIVE_CACHE_KEY = '_JMS_SYSTEM_USER_CONNECTIVE_{}'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -147,17 +159,44 @@ class SystemUser(AssetUser):
         return assets
 
     @property
-    def assets_connectivity(self):
-        _result = cache.get(SYSTEM_USER_CONN_CACHE_KEY.format(self.name), {})
-        return _result
+    def connectivity(self):
+        cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
+        value = cache.get(cache_key, None)
+        if not value or 'unreachable' not in value:
+            return {'unreachable': [], 'reachable': []}
+        else:
+            return value
+
+    @connectivity.setter
+    def connectivity(self, value):
+        data = self.connectivity
+        unreachable = data['unreachable']
+        reachable = data['reachable']
+
+        for host in value.get('dark', {}).keys():
+            if host not in unreachable:
+                unreachable.append(host)
+            if host in reachable:
+                reachable.remove(host)
+        for host in value.get('contacted'):
+            if host not in reachable:
+                reachable.append(host)
+            if host in unreachable:
+                unreachable.remove(host)
+        cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
+        cache.set(cache_key, data, 3600)
 
     @property
     def assets_unreachable(self):
-        return list(self.assets_connectivity.get('dark', {}).keys())
+        return self.connectivity.get('unreachable')
 
     @property
     def assets_reachable(self):
-        return self.assets_connectivity.get('contacted', [])
+        return self.connectivity.get('reachable')
+
+    @property
+    def login_mode_display(self):
+        return self.get_login_mode_display()
 
     def is_need_push(self):
         if self.auto_push and self.protocol == self.PROTOCOL_SSH:
@@ -166,10 +205,10 @@ class SystemUser(AssetUser):
             return False
 
     def set_cache(self):
-        cache.set(self.cache_key.format(self.id), self, 3600)
+        cache.set(self.SYSTEM_USER_CACHE_KEY.format(self.id), self, 3600)
 
     def expire_cache(self):
-        cache.delete(self.cache_key.format(self.id))
+        cache.delete(self.SYSTEM_USER_CACHE_KEY.format(self.id))
 
     @property
     def cmd_filter_rules(self):
@@ -190,7 +229,7 @@ class SystemUser(AssetUser):
 
     @classmethod
     def get_system_user_by_id_or_cached(cls, sid):
-        cached = cache.get(cls.cache_key.format(sid))
+        cached = cache.get(cls.SYSTEM_USER_CACHE_KEY.format(sid))
         if cached:
             return cached
         try:
