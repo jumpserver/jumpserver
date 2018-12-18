@@ -216,7 +216,6 @@ class AssetExportView(LoginRequiredMixin, View):
             return HttpResponse('Json object not valid', status=400)
 
         if not assets_id:
-            print(node_id)
             node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
             assets = node.get_all_assets()
             for asset in assets:
