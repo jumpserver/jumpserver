@@ -103,13 +103,14 @@ var dateOptions = {
     }
 };
 function initSelectedAssets2Table(){
+    // 解决input框中的资产和弹出表格中资产的显示不一致
     var inputAssets = $('#id_assets').val();
     var selectedAssets = asset_table2.selected.concat();
 
     // input assets无，table assets选中，则取消勾选(再次click)
     if (selectedAssets.length !== 0){
         $.each(selectedAssets, function (index, assetId){
-            if (inputAssets.indexOf(assetId) === -1){
+            if ($.inArray(assetId, inputAssets) === -1){
                 $('#'+assetId).trigger('click');  // 取消勾选
              }
         });
@@ -128,8 +129,8 @@ function initSelectedAssets2Table(){
             }
         });
     }
-
 }
+
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
