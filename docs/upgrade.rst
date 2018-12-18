@@ -729,6 +729,8 @@
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
+    # 注意把浏览器缓存清理下
+
 **Docker Coco Guacamole**
 
 说明: Docker 部署的 coco 与 guacamole 升级说明
