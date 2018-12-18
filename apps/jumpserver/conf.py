@@ -326,15 +326,26 @@ defaults = {
 def load_user_config():
     sys.path.insert(0, PROJECT_DIR)
     config = Config(PROJECT_DIR, defaults)
+    loaded = False
+
+    for i in ['config.yml', 'config.yaml']:
+        if os.path.isfile(os.path.join(config.root_path, i)):
+            config.from_yaml(i)
+            loaded = True
+
     try:
         from config import config as c
         config.from_object(c)
+        loaded = True
     except ImportError:
+        pass
+
+    if not loaded:
         msg = """
     
         Error: No config file found.
     
-        You can run `cp config_example.py config.py`, and edit it.
+        You can run `cp config_example.yml config.yml`, and edit it.
         """
         raise ImportError(msg)
     return config
