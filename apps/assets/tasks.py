@@ -389,6 +389,18 @@ def push_system_user_to_assets(system_user, assets):
     return push_system_user_util(system_user, assets, task_name)
 
 
+@shared_task
+@after_app_shutdown_clean
+def test_system_user_connectability_period():
+    pass
+
+
+@shared_task
+@after_app_shutdown_clean
+def test_admin_user_connectability_period():
+    pass
+
+
 # @shared_task
 # @register_as_period_task(interval=3600)
 # @after_app_ready_start
