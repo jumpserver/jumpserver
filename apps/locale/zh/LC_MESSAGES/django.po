@@ -637,7 +637,7 @@ msgstr "分类"
 
 #: assets/models/node.py:20
 msgid "Key"
-msgstr ""
+msgstr "键"
 
 #: assets/models/node.py:127
 msgid "New node"
@@ -739,15 +739,15 @@ msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
 #: assets/tasks.py:230
-msgid "Test admin user connectability period: {}"
+msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
 #: assets/tasks.py:236
-msgid "Test admin user connectability: {}"
+msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
 #: assets/tasks.py:246
-msgid "Test assets connectability"
+msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
 #: assets/tasks.py:251 assets/tasks.py:316 assets/tasks.py:423
@@ -763,15 +763,15 @@ msgid "No assets, task stop"
 msgstr "没有匹配到资产，结束任务"
 
 #: assets/tasks.py:280
-msgid "Test assets connectability: {}"
+msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
 #: assets/tasks.py:339
-msgid "Test system user connectability: {}"
+msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
 #: assets/tasks.py:346
-msgid "Test system user connectability: {} => {}"
+msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
 #: assets/tasks.py:414
@@ -4508,7 +4508,7 @@ msgstr "创建账户"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:91
 msgid "Loading..."
-msgstr ""
+msgstr "加载中..."
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:106
 msgid "Load failed"
@@ -4634,7 +4634,7 @@ msgstr "更新组织"
 #~ msgid "Update assets hardware info period"
 #~ msgstr "定期更新资产硬件信息"
 
-#~ msgid "Test system user connectability period: {}"
+#~ msgid "Test system user connectivity period: {}"
 #~ msgstr "定期测试系统用户可连接性: {}"
 
 #~ msgid "Date finished"

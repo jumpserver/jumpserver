@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from common.utils import get_logger
 from .models import Asset, SystemUser, Node
 from .tasks import update_assets_hardware_info_util, \
-    test_asset_connectability_util, push_system_user_to_assets
+    test_asset_connectivity_util, push_system_user_to_assets
 
 
 logger = get_logger(__file__)
@@ -19,8 +19,8 @@ def update_asset_hardware_info_on_created(asset):
 
 
 def test_asset_conn_on_created(asset):
-    logger.debug("Test asset `{}` connectability".format(asset))
-    test_asset_connectability_util.delay([asset])
+    logger.debug("Test asset `{}` connectivity".format(asset))
+    test_asset_connectivity_util.delay([asset])
 
 
 def set_asset_root_node(asset):

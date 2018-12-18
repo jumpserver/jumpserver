@@ -9,7 +9,7 @@ from .system_user import AssetSystemUserSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
-    'AssetAsNodeSerializer',
+    'AssetAsNodeSerializer', 'AssetSimpleSerializer',
 ]
 
 
@@ -33,7 +33,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
         fields.extend([
-            'hardware_info', 'is_connective', 'org_name'
+            'hardware_info', 'connectivity', 'org_name'
         ])
         return fields
 
@@ -78,3 +78,9 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
             "is_active", "system_users_join", "org_name",
             "os", "platform", "comment", "org_id", "protocol"
         )
+
+
+class AssetSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = ['id', 'hostname', 'port', 'ip', 'connectivity']

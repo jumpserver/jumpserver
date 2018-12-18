@@ -95,7 +95,7 @@ function initTable() {
             }}],
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
-            {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "get_login_mode_display"}, {data: "assets_amount" },
+            {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "login_mode_display"}, {data: "assets_amount" },
             {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }
         ],
         op_html: $('#actions').html()
