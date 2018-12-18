@@ -57,6 +57,10 @@
 <script>
 var zTree2, asset_table2 = 0;
 function initTable2() {
+    if(asset_table2){
+        return
+    }
+
     var options = {
         ele: $('#asset_list_modal_table'),
         ajax_url: '{% url "api-assets:asset-list" %}?show_current_asset=1',
