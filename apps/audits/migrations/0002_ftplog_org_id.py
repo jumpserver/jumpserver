@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ftplog',
             name='org_id',
-            field=models.CharField(blank=True, default=None, max_length=36, null=True),
+            field=models.CharField(blank=True, db_index=True, default=None, max_length=36, null=True),
         ),
     ]

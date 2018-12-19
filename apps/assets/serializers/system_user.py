@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import SystemUser
+from ..models import SystemUser, Asset
 from .base import AuthSerializer
 
 
@@ -21,17 +21,17 @@ class SystemUserSerializer(serializers.ModelSerializer):
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
         fields.extend([
-            'get_login_mode_display',
+            'login_mode_display',
         ])
         return fields
 
     @staticmethod
     def get_unreachable_assets(obj):
-        return obj.unreachable_assets
+        return obj.assets_unreachable
 
     @staticmethod
     def get_reachable_assets(obj):
-        return obj.reachable_assets
+        return obj.assets_reachable
 
     def get_unreachable_amount(self, obj):
         return len(self.get_unreachable_assets(obj))
@@ -41,7 +41,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        return len(obj.get_assets())
+        return len(obj.get_related_assets())
 
 
 class SystemUserAuthSerializer(AuthSerializer):
@@ -76,3 +76,6 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')
+
+
+

@@ -13,36 +13,36 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='adminuser',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='asset',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='domain',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='gateway',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='label',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='node',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AlterField(
             model_name='systemuser',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
     ]

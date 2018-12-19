@@ -62,8 +62,11 @@ class TaskDetailView(AdminUserRequiredMixin, DetailView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org:
+        # Todo: 需要整理默认组织等东西
+        if current_org.is_real():
             queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
         return queryset
 
     def get_context_data(self, **kwargs):

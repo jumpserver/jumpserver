@@ -304,7 +304,7 @@ defaults = {
     'REDIS_DB_CELERY': 3,
     'REDIS_DB_CACHE': 4,
     'CAPTCHA_TEST_MODE': None,
-    'TOKEN_EXPIRATION': 3600,
+    'TOKEN_EXPIRATION': 3600 * 24,
     'DISPLAY_PER_PAGE': 25,
     'DEFAULT_EXPIRED_YEARS': 70,
     'SESSION_COOKIE_DOMAIN': None,
@@ -312,7 +312,14 @@ defaults = {
     'SESSION_COOKIE_AGE': 3600 * 24,
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
-    'EMAIL_SUFFIX': 'jumpserver.org'
+    'OTP_ISSUER_NAME': 'Jumpserver',
+    'EMAIL_SUFFIX': 'jumpserver.org',
+    'TERMINAL_PASSWORD_AUTH': True,
+    'TERMINAL_PUBLIC_KEY_AUTH': True,
+    'TERMINAL_HEARTBEAT_INTERVAL': 5,
+    'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
+    'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
+    'TERMINAL_SESSION_KEEP_DURATION': 9999,
 }
 
 

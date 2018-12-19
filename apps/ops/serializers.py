@@ -53,7 +53,7 @@ class AdHocRunHistorySerializer(serializers.ModelSerializer):
     @staticmethod
     def get_stat(obj):
         return {
-            "total": len(obj.adhoc.hosts),
+            "total": obj.adhoc.hosts.count(),
             "success": len(obj.summary.get("contacted", [])),
             "failed": len(obj.summary.get("dark", [])),
         }

@@ -17,7 +17,7 @@ from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
-    test_asset_connectability_manual
+    test_asset_connectivity_manual
 from ..utils import LabelFilter
 
 
@@ -41,40 +41,46 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
 
-    def filter_node(self):
+    def filter_node(self, queryset):
         node_id = self.request.query_params.get("node_id")
         if not node_id:
-            return
+            return queryset
 
         node = get_object_or_404(Node, id=node_id)
         show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
-        if node.is_root():
-            if show_current_asset:
-                self.queryset = self.queryset.filter(
-                    Q(nodes=node_id) | Q(nodes__isnull=True)
-                )
-            return
-        if show_current_asset:
-            self.queryset = self.queryset.filter(nodes=node)
+        if node.is_root() and show_current_asset:
+            queryset = queryset.filter(
+                Q(nodes=node_id) | Q(nodes__isnull=True)
+            )
+        elif node.is_root() and not show_current_asset:
+            pass
+        elif not node.is_root() and show_current_asset:
+            queryset = queryset.filter(nodes=node)
         else:
-            self.queryset = self.queryset.filter(
+            queryset = queryset.filter(
                 nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
             )
+        return queryset
 
-    def filter_admin_user_id(self):
+    def filter_admin_user_id(self, queryset):
         admin_user_id = self.request.query_params.get('admin_user_id')
-        if admin_user_id:
-            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-            self.queryset = self.queryset.filter(admin_user=admin_user)
+        if not admin_user_id:
+            return queryset
+        admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+        queryset = queryset.filter(admin_user=admin_user)
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.filter_node(queryset)
+        queryset = self.filter_admin_user_id(queryset)
+        return queryset
 
     def get_queryset(self):
-        self.queryset = super().get_queryset()\
-            .prefetch_related('labels', 'nodes')\
-            .select_related('admin_user')
-        self.filter_admin_user_id()
-        self.filter_node()
-        return self.queryset.distinct()
+        queryset = super().get_queryset().distinct()
+        queryset = self.get_serializer_class().setup_eager_loading(queryset)
+        return queryset
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
@@ -103,7 +109,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
 
 class AssetAdminUserTestApi(generics.RetrieveAPIView):
     """
-    Test asset admin user connectivity
+    Test asset admin user assets_connectivity
     """
     queryset = Asset.objects.all()
     permission_classes = (IsOrgAdmin,)
@@ -111,7 +117,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        task = test_asset_connectability_manual.delay(asset)
+        task = test_asset_connectivity_manual.delay(asset)
         return Response({"task": task.id})
 
 

@@ -24,8 +24,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if current_org:
+        if current_org.is_real():
             queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
         return queryset
 
 
