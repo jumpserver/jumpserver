@@ -73,7 +73,7 @@ function initTable2() {
     return asset_table2
 }
 
-function onSelected2(event, treeNode) {
+function onNodeSelected2(event, treeNode) {
     var url = asset_table2.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.meta.node.id);
     asset_table2.ajax.url(url);
@@ -100,7 +100,7 @@ function initTree2() {
             type: 'get'
 		},
         callback: {
-            onSelected: onSelected2
+            onSelected: onNodeSelected2
         }
     };
     zTree2 = $.fn.zTree.init($("#assetTree2"), setting);
