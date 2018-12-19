@@ -254,7 +254,7 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ git git fetch
+    $ git fetch
     $ git checkout 1.4.5
     $ git clean -df  # 清除未跟踪文件, 请一定要做好备份后再操作此步骤
     $ git reset --hard  # 还原所有修改, 请一定要做好备份后再操作此步骤
