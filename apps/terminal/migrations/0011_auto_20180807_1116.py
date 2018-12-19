@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='command',
             name='org_id',
-            field=models.CharField(blank=True, default=None, max_length=36, null=True),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
         migrations.AddField(
             model_name='session',
             name='org_id',
-            field=models.CharField(blank=True, default=None, max_length=36, null=True),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
     ]

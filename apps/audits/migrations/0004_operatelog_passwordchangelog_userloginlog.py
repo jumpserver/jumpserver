@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OperateLog',
             fields=[
-                ('org_id', models.CharField(blank=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('user', models.CharField(max_length=128, verbose_name='User')),
                 ('action', models.CharField(choices=[('create', 'Create'), ('update', 'Update'), ('delete', 'Delete')], max_length=16, verbose_name='Action')),
