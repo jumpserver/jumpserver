@@ -143,7 +143,6 @@ Systemd 管理启动 Jumpserver
     # 适合按照一步一步文档进行安装的用户, Centos 7
 
     # Jumpserver
-    $ sed -i "s/START_TIMEOUT = 15/START_TIMEOUT = 40/g" /opt/jumpserver/jms
     $ cat << EOF > /usr/lib/systemd/system/jms.service
     [Unit]
     Description=jms
