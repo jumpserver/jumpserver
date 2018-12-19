@@ -31,7 +31,7 @@
 .. code-block:: shell
 
     $ cp -r /opt/jumpserver /opt/jumpserver_bak
-    $ mysqldump -uroot -p jumpserver --ignore-table=jumpserver.django_migrations > /opt/jumpserver.sql
+    $ mysqldump -uroot -p jumpserver > /opt/jumpserver.sql
 
 .. code-block:: shell
 
@@ -346,19 +346,7 @@
 
 .. code-block:: shell
 
-    $ cd /opt/docker-guacamole
-    $ git pull
-    $ /etc/init.d/guacd stop
-    $ sh /config/tomcat8/bin/shutdown.sh
-    $ cp guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
-
-    $ cd /config
-    $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
-    $ tar xf linux-amd64.tar.gz -C /bin/
-    $ chmod +x /bin/ssh-forward
-
-    $ /etc/init.d/guacd start
-    $ sh /config/tomcat8/bin/startup.sh
+    # 跳过
 
 5. 升级 Luna
 
@@ -392,7 +380,7 @@
 
 
 1.4.4 升级到 1.4.5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - 当前版本必须是 1.4.4 版本,否则请先升级到 1.4.4
 - 从 1.4.5 版本开始,由官方维护唯一 migrations
@@ -750,6 +738,70 @@
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
 
-1.4.6 及之后版本升级说明 (未开放, 等待更新)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- 如果当前版本必须小于 1.4.5 ,请先升级到 1.4.5
+1.4.5 升级到 1.4.6 及之后版本
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Jumpserver**
+
+.. code-block:: shell
+
+    $ cd /opt/jumpserver
+    $ git pull
+    $ pip install -r requirements/requirements.txt
+    $ cd utils
+    $ sh make_migrations.sh
+
+    $ cd ../
+    $ ./jms start all -d
+
+**Coco**
+
+说明: Docker 部署的请跳过
+
+.. code-block:: shell
+
+    $ cd /opt/coco
+    $ git pull
+    $ source /opt/py3/bin/activate
+    $ pip install -r requirements/requirements.txt
+    $ ./cocod start -d
+
+**Guacamole**
+
+说明: Docker 部署的请跳过
+
+.. code-block:: shell
+
+    # 1.4.6 无更新, 跳过
+
+**Luna**
+
+说明: 直接下载 release 包
+
+.. code-block:: shell
+
+    $ cd /opt
+    $ rm -rf luna
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz
+    $ tar xf luna.tar.gz
+    $ chown -R root:root luna
+
+    # 注意把浏览器缓存清理下
+
+**Docker Coco Guacamole**
+
+说明: Docker 部署的 coco 与 guacamole 升级说明
+
+.. code-block:: shell
+
+    # 先到 Web 会话管理 - 终端管理 删掉所有组件
+    $ docker sop jms_coco
+    $ docker stop jms_guacamole
+    $ docker rm jms_coco
+    $ docker rm jms_guacamole
+    $ docker pull jumpserver/jms_coco:1.4.5
+    $ docker pull jumpserver/jms_guacamole:1.4.5
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
+
+    # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
