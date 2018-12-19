@@ -50,7 +50,7 @@
       && docker pull jumpserver/jms_coco:1.4.5 \
       && docker pull jumpserver/jms_guacamole:1.4.5 \
       && cd /opt \
-      && wget https://github.com/jumpserver/luna/releases/download/1.4.5/luna.tar.gz \
+      && wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz \
       && tar xf luna.tar.gz \
       && chown -R root:root luna \
       && rm /etc/nginx/conf.d/default.conf
