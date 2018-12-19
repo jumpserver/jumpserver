@@ -119,7 +119,7 @@ class SessionReplayViewSet(viewsets.ViewSet):
         session = get_object_or_404(Session, id=session_id)
 
         data = {
-            'type': 'guacamole' if self.session.protocol == 'rdp' else 'json',
+            'type': 'guacamole' if session.protocol == 'rdp' else 'json',
             'src': '',
         }
 
