@@ -180,8 +180,8 @@ function initTable() {
         ajax_url: '{% url "api-assets:asset-list" %}',
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
-            {data: "cpu_cores"},
-            {data: "connectivity"}, {data: "id", orderable: false }
+            {data: "cpu_cores", orderable: false},
+            {data: "connectivity", orderable: false}, {data: "id", orderable: false }
         ],
         op_html: $('#actions').html()
     };
