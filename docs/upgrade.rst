@@ -599,6 +599,7 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
+    $ git checkout master
     $ git pull
     $ pip install -r requirements/requirements.txt
     $ cd utils
