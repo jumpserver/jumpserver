@@ -115,10 +115,12 @@ class SystemUser(AssetUser):
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
+    PROTOCOL_VNC = 'vnc'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
         (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_VNC, 'vnc'),
     )
 
     LOGIN_AUTO = 'auto'
