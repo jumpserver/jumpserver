@@ -270,7 +270,7 @@ CentOS 7 安装文档
 .. code-block:: shell
 
     # 配置 Nginx 整合各组件
-    $ rm /etc/nginx/conf.d/default.conf
+    $ rm -rf /etc/nginx/conf.d/default.conf
 
 .. code-block:: shell
 
