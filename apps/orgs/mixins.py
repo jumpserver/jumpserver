@@ -74,7 +74,7 @@ class OrgManager(models.Manager):
 
 
 class OrgModelMixin(models.Model):
-    org_id = models.CharField(max_length=36, blank=True, default='', verbose_name=_("Organization"))
+    org_id = models.CharField(max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True)
     objects = OrgManager()
 
     sep = '@'

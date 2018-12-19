@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CommandFilter',
             fields=[
-                ('org_id', models.CharField(blank=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=64, verbose_name='Name')),
                 ('is_active', models.BooleanField(default=True, verbose_name='Is active')),
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CommandFilterRule',
             fields=[
-                ('org_id', models.CharField(blank=True, default='', max_length=36, verbose_name='Organization')),
+                ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('type', models.CharField(choices=[('regex', 'Regex'), ('command', 'Command')], default='command', max_length=16, verbose_name='Type')),
                 ('priority', models.IntegerField(default=50, help_text='1-100, the lower will be match first', validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(100)], verbose_name='Priority')),
