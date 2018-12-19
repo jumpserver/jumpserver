@@ -232,7 +232,7 @@
     # 保存后重新载入配置
     $ nginx -s reload
 
-1.4.4 升级到 1.4.5
+1.4.4 升级到最新版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - 当前版本必须是 1.4.4 版本,否则请先升级到 1.4.4
@@ -255,7 +255,7 @@
 
     $ cd /opt/jumpserver
     $ git fetch
-    $ git checkout 1.4.5
+    $ git checkout master
     $ git clean -df  # 清除未跟踪文件, 请一定要做好备份后再操作此步骤
     $ git reset --hard  # 还原所有修改, 请一定要做好备份后再操作此步骤
 
@@ -415,7 +415,6 @@
 .. code-block:: shell
 
     $ sh 1.4.4_to_1.4.5_migrations.sh
-    $ sh make_migrations.sh
 
     $ cd ../
     $ ./jms start all -d
@@ -566,7 +565,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.5/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -583,15 +582,15 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.5
-    $ docker pull jumpserver/jms_guacamole:1.4.5
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.5
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
+    $ docker pull jumpserver/jms_coco:1.4.6
+    $ docker pull jumpserver/jms_guacamole:1.4.6
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
 
-1.4.5 升级到 1.4.6 及之后版本
+1.4.5 升级到最新版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Jumpserver**
@@ -599,11 +598,8 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ git checkout master
     $ git pull
     $ pip install -r requirements/requirements.txt
-    $ cd utils
-    $ sh make_migrations.sh
 
     $ cd ../
     $ ./jms start all -d
