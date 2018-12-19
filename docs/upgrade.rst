@@ -429,8 +429,7 @@
     $ git pull
     $ source /opt/py3/bin/activate
     $ ./cocod stop
-
-    $ mv conf.py $jumpserver_backup/
+    $ mv conf.py conf.bak
 
     # 更新 conf.py ,请根据你原备份的 conf.py 内容进行修改
     $ cp conf_example.py conf.py
