@@ -34,7 +34,7 @@ RDP 协议资产连接错误排查思路
     # docker 部署请直接删除容器后重建,记得一定要先在 终端管理 删除不在线的组件
     $ docker stop jms_guacamole
     $ docker rm jms_guacamole
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.5
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
 
