@@ -26,7 +26,7 @@
 .. code-block:: shell
 
     $ apt-get update && apt-get -y upgrade
-    $ apt-get -y install wget gcc libffi-dev git
+    $ apt-get -y install wget gcc libffi-dev git libmysqlclient-dev
 
     # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
     $ apt-get -y install language-pack-zh-hans
