@@ -252,14 +252,7 @@
     # Default using Config settings, you can write if/else for different env
     config = DevelopmentConfig()
 
-**2.8 生成数据库表结构和初始化数据**
-
-.. code-block:: shell
-
-    $ cd /opt/jumpserver/utils
-    $ sh make_migrations.sh
-
-**2.9 运行 Jumpserver**
+**2.8 运行 Jumpserver**
 
 .. code-block:: shell
 

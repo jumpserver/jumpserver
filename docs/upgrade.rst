@@ -145,7 +145,6 @@
 .. code-block:: shell
 
     $ pip install -r requirements/requirements.txt
-    $ cd utils && sh make_migrations.sh
 
 .. code-block:: shell
 

@@ -229,10 +229,6 @@ CentOS 7 安装文档
 
 .. code-block:: shell
 
-    # 生成数据库表结构和初始化数据
-    $ cd /opt/jumpserver/utils
-    $ sh make_migrations.sh
-
     # 运行 Jumpserver
     $ cd /opt/jumpserver
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d

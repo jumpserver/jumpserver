@@ -134,8 +134,6 @@
       && sed -i "s/# LOG_LEVEL = 'DEBUG'/LOG_LEVEL = 'ERROR'/g" /opt/jumpserver/config.py \
       && sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE = False/SESSION_EXPIRE_AT_BROWSER_CLOSE = True/g" /opt/jumpserver/config.py \
       && sed -i "s/DB_PASSWORD = ''/DB_PASSWORD = '$DB_PASSWORD'/g" /opt/jumpserver/config.py \
-      && cd /opt/jumpserver/utils \
-      && sh make_migrations.sh \
       && cd /opt/jumpserver \
       && ./jms start all -d \
       && Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
