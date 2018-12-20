@@ -186,6 +186,19 @@
             </div>
         </div>
     </div>
-    {% include 'users/_user_update_pk_modal.html' %}
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).ready(function () {
+}).on('click', '.celery-task-log', function () {
+    var history_pk = "{{ object.latest_history.pk  }}";
+    if (!history_pk) {
+        alert("没有运行历史");
+        return
+    }
+    var url = '{% url 'ops:celery-task-log' pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', history_pk);
+    window.open(url, '', 'width=800,height=600,left=400,top=400')
+})
+</script>
 {% endblock %}
 

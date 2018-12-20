@@ -118,10 +118,11 @@ class SessionReplayViewSet(viewsets.ViewSet):
         session_id = kwargs.get('pk')
         session = get_object_or_404(Session, id=session_id)
 
-        data = {
-            'type': 'guacamole' if session.protocol == 'rdp' else 'json',
-            'src': '',
-        }
+        tp = 'json'
+        if session.protocol in ('rdp', 'vnc'):
+            tp = 'guacamole'
+
+        data = {'type': tp, 'src': ''}
 
         # 新版本和老版本的文件后缀不同
         session_path = session.get_rel_replay_path()  # 存在外部存储上的路径

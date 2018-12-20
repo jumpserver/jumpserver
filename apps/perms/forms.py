@@ -12,8 +12,6 @@ from .models import AssetPermission
 class AssetPermissionForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'initial' not in kwargs:
-            return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
             users_field.queryset = current_org.get_org_users()
