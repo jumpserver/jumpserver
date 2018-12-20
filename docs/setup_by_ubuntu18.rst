@@ -48,7 +48,7 @@ Ubuntu 18.04 安装文档
 
 .. code-block:: shell
 
-    $ apt-get -y install mysql-server libmysqlclient-dev  # 安装过程中注意输入数据库 root账户 的密码
+    $ apt-get -y install mysql-server libmysqlclient-dev
 
 **1.4 创建数据库 Jumpserver 并授权**
 
@@ -83,8 +83,6 @@ Ubuntu 18.04 安装文档
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **2.1 下载或 Clone 项目**
-
-项目提交较多 git clone 时较大,你可以选择去 Github 项目页面直接下载zip包。
 
 .. code-block:: shell
 
