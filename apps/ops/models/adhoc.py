@@ -42,7 +42,7 @@ class Task(models.Model):
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     created_by = models.CharField(max_length=128, blank=True, default='')
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
     __latest_adhoc = None
     _ignore_auto_created_by = True
 
