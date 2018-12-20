@@ -4,8 +4,6 @@ import re
 import os
 
 from celery import shared_task
-from ops.celery import app as celery_app
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from common.utils import capacity_convert, \
