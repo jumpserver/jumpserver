@@ -25,7 +25,7 @@
                                 <a href="{% url 'ops:task-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history' %} </a>
                             </li>
                             <li>
-                                <a class="text-center celery-task-log" onclick="window.open('{% url 'ops:celery-task-log' pk=object.latest_history.pk %}','', 'width=800,height=600,left=400,top=400')"><i class="fa fa-laptop"></i> {% trans 'Last run output' %} </a>
+                                <a class="text-center celery-task-log"><i class="fa fa-laptop"></i> {% trans 'Last run output' %} </a>
                             </li>
                         </ul>
                     </div>
@@ -148,6 +148,14 @@ function initTable() {
 
 $(document).ready(function () {
     initTable();
+}).on('click', '.celery-task-log', function () {
+    var history_pk = "{{ object.latest_history.pk  }}";
+    if (!history_pk) {
+        alert("没有运行历史");
+        return
+    }
+    var url = '{% url 'ops:celery-task-log' pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', history_pk);
+    window.open(url, '', 'width=800,height=600,left=400,top=400')
 })
 
 </script>
