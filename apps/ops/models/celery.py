@@ -19,7 +19,7 @@ class CeleryTask(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=1024)
-    status = models.CharField(max_length=128, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=128, choices=STATUS_CHOICES, db_index=True)
     log_path = models.CharField(max_length=256, blank=True, null=True)
     date_published = models.DateTimeField(auto_now_add=True)
     date_start = models.DateTimeField(null=True)

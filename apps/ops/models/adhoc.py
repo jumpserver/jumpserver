@@ -164,7 +164,7 @@ class AdHoc(models.Model):
     run_as = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     @property
     def tasks(self):

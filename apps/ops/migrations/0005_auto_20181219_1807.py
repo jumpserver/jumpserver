@@ -15,4 +15,17 @@ class Migration(migrations.Migration):
             name='date_created',
             field=models.DateTimeField(auto_now_add=True, db_index=True),
         ),
+        migrations.AlterField(
+            model_name='adhoc',
+            name='date_created',
+            field=models.DateTimeField(auto_now_add=True, db_index=True),
+        ),
+        migrations.AlterField(
+            model_name='celerytask',
+            name='status',
+            field=models.CharField(
+                choices=[('waiting', 'waiting'), ('running', 'running'),
+                         ('finished', 'finished')], db_index=True,
+                max_length=128),
+        ),
     ]
