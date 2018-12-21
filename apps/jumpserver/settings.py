@@ -499,8 +499,9 @@ BOOTSTRAP3 = {
     # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
-    'set_placeholder': True,
+    'set_placeholder': False,
     'success_css_class': '',
+    'required_css_class': 'required',
 }
 
 TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
