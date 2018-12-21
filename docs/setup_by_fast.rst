@@ -67,7 +67,7 @@
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
-            try_files $uri / /index.html;
+            try_files \$uri / /index.html;
             alias /opt/luna/;
         }
 
