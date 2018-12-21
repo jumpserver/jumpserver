@@ -61,7 +61,3 @@ class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
         }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
-        }

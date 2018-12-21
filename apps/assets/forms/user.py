@@ -80,10 +80,6 @@ class AdminUserForm(PasswordAndKeyAuthForm):
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
         }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
-        }
 
 
 class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
@@ -150,7 +146,6 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             }),
         }
         help_texts = {
-            'name': '* required',
             'auto_push': _('Auto push system user to asset'),
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),
