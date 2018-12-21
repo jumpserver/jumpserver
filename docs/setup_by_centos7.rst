@@ -251,7 +251,8 @@ CentOS 7 安装文档
     $ firewall-cmd --reload
     # 172.17.0.x 是docker容器默认的IP池, 这里偷懒直接授权ip段了, 可以根据实际情况单独授权IP
 
-    # 注意,<Jumpserver_url> 请自行修改成 jumpserver 对外的访问地址,如 192.168.100.100:8080
+    # http://<Jumpserver_url> 指向 jumpserver 的服务端口, 如 http://192.168.244.144:8080
+    # BOOTSTRAP_TOKEN 为 Jumpserver/config.py 里面的 BOOTSTRAP_TOKEN
     $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
     $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
 
