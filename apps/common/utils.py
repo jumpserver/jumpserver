@@ -391,6 +391,8 @@ def get_request_ip(request):
 def get_command_storage_setting():
     default = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
     value = settings.TERMINAL_COMMAND_STORAGE
+    if not value:
+        return default
     value.update(default)
     return value
 
@@ -398,6 +400,8 @@ def get_command_storage_setting():
 def get_replay_storage_setting():
     default = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
     value = settings.TERMINAL_REPLAY_STORAGE
+    if not value:
+        return default
     value.update(default)
     return value
 
