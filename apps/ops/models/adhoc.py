@@ -168,7 +168,10 @@ class AdHoc(models.Model):
 
     @property
     def tasks(self):
-        return json.loads(self._tasks)
+        try:
+            return json.loads(self._tasks)
+        except:
+            return []
 
     @tasks.setter
     def tasks(self, item):

@@ -18,8 +18,7 @@ class GenerateTree:
             "asset_instance": set("system_user")
         }
         """
-        self.__all_nodes = Node.objects.all()
-        self.__node_asset_map = defaultdict(set)
+        self.__all_nodes = list(Node.objects.all())
         self.nodes = defaultdict(dict)
 
     def add_asset(self, asset, system_users):
