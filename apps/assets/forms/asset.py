@@ -41,9 +41,6 @@ class AssetCreateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': '* required',
-            'ip': '* required',
-            'port': '* required',
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -80,10 +77,6 @@ class AssetUpdateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': '* required',
-            'ip': '* required',
-            'port': '* required',
-            'cluster': '* required',
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -95,7 +88,7 @@ class AssetUpdateForm(OrgModelForm):
 
 class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
-        required=True, help_text='* required',
+        required=True,
         label=_('Select assets'), queryset=Asset.objects.all(),
         widget=forms.SelectMultiple(
             attrs={

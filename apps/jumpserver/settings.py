@@ -501,6 +501,7 @@ BOOTSTRAP3 = {
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': True,
     'success_css_class': '',
+    'required_css_class': 'required',
 }
 
 TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
