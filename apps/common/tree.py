@@ -49,7 +49,9 @@ class TreeNode:
             return False
         elif not self.isParent and other.isParent:
             return True
-        return self.id > other.id
+        if self.pId != other.pId:
+            return self.pId > other.pId
+        return self.name > other.name
 
     def __eq__(self, other):
         return self.id == other.id
