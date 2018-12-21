@@ -510,6 +510,8 @@ Guacamole 需要 Tomcat 来运行
 
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
+
+    # BOOTSTRAP_TOKEN 为 Jumpserver/config.py 里面的 BOOTSTRAP_TOKEN
     $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
     $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
