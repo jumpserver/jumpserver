@@ -317,7 +317,6 @@
         """
         # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
         # NAME = "localhost"
-        NAME = "coco"
 
         # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'

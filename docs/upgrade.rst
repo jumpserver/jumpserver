@@ -255,6 +255,7 @@
     $ cd /opt/jumpserver
     $ git fetch
     $ git checkout master
+    $ git pull
     $ git clean -df  # 清除未跟踪文件, 请一定要做好备份后再操作此步骤
     $ git reset --hard  # 还原所有修改, 请一定要做好备份后再操作此步骤
 
@@ -451,7 +452,6 @@
         """
         # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
         # NAME = "localhost"
-        NAME = "coco"
 
         # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
         # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
@@ -620,7 +620,13 @@
 
 .. code-block:: shell
 
-    # 1.4.6 无更新, 跳过
+    $ cd /opt/docker-guacamole
+    $ git pull
+    $ /etc/init.d/guacd stop
+    $ sh /config/tomcat8/bin/shutdown.sh
+    $ cp -r guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ /etc/init.d/guacd start
+    $ sh /config/tomcat8/bin/startup.sh
 
 **Luna**
 
