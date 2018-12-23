@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.urls import path
+from django.urls import path, include
 from rest_framework_bulk.routes import BulkRouter
 
-from .. import api
+from ..api import v1 as api
 
 app_name = 'terminal'
 
@@ -20,7 +20,7 @@ router.register(r'status', api.StatusViewSet, 'status')
 
 urlpatterns = [
     path('sessions/<uuid:pk>/replay/',
-         api.SessionReplayV2ViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
+         api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
          name='session-replay'),
     path('tasks/kill-session/', api.KillSessionAPI.as_view(), name='kill-session'),
     path('terminal/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
@@ -33,3 +33,6 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
+
+
+

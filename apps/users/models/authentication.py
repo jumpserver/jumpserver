@@ -17,13 +17,16 @@ class AccessKey(models.Model):
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, verbose_name='User',
-                             on_delete=models.CASCADE, related_name='access_key')
+                             on_delete=models.CASCADE, related_name='access_keys')
 
     def get_id(self):
         return str(self.id)
 
     def get_secret(self):
         return str(self.secret)
+
+    def get_full_value(self):
+        return '{}:{}'.format(self.id, self.secret)
 
     def __str__(self):
         return str(self.id)
@@ -55,11 +58,15 @@ class LoginLog(models.Model):
     REASON_NOTHING = 0
     REASON_PASSWORD = 1
     REASON_MFA = 2
+    REASON_NOT_EXIST = 3
+    REASON_PASSWORD_EXPIRED = 4
 
     REASON_CHOICE = (
         (REASON_NOTHING, _('-')),
         (REASON_PASSWORD, _('Username/password check failed')),
         (REASON_MFA, _('MFA authentication failed')),
+        (REASON_NOT_EXIST, _("Username does not exist")),
+        (REASON_PASSWORD_EXPIRED, _("Password expired")),
     )
 
     STATUS_CHOICE = (
@@ -67,7 +74,7 @@ class LoginLog(models.Model):
         (False, _('Failed'))
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    username = models.CharField(max_length=20, verbose_name=_('Username'))
+    username = models.CharField(max_length=128, verbose_name=_('Username'))
     type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
     ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))

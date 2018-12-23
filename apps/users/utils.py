@@ -16,11 +16,12 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
+from datetime import datetime
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
-from common.models import common_settings, Setting
 from common.forms import SecuritySettingForm
+from common.models import Setting
 from .models import User, LoginLog
 
 
@@ -109,6 +110,44 @@ def send_reset_password_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_password_expiration_reminder_mail(user):
+    subject = _('Security notice')
+    recipient_list = [user.email]
+    message = _("""
+    Hello %(name)s:
+    </br>
+    Your password will expire in %(date_password_expired)s,
+    </br>
+    For your account security, please click on the link below to update your password in time
+    </br>
+    <a href="%(update_password_url)s">Click here update password</a>
+    </br>
+    If your password has expired, please click 
+    <a href="%(forget_password_url)s?email=%(email)s">Password expired</a> 
+    to apply for a password reset email.
+
+    </br>
+    ---
+
+    </br>
+    <a href="%(login_url)s">Login direct</a>
+
+    </br>
+    """) % {
+        'name': user.name,
+        'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
+            user.date_password_expired)).strftime('%Y-%m-%d %H:%M'),
+        'update_password_url': reverse('users:user-password-update', external=True),
+        'forget_password_url': reverse('users:forgot-password', external=True),
+        'email': user.email,
+        'login_url': reverse('users:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 def send_reset_ssh_key_mail(user):
     subject = _('SSH Key Reset')
     recipient_list = [user.email]
@@ -161,24 +200,6 @@ def check_user_valid(**kwargs):
             if public_key == public_key_saved[1]:
                 return user, ''
     return None, _('Password or SSH public key invalid')
-
-
-def refresh_token(token, user, expiration=settings.TOKEN_EXPIRATION or 3600):
-    cache.set(token, user.id, expiration)
-
-
-def generate_token(request, user):
-    expiration = settings.TOKEN_EXPIRATION or 3600
-    remote_addr = request.META.get('REMOTE_ADDR', '')
-    if not isinstance(remote_addr, bytes):
-        remote_addr = remote_addr.encode("utf-8")
-    remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-    token = cache.get('%s_%s' % (user.id, remote_addr))
-    if not token:
-        token = uuid.uuid4().hex
-        cache.set(token, user.id, expiration)
-        cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
-    return token
 
 
 def validate_ip(ip):
@@ -275,57 +296,27 @@ def check_otp_code(otp_secret_key, otp_code):
 
 def get_password_check_rules():
     check_rules = []
-    min_length = settings.DEFAULT_PASSWORD_MIN_LENGTH
-    min_name = 'SECURITY_PASSWORD_MIN_LENGTH'
-    base_filed = SecuritySettingForm.base_fields
-    password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
-
-    if not password_setting:
-        # 用户还没有设置过密码校验规则
-        label = base_filed.get(min_name).label
-        label += ' ' + str(min_length) + _('Bit')
-        id = 'rule_' + min_name
-        rules = {'id': id, 'label': label}
-        check_rules.append(rules)
-
-    for setting in password_setting:
-        if setting.cleaned_value:
-            id = 'rule_' + setting.name
-            label = base_filed.get(setting.name).label
-            if setting.name == min_name:
-                label += str(setting.cleaned_value) + _('Bit')
-                min_length = setting.cleaned_value
-            rules = {'id': id, 'label': label}
-            check_rules.append(rules)
-
-    return check_rules, min_length
+    for rule in settings.SECURITY_PASSWORD_RULES:
+        key = "id_{}".format(rule.lower())
+        value = getattr(settings, rule)
+        if not value:
+            continue
+        check_rules.append({'key': key, 'value': int(value)})
+    return check_rules
 
 
 def check_password_rules(password):
-    min_field_name = 'SECURITY_PASSWORD_MIN_LENGTH'
-    upper_field_name = 'SECURITY_PASSWORD_UPPER_CASE'
-    lower_field_name = 'SECURITY_PASSWORD_LOWER_CASE'
-    number_field_name = 'SECURITY_PASSWORD_NUMBER'
-    special_field_name = 'SECURITY_PASSWORD_SPECIAL_CHAR'
-    min_length = getattr(common_settings, min_field_name) or \
-                 settings.DEFAULT_PASSWORD_MIN_LENGTH
-
-    password_setting = Setting.objects.filter(name__startswith='SECURITY_PASSWORD')
-    if not password_setting:
-        pattern = r"^.{" + str(min_length) + ",}$"
-    else:
-        pattern = r"^"
-        for setting in password_setting:
-            if setting.cleaned_value and setting.name == upper_field_name:
-                pattern += '(?=.*[A-Z])'
-            elif setting.cleaned_value and setting.name == lower_field_name:
-                pattern += '(?=.*[a-z])'
-            elif setting.cleaned_value and setting.name == number_field_name:
-                pattern += '(?=.*\d)'
-            elif setting.cleaned_value and setting.name == special_field_name:
-                pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'",\.<>\/\?])'
-        pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'",\.<>\/\?]'
-
+    pattern = r"^"
+    if settings.SECURITY_PASSWORD_UPPER_CASE:
+        pattern += '(?=.*[A-Z])'
+    if settings.SECURITY_PASSWORD_LOWER_CASE:
+        pattern += '(?=.*[a-z])'
+    if settings.SECURITY_PASSWORD_NUMBER:
+        pattern += '(?=.*\d)'
+    if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
+        pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
+    pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
+    pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
@@ -340,8 +331,7 @@ def increase_login_failed_count(username, ip):
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
-        settings.DEFAULT_LOGIN_LIMIT_TIME
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
     cache.set(key_limit, count, int(limit_time)*60)
 
 
@@ -357,10 +347,8 @@ def is_block_login(username, ip):
     key_block = key_prefix_block.format(username)
     count = cache.get(key_limit, 0)
 
-    limit_count = common_settings.SECURITY_LOGIN_LIMIT_COUNT or \
-        settings.DEFAULT_LOGIN_LIMIT_COUNT
-    limit_time = common_settings.SECURITY_LOGIN_LIMIT_TIME or \
-        settings.DEFAULT_LOGIN_LIMIT_TIME
+    limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
     if count >= limit_count:
         cache.set(key_block, 1, int(limit_time)*60)

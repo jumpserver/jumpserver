@@ -7,14 +7,16 @@ from rest_framework_bulk import BulkListSerializer
 
 from common.utils import get_signer, validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
-from .models import User, UserGroup
+from ..models import User, UserGroup
 
 signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     groups_display = serializers.SerializerMethodField()
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset = UserGroup.objects.all(), required=False)
+    groups = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=UserGroup.objects.all(), required=False
+    )
 
     class Meta:
         model = User

@@ -2,6 +2,7 @@
 
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.views import APIView, Response
+from rest_framework.pagination import LimitOffsetPagination
 
 from django.views.generic.detail import SingleObjectMixin
 
@@ -20,6 +21,11 @@ class DomainViewSet(BulkModelViewSet):
     queryset = Domain.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.DomainSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset().all()
+        return queryset
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
@@ -33,11 +39,12 @@ class DomainViewSet(BulkModelViewSet):
 
 
 class GatewayViewSet(BulkModelViewSet):
-    filter_fields = ("domain",)
+    filter_fields = ("domain__name", "name", "username", "ip", "domain")
     search_fields = filter_fields
     queryset = Gateway.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.GatewaySerializer
+    pagination_class = LimitOffsetPagination
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):

@@ -37,7 +37,8 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
                      kwargs=kwargs, current_app=current_app)
 
     if external:
-        url = settings.SITE_URL.strip('/') + url
+        site_url = settings.SITE_URL
+        url = site_url.strip('/') + url
     return url
 
 
@@ -385,6 +386,20 @@ def get_request_ip(request):
     else:
         login_ip = request.META.get('REMOTE_ADDR', '')
     return login_ip
+
+
+def get_command_storage_setting():
+    default = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
+    value = settings.TERMINAL_COMMAND_STORAGE
+    value.update(default)
+    return value
+
+
+def get_replay_storage_setting():
+    default = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
+    value = settings.TERMINAL_REPLAY_STORAGE
+    value.update(default)
+    return value
 
 
 class TeeObj:

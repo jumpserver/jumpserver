@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.core.cache import cache
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
-from .models import Terminal, Status, Session, Task
-from .backends import get_multi_command_storage
+from ..models import Terminal, Status, Session, Task
+from ..backends import get_multi_command_storage
 
 
 class TerminalSerializer(serializers.ModelSerializer):
@@ -31,6 +29,8 @@ class TerminalSerializer(serializers.ModelSerializer):
     def get_is_alive(obj):
         key = StatusSerializer.CACHE_KEY_PREFIX + str(obj.id)
         return cache.get(key)
+
+
 
 
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -70,4 +70,5 @@ class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField()
+
 

@@ -17,24 +17,12 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
+from .conf import load_user_config
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
-
-sys.path.append(PROJECT_DIR)
-
-# Import project config setting
-try:
-    from config import config as CONFIG
-except ImportError:
-    msg = """
-    
-    Error: No config file found.
-    
-    You can run `cp config_example.py config.py`, and edit it.
-    """
-    raise ImportError(msg)
-    # CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
+CONFIG = load_user_config()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -42,16 +30,19 @@ except ImportError:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = CONFIG.SECRET_KEY
 
+# SECURITY WARNING: keep the token secret, remove it if all coco, guacamole ok
+BOOTSTRAP_TOKEN = CONFIG.BOOTSTRAP_TOKEN
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = CONFIG.DEBUG or False
+DEBUG = CONFIG.DEBUG
 
 # Absolute url for some case, for example email link
-SITE_URL = CONFIG.SITE_URL or 'http://localhost'
+SITE_URL = CONFIG.SITE_URL
 
 # LOG LEVEL
-LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
+LOG_LEVEL = CONFIG.LOG_LEVEL
 
-ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -64,6 +55,7 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
+    'authentication.apps.AuthenticationConfig',  # authentication
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -94,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -150,9 +143,9 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
 
-SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
-CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
+CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -315,13 +308,13 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 
 # Email config
-EMAIL_HOST = CONFIG.EMAIL_HOST
-EMAIL_PORT = CONFIG.EMAIL_PORT
-EMAIL_HOST_USER = CONFIG.EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = CONFIG.EMAIL_HOST_PASSWORD
-EMAIL_USE_SSL = CONFIG.EMAIL_USE_SSL
-EMAIL_USE_TLS = CONFIG.EMAIL_USE_TLS
-EMAIL_SUBJECT_PREFIX = CONFIG.EMAIL_SUBJECT_PREFIX or ''
+EMAIL_HOST = 'smtp.jumpserver.org'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'noreply@jumpserver.org'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = False
+EMAIL_SUBJECT_PREFIX = '[JMS] '
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -361,23 +354,23 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Auth LDAP settings
-AUTH_LDAP = CONFIG.AUTH_LDAP
-AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
-AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
-AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
-AUTH_LDAP_SEARCH_OU = CONFIG.AUTH_LDAP_SEARCH_OU
-AUTH_LDAP_SEARCH_FILTER = CONFIG.AUTH_LDAP_SEARCH_FILTER
-AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
-AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
-AUTH_LDAP_USER_SEARCH_UNION = [
+AUTH_LDAP = False
+AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=jumpserver,dc=org'
+AUTH_LDAP_BIND_PASSWORD = ''
+AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'
+AUTH_LDAP_SEARCH_FILTER = '(cn=%(user)s)'
+AUTH_LDAP_START_TLS = False
+AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail"}
+AUTH_LDAP_USER_SEARCH_UNION = lambda: [
     LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
     for USER_SEARCH in str(AUTH_LDAP_SEARCH_OU).split("|")
 ]
-AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*AUTH_LDAP_USER_SEARCH_UNION)
+AUTH_LDAP_USER_SEARCH = lambda: LDAPSearchUnion(*AUTH_LDAP_USER_SEARCH_UNION())
 AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
 AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-    AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
+   AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
 )
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_TIMEOUT: 5
@@ -389,12 +382,30 @@ AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
 
+# openid
+# Auth OpenID settings
+BASE_SITE_URL = CONFIG.BASE_SITE_URL
+AUTH_OPENID = CONFIG.AUTH_OPENID
+AUTH_OPENID_SERVER_URL = CONFIG.AUTH_OPENID_SERVER_URL
+AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
+AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
+AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
+AUTH_OPENID_BACKENDS = [
+    'authentication.openid.backends.OpenIDAuthorizationPasswordBackend',
+    'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
+]
+
+if AUTH_OPENID:
+    LOGIN_URL = reverse_lazy("authentication:openid-login")
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
+
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
     'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
-    'db':CONFIG.REDIS_DB_CELERY_BROKER or 3,
+    'db': CONFIG.REDIS_DB_CELERY_BROKER or 3,
 }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
@@ -416,10 +427,10 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-            'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
-            'host': CONFIG.REDIS_HOST or '127.0.0.1',
-            'port': CONFIG.REDIS_PORT or 6379,
-            'db': CONFIG.REDIS_DB_CACHE or 4,
+            'password': CONFIG.REDIS_PASSWORD,
+            'host': CONFIG.REDIS_HOST,
+            'port': CONFIG.REDIS_PORT,
+            'db': CONFIG.REDIS_DB_CACHE,
         }
     }
 }
@@ -434,27 +445,45 @@ COMMAND_STORAGE = {
     'ENGINE': 'terminal.backends.command.db',
 }
 
-TERMINAL_COMMAND_STORAGE = {
+DEFAULT_TERMINAL_COMMAND_STORAGE = {
     "default": {
         "TYPE": "server",
     },
+}
+
+TERMINAL_COMMAND_STORAGE = {
     # 'ali-es': {
     #     'TYPE': 'elasticsearch',
     #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
     # },
 }
 
-TERMINAL_REPLAY_STORAGE = {
+DEFAULT_TERMINAL_REPLAY_STORAGE = {
     "default": {
         "TYPE": "server",
     },
 }
 
+TERMINAL_REPLAY_STORAGE = {
+}
 
-DEFAULT_PASSWORD_MIN_LENGTH = 6
-DEFAULT_LOGIN_LIMIT_COUNT = 7
-DEFAULT_LOGIN_LIMIT_TIME = 30  # Unit: minute
-DEFAULT_SECURITY_MAX_IDLE_TIME = 30  # Unit: minute
+SECURITY_MFA_AUTH = False
+SECURITY_LOGIN_LIMIT_COUNT = 7
+SECURITY_LOGIN_LIMIT_TIME = 30  # Unit: minute
+SECURITY_MAX_IDLE_TIME = 30  # Unit: minute
+SECURITY_PASSWORD_EXPIRATION_TIME = 9999  # Unit: day
+SECURITY_PASSWORD_MIN_LENGTH = 6  # Unit: bit
+SECURITY_PASSWORD_UPPER_CASE = False
+SECURITY_PASSWORD_LOWER_CASE = False
+SECURITY_PASSWORD_NUMBER = False
+SECURITY_PASSWORD_SPECIAL_CHAR = False
+SECURITY_PASSWORD_RULES = [
+    'SECURITY_PASSWORD_MIN_LENGTH',
+    'SECURITY_PASSWORD_UPPER_CASE',
+    'SECURITY_PASSWORD_LOWER_CASE',
+    'SECURITY_PASSWORD_NUMBER',
+    'SECURITY_PASSWORD_SPECIAL_CHAR'
+]
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
@@ -466,16 +495,18 @@ BOOTSTRAP3 = {
     'success_css_class': '',
 }
 
-TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION or 3600
-DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE or 25
+TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
+DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
 DEFAULT_EXPIRED_YEARS = 70
 USER_GUIDE_URL = ""
 
 
 SWAGGER_SETTINGS = {
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'jumpserver.swagger.CustomSwaggerAutoSchema',
     'SECURITY_DEFINITIONS': {
         'basic': {
             'type': 'basic'
         }
     },
 }
+

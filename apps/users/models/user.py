@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+import base64
 from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.core import signing
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
-from common.models import common_settings
-from orgs.mixins import OrgManager
 from orgs.utils import current_org
 
 
@@ -40,9 +40,11 @@ class User(AbstractUser):
     )
     SOURCE_LOCAL = 'local'
     SOURCE_LDAP = 'ldap'
+    SOURCE_OPENID = 'openid'
     SOURCE_CHOICES = (
         (SOURCE_LOCAL, 'Local'),
         (SOURCE_LDAP, 'LDAP/AD'),
+        (SOURCE_OPENID, 'OpenID'),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
@@ -94,6 +96,10 @@ class User(AbstractUser):
     source = models.CharField(
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
         verbose_name=_('Source')
+    )
+    date_password_last_updated = models.DateTimeField(
+        auto_now_add=True, blank=True, null=True,
+        verbose_name=_('Date password last updated')
     )
 
     def __str__(self):
@@ -219,6 +225,34 @@ class User(AbstractUser):
     def is_staff(self, value):
         pass
 
+    @property
+    def is_local(self):
+        return self.source == self.SOURCE_LOCAL
+    
+    @property
+    def date_password_expired(self):
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        date_expired = self.date_password_last_updated + timezone.timedelta(
+            days=int(interval))
+        return date_expired
+
+    @property
+    def password_expired_remain_days(self):
+        date_remain = self.date_password_expired - timezone.now()
+        return date_remain.days
+
+    @property
+    def password_has_expired(self):
+        if self.is_local and self.password_expired_remain_days < 0:
+            return True
+        return False
+
+    @property
+    def password_will_expired(self):
+        if self.is_local and self.password_expired_remain_days < 5:
+            return True
+        return False
+
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
@@ -241,15 +275,38 @@ class User(AbstractUser):
             token = PrivateToken.objects.create(user=self)
         return token.key
 
+    def refresh_private_token(self):
+        from .authentication import PrivateToken
+        PrivateToken.objects.filter(user=self).delete()
+        return PrivateToken.objects.create(user=self)
+
+    def create_bearer_token(self, request=None):
+        expiration = settings.TOKEN_EXPIRATION or 3600
+        if request:
+            remote_addr = request.META.get('REMOTE_ADDR', '')
+        else:
+            remote_addr = '0.0.0.0'
+        if not isinstance(remote_addr, bytes):
+            remote_addr = remote_addr.encode("utf-8")
+        remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
+        token = cache.get('%s_%s' % (self.id, remote_addr))
+        if not token:
+            token = uuid.uuid4().hex
+            cache.set(token, self.id, expiration)
+            cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
+        return token
+
+    def refresh_bearer_token(self, token):
+        pass
+
     def create_access_key(self):
         from . import AccessKey
         access_key = AccessKey.objects.create(user=self)
         return access_key
 
-    def refresh_private_token(self):
-        from .authentication import PrivateToken
-        PrivateToken.objects.filter(user=self).delete()
-        return PrivateToken.objects.create(user=self)
+    @property
+    def access_key(self):
+        return self.access_keys.first()
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
@@ -257,7 +314,7 @@ class User(AbstractUser):
         return False
 
     def check_public_key(self, public_key):
-        if self.ssH_public_key == public_key:
+        if self.ssh_public_key == public_key:
             return True
         return False
 
@@ -282,7 +339,7 @@ class User(AbstractUser):
 
     @property
     def otp_force_enabled(self):
-        if common_settings.SECURITY_MFA_AUTH:
+        if settings.SECURITY_MFA_AUTH:
             return True
         return self.otp_level == 2
 
@@ -312,7 +369,8 @@ class User(AbstractUser):
             'phone': self.phone,
             'otp_level': self.otp_level,
             'comment': self.comment,
-            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S') if self.date_expired is not None else None
+            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S') \
+                if self.date_expired is not None else None
         })
 
     @classmethod
@@ -339,6 +397,7 @@ class User(AbstractUser):
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.date_password_last_updated = timezone.now()
         self.save()
 
     def delete(self, using=None, keep_parents=False):

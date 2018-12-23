@@ -1,11 +1,10 @@
 import json
 
-import ldap
 from django.db import models
+from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
 from .utils import get_signer
 
@@ -40,11 +39,7 @@ class Setting(models.Model):
         return self.name
 
     def __getattr__(self, item):
-        instances = self.__class__.objects.filter(name=item)
-        if len(instances) == 1:
-            return instances[0].cleaned_value
-        else:
-            return None
+        return cache.get(item)
 
     @property
     def cleaned_value(self):
@@ -68,6 +63,32 @@ class Setting(models.Model):
             raise ValueError("Json dump error: {}".format(str(e)))
 
     @classmethod
+    def save_storage(cls, name, data):
+        obj = cls.objects.filter(name=name).first()
+        if not obj:
+            obj = cls()
+            obj.name = name
+            obj.encrypted = True
+            obj.cleaned_value = data
+        else:
+            value = obj.cleaned_value
+            value.update(data)
+            obj.cleaned_value = value
+        obj.save()
+        return obj
+
+    @classmethod
+    def delete_storage(cls, name, storage_name):
+        obj = cls.objects.filter(name=name).first()
+        if not obj:
+            return False
+        value = obj.cleaned_value
+        value.pop(storage_name, '')
+        obj.cleaned_value = value
+        obj.save()
+        return True
+
+    @classmethod
     def refresh_all_settings(cls):
         try:
             settings_list = cls.objects.all()
@@ -78,22 +99,15 @@ class Setting(models.Model):
 
     def refresh_setting(self):
         setattr(settings, self.name, self.cleaned_value)
-
         if self.name == "AUTH_LDAP":
             if self.cleaned_value and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
-                settings.AUTHENTICATION_BACKENDS.insert(0, settings.AUTH_LDAP_BACKEND)
+                old_setting = settings.AUTHENTICATION_BACKENDS
+                old_setting.insert(0, settings.AUTH_LDAP_BACKEND)
+                settings.AUTHENTICATION_BACKENDS = old_setting
             elif not self.cleaned_value and settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
-                settings.AUTHENTICATION_BACKENDS.remove(settings.AUTH_LDAP_BACKEND)
-
-        if self.name == "AUTH_LDAP_SEARCH_FILTER":
-            settings.AUTH_LDAP_USER_SEARCH_UNION = [
-                LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, settings.AUTH_LDAP_SEARCH_FILTER)
-                for USER_SEARCH in str(settings.AUTH_LDAP_SEARCH_OU).split("|")
-            ]
-            settings.AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(*settings.AUTH_LDAP_USER_SEARCH_UNION)
+                old_setting = settings.AUTHENTICATION_BACKENDS
+                old_setting.remove(settings.AUTH_LDAP_BACKEND)
+                settings.AUTHENTICATION_BACKENDS = old_setting
 
     class Meta:
         db_table = "settings"
-
-
-common_settings = Setting()

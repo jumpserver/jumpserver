@@ -30,7 +30,7 @@
             <div class="col-sm-9">
                 <div class="input-group date">
                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d' }}">
+                    <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
                 </div>
                 <span class="help-block ">{{ form.date_expired.errors }}</span>
             </div>
@@ -52,18 +52,24 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src='{% static "js/plugins/daterangepicker/moment.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "js/plugins/daterangepicker/daterangepicker.min.js" %}'></script>
+    <link rel="stylesheet" type="text/css" href={% static "css/plugins/daterangepicker/daterangepicker.css" %} />
+
     <script>
+        var dateOptions = {
+            singleDatePicker: true,
+            showDropdowns: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            autoApply: true,
+            locale: {
+                format: 'YYYY-MM-DD HH:mm'
+            }
+        };
         $(document).ready(function () {
             $('.select2').select2();
-
-            $('.input-group.date').datepicker({
-                format: "yyyy-mm-dd",
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true
-            });
+            $('#id_date_expired').daterangepicker(dateOptions);
         })
     </script>
 {% endblock %}

@@ -50,6 +50,8 @@
 
                         {% if block_login %}
                             <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
+                        {% elif password_expired %}
+                            <p class="red-fonts">{% trans 'The user password has expired' %}</p>
                         {% elif form.errors %}
                             {% if 'captcha' in form.errors %}
                                 <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
@@ -75,9 +77,23 @@
                         </p>
                         {% endif %}
 
-                        <a href="{% url 'users:forgot-password' %}">
-                            <small>{% trans 'Forgot password' %}?</small>
-                        </a>
+                        <div class="text-muted text-center">
+                        <div>
+                            <a href="{% url 'users:forgot-password' %}">
+                                <small>{% trans 'Forgot password' %}?</small>
+                            </a>
+                        </div>
+
+                        {% if AUTH_OPENID %}
+                        <div class="hr-line-dashed"></div>
+                        <p class="text-muted text-center">{% trans "More login options" %}</p>
+                        <div>
+                            <button type="button" class="btn btn-default btn-sm btn-block" onclick="location.href='{% url 'authentication:openid-login' %}'">
+                                <i class="fa fa-openid"></i>
+                                {% trans 'Keycloak' %}
+                            </button>
+                        </div>
+                        {% endif %}
 
                     </form>
                     <p class="m-t">

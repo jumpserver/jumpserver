@@ -2,8 +2,11 @@
 #
 
 from rest_framework import serializers
-from .models import AssetPermission
+
 from common.fields import StringManyToManyField
+from .models import AssetPermission
+from assets.models import Node
+from assets.serializers import AssetGrantedSerializer
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -45,3 +48,29 @@ class AssetPermissionUpdateAssetSerializer(serializers.ModelSerializer):
         model = AssetPermission
         fields = ['id', 'assets']
 
+
+class AssetPermissionNodeSerializer(serializers.ModelSerializer):
+    asset = AssetGrantedSerializer(required=False)
+    assets_amount = serializers.SerializerMethodField()
+
+    tree_id = serializers.SerializerMethodField()
+    tree_parent = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Node
+        fields = [
+            'id', 'key', 'value', 'asset', 'is_node', 'org_id',
+            'tree_id', 'tree_parent', 'assets_amount',
+        ]
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return obj.assets_amount
+
+    @staticmethod
+    def get_tree_id(obj):
+        return obj.key
+
+    @staticmethod
+    def get_tree_parent(obj):
+        return obj.parent_key

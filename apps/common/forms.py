@@ -4,29 +4,28 @@ import json
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
-from django.conf import settings
 
-from .models import Setting, common_settings
+from .models import Setting, settings
 from .fields import FormDictField, FormEncryptCharField, \
-    FormEncryptMixin, FormEncryptDictField
+    FormEncryptMixin
 
 
 class BaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            db_value = getattr(common_settings, name)
-            django_value = getattr(settings, name) if hasattr(settings, name) else None
+            value = getattr(settings, name, None)
+            # django_value = getattr(settings, name) if hasattr(settings, name) else None
 
-            if db_value is None and django_value is None:
+            if value is None:  # and django_value is None:
                 continue
 
-            if db_value is False or db_value:
-                if isinstance(db_value, dict):
-                    db_value = json.dumps(db_value)
-                initial_value = db_value
-            elif django_value is False or django_value:
-                initial_value = django_value
+            if value is not None:
+                if isinstance(value, dict):
+                    value = json.dumps(value)
+                initial_value = value
+            # elif django_value is False or django_value:
+            #     initial_value = django_value
             else:
                 initial_value = ''
             field.initial = initial_value
@@ -44,7 +43,7 @@ class BaseForm(forms.Form):
                 field = self.fields[name]
                 if isinstance(field.widget, forms.PasswordInput) and not value:
                     continue
-                if value == getattr(common_settings, name):
+                if value == getattr(settings, name):
                     continue
 
                 encrypted = True if isinstance(field, FormEncryptMixin) else False
@@ -70,7 +69,7 @@ class BasicSettingForm(BaseForm):
     )
     EMAIL_SUBJECT_PREFIX = forms.CharField(
         max_length=1024, label=_("Email Subject Prefix"),
-        initial="[Jumpserver] "
+        help_text=_("Tips: Some word will be intercept by mail provider")
     )
 
 
@@ -98,21 +97,21 @@ class EmailSettingForm(BaseForm):
 
 class LDAPSettingForm(BaseForm):
     AUTH_LDAP_SERVER_URI = forms.CharField(
-        label=_("LDAP server"), initial='ldap://localhost:389'
+        label=_("LDAP server"),
     )
     AUTH_LDAP_BIND_DN = forms.CharField(
-        label=_("Bind DN"), initial='cn=admin,dc=jumpserver,dc=org'
+        label=_("Bind DN"),
     )
     AUTH_LDAP_BIND_PASSWORD = FormEncryptCharField(
-        label=_("Password"), initial='',
+        label=_("Password"),
         widget=forms.PasswordInput, required=False
     )
     AUTH_LDAP_SEARCH_OU = forms.CharField(
-        label=_("User OU"), initial='ou=tech,dc=jumpserver,dc=org',
+        label=_("User OU"),
         help_text=_("Use | split User OUs")
     )
     AUTH_LDAP_SEARCH_FILTER = forms.CharField(
-        label=_("User search filter"), initial='(cn=%(user)s)',
+        label=_("User search filter"),
         help_text=_("Choice may be (cn|uid|sAMAccountName)=%(user)s)")
     )
     AUTH_LDAP_USER_ATTR_MAP = FormDictField(
@@ -120,14 +119,14 @@ class LDAPSettingForm(BaseForm):
         help_text=_(
             "User attr map present how to map LDAP user attr to jumpserver, "
             "username,name,email is jumpserver attr"
-        )
+        ),
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
     AUTH_LDAP_START_TLS = forms.BooleanField(
-        label=_("Use SSL"), initial=False, required=False
+        label=_("Use SSL"), required=False
     )
-    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), initial=False, required=False)
+    AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), required=False)
 
 
 class TerminalSettingForm(BaseForm):
@@ -135,30 +134,22 @@ class TerminalSettingForm(BaseForm):
         ('hostname', _('Hostname')),
         ('ip', _('IP')),
     )
-    TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
-        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
-    )
-    TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
-        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
-    )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Password auth")
     )
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
         initial=True, required=False, label=_("Public key auth")
     )
-    TERMINAL_COMMAND_STORAGE = FormEncryptDictField(
-        label=_("Command storage"), help_text=_(
-            "Set terminal storage setting, `default` is the using as default,"
-            "You can set other storage and some terminal using"
-        )
+    TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
+        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
     )
-    TERMINAL_REPLAY_STORAGE = FormEncryptDictField(
-        label=_("Replay storage"), help_text=_(
-            "Set replay storage setting, `default` is the using as default,"
-            "You can set other storage and some terminal using"
-        )
+    TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
+        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
     )
+
+
+class TerminalCommandStorage(BaseForm):
+    pass
 
 
 class SecuritySettingForm(BaseForm):
@@ -181,10 +172,11 @@ class SecuritySettingForm(BaseForm):
         initial=30, min_value=5,
         label=_("No logon interval"),
         help_text=_(
-            "Tip :(unit/minute) if the user has failed to log in for a limited "
+            "Tip: (unit/minute) if the user has failed to log in for a limited "
             "number of times, no login is allowed during this time interval."
         )
     )
+    # ssh max idle time
     SECURITY_MAX_IDLE_TIME = forms.IntegerField(
         initial=30, required=False,
         label=_("Connection max idle time"),
@@ -192,6 +184,18 @@ class SecuritySettingForm(BaseForm):
             'If idle time more than it, disconnect connection(only ssh now) '
             'Unit: minute'
         ),
+    )
+    # password expiration time
+    SECURITY_PASSWORD_EXPIRATION_TIME = forms.IntegerField(
+        initial=9999, label=_("Password expiration time"),
+        min_value=1,
+        help_text=_(
+            "Tip: (unit/day) "
+            "If the user does not update the password during the time, "
+            "the user password will expire failure;"
+            "The password expiration reminder mail will be automatic sent to the user "
+            "by system within 5 days (daily) before the password expires"
+        )
     )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(

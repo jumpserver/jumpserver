@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
+
+import os
 import json
+import jms_storage
 
 from rest_framework.views import Response, APIView
 from ldap3 import Server, Connection
@@ -8,8 +11,9 @@ from django.core.mail import get_connection, send_mail
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from .permissions import IsOrgAdmin
+from .permissions import IsOrgAdmin, IsSuperUser
 from .serializers import MailTestSerializer, LDAPTestSerializer
+from .models import Setting
 
 
 class MailTestingAPI(APIView):
@@ -85,19 +89,95 @@ class LDAPTestingAPI(APIView):
             return Response({"error": str(serializer.errors)}, status=401)
 
 
+class ReplayStorageCreateAPI(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request):
+        storage_data = request.data
+
+        if storage_data.get('TYPE') == 'ceph':
+            port = storage_data.get('PORT')
+            if port.isdigit():
+                storage_data['PORT'] = int(storage_data.get('PORT'))
+
+        storage_name = storage_data.pop('NAME')
+        data = {storage_name: storage_data}
+
+        if not self.is_valid(storage_data):
+            return Response({"error": _("Error: Account invalid")}, status=401)
+
+        Setting.save_storage('TERMINAL_REPLAY_STORAGE', data)
+        return Response({"msg": _('Create succeed')}, status=200)
+
+    @staticmethod
+    def is_valid(storage_data):
+        if storage_data.get('TYPE') == 'server':
+            return True
+        storage = jms_storage.get_object_storage(storage_data)
+        target = 'tests.py'
+        src = os.path.join(settings.BASE_DIR, 'common', target)
+        return storage.is_valid(src, target)
+
+
+class ReplayStorageDeleteAPI(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request):
+        storage_name = str(request.data.get('name'))
+        Setting.delete_storage('TERMINAL_REPLAY_STORAGE', storage_name)
+        return Response({"msg": _('Delete succeed')}, status=200)
+
+
+class CommandStorageCreateAPI(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request):
+        storage_data = request.data
+        storage_name = storage_data.pop('NAME')
+        data = {storage_name: storage_data}
+        if not self.is_valid(storage_data):
+            return Response({"error": _("Error: Account invalid")}, status=401)
+
+        Setting.save_storage('TERMINAL_COMMAND_STORAGE', data)
+        return Response({"msg": _('Create succeed')}, status=200)
+
+    @staticmethod
+    def is_valid(storage_data):
+        if storage_data.get('TYPE') == 'server':
+            return True
+        try:
+            storage = jms_storage.get_log_storage(storage_data)
+        except Exception:
+            return False
+
+        return storage.ping()
+
+
+class CommandStorageDeleteAPI(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request):
+        storage_name = str(request.data.get('name'))
+        Setting.delete_storage('TERMINAL_COMMAND_STORAGE', storage_name)
+        return Response({"msg": _('Delete succeed')}, status=200)
+
+
 class DjangoSettingsAPI(APIView):
     def get(self, request):
         if not settings.DEBUG:
             return Response("Not in debug mode")
 
         data = {}
-        for k, v in settings.__dict__.items():
-            if k and k.isupper():
-                try:
-                    json.dumps(v)
-                    data[k] = v
-                except (json.JSONDecodeError, TypeError):
-                    data[k] = str(v)
+        for i in [settings, getattr(settings, '_wrapped')]:
+            if not i:
+                continue
+            for k, v in i.__dict__.items():
+                if k and k.isupper():
+                    try:
+                        json.dumps(v)
+                        data[k] = v
+                    except (json.JSONDecodeError, TypeError):
+                        data[k] = str(v)
         return Response(data)
 
 

@@ -19,13 +19,13 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsOrgAdmin,)
-    label = None
-    help_text = ''
+    # label = None
+    # help_text = ''
 
 
 class TaskRun(generics.RetrieveAPIView):
     queryset = Task.objects.all()
-    serializer_class = TaskViewSet
+    # serializer_class = TaskViewSet
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):

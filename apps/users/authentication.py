@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import base64
 import uuid
-import hashlib
 import time
 
 from django.core.cache import cache
@@ -12,11 +10,10 @@ from django.utils.translation import ugettext as _
 from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import HTTP_HEADER_ENCODING
-from rest_framework import authentication, exceptions, permissions
+from rest_framework import authentication, exceptions
 from rest_framework.authentication import CSRFCheck
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
-from .utils import refresh_token
 from .models import User, AccessKey, PrivateToken
 
 
@@ -144,7 +141,6 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         if not user:
             msg = _('Invalid token or cache refreshed.')
             raise exceptions.AuthenticationFailed(msg)
-        refresh_token(token, user)
         return user, None
 
 

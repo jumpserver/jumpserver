@@ -178,7 +178,7 @@ def start_celery():
         '-A',  'ops',
         '-l', LOG_LEVEL.lower(),
         '--pidfile', pid_file,
-        '-c', str(WORKERS),
+        '--autoscale', '20,4',
     ]
     if DAEMON:
         cmd.extend([

@@ -2,6 +2,8 @@ from importlib import import_module
 from django.conf import settings
 from .command.serializers import SessionCommandSerializer
 
+from common import utils
+
 TYPE_ENGINE_MAPPING = {
     'elasticsearch': 'terminal.backends.command.es',
 }
@@ -16,7 +18,9 @@ def get_command_storage():
 
 def get_terminal_command_storages():
     storage_list = {}
-    for name, params in settings.TERMINAL_COMMAND_STORAGE.items():
+    command_storage = utils.get_command_storage_setting()
+
+    for name, params in command_storage.items():
         tp = params['TYPE']
         if tp == 'server':
             storage = get_command_storage()
