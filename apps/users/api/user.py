@@ -47,7 +47,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
         return super().get_permissions()
 
     def allow_bulk_destroy(self, qs, filtered):
-        return qs.count() == filtered.count()
+        return qs.count() != filtered.count()
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
