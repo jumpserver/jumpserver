@@ -139,13 +139,13 @@ class TerminalSettingForm(BaseForm):
         (50, 50),
     )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
-        initial=True, required=False, label=_("Password auth")
+        required=False, label=_("Password auth")
     )
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
-        initial=True, required=False, label=_("Public key auth")
+        required=False, label=_("Public key auth")
     )
     TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
-        initial=5, min_value=5,
+        min_value=5,
         label=_("Heartbeat interval"), help_text=_("Units: seconds")
     )
     TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
@@ -155,7 +155,7 @@ class TerminalSettingForm(BaseForm):
         choices=PAGE_SIZE_CHOICES, initial='auto', label=_("List page size"),
     )
     TERMINAL_SESSION_KEEP_DURATION = forms.IntegerField(
-        label=_("Session keep duration"), min_value=1,
+        min_value=1, label=_("Session keep duration"),
         help_text=_("Units: days, Session, record, command will be delete "
                     "if more than duration, only in database")
     )
