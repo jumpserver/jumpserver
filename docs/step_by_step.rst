@@ -21,7 +21,6 @@
 
 .. code-block:: shell
 
-    # CentOS 7
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
 
@@ -34,15 +33,6 @@
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
-
-    # CentOS6
-    $ setenforce 0  # 临时关闭,重启后失效
-    $ service iptables stop  # 临时关闭,重启后失效
-
-    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
-    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-    $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
 
 一. 准备 Python3 和 Python 虚拟环境
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,7 +51,7 @@
 
 **1.3 建立 Python 虚拟环境**
 
-因为 CentOS 6/7 自带的是 Python2,而 Yum 等工具依赖原来的 Python,为了不扰乱原来的环境我们来使用 Python 虚拟环境
+因为 CentOS 7 自带的是 Python2,而 Yum 等工具依赖原来的 Python,为了不扰乱原来的环境我们来使用 Python 虚拟环境
 
 .. code-block:: shell
 
@@ -121,24 +111,15 @@
     $ systemctl enable redis
     $ systemctl start redis
 
-    # centos6
-    $ yum -y install redis
-    $ chkconfig redis on
-    $ service redis start
-
-
 **2.5 安装 MySQL**
 
 本教程使用 Mysql 作为数据库,如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
 
 .. code-block:: shell
 
-    # centos7
     $ yum -y install mariadb mariadb-devel mariadb-server # centos7下安装的是mariadb
     $ systemctl enable mariadb
     $ systemctl start mariadb
-
-    # centos6 自带的 mysql5.1 不支持,请在其他服务器上创建 jumpserver 数据库连接
 
 **2.6 创建数据库 Jumpserver 并授权**
 
@@ -533,7 +514,6 @@ Guacamole 需要 Tomcat 来运行
 
 .. code-block:: shell
 
-    # CentOS7
     $ vi /etc/yum.repos.d/nginx.repo
 
     [nginx]
@@ -541,18 +521,6 @@ Guacamole 需要 Tomcat 来运行
     baseurl=http://nginx.org/packages/centos/7/$basearch/
     gpgcheck=0
     enabled=1
-
-    # CentOS6
-    $ vi /etc/yum.repos.d/nginx.repo
-
-    [nginx]
-    name=nginx repo
-    baseurl=http://nginx.org/packages/centos/6/$basearch/
-    gpgcheck=0
-    enabled=1
-
-    $ yum -y install nginx
-    $ rm -rf /etc/nginx/conf.d/default.conf
 
 **6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 
@@ -629,11 +597,6 @@ Guacamole 需要 Tomcat 来运行
     # CentOS 7
     $ systemctl start nginx
     $ systemctl enable nginx
-
-
-    # CentOS 6
-    $ service nginx start
-    $ chkconfig nginx on
 
 **6.4 开始使用 Jumpserver**
 
