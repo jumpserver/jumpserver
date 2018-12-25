@@ -1,16 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import re
+import time
 import os
 
 from celery import shared_task
 from django.utils.translation import ugettext as _
+from django.core.cache import cache
 
 from common.utils import capacity_convert, \
     sum_capacity, encrypt_password, get_logger
-from ops.celery.utils import register_as_period_task, after_app_shutdown_clean, \
-    after_app_ready_start
-from orgs.utils import set_to_root_org
+from ops.celery.utils import register_as_period_task, after_app_shutdown_clean
 
 from .models import SystemUser, AdminUser, Asset
 from . import const
@@ -211,6 +211,11 @@ def test_admin_user_connectivity_period():
     """
     A period task that update the ansible task period
     """
+    key = '_JMS_TEST_ADMIN_USER_CONNECTIVITY_PERIOD'
+    prev_execute_time = cache.get(key)
+    if prev_execute_time and time.time() - prev_execute_time < 60*40:
+        logger.debug("Test admin user connectivity, less than 40 minutes, skip")
+        return
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
         task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
