@@ -213,9 +213,10 @@ def test_admin_user_connectivity_period():
     """
     key = '_JMS_TEST_ADMIN_USER_CONNECTIVITY_PERIOD'
     prev_execute_time = cache.get(key)
-    if prev_execute_time and time.time() - prev_execute_time < 60*40:
+    if prev_execute_time:
         logger.debug("Test admin user connectivity, less than 40 minutes, skip")
         return
+    cache.set(key, 1, 60*40)
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
         task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
