@@ -528,6 +528,7 @@ jumpserver.initServerSideDataTable = function (options) {
         lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
     });
     table.selected = [];
+    table.selected_rows = [];
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', true);
@@ -535,6 +536,7 @@ jumpserver.initServerSideDataTable = function (options) {
         if (type === 'row') {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
+                table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
                     table.selected.push(row.id)
                 }
