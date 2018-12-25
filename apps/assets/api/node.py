@@ -34,7 +34,7 @@ __all__ = [
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
     'TestNodeConnectiveApi', 'NodeListAsTreeApi',
-    'NodeChildrenAsTreeApi',
+    'NodeChildrenAsTreeApi', 'RefreshAssetsAmount',
 ]
 
 
@@ -275,3 +275,12 @@ class TestNodeConnectiveApi(APIView):
         task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
         task = test_asset_connectivity_util.delay(assets, task_name=task_name)
         return Response({"task": task.id})
+
+
+class RefreshAssetsAmount(APIView):
+    permission_classes = (IsOrgAdmin,)
+    model = Node
+
+    def get(self, request, *args, **kwargs):
+        self.model.expire_nodes_assets_amount()
+        return Response("Ok")
