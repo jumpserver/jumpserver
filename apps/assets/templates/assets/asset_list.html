@@ -345,10 +345,10 @@ function beforeDrag() {
 function beforeDrop(treeId, treeNodes, targetNode, moveType) {
     var treeNodesNames = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesNames.push(value.value);
+        treeNodesNames.push(value.name);
     });
 
-    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
+    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.name + "` 下吗?";
     return confirm(msg);
 }
 
@@ -358,10 +358,10 @@ function onDrag(event, treeId, treeNodes) {
 function onDrop(event, treeId, treeNodes, targetNode, moveType) {
     var treeNodesIds = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesIds.push(value.node_id);
+        treeNodesIds.push(value.meta.node.id);
     });
 
-    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.node_id);
+    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.meta.node.id);
     var body = {nodes: treeNodesIds};
     APIUpdateAttr({
         url: the_url,
