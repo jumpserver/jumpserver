@@ -92,15 +92,16 @@ FAQ
 
 .. code-block:: shell
 
-    $ vi /opt/jumpserver/apps/jumpserver/settings.py
+    $ vi /opt/jumpserver/config.py
 
 .. code-block:: python
 
-    # 找到如下行,注释(可参考 django 设置 session 过期时间),修改你要的设置即可
-    # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+    # 找到如下行(可参考 django 设置 session 过期时间),修改你要的设置即可
+    # SESSION_COOKIE_AGE = 3600 * 24
+    # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
     # 如下,设置关闭浏览器 cookie 失效,则修改为
-    # SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
+    # SESSION_COOKIE_AGE = 3600 * 24
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 8. 资产授权说明
@@ -227,7 +228,6 @@ FAQ
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
-    $ chcon -Rt svirt_sandbox_file_t /opt/guacamole/key  # 设置 selinux 允许容器对目录读写
 
 12. 生成随机 SECRET_KEY
 
