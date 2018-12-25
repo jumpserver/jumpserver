@@ -23,19 +23,26 @@
 
 4. pip install 提示 Could not find a version that satisfies the requirement xxxxxx==x.x.xx(版本)
 
-.. code-block:: vim
+.. code-block:: shell
 
     # 一般是由于镜像源未同步,-i 指定官方源即可,如：
     $ pip install -r requirement.txt -i https://pypi.org/simple
     $ pip install xxxxx==x.x.xx -i https://pypi.org/simple
 
-5. sh make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
+5. pip install 提示 install for mysqlclient ... error /usr/bin/ld: 找不到 -lmariadb
+
+.. code-block:: shell
+
+    # 如果是 Mariadb 大于 10 版本
+    $ yum install MariaDB-shared
+
+6. sh make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
 
 .. code-block:: vim
 
     # 这是由于 config.py 里面的内容格式不对,请参考安装文档的说明,把提示的内容与上一行对齐即可
 
-6. sh make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
+7. sh make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
 .. code-block:: shell
 
@@ -50,7 +57,7 @@
     $ pip install -r requirements.txt
     # 然后重新执行 sh make_migrations.sh
 
-7.  sh make_migrations.sh 报错 CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
+8.  sh make_migrations.sh 报错 CommandError: Conflicting migrations detected; multiple ... django_celery_beat ...
 
 .. code-block:: shell
 
@@ -59,14 +66,14 @@
     $ pip uninstall django-celery-beat
     $ pip install django-celery-beat
 
-8. 执行 ./jms start all 后一直卡在 beat: Waking up in 1.00 minute.
+9. 执行 ./jms start all 后一直卡在 beat: Waking up in 1.00 minute.
 
 .. code-block:: vim
 
     # 如果没有error提示进程无法启动,那么这是正常现象
     # 如果不想在前台启动,可以使用 ./jms start all -d 在后台启动
 
-9. 执行 ./jms start all 后提示 xxx is stopped
+10. 执行 ./jms start all 后提示 xxx is stopped
 
 .. code-block:: shell
 
@@ -74,20 +81,20 @@
     # xxx is stopped
     $ ./jms restart xxx  # 如 ./jms restart gunicorn
 
-10. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
+11. 执行 ./jms start all 后提示 WARNINGS: ?: (mysql.W002) MySQL Strict Mode is not set for database connection 'default' ...
 
 .. code-block:: vim
 
     # 这是严格模式的警告,可以参考后面的url解决,或者忽略
 
-11. 启动 jumpserver 后,访问 8080 端口页面显示不正常
+12. 启动 jumpserver 后,访问 8080 端口页面显示不正常
 
 .. code-block:: vim
 
     # 这是因为你在 config.py 里面设置了 DEBUG = False
     # 跟着教程继续操作,后面搭建 nginx 代理即可正常访问
 
-12. 执行 ./cocod start 后提示 No module named 'jms'
+13. 执行 ./cocod start 后提示 No module named 'jms'
 
 .. code-block:: shell
 
@@ -102,7 +109,7 @@
     $ pip install -r requirements/requirements.txt
     # 然后重新执行 ./cocod start 即可
 
-13. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
+14. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
 
 .. code-block:: shell
 
@@ -114,7 +121,7 @@
     $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的,key应该在这里,如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
-14. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
+15. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
 
 .. code-block:: vim
 
@@ -128,7 +135,7 @@
 
     保存后重新执行 ./cocod start 即可
 
-15. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
+16. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
 
 .. code-block:: shell
 
@@ -138,20 +145,20 @@
 
     保存后重新执行 ./cocod start 即可
 
-16. 运行 ./cocod start 后提示 Connect endpoint http://xxxx:8080 error: HTTPConnectionPool(host='xxxx', port=8080)
+17. 运行 ./cocod start 后提示 Connect endpoint http://xxxx:8080 error: HTTPConnectionPool(host='xxxx', port=8080)
 
 .. code-block:: vim
 
     # 这是因为 coco 无法连接到 jumpserver 报的错误,确定 http://xxxx:8080 设置正确(配置文件 coco/conf.py)
     # 如果 jumpserver 的IP和端口不对,请手动修改 conf.py 的 CORE_HOST
 
-17. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
+18. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
 
 .. code-block:: vim
 
     # 这是因为你的 pip 依赖包未正确安装,参考本文档第 4 条
 
-18. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
+19. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
 
 .. code-block:: nginx
 
@@ -215,7 +222,7 @@
 
     ...
 
-19. 访问 luna 页面提示 Luna是单独部署的一个程序,你需要部署luna,coco,配置nginx做url分发...
+20. 访问 luna 页面提示 Luna是单独部署的一个程序,你需要部署luna,coco,配置nginx做url分发...
 
 .. code-block:: vim
 
