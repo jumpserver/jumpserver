@@ -95,8 +95,11 @@ $(document).ready(function () {
         if(protocol === 'rdp'){
             port = 3389;
         }
-        if(protocol === 'telnet (beta)'){
+        else if(protocol === 'telnet (beta)'){
             port = 23;
+        }
+        else if(protocol === 'vnc'){
+            port = 5901;
         }
         $("#id_port").val(port);
     });
