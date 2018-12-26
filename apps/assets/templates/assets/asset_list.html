@@ -133,6 +133,8 @@
         <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
         <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
         <li class="divider"></li>
+        <li id="menu_refresh_assets_amount" class="btn-refresh-assets-amount" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh all node assets amount' %}</a></li>
+        <li class="divider"></li>
         <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
         <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
 {#        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>#}
@@ -558,6 +560,15 @@ $(document).ready(function(){
     hideRMenu();
 
 })
+.on('click', '#menu_refresh_assets_amount', function () {
+    hideRMenu();
+    var url = "{% url 'api-assets:refresh-assets-amount' %}";
+    APIUpdateAttr({
+        'url': url,
+        'method': 'GET'
+    });
+    window.location.reload();
+})
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);
     var $data_table = $("#asset_list_table").DataTable();
@@ -724,6 +735,7 @@ $(document).ready(function(){
 }).on('click', '#menu_asset_move', function () {
     update_node_action = "move"
 })
+
 </script>
 
 {% endblock %}
