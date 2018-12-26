@@ -522,7 +522,11 @@ Guacamole 需要 Tomcat 来运行
     gpgcheck=0
     enabled=1
 
-**6.2 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
+    $ yum install -y nginx
+    $ rm -rf /etc/nginx/conf.d/default.conf
+    $ systemctl enable nginx
+
+**6.3 准备配置文件 修改 /etc/nginx/conf.d/jumpserver.conf**
 
 .. code-block:: nginx
 
