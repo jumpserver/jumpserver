@@ -104,7 +104,11 @@ class ReplayStorageCreateAPI(APIView):
         data = {storage_name: storage_data}
 
         if not self.is_valid(storage_data):
-            return Response({"error": _("Error: Account invalid")}, status=401)
+            return Response({
+                "error": _("Error: Account invalid (Please make sure the "
+                           "information such as Access key or Secret key is correct)")},
+                status=401
+            )
 
         Setting.save_storage('TERMINAL_REPLAY_STORAGE', data)
         return Response({"msg": _('Create succeed')}, status=200)
@@ -136,7 +140,11 @@ class CommandStorageCreateAPI(APIView):
         storage_name = storage_data.pop('NAME')
         data = {storage_name: storage_data}
         if not self.is_valid(storage_data):
-            return Response({"error": _("Error: Account invalid")}, status=401)
+            return Response(
+                {"error": _("Error: Account invalid (Please make sure the "
+                            "information such as Access key or Secret key is correct)")},
+                status=401
+            )
 
         Setting.save_storage('TERMINAL_COMMAND_STORAGE', data)
         return Response({"msg": _('Create succeed')}, status=200)

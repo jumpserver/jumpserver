@@ -74,8 +74,11 @@ def on_system_user_assets_change(sender, instance=None, **kwargs):
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_changed(sender, instance=None, **kwargs):
-    logger.debug("Asset node change signal received")
+    logger.debug("Asset nodes change signal received")
     if isinstance(instance, Asset):
+        if kwargs['action'] == 'pre_remove':
+            nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+            Node.expire_nodes_assets_amount(nodes)
         if kwargs['action'] == 'post_add':
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
             Node.expire_nodes_assets_amount(nodes)
@@ -91,7 +94,7 @@ def on_asset_node_changed(sender, instance=None, **kwargs):
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_node_assets_changed(sender, instance=None, **kwargs):
     if isinstance(instance, Node):
-        logger.debug("Node assets change signal received")
+        logger.debug("Node assets change signal {} received".format(instance))
         # 当节点和资产关系发生改变时，过期资产数量缓存
         instance.expire_assets_amount()
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
