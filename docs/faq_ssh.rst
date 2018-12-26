@@ -34,7 +34,7 @@ SSH 协议资产连接错误排查思路
     $ docker rm jms_coco
     $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
 
-    # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
+    # 正常运行后到Jumpserver 会话管理-终端管理 里面查看coco注册
 
 2. 访问 luna 界面不显示资产信息
 
