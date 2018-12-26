@@ -74,6 +74,8 @@ urlpatterns = [
          api.RefreshNodeHardwareInfoApi.as_view(), name='node-refresh-hardware-info'),
     path('nodes/<uuid:pk>/test-connective/',
          api.TestNodeConnectiveApi.as_view(), name='node-test-connective'),
+    path('nodes/refresh-assets-amount/',
+         api.RefreshAssetsAmount.as_view(), name='refresh-assets-amount'),
 
     path('gateway/<uuid:pk>/test-connective/',
          api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-26 11:39+0800\n"
+"POT-Creation-Date: 2018-12-26 13:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -116,7 +116,7 @@ msgstr "端口"
 #: audits/templates/audits/ftp_log_list.html:41
 #: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:42
 #: perms/models.py:31
-#: perms/templates/perms/asset_permission_create_update.html:40
+#: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:56
 #: perms/templates/perms/asset_permission_list.html:114
 #: terminal/backends/command/models.py:13 terminal/models.py:140
@@ -630,7 +630,7 @@ msgstr "默认资产组"
 #: ops/templates/ops/command_execution_list.html:34
 #: ops/templates/ops/command_execution_list.html:59 perms/forms.py:36
 #: perms/models.py:29
-#: perms/templates/perms/asset_permission_create_update.html:36
+#: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:54
 #: perms/templates/perms/asset_permission_list.html:108 templates/index.html:87
 #: terminal/backends/command/models.py:12 terminal/models.py:139
@@ -858,7 +858,7 @@ msgstr "资产列表"
 #: assets/templates/assets/asset_create.html:16
 #: assets/templates/assets/asset_update.html:21
 #: assets/templates/assets/gateway_create_update.html:37
-#: perms/templates/perms/asset_permission_create_update.html:33
+#: perms/templates/perms/asset_permission_create_update.html:38
 msgid "Basic"
 msgstr "基本"
 
@@ -878,7 +878,7 @@ msgstr "自动生成密钥"
 #: assets/templates/assets/asset_create.html:60
 #: assets/templates/assets/asset_update.html:64
 #: assets/templates/assets/gateway_create_update.html:53
-#: perms/templates/perms/asset_permission_create_update.html:45
+#: perms/templates/perms/asset_permission_create_update.html:50
 #: terminal/templates/terminal/terminal_update.html:42
 msgid "Other"
 msgstr "其它"
@@ -900,7 +900,7 @@ msgstr "其它"
 #: common/templates/common/replay_storage_create.html:138
 #: common/templates/common/security_setting.html:70
 #: common/templates/common/terminal_setting.html:68
-#: perms/templates/perms/asset_permission_create_update.html:75
+#: perms/templates/perms/asset_permission_create_update.html:80
 #: terminal/templates/terminal/terminal_update.html:47
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
@@ -933,7 +933,7 @@ msgstr "重置"
 #: common/templates/common/replay_storage_create.html:139
 #: common/templates/common/security_setting.html:71
 #: common/templates/common/terminal_setting.html:70
-#: perms/templates/perms/asset_permission_create_update.html:76
+#: perms/templates/perms/asset_permission_create_update.html:81
 #: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:127
 #: terminal/templates/terminal/terminal_update.html:48
@@ -1008,7 +1008,7 @@ msgstr "测试"
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:88
 #: assets/templates/assets/asset_detail.html:24
-#: assets/templates/assets/asset_list.html:175
+#: assets/templates/assets/asset_list.html:177
 #: assets/templates/assets/cmd_filter_detail.html:29
 #: assets/templates/assets/cmd_filter_list.html:57
 #: assets/templates/assets/cmd_filter_rule_list.html:86
@@ -1040,7 +1040,7 @@ msgstr "更新"
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:89
 #: assets/templates/assets/asset_detail.html:28
-#: assets/templates/assets/asset_list.html:176
+#: assets/templates/assets/asset_list.html:178
 #: assets/templates/assets/cmd_filter_detail.html:33
 #: assets/templates/assets/cmd_filter_list.html:58
 #: assets/templates/assets/cmd_filter_rule_list.html:87
@@ -1082,7 +1082,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:208
-#: assets/templates/assets/asset_list.html:624
+#: assets/templates/assets/asset_list.html:635
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
@@ -1166,7 +1166,7 @@ msgstr "快速修改"
 #: assets/templates/assets/asset_detail.html:151
 #: assets/templates/assets/user_asset_list.html:47 perms/models.py:34
 #: perms/models.py:82
-#: perms/templates/perms/asset_permission_create_update.html:47
+#: perms/templates/perms/asset_permission_create_update.html:52
 #: perms/templates/perms/asset_permission_detail.html:120
 #: perms/templates/perms/asset_permission_list.html:59
 #: terminal/templates/terminal/terminal_list.html:34
@@ -1272,34 +1272,38 @@ msgid "Test node connective"
 msgstr "测试节点资产可连接性"
 
 #: assets/templates/assets/asset_list.html:136
+msgid "Refresh all node assets amount"
+msgstr "刷新所有节点资产数量"
+
+#: assets/templates/assets/asset_list.html:138
 msgid "Display only current node assets"
 msgstr "仅显示当前节点资产"
 
-#: assets/templates/assets/asset_list.html:137
+#: assets/templates/assets/asset_list.html:139
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-#: assets/templates/assets/asset_list.html:214
+#: assets/templates/assets/asset_list.html:216
 msgid "Create node failed"
 msgstr "创建节点失败"
 
-#: assets/templates/assets/asset_list.html:226
+#: assets/templates/assets/asset_list.html:228
 msgid "Have child node, cancel"
 msgstr "存在子节点，不能删除"
 
-#: assets/templates/assets/asset_list.html:228
+#: assets/templates/assets/asset_list.html:230
 msgid "Have assets, cancel"
 msgstr "存在资产，不能删除"
 
-#: assets/templates/assets/asset_list.html:299
+#: assets/templates/assets/asset_list.html:301
 msgid "Rename success"
 msgstr "重命名成功"
 
-#: assets/templates/assets/asset_list.html:300
+#: assets/templates/assets/asset_list.html:302
 msgid "Rename failed, do not change the root node name"
 msgstr "重命名失败，不能更改root节点的名称"
 
-#: assets/templates/assets/asset_list.html:618
+#: assets/templates/assets/asset_list.html:629
 #: assets/templates/assets/system_user_list.html:137
 #: users/templates/users/user_detail.html:380
 #: users/templates/users/user_detail.html:406
@@ -1309,11 +1313,11 @@ msgstr "重命名失败，不能更改root节点的名称"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:619
+#: assets/templates/assets/asset_list.html:630
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:622
+#: assets/templates/assets/asset_list.html:633
 #: assets/templates/assets/system_user_list.html:141
 #: common/templates/common/terminal_setting.html:163
 #: users/templates/users/user_detail.html:384
@@ -1326,16 +1330,16 @@ msgstr "删除选择资产"
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:628
+#: assets/templates/assets/asset_list.html:639
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:629
-#: assets/templates/assets/asset_list.html:634
+#: assets/templates/assets/asset_list.html:640
+#: assets/templates/assets/asset_list.html:645
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:633
+#: assets/templates/assets/asset_list.html:644
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -2610,7 +2614,7 @@ msgstr "添加节点"
 msgid "Join"
 msgstr "加入"
 
-#: perms/templates/perms/asset_permission_create_update.html:53
+#: perms/templates/perms/asset_permission_create_update.html:58
 msgid "Validity period"
 msgstr "有效期"
 
