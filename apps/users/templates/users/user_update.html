@@ -3,7 +3,7 @@
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Update user" %}{% endblock %}
 {% block password %}
-    {% if object.is_local %}
+    {% if object.can_update_password %}
     {% bootstrap_field form.password layout="horizontal" %}
     {#  密码popover  #}
     <div id="container">

@@ -169,7 +169,7 @@
                                             </span>
                                         </td>
                                     </tr>
-                                    {% if request.user.is_local %}
+                                    {% if request.user.can_update_password %}
                                     <tr class="no-borders">
                                         <td>{% trans 'Update password' %}:</td>
                                         <td>
