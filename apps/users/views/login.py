@@ -239,7 +239,7 @@ class UserForgotPasswordView(TemplateView):
         if not user:
             error = _('Email address invalid, please input again')
             return self.get(request, errors=error)
-        elif not user.is_local:
+        elif not user.can_update_password():
             error = _('User auth from {}, go there change password'.format(user.source))
             return self.get(request, errors=error)
         else:
@@ -298,6 +298,9 @@ class UserResetPasswordView(TemplateView):
             return self.get(request, errors=_('Password not same'))
 
         user = User.validate_reset_token(token)
+        if not user.can_update_password():
+            error = _('User auth from {}, go there change password'.format(user.source))
+            return self.get(request, errors=error)
         if not user:
             return self.get(request, errors=_('Token invalid or expired'))
 
