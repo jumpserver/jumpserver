@@ -58,9 +58,6 @@ def check_database_connection():
 def make_migrations():
     print("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    if len(os.listdir('assets/migrations')) < 4:
-        print("Make database migrations ...")
-        subprocess.call('python3 manage.py makemigrations', shell=True)
     print("Migrate model change to database ...")
     subprocess.call('python3 manage.py migrate', shell=True)
 
