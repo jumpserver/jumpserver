@@ -120,7 +120,14 @@ class User(AbstractUser):
 
     def set_password(self, raw_password):
         self._set_password = True
-        return super().set_password(raw_password)
+        if self.can_update_password():
+            return super().set_password(raw_password)
+        else:
+            error = _("User auth from {}, go there change password").format(self.source)
+            raise PermissionError(error)
+
+    def can_update_password(self):
+        return self.is_local
 
     @property
     def otp_secret_key(self):

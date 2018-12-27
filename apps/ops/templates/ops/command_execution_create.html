@@ -265,7 +265,6 @@ $(document).ready(function(){
     systemUserId = $('#system-users-select').val();
     $(".select2").select2({
         dropdownAutoWidth : true,
-        width: 'auto'
     }).on('select2:select', function(evt) {
          var data = evt.params.data;
          systemUserId = data.id;
