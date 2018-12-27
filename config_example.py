@@ -90,6 +90,12 @@ class Config:
     # AUTH_OPENID_CLIENT_ID = 'client-id'
     # AUTH_OPENID_CLIENT_SECRET = 'client-secret'
 
+    # Use Radius authorization
+    # 使用Radius认证
+    # AUTH_RADIUS = False
+    # RADIUS_SERVER = '127.0.0.1'
+    # RADIUS_PORT = 1812
+
     #
     # OTP_VALID_WINDOW = 0
 

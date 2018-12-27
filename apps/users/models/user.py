@@ -41,6 +41,7 @@ class User(AbstractUser):
     SOURCE_LOCAL = 'local'
     SOURCE_LDAP = 'ldap'
     SOURCE_OPENID = 'openid'
+    SOURCE_RADIUS = 'radius'
     SOURCE_CHOICES = (
         (SOURCE_LOCAL, 'Local'),
         (SOURCE_LDAP, 'LDAP/AD'),
