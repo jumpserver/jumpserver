@@ -419,6 +419,7 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
                 self.request.source_display
             )
             form.add_error("password", error)
+            return self.form_invalid(form)
         password = form.cleaned_data.get('new_password')
         is_ok = check_password_rules(password)
         if not is_ok:
