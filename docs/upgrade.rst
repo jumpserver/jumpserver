@@ -578,7 +578,7 @@
 .. code-block:: shell
 
     # 先到 Web 会话管理 - 终端管理 删掉所有组件
-    $ docker sop jms_coco
+    $ docker stop jms_coco
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
@@ -651,7 +651,7 @@
 .. code-block:: shell
 
     # 先到 Web 会话管理 - 终端管理 删掉所有组件
-    $ docker sop jms_coco
+    $ docker stop jms_coco
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
