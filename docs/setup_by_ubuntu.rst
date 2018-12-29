@@ -440,12 +440,12 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ ./configure --with-init-dir=/etc/init.d
     $ make && make install
     $ cd ..
-    $ rm -rf guacamole-server-0.9.14 \
+    $ rm -rf guacamole-server-0.9.14
     $ ldconfig
 
     $ mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions  # 创建 guacamole 目录
-    $ cp /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/
-    $ cp /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/  # guacamole 配置文件
+    $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties  # guacamole 配置文件
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
@@ -462,7 +462,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ rm -rf apache-tomcat-8.5.35.tar.gz
     $ mv apache-tomcat-8.5.35 tomcat8
     $ rm -rf /config/tomcat8/webapps/*
-    $ cp /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
+    $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
     $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
 

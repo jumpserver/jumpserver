@@ -1,7 +1,7 @@
 更新升级
 -------------
 
-1.0.x 升级到 1.4.4
+任意版本升级到 1.4.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - 请先检查自己各组件的当前版本
@@ -544,7 +544,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ cp -r guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ ln -sf guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
@@ -626,7 +626,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ cp -r guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
+    $ ln -sf guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
