@@ -3,6 +3,7 @@
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Update user" %}{% endblock %}
 {% block password %}
+    {% if object.can_update_password %}
     {% bootstrap_field form.password layout="horizontal" %}
     {#  密码popover  #}
     <div id="container">
@@ -14,13 +15,24 @@
             <div class="popover-content"></div>
         </div>
     </div>
+    {% else %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-8 controls" style="margin-top: 8px;" id="password_help_text">
+            {% trans 'User auth from {}, go there change password' %}
+        </div>
+    </div>
+    {% endif %}
     {% bootstrap_field form.public_key layout="horizontal" %}
 {% endblock %}
 
 {% block custom_foot_js %}
     {{ block.super }}
 <script>
-    $(document).ready(function(){
+    function passwordCheck() {
+        if ($('#id_password').length != 1) {
+            return
+        }
         var el = $('#id_password_rules'),
             idPassword = $('#id_password'),
             idPopover = $('#popover777'),
@@ -39,11 +51,11 @@
                 "veryStrong": "{% trans 'Very strong' %}"
             };
 
-         jQuery.each(password_check_rules, function (idx, rules) {
-             if(rules.key === 'id_security_password_min_length'){
-                 minLength = rules.value
-             }
-         });
+        $.each(password_check_rules, function (idx, rules) {
+            if(rules.key === 'id_security_password_min_length'){
+                minLength = rules.value
+            }
+        });
 
         // 初始化popover
         initPopover(container, progress, idPassword, el, password_check_rules, i18n_fallback);
@@ -61,6 +73,13 @@
             var password = idPassword.val();
             checkPasswordRules(password, minLength);
         });
+    }
+    $(document).ready(function(){
+        passwordCheck();
+
+        var origin_text = $("#password_help_text").text();
+        var new_text = origin_text.replace('{}', "{{ object.source_display }}");
+        $("#password_help_text").html(new_text);
 
     })
 </script>
