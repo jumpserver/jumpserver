@@ -159,7 +159,7 @@ $(document).ready(function () {
         'comment': "{% trans 'Comment' %}"
         {#'date_joined': "{% trans 'Date joined' %}",#}
     };
-    $.each(data, function(index, value){
+    $.each(data.results, function(index, value){
         if(value.id === asset_id){
             for(var i in desc){
                 trs += "<tr class='no-borders-tr'>\n" +
