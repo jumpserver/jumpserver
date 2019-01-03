@@ -5,8 +5,15 @@ from rest_framework import serializers
 
 from common.fields import StringManyToManyField
 from .models import AssetPermission
-from assets.models import Node
+from assets.models import Node, Asset, SystemUser
 from assets.serializers import AssetGrantedSerializer
+
+__all__ = [
+    'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
+    'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
+    'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
+    'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
+]
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -74,3 +81,58 @@ class AssetPermissionNodeSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_tree_parent(obj):
         return obj.parent_key
+
+
+class NodeGrantedSerializer(serializers.ModelSerializer):
+    """
+    授权资产组
+    """
+    assets_granted = AssetGrantedSerializer(many=True, read_only=True)
+    assets_amount = serializers.SerializerMethodField()
+    parent = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Node
+        fields = [
+            'id', 'key', 'name', 'value', 'parent',
+            'assets_granted', 'assets_amount', 'org_id',
+        ]
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return len(obj.assets_granted)
+
+    @staticmethod
+    def get_name(obj):
+        return obj.name
+
+    @staticmethod
+    def get_parent(obj):
+        return obj.parent.id
+
+
+class GrantedNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Node
+        fields = [
+            'id', 'name', 'key', 'value',
+        ]
+
+
+class GrantedAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'hostname', 'ip', 'port', 'protocol', 'platform',
+            'domain', 'is_active', 'comment'
+        ]
+
+
+class GrantedSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = [
+            'id', 'name', 'username', 'protocol', 'priority',
+            'login_mode', 'comment'
+        ]

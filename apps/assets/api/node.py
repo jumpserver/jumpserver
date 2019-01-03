@@ -17,15 +17,14 @@ from rest_framework import generics, mixins, viewsets
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
-from django.db.models import Count
 
 from common.utils import get_logger, get_object_or_none
+from common.tree import TreeNodeSerializer
 from ..hands import IsOrgAdmin
 from ..models import Node
-from ..tasks import update_assets_hardware_info_util, test_asset_connectability_util
+from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
 from .. import serializers
 
 
@@ -34,7 +33,8 @@ __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
-    'TestNodeConnectiveApi'
+    'TestNodeConnectiveApi', 'NodeListAsTreeApi',
+    'NodeChildrenAsTreeApi', 'RefreshAssetsAmount',
 ]
 
 
@@ -43,22 +43,89 @@ class NodeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
-    def perform_create(self, serializer):
-        child_key = Node.root().get_next_child_key()
-        serializer.validated_data["key"] = child_key
-        serializer.save()
 
-    def update(self, request, *args, **kwargs):
-        node = self.get_object()
-        if node.is_root():
-            node_value = node.value
-            post_value = request.data.get('value')
-            if node_value != post_value:
-                return Response(
-                    {"msg": _("You can't update the root node name")},
-                    status=400
-                )
-        return super().update(request, *args, **kwargs)
+class NodeListAsTreeApi(generics.ListAPIView):
+    """
+    获取节点列表树
+    [
+      {
+        "id": "",
+        "name": "",
+        "pId": "",
+        "meta": ""
+      }
+    ]
+    """
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = TreeNodeSerializer
+
+    def get_queryset(self):
+        queryset = [node.as_tree_node() for node in Node.objects.all()]
+        return queryset
+
+    def filter_queryset(self, queryset):
+        if self.request.query_params.get('refresh', '0') == '1':
+            queryset = self.refresh_nodes(queryset)
+        return queryset
+
+    @staticmethod
+    def refresh_nodes(queryset):
+        Node.expire_nodes_assets_amount()
+        Node.expire_nodes_full_value()
+        return queryset
+
+
+class NodeChildrenAsTreeApi(generics.ListAPIView):
+    """
+    节点子节点作为树返回，
+    [
+      {
+        "id": "",
+        "name": "",
+        "pId": "",
+        "meta": ""
+      }
+    ]
+
+    """
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = TreeNodeSerializer
+    node = None
+    is_root = False
+
+    def get_queryset(self):
+        node_key = self.request.query_params.get('key')
+        if node_key:
+            self.node = Node.objects.get(key=node_key)
+            queryset = self.node.get_children(with_self=False)
+        else:
+            self.is_root = True
+            self.node = Node.root()
+            queryset = list(self.node.get_children(with_self=True))
+            nodes_invalid = Node.objects.exclude(key__startswith=self.node.key)
+            queryset.extend(list(nodes_invalid))
+        queryset = [node.as_tree_node() for node in queryset]
+        return queryset
+
+    def filter_assets(self, queryset):
+        include_assets = self.request.query_params.get('assets', '0') == '1'
+        if not include_assets:
+            return queryset
+        assets = self.node.get_assets()
+        for asset in assets:
+            queryset.append(asset.as_tree_node(self.node))
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = self.filter_assets(queryset)
+        queryset = self.filter_refresh_nodes(queryset)
+        return queryset
+
+    def filter_refresh_nodes(self, queryset):
+        if self.request.query_params.get('refresh', '0') == '1':
+            Node.expire_nodes_assets_amount()
+            Node.expire_nodes_full_value()
+        return queryset
 
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
@@ -67,19 +134,13 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     serializer_class = serializers.NodeSerializer
     instance = None
 
-    def counter(self):
-        values = [
-            child.value[child.value.rfind(' '):]
-            for child in self.get_object().get_children()
-            if child.value.startswith("新节点 ")
-        ]
-        values = [int(value) for value in values if value.strip().isdigit()]
-        count = max(values)+1 if values else 1
-        return count
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        instance = self.get_object()
         if not request.data.get("value"):
-            request.data["value"] = _("New node {}").format(self.counter())
+            request.data["value"] = instance.get_next_child_preset_name()
         return super().post(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -91,15 +152,12 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
                 'The same level node name cannot be the same'
             )
         node = instance.create_child(value=value)
-        return Response(
-            {"id": node.id, "key": node.key, "value": node.value},
-            status=201,
-        )
+        return Response(self.serializer_class(instance=node).data, status=201)
 
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         if not pk:
-            node = None
+            node = Node.root()
         else:
             node = get_object_or_404(Node, pk=pk)
         return node
@@ -107,7 +165,6 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def get_queryset(self):
         queryset = []
         query_all = self.request.query_params.get("all")
-        query_assets = self.request.query_params.get('assets')
         node = self.get_object()
 
         if node is None:
@@ -120,22 +177,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
         else:
             children = node.get_children()
         queryset.extend(list(children))
-
-        if query_assets:
-            assets = node.get_assets()
-            for asset in assets:
-                node_fake = Node()
-                node_fake.assets__count = 0
-                node_fake.id = asset.id
-                node_fake.is_node = False
-                node_fake.key = node.key + ':0'
-                node_fake.value = asset.hostname
-                queryset.append(node_fake)
-        queryset = sorted(queryset, key=lambda x: x.is_node, reverse=True)
         return queryset
-
-    def get(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
 
 class NodeAssetsApi(generics.ListAPIView):
@@ -234,5 +276,14 @@ class TestNodeConnectiveApi(APIView):
         assets = node.assets.all()
         # task_name = _("测试节点下资产是否可连接: {}".format(node.name))
         task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
-        task = test_asset_connectability_util.delay(assets, task_name=task_name)
+        task = test_asset_connectivity_util.delay(assets, task_name=task_name)
         return Response({"task": task.id})
+
+
+class RefreshAssetsAmount(APIView):
+    permission_classes = (IsOrgAdmin,)
+    model = Node
+
+    def get(self, request, *args, **kwargs):
+        self.model.expire_nodes_assets_amount()
+        return Response("Ok")

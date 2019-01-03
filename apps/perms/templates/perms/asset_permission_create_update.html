@@ -29,6 +29,11 @@
                     </div>
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="" >
+                            {% if form.non_field_errors %}
+                                 <div class="alert alert-danger">
+                                     {{ form.non_field_errors }}
+                                 </div>
+                            {% endif %}
                             {% csrf_token %}
                             <h3>{% trans 'Basic' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
@@ -54,9 +59,15 @@
                                 <div class="col-sm-9">
                                     <div class="input-daterange input-group" id="datepicker">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                        <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value|date:'Y-m-d H:i' }}">
-                                        <span class="input-group-addon">to</span>
-                                        <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
+                                        {% if form.errors %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value }}">
+                                        {% else %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value|date:'Y-m-d H:i' }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
+                                        {% endif %}
                                     </div>
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                     <span class="help-block ">{{ form.date_start.errors }}</span>
@@ -107,17 +118,27 @@ $(document).ready(function () {
             e.preventDefault();
             e.stopPropagation();
             $("#asset_list_modal").modal();
+            initSelectedAssets2Table();
         }
     })
 })
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
-    $('.select2 option:selected').each(function (i, data) {
-        assets.push($(data).attr('value'))
+
+    var options = [];
+    $('#id_assets option').each(function (i, v) {
+        options.push(v.value)
     });
-    $.each(assets, function (id, data) {
-        $('.select2').val(assets).trigger('change');
+    asset_table2.selected_rows.forEach(function (i) {
+        var name = i.hostname + '(' + i.ip + ')';
+        var option = new Option(name, i.id, false, true);
+
+        if (options.indexOf(i.id) === -1) {
+            $('#id_assets').append(option).trigger('change');
+        }
     });
+
+    $('#id_assets').val(assets).trigger('change');
     $("#asset_list_modal").modal('hide');
 });
 </script>

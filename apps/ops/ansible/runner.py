@@ -17,7 +17,7 @@ from common.utils import get_logger
 from .exceptions import AnsibleError
 
 
-__all__ = ["AdHocRunner", "PlayBookRunner"]
+__all__ = ["AdHocRunner", "PlayBookRunner", "CommandRunner"]
 C.HOST_KEY_CHECKING = False
 logger = get_logger(__name__)
 
@@ -45,7 +45,7 @@ def get_default_options():
         listtasks=False,
         listhosts=False,
         syntax=False,
-        timeout=60,
+        timeout=30,
         connection='ssh',
         module_path='',
         forks=10,
@@ -135,6 +135,7 @@ class AdHocRunner:
     loader_class = DataLoader
     variable_manager_class = VariableManager
     default_options = get_default_options()
+    command_modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
     def __init__(self, inventory, options=None):
         self.options = self.update_options(options)
@@ -145,7 +146,7 @@ class AdHocRunner:
         )
 
     def get_result_callback(self, file_obj=None):
-        return self.__class__.results_callback_class(file_obj=file_obj)
+        return self.__class__.results_callback_class()
 
     @staticmethod
     def check_module_args(module_name, module_args=''):
@@ -163,10 +164,30 @@ class AdHocRunner:
                 "pattern: %s  dose not match any hosts." % pattern
             )
 
+    def clean_args(self, module, args):
+        if not args:
+            return ''
+        if module not in self.command_modules_choices:
+            return args
+        if isinstance(args, str):
+            if args.startswith('executable='):
+                _args = args.split(' ')
+                executable, command = _args[0].split('=')[1], ' '.join(_args[1:])
+                args = {'executable': executable, '_raw_params':  command}
+            else:
+                args = {'_raw_params':  args}
+            return args
+        else:
+            return args
+
     def clean_tasks(self, tasks):
         cleaned_tasks = []
         for task in tasks:
-            self.check_module_args(task['action']['module'], task['action'].get('args'))
+            module = task['action']['module']
+            args = task['action'].get('args')
+            cleaned_args = self.clean_args(module, args)
+            task['action']['args'] = cleaned_args
+            self.check_module_args(module, cleaned_args)
             cleaned_tasks.append(task)
         return cleaned_tasks
 
@@ -177,17 +198,16 @@ class AdHocRunner:
             options = self.__class__.default_options
         return options
 
-    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no', file_obj=None):
+    def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no'):
         """
         :param tasks: [{'action': {'module': 'shell', 'args': 'ls'}, ...}, ]
         :param pattern: all, *, or others
         :param play_name: The play name
         :param gather_facts:
-        :param file_obj: logging to file_obj
         :return:
         """
         self.check_pattern(pattern)
-        self.results_callback = self.get_result_callback(file_obj)
+        self.results_callback = self.get_result_callback()
         cleaned_tasks = self.clean_tasks(tasks)
 
         play_source = dict(
@@ -211,10 +231,6 @@ class AdHocRunner:
             stdout_callback=self.results_callback,
             passwords=self.options.passwords,
         )
-        print("Get matched hosts: {}".format(
-            self.inventory.get_matched_hosts(pattern)
-        ))
-
         try:
             tqm.run(play)
             return self.results_callback
@@ -229,16 +245,12 @@ class CommandRunner(AdHocRunner):
     results_callback_class = CommandResultCallback
     modules_choices = ('shell', 'raw', 'command', 'script')
 
-    def execute(self, cmd, pattern, module=None):
+    def execute(self, cmd, pattern, module='shell'):
         if module and module not in self.modules_choices:
             raise AnsibleError("Module should in {}".format(self.modules_choices))
-        else:
-            module = "shell"
 
         tasks = [
             {"action": {"module": module, "args": cmd}}
         ]
-        hosts = self.inventory.get_hosts(pattern=pattern)
-        name = "Run command {} on {}".format(cmd, ", ".join([host.name for host in hosts]))
-        return self.run(tasks, pattern, play_name=name)
+        return self.run(tasks, pattern, play_name=cmd)
 

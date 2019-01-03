@@ -41,9 +41,6 @@ class AssetCreateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': '* required',
-            'ip': '* required',
-            'port': '* required',
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -80,10 +77,6 @@ class AssetUpdateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': '* required',
-            'ip': '* required',
-            'port': '* required',
-            'cluster': '* required',
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -95,7 +88,7 @@ class AssetUpdateForm(OrgModelForm):
 
 class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
-        required=True, help_text='* required',
+        required=True,
         label=_('Select assets'), queryset=Asset.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
@@ -142,14 +135,14 @@ class AssetBulkUpdateForm(OrgModelForm):
                         if k in changed_fields}
         assets = cleaned_data.pop('assets')
         labels = cleaned_data.pop('labels', [])
-        nodes = cleaned_data.pop('nodes')
+        nodes = cleaned_data.pop('nodes', None)
         assets = Asset.objects.filter(id__in=[asset.id for asset in assets])
         assets.update(**cleaned_data)
 
         if labels:
-            for label in labels:
-                label.assets.add(*tuple(assets))
+            for asset in assets:
+                asset.labels.set(labels)
         if nodes:
-            for node in nodes:
-                node.assets.add(*tuple(assets))
+            for asset in assets:
+                asset.nodes.set(nodes)
         return assets

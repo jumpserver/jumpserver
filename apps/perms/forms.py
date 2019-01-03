@@ -7,16 +7,24 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from .models import AssetPermission
+from assets.models import Asset
 
 
 class AssetPermissionForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'initial' not in kwargs:
-            return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
             users_field.queryset = current_org.get_org_users()
+        assets_field = self.fields.get('assets')
+
+        # 前端渲染优化, 防止过多资产
+        if not self.data:
+            instance = kwargs.get('instance')
+            if instance:
+                assets_field.queryset = instance.assets.all()
+            else:
+                assets_field.queryset = Asset.objects.none()
 
     class Meta:
         model = AssetPermission

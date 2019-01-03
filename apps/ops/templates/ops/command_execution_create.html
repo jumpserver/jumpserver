@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.exhide.min.js' %}"></script>
+    <script src="{% static 'js/jquery.form.min.js' %}"></script>
+    <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
+    <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
+    <script src="{% static 'js/plugins/codemirror/codemirror.js' %}"></script>
+    <script src="{% static 'js/plugins/codemirror/mode/shell/shell.js' %}"></script>
+    <link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/codemirror/ambiance.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+	<style type="text/css">
+        .xterm .xterm-screen canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 10px;
+        }
+        .select2-container .select2-selection--single {
+            height: 34px;
+        }
+	</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper wrapper-content">
+   <div class="row">
+       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
+           <div class="ibox float-e-margins">
+               <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
+                   <div class="file-manager ">
+                       <div id="assetTree" class="ztree"></div>
+                       <div class="clearfix"></div>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div class="col-lg-9 animated fadeInRight" id="split-right">
+           <div class="tree-toggle">
+               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
+               </div>
+           </div>
+           <div class="mail-box-header" style="padding-top: 5px;">
+               <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" onsubmit="return execute()">
+                   <div class="form-group">
+                       <div id="term" style="height: 100%;width: 100%"></div>
+                   </div>
+                   <div class="row">
+                       <div class="col-lg-10">
+                       <div class="input-group" style="height: 100%; width: 100%">
+                           <textarea class="form-control" id="command-text"></textarea>
+                       </div>
+                       </div>
+                       <div class="col-lg-2">
+                            <select class="select2 form-control" id="system-users-select">
+                            {% for s in system_users %}
+                               {% if s.protocol == 'ssh' and s.login_mode == 'auto' %}
+                                   <option value="{{ s.id }}">{{ s }}</option>
+                               {% endif %}
+                            {% endfor %}
+                            </select>
+                           <button type="button" class="btn btn-primary btn-execute" style="margin-top: 30px; width: 100%">{% trans 'Go' %}</button>
+                       </div>
+                   </div>
+                </form>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+var zTree, show = 0;
+var systemUserId = null;
+
+function initTree() {
+    var setting = {
+        check: {
+            enable: true
+        },
+        view: {
+            dblClickExpand: false,
+            showLine: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        edit: {
+            enable: true,
+			showRemoveBtn: false,
+			showRenameBtn: false,
+            drag: {
+                isCopy: true,
+                isMove: true
+            }
+        },
+        callback: {
+            onCheck: onCheck
+        }
+    };
+    var url = "{% url 'api-perms:my-nodes-assets-as-tree' %}";
+    if (systemUserId) {
+        url += '?system_user=' + systemUserId
+    }
+
+    $.get(url, function(data, status){
+        $.fn.zTree.init($("#assetTree"), setting, data);
+        zTree = $.fn.zTree.getZTreeObj("assetTree");
+    });
+}
+
+function getSelectedAssetsNode() {
+    var nodes = zTree.getCheckedNodes(true);
+    var assetsNodeId = [];
+	var assetsNode = [];
+	nodes.forEach(function (node) {
+	    if (node.meta.type === 'asset' && !node.isHidden && node.meta.asset.protocol === 'ssh') {
+	        if (assetsNodeId.indexOf(node.id) === -1) {
+	            assetsNodeId.push(node.id);
+                assetsNode.push(node)
+            }
+        }
+    });
+	return assetsNode;
+}
+
+function onCheck(e, treeId, treeNode) {
+    var nodes = getSelectedAssetsNode();
+    var nodes_names = nodes.map(function (node) {
+        return node.name;
+    });
+    var message = "已选择资产: ";
+	message += nodes_names.join(", ");
+	message += "\r\n";
+	message += "总共: " + nodes_names.length + "个\r\n";
+	term.clear();
+	term.write(message)
+}
+
+function toggle() {
+    if (show === 0) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+}
+
+var term = null;
+
+function initResultTerminal() {
+    term = new Terminal({
+        cursorBlink: false,
+        screenKeys: false,
+        fontFamily: '"Monaco", "Consolas", "monospace"',
+        fontSize: 13,
+        rightClickSelectsWord: true,
+        disableStdin: true,
+        theme: {
+          background: '#1f1b1b'
+        }
+    });
+    term.open(document.getElementById('term'));
+    term.write("选择左侧资产, 选择运行的系统用户，批量执行命令\r\n")
+}
+
+function wrapperError(msg) {
+    return '\033[31m' + msg + '\033[0m' + '\r\n';
+}
+
+function execute() {
+    if (!term) {
+        initResultTerminal()
+    }
+    var url = '{% url "api-ops:command-execution-list" %}';
+    var run_as = systemUserId;
+    var command = editor.getValue();
+    var hosts = getSelectedAssetsNode().map(function (node) {
+        return node.id;
+    });
+    if (hosts.length === 0) {
+        term.write(wrapperError('没有选中资产'));
+        return
+    }
+    if (!command) {
+        term.write(wrapperError('没有输入命令'));
+        return
+    }
+    if (!run_as) {
+        term.write(wrapperError('没有选择运行用户'));
+        return
+    }
+    var data = {
+        hosts: hosts,
+        run_as: run_as,
+        command: command
+    };
+    var mark = '';
+    var log_url = null;
+    var end = false;
+    var error = false;
+    var int = null;
+    var interval = 200;
+
+    function writeExecutionOutput() {
+        if (!end) {
+            $.ajax({
+                url: log_url + '?mark=' + mark,
+                method: "GET",
+                contentType: "application/json; charset=utf-8"
+            }).done(function(data, textStatue, jqXHR) {
+                if (jqXHR.status === 203) {
+                    error = true;
+                    term.write('.');
+                    interval = 500;
+                }
+                if (jqXHR.status === 200){
+                    term.write(data.data);
+                    mark = data.mark;
+                    if (data.end){
+                        end = true;
+                        window.clearInterval(int)
+                    }
+                }
+            })
+        }
+    }
+
+    APIUpdateAttr({
+        url: url,
+        body: JSON.stringify(data),
+        method: 'POST',
+        flash_message: false,
+        success: function (resp) {
+            term.write("{% trans 'Pending' %}" + "...\r\n");
+            log_url = resp.log_url;
+            int = setInterval(function () {
+                writeExecutionOutput()
+            }, interval);
+        }
+    });
+    return false;
+}
+
+var editor;
+$(document).ready(function(){
+    systemUserId = $('#system-users-select').val();
+    $(".select2").select2({
+        dropdownAutoWidth : true,
+    }).on('select2:select', function(evt) {
+         var data = evt.params.data;
+         systemUserId = data.id;
+         initTree();
+    });
+    editor = CodeMirror.fromTextArea(document.getElementById("command-text"), {
+        lineNumbers: true,
+        lineWrapping: true,
+        mode: "shell"
+    });
+    editor.setSize(600, 100);
+    var charWidth = editor.defaultCharWidth(), basePadding = 4;
+    editor.on("renderLine", function(cm, line, elt) {
+        var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * charWidth;
+        elt.style.textIndent = "-" + off + "px";
+        elt.style.paddingLeft = (basePadding + off) + "px";
+    });
+    editor.refresh();
+    initTree();
+    initResultTerminal();
+}).on('click', '.btn-execute', function () {
+    execute()
+})
+</script>
+{% endblock %}

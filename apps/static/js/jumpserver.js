@@ -528,6 +528,7 @@ jumpserver.initServerSideDataTable = function (options) {
         lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
     });
     table.selected = [];
+    table.selected_rows = [];
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', true);
@@ -535,7 +536,8 @@ jumpserver.initServerSideDataTable = function (options) {
         if (type === 'row') {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
-                if (row.id){
+                table.selected_rows.push(row);
+                if (row.id && $.inArray(row.id, table.selected) === -1){
                     table.selected.push(row.id)
                 }
             })
@@ -811,4 +813,33 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
     };
     $idPassword.pwstrength(options);
     popoverPasswordRules(password_check_rules, $el);
+}
+
+// 解决input框中的资产和弹出表格中资产的显示不一致
+function initSelectedAssets2Table(){
+    var inputAssets = $('#id_assets').val();
+    var selectedAssets = asset_table2.selected.concat();
+
+    // input assets无，table assets选中，则取消勾选(再次click)
+    if (selectedAssets.length !== 0){
+        $.each(selectedAssets, function (index, assetId){
+            if ($.inArray(assetId, inputAssets) === -1){
+                $('#'+assetId).trigger('click');  // 取消勾选
+            }
+        });
+    }
+
+    // input assets有，table assets没选，则选中(click)
+    if (inputAssets !== null){
+        asset_table2.selected = inputAssets;
+        $.each(inputAssets, function(index, assetId){
+            var dom = document.getElementById(assetId);
+            if (dom !== null){
+                var selected = dom.parentElement.parentElement.className.indexOf('selected')
+            }
+            if (selected === -1){
+                $('#'+assetId).trigger('click');
+            }
+        });
+    }
 }

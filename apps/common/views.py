@@ -52,7 +52,7 @@ class EmailSettingView(SuperUserRequiredMixin, TemplateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
-            msg = _("Update setting successfully, please restart program")
+            msg = _("Update setting successfully")
             messages.success(request, msg)
             return redirect('settings:email-setting')
         else:

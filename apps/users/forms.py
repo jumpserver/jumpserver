@@ -63,11 +63,6 @@ class UserCreateUpdateForm(OrgModelForm):
             'username', 'name', 'email', 'groups', 'wechat',
             'phone', 'role', 'date_expired', 'comment', 'otp_level'
         ]
-        help_texts = {
-            'username': '* required',
-            'name': '* required',
-            'email': '* required',
-        }
         widgets = {
             'otp_level': forms.RadioSelect(),
             'groups': forms.SelectMultiple(
@@ -131,17 +126,16 @@ class UserCreateUpdateForm(OrgModelForm):
 
 
 class UserProfileForm(forms.ModelForm):
+    username = forms.CharField(disabled=True)
+    name = forms.CharField(disabled=True)
+    email = forms.CharField(disabled=True)
+
     class Meta:
         model = User
         fields = [
             'username', 'name', 'email',
             'wechat', 'phone',
         ]
-        help_texts = {
-            'username': '* required',
-            'name': '* required',
-            'email': '* required',
-        }
 
 
 UserProfileForm.verbose_name = _("Profile")
@@ -259,7 +253,6 @@ UserPublicKeyForm.verbose_name = _("Public key")
 class UserBulkUpdateForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         required=True,
-        help_text='* required',
         label=_('Select users'),
         queryset=User.objects.all(),
         widget=forms.SelectMultiple(
@@ -342,9 +335,6 @@ class UserGroupForm(OrgModelForm):
         fields = [
             'name', 'users', 'comment',
         ]
-        help_texts = {
-            'name': '* required'
-        }
 
 
 class FileForm(forms.Form):

@@ -26,6 +26,15 @@ class LabelForm(forms.ModelForm):
             initial['assets'] = kwargs['instance'].assets.all()
         super().__init__(*args, **kwargs)
 
+        # 前端渲染优化, 防止过多资产
+        assets_field = self.fields.get('assets')
+        if not self.data:
+            instance = kwargs.get('instance')
+            if instance:
+                assets_field.queryset = instance.assets.all()
+            else:
+                assets_field.queryset = Asset.objects.none()
+
     def save(self, commit=True):
         label = super().save(commit=commit)
         assets = self.cleaned_data['assets']

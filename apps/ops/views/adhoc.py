@@ -2,14 +2,22 @@
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView
 
 from common.mixins import DatetimeSearchMixin
-from .models import Task, AdHoc, AdHocRunHistory, CeleryTask
-from common.permissions import SuperUserRequiredMixin, AdminUserRequiredMixin
+from common.permissions import AdminUserRequiredMixin
+from orgs.utils import current_org
+from ..models import Task, AdHoc, AdHocRunHistory
 
 
-class TaskListView(SuperUserRequiredMixin, DatetimeSearchMixin, ListView):
+__all__ = [
+    'TaskListView', 'TaskDetailView', 'TaskHistoryView',
+    'TaskAdhocView', 'AdHocDetailView', 'AdHocHistoryDetailView',
+    'AdHocHistoryView'
+]
+
+
+class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
@@ -18,18 +26,23 @@ class TaskListView(SuperUserRequiredMixin, DatetimeSearchMixin, ListView):
     keyword = ''
 
     def get_queryset(self):
-        self.queryset = super().get_queryset()
+        queryset = super().get_queryset()
+        if current_org.is_real():
+            queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
+
         self.keyword = self.request.GET.get('keyword', '')
-        self.queryset = self.queryset.filter(
+        queryset = queryset.filter(
             date_created__gt=self.date_from,
             date_created__lt=self.date_to
         )
 
         if self.keyword:
-            self.queryset = self.queryset.filter(
+            queryset = queryset.filter(
                 name__icontains=self.keyword,
             )
-        return self.queryset
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {
@@ -43,9 +56,18 @@ class TaskListView(SuperUserRequiredMixin, DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class TaskDetailView(SuperUserRequiredMixin, DetailView):
+class TaskDetailView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_detail.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Todo: 需要整理默认组织等东西
+        if current_org.is_real():
+            queryset = queryset.filter(created_by=current_org.id)
+        else:
+            queryset = queryset.filter(created_by='')
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {
@@ -56,7 +78,7 @@ class TaskDetailView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskAdhocView(SuperUserRequiredMixin, DetailView):
+class TaskAdhocView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_adhoc.html'
 
@@ -69,7 +91,7 @@ class TaskAdhocView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskHistoryView(SuperUserRequiredMixin, DetailView):
+class TaskHistoryView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_history.html'
 
@@ -82,7 +104,7 @@ class TaskHistoryView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocDetailView(SuperUserRequiredMixin, DetailView):
+class AdHocDetailView(AdminUserRequiredMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_detail.html'
 
@@ -95,7 +117,7 @@ class AdHocDetailView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryView(SuperUserRequiredMixin, DetailView):
+class AdHocHistoryView(AdminUserRequiredMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_history.html'
 
@@ -108,7 +130,7 @@ class AdHocHistoryView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryDetailView(SuperUserRequiredMixin, DetailView):
+class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
     model = AdHocRunHistory
     template_name = 'ops/adhoc_history_detail.html'
 
@@ -121,6 +143,5 @@ class AdHocHistoryDetailView(SuperUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class CeleryTaskLogView(AdminUserRequiredMixin, DetailView):
-    template_name = 'ops/celery_task_log.html'
-    model = CeleryTask
+
+

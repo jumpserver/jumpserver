@@ -24,17 +24,27 @@
 {% block custom_foot_js %}
 <script type="text/javascript">
 $(document).ready(function () {
-    console.log($.fn.select2.defaults);
     $('.select2').select2().off("select2:open");
 }).on('click', '.select2-selection__rendered', function (e) {
     e.preventDefault();
     $("#asset_list_modal").modal();
+    initSelectedAssets2Table();
 })
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
-    $.each(assets, function (id, data) {
-        $('.select2').val(assets).trigger('change');
+    var options = [];
+    $('#id_assets option').each(function (i, v) {
+        options.push(v.value)
     });
+    asset_table2.selected_rows.forEach(function (i) {
+        var name = i.hostname + '(' + i.ip + ')';
+        var option = new Option(name, i.id, false, true);
+
+        if (options.indexOf(i.id) === -1) {
+            $('#id_assets').append(option).trigger('change');
+        }
+    });
+    $('.select2').val(assets).trigger('change');
     $("#asset_list_modal").modal('hide');
 
 })

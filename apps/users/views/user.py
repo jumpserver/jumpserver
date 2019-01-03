@@ -87,6 +87,8 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
+        if current_org and current_org.is_real():
+            user.orgs.add(current_org.id)
         post_user_create.send(self.__class__, user=user)
         return super().form_valid(form)
 
@@ -412,6 +414,12 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
         return super().get_success_url()
 
     def form_valid(self, form):
+        if not self.request.user.can_update_password():
+            error = _("User auth from {}, go there change password").format(
+                self.request.source_display
+            )
+            form.add_error("password", error)
+            return self.form_invalid(form)
         password = form.cleaned_data.get('new_password')
         is_ok = check_password_rules(password)
         if not is_ok:

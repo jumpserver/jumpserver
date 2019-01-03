@@ -1,0 +1,122 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% load common_tags %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content_left_head %}
+{% endblock %}
+
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+            </div>
+        </div>
+        {% if user_list %}
+        <div class="input-group">
+            <select class="select2 form-control" name="user">
+                <option value="">{% trans 'User' %}</option>
+                {% for u in user_list %}
+                    <option value="{{ u.id }}" {% if u.id == user_id %} selected {% endif %}>{{ u }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="{% trans 'Search'  %}" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    {% trans "Search"  %}
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block table_container %}
+    <table class="footable table table-stripped table-bordered toggle-arrow-tiny" data-page="false" >
+    <thead>
+        <th class="text-center"></th>
+        <th class="text-center">{% trans 'Hosts' %}</th>
+        <th class="text-center">{% trans 'User' %}</th>
+        <th class="text-center">{% trans 'Command' %}</th>
+        <th class="text-center">{% trans 'Run as' %}</th>
+        <th class="text-center">{% trans 'Output' %}</th>
+        <th class="text-center">{% trans 'Finished' %}</th>
+        <th class="text-center">{% trans 'Success' %}</th>
+        <th class="text-center">{% trans 'Date start' %}</th>
+    </thead>
+    <tbody>
+    {% for object in object_list %}
+        <tr class="gradeX">
+            <td>{{ forloop.counter }}</td>
+            <td class="text-center hosts" value="{{ object.get_hosts_names }}"></td>
+            <td class="text-center">{{ object.user.name }}</td>
+            <td class="text-center">{{ object.command| truncatechars:16 }}</td>
+            <td class="text-center">{{ object.run_as.username }}</td>
+            <td class="text-center"><a href="{% url "ops:celery-task-log" pk=object.id %}" target="_blank">查看</a></td>
+            <td class="text-center">{{ object.is_finished | state_show | safe }}</td>
+            <td class="text-center">{{ object.is_success | state_show | safe }}</td>
+            <td class="text-center">{{ object.date_start }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+<script>
+$(document).ready(function() {
+    {#$('table').DataTable({#}
+    {#    "searching": false,#}
+    {#    "paging": false,#}
+    {#    "bInfo" : false,#}
+    {#    "order": []#}
+    {# });#}
+    {#$('.footable').footable();#}
+    $('.select2').select2({
+        dropdownAutoWidth : true,
+        width: 'auto'
+    });
+    $('#date .input-daterange').datepicker({
+        format: "yyyy-mm-dd",
+        todayBtn: "linked",
+        keyboardNavigation: false,
+        forceParse: false,
+        calendarWeeks: true,
+        autoclose: true
+    });
+    $(".hosts").each(function (i) {
+        var data = $(this).attr('value');
+        var data_list = data.split(",");
+        if (data_list.length === 1 && data_list[0] === "") {
+            data_list.pop();
+        }
+        var html = createPopover(data_list);
+        $(this).html(html);
+    });
+    $('[data-toggle="popover"]').popover();
+})
+</script>
+{% endblock %}
+

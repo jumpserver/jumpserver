@@ -57,7 +57,6 @@
             </div>
         </div>
     </div>
-
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -108,7 +107,8 @@ function initTable() {
 
 function onSelected(event, treeNode) {
     url = '{% url "api-perms:user-node-assets" pk=object.id node_id=DEFAULT_PK %}';
-    url = url.replace("{{ DEFAULT_PK }}", treeNode.node_id);
+    var node_id = treeNode.meta.node.id;
+    url = url.replace("{{ DEFAULT_PK }}", node_id);
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
 }
@@ -129,23 +129,9 @@ function initTree() {
         }
     };
 
-    var zNodes = [];
-    $.get("{% url 'api-perms:user-nodes' pk=object.id %}", function(data, status) {
-        $.each(data, function (index, value) {
-            value["node_id"] = value["id"];
-            value["id"] = value["tree_id"];
-            if (value["tree_id"] !== value["tree_parent"]) {
-                value["pId"] = value["tree_parent"];
-            }
-            value["isParent"] = value["is_node"];
-            value['name'] = value['value'];
-            value["iconSkin"] = value["is_node"] ? null : 'file';
-        });
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+    $.get("{% url 'api-perms:user-nodes-assets-as-tree' pk=object.id %}?show_assets=0", function(data, status) {
+        $.fn.zTree.init($("#assetTree"), setting, data);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
-        var root = zTree.getNodes()[0];
-        zTree.expandNode(root);
     });
 }
 

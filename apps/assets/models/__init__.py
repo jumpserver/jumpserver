@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
 from .user import *
 from .label import Label
 from .cluster import *

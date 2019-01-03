@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usergroup',
             name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
+            field=models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization'),
         ),
     ]

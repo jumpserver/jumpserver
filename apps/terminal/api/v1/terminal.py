@@ -83,10 +83,10 @@ class TerminalTokenApi(APIView):
         if not terminal.is_accepted:
             return Response("Terminal was not accepted yet", status=400)
 
-        if not terminal.user or not terminal.user.access_key.all():
+        if not terminal.user or not terminal.user.access_key:
             return Response("No access key generate", status=401)
 
-        access_key = terminal.user.access_key.first()
+        access_key = terminal.user.access_key()
         data = OrderedDict()
         data['access_key'] = {'id': access_key.id, 'secret': access_key.secret}
         return Response(data, status=200)

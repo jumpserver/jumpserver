@@ -57,6 +57,10 @@
 <script>
 var zTree2, asset_table2 = 0;
 function initTable2() {
+    if(asset_table2){
+        return
+    }
+
     var options = {
         ele: $('#asset_list_modal_table'),
         ajax_url: '{% url "api-assets:asset-list" %}?show_current_asset=1',
@@ -69,16 +73,16 @@ function initTable2() {
     return asset_table2
 }
 
-function onSelected2(event, treeNode) {
+function onNodeSelected2(event, treeNode) {
     var url = asset_table2.ajax.url();
-    url = setUrlParam(url, "node_id", treeNode.node_id);
-    setCookie('node_selected', treeNode.id);
+    url = setUrlParam(url, "node_id", treeNode.meta.node.id);
     asset_table2.ajax.url(url);
     asset_table2.ajax.reload();
 }
 
 
 function initTree2() {
+    var url = '{% url 'api-assets:node-children-tree' %}?assets=0';
     var setting = {
         view: {
             dblClickExpand: false,
@@ -89,33 +93,22 @@ function initTree2() {
                 enable: true
             }
         },
+        async: {
+			enable: true,
+			url: url,
+			autoParam: ["id=key", "name=n", "level=lv"],
+            type: 'get'
+		},
         callback: {
-            onSelected: onSelected2
+            onSelected: onNodeSelected2
         }
     };
-
-    var zNodes = [];
-    $.get("{% url 'api-assets:node-list' %}", function(data, status){
-        $.each(data, function (index, value) {
-            value["node_id"] = value["id"];
-            value["id"] = value["tree_id"];
-            value["pId"] = value["tree_parent"];
-            {#value["open"] = true;#}
-            if (value["key"] === "0") {
-                value["open"] = true;
-            }
-            value["name"] = value["value"] + ' (' + value['assets_amount'] + ')';
-        });
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree2"), setting, zNodes);
-        zTree2 = $.fn.zTree.getZTreeObj("assetTree2");
-        var root = zTree2.getNodes()[0];
-        zTree2.expandNode(root);
-    });
+    zTree2 = $.fn.zTree.init($("#assetTree2"), setting);
 }
 
 
 $(document).ready(function(){
+}).on('show.bs.modal', function () {
     initTable2();
     initTree2();
 })

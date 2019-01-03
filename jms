@@ -26,10 +26,10 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
 HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
-DEBUG = CONFIG.DEBUG
-LOG_LEVEL = CONFIG.LOG_LEVEL
+DEBUG = CONFIG.DEBUG or False
+LOG_LEVEL = CONFIG.LOG_LEVEL or 'INFO'
 
-START_TIMEOUT = 15
+START_TIMEOUT = 40
 WORKERS = 4
 DAEMON = False
 
@@ -58,9 +58,6 @@ def check_database_connection():
 def make_migrations():
     print("Check database structure change ...")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    if len(os.listdir('assets/migrations')) < 4:
-        print("Make database migrations ...")
-        subprocess.call('python3 manage.py makemigrations', shell=True)
     print("Migrate model change to database ...")
     subprocess.call('python3 manage.py migrate', shell=True)
 

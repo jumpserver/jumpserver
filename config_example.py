@@ -44,6 +44,11 @@ class Config:
     # LOG_LEVEL = 'DEBUG'
     # LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
+    # Session expiration setting, Default 24 hour, Also set expired on on browser close
+    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # SESSION_COOKIE_AGE = 3600 * 24
+    # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
     # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -72,7 +77,9 @@ class Config:
     # Redis配置
     REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
-    REDIS_PASSWORD = ''
+    # REDIS_PASSWORD = ''
+    # REDIS_DB_CELERY = 3
+    # REDIS_DB_CACHE = 4
 
     # Use OpenID authorization
     # 使用OpenID 来进行认证设置
@@ -82,6 +89,9 @@ class Config:
     # AUTH_OPENID_REALM_NAME = 'realm-name'
     # AUTH_OPENID_CLIENT_ID = 'client-id'
     # AUTH_OPENID_CLIENT_SECRET = 'client-secret'
+
+    #
+    # OTP_VALID_WINDOW = 0
 
     def __init__(self):
         pass

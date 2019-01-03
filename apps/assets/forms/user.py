@@ -80,10 +80,6 @@ class AdminUserForm(PasswordAndKeyAuthForm):
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
         }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
-        }
 
 
 class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
@@ -99,8 +95,10 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
-        if login_mode == SystemUser.MANUAL_LOGIN or \
-                protocol in [SystemUser.RDP_PROTOCOL, SystemUser.TELNET_PROTOCOL]:
+        if login_mode == SystemUser.LOGIN_MANUAL or \
+                protocol in [SystemUser.PROTOCOL_RDP,
+                             SystemUser.PROTOCOL_TELNET,
+                             SystemUser.PROTOCOL_VNC]:
             system_user.auto_push = 0
             auto_generate_key = False
             system_user.save()
@@ -120,17 +118,18 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         if not self.instance and not auto_generate:
             super().validate_password_key()
 
-    def is_valid(self):
-        validated = super().is_valid()
-        username = self.cleaned_data.get('username')
-        login_mode = self.cleaned_data.get('login_mode')
-        if login_mode == SystemUser.AUTO_LOGIN and not username:
-            self.add_error(
-                "username", _('* Automatic login mode,'
-                              ' must fill in the username.')
-            )
-            return False
-        return validated
+    def clean_username(self):
+        username = self.data.get('username')
+        login_mode = self.data.get('login_mode')
+        protocol = self.data.get('protocol')
+
+        if username:
+            return username
+        if login_mode == SystemUser.LOGIN_AUTO and \
+                protocol != SystemUser.PROTOCOL_VNC:
+            msg = _('* Automatic login mode must fill in the username.')
+            raise forms.ValidationError(msg)
+        return username
 
     class Meta:
         model = SystemUser
@@ -147,8 +146,6 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             }),
         }
         help_texts = {
-            'name': '* required',
-            'username': '* required',
             'auto_push': _('Auto push system user to asset'),
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),

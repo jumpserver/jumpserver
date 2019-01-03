@@ -120,7 +120,14 @@ class User(AbstractUser):
 
     def set_password(self, raw_password):
         self._set_password = True
-        return super().set_password(raw_password)
+        if self.can_update_password():
+            return super().set_password(raw_password)
+        else:
+            error = _("User auth from {}, go there change password").format(self.source)
+            raise PermissionError(error)
+
+    def can_update_password(self):
+        return self.is_local
 
     @property
     def otp_secret_key(self):
@@ -141,6 +148,18 @@ class User(AbstractUser):
         if self._public_key:
             return True
         return False
+
+    @property
+    def groups_display(self):
+        return ' '.join(self.groups.all().values_list('name', flat=True))
+
+    @property
+    def role_display(self):
+        return self.get_role_display()
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
 
     @property
     def is_expired(self):
@@ -260,8 +279,6 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
-        if current_org and current_org.is_real():
-            self.orgs.add(current_org.id)
 
     @property
     def private_token(self):

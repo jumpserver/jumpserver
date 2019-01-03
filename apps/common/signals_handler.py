@@ -26,21 +26,20 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 def refresh_all_settings_on_django_ready(sender, **kwargs):
     logger.debug("Receive django ready signal")
     logger.debug("  - fresh all settings")
-    CACHE_KEY_PREFIX = '_SETTING_'
+    cache_key_prefix = '_SETTING_'
 
     def monkey_patch_getattr(self, name):
-        key = CACHE_KEY_PREFIX + name
+        key = cache_key_prefix + name
         cached = cache.get(key)
         if cached is not None:
             return cached
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
-        # self.__dict__[name] = val  # Never set it
         return val
 
     def monkey_patch_setattr(self, name, value):
-        key = CACHE_KEY_PREFIX + name
+        key = cache_key_prefix + name
         cache.set(key, value, None)
         if name == '_wrapped':
             self.__dict__.clear()
@@ -51,7 +50,7 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
     def monkey_patch_delattr(self, name):
         super(LazySettings, self).__delattr__(name)
         self.__dict__.pop(name, None)
-        key = CACHE_KEY_PREFIX + name
+        key = cache_key_prefix + name
         cache.delete(key)
 
     try:
@@ -65,6 +64,8 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
 
 @receiver(pre_save, dispatch_uid="my_unique_identifier")
 def on_create_set_created_by(sender, instance=None, **kwargs):
+    if getattr(instance, '_ignore_auto_created_by', False) is True:
+        return
     if hasattr(instance, 'created_by') and not instance.created_by:
         if current_request and current_request.user.is_authenticated:
             instance.created_by = current_request.user.name

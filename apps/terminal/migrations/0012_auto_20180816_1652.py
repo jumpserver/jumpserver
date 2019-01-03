@@ -10,14 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='command',
-            name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
-        ),
-        migrations.AlterField(
-            model_name='session',
-            name='org_id',
-            field=models.CharField(blank=True, default='', max_length=36, verbose_name='Organization'),
-        ),
     ]

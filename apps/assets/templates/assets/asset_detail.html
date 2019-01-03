@@ -78,6 +78,10 @@
                                             <td><b>{{ asset.admin_user }}</b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Domain' %}:</td>
+                                            <td><b>{{ asset.domain|default:"" }}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Vendor' %}:</td>
                                             <td><b>{{ asset.vendor|default:"" }}</b></td>
                                         </tr>
@@ -159,7 +163,7 @@
                                               </span>
                                           </td>
                                         </tr>
-                                        {% if asset.is_unixlike %}
+                                        {% if asset.protocol == 'ssh' %}
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
                                             <td>

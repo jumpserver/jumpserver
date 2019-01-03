@@ -284,14 +284,16 @@ def generate_otp_uri(request, issuer="Jumpserver"):
         otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
     cache.set(request.session.session_key+'otp_key', otp_secret_key, 600)
     totp = pyotp.TOTP(otp_secret_key)
-    return totp.provisioning_uri(name=user.username, issuer_name=issuer), otp_secret_key
+    otp_issuer_name = settings.OTP_ISSUER_NAME or issuer
+    return totp.provisioning_uri(name=user.username, issuer_name=otp_issuer_name), otp_secret_key
 
 
 def check_otp_code(otp_secret_key, otp_code):
     if not otp_secret_key or not otp_code:
         return False
     totp = pyotp.TOTP(otp_secret_key)
-    return totp.verify(otp_code)
+    otp_valid_window = settings.OTP_VALID_WINDOW or 0
+    return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 
 
 def get_password_check_rules():

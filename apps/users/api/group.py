@@ -6,7 +6,7 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
 from ..serializers import UserGroupSerializer, \
-    UserGroupUpdateMemeberSerializer
+    UserGroupUpdateMemberSerializer
 from ..models import UserGroup
 from common.permissions import IsOrgAdmin
 from common.mixins import IDInFilterMixin
@@ -26,5 +26,5 @@ class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()
-    serializer_class = UserGroupUpdateMemeberSerializer
+    serializer_class = UserGroupUpdateMemberSerializer
     permission_classes = (IsOrgAdmin,)

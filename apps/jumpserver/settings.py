@@ -14,7 +14,7 @@ import os
 import sys
 
 import ldap
-from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+# from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
 from .conf import load_user_config
@@ -146,6 +146,7 @@ LOGIN_URL = reverse_lazy('users:login')
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
+SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -353,6 +354,10 @@ AUTH_USER_MODEL = 'users.User'
 FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
+# OTP settings
+OTP_ISSUER_NAME = CONFIG.OTP_ISSUER_NAME
+OTP_VALID_WINDOW = CONFIG.OTP_VALID_WINDOW
+
 # Auth LDAP settings
 AUTH_LDAP = False
 AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
@@ -362,22 +367,17 @@ AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'
 AUTH_LDAP_SEARCH_FILTER = '(cn=%(user)s)'
 AUTH_LDAP_START_TLS = False
 AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail"}
-AUTH_LDAP_USER_SEARCH_UNION = lambda: [
-    LDAPSearch(USER_SEARCH, ldap.SCOPE_SUBTREE, AUTH_LDAP_SEARCH_FILTER)
-    for USER_SEARCH in str(AUTH_LDAP_SEARCH_OU).split("|")
-]
-AUTH_LDAP_USER_SEARCH = lambda: LDAPSearchUnion(*AUTH_LDAP_USER_SEARCH_UNION())
-AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
-AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-   AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
-)
+# AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
+# AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
+# AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+#    AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
+# )
 AUTH_LDAP_CONNECTION_OPTIONS = {
     ldap.OPT_TIMEOUT: 5
 }
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
-AUTH_LDAP_BACKEND = 'django_auth_ldap.backend.LDAPBackend'
+AUTH_LDAP_BACKEND = 'authentication.ldap.backends.LDAPAuthorizationBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
@@ -402,10 +402,10 @@ if AUTH_OPENID:
 
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
-    'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
-    'host': CONFIG.REDIS_HOST or '127.0.0.1',
-    'port': CONFIG.REDIS_PORT or 6379,
-    'db': CONFIG.REDIS_DB_CELERY_BROKER or 3,
+    'password': CONFIG.REDIS_PASSWORD,
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+    'db': CONFIG.REDIS_DB_CELERY,
 }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
@@ -467,6 +467,7 @@ DEFAULT_TERMINAL_REPLAY_STORAGE = {
 TERMINAL_REPLAY_STORAGE = {
 }
 
+
 SECURITY_MFA_AUTH = False
 SECURITY_LOGIN_LIMIT_COUNT = 7
 SECURITY_LOGIN_LIMIT_TIME = 30  # Unit: minute
@@ -485,14 +486,22 @@ SECURITY_PASSWORD_RULES = [
     'SECURITY_PASSWORD_SPECIAL_CHAR'
 ]
 
+TERMINAL_PASSWORD_AUTH = CONFIG.TERMINAL_PASSWORD_AUTH
+TERMINAL_PUBLIC_KEY_AUTH = CONFIG.TERMINAL_PUBLIC_KEY_AUTH
+TERMINAL_HEARTBEAT_INTERVAL = CONFIG.TERMINAL_HEARTBEAT_INTERVAL
+TERMINAL_ASSET_LIST_SORT_BY = CONFIG.TERMINAL_ASSET_LIST_SORT_BY
+TERMINAL_ASSET_LIST_PAGE_SIZE = CONFIG.TERMINAL_ASSET_LIST_PAGE_SIZE
+TERMINAL_SESSION_KEEP_DURATION = CONFIG.TERMINAL_SESSION_KEEP_DURATION
+
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-2',
     # Field class to use in horizontal forms
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
-    'set_placeholder': True,
+    'set_placeholder': False,
     'success_css_class': '',
+    'required_css_class': 'required',
 }
 
 TOKEN_EXPIRATION = CONFIG.TOKEN_EXPIRATION
@@ -510,3 +519,5 @@ SWAGGER_SETTINGS = {
     },
 }
 
+# Default email suffix
+EMAIL_SUFFIX = CONFIG.EMAIL_SUFFIX

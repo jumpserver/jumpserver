@@ -38,16 +38,16 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if current_org.is_real():
-            org_users = current_org.get_org_users()
-            queryset = queryset.filter(id__in=org_users)
+        queryset = current_org.get_org_users()
         return queryset
 
     def get_permissions(self):
         if self.action == "retrieve":
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
+
+    def allow_bulk_destroy(self, qs, filtered):
+        return qs.count() != filtered.count()
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
