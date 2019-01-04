@@ -24,7 +24,7 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 SSH访问: ssh -p 2222 <容器所在服务器IP>
 
-XShell等工具请添加connection连接,ssh 端口 2222
+XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 
 默认管理员账户 admin 密码 admin
 
