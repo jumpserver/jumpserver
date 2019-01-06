@@ -372,7 +372,7 @@ CentOS 7 安装文档
     ...
 
     # nginx 代理设置
-    $ vi /etc/nginx.conf
+    $ vi /etc/nginx/nginx.conf
     user  nginx;
     worker_processes  auto;
 
