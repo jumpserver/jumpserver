@@ -47,15 +47,14 @@ class TreeNode:
     def __gt__(self, other):
         if self.isParent and not other.isParent:
             return False
-        return self.id > other.id
+        elif not self.isParent and other.isParent:
+            return True
+        if self.pId != other.pId:
+            return self.pId > other.pId
+        return self.name > other.name
 
     def __eq__(self, other):
         return self.id == other.id
-
-    def __lt__(self, other):
-        if self.isParent and not other.isParent:
-            return True
-        return self.id < other.id
 
 
 class Tree:

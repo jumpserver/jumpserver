@@ -29,6 +29,11 @@
                     </div>
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="" >
+                            {% if form.non_field_errors %}
+                                 <div class="alert alert-danger">
+                                     {{ form.non_field_errors }}
+                                 </div>
+                            {% endif %}
                             {% csrf_token %}
                             <h3>{% trans 'Basic' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
@@ -113,14 +118,27 @@ $(document).ready(function () {
             e.preventDefault();
             e.stopPropagation();
             $("#asset_list_modal").modal();
+            initSelectedAssets2Table();
         }
     })
 })
 .on('click', '#btn_asset_modal_confirm', function () {
     var assets = asset_table2.selected;
 
-    $('#id_assets').val(assets).trigger('change');
+    var options = [];
+    $('#id_assets option').each(function (i, v) {
+        options.push(v.value)
+    });
+    asset_table2.selected_rows.forEach(function (i) {
+        var name = i.hostname + '(' + i.ip + ')';
+        var option = new Option(name, i.id, false, true);
 
+        if (options.indexOf(i.id) === -1) {
+            $('#id_assets').append(option).trigger('change');
+        }
+    });
+
+    $('#id_assets').val(assets).trigger('change');
     $("#asset_list_modal").modal('hide');
 });
 </script>

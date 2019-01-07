@@ -438,4 +438,7 @@ div.dataTables_wrapper div.dataTables_filter {
     white-space: nowrap;
 }
 
-
+.form-group .required .control-label:after {
+    content:"*";
+    color:red;
+}

@@ -139,22 +139,23 @@ class TerminalSettingForm(BaseForm):
         (50, 50),
     )
     TERMINAL_PASSWORD_AUTH = forms.BooleanField(
-        initial=True, required=False, label=_("Password auth")
+        required=False, label=_("Password auth")
     )
     TERMINAL_PUBLIC_KEY_AUTH = forms.BooleanField(
-        initial=True, required=False, label=_("Public key auth")
+        required=False, label=_("Public key auth")
     )
     TERMINAL_HEARTBEAT_INTERVAL = forms.IntegerField(
-        initial=5, label=_("Heartbeat interval"), help_text=_("Units: seconds")
+        min_value=5, label=_("Heartbeat interval"),
+        help_text=_("Units: seconds")
     )
     TERMINAL_ASSET_LIST_SORT_BY = forms.ChoiceField(
-        choices=SORT_BY_CHOICES, initial='hostname', label=_("List sort by")
+        choices=SORT_BY_CHOICES, label=_("List sort by")
     )
     TERMINAL_ASSET_LIST_PAGE_SIZE = forms.ChoiceField(
-        choices=PAGE_SIZE_CHOICES, initial='auto', label=_("List page size"),
+        choices=PAGE_SIZE_CHOICES, label=_("List page size"),
     )
     TERMINAL_SESSION_KEEP_DURATION = forms.IntegerField(
-        label=_("Session keep duration"),
+        min_value=1, label=_("Session keep duration"),
         help_text=_("Units: days, Session, record, command will be delete "
                     "if more than duration, only in database")
     )
@@ -167,8 +168,7 @@ class TerminalCommandStorage(BaseForm):
 class SecuritySettingForm(BaseForm):
     # MFA global setting
     SECURITY_MFA_AUTH = forms.BooleanField(
-        initial=False, required=False,
-        label=_("MFA Secondary certification"),
+        required=False, label=_("MFA Secondary certification"),
         help_text=_(
             'After opening, the user login must use MFA secondary '
             'authentication (valid for all users, including administrators)'
@@ -176,13 +176,11 @@ class SecuritySettingForm(BaseForm):
     )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
-        initial=7, min_value=3,
-        label=_("Limit the number of login failures")
+        min_value=3, label=_("Limit the number of login failures")
     )
     # limit login time
     SECURITY_LOGIN_LIMIT_TIME = forms.IntegerField(
-        initial=30, min_value=5,
-        label=_("No logon interval"),
+        min_value=5, label=_("No logon interval"),
         help_text=_(
             "Tip: (unit/minute) if the user has failed to log in for a limited "
             "number of times, no login is allowed during this time interval."
@@ -190,8 +188,7 @@ class SecuritySettingForm(BaseForm):
     )
     # ssh max idle time
     SECURITY_MAX_IDLE_TIME = forms.IntegerField(
-        initial=30, required=False,
-        label=_("Connection max idle time"),
+        required=False, label=_("Connection max idle time"),
         help_text=_(
             'If idle time more than it, disconnect connection(only ssh now) '
             'Unit: minute'
@@ -199,8 +196,8 @@ class SecuritySettingForm(BaseForm):
     )
     # password expiration time
     SECURITY_PASSWORD_EXPIRATION_TIME = forms.IntegerField(
-        initial=9999, label=_("Password expiration time"),
-        min_value=1,
+        label=_("Password expiration time"),
+        min_value=1, max_value=99999,
         help_text=_(
             "Tip: (unit: day) "
             "If the user does not update the password during the time, "
@@ -211,35 +208,30 @@ class SecuritySettingForm(BaseForm):
     )
     # min length
     SECURITY_PASSWORD_MIN_LENGTH = forms.IntegerField(
-        initial=6, label=_("Password minimum length"),
-        min_value=6
+        min_value=6, label=_("Password minimum length"),
     )
     # upper case
     SECURITY_PASSWORD_UPPER_CASE = forms.BooleanField(
-        initial=False, required=False,
-        label=_("Must contain capital letters"),
+        required=False, label=_("Must contain capital letters"),
         help_text=_(
             'After opening, the user password changes '
             'and resets must contain uppercase letters')
     )
     # lower case
     SECURITY_PASSWORD_LOWER_CASE = forms.BooleanField(
-        initial=False, required=False,
-        label=_("Must contain lowercase letters"),
+        required=False, label=_("Must contain lowercase letters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain lowercase letters')
     )
     # number
     SECURITY_PASSWORD_NUMBER = forms.BooleanField(
-        initial=False, required=False,
-        label=_("Must contain numeric characters"),
+        required=False, label=_("Must contain numeric characters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain numeric characters')
     )
     # special char
     SECURITY_PASSWORD_SPECIAL_CHAR = forms.BooleanField(
-        initial=False, required=False,
-        label=_("Must contain special characters"),
+        required=False, label=_("Must contain special characters"),
         help_text=_('After opening, the user password changes '
                     'and resets must contain special characters')
     )

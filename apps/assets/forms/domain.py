@@ -28,6 +28,15 @@ class DomainForm(forms.ModelForm):
             initial['assets'] = kwargs['instance'].assets.all()
         super().__init__(*args, **kwargs)
 
+        # 前端渲染优化, 防止过多资产
+        assets_field = self.fields.get('assets')
+        if not self.data:
+            instance = kwargs.get('instance')
+            if instance:
+                assets_field.queryset = instance.assets.all()
+            else:
+                assets_field.queryset = Asset.objects.none()
+
     def save(self, commit=True):
         instance = super().save(commit=commit)
         assets = self.cleaned_data['assets']
@@ -36,14 +45,12 @@ class DomainForm(forms.ModelForm):
 
 
 class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
-    protocol = forms.ChoiceField(
-        choices=[Gateway.PROTOCOL_CHOICES[0]],
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         password_field = self.fields.get('password')
         password_field.help_text = _('Password should not contain special characters')
+        protocol_field = self.fields.get('protocol')
+        protocol_field.choices = [Gateway.PROTOCOL_CHOICES[0]]
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -62,8 +69,4 @@ class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
-        }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
         }

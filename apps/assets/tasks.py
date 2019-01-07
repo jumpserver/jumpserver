@@ -1,18 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import re
+import time
 import os
 
 from celery import shared_task
-from ops.celery import app as celery_app
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
+from django.core.cache import cache
 
 from common.utils import capacity_convert, \
     sum_capacity, encrypt_password, get_logger
-from ops.celery.utils import register_as_period_task, after_app_shutdown_clean, \
-    after_app_ready_start
-from orgs.utils import set_to_root_org
+from ops.celery.utils import register_as_period_task, after_app_shutdown_clean
 
 from .models import SystemUser, AdminUser, Asset
 from . import const
@@ -213,6 +211,12 @@ def test_admin_user_connectivity_period():
     """
     A period task that update the ansible task period
     """
+    key = '_JMS_TEST_ADMIN_USER_CONNECTIVITY_PERIOD'
+    prev_execute_time = cache.get(key)
+    if prev_execute_time:
+        logger.debug("Test admin user connectivity, less than 40 minutes, skip")
+        return
+    cache.set(key, 1, 60*40)
     admin_users = AdminUser.objects.all()
     for admin_user in admin_users:
         task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
@@ -387,6 +391,18 @@ def push_system_user_a_asset_manual(system_user, asset):
 def push_system_user_to_assets(system_user, assets):
     task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util(system_user, assets, task_name)
+
+
+@shared_task
+@after_app_shutdown_clean
+def test_system_user_connectability_period():
+    pass
+
+
+@shared_task
+@after_app_shutdown_clean
+def test_admin_user_connectability_period():
+    pass
 
 
 # @shared_task

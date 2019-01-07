@@ -59,19 +59,21 @@ class Asset(OrgModelMixin):
         ('Other', 'Other'),
     )
 
-    SSH_PROTOCOL = 'ssh'
-    RDP_PROTOCOL = 'rdp'
-    TELNET_PROTOCOL = 'telnet'
+    PROTOCOL_SSH = 'ssh'
+    PROTOCOL_RDP = 'rdp'
+    PROTOCOL_TELNET = 'telnet'
+    PROTOCOL_VNC = 'vnc'
     PROTOCOL_CHOICES = (
-        (SSH_PROTOCOL, 'ssh'),
-        (RDP_PROTOCOL, 'rdp'),
-        (TELNET_PROTOCOL, 'telnet (beta)'),
+        (PROTOCOL_SSH, 'ssh'),
+        (PROTOCOL_RDP, 'rdp'),
+        (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_VNC, 'vnc'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=SSH_PROTOCOL, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)

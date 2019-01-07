@@ -18,8 +18,7 @@ class GenerateTree:
             "asset_instance": set("system_user")
         }
         """
-        self.__all_nodes = Node.objects.all()
-        self.__node_asset_map = defaultdict(set)
+        self.__all_nodes = list(Node.objects.all())
         self.nodes = defaultdict(dict)
 
     def add_asset(self, asset, system_users):
@@ -136,7 +135,9 @@ class AssetPermissionUtil:
         permissions = self.permissions.prefetch_related('assets', 'system_users')
         for perm in permissions:
             for asset in perm.assets.all().valid().prefetch_related('nodes'):
-                assets[asset].update(perm.system_users.all())
+                assets[asset].update(
+                    perm.system_users.filter(protocol=asset.protocol)
+                )
         return assets
 
     def get_assets(self):
@@ -147,7 +148,9 @@ class AssetPermissionUtil:
         for node, system_users in nodes.items():
             _assets = node.get_all_assets().valid().prefetch_related('nodes')
             for asset in _assets:
-                assets[asset].update(system_users)
+                assets[asset].update(
+                    [s for s in system_users if s.protocol == asset.protocol]
+                )
         self._assets = assets
         return self._assets
 

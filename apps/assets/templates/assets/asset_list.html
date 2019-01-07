@@ -92,8 +92,7 @@
                            <th class="text-center">{% trans 'Hostname' %}</th>
                            <th class="text-center">{% trans 'IP' %}</th>
                            <th class="text-center">{% trans 'Hardware' %}</th>
-                           <th class="text-center">{% trans 'Active' %}</th>
-{#                           <th class="text-center">{% trans 'Reachable' %}</th>#}
+                           <th class="text-center">{% trans 'Reachable' %}</th>
                            <th class="text-center">{% trans 'Action' %}</th>
                        </tr>
                    </thead>
@@ -134,9 +133,11 @@
         <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
         <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
         <li class="divider"></li>
+        <li id="menu_refresh_assets_amount" class="btn-refresh-assets-amount" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh all node assets amount' %}</a></li>
+        <li class="divider"></li>
         <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
         <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
-        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>
+{#        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>#}
     </ul>
 </div>
 
@@ -163,10 +164,12 @@ function initTable() {
                 $(td).html(rowData.hardware_info)
             }},
             {targets: 4, createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                if (cellData === 1){
+                    $(td).html('<i class="fa fa-circle text-navy"></i>')
+                } else if (cellData === 0) {
+                    $(td).html('<i class="fa fa-circle text-danger"></i>')
                 } else {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                    $(td).html('<i class="fa fa-circle text-warning"></i>')
                 }
             }},
 
@@ -179,8 +182,8 @@ function initTable() {
         ajax_url: '{% url "api-assets:asset-list" %}',
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
-            {data: "cpu_cores"}, {data: "is_active", orderable: false },
-            {data: "id", orderable: false }
+            {data: "cpu_cores", orderable: false},
+            {data: "connectivity", orderable: false}, {data: "id", orderable: false }
         ],
         op_html: $('#actions').html()
     };
@@ -344,10 +347,10 @@ function beforeDrag() {
 function beforeDrop(treeId, treeNodes, targetNode, moveType) {
     var treeNodesNames = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesNames.push(value.value);
+        treeNodesNames.push(value.name);
     });
 
-    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.value + "` 下吗?";
+    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.name + "` 下吗?";
     return confirm(msg);
 }
 
@@ -357,10 +360,10 @@ function onDrag(event, treeId, treeNodes) {
 function onDrop(event, treeId, treeNodes, targetNode, moveType) {
     var treeNodesIds = [];
     $.each(treeNodes, function (index, value) {
-        treeNodesIds.push(value.node_id);
+        treeNodesIds.push(value.meta.node.id);
     });
 
-    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.node_id);
+    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.meta.node.id);
     var body = {nodes: treeNodesIds};
     APIUpdateAttr({
         url: the_url,
@@ -557,6 +560,15 @@ $(document).ready(function(){
     hideRMenu();
 
 })
+.on('click', '#menu_refresh_assets_amount', function () {
+    hideRMenu();
+    var url = "{% url 'api-assets:refresh-assets-amount' %}";
+    APIUpdateAttr({
+        'url': url,
+        'method': 'GET'
+    });
+    window.location.reload();
+})
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);
     var $data_table = $("#asset_list_table").DataTable();
@@ -723,6 +735,7 @@ $(document).ready(function(){
 }).on('click', '#menu_asset_move', function () {
     update_node_action = "move"
 })
+
 </script>
 
 {% endblock %}

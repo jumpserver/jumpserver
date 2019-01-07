@@ -57,6 +57,10 @@
 <script>
 var zTree2, asset_table2 = 0;
 function initTable2() {
+    if(asset_table2){
+        return
+    }
+
     var options = {
         ele: $('#asset_list_modal_table'),
         ajax_url: '{% url "api-assets:asset-list" %}?show_current_asset=1',
@@ -69,7 +73,7 @@ function initTable2() {
     return asset_table2
 }
 
-function onSelected2(event, treeNode) {
+function onNodeSelected2(event, treeNode) {
     var url = asset_table2.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.meta.node.id);
     asset_table2.ajax.url(url);
@@ -96,7 +100,7 @@ function initTree2() {
             type: 'get'
 		},
         callback: {
-            onSelected: onSelected2
+            onSelected: onNodeSelected2
         }
     };
     zTree2 = $.fn.zTree.init($("#assetTree2"), setting);

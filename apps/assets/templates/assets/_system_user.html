@@ -103,15 +103,17 @@ var need_change_field_login_mode = [
 ];
 
 function protocolChange() {
-    if ($(protocol_id + " option:selected").text() === 'rdp') {
+    var protocol = $(protocol_id + " option:selected").text();
+    if (protocol === 'rdp' || protocol === 'vnc') {
         $('.auth-fields').removeClass('hidden');
         $('#command-filter-block').addClass('hidden');
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').addClass('hidden')
         });
     }
-    else if ($(protocol_id + " option:selected").text() === 'telnet (beta)') {
+    else if (protocol === 'telnet (beta)') {
         $('.auth-fields').removeClass('hidden');
+        $('#command-filter-block').removeClass('hidden');
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').addClass('hidden')
         });
@@ -123,6 +125,7 @@ function protocolChange() {
             return
         }
         authFieldsDisplay();
+        $('#command-filter-block').removeClass('hidden');
         $.each(need_change_field, function (index, value) {
             $(value).closest('.form-group').removeClass('hidden')
         });

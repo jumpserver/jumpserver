@@ -42,7 +42,7 @@ class Task(models.Model):
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     created_by = models.CharField(max_length=128, blank=True, default='')
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
     __latest_adhoc = None
     _ignore_auto_created_by = True
 
@@ -164,11 +164,14 @@ class AdHoc(models.Model):
     run_as = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     @property
     def tasks(self):
-        return json.loads(self._tasks)
+        try:
+            return json.loads(self._tasks)
+        except:
+            return []
 
     @tasks.setter
     def tasks(self, item):
