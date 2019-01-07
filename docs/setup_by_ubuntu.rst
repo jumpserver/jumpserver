@@ -498,20 +498,20 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ apt-get -y install nginx
+    $ rm -rf /etc/nginx/site-enabled/default
 
 
-**6.2 准备配置文件 修改 /etc/nginx/site-enabled/default**
+**6.2 准备配置文件 修改 /etc/nginx/site-enabled/jumpserver.conf**
 
 
 .. code-block:: nginx
 
-    $ vim /etc/nginx/site-enabled/default
+    $ vim /etc/nginx/site-enabled/jumpserver.conf
 
     server {
         listen 80;
         server_name _;
 
-        ## 新增如下内容,以上内容是原文内容,请从这一行开始复制
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
@@ -566,8 +566,6 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
-        ## 到此结束,请不要继续复制了
-
     }
 
 **6.3 重启 Nginx**
@@ -575,7 +573,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ nginx -t  # 如果没有报错请继续
-    $ service nginx restart
+    $ nginx -s reload
 
 
 **6.4 开始使用 Jumpserver**
