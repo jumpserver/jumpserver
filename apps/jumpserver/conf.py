@@ -331,6 +331,10 @@ defaults = {
     'SECURITY_PASSWORD_LOWER_CASE': False,
     'SECURITY_PASSWORD_NUMBER': False,
     'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+    'AUTH_RADIUS': False,
+    'RADIUS_SERVER': 'localhost',
+    'RADIUS_PORT': 1812,
+    'RADIUS_SECRET': '',
     'HTTP_BIND_HOST': '0.0.0.0',
     'HTTP_LISTEN_PORT': 8080,
 }

@@ -12,7 +12,7 @@ RUN yum -y install epel-release && cd /tmp/requirements && \
 RUN cd /tmp/requirements &&  pip install -r requirements.txt
 
 COPY . /opt/jumpserver
-COPY config_docker.py /opt/jumpserver/config.py
+COPY config_example.yml /opt/jumpserver/config.yml
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
