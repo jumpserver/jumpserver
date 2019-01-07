@@ -14,7 +14,6 @@
 .. code-block:: vim
 
     # 修改 url 的"localhost"为你的实际 url 地址,否则邮件收到的地址将为"localhost" 也无法创建新用户
-    # 修改完 url 地址后需要重启 jumpserver 服务(重启才能生效,后续会解决这个问题)
 
 .. image:: _static/img/basic_setting.jpg
 
@@ -27,7 +26,6 @@
     # 默认使用 25 端口,不勾选 SSL 和 TLS;如果需要勾选 SSL,端口需要修改成 465;如果需要勾选 TLS,端口需要改成 587
     # 不可以同时勾选 SSL 和 TLS,
     # 配置邮件服务后,点击页面的"测试连接"按钮,如果配置正确,Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面,确定收到测试邮件后点击保存即可使用
-    # 设置后立即生效
 
 .. image:: _static/img/smtp_setting.jpg
 
@@ -40,7 +38,6 @@
     # 先"测试"通过才能保存
     # DN 和 OU 一定要完整(如 "DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org")
     # 注：可借用第三方 gui 工具查看 ldap 用户的属性,新版本已经支持中文名登录,即cn=中文也可正常使用
-    # 设置后重启 Jumpserver 才能生效
 
 参考 `LDAP 使用说明 <faq_ldap.html>`_
 
@@ -53,7 +50,7 @@
 
     # "命令记录""录像存储"位置设置
     # 修改后,需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录,然后重启 Jumpserver 服务
-    # 设置后重启 Jumpserver 才能生效
+    # 设置后重启 Coco 才能生效
 
 **1.5 安全设置**
 ----------------
