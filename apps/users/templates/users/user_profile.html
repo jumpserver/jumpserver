@@ -149,14 +149,6 @@
                                 <table class="table">
                                     <tbody>
                                     <tr class="no-borders-tr">
-                                        <td>{% trans 'Update password' %}:</td>
-                                        <td>
-                                            <span class="pull-right">
-                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Update' %}</a>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr class="no-borders-tr">
                                         <td>{% trans 'Set MFA' %}:</td>
                                         <td>
                                             <span class="pull-right">
@@ -177,6 +169,16 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    {% if request.user.can_update_password %}
+                                    <tr class="no-borders">
+                                        <td>{% trans 'Update password' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Update' %}</a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
                                     {% if request.user.otp_enabled and request.user.otp_secret_key %}
                                     <tr>
                                         <td>{% trans 'Update MFA' %}:</td>

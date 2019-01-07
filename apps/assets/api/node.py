@@ -134,6 +134,9 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     serializer_class = serializers.NodeSerializer
     instance = None
 
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         instance = self.get_object()
         if not request.data.get("value"):
@@ -154,7 +157,7 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         if not pk:
-            node = None
+            node = Node.root()
         else:
             node = get_object_or_404(Node, pk=pk)
         return node
