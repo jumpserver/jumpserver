@@ -46,6 +46,7 @@ class User(AbstractUser):
         (SOURCE_LOCAL, 'Local'),
         (SOURCE_LDAP, 'LDAP/AD'),
         (SOURCE_OPENID, 'OpenID'),
+        (SOURCE_RADIUS, 'Radius'),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
