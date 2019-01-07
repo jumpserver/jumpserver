@@ -16,12 +16,15 @@ API 文档
 
 .. code-block:: shell
 
-    $ curl -X POST -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}' http://localhost/api/users/v1/auth/  # 获取token
-    {"token":"937b38011acf499eb474e2fecb424ab3"}%  # 获取到的token
+    $ curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}'  # 获取token
+    {"token":"937b38011acf499eb474e2fecb424ab3"}  # 获取到的token
 
     # 如果开启了 MFA, 则返回的是 seed, 需要携带 seed 和 otp_code 再次提交一次才能获取到 token
-    $ curl -X POST  -H 'Content-Type: application/json' -H 'cache-control: no-cache' -d '{"seed": "629ba0935a624bd9b21e31c19e0cc8cb", "otp_code": "202123"}'
-    {"token":"937b38011acf499eb474e2fecb424ab3"}%
+    curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}'
+    {"code":101,"msg":"请携带seed值, 进行MFA二次认证","otp_url":"/api/users/v1/otp/auth/","seed":"629ba0935a624bd9b21e31c19e0cc8cb"}
+    $ curl -X POST http://localhost/api/users/v1/otp/auth/ -H 'Content-Type: application/json' -H 'cache-control: no-cache' -d '{"seed": "629ba0935a624bd9b21e31c19e0cc8cb", "otp_code": "202123"}'
+    {"token":"937b38011acf499eb474e2fecb424ab3"}
+    # otp_code 为动态密码
 
     $ curl -H 'Authorization: Bearer 937b38011acf499eb474e2fecb424ab3' -H "Content-Type:application/json" http://localhost/api/users/v1/users/
     # 使用token访问,token有效期 1小时
