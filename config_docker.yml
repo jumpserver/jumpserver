@@ -61,7 +61,5 @@ REDIS_PORT: 6379
 # AUTH_OPENID_CLIENT_ID: client-id
 # AUTH_OPENID_CLIENT_SECRET: client-secret
 
-# OTP settings
-# OTP/MFA 配置
+# OTP校验窗口大小，可以避免服务器时间稍有差异引起OTP校验失败
 # OTP_VALID_WINDOW: 0
-# OTP_ISSUER_NAME: Jumpserver

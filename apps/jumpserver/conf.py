@@ -286,8 +286,8 @@ class Config(dict):
 
 
 defaults = {
-    'SECRET_KEY': '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x',
-    'BOOTSTRAP_TOKEN': 'PleaseChangeMe',
+    'SECRET_KEY': '',
+    'BOOTSTRAP_TOKEN': '',
     'DEBUG': True,
     'SITE_URL': 'http://localhost',
     'LOG_LEVEL': 'DEBUG',
@@ -312,6 +312,7 @@ defaults = {
     'SESSION_COOKIE_AGE': 3600 * 24,
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
+    'OTP_VALID_WINDOW': 0,
     'OTP_ISSUER_NAME': 'Jumpserver',
     'EMAIL_SUFFIX': 'jumpserver.org',
     'TERMINAL_PASSWORD_AUTH': True,
@@ -330,6 +331,8 @@ defaults = {
     'SECURITY_PASSWORD_LOWER_CASE': False,
     'SECURITY_PASSWORD_NUMBER': False,
     'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+    'HTTP_BIND_HOST': '0.0.0.0',
+    'HTTP_LISTEN_PORT': 8080,
 }
 
 
@@ -348,6 +351,12 @@ def load_user_config():
         config.from_object(c)
         loaded = True
     except ImportError:
+        pass
+
+    try:
+        config.from_yaml('config.yml')
+        loaded = True
+    except IOError:
         pass
 
     if not loaded:
