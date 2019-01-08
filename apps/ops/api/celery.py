@@ -31,7 +31,7 @@ class CeleryTaskLogApi(generics.RetrieveAPIView):
         if not log_path or not os.path.isfile(log_path):
             return Response({"data": _("Waiting ...")}, status=203)
 
-        with open(log_path, 'r') as f:
+        with open(log_path, 'r', encoding="utf8") as f:
             offset = cache.get(mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')

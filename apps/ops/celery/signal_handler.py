@@ -81,7 +81,7 @@ def pre_run_task_signal_handler(sender, task_id=None, task=None, **kwargs):
         t.status = CeleryTask.RUNNING
         t.log_path = log_path
         t.save()
-    f = open(full_path, 'w')
+    f = open(full_path, 'w', encoding="utf-8")
     tee = TeeObj(f)
     sys.stdout = tee
     task.log_f = tee

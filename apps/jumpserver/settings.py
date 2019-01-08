@@ -209,19 +209,21 @@ LOGGING = {
             'formatter': 'main'
         },
         'file': {
+            'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': "D",
             'interval': 1,
             "backupCount": 7,
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log'),
         },
         'ansible_logs': {
+            'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log')
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log'),
         },
     },
     'loggers': {
