@@ -340,29 +340,33 @@ defaults = {
 }
 
 
-def load_user_config():
-    sys.path.insert(0, PROJECT_DIR)
-    config = Config(PROJECT_DIR, defaults)
-    loaded = False
-
-    for i in ['config.yml', 'config.yaml']:
-        if os.path.isfile(os.path.join(config.root_path, i)):
-            config.from_yaml(i)
-            loaded = True
-
+def load_from_object(config):
     try:
         from config import config as c
         config.from_object(c)
-        loaded = True
+        return True
     except ImportError:
         pass
+    return False
 
-    try:
-        config.from_yaml('config.yml')
-        loaded = True
-    except IOError:
-        pass
 
+def load_from_yml(config):
+    for i in ['config.yml', 'config.yaml']:
+        if not os.path.isfile(os.path.join(config.root_path, i)):
+            continue
+        loaded = config.from_yaml(i)
+        if loaded:
+            return True
+    return False
+
+
+def load_user_config():
+    sys.path.insert(0, PROJECT_DIR)
+    config = Config(PROJECT_DIR, defaults)
+
+    loaded = load_from_object(config)
+    if not loaded:
+        loaded = load_from_yml(config)
     if not loaded:
         msg = """
     

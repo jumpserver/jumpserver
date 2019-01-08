@@ -25,7 +25,7 @@ logger = get_task_logger(__name__)
 @after_app_ready_start
 @after_app_shutdown_clean
 def delete_terminal_status_period():
-    yesterday = timezone.now() - datetime.timedelta(days=3)
+    yesterday = timezone.now() - datetime.timedelta(days=1)
     Status.objects.filter(date_created__lt=yesterday).delete()
 
 
