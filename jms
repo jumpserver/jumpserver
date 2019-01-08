@@ -15,7 +15,8 @@ sys.path.append(BASE_DIR)
 from apps import __version__
 
 try:
-    from config import config as CONFIG
+    from apps.jumpserver.conf import load_user_config
+    CONFIG = load_user_config()
 except ImportError:
     print("Could not find config file, `cp config_example.py config.py`")
     sys.exit(1)

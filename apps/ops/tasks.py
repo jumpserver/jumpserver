@@ -1,9 +1,12 @@
 # coding: utf-8
+import os
+
 from celery import shared_task, subtask
+from django.utils import timezone
 
 from common.utils import get_logger, get_object_or_none
 from .celery.utils import register_as_period_task, after_app_shutdown_clean
-from .models import Task, CommandExecution
+from .models import Task, CommandExecution, CeleryTask
 
 logger = get_logger(__file__)
 
@@ -46,6 +49,24 @@ def clean_tasks_adhoc_period():
         for ad in adhoc:
             ad.history.all().delete()
             ad.delete()
+
+
+@shared_task
+@register_as_period_task(interval=3600*24)
+@after_app_shutdown_clean
+def clean_celery_tasks_period():
+    logger.debug("Start clean celery task history")
+    one_month_ago = timezone.now() - timezone.timedelta(days=30)
+    tasks = CeleryTask.objects.filter(date_start__lt=one_month_ago)
+    for task in tasks:
+        if os.path.isfile(task.full_log_path):
+            try:
+                os.remove(task.full_log_path)
+            except (FileNotFoundError, PermissionError):
+                pass
+        task.delete()
+    tasks = CeleryTask.objects.filter(date_start__isnull=True)
+    tasks.delete()
 
 
 @shared_task
