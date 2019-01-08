@@ -29,7 +29,7 @@
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setenforce 0
-    $ sed -i "s/enforcing/disabled/g" `grep enforcing -rl /etc/selinux/config`
+    $ sed -i "s/enforcing/disabled/g" /etc/selinux/config
 
     # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
@@ -479,8 +479,8 @@ Guacamole 需要 Tomcat 来运行
     $ mv apache-tomcat-8.5.35 tomcat8
     $ rm -rf /config/tomcat8/webapps/*
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
-    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml`  # 修改默认端口为 8081
-    $ sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties`  # 修改 log 等级为 WARNING
+    $ sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat8/conf/server.xml  # 修改默认端口为 8081
+    $ sed -i 's/FINE/WARNING/g' /config/tomcat8/conf/logging.properties  # 修改 log 等级为 WARNING
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
