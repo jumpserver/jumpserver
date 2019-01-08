@@ -217,7 +217,7 @@ FAQ
     $ systemctl stop firewalld.service  # 临时关闭防火墙,重启后失效
 
     # Centos 7 如需永久关闭,还需执行下面步骤
-    $ sed -i "s/enforcing/disabled/g" 'grep enforcing -rl /etc/selinux/config'  # 禁用 selinux
+    $ sed -i "s/enforcing/disabled/g" /etc/selinux/config  # 禁用 selinux
     $ systemctl disable firewalld.service  # 禁用防火墙
 
     # Centos 7 在不关闭 selinux 和 防火墙 的情况下使用 Jumpserver
