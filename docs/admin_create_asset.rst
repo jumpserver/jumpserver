@@ -39,6 +39,8 @@
     # DN 和 OU 一定要完整(如 "DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org")
     # 注：可借用第三方 gui 工具查看 ldap 用户的属性,新版本已经支持中文名登录,即cn=中文也可正常使用
 
+.. image:: _static/img/ldap_setting.jpg
+
 参考 `LDAP 使用说明 <faq_ldap.html>`_
 
 **1.4 终端设置**

@@ -58,11 +58,9 @@ CentOS 7 安装文档
     $ systemctl enable mariadb
     $ systemctl start mariadb
     # 创建数据库 Jumpserver 并授权
-    $ mysql -uroot
-    > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
-    > flush privileges;
-    > quit
+    $ DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24  # 生成随机数据库密码
+    $ echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m"
+    $ mysql -uroot -e "create database jumpserver default charset 'utf8'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
 
     # 安装 Nginx ,用作代理服务器整合 Jumpserver 与各个组件
     $ vi /etc/yum.repos.d/nginx.repo
@@ -103,131 +101,94 @@ CentOS 7 安装文档
 
     # 修改 Jumpserver 配置文件
     $ cd /opt/jumpserver
-    $ cp config_example.py config.py
-    $ vi config.py
+    $ cp config_example.yml config.yml
 
-**注意: 配置文件是 Python 格式,不要用 TAB,而要用空格**
+    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50  # 生成随机SECRET_KEY
+    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16  # 生成随机BOOTSTRAP_TOKEN
 
-.. code-block:: python
+    $ sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml
+    $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOSECRET_KEY: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml
+    $ sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml
+    $ Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
 
-    """
-        jumpserver.config
-        ~~~~~~~~~~~~~~~~~
+    $ echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m"
+    $ echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m"
+    $ echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m"
 
-        Jumpserver project setting file
+    $ vi config.yml  # 确认内容有没有错误
 
-        :copyright: (c) 2014-2017 by Jumpserver Team
-        :license: GPL v2, see LICENSE for more details.
-    """
-    import os
+.. code-block:: yaml
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # SECURITY WARNING: keep the secret key used in production secret!
+    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    SECRET_KEY:
 
+    # SECURITY WARNING: keep the bootstrap token used in production secret!
+    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    BOOTSTRAP_TOKEN:
 
-    class Config:
-        """
-        Jumpserver Config File
-        Jumpserver 配置文件
+    # Development env open this, when error occur display the full process track, Production disable it
+    # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
+    DEBUG: false
 
-        Jumpserver use this config for drive django framework running,
-        You can set is value or set the same envirment value,
-        Jumpserver look for config order: file => env => default
+    # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
+    # 日志级别
+    LOG_LEVEL: ERROR
+    # LOG_DIR:
 
-        Jumpserver使用配置来驱动Django框架的运行，
-        你可以在该文件中设置，或者设置同样名称的环境变量,
-        Jumpserver使用配置的顺序: 文件 => 环境变量 => 默认值
-        """
-        # SECURITY WARNING: keep the secret key used in production secret!
-        # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
-        SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+    # Session expiration setting, Default 24 hour, Also set expired on on browser close
+    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # SESSION_COOKIE_AGE: 3600 * 24
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
 
-        # Django security setting, if your disable debug model, you should setting that
-        ALLOWED_HOSTS = ['*']
+    # Database setting, Support sqlite3, mysql, postgres ....
+    # 数据库设置
+    # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # SECURITY WARNING: keep the bootstrap token used in production secret!
-        # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-        BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvmV'
+    # SQLite setting:
+    # 使用单文件sqlite数据库
+    # DB_ENGINE: sqlite3
+    # DB_NAME:
 
-        # Development env open this, when error occur display the full process track, Production disable it
-        # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
-        # DEBUG = True
-        DEBUG = False
+    # MySQL or postgres setting like:
+    # 使用Mysql作为数据库
+    DB_ENGINE: mysql
+    DB_HOST: 127.0.0.1
+    DB_PORT: 3306
+    DB_USER: jumpserver
+    DB_PASSWORD:
+    DB_NAME: jumpserver
 
-        # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
-        # 日志级别
-        # LOG_LEVEL = 'DEBUG'
-        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
-        LOG_LEVEL = 'ERROR'
-        LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    # When Django start it will bind this host and port
+    # ./manage.py runserver 127.0.0.1:8080
+    # 运行时绑定端口
+    HTTP_BIND_HOST: 0.0.0.0
+    HTTP_LISTEN_PORT: 8080
 
-        # Session expiration setting, Default 24 hour, Also set expired on on browser close
-        # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-        # SESSION_COOKIE_AGE = 3600 * 24
-        # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    # Use Redis as broker for celery and web socket
+    # Redis配置
+    REDIS_HOST: 127.0.0.1
+    REDIS_PORT: 6379
+    # REDIS_PASSWORD:
+    # REDIS_DB_CELERY: 3
+    # REDIS_DB_CACHE: 4
 
-        # Database setting, Support sqlite3, mysql, postgres ....
-        # 数据库设置
-        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+    # Use OpenID authorization
+    # 使用OpenID 来进行认证设置
+    # BASE_SITE_URL: http://localhost:8080
+    # AUTH_OPENID: false  # True or False
+    # AUTH_OPENID_SERVER_URL: https://openid-auth-server.com/
+    # AUTH_OPENID_REALM_NAME: realm-name
+    # AUTH_OPENID_CLIENT_ID: client-id
+    # AUTH_OPENID_CLIENT_SECRET: client-secret
 
-        # SQLite setting:
-        # 使用单文件sqlite数据库
-        # DB_ENGINE = 'sqlite3'
-        # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
-
-        # MySQL or postgres setting like:
-        # 使用Mysql作为数据库
-        DB_ENGINE = 'mysql'
-        DB_HOST = '127.0.0.1'
-        DB_PORT = 3306
-        DB_USER = 'jumpserver'
-        DB_PASSWORD = 'weakPassword'
-        DB_NAME = 'jumpserver'
-
-        # When Django start it will bind this host and port
-        # ./manage.py runserver 127.0.0.1:8080
-        # 运行时绑定端口
-        HTTP_BIND_HOST = '0.0.0.0'
-        HTTP_LISTEN_PORT = 8080
-
-        # Use Redis as broker for celery and web socket
-        # Redis配置
-        REDIS_HOST = '127.0.0.1'
-        REDIS_PORT = 6379
-        # REDIS_PASSWORD = ''
-        # REDIS_DB_CELERY_BROKER = 3
-        # REDIS_DB_CACHE = 4
-
-        # Use OpenID authorization
-        # 使用OpenID 来进行认证设置
-        # BASE_SITE_URL = 'http://localhost:8080'
-        # AUTH_OPENID = False  # True or False
-        # AUTH_OPENID_SERVER_URL = 'https://openid-auth-server.com/'
-        # AUTH_OPENID_REALM_NAME = 'realm-name'
-        # AUTH_OPENID_CLIENT_ID = 'client-id'
-        # AUTH_OPENID_CLIENT_SECRET = 'client-secret'
-
-        def __init__(self):
-            pass
-
-        def __getattr__(self, item):
-            return None
-
-
-    class DevelopmentConfig(Config):
-        pass
-
-
-    class TestConfig(Config):
-        pass
-
-
-    class ProductionConfig(Config):
-        pass
-
-
-    # Default using Config settings, you can write if/else for different env
-    config = DevelopmentConfig()
+    # OTP settings
+    # OTP/MFA 配置
+    # OTP_VALID_WINDOW: 0
+    # OTP_ISSUER_NAME: Jumpserver
 
 .. code-block:: shell
 
@@ -254,15 +215,15 @@ CentOS 7 安装文档
     # 172.17.0.x 是docker容器默认的IP池, 这里偷懒直接授权ip段了, 可以根据实际情况单独授权IP
 
     # http://<Jumpserver_url> 指向 jumpserver 的服务端口, 如 http://192.168.244.144:8080
-    # BOOTSTRAP_TOKEN 为 Jumpserver/config.py 里面的 BOOTSTRAP_TOKEN
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
+    # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.7
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.7
 
 .. code-block:: shell
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -362,13 +323,13 @@ CentOS 7 安装文档
 .. code-block:: shell
 
     # coco 服务默认运行在单核心下面, 当负载过高时会导致用户访问变慢, 这时可运行多个 docker 容器缓解
-    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
-    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.6
+    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.7
+    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.7
     ...
 
     # guacamole 也是一样
-    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
-    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.6
+    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.7
     ...
 
     # nginx 代理设置

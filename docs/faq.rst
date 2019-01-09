@@ -83,7 +83,7 @@ FAQ
 
 .. code-block:: shell
 
-    $ vi /opt/coco/conf.py
+    $ vi /opt/coco/conf.yml
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
     SSH_TIMEOUT = 60
@@ -92,7 +92,7 @@ FAQ
 
 .. code-block:: shell
 
-    $ vi /opt/jumpserver/config.py
+    $ vi /opt/jumpserver/config.yml
 
 .. code-block:: python
 

@@ -9,23 +9,23 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ vi config.py
+    $ vi config.yml
 
     # 调整 debug 模式和 log_level
     ...
-    DEBUG = os.environ.get("DEBUG") or False
+    DEBUG: false
     ...
-    LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'ERROR'
+    LOG_LEVEL: ERROR
     ...
 
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ vi conf.py
+    $ vi conf.yml
 
     # 调整 log_level
     ...
-    LOG_LEVEL = 'ERROR'
+    LOG_LEVEL: ERROR
     ...
 
     # 设置好后重启 jumpserver 和 coco

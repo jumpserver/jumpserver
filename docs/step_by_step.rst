@@ -127,151 +127,108 @@
 
 .. code-block:: shell
 
-    $ mysql -uroot
-    > create database jumpserver default charset 'utf8';
-    > grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by 'weakPassword';
-    > flush privileges;
-    > quit
+    $ DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24  # 生成随机数据库密码
+    $ echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m"
+    $ mysql -uroot -e "create database jumpserver default charset 'utf8'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
 
 **2.7 修改 Jumpserver 配置文件**
 
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ cp config_example.py config.py
-    $ vi config.py
+    $ cp config_example.yml config.yml
 
-    # 注意对齐,不要直接复制本文档的内容,实际内容以文件为准,本文仅供参考
+    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50  # 生成随机SECRET_KEY
+    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16  # 生成随机BOOTSTRAP_TOKEN
 
-**注意: 配置文件是 Python 格式,不要用 TAB,而要用空格**
+    $ sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml
+    $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOSECRET_KEY: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml
+    $ sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml
 
-.. code-block:: python
+    $ echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m"
+    $ echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m"
 
-    """
-        jumpserver.config
-        ~~~~~~~~~~~~~~~~~
+    $ vi config.yml  # 确认内容有没有错误
 
-        Jumpserver project setting file
+.. code-block:: yaml
 
-        :copyright: (c) 2014-2017 by Jumpserver Team
-        :license: GPL v2, see LICENSE for more details.
-    """
-    import os
+    # SECURITY WARNING: keep the secret key used in production secret!
+    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    SECRET_KEY:
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # SECURITY WARNING: keep the bootstrap token used in production secret!
+    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    BOOTSTRAP_TOKEN:
 
+    # Development env open this, when error occur display the full process track, Production disable it
+    # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
+    DEBUG: false
 
-    class Config:
-        """
-        Jumpserver Config File
-        Jumpserver 配置文件
+    # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
+    # 日志级别
+    LOG_LEVEL: ERROR
+    # LOG_DIR:
 
-        Jumpserver use this config for drive django framework running,
-        You can set is value or set the same envirment value,
-        Jumpserver look for config order: file => env => default
+    # Session expiration setting, Default 24 hour, Also set expired on on browser close
+    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # SESSION_COOKIE_AGE: 3600 * 24
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
 
-        Jumpserver使用配置来驱动Django框架的运行，
-        你可以在该文件中设置，或者设置同样名称的环境变量,
-        Jumpserver使用配置的顺序: 文件 => 环境变量 => 默认值
-        """
-        # SECURITY WARNING: keep the secret key used in production secret!
-        # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
-        SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+    # Database setting, Support sqlite3, mysql, postgres ....
+    # 数据库设置
+    # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-        # Django security setting, if your disable debug model, you should setting that
-        ALLOWED_HOSTS = ['*']
+    # SQLite setting:
+    # 使用单文件sqlite数据库
+    # DB_ENGINE: sqlite3
+    # DB_NAME:
 
-        # SECURITY WARNING: keep the bootstrap token used in production secret!
-        # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-        BOOTSTRAP_TOKEN = 'nwv4RdXpM82LtSvmV'
+    # MySQL or postgres setting like:
+    # 使用Mysql作为数据库
+    DB_ENGINE: mysql
+    DB_HOST: 127.0.0.1
+    DB_PORT: 3306
+    DB_USER: jumpserver
+    DB_PASSWORD:
+    DB_NAME: jumpserver
 
-        # Development env open this, when error occur display the full process track, Production disable it
-        # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
-        # DEBUG = True
-        DEBUG = False
+    # When Django start it will bind this host and port
+    # ./manage.py runserver 127.0.0.1:8080
+    # 运行时绑定端口
+    HTTP_BIND_HOST: 0.0.0.0
+    HTTP_LISTEN_PORT: 8080
 
-        # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
-        # 日志级别
-        # LOG_LEVEL = 'DEBUG'
-        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
-        LOG_LEVEL = 'ERROR'
-        LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    # Use Redis as broker for celery and web socket
+    # Redis配置
+    REDIS_HOST: 127.0.0.1
+    REDIS_PORT: 6379
+    # REDIS_PASSWORD:
+    # REDIS_DB_CELERY: 3
+    # REDIS_DB_CACHE: 4
 
-        # Session expiration setting, Default 24 hour, Also set expired on on browser close
-        # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-        # SESSION_COOKIE_AGE = 3600 * 24
-        # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-        SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    # Use OpenID authorization
+    # 使用OpenID 来进行认证设置
+    # BASE_SITE_URL: http://localhost:8080
+    # AUTH_OPENID: false  # True or False
+    # AUTH_OPENID_SERVER_URL: https://openid-auth-server.com/
+    # AUTH_OPENID_REALM_NAME: realm-name
+    # AUTH_OPENID_CLIENT_ID: client-id
+    # AUTH_OPENID_CLIENT_SECRET: client-secret
 
-        # Database setting, Support sqlite3, mysql, postgres ....
-        # 数据库设置
-        # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-        # SQLite setting:
-        # 使用单文件sqlite数据库
-        # DB_ENGINE = 'sqlite3'
-        # DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
-
-        # MySQL or postgres setting like:
-        # 使用Mysql作为数据库
-        DB_ENGINE = 'mysql'
-        DB_HOST = '127.0.0.1'
-        DB_PORT = 3306
-        DB_USER = 'jumpserver'
-        DB_PASSWORD = 'weakPassword'
-        DB_NAME = 'jumpserver'
-
-        # When Django start it will bind this host and port
-        # ./manage.py runserver 127.0.0.1:8080
-        # 运行时绑定端口
-        HTTP_BIND_HOST = '0.0.0.0'
-        HTTP_LISTEN_PORT = 8080
-
-        # Use Redis as broker for celery and web socket
-        # Redis配置
-        REDIS_HOST = '127.0.0.1'
-        REDIS_PORT = 6379
-        # REDIS_PASSWORD = ''
-        # REDIS_DB_CELERY_BROKER = 3
-        # REDIS_DB_CACHE = 4
-
-        # Use OpenID authorization
-        # 使用OpenID 来进行认证设置
-        # BASE_SITE_URL = 'http://localhost:8080'
-        # AUTH_OPENID = False  # True or False
-        # AUTH_OPENID_SERVER_URL = 'https://openid-auth-server.com/'
-        # AUTH_OPENID_REALM_NAME = 'realm-name'
-        # AUTH_OPENID_CLIENT_ID = 'client-id'
-        # AUTH_OPENID_CLIENT_SECRET = 'client-secret'
-
-        def __init__(self):
-            pass
-
-        def __getattr__(self, item):
-            return None
-
-
-    class DevelopmentConfig(Config):
-        pass
-
-
-    class TestConfig(Config):
-        pass
-
-
-    class ProductionConfig(Config):
-        pass
-
-
-    # Default using Config settings, you can write if/else for different env
-    config = DevelopmentConfig()
+    # OTP settings
+    # OTP/MFA 配置
+    # OTP_VALID_WINDOW: 0
+    # OTP_ISSUER_NAME: Jumpserver
 
 **2.8 运行 Jumpserver**
 
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
+    $ ./jms start all -d  # 后台运行使用 -d 参数./jms start all -d
 
     # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
@@ -281,8 +238,6 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **3.1 下载或 Clone 项目**
-
-新开一个终端,别忘了 source /opt/py3/bin/activate
 
 .. code-block:: shell
 
@@ -308,108 +263,72 @@
 
     $ cd /opt/coco
     $ mkdir keys logs
-    $ cp conf_example.py conf.py  # 如果 coco 与 jumpserver 分开部署,请手动修改 conf.py
-    $ vi conf.py
+    $ cp conf_example.yml conf.yml
 
-    # 注意对齐,不要直接复制本文档的内容
+    $ sed -i "s/BOOTSTRAP_TOKEN: <ChangeIT>/BOOTSTRAP_TOSECRET_KEY: $BOOTSTRAP_TOKEN/g" /opt/coco/conf.yml
+    $ sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/coco/conf.yml
 
-**注意: 配置文件是 Python 格式,不要用 TAB,而要用空格**
+    $ vi conf.yml
 
-.. code-block:: python
+.. code-block:: yaml
 
-    #!/usr/bin/env python3
-    # -*- coding: utf-8 -*-
-    #
+    # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
+    # NAME: {{ Hostname }}
 
-    import os
+    # Jumpserver项目的url, api请求注册会使用
+    CORE_HOST: http://127.0.0.1:8080
 
-    BASE_DIR = os.path.dirname(__file__)
+    # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
+    # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
+    BOOTSTRAP_TOKEN: <ChangeIT>
 
+    # 启动时绑定的ip, 默认 0.0.0.0
+    # BIND_HOST: 0.0.0.0
 
-    class Config:
-        """
-        Coco config file, coco also load config from server update setting below
-        """
-        # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-        # NAME = "localhost"
+    # 监听的SSH端口号, 默认2222
+    # SSHD_PORT: 2222
 
-        # Jumpserver项目的url, api请求注册会使用, 如果Jumpserver没有运行在127.0.0.1:8080,请修改此处
-        # CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
-        CORE_HOST = 'http://127.0.0.1:8080'
+    # 监听的HTTP/WS端口号，默认5000
+    # HTTPD_PORT: 5000
 
-        # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
-        # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
-        # BOOTSTRAP_TOKEN = "PleaseChangeMe"
-        BOOTSTRAP_TOKEN = "nwv4RdXpM82LtSvmV"
+    # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
+    # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
+    # ACCESS_KEY: null
 
-        # 启动时绑定的ip, 默认 0.0.0.0
-        # BIND_HOST = '0.0.0.0'
+    # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
+    # ACCESS_KEY_STORE: keys/.access_key
 
-        # 监听的SSH端口号, 默认2222
-        # SSHD_PORT = 2222
+    # 加密密钥
+    # SECRET_KEY: null
 
-        # 监听的HTTP/WS端口号,默认5000
-        # HTTPD_PORT = 5000
+    # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+    LOG_LEVEL: ERROR
 
-        # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
-        # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
-        # ACCESS_KEY = None
+    # 日志存放的目录
+    # LOG_DIR: logs
 
-        # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-        # ACCESS_KEY_STORE = os.path.join(BASE_DIR, 'keys', '.access_key')
+    # SSH白名单
+    # ALLOW_SSH_USER: 'all'
 
-        # 加密密钥
-        # SECRET_KEY = None
+    # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
+    # BLOCK_SSH_USER:
+    #   -
 
-        # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
-        # LOG_LEVEL = 'INFO'
-        LOG_LEVEL = 'ERROR'
+    # 和Jumpserver 保持心跳时间间隔
+    # HEARTBEAT_INTERVAL: 5
 
-        # 日志存放的目录
-        # LOG_DIR = os.path.join(BASE_DIR, 'logs')
+    # Admin的名字，出问题会提示给用户
+    # ADMINS: ''
 
-        # Session录像存放目录
-        # SESSION_DIR = os.path.join(BASE_DIR, 'sessions')
+    # SSH连接超时时间 (default 15 seconds)
+    # SSH_TIMEOUT: 15
 
-        # 资产显示排序方式, ['ip', 'hostname']
-        # ASSET_LIST_SORT_BY = 'ip'
-
-        # 登录是否支持密码认证
-        # PASSWORD_AUTH = True
-
-        # 登录是否支持秘钥认证
-        # PUBLIC_KEY_AUTH = True
-
-        # SSH白名单
-        # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
-
-        # SSH黑名单, 如果用户同时在白名单和黑名单,黑名单优先生效
-        # BLOCK_SSH_USER = []
-
-        # 和Jumpserver 保持心跳时间间隔
-        # HEARTBEAT_INTERVAL = 5
-
-        # Admin的名字,出问题会提示给用户
-        # ADMINS = ''
-        COMMAND_STORAGE = {
-            "TYPE": "server"
-        }
-        REPLAY_STORAGE = {
-            "TYPE": "server"
-        }
-
-        # SSH连接超时时间 (default 15 seconds)
-        # SSH_TIMEOUT = 15
-
-        # 语言 = en
-        LANGUAGE_CODE = 'zh'
-
-
-    config = Config()
+    # 语言 = en
+    # LANGUAGE_CODE: zh
 
 .. code-block:: shell
 
-    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
+    $ ./cocod start -d  # 后台运行使用 -d 参数./cocod start -d
 
     # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
@@ -425,7 +344,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -494,9 +413,9 @@ Guacamole 需要 Tomcat 来运行
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
 
-    # BOOTSTRAP_TOKEN 为 Jumpserver/config.py 里面的 BOOTSTRAP_TOKEN
-    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
-    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
+    # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
+    $ export BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN
+    $ echo "export BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
