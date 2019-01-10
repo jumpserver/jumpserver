@@ -21,7 +21,7 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ vi conf.yml
+    $ vi config.yml
 
     # 调整 log_level
     ...

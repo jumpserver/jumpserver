@@ -135,7 +135,7 @@
       && Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
       && mysql -uroot -e "create database jumpserver default charset 'utf8';grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD';flush privileges;" \
       && sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml \
-      && sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOSECRET_KEY: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml \
+      && sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml \
       && sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml \
       && sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml \
       && sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml \

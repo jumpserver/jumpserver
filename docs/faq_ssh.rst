@@ -81,7 +81,7 @@ SSH 协议资产连接错误排查思路
 
     # 这是因为当前系统的 hostname 有 coco 不支持的字符,需要手动指定 coco 的 NAME
     $ cd /opt/coco/
-    $ vi conf.yml
+    $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
     # NAME = "localhost"

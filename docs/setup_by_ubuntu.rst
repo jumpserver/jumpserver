@@ -128,7 +128,7 @@
     $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16  # 生成随机BOOTSTRAP_TOKEN
 
     $ sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml
-    $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOSECRET_KEY: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
+    $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
     $ sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml
     $ sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml
     $ sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml
@@ -250,8 +250,8 @@
 
     $ cd /opt/coco
     $ mkdir keys logs
-    $ cp conf_example.yml conf.yml
-    $ vim conf.yml
+    $ cp config_example.yml config.yml
+    $ vim config.yml
 
 .. code-block:: yaml
 

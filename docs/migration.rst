@@ -53,7 +53,7 @@
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ vi conf.yml
+    $ vi config.yml
     # 把数据库和 redis 信息修改并保存
 
 4. 启动 jumpserver

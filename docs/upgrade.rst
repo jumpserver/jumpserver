@@ -384,9 +384,9 @@
     $ ./cocod stop
     $ mv conf.py conf.bak
 
-    # 更新 conf.yml ,请根据你原备份的 conf.yml 内容进行修改
-    $ cp conf_example.yml conf.yml
-    $ vi conf.yml
+    # 更新 config.yml ,请根据你原备份的 conf.bak 内容进行修改
+    $ cp config_example.yml config.yml
+    $ vi config.yml
 
 .. code-block:: vim
 
@@ -614,9 +614,9 @@
     $ ./cocod stop
     $ mv conf.py conf.bak
 
-    # 更新 conf.yml ,请根据你原备份的 conf.bak 内容进行修改
-    $ cp conf_example.yml conf.yml
-    $ vi conf.yml
+    # 更新 config.yml ,请根据你原备份的 conf.bak 内容进行修改
+    $ cp config_example.yml config.yml
+    $ vi config.yml
 
 .. code-block:: vim
 
@@ -844,9 +844,9 @@
     $ ./cocod stop
     $ mv conf.py conf.bak
 
-    # 更新 conf.yml ,请根据你原备份的 conf.yml 内容进行修改
-    $ cp conf_example.yml conf.yml
-    $ vi conf.yml
+    # 更新 config.yml ,请根据你原备份的 config.yml 内容进行修改
+    $ cp config_example.yml config.yml
+    $ vi config.yml
 
 .. code-block:: vim
 

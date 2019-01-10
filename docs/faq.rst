@@ -83,7 +83,7 @@ FAQ
 
 .. code-block:: shell
 
-    $ vi /opt/coco/conf.yml
+    $ vi /opt/coco/config.yml
 
     # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
     SSH_TIMEOUT = 60

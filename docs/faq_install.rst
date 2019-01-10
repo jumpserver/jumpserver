@@ -127,7 +127,7 @@
 
     这是因为当前系统的 hostname 有 coco 不支持的字符,需要手动指定 coco 的 NAME
     $ cd /opt/coco/
-    $ vi conf.yml
+    $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
     # NAME = "localhost"
@@ -149,8 +149,8 @@
 
 .. code-block:: vim
 
-    # 这是因为 coco 无法连接到 jumpserver 报的错误,确定 http://xxxx:8080 设置正确(配置文件 coco/conf.yml)
-    # 如果 jumpserver 的IP和端口不对,请手动修改 conf.yml 的 CORE_HOST
+    # 这是因为 coco 无法连接到 jumpserver 报的错误,确定 http://xxxx:8080 设置正确(配置文件 coco/config.yml)
+    # 如果 jumpserver 的IP和端口不对,请手动修改 config.yml 的 CORE_HOST
 
 18. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
 
