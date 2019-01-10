@@ -61,8 +61,9 @@ class Terminal(models.Model):
     def config(self):
         configs = {}
         for k in dir(settings):
-            if k.startswith('TERMINAL'):
-                configs[k] = getattr(settings, k)
+            if not k.startswith('TERMINAL'):
+                continue
+            configs[k] = getattr(settings, k)
         configs.update(self.get_common_storage())
         configs.update(self.get_replay_storage())
         configs.update({
