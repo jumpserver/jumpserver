@@ -2989,7 +2989,7 @@ msgstr "一个月内历史汇总"
 
 #: templates/index.html:277 templates/index.html:301
 msgid "Login count"
-msgstr "登陆次数"
+msgstr "登录次数"
 
 #: templates/index.html:277 templates/index.html:308
 msgid "Active users"
@@ -3009,7 +3009,7 @@ msgstr "禁用用户"
 
 #: templates/index.html:342 templates/index.html:394
 msgid "Month not logged in user"
-msgstr "月未登陆用户"
+msgstr "月未登录用户"
 
 #: templates/index.html:368 templates/index.html:444
 msgid "Access to the source"
@@ -3017,7 +3017,7 @@ msgstr "访问来源"
 
 #: templates/index.html:418 templates/index.html:468
 msgid "Month is logged into the host"
-msgstr "月被登陆主机"
+msgstr "月被登录主机"
 
 #: templates/index.html:418 templates/index.html:469
 msgid "Disable host"
@@ -3025,7 +3025,7 @@ msgstr "禁用主机"
 
 #: templates/index.html:418 templates/index.html:470
 msgid "Month not logged on host"
-msgstr "月未登陆主机"
+msgstr "月未登录主机"
 
 #: templates/rest_framework/base.html:128
 msgid "Filters"
@@ -3583,7 +3583,7 @@ msgstr "更新ssh密钥"
 #: users/templates/users/first_login.html:19
 #: users/templates/users/first_login_done.html:19
 msgid "First Login"
-msgstr "首次登陆"
+msgstr "首次登录"
 
 #: users/templates/users/first_login.html:72
 msgid "I agree with the terms and conditions."
@@ -4326,7 +4326,7 @@ msgstr "* 您的密码不符合要求"
 
 #: users/views/login.py:349
 msgid "First login"
-msgstr "首次登陆"
+msgstr "首次登录"
 
 #: users/views/user.py:145
 msgid "Bulk update user success"
