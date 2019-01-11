@@ -28,6 +28,7 @@ def monkey_patch_settings(sender, **kwargs):
     uncached_settings = [
         'CACHES', 'DEBUG', 'SECRET_KEY', 'INSTALLED_APPS',
         'ROOT_URLCONF', 'TEMPLATES', 'DATABASES', '_wrapped',
+        'CELERY_LOG_DIR'
     ]
 
     def monkey_patch_getattr(self, name):

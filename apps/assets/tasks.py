@@ -1,15 +1,15 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import re
-import time
 import os
 
 from celery import shared_task
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
-from common.utils import capacity_convert, \
-    sum_capacity, encrypt_password, get_logger
+from common.utils import (
+    capacity_convert, sum_capacity, encrypt_password, get_logger
+)
 from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
@@ -134,7 +134,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
 @shared_task
 def update_asset_hardware_info_manual(asset):
     task_name = _("Update asset hardware info: {}").format(asset.hostname)
-    return update_assets_hardware_info_util(
+    update_assets_hardware_info_util(
         [asset], task_name=task_name
     )
 
@@ -153,7 +153,7 @@ def update_assets_hardware_info_period():
 ##  ADMIN USER CONNECTIVE  ##
 
 
-@shared_task
+# @shared_task
 def test_asset_connectivity_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 

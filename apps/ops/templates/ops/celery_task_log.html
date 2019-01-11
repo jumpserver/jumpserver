@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 <head>
-    <title>term.js</title>
+    <title>{% trans 'Task log' %}</title>
     <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
@@ -15,14 +16,14 @@
         }
     </style>
 </head>
-    <div id="term" style="height: 100%;width: 100%">
-    </div>
+<div id="term" style="height: 100%;width: 100%">
+</div>
 
 <script>
     var rowHeight = 18;
     var colWidth = 10;
     var mark = '';
-    var url = "{% url 'api-ops:celery-task-log' pk=object.id %}";
+    var url = "{% url 'api-ops:celery-task-log' pk=task_id %}";
     var term;
     var end = false;
     var error = false;
@@ -35,9 +36,9 @@
         {#colWidth = 1.00 * t.width() / 6;#}
     }
     function resize() {
-       var rows = Math.floor(window.innerHeight / rowHeight) - 1;
-       var cols = Math.floor(window.innerWidth / colWidth) - 2;
-       term.resize(cols, rows);
+       {#var rows = Math.floor(window.innerHeight / rowHeight) - 1;#}
+       {#var cols = Math.floor(window.innerWidth / colWidth) - 2;#}
+       {#term.resize(cols, rows);#}
     }
     function requestAndWrite() {
         if (!end && success) {
@@ -73,7 +74,7 @@
             disableStdin: true
         });
         term.open(document.getElementById('term'));
-        term.resize(80, 24);
+        term.resize(90, 32);
         resize();
         term.on('data', function (data) {
             {#term.write(data.replace('\r', '\r\n'))#}
