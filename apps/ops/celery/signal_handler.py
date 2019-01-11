@@ -5,46 +5,43 @@ import datetime
 import sys
 import time
 
-from django.conf import settings
 from django.utils import timezone
 from django.core.cache import cache
 from django.db import transaction
 from celery import subtask
-from celery.signals import worker_ready, worker_shutdown, task_prerun, \
+from celery.signals import (
+    worker_ready, worker_shutdown, task_prerun,
     task_postrun, after_task_publish
+)
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, TeeObj, get_object_or_none
-from common.const import celery_task_pre_key
-from .utils import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
+from .decorator import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
 from ..models import CeleryTask
 
 logger = get_logger(__file__)
 
 
 @worker_ready.connect
-def on_app_ready(sender=None, headers=None, body=None, **kwargs):
+def on_app_ready(sender=None, headers=None, **kwargs):
     if cache.get("CELERY_APP_READY", 0) == 1:
         return
     cache.set("CELERY_APP_READY", 1, 10)
     tasks = get_after_app_ready_tasks()
-    logger.debug("Start need start task: [{}]".format(
-        ", ".join(tasks))
-    )
+    logger.debug("Work ready signal recv")
+    logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
     for task in tasks:
         subtask(task).delay()
 
 
 @worker_shutdown.connect
-def after_app_shutdown(sender=None, headers=None, body=None, **kwargs):
+def after_app_shutdown_periodic_tasks(sender=None, **kwargs):
     if cache.get("CELERY_APP_SHUTDOWN", 0) == 1:
         return
     cache.set("CELERY_APP_SHUTDOWN", 1, 10)
     tasks = get_after_app_shutdown_clean_tasks()
-    logger.debug("App shutdown signal recv")
-    logger.debug("Clean need cleaned period tasks: [{}]".format(
-        ', '.join(tasks))
-    )
+    logger.debug("Worker shutdown signal recv")
+    logger.debug("Clean period tasks: [{}]".format(', '.join(tasks)))
     PeriodicTask.objects.filter(name__in=tasks).delete()
 
 

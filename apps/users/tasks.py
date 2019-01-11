@@ -3,10 +3,8 @@
 
 from celery import shared_task
 
-from ops.celery.utils import (
-    create_or_update_celery_periodic_tasks,
-    after_app_ready_start
-)
+from ops.celery.utils import create_or_update_celery_periodic_tasks
+from ops.celery.decorator import after_app_ready_start
 from .models import User
 from common.utils import get_logger
 from .utils import write_login_log, send_password_expiration_reminder_mail
