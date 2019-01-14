@@ -6,7 +6,7 @@ RUN useradd jumpserver
 
 COPY ./requirements /tmp/requirements
 
-RUN yum -y install epel-release && cd /tmp/requirements && \
+RUN yum -y install epel-release openldap-clients telnet && cd /tmp/requirements && \
     yum -y install $(cat rpm_requirements.txt)
 
 RUN cd /tmp/requirements &&  pip install -r requirements.txt
