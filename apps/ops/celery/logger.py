@@ -100,6 +100,9 @@ class CeleryTaskLoggerHandler(StreamHandler):
     def on_start_end(self, sender, task_id, **kwargs):
         return self.handle_task_end(task_id)
 
+    def after_task_publish(self, sender, body, **kwargs):
+        pass
+
     def emit(self, record):
         task_id = self.get_current_task_id()
         if not task_id:
@@ -135,41 +138,23 @@ class CeleryTaskMQLoggerHandler(CeleryTaskLoggerHandler):
 
 class CeleryTaskFileHandler(CeleryTaskLoggerHandler):
     def __init__(self):
-        self.files = {}
+        self.f = None
         super().__init__(stream=None)
 
-    def get_file(self, task_id, auto_create=True):
-        f = self.files.get(task_id)
-        if not f and auto_create:
-            f = self.create_task_log_f(task_id)
-            self.files[task_id] = f
-        return f
-
-    def create_task_log_f(self, task_id):
-        log_path = get_celery_task_log_path(task_id)
-        f = open(log_path, 'a')
-        self.files[task_id] = f
-        return f
-
-    def write_task_log(self, task_id, record):
+    def emit(self, record):
         msg = self.format(record)
-        f2 = open('/tmp/abc.log', 'a')
-        f2.write(msg)
-        f = self.get_file(task_id)
-        f.write(msg)
-        f.write(self.terminator)
-        f.flush()
+        if not self.f:
+            return
+        self.f.write(msg)
+        self.f.write(self.terminator)
+        self.flush()
 
     def flush(self):
-        task_id = self.get_current_task_id()
-        f = self.get_file(task_id, auto_create=False)
-        if f:
-            f.flush()
+        self.f and self.f.flush()
 
     def handle_task_start(self, task_id):
-        self.create_task_log_f(task_id)
+        log_path = get_celery_task_log_path(task_id)
+        self.f = open(log_path, 'a')
 
     def handle_task_end(self, task_id):
-        f = self.files.pop(task_id, None)
-        if f and not f.closed:
-            f.close()
+        self.f and self.f.close()

@@ -153,7 +153,7 @@ def update_assets_hardware_info_period():
 ##  ADMIN USER CONNECTIVE  ##
 
 
-# @shared_task
+@shared_task
 def test_asset_connectivity_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 

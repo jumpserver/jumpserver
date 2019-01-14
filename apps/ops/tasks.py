@@ -83,11 +83,9 @@ def create_or_update_registered_periodic_tasks():
 
 @shared_task
 def hello(name, callback=None):
-    print("Hello {}".format(name))
     import time
     time.sleep(10)
-    if callback is not None:
-        subtask(callback).delay("Guahongwei")
+    print("Hello {}".format(name))
 
 
 @shared_task
