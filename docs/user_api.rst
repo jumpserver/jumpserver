@@ -39,7 +39,7 @@ API 文档
 
     def get_token():
 
-        url = 'https://jumpserver.tk/api/users/v1/auth/'
+        url = 'https://demo.jumpserver.org/api/users/v1/auth/'
 
         query_args = {
             "username": "admin",
@@ -48,11 +48,11 @@ API 文档
 
         response = requests.post(url, data=query_args)
 
-        return json.loads(response.text)['Token']
+        return json.loads(response.text)['token']
 
     def get_user_info():
 
-        url = 'https://jumpserver.tk/api/users/v1/users/'
+        url = 'https://demo.jumpserver.org/api/users/v1/users/'
 
         token = get_token()
 
