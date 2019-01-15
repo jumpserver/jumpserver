@@ -478,7 +478,7 @@ jumpserver.initServerSideDataTable = function (options) {
             url: options.ajax_url ,
             data: function (data) {
                 delete data.columns;
-                if (data.length !== null ){
+                if (data.length !== null){
                     data.limit = data.length;
                     delete data.length;
                 }
@@ -525,7 +525,7 @@ jumpserver.initServerSideDataTable = function (options) {
         columns: options.columns || [],
         select: options.select || select,
         language: jumpserver.language,
-        lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
+        lengthMenu: [[15, 25, 50, 9999], [15, 25, 50, 'All']]
     });
     table.selected = [];
     table.selected_rows = [];

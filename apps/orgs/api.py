@@ -66,3 +66,4 @@ class OrgMembershipUsersViewSet(OrgMembershipModelViewSetMixin, BulkModelViewSet
     serializer_class = OrgMembershipUserSerializer
     membership_class = Organization.users.through
     permission_classes = (IsSuperUserOrAppUser, )
+

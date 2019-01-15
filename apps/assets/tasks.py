@@ -229,7 +229,8 @@ def test_admin_user_connectivity_period():
 @shared_task
 def test_admin_user_connectivity_manual(admin_user):
     task_name = _("Test admin user connectivity: {}").format(admin_user.name)
-    return test_admin_user_connectivity_util(admin_user, task_name)
+    test_admin_user_connectivity_util(admin_user, task_name)
+    return True
 
 
 ##  System user connective ##

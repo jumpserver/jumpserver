@@ -28,18 +28,12 @@ class AssetPermissionListSerializer(serializers.ModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
-    inherit = serializers.SerializerMethodField()
+    is_valid = serializers.BooleanField()
+    is_expired = serializers.BooleanField()
 
     class Meta:
         model = AssetPermission
         fields = '__all__'
-
-    @staticmethod
-    def get_inherit(obj):
-        if hasattr(obj, 'inherit'):
-            return obj.inherit
-        else:
-            return None
 
 
 class AssetPermissionUpdateUserSerializer(serializers.ModelSerializer):
