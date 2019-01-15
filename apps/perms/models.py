@@ -52,8 +52,14 @@ class AssetPermission(OrgModelMixin):
         return str(self.id)
 
     @property
+    def is_expired(self):
+        if self.date_expired > timezone.now() > self.date_start:
+            return False
+        return True
+
+    @property
     def is_valid(self):
-        if self.date_expired > timezone.now() > self.date_start and self.is_active:
+        if not self.is_expired and self.is_active:
             return True
         return False
 
