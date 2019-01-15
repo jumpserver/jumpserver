@@ -113,6 +113,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     """
     queryset = Asset.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.TaskIDSerializer
 
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
@@ -124,6 +125,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
 class AssetGatewayApi(generics.RetrieveAPIView):
     queryset = Asset.objects.all()
     permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.GatewayWithAuthSerializer
 
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')

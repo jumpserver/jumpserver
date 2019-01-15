@@ -1,7 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 import datetime
 
+from django.db import transaction
 from django.utils import timezone
+from django.db.utils import OperationalError
 
 from .base import CommandBase
 
@@ -35,7 +37,25 @@ class CommandStore(CommandBase):
                 input=c["input"], output=c["output"], session=c["session"],
                 org_id=c["org_id"], timestamp=c["timestamp"]
             ))
-        return self.model.objects.bulk_create(_commands)
+        error = False
+        try:
+            with transaction.atomic():
+                self.model.objects.bulk_create(_commands)
+        except OperationalError:
+            error = True
+        except:
+            return False
+
+        if not error:
+            return True
+        for command in _commands:
+            try:
+                with transaction.atomic():
+                    command.save()
+            except OperationalError:
+                command.output = str(command.output.encode())
+                command.save()
+        return True
 
     @staticmethod
     def make_filter_kwargs(

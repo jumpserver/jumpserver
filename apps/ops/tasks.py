@@ -5,7 +5,11 @@ from celery import shared_task, subtask
 from django.utils import timezone
 
 from common.utils import get_logger, get_object_or_none
-from .celery.utils import register_as_period_task, after_app_shutdown_clean
+from .celery.decorator import (
+    register_as_period_task, after_app_shutdown_clean_periodic,
+    after_app_ready_start
+)
+from .celery.utils import create_or_update_celery_periodic_tasks
 from .models import Task, CommandExecution, CeleryTask
 
 logger = get_logger(__file__)
@@ -39,8 +43,8 @@ def run_command_execution(cid, **kwargs):
 
 
 @shared_task
+@after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24)
-@after_app_shutdown_clean
 def clean_tasks_adhoc_period():
     logger.debug("Start clean task adhoc and run history")
     tasks = Task.objects.all()
@@ -52,8 +56,8 @@ def clean_tasks_adhoc_period():
 
 
 @shared_task
+@after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24)
-@after_app_shutdown_clean
 def clean_celery_tasks_period():
     logger.debug("Start clean celery task history")
     one_month_ago = timezone.now() - timezone.timedelta(days=30)
@@ -70,10 +74,18 @@ def clean_celery_tasks_period():
 
 
 @shared_task
+@after_app_ready_start
+def create_or_update_registered_periodic_tasks():
+    from .celery.decorator import get_register_period_tasks
+    for task in get_register_period_tasks():
+        create_or_update_celery_periodic_tasks(task)
+
+
+@shared_task
 def hello(name, callback=None):
+    import time
+    time.sleep(10)
     print("Hello {}".format(name))
-    if callback is not None:
-        subtask(callback).delay("Guahongwei")
 
 
 @shared_task

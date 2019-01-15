@@ -10,6 +10,5 @@ class OpsConfig(AppConfig):
         from orgs.models import Organization
         from orgs.utils import set_current_org
         set_current_org(Organization.root())
-
-        super().ready()
         from .celery import signal_handler
+        super().ready()

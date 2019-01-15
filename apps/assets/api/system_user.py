@@ -117,6 +117,7 @@ class SystemUserAssetsListView(generics.ListAPIView):
 class SystemUserPushToAssetApi(generics.RetrieveAPIView):
     queryset = SystemUser.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.TaskIDSerializer
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
@@ -129,6 +130,7 @@ class SystemUserPushToAssetApi(generics.RetrieveAPIView):
 class SystemUserTestAssetConnectivityApi(generics.RetrieveAPIView):
     queryset = SystemUser.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.TaskIDSerializer
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()

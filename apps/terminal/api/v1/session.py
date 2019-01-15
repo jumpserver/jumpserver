@@ -33,16 +33,19 @@ class SessionViewSet(BulkModelViewSet):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.session_set.all()
-        return self.queryset.all()
+            queryset = queryset.filter(terminal=terminal)
+            return queryset
+        return queryset
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
             serializer.validated_data["terminal"] = self.request.user.terminal
         sid = serializer.validated_data["system_user"]
+        # guacamole提交的是id
         if is_uuid(sid):
             _system_user = SystemUser.get_system_user_by_id_or_cached(sid)
             if _system_user:

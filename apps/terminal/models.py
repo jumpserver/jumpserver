@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.core.cache import cache
 
 from users.models import User
 from orgs.mixins import OrgModelMixin
@@ -153,6 +154,7 @@ class Session(OrgModelMixin):
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
     upload_to = 'replay'
+    ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
 
     def get_rel_replay_path(self, version=2):
         """
@@ -181,6 +183,17 @@ class Session(OrgModelMixin):
             return name, None
         except OSError as e:
             return None, e
+
+    @classmethod
+    def set_active_sessions(cls, sessions_id):
+        data = {cls.ACTIVE_CACHE_KEY_PREFIX.format(i): i for i in sessions_id}
+        cache.set_many(data, timeout=5*60)
+
+    def is_active(self):
+        if self.protocol in ['ssh', 'telnet']:
+            key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
+            return bool(cache.get(key))
+        return True
 
     class Meta:
         db_table = "terminal_session"
