@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from ..models import User, AccessKey
 
@@ -12,7 +13,7 @@ class AccessKeySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'secret']
 
 
-class ServiceAccountRegistrationSerializer(serializers.ModelSerializer):
+class ServiceAccountSerializer(serializers.ModelSerializer):
     access_key = AccessKeySerializer(read_only=True)
 
     class Meta:
@@ -30,15 +31,22 @@ class ServiceAccountRegistrationSerializer(serializers.ModelSerializer):
     def validate_name(self, name):
         email = self.get_email()
         username = self.get_username()
-        if User.objects.filter(email=email) or \
-                User.objects.filter(username=username):
-            raise serializers.ValidationError('name not unique', code='unique')
+        if self.instance:
+            users = User.objects.exclude(id=self.instance.id)
+        else:
+            users = User.objects.all()
+        if users.filter(email=email) or \
+                users.filter(username=username):
+            raise serializers.ValidationError(_('name not unique'), code='unique')
         return name
 
+    def save(self, **kwargs):
+        self.validated_data['email'] = self.get_email()
+        self.validated_data['username'] = self.get_username()
+        self.validated_data['role'] = User.ROLE_APP
+        return super().save(**kwargs)
+
     def create(self, validated_data):
-        validated_data['email'] = self.get_email()
-        validated_data['username'] = self.get_username()
-        validated_data['role'] = User.ROLE_APP
         instance = super().create(validated_data)
         instance.create_access_key()
         return instance

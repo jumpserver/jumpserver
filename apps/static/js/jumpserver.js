@@ -161,6 +161,58 @@ function activeNav() {
     }
 }
 
+function formSubmit(props) {
+    /*
+    {
+      "form": $("form"),
+      "url": "",
+      "method": "POST",
+      "redirect_to": "",
+      "success": function(data, textStatue, jqXHR){},
+      "error": function(jqXHR, textStatus, errorThrown) {}
+    }
+    */
+    props = props || {};
+    var data = props.data || props.form.serializeObject();
+    var redirect_to = props.redirect_to;
+    $.ajax({
+        url: props.url,
+        type: props.method || 'POST',
+        data: JSON.stringify(data),
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json"
+    }).done(function (data, textState, jqXHR) {
+        if (redirect_to) {
+            location.href = redirect_to;
+        } else if (typeof props.success === 'function') {
+            return props.success(data, textState, jqXHR);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status === 400) {
+            var errors = jqXHR.responseJSON;
+            console.log(errors);
+            $.each(errors, function (k, v) {
+                console.log(k, v);
+                var field = props.form.find('input[name="' + k + '"]');
+                var form_group = field.parents('.form-group');
+                var parent = field.parent();
+                var help_block = parent.children('.help-block');
+                if (help_block.length === 0) {
+                    parent.append('<div class="help-block"></div>');
+                    help_block = parent.children('.help-block');
+                }
+                if (field.length === 1 && form_group.length === 1) {
+                    form_group.addClass('has-error');
+                    var ori_help_msg = help_block.html();
+                    var new_help_msg = v.join("<br/>") + ori_help_msg;
+                    help_block.html(new_help_msg);
+                }
+            })
+        }
+
+    })
+}
+
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
@@ -195,9 +247,6 @@ function APIUpdateAttr(props) {
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
             var msg = "";
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
             if (user_fail_message) {
                 msg = user_fail_message;
             } else if (jqXHR.responseJSON) {
@@ -213,6 +262,7 @@ function APIUpdateAttr(props) {
             toastr.error(msg);
         }
         if (typeof props.error === 'function') {
+            console.log(jqXHR);
             return props.error(jqXHR.responseText, jqXHR.status);
         }
     });

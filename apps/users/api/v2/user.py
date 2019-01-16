@@ -7,6 +7,6 @@ from ...serializers import v2 as serializers
 
 
 class ServiceAccountRegistrationViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.ServiceAccountRegistrationSerializer
+    serializer_class = serializers.ServiceAccountSerializer
     permission_classes = (WithBootstrapToken,)
     http_method_names = ['post']
