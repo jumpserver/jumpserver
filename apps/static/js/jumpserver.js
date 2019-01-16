@@ -192,7 +192,6 @@ function formSubmit(props) {
             var errors = jqXHR.responseJSON;
             console.log(errors);
             $.each(errors, function (k, v) {
-                console.log(k, v);
                 var field = props.form.find('input[name="' + k + '"]');
                 var form_group = field.parents('.form-group');
                 var parent = field.parent();
