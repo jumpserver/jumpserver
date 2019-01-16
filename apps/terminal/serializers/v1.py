@@ -31,8 +31,6 @@ class TerminalSerializer(serializers.ModelSerializer):
         return cache.get(key)
 
 
-
-
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     command_amount = serializers.SerializerMethodField()
     command_store = get_multi_command_storage()

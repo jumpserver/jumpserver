@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-15 17:56+0800\n"
+"POT-Creation-Date: 2019-01-16 17:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -67,8 +67,8 @@ msgstr "网域"
 #: assets/templates/assets/asset_update.html:35 perms/forms.py:45
 #: perms/forms.py:52 perms/models.py:85
 #: perms/templates/perms/asset_permission_list.html:57
-#: perms/templates/perms/asset_permission_list.html:77
-#: perms/templates/perms/asset_permission_list.html:126
+#: perms/templates/perms/asset_permission_list.html:78
+#: perms/templates/perms/asset_permission_list.html:128
 #: xpack/plugins/cloud/models.py:123
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:63
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:66
@@ -119,7 +119,7 @@ msgstr "端口"
 #: perms/models.py:31
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:56
-#: perms/templates/perms/asset_permission_list.html:123
+#: perms/templates/perms/asset_permission_list.html:125
 #: terminal/backends/command/models.py:13 terminal/models.py:143
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
@@ -185,7 +185,7 @@ msgstr "名称"
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:30
 #: audits/templates/audits/login_log_list.html:49
-#: perms/templates/perms/asset_permission_list.html:76
+#: perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:77 users/models/user.py:53
 #: users/templates/users/_select_user_modal.html:14
@@ -277,7 +277,7 @@ msgstr "IP"
 #: assets/templates/assets/user_asset_list.html:45
 #: assets/templates/assets/user_asset_list.html:150 common/forms.py:130
 #: perms/templates/perms/asset_permission_asset.html:54
-#: perms/templates/perms/asset_permission_list.html:75
+#: perms/templates/perms/asset_permission_list.html:77
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
 msgid "Hostname"
@@ -637,7 +637,7 @@ msgstr "默认资产组"
 #: perms/models.py:29
 #: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:54
-#: perms/templates/perms/asset_permission_list.html:117 templates/index.html:87
+#: perms/templates/perms/asset_permission_list.html:119 templates/index.html:87
 #: terminal/backends/command/models.py:12 terminal/models.py:142
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
@@ -724,7 +724,8 @@ msgstr "登录模式"
 #: perms/models.py:33 perms/models.py:87
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:58
-#: perms/templates/perms/asset_permission_list.html:129 templates/_nav.html:25
+#: perms/templates/perms/asset_permission_list.html:79
+#: perms/templates/perms/asset_permission_list.html:131 templates/_nav.html:25
 #: terminal/backends/command/models.py:14 terminal/models.py:144
 #: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/command_list.html:74
@@ -884,7 +885,7 @@ msgstr "自动生成密钥"
 #: assets/templates/assets/asset_update.html:64
 #: assets/templates/assets/gateway_create_update.html:53
 #: perms/templates/perms/asset_permission_create_update.html:50
-#: terminal/templates/terminal/terminal_update.html:42
+#: terminal/templates/terminal/terminal_update.html:40
 msgid "Other"
 msgstr "其它"
 
@@ -906,7 +907,7 @@ msgstr "其它"
 #: common/templates/common/security_setting.html:70
 #: common/templates/common/terminal_setting.html:68
 #: perms/templates/perms/asset_permission_create_update.html:80
-#: terminal/templates/terminal/terminal_update.html:47
+#: terminal/templates/terminal/terminal_update.html:45
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_detail.html:176
@@ -941,7 +942,7 @@ msgstr "重置"
 #: perms/templates/perms/asset_permission_create_update.html:81
 #: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:127
-#: terminal/templates/terminal/terminal_update.html:48
+#: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
 #: users/templates/users/forgot_password.html:45
 #: users/templates/users/user_bulk_update.html:24
@@ -1025,7 +1026,7 @@ msgstr "测试"
 #: assets/templates/assets/system_user_detail.html:26
 #: assets/templates/assets/system_user_list.html:92 audits/models.py:32
 #: perms/templates/perms/asset_permission_detail.html:30
-#: perms/templates/perms/asset_permission_list.html:175
+#: perms/templates/perms/asset_permission_list.html:177
 #: terminal/templates/terminal/terminal_detail.html:16
 #: terminal/templates/terminal/terminal_list.html:71
 #: users/templates/users/user_detail.html:25
@@ -1060,7 +1061,7 @@ msgstr "更新"
 #: common/templates/common/terminal_setting.html:112
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_detail.html:34
-#: perms/templates/perms/asset_permission_list.html:176
+#: perms/templates/perms/asset_permission_list.html:178
 #: terminal/templates/terminal/terminal_list.html:73
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
@@ -1173,7 +1174,6 @@ msgstr "快速修改"
 #: perms/models.py:88
 #: perms/templates/perms/asset_permission_create_update.html:52
 #: perms/templates/perms/asset_permission_detail.html:120
-#: perms/templates/perms/asset_permission_list.html:73
 #: terminal/templates/terminal/terminal_list.html:34
 #: users/templates/users/_select_user_modal.html:18
 #: users/templates/users/user_detail.html:144
@@ -2572,7 +2572,8 @@ msgstr "组织管理"
 
 #: perms/forms.py:39 perms/models.py:30 perms/models.py:86
 #: perms/templates/perms/asset_permission_list.html:55
-#: perms/templates/perms/asset_permission_list.html:120 templates/_nav.html:14
+#: perms/templates/perms/asset_permission_list.html:75
+#: perms/templates/perms/asset_permission_list.html:122 templates/_nav.html:14
 #: users/forms.py:273 users/models/group.py:26 users/models/user.py:61
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
@@ -2658,6 +2659,7 @@ msgid "Create permission"
 msgstr "创建授权规则"
 
 #: perms/templates/perms/asset_permission_list.html:59
+#: perms/templates/perms/asset_permission_list.html:73
 #: users/templates/users/user_list.html:28 xpack/plugins/cloud/models.py:53
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:60
 #: xpack/plugins/cloud/templates/cloud/account_list.html:14
@@ -3544,6 +3546,10 @@ msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 #: users/models/user.py:440
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
+
+#: users/serializers/v2.py:40
+msgid "name not unique"
+msgstr "名称重复"
 
 #: users/templates/users/_base_otp.html:27
 msgid "Home page"

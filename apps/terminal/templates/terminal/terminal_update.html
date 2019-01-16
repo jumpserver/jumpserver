@@ -33,8 +33,6 @@
                             <h3>{% trans 'Info' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.remote_addr layout="horizontal" %}
-{#                            {% bootstrap_field form.ssh_port layout="horizontal" %}#}
-{#                            {% bootstrap_field form.http_port layout="horizontal" %}#}
                             {% bootstrap_field form.command_storage layout="horizontal" %}
                             {% bootstrap_field form.replay_storage layout="horizontal" %}
 
@@ -60,14 +58,14 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
-
-            $('.input-group.date').datepicker({
-                format: "yyyy-mm-dd",
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true
+        }).on('submit', 'form', function (e) {
+            e.preventDefault();
+            var form = $('form');
+            formSubmit({
+                'url': '{% url 'api-terminal-v2:terminal-detail' pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}',  '{{ object.id }}'),
+                'form': form,
+                'method': 'PUT',
+                'redirect_to': '{% url "terminal:terminal-list" %}'
             });
         })
     </script>
