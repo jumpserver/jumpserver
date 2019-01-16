@@ -188,25 +188,55 @@ function formSubmit(props) {
             return props.success(data, textState, jqXHR);
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
+        if (typeof props.error === 'function') {
+            return props.error(jqXHR, textStatus, errorThrown)
+        }
+        if (!props.form) {
+            alert(jqXHR.responseText);
+            return
+        }
         if (jqXHR.status === 400) {
             var errors = jqXHR.responseJSON;
-            console.log(errors);
+            var noneFieldErrorRef = props.form.children('.alert-danger');
+            if (noneFieldErrorRef.length !== 1) {
+                props.form.prepend('<div class="alert alert-danger" style="display: none"></div>');
+                noneFieldErrorRef = props.form.children('.alert-danger');
+            }
+            var noneFieldErrorMsg = "";
+            noneFieldErrorRef.css("display", "none");
+            noneFieldErrorRef.html("");
+            props.form.find(".help-block.error").html("");
+            props.form.find(".form-group.has-error").removeClass("has-error");
+
+            if (typeof errors !== "object") {
+                noneFieldErrorMsg = errors;
+                if (noneFieldErrorRef.length === 1) {
+                    noneFieldErrorRef.css('display', 'block');
+                    noneFieldErrorRef.html(noneFieldErrorMsg);
+                }
+                return
+            }
             $.each(errors, function (k, v) {
-                var field = props.form.find('input[name="' + k + '"]');
-                var form_group = field.parents('.form-group');
-                var parent = field.parent();
-                var help_block = parent.children('.help-block');
-                if (help_block.length === 0) {
-                    parent.append('<div class="help-block"></div>');
-                    help_block = parent.children('.help-block');
+                var fieldRef = props.form.find('input[name="' + k + '"]');
+                var formGroupRef = fieldRef.parents('.form-group');
+                var parentRef = fieldRef.parent();
+                var helpBlockRef = parentRef.children('.help-block.error');
+                if (helpBlockRef.length === 0) {
+                    parentRef.append('<div class="help-block error"></div>');
+                    helpBlockRef = parentRef.children('.help-block.error');
                 }
-                if (field.length === 1 && form_group.length === 1) {
-                    form_group.addClass('has-error');
-                    var ori_help_msg = help_block.html();
-                    var new_help_msg = v.join("<br/>") + ori_help_msg;
-                    help_block.html(new_help_msg);
+                if (fieldRef.length === 1 && formGroupRef.length === 1) {
+                    formGroupRef.addClass('has-error');
+                    var help_msg = v.join("<br/>") ;
+                    helpBlockRef.html(help_msg);
+                } else {
+                    noneFieldErrorMsg += v + '<br/>';
                 }
-            })
+            });
+            if (noneFieldErrorRef.length === 1 && noneFieldErrorMsg !== '') {
+                noneFieldErrorRef.css('display', 'block');
+                noneFieldErrorRef.html(noneFieldErrorMsg);
+            }
         }
 
     })

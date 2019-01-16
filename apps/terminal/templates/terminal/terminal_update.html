@@ -30,8 +30,6 @@
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
                             {% csrf_token %}
-                             <div class="alert alert-danger" style="display: none">
-                             </div>
                             <h3>{% trans 'Info' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.remote_addr layout="horizontal" %}
