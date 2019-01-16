@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 16:26+0800\n"
+"POT-Creation-Date: 2019-01-16 17:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -885,7 +885,7 @@ msgstr "自动生成密钥"
 #: assets/templates/assets/asset_update.html:64
 #: assets/templates/assets/gateway_create_update.html:53
 #: perms/templates/perms/asset_permission_create_update.html:50
-#: terminal/templates/terminal/terminal_update.html:42
+#: terminal/templates/terminal/terminal_update.html:40
 msgid "Other"
 msgstr "其它"
 
@@ -907,7 +907,7 @@ msgstr "其它"
 #: common/templates/common/security_setting.html:70
 #: common/templates/common/terminal_setting.html:68
 #: perms/templates/perms/asset_permission_create_update.html:80
-#: terminal/templates/terminal/terminal_update.html:47
+#: terminal/templates/terminal/terminal_update.html:45
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_detail.html:176
@@ -942,7 +942,7 @@ msgstr "重置"
 #: perms/templates/perms/asset_permission_create_update.html:81
 #: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:127
-#: terminal/templates/terminal/terminal_update.html:48
+#: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
 #: users/templates/users/forgot_password.html:45
 #: users/templates/users/user_bulk_update.html:24
@@ -3225,7 +3225,7 @@ msgstr "拒绝"
 msgid "Accept terminal registration"
 msgstr "接受终端注册"
 
-#: terminal/templates/terminal/terminal_update.html:35
+#: terminal/templates/terminal/terminal_update.html:33
 msgid "Info"
 msgstr "信息"
 
