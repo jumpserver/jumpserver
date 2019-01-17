@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
+import socket
 
 import ldap
 # from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
@@ -23,6 +24,13 @@ from .conf import load_user_config
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 CONFIG = load_user_config()
+LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
+HOSTNAME = socket.gethostname()
+JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver-{}.log'.format(HOSTNAME))
+ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible-{}.log'.format(HOSTNAME))
+
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -216,14 +224,14 @@ LOGGING = {
             'interval': 1,
             "backupCount": 7,
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log'),
+            'filename': JUMPSERVER_LOG_FILE,
         },
         'ansible_logs': {
             'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log'),
+            'filename': ANSIBLE_LOG_FILE,
         },
     },
     'loggers': {
