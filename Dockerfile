@@ -12,6 +12,7 @@ RUN yum -y install epel-release openldap-clients telnet && cd /tmp/requirements 
 RUN cd /tmp/requirements &&  pip install -r requirements.txt
 
 COPY . /opt/jumpserver
+RUN echo > config.yml
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
