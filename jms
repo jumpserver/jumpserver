@@ -18,7 +18,7 @@ try:
     from apps.jumpserver.conf import load_user_config
     CONFIG = load_user_config()
 except ImportError:
-    print("Could not find config file, `cp config_example.py config.py`")
+    print("Could not find config file, `cp config_example.yml config.yml`")
     sys.exit(1)
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"

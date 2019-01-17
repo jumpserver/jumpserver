@@ -193,8 +193,8 @@ class Config(dict):
         if self.root_path:
             filename = os.path.join(self.root_path, filename)
         try:
-            with open(filename) as json_file:
-                obj = yaml.load(json_file)
+            with open(filename) as f:
+                obj = yaml.load(f)
         except IOError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
                 return False
@@ -202,8 +202,7 @@ class Config(dict):
             raise
         if obj:
             return self.from_mapping(obj)
-        else:
-            return False
+        return True
 
     def from_mapping(self, *mapping, **kwargs):
         """Updates the config like :meth:`update` ignoring items with non-upper
