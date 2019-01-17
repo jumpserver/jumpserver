@@ -200,7 +200,10 @@ class Config(dict):
                 return False
             e.strerror = 'Unable to load configuration file (%s)' % e.strerror
             raise
-        return self.from_mapping(obj)
+        if obj:
+            return self.from_mapping(obj)
+        else:
+            return False
 
     def from_mapping(self, *mapping, **kwargs):
         """Updates the config like :meth:`update` ignoring items with non-upper
