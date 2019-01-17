@@ -25,7 +25,7 @@ class TerminalRegistrationApi(generics.CreateAPIView):
     http_method_names = ['post']
 
     def create(self, request, *args, **kwargs):
-        data = request.data
+        data = {k: v for k, v in request.data.items()}
         serializer = serializers.TerminalSerializer(
             data=data, context={'request': request}
         )
