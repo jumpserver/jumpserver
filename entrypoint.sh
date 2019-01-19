@@ -7,5 +7,10 @@ function cleanup()
     fi
 }
 
+service="all"
+if [ "$1" != "" ];then
+    service=$1
+fi
+
 trap cleanup EXIT
-python jms start all
+python jms start $service
