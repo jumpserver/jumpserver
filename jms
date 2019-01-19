@@ -15,9 +15,10 @@ sys.path.append(BASE_DIR)
 from apps import __version__
 
 try:
-    from config import config as CONFIG
+    from apps.jumpserver.conf import load_user_config
+    CONFIG = load_user_config()
 except ImportError:
-    print("Could not find config file, `cp config_example.py config.py`")
+    print("Could not find config file, `cp config_example.yml config.yml`")
     sys.exit(1)
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"
@@ -107,8 +108,7 @@ def is_running(s, unlink=True):
     pid_file = get_pid_file_path(s)
 
     if os.path.isfile(pid_file):
-        with open(pid_file, 'r') as f:
-            pid = get_pid(s)
+        pid = get_pid(s)
         if check_pid(pid):
             return True
 

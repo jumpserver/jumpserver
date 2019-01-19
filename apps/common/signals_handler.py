@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+import json
+
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from django.conf import LazySettings, empty
@@ -8,7 +10,7 @@ from django.core.cache import cache
 
 from jumpserver.utils import current_request
 from .models import Setting
-from .utils import get_logger
+from .utils import get_logger, ssh_key_gen
 from .signals import django_ready
 
 logger = get_logger(__file__)
@@ -16,23 +18,25 @@ logger = get_logger(__file__)
 
 @receiver(post_save, sender=Setting, dispatch_uid="my_unique_identifier")
 def refresh_settings_on_changed(sender, instance=None, **kwargs):
-    logger.debug("Receive setting item change")
-    logger.debug("  - refresh setting: {}".format(instance.name))
     if instance:
         instance.refresh_setting()
 
 
 @receiver(django_ready, dispatch_uid="my_unique_identifier")
-def refresh_all_settings_on_django_ready(sender, **kwargs):
-    logger.debug("Receive django ready signal")
-    logger.debug("  - fresh all settings")
+def monkey_patch_settings(sender, **kwargs):
     cache_key_prefix = '_SETTING_'
+    uncached_settings = [
+        'CACHES', 'DEBUG', 'SECRET_KEY', 'INSTALLED_APPS',
+        'ROOT_URLCONF', 'TEMPLATES', 'DATABASES', '_wrapped',
+        'CELERY_LOG_DIR'
+    ]
 
     def monkey_patch_getattr(self, name):
-        key = cache_key_prefix + name
-        cached = cache.get(key)
-        if cached is not None:
-            return cached
+        if name not in uncached_settings:
+            key = cache_key_prefix + name
+            cached = cache.get(key)
+            if cached is not None:
+                return cached
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
@@ -60,6 +64,18 @@ def refresh_all_settings_on_django_ready(sender, **kwargs):
         Setting.refresh_all_settings()
     except (ProgrammingError, OperationalError):
         pass
+
+
+@receiver(django_ready)
+def auto_generate_terminal_host_key(sender, **kwargs):
+    try:
+        if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
+            return
+    except ProgrammingError:
+        return
+    private_key, public_key = ssh_key_gen()
+    value = json.dumps(private_key)
+    Setting.objects.create(name='TERMINAL_HOST_KEY', value=value)
 
 
 @receiver(pre_save, dispatch_uid="my_unique_identifier")

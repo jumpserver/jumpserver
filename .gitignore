@@ -17,6 +17,7 @@ dump.rdb
 .idea/
 db.sqlite3
 config.py
+config.yml
 *.log
 host_rsa_key
 *.bat

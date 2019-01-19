@@ -17,13 +17,13 @@ class UserCreation:
         self.domain = domain
 
     def auth(self):
-        url = "{}/api/users/v1/token/".format(self.domain)
+        url = "{}/api/users/v1/auth/".format(self.domain)
         data = {"username": self.username, "password": self.password}
         resp = requests.post(url, data=data)
         if resp.status_code == 200:
             data = resp.json()
             self.headers.update({
-                'Authorization': '{} {}'.format(data['Keyword'], data['Token'])
+                'Authorization': '{} {}'.format('Bearer', data['token'])
             })
         else:
             print("用户名 或 密码 或 地址 不对")

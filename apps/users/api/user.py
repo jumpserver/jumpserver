@@ -19,6 +19,7 @@ from orgs.utils import current_org
 from ..serializers import UserSerializer, UserPKUpdateSerializer, \
     UserUpdateGroupSerializer, ChangeUserPasswordSerializer
 from ..models import User
+from ..signals import post_user_create
 
 
 logger = get_logger(__name__)
@@ -36,6 +37,10 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        post_user_create.send(self.__class__, user=user)
 
     def get_queryset(self):
         queryset = current_org.get_org_users()

@@ -19,3 +19,8 @@ class LDAPTestSerializer(serializers.Serializer):
     AUTH_LDAP_USER_ATTR_MAP = serializers.CharField()
     AUTH_LDAP_START_TLS = serializers.BooleanField(required=False)
 
+
+class OutputSerializer(serializers.Serializer):
+    output = serializers.CharField()
+    is_end = serializers.BooleanField()
+    mark = serializers.CharField()

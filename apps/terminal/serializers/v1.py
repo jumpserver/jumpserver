@@ -31,8 +31,6 @@ class TerminalSerializer(serializers.ModelSerializer):
         return cache.get(key)
 
 
-
-
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     command_amount = serializers.SerializerMethodField()
     command_store = get_multi_command_storage()
@@ -69,6 +67,6 @@ class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class ReplaySerializer(serializers.Serializer):
-    file = serializers.FileField()
+    file = serializers.FileField(allow_empty_file=True)
 
 

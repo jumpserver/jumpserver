@@ -87,6 +87,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     queryset = AdminUser.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.TaskIDSerializer
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()

@@ -1,46 +1,42 @@
 # -*- coding: utf-8 -*-
 #
-import uuid
+
 import os
-
 from celery.result import AsyncResult
-from django.core.cache import cache
-from django.utils.translation import ugettext as _
 from rest_framework import generics
-from rest_framework.views import Response
 
-from common.permissions import IsOrgAdmin, IsValidUser
+from common.permissions import IsValidUser
+from common.api import LogTailApi
 from ..models import CeleryTask
 from ..serializers import CeleryResultSerializer
+from ..celery.utils import get_celery_task_log_path
 
 
 __all__ = ['CeleryTaskLogApi', 'CeleryResultApi']
 
 
-class CeleryTaskLogApi(generics.RetrieveAPIView):
+class CeleryTaskLogApi(LogTailApi):
     permission_classes = (IsValidUser,)
-    buff_size = 1024 * 10
-    end = False
-    queryset = CeleryTask.objects.all()
+    task = None
+    task_id = ''
 
     def get(self, request, *args, **kwargs):
-        mark = request.query_params.get("mark") or str(uuid.uuid4())
-        task = self.get_object()
-        log_path = task.full_log_path
+        self.task_id = str(kwargs.get('pk'))
+        self.task = AsyncResult(self.task_id)
+        return super().get(request, *args, **kwargs)
 
-        if not log_path or not os.path.isfile(log_path):
-            return Response({"data": _("Waiting ...")}, status=203)
+    def get_log_path(self):
+        new_path = get_celery_task_log_path(self.task_id)
+        if new_path and os.path.isfile(new_path):
+            return new_path
+        try:
+            task = CeleryTask.objects.get(id=self.task_id)
+        except CeleryTask.DoesNotExist:
+            return None
+        return task.full_log_path
 
-        with open(log_path, 'r') as f:
-            offset = cache.get(mark, 0)
-            f.seek(offset)
-            data = f.read(self.buff_size).replace('\n', '\r\n')
-            mark = str(uuid.uuid4())
-            cache.set(mark, f.tell(), 5)
-
-            if data == '' and task.is_finished():
-                self.end = True
-            return Response({"data": data, 'end': self.end, 'mark': mark})
+    def is_file_finish_write(self):
+        return self.task.ready()
 
 
 class CeleryResultApi(generics.RetrieveAPIView):
