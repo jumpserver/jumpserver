@@ -280,6 +280,8 @@ class Config(dict):
             return value
         value = os.environ.get(item, None)
         if value is not None:
+            if value.isdigit():
+                value = int(value)
             return value
         return self.defaults.get(item)
 
