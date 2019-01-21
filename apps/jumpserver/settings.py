@@ -25,9 +25,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 CONFIG = load_user_config()
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
-HOSTNAME = socket.gethostname()
-JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver-{}.log'.format(HOSTNAME))
-ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible-{}.log'.format(HOSTNAME))
+JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
+ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
