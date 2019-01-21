@@ -215,10 +215,10 @@ class LogTailApi(generics.RetrieveAPIView):
                 return Response({
                     "data": 'Not found the log',
                     'end': True,
-                    'mark': mark}
-                )
+                    'mark': mark
+                })
             else:
-                return Response({"data": _("Waiting ...\n")}, status=200)
+                return Response({"data": "Waiting...\r\n"}, status=200)
 
         with open(log_path, 'r') as f:
             offset = cache.get(mark, 0)

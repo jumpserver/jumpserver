@@ -94,7 +94,7 @@
             <td class="text-center">{{ session.remote_addr|default:"" }}</td>
             <td class="text-center">{{ session.protocol }}</td>
             <td class="text-center">{{ session.get_login_from_display }}</td>
-            <td class="text-center">{{ session.id | get_session_command_amount }}</td>
+            <td class="text-center">{{ session.command_amount }}</td>
 
             <td class="text-center">{{ session.date_start }}</td>
 {#            <td class="text-center">{{ session.date_last_active }}</td>#}
