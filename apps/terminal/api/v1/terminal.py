@@ -100,15 +100,18 @@ class StatusViewSet(viewsets.ModelViewSet):
     task_serializer_class = serializers.TaskSerializer
 
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
+        self.handle_status(request)
         self.handle_sessions()
         tasks = self.request.user.terminal.task_set.filter(is_finished=False)
         serializer = self.task_serializer_class(tasks, many=True)
         return Response(serializer.data, status=201)
 
+    def handle_status(self, request):
+        request.user.terminal.is_alive = True
+
     def handle_sessions(self):
         sessions_id = self.request.data.get('sessions', [])
-        Session.set_active_sessions(sessions_id)
+        Session.set_sessions_active(sessions_id)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)

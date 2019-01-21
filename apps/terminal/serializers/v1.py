@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-from django.core.cache import cache
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
 from ..models import Terminal, Status, Session, Task
-from ..backends import get_multi_command_storage
 
 
 class TerminalSerializer(serializers.ModelSerializer):
     session_online = serializers.SerializerMethodField()
-    is_alive = serializers.SerializerMethodField()
+    is_alive = serializers.BooleanField()
 
     class Meta:
         model = Terminal
@@ -23,39 +21,22 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_session_online(obj):
-        return Session.objects.filter(terminal=obj.id, is_finished=False).count()
-
-    @staticmethod
-    def get_is_alive(obj):
-        key = StatusSerializer.CACHE_KEY_PREFIX + str(obj.id)
-        return cache.get(key)
+        return Session.objects.filter(terminal=obj, is_finished=False).count()
 
 
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    command_amount = serializers.SerializerMethodField()
-    command_store = get_multi_command_storage()
+    command_amount = serializers.IntegerField()
 
     class Meta:
         model = Session
         list_serializer_class = BulkListSerializer
         fields = '__all__'
 
-    def get_command_amount(self, obj):
-        return self.command_store.count(session=str(obj.id))
-
 
 class StatusSerializer(serializers.ModelSerializer):
-    CACHE_KEY_PREFIX = 'terminal_status_'
-
     class Meta:
-        fields = '__all__'
+        fields = ['id', 'terminal']
         model = Status
-
-    def create(self, validated_data):
-        terminal_id = str(validated_data['terminal'].id)
-        key = self.CACHE_KEY_PREFIX + terminal_id
-        cache.set(key, 1, 60)
-        return validated_data
 
 
 class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):

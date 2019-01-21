@@ -185,7 +185,7 @@ class Asset(OrgModelMixin):
     @property
     def connectivity(self):
         if not self.is_unixlike():
-            return self.UNKNOWN
+            return self.REACHABLE
         key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
         cached = cache.get(key, None)
         return cached if cached is not None else self.UNKNOWN
