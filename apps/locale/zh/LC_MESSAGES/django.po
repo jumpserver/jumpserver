@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 17:58+0800\n"
+"POT-Creation-Date: 2019-01-21 17:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -120,7 +120,7 @@ msgstr "端口"
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:56
 #: perms/templates/perms/asset_permission_list.html:125
-#: terminal/backends/command/models.py:13 terminal/models.py:143
+#: terminal/backends/command/models.py:13 terminal/models.py:155
 #: terminal/templates/terminal/command_list.html:40
 #: terminal/templates/terminal/command_list.html:73
 #: terminal/templates/terminal/session_list.html:41
@@ -158,8 +158,8 @@ msgstr "不能包含特殊字符"
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_list.html:72
-#: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:21
-#: terminal/models.py:212 terminal/templates/terminal/terminal_detail.html:43
+#: perms/templates/perms/asset_permission_user.html:54 terminal/models.py:22
+#: terminal/models.py:233 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
 #: users/models/user.py:55 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
@@ -427,7 +427,7 @@ msgstr "创建日期"
 #: assets/templates/assets/user_asset_list.html:159 common/models.py:34
 #: ops/models/adhoc.py:43 orgs/models.py:17 perms/models.py:39
 #: perms/models.py:92 perms/templates/perms/asset_permission_detail.html:102
-#: terminal/models.py:31 terminal/templates/terminal/terminal_detail.html:63
+#: terminal/models.py:32 terminal/templates/terminal/terminal_detail.html:63
 #: users/models/group.py:15 users/models/user.py:88
 #: users/templates/users/user_detail.html:127
 #: users/templates/users/user_group_detail.html:67
@@ -461,7 +461,7 @@ msgstr "可连接"
 
 #: assets/models/asset.py:119 assets/models/base.py:36
 msgid "Unknown"
-msgstr ""
+msgstr "未知"
 
 #: assets/models/base.py:25
 msgid "SSH private key"
@@ -534,7 +534,7 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:36 ops/models/command.py:21
-#: ops/templates/ops/command_execution_list.html:60 terminal/models.py:149
+#: ops/templates/ops/command_execution_list.html:60 terminal/models.py:161
 #: terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
 #: terminal/templates/terminal/session_detail.html:48
@@ -638,7 +638,7 @@ msgstr "默认资产组"
 #: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:54
 #: perms/templates/perms/asset_permission_list.html:119 templates/index.html:87
-#: terminal/backends/command/models.py:12 terminal/models.py:142
+#: terminal/backends/command/models.py:12 terminal/models.py:154
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
@@ -726,7 +726,7 @@ msgstr "登录模式"
 #: perms/templates/perms/asset_permission_list.html:58
 #: perms/templates/perms/asset_permission_list.html:79
 #: perms/templates/perms/asset_permission_list.html:131 templates/_nav.html:25
-#: terminal/backends/command/models.py:14 terminal/models.py:144
+#: terminal/backends/command/models.py:14 terminal/models.py:156
 #: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/command_list.html:74
 #: terminal/templates/terminal/session_list.html:49
@@ -1661,7 +1661,7 @@ msgstr "系统用户资产"
 #: audits/templates/audits/ftp_log_list.html:73
 #: audits/templates/audits/operate_log_list.html:70
 #: audits/templates/audits/password_change_log_list.html:52
-#: terminal/models.py:146 terminal/templates/terminal/session_list.html:74
+#: terminal/models.py:158 terminal/templates/terminal/session_list.html:74
 #: terminal/templates/terminal/terminal_detail.html:47
 msgid "Remote addr"
 msgstr "远端地址"
@@ -1704,7 +1704,7 @@ msgstr "修改者"
 #: ops/templates/ops/adhoc_history_detail.html:61
 #: ops/templates/ops/command_execution_list.html:65
 #: ops/templates/ops/task_history.html:58 perms/models.py:35
-#: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:153
+#: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:165
 #: terminal/templates/terminal/session_list.html:78
 msgid "Date start"
 msgstr "开始日期"
@@ -1835,10 +1835,6 @@ msgstr "创建成功"
 #: common/templates/common/terminal_setting.html:151
 msgid "Delete succeed"
 msgstr "删除成功"
-
-#: common/api.py:221
-msgid "Waiting ...\n"
-msgstr ""
 
 #: common/const.py:6
 #, python-format
@@ -2218,7 +2214,7 @@ msgid "Password check rule"
 msgstr "密码校验规则"
 
 #: common/templates/common/terminal_setting.html:76 terminal/forms.py:27
-#: terminal/models.py:25
+#: terminal/models.py:26
 msgid "Command storage"
 msgstr "命令存储"
 
@@ -2235,7 +2231,7 @@ msgid "Add"
 msgstr "添加"
 
 #: common/templates/common/terminal_setting.html:98 terminal/forms.py:32
-#: terminal/models.py:26
+#: terminal/models.py:27
 msgid "Replay storage"
 msgstr "录像存储"
 
@@ -2323,6 +2319,14 @@ msgstr "Become"
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
+
+#: ops/models/adhoc.py:223
+msgid "{} Start task: {}"
+msgstr "{} 任务开始: {}"
+
+#: ops/models/adhoc.py:226
+msgid "{} Task finish"
+msgstr "{} 任务结束"
 
 #: ops/models/adhoc.py:324
 msgid "Start time"
@@ -3073,55 +3077,55 @@ msgstr ""
 "录像文件支持存储到服务器端硬盘、AWS S3、 阿里云 OSS 中，默认存储到服务器端硬"
 "盘, 更多查看文档"
 
-#: terminal/models.py:22
+#: terminal/models.py:23
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models.py:23
+#: terminal/models.py:24
 msgid "SSH Port"
 msgstr "SSH端口"
 
-#: terminal/models.py:24
+#: terminal/models.py:25
 msgid "HTTP Port"
 msgstr "HTTP端口"
 
-#: terminal/models.py:113
+#: terminal/models.py:125
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models.py:114
+#: terminal/models.py:126
 msgid "CPU Usage"
 msgstr "CPU使用"
 
-#: terminal/models.py:115
+#: terminal/models.py:127
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models.py:116
+#: terminal/models.py:128
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models.py:117
+#: terminal/models.py:129
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models.py:118
+#: terminal/models.py:130
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models.py:148 terminal/templates/terminal/session_list.html:104
+#: terminal/models.py:160 terminal/templates/terminal/session_list.html:104
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models.py:152
+#: terminal/models.py:164
 msgid "Date last active"
 msgstr "最后活跃日期"
 
-#: terminal/models.py:154
+#: terminal/models.py:166
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models.py:213
+#: terminal/models.py:234
 msgid "Args"
 msgstr "参数"
 

@@ -9,7 +9,7 @@ from ..models import Terminal, Status, Session, Task
 
 class TerminalSerializer(serializers.ModelSerializer):
     session_online = serializers.SerializerMethodField()
-    is_alive = serializers.BooleanField()
+    is_alive = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Terminal
@@ -25,7 +25,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 
 class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    command_amount = serializers.IntegerField()
+    command_amount = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Session

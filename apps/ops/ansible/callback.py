@@ -118,18 +118,6 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
         self.gather_result("unreachable", result)
         super().v2_runner_on_unreachable(result)
 
-    def on_playbook_start(self, name):
-        date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.display(
-            "{} Start task: {}\r\n".format(date_start, name)
-        )
-
-    def on_playbook_end(self, name):
-        date_finished = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.display(
-            "{} Task finish\r\n".format(date_finished)
-        )
-
     def display_skipped_hosts(self):
         pass
 
