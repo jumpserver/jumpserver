@@ -43,6 +43,23 @@ class NodeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
+    def perform_create(self, serializer):
+        child_key = Node.root().get_next_child_key()
+        serializer.validated_data["key"] = child_key
+        serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        node = self.get_object()
+        if node.is_root():
+            node_value = node.value
+            post_value = request.data.get('value')
+            if node_value != post_value:
+                return Response(
+                    {"msg": _("You can't update the root node name")},
+                    status=400
+                )
+        return super().update(request, *args, **kwargs)
+
 
 class NodeListAsTreeApi(generics.ListAPIView):
     """
