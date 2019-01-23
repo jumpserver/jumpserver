@@ -22,7 +22,7 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from common.forms import SecuritySettingForm
 from common.models import Setting
-from .models import User, LoginLog
+from .models import User, LoginLog, UserGroup
 
 
 logger = logging.getLogger('jumpserver')
@@ -36,6 +36,32 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             self.raise_exception = True
             return False
         return True
+
+
+def create_or_add_user_group(user,groupname,user_group_set=None):
+    if user_group_set.filter(name=groupname):
+        return
+    else:
+        group_objs = UserGroup.objects.filter(name=groupname)
+        qlen=len(group_objs)
+        if qlen == 0:
+            group_objs,_ = UserGroup.objects.get_or_create(name=str(groupname),created_by ="ldap")
+            #group_objs = UserGroup.objects.filter(name=str(groupname))
+        else:
+            group_objs=group_objs[0]
+        logger.debug("user add group success | user {} | group {}".format(user.username, groupname))
+        user.groups.add(group_objs)
+
+
+def check_ldap_user_group_relation(user):
+    if user.source == "ldap":
+        user_group_set = user.groups.all()
+        for groupname in user.ldap_user.group_names:
+            create_or_add_user_group(user,groupname,user_group_set)
+        create_or_add_user_group(user,"logview",user_group_set)
+        user.save()
+    else:
+        logger.warn("user is not ldap user" )
 
 
 def send_user_created_mail(user):
@@ -189,6 +215,8 @@ def check_user_valid(**kwargs):
         return None, _('Disabled or expired')
 
     if password and authenticate(username=username, password=password):
+        #if user.source=="ldap":
+        #    add_ldap_group(username,LdapUserGroup.usergroup_from_ldap)
         return user, ''
 
     if public_key and user.public_key:
