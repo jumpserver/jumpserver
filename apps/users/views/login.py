@@ -42,7 +42,8 @@ __all__ = [
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
-    template_name = 'users/login.html'
+    # template_name = 'users/login.html'
+    template_name = 'users/new_login.html'
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
     redirect_field_name = 'next'
