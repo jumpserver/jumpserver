@@ -128,6 +128,7 @@ def parse_service(s):
 
 def start_gunicorn():
     print("\n- Start Gunicorn WSGI HTTP Server")
+    prepare()
     service = 'gunicorn'
     bind = '{}:{}'.format(HTTP_HOST, HTTP_PORT)
     log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
@@ -220,7 +221,6 @@ def start_service(s):
     print(time.ctime())
     print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
         __version__))
-    prepare()
 
     services_handler = {
          "gunicorn": start_gunicorn,
