@@ -108,15 +108,18 @@
                                 <label class="col-md-2 control-label" for="id_endpoint">{% trans "Endpoint" %}</label>
                                 <div class="col-md-9">
                                     <input id="id_endpoint" class="form-control" type="text" name="ENDPOINT" value="" placeholder="Endpoint">
+                                    <div class="help-block">
+                                        <span class="oss">OSS: 格式 http://{REGION_NAME}.aliyuncs.com <br>
+                                            如: http://oss-cn-hangzhou.aliyuncs.com
+                                        </span>
+                                        <span class="s3">S3: http://s3.amazonaws.com <br> </span>
+                                        <span class="s3">S3中国: http://s3.amazonaws.com.cn <br></span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="form-group" style="display: none;" >
                                 <label class="col-md-2 control-label" for="id_endpoint_suffix">{% trans "Endpoint suffix" %}</label>
-{#                                <div class="col-md-9">#}
-{#                                    <input id="id_endpoint_suffix" class="form-control" type="text" name="ENDPOINT_SUFFIX" value="">#}
-{#                                    <div class="help-block">{% trans '' %}</div>#}
-{#                                </div>#}
                                 <div class="col-md-9">
                                     <select id="id_endpoint_suffix" name="ENDPOINT_SUFFIX" class="endpoint-suffix-selector form-control">
                                         <option value="core.chinacloudapi.cn" selected="selected">core.chinacloudapi.cn</option>
@@ -129,6 +132,13 @@
                                 <label class="col-md-2 control-label" for="id_region">{% trans "Region" %}</label>
                                 <div class="col-md-9">
                                     <input id="id_region" class="form-control" type="text" name="REGION" value="" placeholder="">
+                                    <div class="help-block">
+                                        <span class="s3">
+                                            北京: cn-north-1
+                                            宁夏: cn-northwest-1
+                                            <a href="https://docs.aws.amazon.com/zh_cn/general/latest/gr/rande.html">更多</a>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -166,7 +176,6 @@ function hiddenField(field){
 }
 
 function getFieldByType(type){
-
     if(type === 'server'){
         return need_get_field_of_server
     }
@@ -211,15 +220,17 @@ $(document).ready(function() {
 
     field_of_all = [name_id, host_id, port_id, bucket_id, access_key_id, secret_key_id, container_name_id, account_name_id, account_key_id, endpoint_id, endpoint_suffix_id, region_id];
     need_get_field_of_server = [name_id];
-    need_get_field_of_s3 = [name_id, bucket_id, access_key_id, secret_key_id, region_id];
+    need_get_field_of_s3 = [name_id, bucket_id, access_key_id, secret_key_id, region_id, endpoint_id];
     need_get_field_of_oss = [name_id, bucket_id, access_key_id, secret_key_id, endpoint_id];
     need_get_field_of_azure = [name_id, container_name_id, account_name_id, account_key_id, endpoint_suffix_id];
     need_get_field_of_ceph = [name_id, host_id, port_id, bucket_id, access_key_id, secret_key_id, region_id];
 })
 .on('change', '.selector', function(){
     var type = $('.selector').val();
-    console.log(type);
+    $("." + type).show();
     hiddenField(field_of_all);
+    $('.help-block').children().hide();
+    $('.help-block ' + '.' + type).show();
     var field = getFieldByType(type);
     showField(field)
 })
