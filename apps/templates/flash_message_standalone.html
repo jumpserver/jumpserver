@@ -22,11 +22,15 @@
             <div class="col-md-12">
                 <div class="ibox-content">
                     <div>
-                        {% if logo_processor.logout_logo %}
-                            <img src="{{ MEDIA_URL }}{{ logo_processor.logout_logo }}" style="margin: auto" width="82" height="82">
+                    {% if interface_processor %}
+                        {% if interface_processor.logout_logo %}
+                            <img src="{{ MEDIA_URL }}{{ interface_processor.logout_logo }}" style="margin: auto" width="82" height="82">
                         {% else %}
                             <img src="{% static 'img/logo.png' %}" style="margin: auto" width="82" height="82">
                         {% endif %}
+                    {% else %}
+                        <img src="{% static 'img/logo.png' %}" style="margin: auto" width="82" height="82">
+                    {% endif %}
 
                         <h2 style="display: inline">Jumpserver</h2>
                     </div>

@@ -133,9 +133,7 @@ TEMPLATES = [
                 'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
                 *get_xpack_context_processor(),
-                'xpack.plugins.interface.context_processor.sheme_processor',
-                'xpack.plugins.interface.context_processor.introdution_processor',
-                'xpack.plugins.interface.context_processor.logo_processor',
+                'xpack.plugins.interface.context_processor.interface_processor',
 
 
 

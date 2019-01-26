@@ -42,8 +42,13 @@ __all__ = [
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
-    # template_name = 'users/login.html'
-    template_name = 'users/new_login.html'
+    template_name = 'users/login.html'
+    from xpack.plugins.license.models import License
+    license = License.objects.all()
+    if license:
+        if license[0].is_default == 0:
+            template_name = 'users/new_login.html'
+
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
     redirect_field_name = 'next'

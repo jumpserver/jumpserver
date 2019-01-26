@@ -38,10 +38,16 @@
         <div class="row" style="height: 472px">
             <div class="col-md-4 col-md-offset-2 input_shadow-1" style="text-align: center;background-color: white; padding-right: 0px;height: 100%">
                 <div style="background-color: white">
+                {% if interface_processor.login_theme %}
                     <div style="margin-top: 40px">
-                    <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">Jumpserver 堡垒机
-                    </span>
+                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface_processor.login_theme }}</span>
                     </div>
+                {% else %}
+                    <div style="margin-top: 40px">
+                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">Jumpserver 堡垒机</span>
+                    </div>
+                {% endif %}
+
                     <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 10px">
                     欢迎回来，请输入用户名和密码登录
                     </div>
@@ -96,9 +102,12 @@
                 </div>
             </div>
             <div class="col-md-4 " style="padding-left: 0px; height: 100%">
-{#                 <div class="form-group" style="background: url({% static 'img/login/650-472.jpg' %});height: 472px;vertical-align: middle">#}
-                    <img src="{% static 'img/login/635-472.jpg' %}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
-                </div>
+                    {% if interface_processor.login_image %}
+                        <img src="{{ MEDIA_URL }}{{ interface_processor.login_image }}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
+                    {% else %}
+                        <img src="{% static 'img/login/635-472.jpg' %}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
+                    {% endif %}
+            </div>
              </div>
        <div class="col-md-2"></div>
 

@@ -23,14 +23,8 @@
     <div class="loginColumns animated fadeInDown">
         <div class="row">
             <div class="col-md-6">
-                {% if sheme_processor %}
-                <h2 class="font-bold" style="text-align: center">{{ sheme_processor }}</h2>
-                {% else %}
-                    <h2 class="font-bold" style="text-align: center">{% trans 'Welcome to the Jumpserver open source fortress' %}</h2>
-                {% endif %}
-                {% if introdution_processor %}
-                <p>{{ introdution_processor }}</p>
-                {% else %}
+
+                <h2 class="font-bold" style="text-align: center">{% trans 'Welcome to the Jumpserver open source fortress' %}</h2>
                 <p>
                     {% trans "The world's first fully open source fortress, using the GNU GPL v2.0 open source protocol, is a professional operation and maintenance audit system in compliance with 4A." %}
                 </p>
@@ -43,17 +37,12 @@
                 <p>
                     {% trans  "Changes the world, starting with a little bit." %}
                 </p>
-            {% endif %}
 
             </div>
             <div class="col-md-6">
                 <div class="ibox-content">
                     <div>
-                        {% if logo_processor.login_logo %}
-                            <img src="{{ MEDIA_URL }}{{ logo_processor.login_logo }}" width="60" height="60">
-                        {% else %}
                         <img src="{% static 'img/logo.png' %}" width="60" height="60">
-                        {% endif %}
                         <span class="font-bold text-center" style="font-size: 24px; font-family: inherit; margin-left: 20px">{% trans 'Login' %}</span>
                     </div>
                     <form class="m-t" role="form" method="post" action="">
@@ -107,8 +96,7 @@
                         {% endif %}
 
                     </form>
-                    <p class="m-t">
-                    </p>
+
                 </div>
             </div>
         </div>
