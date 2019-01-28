@@ -141,10 +141,10 @@ function onCheck(e, treeId, treeNode) {
     var nodes_names = nodes.map(function (node) {
         return node.name;
     });
-    var message = "已选择资产: ";
+    var message = "{% trans 'Selected assets' %}" + ': ';
 	message += nodes_names.join(", ");
 	message += "\r\n";
-	message += "总共: " + nodes_names.length + "个\r\n";
+    message += "{% trans 'In total' %}" + ': ' + nodes_names.length + "个\r\n";
 	term.clear();
 	term.write(message)
 }
@@ -179,7 +179,7 @@ function initResultTerminal() {
         }
     });
     term.open(document.getElementById('term'));
-    term.write("选择左侧资产, 选择运行的系统用户，批量执行命令\r\n")
+    term.write("{% trans 'Select the left asset, select the running system user, execute command in batch' %}" + "\r\n")
 }
 
 function wrapperError(msg) {
@@ -197,15 +197,15 @@ function execute() {
         return node.id;
     });
     if (hosts.length === 0) {
-        term.write(wrapperError('没有选中资产'));
+        term.write(wrapperError("{% trans 'Unselected assets' %}"));
         return
     }
     if (!command) {
-        term.write(wrapperError('没有输入命令'));
+        term.write(wrapperError("{% trans 'No input command' %}"));
         return
     }
     if (!run_as) {
-        term.write(wrapperError('没有选择运行用户'));
+        term.write(wrapperError("{% trans 'No system user was selected' %}"));
         return
     }
     var data = {

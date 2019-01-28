@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-21 17:40+0800\n"
+"POT-Creation-Date: 2019-01-28 12:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,11 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/api/node.py:264
+#: assets/api/node.py:58
+msgid "You can't update the root node name"
+msgstr "不能修改根节点名称"
+
+#: assets/api/node.py:281
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:278
+#: assets/api/node.py:295
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -903,7 +907,7 @@ msgstr "其它"
 #: common/templates/common/command_storage_create.html:79
 #: common/templates/common/email_setting.html:62
 #: common/templates/common/ldap_setting.html:62
-#: common/templates/common/replay_storage_create.html:138
+#: common/templates/common/replay_storage_create.html:151
 #: common/templates/common/security_setting.html:70
 #: common/templates/common/terminal_setting.html:68
 #: perms/templates/perms/asset_permission_create_update.html:80
@@ -936,7 +940,7 @@ msgstr "重置"
 #: common/templates/common/command_storage_create.html:80
 #: common/templates/common/email_setting.html:63
 #: common/templates/common/ldap_setting.html:63
-#: common/templates/common/replay_storage_create.html:139
+#: common/templates/common/replay_storage_create.html:152
 #: common/templates/common/security_setting.html:71
 #: common/templates/common/terminal_setting.html:70
 #: perms/templates/perms/asset_permission_create_update.html:81
@@ -2198,16 +2202,51 @@ msgstr "账户密钥"
 msgid "Endpoint"
 msgstr "端点"
 
+#: common/templates/common/replay_storage_create.html:113
+#, python-brace-format
+msgid "OSS: http://{REGION_NAME}.aliyuncs.com"
+msgstr "OSS: http://{REGION_NAME}.aliyuncs.com"
+
 #: common/templates/common/replay_storage_create.html:115
+msgid "Example: http://oss-cn-hangzhou.aliyuncs.com"
+msgstr "如: http://oss-cn-hangzhou.aliyuncs.com"
+
+#: common/templates/common/replay_storage_create.html:117
+#, python-brace-format
+msgid "S3: http://s3.{REGION_NAME}.amazonaws.com"
+msgstr "S3: http://s3.{REGION_NAME}.amazonaws.com"
+
+#: common/templates/common/replay_storage_create.html:118
+#, python-brace-format
+msgid "S3(China): http://s3.{REGION_NAME}.amazonaws.com.cn"
+msgstr "S3(中国): http://s3.{REGION_NAME}.amazonaws.com.cn"
+
+#: common/templates/common/replay_storage_create.html:119
+msgid "Example: http://s3.cn-north-1.amazonaws.com.cn"
+msgstr "如: http://s3.cn-north-1.amazonaws.com.cn"
+
+#: common/templates/common/replay_storage_create.html:125
 msgid "Endpoint suffix"
 msgstr "端点后缀"
 
-#: common/templates/common/replay_storage_create.html:129
+#: common/templates/common/replay_storage_create.html:135
 #: xpack/plugins/cloud/models.py:186
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:83
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
 msgid "Region"
 msgstr "地域"
+
+#: common/templates/common/replay_storage_create.html:140
+msgid "Beijing: cn-north-1"
+msgstr "北京: cn-north-1"
+
+#: common/templates/common/replay_storage_create.html:141
+msgid "Ningxia: cn-northwest-1"
+msgstr "宁夏: cn-northwest-1"
+
+#: common/templates/common/replay_storage_create.html:142
+msgid "More"
+msgstr "更多"
 
 #: common/templates/common/security_setting.html:46
 msgid "Password check rule"
@@ -2328,36 +2367,36 @@ msgstr "{} 任务开始: {}"
 msgid "{} Task finish"
 msgstr "{} 任务结束"
 
-#: ops/models/adhoc.py:324
+#: ops/models/adhoc.py:323
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models/adhoc.py:325
+#: ops/models/adhoc.py:324
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models/adhoc.py:326 ops/templates/ops/adhoc_history.html:57
+#: ops/models/adhoc.py:325 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:41
 msgid "Time"
 msgstr "时间"
 
-#: ops/models/adhoc.py:327 ops/templates/ops/adhoc_detail.html:106
+#: ops/models/adhoc.py:326 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/adhoc_history_detail.html:69
 #: ops/templates/ops/task_detail.html:84 ops/templates/ops/task_history.html:61
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models/adhoc.py:328 ops/templates/ops/adhoc_history.html:56
+#: ops/models/adhoc.py:327 ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/task_history.html:62
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models/adhoc.py:329
+#: ops/models/adhoc.py:328
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models/adhoc.py:330
+#: ops/models/adhoc.py:329
 msgid "Adhoc result summary"
 msgstr "汇总"
 
@@ -2479,8 +2518,6 @@ msgid "Success assets"
 msgstr "成功资产"
 
 #: ops/templates/ops/celery_task_log.html:4
-#, fuzzy
-#| msgid "Task list"
 msgid "Task log"
 msgstr "任务列表"
 
@@ -2489,6 +2526,32 @@ msgstr "任务列表"
 #: terminal/templates/terminal/session_detail.html:100
 msgid "Go"
 msgstr ""
+
+#: ops/templates/ops/command_execution_create.html:144
+msgid "Selected assets"
+msgstr "已选择资产"
+
+#: ops/templates/ops/command_execution_create.html:147
+msgid "In total"
+msgstr "总共"
+
+#: ops/templates/ops/command_execution_create.html:182
+msgid ""
+"Select the left asset, select the running system user, execute command in "
+"batch"
+msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
+
+#: ops/templates/ops/command_execution_create.html:200
+msgid "Unselected assets"
+msgstr "没有选中资产"
+
+#: ops/templates/ops/command_execution_create.html:204
+msgid "No input command"
+msgstr "没有输入命令"
+
+#: ops/templates/ops/command_execution_create.html:208
+msgid "No system user was selected"
+msgstr "没有选择系统用户"
 
 #: ops/templates/ops/command_execution_create.html:253
 msgid "Pending"
@@ -4666,9 +4729,6 @@ msgstr "更新组织"
 
 #~ msgid "No assets, task stop"
 #~ msgstr "没有匹配到资产，结束任务"
-
-#~ msgid "You can't update the root node name"
-#~ msgstr "不能修改根节点名称"
 
 #~ msgid "Update assets hardware info period"
 #~ msgstr "定期更新资产硬件信息"
