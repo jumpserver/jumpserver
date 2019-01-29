@@ -43,6 +43,23 @@ class NodeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
+    def perform_create(self, serializer):
+        child_key = Node.root().get_next_child_key()
+        serializer.validated_data["key"] = child_key
+        serializer.save()
+
+    def update(self, request, *args, **kwargs):
+        node = self.get_object()
+        if node.is_root():
+            node_value = node.value
+            post_value = request.data.get('value')
+            if node_value != post_value:
+                return Response(
+                    {"msg": _("You can't update the root node name")},
+                    status=400
+                )
+        return super().update(request, *args, **kwargs)
+
 
 class NodeListAsTreeApi(generics.ListAPIView):
     """
@@ -259,7 +276,7 @@ class RefreshNodeHardwareInfoApi(APIView):
     def get(self, request, *args, **kwargs):
         node_id = kwargs.get('pk')
         node = get_object_or_404(self.model, id=node_id)
-        assets = node.assets.all()
+        assets = node.get_all_assets()
         # task_name = _("更新节点资产硬件信息: {}".format(node.name))
         task_name = _("Update node asset hardware information: {}").format(node.name)
         task = update_assets_hardware_info_util.delay(assets, task_name=task_name)
@@ -273,7 +290,7 @@ class TestNodeConnectiveApi(APIView):
     def get(self, request, *args, **kwargs):
         node_id = kwargs.get('pk')
         node = get_object_or_404(self.model, id=node_id)
-        assets = node.assets.all()
+        assets = node.get_all_assets()
         # task_name = _("测试节点下资产是否可连接: {}".format(node.name))
         task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
         task = test_asset_connectivity_util.delay(assets, task_name=task_name)

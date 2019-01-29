@@ -9,10 +9,10 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.playbook.play import Play
 import ansible.constants as C
-from ansible.utils.display import Display
 
-from .callback import AdHocResultCallback, PlaybookResultCallBack, \
-    CommandResultCallback
+from .callback import (
+    AdHocResultCallback, PlaybookResultCallBack, CommandResultCallback
+)
 from common.utils import get_logger
 from .exceptions import AnsibleError
 
@@ -20,13 +20,6 @@ from .exceptions import AnsibleError
 __all__ = ["AdHocRunner", "PlayBookRunner", "CommandRunner"]
 C.HOST_KEY_CHECKING = False
 logger = get_logger(__name__)
-
-
-class CustomDisplay(Display):
-    def display(self, msg, color=None, stderr=False, screen_only=False, log_only=False):
-        pass
-
-display = CustomDisplay()
 
 
 Options = namedtuple('Options', [

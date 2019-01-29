@@ -11,10 +11,11 @@ app_name = 'terminal'
 
 router = BulkRouter()
 router.register(r'terminal', api.TerminalViewSet, 'terminal')
-router.register(r'terminal-registrations', api.TerminalRegistrationViewSet, 'terminal-registration')
 
 
 urlpatterns = [
+    path('terminal-registrations/', api.TerminalRegistrationApi.as_view(),
+         name='terminal-registration')
 ]
 
 urlpatterns += router.urls

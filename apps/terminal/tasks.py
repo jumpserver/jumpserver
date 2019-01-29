@@ -10,8 +10,9 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 
 
-from ops.celery.utils import register_as_period_task, after_app_ready_start, \
-    after_app_shutdown_clean
+from ops.celery.decorator import (
+    register_as_period_task, after_app_ready_start, after_app_shutdown_clean_periodic
+)
 from .models import Status, Session, Command
 
 
@@ -23,28 +24,30 @@ logger = get_task_logger(__name__)
 @shared_task
 @register_as_period_task(interval=3600)
 @after_app_ready_start
-@after_app_shutdown_clean
+@after_app_shutdown_clean_periodic
 def delete_terminal_status_period():
-    yesterday = timezone.now() - datetime.timedelta(days=3)
+    yesterday = timezone.now() - datetime.timedelta(days=1)
     Status.objects.filter(date_created__lt=yesterday).delete()
 
 
 @shared_task
-@register_as_period_task(interval=3600)
+@register_as_period_task(interval=600)
 @after_app_ready_start
-@after_app_shutdown_clean
+@after_app_shutdown_clean_periodic
 def clean_orphan_session():
     active_sessions = Session.objects.filter(is_finished=False)
     for session in active_sessions:
-        if not session.terminal or not session.terminal.is_active:
-            session.is_finished = True
-            session.save()
+        if not session.is_active():
+            continue
+        session.is_finished = True
+        session.date_end = timezone.now()
+        session.save()
 
 
 @shared_task
 @register_as_period_task(interval=3600*24)
 @after_app_ready_start
-@after_app_shutdown_clean
+@after_app_shutdown_clean_periodic
 def clean_expired_session_period():
     logger.info("Start clean expired session record, commands and replay")
     days = settings.TERMINAL_SESSION_KEEP_DURATION
@@ -64,3 +67,4 @@ def clean_expired_session_period():
                 default_storage.delete(_local_path)
         # 删除session记录
         session.delete()
+

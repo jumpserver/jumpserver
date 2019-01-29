@@ -4,7 +4,7 @@
 from werkzeug.local import Local
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
@@ -191,7 +191,7 @@ class OrgMembershipModelViewSetMixin:
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
 
     def dispatch(self, request, *args, **kwargs):
-        self.org = Organization.objects.get(pk=kwargs.get('org_id'))
+        self.org = get_object_or_404(Organization, pk=kwargs.get('org_id'))
         return super().dispatch(request, *args, **kwargs)
 
     def get_serializer_context(self):
@@ -200,4 +200,5 @@ class OrgMembershipModelViewSetMixin:
         return context
 
     def get_queryset(self):
-        return self.membership_class.objects.filter(organization=self.org)
+        queryset = self.membership_class.objects.filter(organization=self.org)
+        return queryset

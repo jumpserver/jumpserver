@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
+import socket
 
 import ldap
 # from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
@@ -23,6 +24,12 @@ from .conf import load_user_config
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 CONFIG = load_user_config()
+LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
+JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
+ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
+
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -209,19 +216,21 @@ LOGGING = {
             'formatter': 'main'
         },
         'file': {
+            'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': "D",
             'interval': 1,
             "backupCount": 7,
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+            'filename': JUMPSERVER_LOG_FILE,
         },
         'ansible_logs': {
+            'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log')
+            'filename': ANSIBLE_LOG_FILE,
         },
     },
     'loggers': {
@@ -400,6 +409,19 @@ if AUTH_OPENID:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 
+# Radius Auth
+AUTH_RADIUS = CONFIG.AUTH_RADIUS
+AUTH_RADIUS_BACKEND = 'authentication.radius.backends.RadiusBackend'
+RADIUS_SERVER = CONFIG.RADIUS_SERVER
+RADIUS_PORT = CONFIG.RADIUS_PORT
+RADIUS_SECRET = CONFIG.RADIUS_SECRET
+
+if AUTH_RADIUS:
+    AUTHENTICATION_BACKENDS.insert(0, AUTH_RADIUS_BACKEND)
+
+# Dump all celery log to here
+CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
+
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
     'password': CONFIG.REDIS_PASSWORD,
@@ -413,14 +435,16 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 3600
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_WORKER_LOG_FORMAT = '%(message)s'
-# CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_LOG_FORMAT = '%(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
-CELERY_REDIRECT_STDOUTS = True
-CELERY_REDIRECT_STDOUTS_LEVEL = "INFO"
-CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_REDIRECT_STDOUTS = True
+CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
+# CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 40
 
 # Cache use redis
 CACHES = {
@@ -492,6 +516,7 @@ TERMINAL_HEARTBEAT_INTERVAL = CONFIG.TERMINAL_HEARTBEAT_INTERVAL
 TERMINAL_ASSET_LIST_SORT_BY = CONFIG.TERMINAL_ASSET_LIST_SORT_BY
 TERMINAL_ASSET_LIST_PAGE_SIZE = CONFIG.TERMINAL_ASSET_LIST_PAGE_SIZE
 TERMINAL_SESSION_KEEP_DURATION = CONFIG.TERMINAL_SESSION_KEEP_DURATION
+TERMINAL_HOST_KEY = CONFIG.TERMINAL_HOST_KEY
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

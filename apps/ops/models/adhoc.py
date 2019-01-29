@@ -220,10 +220,10 @@ class AdHoc(models.Model):
         time_start = time.time()
         try:
             date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("{} Start task: {}\r\n".format(date_start, self.task.name))
+            print(_("{} Start task: {}").format(date_start, self.task.name))
             raw, summary = self._run_only()
             date_end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("\r\n{} Task finished".format(date_end))
+            print(_("{} Task finish").format(date_end))
             history.is_finished = True
             if summary.get('dark'):
                 history.is_success = False
@@ -235,7 +235,6 @@ class AdHoc(models.Model):
         except Exception as e:
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
-            # f.close()
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start
             history.save()

@@ -1,16 +1,18 @@
 # ~*~ coding: utf-8 ~*~
 import json
 import re
-import time
 import os
 
 from celery import shared_task
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
-from common.utils import capacity_convert, \
-    sum_capacity, encrypt_password, get_logger
-from ops.celery.utils import register_as_period_task, after_app_shutdown_clean
+from common.utils import (
+    capacity_convert, sum_capacity, encrypt_password, get_logger
+)
+from ops.celery.decorator import (
+    register_as_period_task, after_app_shutdown_clean_periodic
+)
 
 from .models import SystemUser, AdminUser, Asset
 from . import const
@@ -132,7 +134,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
 @shared_task
 def update_asset_hardware_info_manual(asset):
     task_name = _("Update asset hardware info: {}").format(asset.hostname)
-    return update_assets_hardware_info_util(
+    update_assets_hardware_info_util(
         [asset], task_name=task_name
     )
 
@@ -221,12 +223,14 @@ def test_admin_user_connectivity_period():
     for admin_user in admin_users:
         task_name = _("Test admin user connectivity period: {}").format(admin_user.name)
         test_admin_user_connectivity_util(admin_user, task_name)
+    cache.set(key, 1, 60*40)
 
 
 @shared_task
 def test_admin_user_connectivity_manual(admin_user):
     task_name = _("Test admin user connectivity: {}").format(admin_user.name)
-    return test_admin_user_connectivity_util(admin_user, task_name)
+    test_admin_user_connectivity_util(admin_user, task_name)
+    return True
 
 
 ##  System user connective ##
@@ -394,13 +398,13 @@ def push_system_user_to_assets(system_user, assets):
 
 
 @shared_task
-@after_app_shutdown_clean
+@after_app_shutdown_clean_periodic
 def test_system_user_connectability_period():
     pass
 
 
 @shared_task
-@after_app_shutdown_clean
+@after_app_shutdown_clean_periodic
 def test_admin_user_connectability_period():
     pass
 
@@ -408,7 +412,7 @@ def test_admin_user_connectability_period():
 # @shared_task
 # @register_as_period_task(interval=3600)
 # @after_app_ready_start
-# # @after_app_shutdown_clean
+# @after_app_shutdown_clean_periodic
 # def push_system_user_period():
 #     for system_user in SystemUser.objects.all():
 #         push_system_user_related_nodes(system_user)

@@ -161,6 +161,87 @@ function activeNav() {
     }
 }
 
+function formSubmit(props) {
+    /*
+    {
+      "form": $("form"),
+      "url": "",
+      "method": "POST",
+      "redirect_to": "",
+      "success": function(data, textStatue, jqXHR){},
+      "error": function(jqXHR, textStatus, errorThrown) {}
+    }
+    */
+    props = props || {};
+    var data = props.data || props.form.serializeObject();
+    var redirect_to = props.redirect_to;
+    $.ajax({
+        url: props.url,
+        type: props.method || 'POST',
+        data: JSON.stringify(data),
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json"
+    }).done(function (data, textState, jqXHR) {
+        if (redirect_to) {
+            location.href = redirect_to;
+        } else if (typeof props.success === 'function') {
+            return props.success(data, textState, jqXHR);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        if (typeof props.error === 'function') {
+            return props.error(jqXHR, textStatus, errorThrown)
+        }
+        if (!props.form) {
+            alert(jqXHR.responseText);
+            return
+        }
+        if (jqXHR.status === 400) {
+            var errors = jqXHR.responseJSON;
+            var noneFieldErrorRef = props.form.children('.alert-danger');
+            if (noneFieldErrorRef.length !== 1) {
+                props.form.prepend('<div class="alert alert-danger" style="display: none"></div>');
+                noneFieldErrorRef = props.form.children('.alert-danger');
+            }
+            var noneFieldErrorMsg = "";
+            noneFieldErrorRef.css("display", "none");
+            noneFieldErrorRef.html("");
+            props.form.find(".help-block.error").html("");
+            props.form.find(".form-group.has-error").removeClass("has-error");
+
+            if (typeof errors !== "object") {
+                noneFieldErrorMsg = errors;
+                if (noneFieldErrorRef.length === 1) {
+                    noneFieldErrorRef.css('display', 'block');
+                    noneFieldErrorRef.html(noneFieldErrorMsg);
+                }
+                return
+            }
+            $.each(errors, function (k, v) {
+                var fieldRef = props.form.find('input[name="' + k + '"]');
+                var formGroupRef = fieldRef.parents('.form-group');
+                var parentRef = fieldRef.parent();
+                var helpBlockRef = parentRef.children('.help-block.error');
+                if (helpBlockRef.length === 0) {
+                    parentRef.append('<div class="help-block error"></div>');
+                    helpBlockRef = parentRef.children('.help-block.error');
+                }
+                if (fieldRef.length === 1 && formGroupRef.length === 1) {
+                    formGroupRef.addClass('has-error');
+                    var help_msg = v.join("<br/>") ;
+                    helpBlockRef.html(help_msg);
+                } else {
+                    noneFieldErrorMsg += v + '<br/>';
+                }
+            });
+            if (noneFieldErrorRef.length === 1 && noneFieldErrorMsg !== '') {
+                noneFieldErrorRef.css('display', 'block');
+                noneFieldErrorRef.html(noneFieldErrorMsg);
+            }
+        }
+
+    })
+}
+
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
@@ -195,9 +276,6 @@ function APIUpdateAttr(props) {
     }).fail(function(jqXHR, textStatus, errorThrown) {
         if (flash_message) {
             var msg = "";
-            console.log(jqXHR);
-            console.log(textStatus);
-            console.log(errorThrown);
             if (user_fail_message) {
                 msg = user_fail_message;
             } else if (jqXHR.responseJSON) {
@@ -213,6 +291,7 @@ function APIUpdateAttr(props) {
             toastr.error(msg);
         }
         if (typeof props.error === 'function') {
+            console.log(jqXHR);
             return props.error(jqXHR.responseText, jqXHR.status);
         }
     });
@@ -478,7 +557,7 @@ jumpserver.initServerSideDataTable = function (options) {
             url: options.ajax_url ,
             data: function (data) {
                 delete data.columns;
-                if (data.length !== null ){
+                if (data.length !== null){
                     data.limit = data.length;
                     delete data.length;
                 }
@@ -525,7 +604,7 @@ jumpserver.initServerSideDataTable = function (options) {
         columns: options.columns || [],
         select: options.select || select,
         language: jumpserver.language,
-        lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]]
+        lengthMenu: [[15, 25, 50, 9999], [15, 25, 50, 'All']]
     });
     table.selected = [];
     table.selected_rows = [];

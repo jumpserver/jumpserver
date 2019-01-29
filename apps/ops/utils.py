@@ -48,7 +48,7 @@ def update_or_create_ansible_task(
         hosts_same = old_hosts == new_hosts
 
     if not adhoc or adhoc != new_adhoc or not hosts_same:
-        logger.info(_("Update task content: {}").format(task_name))
+        logger.debug(_("Update task content: {}").format(task_name))
         new_adhoc.save()
         new_adhoc.hosts.set(hosts)
         task.latest_adhoc = new_adhoc

@@ -8,10 +8,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.core.cache import cache
 
 from users.models import User
 from orgs.mixins import OrgModelMixin
 from common.utils import get_command_storage_setting, get_replay_storage_setting
+from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
 
 
@@ -28,6 +30,17 @@ class Terminal(models.Model):
     is_deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    STATUS_KEY_PREFIX = 'terminal_status_'
+
+    @property
+    def is_alive(self):
+        key = self.STATUS_KEY_PREFIX + str(self.id)
+        return bool(cache.get(key))
+
+    @is_alive.setter
+    def is_alive(self, value):
+        key = self.STATUS_KEY_PREFIX + str(self.id)
+        cache.set(key, value, 60)
 
     @property
     def is_active(self):
@@ -41,7 +54,7 @@ class Terminal(models.Model):
             self.user.is_active = active
             self.user.save()
 
-    def get_common_storage(self):
+    def get_command_storage_setting(self):
         storage_all = get_command_storage_setting()
         if self.command_storage in storage_all:
             storage = storage_all.get(self.command_storage)
@@ -49,7 +62,7 @@ class Terminal(models.Model):
             storage = storage_all.get('default')
         return {"TERMINAL_COMMAND_STORAGE": storage}
 
-    def get_replay_storage(self):
+    def get_replay_storage_setting(self):
         storage_all = get_replay_storage_setting()
         if self.replay_storage in storage_all:
             storage = storage_all.get(self.replay_storage)
@@ -61,10 +74,11 @@ class Terminal(models.Model):
     def config(self):
         configs = {}
         for k in dir(settings):
-            if k.startswith('TERMINAL'):
-                configs[k] = getattr(settings, k)
-        configs.update(self.get_common_storage())
-        configs.update(self.get_replay_storage())
+            if not k.startswith('TERMINAL'):
+                continue
+            configs[k] = getattr(settings, k)
+        configs.update(self.get_command_storage_setting())
+        configs.update(self.get_replay_storage_setting())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
@@ -152,6 +166,7 @@ class Session(OrgModelMixin):
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
     upload_to = 'replay'
+    ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
 
     def get_rel_replay_path(self, version=2):
         """
@@ -180,6 +195,26 @@ class Session(OrgModelMixin):
             return name, None
         except OSError as e:
             return None, e
+
+    @classmethod
+    def set_sessions_active(cls, sessions_id):
+        data = {cls.ACTIVE_CACHE_KEY_PREFIX.format(i): i for i in sessions_id}
+        cache.set_many(data, timeout=5*60)
+
+    @classmethod
+    def get_active_sessions(cls):
+        return cls.objects.filter(is_finished=False)
+
+    def is_active(self):
+        if self.protocol in ['ssh', 'telnet']:
+            key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
+            return bool(cache.get(key))
+        return True
+
+    @property
+    def command_amount(self):
+        command_store = get_multi_command_storage()
+        return command_store.count(session=str(self.id))
 
     class Meta:
         db_table = "terminal_session"

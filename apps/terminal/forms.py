@@ -39,5 +39,3 @@ class TerminalForm(forms.ModelForm):
             'name', 'remote_addr', 'comment',
             'command_storage', 'replay_storage',
         ]
-        help_texts = {
-        }

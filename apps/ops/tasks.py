@@ -1,9 +1,18 @@
 # coding: utf-8
+import os
+import subprocess
+
+from django.conf import settings
 from celery import shared_task, subtask
+from django.utils import timezone
 
 from common.utils import get_logger, get_object_or_none
-from .celery.utils import register_as_period_task, after_app_shutdown_clean
-from .models import Task, CommandExecution
+from .celery.decorator import (
+    register_as_period_task, after_app_shutdown_clean_periodic,
+    after_app_ready_start
+)
+from .celery.utils import create_or_update_celery_periodic_tasks
+from .models import Task, CommandExecution, CeleryTask
 
 logger = get_logger(__file__)
 
@@ -36,8 +45,8 @@ def run_command_execution(cid, **kwargs):
 
 
 @shared_task
+@after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24)
-@after_app_shutdown_clean
 def clean_tasks_adhoc_period():
     logger.debug("Start clean task adhoc and run history")
     tasks = Task.objects.all()
@@ -49,10 +58,41 @@ def clean_tasks_adhoc_period():
 
 
 @shared_task
+@after_app_shutdown_clean_periodic
+@register_as_period_task(interval=3600*24)
+def clean_celery_tasks_period():
+    expire_days = 30
+    logger.debug("Start clean celery task history")
+    one_month_ago = timezone.now() - timezone.timedelta(days=expire_days)
+    tasks = CeleryTask.objects.filter(date_start__lt=one_month_ago)
+    for task in tasks:
+        if os.path.isfile(task.full_log_path):
+            try:
+                os.remove(task.full_log_path)
+            except (FileNotFoundError, PermissionError):
+                pass
+        task.delete()
+    tasks = CeleryTask.objects.filter(date_start__isnull=True)
+    tasks.delete()
+    command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
+        settings.CELERY_LOG_DIR, expire_days
+    )
+    subprocess.call(command, shell=True)
+
+
+@shared_task
+@after_app_ready_start
+def create_or_update_registered_periodic_tasks():
+    from .celery.decorator import get_register_period_tasks
+    for task in get_register_period_tasks():
+        create_or_update_celery_periodic_tasks(task)
+
+
+@shared_task
 def hello(name, callback=None):
+    import time
+    time.sleep(10)
     print("Hello {}".format(name))
-    if callback is not None:
-        subtask(callback).delay("Guahongwei")
 
 
 @shared_task

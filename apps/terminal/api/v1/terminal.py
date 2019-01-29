@@ -100,52 +100,18 @@ class StatusViewSet(viewsets.ModelViewSet):
     task_serializer_class = serializers.TaskSerializer
 
     def create(self, request, *args, **kwargs):
-        from_gua = self.request.query_params.get("from_guacamole", None)
-        if not from_gua:
-            self.handle_sessions()
-        super().create(request, *args, **kwargs)
+        self.handle_status(request)
+        self.handle_sessions()
         tasks = self.request.user.terminal.task_set.filter(is_finished=False)
         serializer = self.task_serializer_class(tasks, many=True)
         return Response(serializer.data, status=201)
 
+    def handle_status(self, request):
+        request.user.terminal.is_alive = True
+
     def handle_sessions(self):
-        sessions_active = []
-        for session_data in self.request.data.get("sessions", []):
-            self.create_or_update_session(session_data)
-            if not session_data["is_finished"]:
-                sessions_active.append(session_data["id"])
-
-        sessions_in_db_active = Session.objects.filter(
-            is_finished=False,
-            terminal=self.request.user.terminal.id
-        )
-
-        for session in sessions_in_db_active:
-            if str(session.id) not in sessions_active:
-                session.is_finished = True
-                session.date_end = timezone.now()
-                session.save()
-
-    def create_or_update_session(self, session_data):
-        session_data["terminal"] = self.request.user.terminal.id
-        _id = session_data["id"]
-        session = get_object_or_none(Session, id=_id)
-        if session:
-            serializer = serializers.SessionSerializer(
-                data=session_data, instance=session
-            )
-        else:
-            serializer = serializers.SessionSerializer(data=session_data)
-
-        if serializer.is_valid():
-            session = serializer.save()
-            return session
-        else:
-            msg = "session data is not valid {}: {}".format(
-                serializer.errors, str(serializer.data)
-            )
-            logger.error(msg)
-            return None
+        sessions_id = self.request.data.get('sessions', [])
+        Session.set_sessions_active(sessions_id)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
