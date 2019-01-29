@@ -71,11 +71,11 @@ def auto_generate_terminal_host_key(sender, **kwargs):
     try:
         if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
             return
+        private_key, public_key = ssh_key_gen()
+        value = json.dumps(private_key)
+        Setting.objects.create(name='TERMINAL_HOST_KEY', value=value)
     except:
-        return
-    private_key, public_key = ssh_key_gen()
-    value = json.dumps(private_key)
-    Setting.objects.create(name='TERMINAL_HOST_KEY', value=value)
+        pass
 
 
 @receiver(pre_save, dispatch_uid="my_unique_identifier")
