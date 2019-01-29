@@ -71,7 +71,7 @@ def auto_generate_terminal_host_key(sender, **kwargs):
     try:
         if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
             return
-    except ProgrammingError:
+    except:
         return
     private_key, public_key = ssh_key_gen()
     value = json.dumps(private_key)
