@@ -170,26 +170,37 @@ class UserLoginOtpView(FormView):
         otp_code = form.cleaned_data.get('otp_code')
         otp_secret_key = user.otp_secret_key
 
-        if check_otp_code(otp_secret_key, otp_code):
-            auth_login(self.request, user)
-            data = {
-                'username': self.request.user.username,
-                'mfa': int(self.request.user.otp_enabled),
-                'reason': LoginLog.REASON_NOTHING,
-                'status': True
-            }
-            self.write_login_log(data)
-            return redirect(self.get_success_url())
-        else:
+        '''2019-01-29 17:23:47 登陆接口MFA验证实现验证一次即失效的功能'''
+        import datetime
+        from users.models import LoginLog
+
+        # 查询30s内有没有相同otp_code的验证，如果有则返回错误，
+        otp_code_v_30s = LoginLog.objects.filter(username=user.username, otp_code=str(otp_code), datetime__gte=(
+            datetime.datetime.now() - datetime.timedelta(seconds=30)
+        ).strftime('%Y-%m-%d %H:%M:%S'))
+
+        if not check_otp_code(otp_secret_key, otp_code) or otp_code_v_30s:
             data = {
                 'username': user.username,
                 'mfa': int(user.otp_enabled),
+                'otp_code': str(otp_code),
                 'reason': LoginLog.REASON_MFA,
                 'status': False
             }
             self.write_login_log(data)
             form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
             return super().form_invalid(form)
+        else:
+            auth_login(self.request, user)
+            data = {
+                'username': self.request.user.username,
+                'mfa': int(self.request.user.otp_enabled),
+                'otp_code': str(otp_code),
+                'reason': LoginLog.REASON_NOTHING,
+                'status': True
+            }
+            self.write_login_log(data)
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         return redirect_user_first_login_or_index(self.request, self.redirect_field_name)

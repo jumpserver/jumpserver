@@ -80,6 +80,9 @@ class LoginLog(models.Model):
     city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('User agent'))
     mfa = models.SmallIntegerField(default=MFA_UNKNOWN, choices=MFA_CHOICE, verbose_name=_('MFA'))
+
+    '''2019-01-29 17:26:56 增加了一个字段用于保存otp验证码'''
+    otp_code = models.CharField(max_length=254, blank=True, default='000000', verbose_name=_('otp code'))
     reason = models.SmallIntegerField(default=REASON_NOTHING, choices=REASON_CHOICE, verbose_name=_('Reason'))
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
     datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
