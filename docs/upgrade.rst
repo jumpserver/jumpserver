@@ -481,7 +481,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -711,7 +711,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -941,7 +941,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
