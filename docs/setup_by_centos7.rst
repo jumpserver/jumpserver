@@ -223,7 +223,7 @@ CentOS 7 安装文档
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/v1.4.7/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
