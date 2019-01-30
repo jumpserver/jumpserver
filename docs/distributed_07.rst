@@ -47,8 +47,8 @@
         -p 8081:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.30:8080 \
-        -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
-        jumpserver/jms_guacamole:1.4.6
+        -e BOOTSTRAP_TOKEN=你的token \
+        jumpserver/jms_guacamole:1.4.7
 
     # 访问 http://192.168.100.100/terminal/terminal/ 检查 guacamole 注册
 
@@ -64,7 +64,7 @@
         -p 8082:8081 \
         -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
         -e JUMPSERVER_SERVER=http://192.168.100.30:8080 \
-        -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
-        jumpserver/jms_guacamole:1.4.6
+        -e BOOTSTRAP_TOKEN=你的token \
+        jumpserver/jms_guacamole:1.4.7
 
     # 访问 http://192.168.100.100/terminal/terminal/ 检查 guacamole 注册

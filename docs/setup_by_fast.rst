@@ -48,15 +48,15 @@
 
     $ cd /opt \
       && git clone https://github.com/jumpserver/jumpserver.git \
-      && wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz \
+      && wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \
       && pip install --upgrade pip setuptools \
       && pip install -r /opt/jumpserver/requirements/requirements.txt \
       && curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io \
       && systemctl restart docker \
-      && docker pull jumpserver/jms_coco:1.4.6 \
-      && docker pull jumpserver/jms_guacamole:1.4.6 \
+      && docker pull jumpserver/jms_coco:1.4.7 \
+      && docker pull jumpserver/jms_guacamole:1.4.7 \
       && cd /opt \
       && tar xf luna.tar.gz \
       && chown -R root:root luna \
@@ -129,22 +129,25 @@
 
     $ systemctl start nginx \
       && DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24` \
+      && SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50` \
       && BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16` \
-      && cp /opt/jumpserver/config_example.py /opt/jumpserver/config.py \
+      && cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml \
       && Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
       && mysql -uroot -e "create database jumpserver default charset 'utf8';grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD';flush privileges;" \
-      && sed -i "s/BOOTSTRAP_TOKEN = 'PleaseChangeMe'/BOOTSTRAP_TOKEN = '$BOOTSTRAP_TOKEN'/g" /opt/jumpserver/config.py \
-      && sed -i "s/# DEBUG = True/DEBUG = False/g" /opt/jumpserver/config.py \
-      && sed -i "s/# LOG_LEVEL = 'DEBUG'/LOG_LEVEL = 'ERROR'/g" /opt/jumpserver/config.py \
-      && sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE = False/SESSION_EXPIRE_AT_BROWSER_CLOSE = True/g" /opt/jumpserver/config.py \
-      && sed -i "s/DB_PASSWORD = ''/DB_PASSWORD = '$DB_PASSWORD'/g" /opt/jumpserver/config.py
+      && sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml \
+      && sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml \
+      && sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml \
+      && sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml \
+      && sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml \
+      && sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml
 
 .. code-block:: shell
 
     $ cd /opt/jumpserver \
       && ./jms start all -d \
-      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.6 \
-      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.6 \
+      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.7 \
+      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.7 \
       && echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m" \
+      && echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m" \
       && echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m" \
       && echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m"

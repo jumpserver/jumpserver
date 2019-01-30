@@ -23,4 +23,5 @@ sftp 使用说明
 
     class SFTPServer(paramiko.SFTPServerInterface):
         root = '/tmp'
-        # 修改 home 为你要指定的目录,如: root = '/'
+        # 修改 /tmp 为你要指定的目录,如: root = '/'
+        # 如果需要指定为用户自己的 home 目录，可以改为 root = 'home'

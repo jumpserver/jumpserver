@@ -36,11 +36,11 @@
     # 如果是 Mariadb 大于 10 版本
     $ yum install MariaDB-shared
 
-6. sh make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.py", line 38
+6. sh make_migrations.sh 时报错 from config import config as CONFIG File "/opt/jumpserver/config.yml", line 38
 
 .. code-block:: vim
 
-    # 这是由于 config.py 里面的内容格式不对,请参考安装文档的说明,把提示的内容与上一行对齐即可
+    # 这是由于 config.yml 里面的内容格式不对,请参考安装文档的说明,把提示的内容与上一行对齐即可
 
 7. sh make_migrations.sh 时报错 Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?
 
@@ -91,7 +91,7 @@
 
 .. code-block:: vim
 
-    # 这是因为你在 config.py 里面设置了 DEBUG = False
+    # 这是因为你在 config.yml 里面设置了 DEBUG = False
     # 跟着教程继续操作,后面搭建 nginx 代理即可正常访问
 
 13. 执行 ./cocod start 后提示 No module named 'jms'
@@ -127,7 +127,7 @@
 
     这是因为当前系统的 hostname 有 coco 不支持的字符,需要手动指定 coco 的 NAME
     $ cd /opt/coco/
-    $ vi conf.py
+    $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
     # NAME = "localhost"
@@ -149,8 +149,8 @@
 
 .. code-block:: vim
 
-    # 这是因为 coco 无法连接到 jumpserver 报的错误,确定 http://xxxx:8080 设置正确(配置文件 coco/conf.py)
-    # 如果 jumpserver 的IP和端口不对,请手动修改 conf.py 的 CORE_HOST
+    # 这是因为 coco 无法连接到 jumpserver 报的错误,确定 http://xxxx:8080 设置正确(配置文件 coco/config.yml)
+    # 如果 jumpserver 的IP和端口不对,请手动修改 config.yml 的 CORE_HOST
 
 18. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
 
