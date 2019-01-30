@@ -48,7 +48,7 @@
 
     $ cd /opt \
       && git clone https://github.com/jumpserver/jumpserver.git \
-      && wget https://github.com/jumpserver/luna/releases/download/v1.4.7/luna.tar.gz \
+      && wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \
       && pip install --upgrade pip setuptools \
