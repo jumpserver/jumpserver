@@ -58,7 +58,7 @@ CentOS 7 安装文档
     $ systemctl enable mariadb
     $ systemctl start mariadb
     # 创建数据库 Jumpserver 并授权
-    $ DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24  # 生成随机数据库密码
+    $ DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24`  # 生成随机数据库密码
     $ echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m"
     $ mysql -uroot -e "create database jumpserver default charset 'utf8'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
 
@@ -103,8 +103,8 @@ CentOS 7 安装文档
     $ cd /opt/jumpserver
     $ cp config_example.yml config.yml
 
-    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50  # 生成随机SECRET_KEY
-    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16  # 生成随机BOOTSTRAP_TOKEN
+    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`  # 生成随机SECRET_KEY
+    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成随机BOOTSTRAP_TOKEN
 
     $ sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml
     $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml

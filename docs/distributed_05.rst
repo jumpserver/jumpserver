@@ -60,8 +60,8 @@
     $ cd /opt/jumpserver
     $ cp config_example.yml config.yml
 
-    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50  # 生成随机SECRET_KEY
-    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16  # 生成随机BOOTSTRAP_TOKEN
+    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`  # 生成随机SECRET_KEY
+    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成随机BOOTSTRAP_TOKEN
 
     $ sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml
     $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
