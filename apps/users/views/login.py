@@ -42,17 +42,21 @@ __all__ = [
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
-    template_name = 'users/login.html'
-    from xpack.plugins.license.models import License
-    license = License.objects.all()
-    if license:
-        if license[0].is_default == 0:
-            template_name = 'users/new_login.html'
-
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
     redirect_field_name = 'next'
     key_prefix_captcha = "_LOGIN_INVALID_{}"
+
+    def get_template_names(self):
+        template_name = 'users/login.html'
+        if settings.XPACK_ENABLED:
+            try:
+                from xpack.plugins.license.models import License
+                if License.has_validated_licence():
+                    template_name = 'users/new_login.html'
+            except ImportError:
+                pass
+        return template_name
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:

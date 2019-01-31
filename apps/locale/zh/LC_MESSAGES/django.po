@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-18 16:43+0800\n"
+"POT-Creation-Date: 2019-01-31 17:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -186,7 +186,7 @@ msgstr "名称"
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:77 users/models/user.py:53
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64
+#: users/templates/users/login.html:64 users/templates/users/new_login.html:85
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -199,7 +199,7 @@ msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:26 assets/models/base.py:24 common/forms.py:102
 #: users/forms.py:17 users/forms.py:35 users/forms.py:47
-#: users/templates/users/login.html:67
+#: users/templates/users/login.html:67 users/templates/users/new_login.html:90
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -913,6 +913,7 @@ msgstr "其它"
 #: users/templates/users/user_pubkey_update.html:76
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:35
+#: xpack/plugins/interface/templates/interface/interface_settings.html:50
 msgid "Reset"
 msgstr "重置"
 
@@ -939,12 +940,13 @@ msgstr "重置"
 #: terminal/templates/terminal/session_list.html:127
 #: terminal/templates/terminal/terminal_update.html:48
 #: users/templates/users/_user.html:51
-#: users/templates/users/forgot_password.html:45
+#: users/templates/users/forgot_password.html:49
 #: users/templates/users/user_bulk_update.html:24
 #: users/templates/users/user_list.html:45
 #: users/templates/users/user_password_update.html:72
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
+#: xpack/plugins/interface/templates/interface/interface_settings.html:51
 msgid "Submit"
 msgstr "提交"
 
@@ -2253,7 +2255,7 @@ msgid "Settings"
 msgstr "系统设置"
 
 #: common/views.py:29 common/views.py:55 common/views.py:81 common/views.py:112
-#: common/views.py:162
+#: common/views.py:162 xpack/plugins/interface/views.py:49
 msgid "Update setting successfully"
 msgstr "更新设置成功"
 
@@ -2733,7 +2735,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72
+#: users/templates/users/login.html:72 users/templates/users/new_login.html:96
 msgid "Login"
 msgstr "登录"
 
@@ -2801,9 +2803,9 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
-#: users/views/group.py:60 users/views/group.py:76 users/views/group.py:92
-#: users/views/login.py:349 users/views/user.py:68 users/views/user.py:83
+#: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
+#: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
+#: users/views/login.py:359 users/views/user.py:68 users/views/user.py:83
 #: users/views/user.py:113 users/views/user.py:194 users/views/user.py:355
 #: users/views/user.py:405 users/views/user.py:445
 msgid "Users"
@@ -2877,7 +2879,7 @@ msgstr "语言播放验证码"
 msgid "Captcha"
 msgstr "验证码"
 
-#: templates/flash_message_standalone.html:45
+#: templates/flash_message_standalone.html:54
 msgid "Return"
 msgstr "返回"
 
@@ -3244,6 +3246,7 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: users/api/auth.py:40 users/templates/users/login.html:52
+#: users/templates/users/new_login.html:71
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -3524,7 +3527,7 @@ msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
 #: users/models/user.py:128 users/templates/users/user_update.html:22
-#: users/views/login.py:243 users/views/login.py:302 users/views/user.py:418
+#: users/views/login.py:253 users/views/login.py:312 users/views/user.py:418
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -3623,12 +3626,12 @@ msgid " for more information"
 msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
-#: users/templates/users/forgot_password.html:27
-#: users/templates/users/login.html:83
+#: users/templates/users/forgot_password.html:31
+#: users/templates/users/login.html:83 users/templates/users/new_login.html:102
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: users/templates/users/forgot_password.html:34
+#: users/templates/users/forgot_password.html:38
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
 
@@ -3669,11 +3672,11 @@ msgstr ""
 msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
-#: users/templates/users/login.html:54
+#: users/templates/users/login.html:54 users/templates/users/new_login.html:73
 msgid "The user password has expired"
 msgstr "用户密码已过期"
 
-#: users/templates/users/login.html:57
+#: users/templates/users/login.html:57 users/templates/users/new_login.html:76
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3919,7 +3922,7 @@ msgstr "重置用户MFA成功"
 
 #: users/templates/users/user_group_detail.html:22
 #: users/templates/users/user_group_granted_asset.html:18
-#: users/views/group.py:77
+#: users/views/group.py:76
 msgid "User group detail"
 msgstr "用户组详情"
 
@@ -3928,7 +3931,7 @@ msgstr "用户组详情"
 msgid "Add user"
 msgstr "添加用户"
 
-#: users/templates/users/user_group_list.html:5 users/views/group.py:45
+#: users/templates/users/user_group_list.html:5 users/views/group.py:44
 msgid "Create user group"
 msgstr "创建用户组"
 
@@ -4267,68 +4270,68 @@ msgstr "禁用或失效"
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/views/group.py:29
+#: users/views/group.py:28
 msgid "User group list"
 msgstr "用户组列表"
 
-#: users/views/group.py:61
+#: users/views/group.py:60
 msgid "Update user group"
 msgstr "更新用户组"
 
-#: users/views/group.py:93
+#: users/views/group.py:92
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:69
+#: users/views/login.py:79
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:191 users/views/user.py:532 users/views/user.py:557
+#: users/views/login.py:201 users/views/user.py:532 users/views/user.py:557
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: users/views/login.py:223
+#: users/views/login.py:233
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:224
+#: users/views/login.py:234
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:240
+#: users/views/login.py:250
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:256
+#: users/views/login.py:266
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:257
+#: users/views/login.py:267
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:270
+#: users/views/login.py:280
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:271
+#: users/views/login.py:281
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:286 users/views/login.py:305
+#: users/views/login.py:296 users/views/login.py:315
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:298
+#: users/views/login.py:308
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:311 users/views/user.py:128 users/views/user.py:428
+#: users/views/login.py:321 users/views/user.py:128 users/views/user.py:428
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:349
+#: users/views/login.py:359
 msgid "First login"
 msgstr "首次登录"
 
@@ -4591,12 +4594,99 @@ msgstr "同步实例任务列表"
 msgid "Create sync Instance task"
 msgstr "创建同步实例任务"
 
+#: xpack/plugins/interface/forms.py:8
+msgid "Login Interface Theme"
+msgstr "登录页系统名称"
+
+#: xpack/plugins/interface/forms.py:9
+msgid "Please fill in the login Interface theme on the login interface"
+msgstr "请填写登录页的系统名称(显示在登录页面 eg:欢迎使用Jumpserver开源堡垒机)"
+
+#: xpack/plugins/interface/forms.py:14
+msgid "Login Interface Image"
+msgstr "登录页图片"
+
+#: xpack/plugins/interface/forms.py:15
+msgid ""
+"This is the image of the Login interface. The size is:(width:635px ; "
+"height:472px)"
+msgstr ""
+"请上传登录页的图片(显示在登录页面的右侧图), 图片的大小为: (宽:635px ; "
+"高:472px)"
+
+#: xpack/plugins/interface/forms.py:19
+msgid "Logout Interface Logo"
+msgstr "退出页面的logo"
+
+#: xpack/plugins/interface/forms.py:20
+msgid ""
+"This is the logo of the Logout interface. The size is:(width:82px ; "
+"height:82px)"
+msgstr ""
+"请上传退出页面的logo(显示在退出页面上), 图片的大小为: (宽:82px ; 高:82px)"
+
+#: xpack/plugins/interface/forms.py:25
+msgid "Index Interface Logo"
+msgstr "首页界面的logo"
+
+#: xpack/plugins/interface/forms.py:26
+msgid ""
+"This is the logo of the Index interface. The size is:(width:185px ; "
+"height:55px)"
+msgstr ""
+"请上传首页界面的logo(显示在系统首页的左上角位置), 尺寸大小为:(宽:185px ; "
+"高:55px)"
+
+#: xpack/plugins/interface/forms.py:31
+msgid "Favition Interface icon"
+msgstr "网站图标"
+
+#: xpack/plugins/interface/forms.py:32
+msgid "This is the icon of the website. The size is:(width:16px ; height:16px"
+msgstr "请上传网站logo(显示在网站的导航栏位置), 尺寸大小为:(宽:16px ; 高:16px)"
+
+#: xpack/plugins/interface/meta.py:8
+msgid "Interface settings"
+msgstr "界面设置"
+
+#: xpack/plugins/interface/models.py:11
+msgid "Login interface image"
+msgstr "登录界面的图片"
+
+#: xpack/plugins/interface/models.py:12
+msgid "Login interface theme"
+msgstr "登录页系统名称"
+
+#: xpack/plugins/interface/models.py:13
+msgid "Logout interface logo"
+msgstr "退出登录界面的logo"
+
+#: xpack/plugins/interface/models.py:14
+msgid "Index interface logo"
+msgstr "首页界面的logo"
+
+#: xpack/plugins/interface/models.py:15
+msgid "Favicon logo"
+msgstr "网站图标"
+
+#: xpack/plugins/interface/models.py:18
+msgid "Interface info"
+msgstr "界面信息"
+
+#: xpack/plugins/interface/templates/interface/interface_settings.html:15
+#: xpack/plugins/interface/views.py:18
+msgid "Interface setting"
+msgstr "界面设置"
+
+#: xpack/plugins/interface/views.py:17
+msgid "Interface"
+msgstr "界面"
+
 #: xpack/plugins/license/license_service.py:34
 msgid "Unlimited"
 msgstr "无限制"
 
 #: xpack/plugins/license/license_service.py:41
-
 msgid ""
 "Your license does not match the current product， please click the right "
 "side to Import license for update!"
@@ -4623,7 +4713,7 @@ msgid "Verification failed. Please re-upload license！"
 msgstr "验证失败，请重新上传许可证！"
 
 #: xpack/plugins/license/meta.py:9 xpack/plugins/license/models.py:11
-#: xpack/plugins/license/views.py:24
+#: xpack/plugins/license/views.py:23
 msgid "License"
 msgstr "许可证"
 
@@ -4637,7 +4727,7 @@ msgid "License file"
 msgstr "许可证文件"
 
 #: xpack/plugins/license/templates/license/license_list.html:32
-#: xpack/plugins/license/views.py:25
+#: xpack/plugins/license/views.py:24
 msgid "License detail"
 msgstr "许可证详情"
 
@@ -4665,13 +4755,26 @@ msgstr "技术咨询"
 msgid "Consult"
 msgstr "咨询"
 
-#: xpack/plugins/license/views.py:41
+
+#: xpack/plugins/license/views.py:30
+msgid "No license, please import license!"
+msgstr "没有许可证,请导入许可证!"
+
+#: xpack/plugins/license/views.py:42
 msgid "Enterprise edition"
 msgstr "企业版"
 
-#: xpack/plugins/license/views.py:83
-msgid "删除成功！"
-msgstr ""
+#: xpack/plugins/license/views.py:84
+#, fuzzy
+#| msgid "Delete succeed"
+msgid "Delete success！"
+msgstr "删除成功"
+
+#: xpack/plugins/license/views.py:87
+#, fuzzy
+#| msgid "Username does not exist"
+msgid "This license does not exist！"
+msgstr "用户名不存在"
 
 #: xpack/plugins/orgs/forms.py:14
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:76
@@ -4767,11 +4870,6 @@ msgstr "更新组织"
 
 #~ msgid "Bit"
 #~ msgstr " 位"
-
-#, fuzzy
-#~| msgid "Delete succeed"
-#~ msgid "Delete success"
-#~ msgstr "删除成功"
 
 #~ msgid ""
 #~ "Set terminal storage setting, `default` is the using as default,You can "

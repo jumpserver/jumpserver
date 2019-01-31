@@ -6,7 +6,16 @@
 <!--/*@thymesVar id="message" type="java.lang.String"*/-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
+    {% if interface_processor %}
+        {% if interface_processor.favicon_logo %}
+            <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface_processor.favicon_logo }}" type="image/x-icon">
+        {% else %}
+                <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
+        {% endif %}
+    {% else %}
+        <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
+    {% endif %}
+
     <title>登录 Jumpserver
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

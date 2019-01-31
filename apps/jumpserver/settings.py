@@ -98,7 +98,10 @@ ROOT_URLCONF = 'jumpserver.urls'
 
 def get_xpack_context_processor():
     if XPACK_ENABLED:
-        return ['xpack.context_processor.xpack_processor']
+        return [
+            'xpack.context_processor.xpack_processor',
+            'xpack.plugins.interface.context_processor.interface_processor'
+        ]
     return []
 
 
@@ -133,10 +136,6 @@ TEMPLATES = [
                 'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
                 *get_xpack_context_processor(),
-                'xpack.plugins.interface.context_processor.interface_processor',
-
-
-
             ],
         },
     },
