@@ -375,10 +375,10 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ cd /config
-    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz
-    $ tar xf apache-tomcat-8.5.35.tar.gz
-    $ rm -rf apache-tomcat-8.5.35.tar.gz
-    $ mv apache-tomcat-8.5.35 tomcat8
+    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz
+    $ tar xf apache-tomcat-8.5.38.tar.gz
+    $ rm -rf apache-tomcat-8.5.38.tar.gz
+    $ mv apache-tomcat-8.5.38 tomcat8
     $ rm -rf /config/tomcat8/webapps/*
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat8/conf/server.xml  # 修改默认端口为 8081
