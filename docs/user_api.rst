@@ -16,11 +16,11 @@ API 文档
 
 .. code-block:: shell
 
-    $ curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}'  # 获取token
+    $ curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type:multipart/form-data' -F username=admin -F password=admin  # 获取token
     {"token":"937b38011acf499eb474e2fecb424ab3"}  # 获取到的token
 
     # 如果开启了 MFA, 则返回的是 seed, 需要携带 seed 和 otp_code 再次提交一次才能获取到 token
-    curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type: application/json' -d '{"username": "admin", "password": "admin"}'
+    curl -X POST http://localhost/api/users/v1/auth/ -H 'Content-Type:multipart/form-data' -F username=admin -F password=admin  
     {"code":101,"msg":"请携带seed值, 进行MFA二次认证","otp_url":"/api/users/v1/otp/auth/","seed":"629ba0935a624bd9b21e31c19e0cc8cb"}
     $ curl -X POST http://localhost/api/users/v1/otp/auth/ -H 'Content-Type: application/json' -H 'cache-control: no-cache' -d '{"seed": "629ba0935a624bd9b21e31c19e0cc8cb", "otp_code": "202123"}'
     {"token":"937b38011acf499eb474e2fecb424ab3"}
