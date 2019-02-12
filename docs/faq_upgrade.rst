@@ -59,8 +59,8 @@
     > quit
 
     # 修改配置文件
-    $ cp /opt/jumpserver_bak/config.yml /opt/jumpserver/
-    $ vim /opt/jumpserver/config.yml
+    $ cp /opt/jumpserver_bak/config.py /opt/jumpserver/
+    $ vim /opt/jumpserver/config.py
     DB_ENGINE = 'mysql'
     DB_HOST = '127.0.0.1'
     DB_PORT = 3306

@@ -26,7 +26,7 @@ SSH 协议资产连接错误排查思路
 
     # 正常部署请参照此步骤解决
     $ cd /opt/coco && ./cocod stop
-    $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的,key应该在这里,如果不存在,直接下一步
+    $ rm /opt/coco/data/keys/.access_key  # coco, 如果你是按文档安装的,key应该在这里,如果不存在,直接下一步
     $ ./cocod start -d
 
     # docker 部署请直接删除容器后重建,记得一定要先在 终端管理 删除不在线的组件
@@ -84,8 +84,8 @@ SSH 协议资产连接错误排查思路
     $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-    # NAME = "localhost"
-    NAME = "localhost"
+    # NAME: {{ Hostname }}
+    NAME: localhost
 
 7. 测试可连接性 及 更新硬件信息
 

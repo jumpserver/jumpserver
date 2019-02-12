@@ -61,8 +61,6 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 - REDIS_PASSWORD =
 
 - VOLUME /opt/jumpserver/data
-- VOLUME /opt/coco/keys
-- VOLUME /config/guacamole/keys
 - VOLUME /var/lib/mysql
 
 .. code-block:: shell

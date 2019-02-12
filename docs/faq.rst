@@ -85,8 +85,8 @@ FAQ
 
     $ vi /opt/coco/config.yml
 
-    # 把 SSH_TIMEOUT = 15 修改成你想要的数字 单位为：秒
-    SSH_TIMEOUT = 60
+    # 把 SSH_TIMEOUT: 15 修改成你想要的数字 单位为：秒
+    SSH_TIMEOUT: 60
 
 7. 设置浏览器过期
 
@@ -94,15 +94,15 @@ FAQ
 
     $ vi /opt/jumpserver/config.yml
 
-.. code-block:: python
+.. code-block:: yaml
 
     # 找到如下行(可参考 django 设置 session 过期时间),修改你要的设置即可
-    # SESSION_COOKIE_AGE = 3600 * 24
-    # SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+    # SESSION_COOKIE_AGE: 3600 * 24
+    # SESSION_EXPIRE_AT_BROWSER_CLOSE: False
 
     # 如下,设置关闭浏览器 cookie 失效,则修改为
-    # SESSION_COOKIE_AGE = 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    # SESSION_COOKIE_AGE: 3600 * 24
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
 
 8. 资产授权说明
 

@@ -91,7 +91,7 @@
 
 .. code-block:: vim
 
-    # 这是因为你在 config.yml 里面设置了 DEBUG = False
+    # 这是因为你在 config.yml 里面设置了 DEBUG: false
     # 跟着教程继续操作,后面搭建 nginx 代理即可正常访问
 
 13. 执行 ./cocod start 后提示 No module named 'jms'
@@ -118,7 +118,7 @@
     # 必须到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
     # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 coco 的注册
     $ cd /opt/coco && ./cocod stop
-    $ rm /opt/coco/keys/.access_key  # coco, 如果你是按文档安装的,key应该在这里,如果不存在key文件直接下一步
+    $ rm /opt/coco/data/keys/.access_key  # coco, 如果你是按文档安装的,key应该在这里,如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
 15. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
@@ -130,8 +130,8 @@
     $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-    # NAME = "localhost"
-    NAME = "coco"
+    # NAME: {{ Hostname }}
+    NAME: localhost
 
     保存后重新执行 ./cocod start 即可
 
