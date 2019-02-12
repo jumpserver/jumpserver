@@ -91,7 +91,7 @@
 
 .. code-block:: vim
 
-    # 这是因为你在 config.yml 里面设置了 DEBUG = False
+    # 这是因为你在 config.yml 里面设置了 DEBUG: false
     # 跟着教程继续操作,后面搭建 nginx 代理即可正常访问
 
 13. 执行 ./cocod start 后提示 No module named 'jms'
@@ -130,8 +130,8 @@
     $ vi config.yml
 
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-    # NAME = "localhost"
-    NAME = "coco"
+    # NAME: {{ Hostname }}
+    NAME: localhost
 
     保存后重新执行 ./cocod start 即可
 
