@@ -41,7 +41,10 @@ def run_ansible_task(tid, callback=None, **kwargs):
 @shared_task
 def run_command_execution(cid, **kwargs):
     execution = get_object_or_none(CommandExecution, id=cid)
-    return execution.run()
+    if execution:
+        execution.run()
+    else:
+        logger.error("Not found the execution id: {}".format(cid))
 
 
 @shared_task

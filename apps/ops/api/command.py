@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import viewsets
+from django.db import transaction
 
 from common.permissions import IsValidUser
 from ..models import CommandExecution
@@ -11,7 +12,6 @@ from ..tasks import run_command_execution
 class CommandExecutionViewSet(viewsets.ModelViewSet):
     serializer_class = CommandExecutionSerializer
     permission_classes = (IsValidUser,)
-    task = None
 
     def get_queryset(self):
         return CommandExecution.objects.filter(
@@ -22,6 +22,6 @@ class CommandExecutionViewSet(viewsets.ModelViewSet):
         instance = serializer.save()
         instance.user = self.request.user
         instance.save()
-        run_command_execution.apply_async(
+        transaction.on_commit(lambda: run_command_execution.apply_async(
             args=(instance.id,), task_id=str(instance.id)
-        )
+        ))

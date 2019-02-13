@@ -176,7 +176,7 @@ def start_celery():
     cmd = [
         'celery', 'worker',
         '-A',  'ops',
-        '-l', LOG_LEVEL.lower(),
+        '-l', 'INFO',
         '--pidfile', pid_file,
         '--autoscale', '20,4',
     ]

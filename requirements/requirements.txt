@@ -14,7 +14,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==2.3.1
 decorator==4.1.2
-Django==2.1
+Django==2.1.7
 django-auth-ldap==1.7.0
 django-bootstrap3==9.1.0
 django-celery-beat==1.1.1
