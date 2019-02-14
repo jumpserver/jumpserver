@@ -34,7 +34,7 @@
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.30" port protocol="tcp" port="6379" accept"
     $ firewall-cmd --reload
 
-    # 设置 mariadb 自启
+    # 设置 redis 自启
     $ systemctl enable redis
 
 .. code-block:: vim
