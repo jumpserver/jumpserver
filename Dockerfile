@@ -9,7 +9,7 @@ COPY ./requirements /tmp/requirements
 RUN yum -y install epel-release openldap-clients telnet && cd /tmp/requirements && \
     yum -y install $(cat rpm_requirements.txt)
 
-RUN cd /tmp/requirements &&  pip install -r requirements.txt
+RUN cd /tmp/requirements &&  pip install -i https://mirrors.ustc.edu.cn/pypi/web/simple -r requirements.txt || pip install -r requirements.txt
 
 COPY . /opt/jumpserver
 RUN echo > config.yml

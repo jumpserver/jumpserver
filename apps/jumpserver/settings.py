@@ -218,10 +218,9 @@ LOGGING = {
         'file': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': "D",
-            'interval': 1,
-            "backupCount": 7,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*100,
+            'backupCount': 7,
             'formatter': 'main',
             'filename': JUMPSERVER_LOG_FILE,
         },
