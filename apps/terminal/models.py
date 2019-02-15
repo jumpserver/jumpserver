@@ -168,7 +168,7 @@ class Session(OrgModelMixin):
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
 
-    def get_rel_replay_path(self, version=2):
+    def get_rel_replay_path(self, version=3):
         """
         获取session日志的文件路径
         :param version: 原来后缀是 .gz，为了统一新版本改为 .replay.gz
@@ -177,10 +177,13 @@ class Session(OrgModelMixin):
         suffix = '.replay.gz'
         if version == 1:
             suffix = '.gz'
-        date = self.date_start.strftime('%Y-%m-%d')
+        if version <= 2:
+            date = self.date_start.strftime('%Y-%m-%d')
+        else:
+            date = self.date_start.utcnow().strftime('%Y-%m-%d')
         return os.path.join(date, str(self.id) + suffix)
 
-    def get_local_path(self, version=2):
+    def get_local_path(self, version=3):
         rel_path = self.get_rel_replay_path(version=version)
         if version == 2:
             local_path = os.path.join(self.upload_to, rel_path)

@@ -206,6 +206,14 @@ class LogTailApi(generics.RetrieveAPIView):
     def get_log_path(self):
         raise NotImplementedError()
 
+    def filter_line(self, line):
+        """
+        过滤行，可能替换一些信息
+        :param line:
+        :return:
+        """
+        return line
+
     def get(self, request, *args, **kwargs):
         mark = request.query_params.get("mark") or str(uuid.uuid4())
         log_path = self.get_log_path()
@@ -224,9 +232,16 @@ class LogTailApi(generics.RetrieveAPIView):
             offset = cache.get(mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')
+
             mark = str(uuid.uuid4())
             cache.set(mark, f.tell(), 5)
 
             if data == '' and self.is_file_finish_write():
                 self.end = True
-            return Response({"data": data, 'end': self.end, 'mark': mark})
+            _data = ''
+            for line in data.split('\r\n'):
+                new_line = self.filter_line(line)
+                if line == '':
+                    continue
+                _data += new_line + '\r\n'
+            return Response({"data": _data, 'end': self.end, 'mark': mark})
