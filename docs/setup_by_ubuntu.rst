@@ -131,7 +131,7 @@
     $ sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml
     $ sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml
     $ sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml
-    $ sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: False/SESSION_EXPIRE_AT_BROWSER_CLOSE: True/g" /opt/jumpserver/config.yml
+    $ sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: false/SESSION_EXPIRE_AT_BROWSER_CLOSE: true/g" /opt/jumpserver/config.yml
     $ sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml
 
     $ echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m"
@@ -160,8 +160,8 @@
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
     # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-    # SESSION_COOKIE_AGE: 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
+    # SESSION_COOKIE_AGE: 86400
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
@@ -284,7 +284,7 @@
     # 加密密钥
     # SECRET_KEY: null
 
-    # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+    # 设置日志级别 [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
     # LOG_LEVEL: INFO
     LOG_LEVEL: ERROR
 
@@ -292,7 +292,7 @@
     # LOG_DIR: logs
 
     # SSH白名单
-    # ALLOW_SSH_USER: 'all'
+    # ALLOW_SSH_USER: all
 
     # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
     # BLOCK_SSH_USER:
@@ -307,8 +307,14 @@
     # SSH连接超时时间 (default 15 seconds)
     # SSH_TIMEOUT: 15
 
-    # 语言 = en
+    # 语言 [en,zh]
     # LANGUAGE_CODE: zh
+
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    # SFTP_ROOT: /tmp
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE: false
 
 .. code-block:: shell
 
@@ -392,8 +398,8 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
 
     # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
-    $ export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
-    $ echo "export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV" >> ~/.bashrc
+    $ export BOOTSTRAP_TOKEN=******
+    $ echo "export BOOTSTRAP_TOKEN=******" >> ~/.bashrc
     $ export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     $ echo "export JUMPSERVER_KEY_DIR=/config/guacamole/keys" >> ~/.bashrc
     $ export GUACAMOLE_HOME=/config/guacamole
