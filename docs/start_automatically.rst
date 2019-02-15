@@ -39,7 +39,7 @@
     export GUACAMOLE_HOME=/config/guacamole
     export JUMPSERVER_KEY_DIR=/config/guacamole/keys
     export JUMPSERVER_SERVER=http://127.0.0.1:8080
-    export BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
+    export BOOTSTRAP_TOKEN=******  # 根据实际情况修改
     /etc/init.d/guacd start
     cd /config/tomcat8/bin && ./startup.sh
 
@@ -143,7 +143,7 @@ Systemd 管理启动 Jumpserver
     # 适合按照一步一步文档进行安装的用户, Centos 7
 
     # Jumpserver
-    $ cat << EOF > /usr/lib/systemd/system/jms.service
+    $ vi /usr/lib/systemd/system/jms.service
     [Unit]
     Description=jms
     After=network.target mariadb.service redis.service
@@ -159,10 +159,8 @@ Systemd 管理启动 Jumpserver
     [Install]
     WantedBy=multi-user.target
 
-    EOF
-
     # Coco
-    $ cat << EOF > /usr/lib/systemd/system/coco.service
+    $ vi /usr/lib/systemd/system/coco.service
     [Unit]
     Description=coco
     After=network.target jms.service
@@ -178,12 +176,10 @@ Systemd 管理启动 Jumpserver
     [Install]
     WantedBy=multi-user.target
 
-    EOF
-
     # Guacamole
     $ chkconfig guacd on
     $ sed -i '143i CATALINA_PID="$CATALINA_BASE/tomcat.pid"' /config/tomcat8/bin/catalina.sh
-    $ cat << EOF > /usr/lib/systemd/system/guacamole.service
+    $ vi /usr/lib/systemd/system/guacamole.service
     [Unit]
     Description=guacamole
     After=network.target jms.service
@@ -192,15 +188,14 @@ Systemd 管理启动 Jumpserver
     [Service]
     Type=forking
     PIDFile=/config/tomcat8/tomcat.pid
-    Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole" "BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV"
+    # BOOTSTRAP_TOKEN 根据实际情况修改
+    Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole" "BOOTSTRAP_TOKEN=******"
     ExecStart=/config/tomcat8/bin/startup.sh
     ExecReload=
     ExecStop=/config/tomcat8/bin/shutdown.sh
 
     [Install]
     WantedBy=multi-user.target
-
-    EOF
 
     # 开机自启设置
     $ systemctl enable jms
