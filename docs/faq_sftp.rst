@@ -17,11 +17,12 @@ sftp 使用说明
     # 此处即是当前资产的 home 目录
 
     # 如果需要修改 /tmp 为其他目录
-    $ vi coco/coco/sftp.py
+    $ vi coco/conf.yml
 
-.. code-block:: python
+.. code-block:: vim
 
-    class SFTPServer(paramiko.SFTPServerInterface):
-        root = '/tmp'
-        # 修改 /tmp 为你要指定的目录,如: root = '/'
-        # 如果需要指定为用户自己的 home 目录，可以改为 root = 'home'
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    SFTP_ROOT: /tmp
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE: false

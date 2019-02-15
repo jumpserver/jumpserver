@@ -290,8 +290,8 @@
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
     # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-    # SESSION_COOKIE_AGE: 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
+    # SESSION_COOKIE_AGE: 86400
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
@@ -420,14 +420,14 @@
     # 加密密钥
     # SECRET_KEY: null
 
-    # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+    # 设置日志级别 [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
     LOG_LEVEL: ERROR
 
     # 日志存放的目录
     # LOG_DIR: logs
 
     # SSH白名单
-    # ALLOW_SSH_USER: 'all'
+    # ALLOW_SSH_USER: all
 
     # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
     # BLOCK_SSH_USER:
@@ -442,8 +442,14 @@
     # SSH连接超时时间 (default 15 seconds)
     # SSH_TIMEOUT: 15
 
-    # 语言 = en
+    # 语言 [en,zh]
     # LANGUAGE_CODE: zh
+
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    # SFTP_ROOT: /tmp
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE: false
 
 .. code-block:: shell
 
@@ -549,8 +555,8 @@
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
     # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-    # SESSION_COOKIE_AGE: 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
+    # SESSION_COOKIE_AGE: 86400
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
@@ -650,14 +656,14 @@
     # 加密密钥
     # SECRET_KEY: null
 
-    # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+    # 设置日志级别 [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
     LOG_LEVEL: ERROR
 
     # 日志存放的目录
     # LOG_DIR: logs
 
     # SSH白名单
-    # ALLOW_SSH_USER: 'all'
+    # ALLOW_SSH_USER: all
 
     # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
     # BLOCK_SSH_USER:
@@ -672,8 +678,14 @@
     # SSH连接超时时间 (default 15 seconds)
     # SSH_TIMEOUT: 15
 
-    # 语言 = en
+    # 语言 [en,zh]
     # LANGUAGE_CODE: zh
+
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    # SFTP_ROOT: /tmp
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE: false
 
 .. code-block:: shell
 
@@ -779,8 +791,8 @@
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
     # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
-    # SESSION_COOKIE_AGE: 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
+    # SESSION_COOKIE_AGE: 86400
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
     # Database setting, Support sqlite3, mysql, postgres ....
     # 数据库设置
@@ -880,14 +892,14 @@
     # 加密密钥
     # SECRET_KEY: null
 
-    # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
+    # 设置日志级别 [DEBUG, INFO, WARN, ERROR, FATAL, CRITICAL]
     LOG_LEVEL: ERROR
 
     # 日志存放的目录
     # LOG_DIR: logs
 
     # SSH白名单
-    # ALLOW_SSH_USER: 'all'
+    # ALLOW_SSH_USER: all
 
     # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
     # BLOCK_SSH_USER:
@@ -902,8 +914,14 @@
     # SSH连接超时时间 (default 15 seconds)
     # SSH_TIMEOUT: 15
 
-    # 语言 = en
+    # 语言 [en,zh]
     # LANGUAGE_CODE: zh
+
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    # SFTP_ROOT: /tmp
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE: false
 
 .. code-block:: shell
 
@@ -1036,7 +1054,7 @@
     $ docker rm jms_guacamole
     $ docker pull jumpserver/jms_coco:1.4.8
     $ docker pull jumpserver/jms_guacamole:1.4.8
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_coco:1.4.8
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV jumpserver/jms_guacamole:1.4.8
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.8
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线

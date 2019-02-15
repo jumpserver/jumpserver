@@ -97,12 +97,12 @@ FAQ
 .. code-block:: yaml
 
     # 找到如下行(可参考 django 设置 session 过期时间),修改你要的设置即可
-    # SESSION_COOKIE_AGE: 3600 * 24
-    # SESSION_EXPIRE_AT_BROWSER_CLOSE: False
+    # SESSION_COOKIE_AGE: 86400
+    # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
     # 如下,设置关闭浏览器 cookie 失效,则修改为
-    # SESSION_COOKIE_AGE: 3600 * 24
-    SESSION_EXPIRE_AT_BROWSER_CLOSE: True
+    # SESSION_COOKIE_AGE: 86400
+    SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
 8. 资产授权说明
 

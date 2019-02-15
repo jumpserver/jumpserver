@@ -48,7 +48,7 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 
 额外环境变量
 ```````````````
-- BOOTSTRAP_TOKEN = nwv4RdXpM82LtSvmV
+- BOOTSTRAP_TOKEN = ******
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
 - DB_PORT = 3306
