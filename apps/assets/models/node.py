@@ -134,10 +134,10 @@ class Node(OrgModelMixin):
         count = max(values) + 1 if values else 1
         return '{} {}'.format(name, count)
 
-    def create_child(self, value):
+    def create_child(self, value, _id=None):
         with transaction.atomic():
             child_key = self.get_next_child_key()
-            child = self.__class__.objects.create(key=child_key, value=value)
+            child = self.__class__.objects.create(id=_id, key=child_key, value=value)
             return child
 
     def get_children(self, with_self=False):

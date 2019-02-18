@@ -163,12 +163,13 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         instance = self.get_object()
         value = request.data.get("value")
+        _id = request.data.get('id') or None
         values = [child.value for child in instance.get_children()]
         if value in values:
             raise ValidationError(
                 'The same level node name cannot be the same'
             )
-        node = instance.create_child(value=value)
+        node = instance.create_child(value=value, _id=_id)
         return Response(self.serializer_class(instance=node).data, status=201)
 
     def get_object(self):
