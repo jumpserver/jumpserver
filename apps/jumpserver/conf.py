@@ -282,6 +282,10 @@ class Config(dict):
         if value is not None:
             if value.isdigit():
                 value = int(value)
+            elif value.lower() == 'false':
+                value = False
+            elif value.lower() == 'true':
+                value = True
             return value
         return self.defaults.get(item)
 
