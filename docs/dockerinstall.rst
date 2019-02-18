@@ -14,8 +14,13 @@ Docker 安装见: `Docker官方安装文档 <https://docs.docker.com/install/>`_
 
 .. code-block:: shell
 
+    $ SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`  # 生成加密秘钥, 勿外泄
+    $ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成组件注册所需Token, 勿外泄
+
     # 最新版本
-    $ docker run --name jms_all -d -p 80:80 -p 2222:2222 jumpserver/jms_all:latest
+    $ docker run --name jms_all -d -p 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
+
+环境迁移和更新升级请手动指定SECRET_KEY和BOOTSTRAP_TOKEN, 需要保持一致
 
 访问
 ```````````````
@@ -48,6 +53,7 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 
 额外环境变量
 ```````````````
+- SECRET_KEY = ******
 - BOOTSTRAP_TOKEN = ******
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
