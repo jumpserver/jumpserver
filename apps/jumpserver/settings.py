@@ -15,7 +15,6 @@ import sys
 import socket
 
 import ldap
-# from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
 from .conf import load_user_config
@@ -81,8 +80,14 @@ INSTALLED_APPS = [
 
 XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
 XPACK_ENABLED = os.path.isdir(XPACK_DIR)
+XPACK_TEMPLATES_DIR = []
+XPACK_CONTEXT_PROCESSOR = []
+
 if XPACK_ENABLED:
+    from xpack.utils import get_xpack_templates_dir, get_xpack_context_processor
     INSTALLED_APPS.append('xpack.apps.XpackConfig')
+    XPACK_TEMPLATES_DIR = get_xpack_templates_dir(BASE_DIR)
+    XPACK_CONTEXT_PROCESSOR = get_xpack_context_processor()
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -103,29 +108,10 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'jumpserver.urls'
 
 
-def get_xpack_context_processor():
-    if XPACK_ENABLED:
-        return ['xpack.context_processor.xpack_processor']
-    return []
-
-
-def get_xpack_templates_dir():
-    if XPACK_ENABLED:
-        dirs = []
-        from xpack.utils import find_enabled_plugins
-        for i in find_enabled_plugins():
-            template_dir = os.path.join(BASE_DIR, 'xpack', 'plugins', i, 'templates')
-            if os.path.isdir(template_dir):
-                dirs.append(template_dir)
-        return dirs
-    else:
-        return []
-
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), *get_xpack_templates_dir()],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), *XPACK_TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,7 +125,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
-                *get_xpack_context_processor(),
+                *XPACK_CONTEXT_PROCESSOR,
             ],
         },
     },
