@@ -5,7 +5,7 @@ import logging
 from django.core.cache import cache
 from celery import subtask
 from celery.signals import (
-    worker_ready, worker_shutdown, after_setup_logger, setup_logging
+    worker_ready, worker_shutdown, after_setup_logger
 )
 from kombu.utils.encoding import safe_str
 from django_celery_beat.models import PeriodicTask
