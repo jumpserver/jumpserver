@@ -149,7 +149,6 @@ def start_gunicorn():
 
     if DAEMON:
         cmd.extend([
-            '--access-logfile', log_file,
             '--daemon',
         ])
     else:

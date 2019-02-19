@@ -69,13 +69,13 @@ class Signer(metaclass=Singleton):
         self.secret_key = secret_key
 
     def sign(self, value):
-        s = JSONWebSignatureSerializer(self.secret_key)
+        s = JSONWebSignatureSerializer(self.secret_key, algorithm_name='HS256')
         return s.dumps(value).decode()
 
     def unsign(self, value):
         if value is None:
             return value
-        s = JSONWebSignatureSerializer(self.secret_key)
+        s = JSONWebSignatureSerializer(self.secret_key, algorithm_name='HS256')
         try:
             return s.loads(value)
         except BadSignature:
