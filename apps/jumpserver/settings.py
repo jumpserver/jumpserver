@@ -26,6 +26,7 @@ CONFIG = load_user_config()
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
+GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
@@ -213,9 +214,20 @@ LOGGING = {
         'ansible_logs': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'main',
+            'maxBytes': 1024*1024*100,
+            'backupCount': 7,
             'filename': ANSIBLE_LOG_FILE,
+        },
+        'gunicorn_logs': {
+            'encoding': 'utf8',
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'main',
+            'maxBytes': 1024*1024*100,
+            'backupCount': 2,
+            'filename': GUNICORN_LOG_FILE,
         },
     },
     'loggers': {
@@ -253,6 +265,10 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'file'],
             'level': "INFO",
+        },
+        'gunicorn': {
+            'handlers': ['console', 'gunicorn_logs'],
+            'level': LOG_LEVEL,
         },
         # 'django.db': {
         #     'handlers': ['console', 'file'],
@@ -428,7 +444,7 @@ CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_WORKER_REDIRECT_STDOUTS = True
 CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
-# CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+# CELERY_WORKER_HIJACK_ROOT_LOGGER = True
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 40
 
 # Cache use redis
