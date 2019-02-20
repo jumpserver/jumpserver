@@ -5,7 +5,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
-    <title>Jumpserver</title>
+    <title>
+        {% if interface and interface.login_title %}
+            {{ interface.login_title }}
+        {% else %}
+            Jumpserver
+        {% endif %}
+    </title>
     {% if interface and interface.favicon %}
             <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface.favicon }}" type="image/x-icon">
     {% else %}

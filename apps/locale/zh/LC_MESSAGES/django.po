@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-31 17:45+0800\n"
+"POT-Creation-Date: 2019-02-20 18:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:281
+#: assets/api/node.py:282
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:295
+#: assets/api/node.py:296
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -193,7 +193,7 @@ msgstr "名称"
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:77 users/models/user.py:53
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64 users/templates/users/new_login.html:85
+#: users/templates/users/login.html:64 users/templates/users/new_login.html:79
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -206,7 +206,7 @@ msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:26 assets/models/base.py:24 common/forms.py:102
 #: users/forms.py:17 users/forms.py:35 users/forms.py:47
-#: users/templates/users/login.html:67 users/templates/users/new_login.html:90
+#: users/templates/users/login.html:67 users/templates/users/new_login.html:84
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -579,6 +579,7 @@ msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
 #: assets/models/cmd_filter.py:50
 #: assets/templates/assets/cmd_filter_rule_list.html:59
+#: xpack/plugins/license/models.py:27
 msgid "Content"
 msgstr "内容"
 
@@ -764,48 +765,48 @@ msgstr "获取资产信息失败：{}"
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:136
+#: assets/tasks.py:134
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:161
+#: assets/tasks.py:159
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:185
+#: assets/tasks.py:183
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:224
+#: assets/tasks.py:225
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:231
+#: assets/tasks.py:232
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:270
+#: assets/tasks.py:271
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:277
+#: assets/tasks.py:278
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:290
+#: assets/tasks.py:291
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:362
+#: assets/tasks.py:363
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh: {}"
 
-#: assets/tasks.py:382 assets/tasks.py:396
+#: assets/tasks.py:383 assets/tasks.py:397
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:388
+#: assets/tasks.py:389
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
@@ -922,7 +923,7 @@ msgstr "其它"
 #: users/templates/users/user_pubkey_update.html:76
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:35
-#: xpack/plugins/interface/templates/interface/interface_settings.html:50
+#: xpack/plugins/interface/templates/interface/interface.html:50
 msgid "Reset"
 msgstr "重置"
 
@@ -955,7 +956,7 @@ msgstr "重置"
 #: users/templates/users/user_password_update.html:72
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
-#: xpack/plugins/interface/templates/interface/interface_settings.html:51
+#: xpack/plugins/interface/templates/interface/interface.html:51
 msgid "Submit"
 msgstr "提交"
 
@@ -1078,7 +1079,6 @@ msgstr "更新"
 #: xpack/plugins/cloud/templates/cloud/account_list.html:40
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:32
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:54
-#: xpack/plugins/license/templates/license/license_list.html:97
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
 #: xpack/plugins/orgs/templates/orgs/org_list.html:87
 msgid "Delete"
@@ -1095,7 +1095,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:208
-#: assets/templates/assets/asset_list.html:635
+#: assets/templates/assets/asset_list.html:636
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
@@ -1173,7 +1173,7 @@ msgstr "创建日期"
 #: terminal/templates/terminal/session_detail.html:81
 #: users/templates/users/user_detail.html:138
 #: users/templates/users/user_profile.html:146
-#: xpack/plugins/license/templates/license/license_list.html:82
+#: xpack/plugins/license/templates/license/license_detail.html:81
 msgid "Quick modify"
 msgstr "快速修改"
 
@@ -1220,7 +1220,7 @@ msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:73
 #: users/templates/users/user_list.html:7
-#: xpack/plugins/license/templates/license/license_list.html:90
+#: xpack/plugins/license/templates/license/license_detail.html:89
 msgid "Import"
 msgstr "导入"
 
@@ -1317,7 +1317,7 @@ msgstr "重命名成功"
 msgid "Rename failed, do not change the root node name"
 msgstr "重命名失败，不能更改root节点的名称"
 
-#: assets/templates/assets/asset_list.html:629
+#: assets/templates/assets/asset_list.html:630
 #: assets/templates/assets/system_user_list.html:137
 #: users/templates/users/user_detail.html:382
 #: users/templates/users/user_detail.html:408
@@ -1327,11 +1327,11 @@ msgstr "重命名失败，不能更改root节点的名称"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:630
+#: assets/templates/assets/asset_list.html:631
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:633
+#: assets/templates/assets/asset_list.html:634
 #: assets/templates/assets/system_user_list.html:141
 #: common/templates/common/terminal_setting.html:163
 #: users/templates/users/user_detail.html:386
@@ -1344,16 +1344,16 @@ msgstr "删除选择资产"
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:639
+#: assets/templates/assets/asset_list.html:640
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:640
-#: assets/templates/assets/asset_list.html:645
+#: assets/templates/assets/asset_list.html:641
+#: assets/templates/assets/asset_list.html:646
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:644
+#: assets/templates/assets/asset_list.html:645
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -2298,7 +2298,7 @@ msgid "Settings"
 msgstr "系统设置"
 
 #: common/views.py:29 common/views.py:55 common/views.py:81 common/views.py:112
-#: common/views.py:162 xpack/plugins/interface/views.py:49
+#: common/views.py:162
 msgid "Update setting successfully"
 msgstr "更新设置成功"
 
@@ -2488,7 +2488,6 @@ msgstr "失败/成功/总"
 #: ops/templates/ops/adhoc_history.html:58
 #: ops/templates/ops/adhoc_history_detail.html:57
 #: ops/templates/ops/task_adhoc.html:58 ops/templates/ops/task_history.html:64
-#: xpack/plugins/license/templates/license/license_list.html:62
 msgid "Version"
 msgstr "版本"
 
@@ -2821,7 +2820,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72 users/templates/users/new_login.html:96
+#: users/templates/users/login.html:72 users/templates/users/new_login.html:90
 msgid "Login"
 msgstr "登录"
 
@@ -2891,7 +2890,7 @@ msgstr ""
 
 #: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
 #: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
-#: users/views/login.py:359 users/views/user.py:68 users/views/user.py:83
+#: users/views/login.py:360 users/views/user.py:68 users/views/user.py:83
 #: users/views/user.py:113 users/views/user.py:194 users/views/user.py:355
 #: users/views/user.py:405 users/views/user.py:445
 msgid "Users"
@@ -2965,7 +2964,14 @@ msgstr "语言播放验证码"
 msgid "Captcha"
 msgstr "验证码"
 
-#: templates/flash_message_standalone.html:54
+#: templates/flash_message_standalone.html:35
+#: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
+#: users/templates/users/new_login.html:50
+#: users/templates/users/reset_password.html:25
+msgid "Welcome to the Jumpserver open source fortress"
+msgstr "欢迎使用Jumpserver开源堡垒机"
+
+#: templates/flash_message_standalone.html:56
 msgid "Return"
 msgstr "返回"
 
@@ -3332,7 +3338,7 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: users/api/auth.py:40 users/templates/users/login.html:52
-#: users/templates/users/new_login.html:71
+#: users/templates/users/new_login.html:65
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -3613,7 +3619,7 @@ msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
 #: users/models/user.py:128 users/templates/users/user_update.html:22
-#: users/views/login.py:243 users/views/login.py:302 users/views/user.py:418
+#: users/views/login.py:254 users/views/login.py:313 users/views/user.py:418
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -3717,18 +3723,13 @@ msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
 #: users/templates/users/forgot_password.html:31
-#: users/templates/users/login.html:83 users/templates/users/new_login.html:102
+#: users/templates/users/login.html:83 users/templates/users/new_login.html:94
 msgid "Forgot password"
 msgstr "忘记密码"
 
 #: users/templates/users/forgot_password.html:38
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
-
-#: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
-#: users/templates/users/reset_password.html:25
-msgid "Welcome to the Jumpserver open source fortress"
-msgstr "欢迎使用Jumpserver开源堡垒机"
 
 #: users/templates/users/login.html:29 users/templates/users/login_otp.html:29
 msgid ""
@@ -3762,11 +3763,11 @@ msgstr ""
 msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
-#: users/templates/users/login.html:54 users/templates/users/new_login.html:73
+#: users/templates/users/login.html:54 users/templates/users/new_login.html:67
 msgid "The user password has expired"
 msgstr "用户密码已过期"
 
-#: users/templates/users/login.html:57 users/templates/users/new_login.html:76
+#: users/templates/users/login.html:57 users/templates/users/new_login.html:70
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3805,6 +3806,14 @@ msgstr "6位数字"
 #: users/templates/users/login_otp.html:70
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
+
+#: users/templates/users/new_login.html:15
+msgid "Login Jumpserver"
+msgstr "登录 Jumpserver"
+
+#: users/templates/users/new_login.html:55
+msgid "Welcome back, please enter username and password to login"
+msgstr "欢迎回来，请输入用户名和密码登录"
 
 #: users/templates/users/reset_password.html:28
 msgid ""
@@ -4366,56 +4375,56 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:79
+#: users/views/login.py:80
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:191 users/views/user.py:532 users/views/user.py:557
+#: users/views/login.py:202 users/views/user.py:532 users/views/user.py:557
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: users/views/login.py:233
+#: users/views/login.py:234
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:234
+#: users/views/login.py:235
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:250
+#: users/views/login.py:251
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:266
+#: users/views/login.py:267
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:267
+#: users/views/login.py:268
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:280
+#: users/views/login.py:281
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:281
+#: users/views/login.py:282
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:296 users/views/login.py:315
+#: users/views/login.py:297 users/views/login.py:316
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:308
+#: users/views/login.py:309
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:311 users/views/user.py:128 users/views/user.py:428
+#: users/views/login.py:322 users/views/user.py:128 users/views/user.py:428
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:359
+#: users/views/login.py:360
 msgid "First login"
 msgstr "首次登录"
 
@@ -4479,23 +4488,23 @@ msgstr ""
 msgid "Access Key Secret"
 msgstr ""
 
-#: xpack/plugins/cloud/forms.py:58
+#: xpack/plugins/cloud/forms.py:52
 msgid "Select account"
 msgstr "选择账户"
 
-#: xpack/plugins/cloud/forms.py:64
+#: xpack/plugins/cloud/forms.py:58
 msgid "Select regions"
 msgstr "选择地域"
 
-#: xpack/plugins/cloud/forms.py:70
+#: xpack/plugins/cloud/forms.py:64
 msgid "Select instances"
 msgstr "选择实例"
 
-#: xpack/plugins/cloud/forms.py:76
+#: xpack/plugins/cloud/forms.py:70
 msgid "Select node"
 msgstr "选择节点"
 
-#: xpack/plugins/cloud/forms.py:82 xpack/plugins/orgs/forms.py:18
+#: xpack/plugins/cloud/forms.py:76 xpack/plugins/orgs/forms.py:18
 msgid "Select admins"
 msgstr "选择管理员"
 
@@ -4678,131 +4687,73 @@ msgstr "同步实例任务列表"
 msgid "Create sync Instance task"
 msgstr "创建同步实例任务"
 
-#: xpack/plugins/interface/forms.py:8
-msgid "Login Interface Theme"
-msgstr "登录页系统名称"
+#: xpack/plugins/interface/forms.py:11 xpack/plugins/interface/models.py:15
+msgid "Title of login page"
+msgstr "登录页面标题"
 
-#: xpack/plugins/interface/forms.py:9
-msgid "Please fill in the login Interface theme on the login interface"
-msgstr "请填写登录页的系统名称(显示在登录页面 eg:欢迎使用Jumpserver开源堡垒机)"
-
-#: xpack/plugins/interface/forms.py:14
-msgid "Login Interface Image"
-msgstr "登录页图片"
-
-#: xpack/plugins/interface/forms.py:15
+#: xpack/plugins/interface/forms.py:13
 msgid ""
-"This is the image of the Login interface. The size is:(width:635px ; "
-"height:472px)"
-msgstr ""
-"请上传登录页的图片(显示在登录页面的右侧图), 图片的大小为: (宽:635px ; "
-"高:472px)"
+"Tips: This will be displayed on the enterprise user login page. (eg: Welcome "
+"to the Jumpserver open source fortress)"
+msgstr "提示：将会显示在企业版用户登录页面（eg: 欢迎使用Jumpserver开源堡垒机）"
 
-#: xpack/plugins/interface/forms.py:19
-msgid "Logout Interface Logo"
-msgstr "退出页面的logo"
+#: xpack/plugins/interface/forms.py:19 xpack/plugins/interface/models.py:19
+msgid "Image of login page"
+msgstr "登录页面图片"
 
-#: xpack/plugins/interface/forms.py:20
+#: xpack/plugins/interface/forms.py:21
 msgid ""
-"This is the logo of the Logout interface. The size is:(width:82px ; "
-"height:82px)"
-msgstr ""
-"请上传退出页面的logo(显示在退出页面上), 图片的大小为: (宽:82px ; 高:82px)"
+"Tips: This will be displayed on the enterprise user login page. (suggest "
+"image size: 635px*472px)"
+msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 635px*472px）"
 
-#: xpack/plugins/interface/forms.py:25
-msgid "Index Interface Logo"
-msgstr "首页界面的logo"
-
-#: xpack/plugins/interface/forms.py:26
-msgid ""
-"This is the logo of the Index interface. The size is:(width:185px ; "
-"height:55px)"
-msgstr ""
-"请上传首页界面的logo(显示在系统首页的左上角位置), 尺寸大小为:(宽:185px ; "
-"高:55px)"
-
-#: xpack/plugins/interface/forms.py:31
-msgid "Favition Interface icon"
+#: xpack/plugins/interface/forms.py:27 xpack/plugins/interface/models.py:23
+msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/forms.py:32
-msgid "This is the icon of the website. The size is:(width:16px ; height:16px"
-msgstr "请上传网站logo(显示在网站的导航栏位置), 尺寸大小为:(宽:16px ; 高:16px)"
+#: xpack/plugins/interface/forms.py:29
+msgid "Tips: website icon. (suggest image size: 16px*16px)"
+msgstr "提示：网站图标（建议图片大小为: 16px*16px）"
 
-#: xpack/plugins/interface/meta.py:8
+#: xpack/plugins/interface/forms.py:34 xpack/plugins/interface/models.py:27
+msgid "Logo of management page"
+msgstr "管理页面logo"
+
+#: xpack/plugins/interface/forms.py:36
+msgid ""
+"Tips: This will appear at the top left of the administration page. (suggest "
+"image size: 185px*55px)"
+msgstr "提示：将会显示在管理页面左上方（建议图片大小为: 185px*55px）"
+
+#: xpack/plugins/interface/forms.py:42 xpack/plugins/interface/models.py:31
+msgid "Logo of logout page"
+msgstr "退出页面logo"
+
+#: xpack/plugins/interface/forms.py:44
+msgid ""
+"Tips: This will be displayed on the enterprise user logout page. (suggest "
+"image size: 82px*82px)"
+msgstr "提示：将会显示在企业版用户退出页面（建议图片大小为：82px*82px）"
+
+#: xpack/plugins/interface/meta.py:10
 msgid "Interface settings"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/models.py:11
-msgid "Login interface image"
-msgstr "登录界面的图片"
-
-#: xpack/plugins/interface/models.py:12
-msgid "Login interface theme"
-msgstr "登录页系统名称"
-
-#: xpack/plugins/interface/models.py:13
-msgid "Logout interface logo"
-msgstr "退出登录界面的logo"
-
-#: xpack/plugins/interface/models.py:14
-msgid "Index interface logo"
-msgstr "首页界面的logo"
-
-#: xpack/plugins/interface/models.py:15
-msgid "Favicon logo"
-msgstr "网站图标"
-
-#: xpack/plugins/interface/models.py:18
-msgid "Interface info"
-msgstr "界面信息"
-
-#: xpack/plugins/interface/templates/interface/interface_settings.html:15
-#: xpack/plugins/interface/views.py:18
+#: xpack/plugins/interface/templates/interface/interface.html:15
+#: xpack/plugins/interface/views.py:21
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/views.py:17
+#: xpack/plugins/interface/views.py:20
 msgid "Interface"
 msgstr "界面"
 
-#: xpack/plugins/license/license_service.py:34
-msgid "Unlimited"
-msgstr "无限制"
-
-#: xpack/plugins/license/license_service.py:41
-msgid ""
-"Your license does not match the current product， please click the right "
-"side to Import license for update!"
-msgstr "您的许可证与当前产品不匹配，请点击右侧 导入许可证 进行更新！"
-
-#: xpack/plugins/license/license_service.py:52
-msgid ""
-"Your license is invalid, please click the right side to Import license for "
-"update!"
-msgstr "您的许可证无效，请点击右侧 导入许可证 进行更新！"
-
-#: xpack/plugins/license/license_service.py:59
-msgid ""
-"Your license has expired, please click the right side to Import license for "
-"update!"
-msgstr "您的许可证已过期 ，请点击右侧 导入许可证 进行更新！"
-
-#: xpack/plugins/license/license_service.py:65
-msgid "Authentication is successful！"
-msgstr "验证成功"
-
-#: xpack/plugins/license/license_service.py:73
-msgid "Verification failed. Please re-upload license！"
-msgstr "验证失败，请重新上传许可证！"
-
-#: xpack/plugins/license/meta.py:9 xpack/plugins/license/models.py:11
-#: xpack/plugins/license/views.py:23
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/views.py:27
 msgid "License"
 msgstr "许可证"
 
 #: xpack/plugins/license/templates/license/_license_import_modal.html:4
-#: xpack/plugins/license/templates/license/license_list.html:88
+#: xpack/plugins/license/templates/license/license_detail.html:87
 msgid "Import license"
 msgstr "导入许可证"
 
@@ -4810,55 +4761,66 @@ msgstr "导入许可证"
 msgid "License file"
 msgstr "许可证文件"
 
-#: xpack/plugins/license/templates/license/license_list.html:32
-#: xpack/plugins/license/views.py:24
+#: xpack/plugins/license/templates/license/license_detail.html:12
+msgid "Please Import License"
+msgstr "请导入许可证"
+
+#: xpack/plugins/license/templates/license/license_detail.html:17
+msgid "License has expired"
+msgstr "许可证已经过期"
+
+#: xpack/plugins/license/templates/license/license_detail.html:22
+msgid "The license will at "
+msgstr "许可证将在 "
+
+#: xpack/plugins/license/templates/license/license_detail.html:22
+msgid " expired."
+msgstr " 过期。"
+
+#: xpack/plugins/license/templates/license/license_detail.html:37
+#: xpack/plugins/license/views.py:28
 msgid "License detail"
 msgstr "许可证详情"
 
-#: xpack/plugins/license/templates/license/license_list.html:49
+#: xpack/plugins/license/templates/license/license_detail.html:53
 msgid "Corporation"
 msgstr "公司"
 
-#: xpack/plugins/license/templates/license/license_list.html:53
+#: xpack/plugins/license/templates/license/license_detail.html:57
 msgid "Expired"
 msgstr "过期时间"
 
-#: xpack/plugins/license/templates/license/license_list.html:57
+#: xpack/plugins/license/templates/license/license_detail.html:61
 msgid "Count"
 msgstr "数量"
 
-#: xpack/plugins/license/templates/license/license_list.html:94
-msgid "Delete license"
-msgstr "删除许可证"
+#: xpack/plugins/license/templates/license/license_detail.html:63
+msgid "Unlimited"
+msgstr "无限制"
 
-#: xpack/plugins/license/templates/license/license_list.html:103
-msgid "Technology consulting"
-msgstr "技术咨询"
+#: xpack/plugins/license/templates/license/license_detail.html:67
+msgid "Edition"
+msgstr "版本"
 
-#: xpack/plugins/license/templates/license/license_list.html:106
-msgid "Consult"
-msgstr "咨询"
-
-
-#: xpack/plugins/license/views.py:30
-msgid "No license, please import license!"
-msgstr "没有许可证,请导入许可证!"
-
-#: xpack/plugins/license/views.py:42
+#: xpack/plugins/license/templates/license/license_detail.html:69
 msgid "Enterprise edition"
 msgstr "企业版"
 
-#: xpack/plugins/license/views.py:84
-#, fuzzy
-#| msgid "Delete succeed"
-msgid "Delete success！"
-msgstr "删除成功"
+#: xpack/plugins/license/templates/license/license_detail.html:93
+msgid "Technology consulting"
+msgstr "技术咨询"
 
-#: xpack/plugins/license/views.py:87
-#, fuzzy
-#| msgid "Username does not exist"
-msgid "This license does not exist！"
-msgstr "用户名不存在"
+#: xpack/plugins/license/templates/license/license_detail.html:96
+msgid "Consult"
+msgstr "咨询"
+
+#: xpack/plugins/license/views.py:45
+msgid "License import successfully"
+msgstr "许可证导入成功"
+
+#: xpack/plugins/license/views.py:47
+msgid "License is invalid"
+msgstr "无效的许可证"
 
 #: xpack/plugins/orgs/forms.py:14
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:76
@@ -4903,6 +4865,16 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#, fuzzy
+#~| msgid "Delete succeed"
+#~ msgid "Delete success！"
+#~ msgstr "删除成功"
+
+#, fuzzy
+#~| msgid "Username does not exist"
+#~ msgid "This license does not exist！"
+#~ msgstr "用户名不存在"
 
 #~ msgid "Valid"
 #~ msgstr "账户状态"

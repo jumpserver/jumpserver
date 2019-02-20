@@ -12,14 +12,18 @@
         <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
     {% endif %}
 
-    <title>登录 Jumpserver
+    <title>
+        {% if interface and interface.login_title %}
+            {{ interface.login_title }}
+        {% else %}
+            Jumpserver
+        {% endif %}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Stylesheets -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap-style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/fit2cloud-style.css' %}" rel="stylesheet">
     <link href="{% static 'css/login-style.css' %}" rel="stylesheet">
 
     <!-- scripts -->
@@ -54,7 +58,7 @@
                 {% endif %}
 
                     <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 10px">
-                    {% trans 'Welcome back, please enter user name and password to login' %}
+                    {% trans 'Welcome back, please enter username and password to login' %}
                     </div>
                     <div style="margin-bottom: 10px">
                     <div>
