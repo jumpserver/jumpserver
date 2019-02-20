@@ -191,6 +191,9 @@ LOGGING = {
         'simple': {
             'format': '%(levelname)s %(message)s'
         },
+        'msg': {
+            'format': '%(message)s'
+        }
     },
     'handlers': {
         'null': {
@@ -220,14 +223,19 @@ LOGGING = {
             'backupCount': 7,
             'filename': ANSIBLE_LOG_FILE,
         },
-        'gunicorn_logs': {
+        'gunicorn_file': {
             'encoding': 'utf8',
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'main',
+            'formatter': 'msg',
             'maxBytes': 1024*1024*100,
             'backupCount': 2,
             'filename': GUNICORN_LOG_FILE,
+        },
+        'gunicorn_console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'msg'
         },
     },
     'loggers': {
@@ -267,8 +275,8 @@ LOGGING = {
             'level': "INFO",
         },
         'gunicorn': {
-            'handlers': ['console', 'gunicorn_logs'],
-            'level': LOG_LEVEL,
+            'handlers': ['gunicorn_console', 'gunicorn_file'],
+            'level': 'INFO',
         },
         # 'django.db': {
         #     'handlers': ['console', 'file'],
