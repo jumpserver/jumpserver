@@ -6,12 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
     <title>Jumpserver</title>
-    {% if interface_processor %}
-        {% if interface_processor.favicon_logo %}
-            <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface_processor.favicon_logo }}" type="image/x-icon">
-        {% else %}
-                <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
-        {% endif %}
+    {% if interface and interface.favicon %}
+            <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface.favicon }}" type="image/x-icon">
     {% else %}
         <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
     {% endif %}

@@ -49,13 +49,14 @@ class UserLoginView(FormView):
 
     def get_template_names(self):
         template_name = 'users/login.html'
-        if settings.XPACK_ENABLED:
-            try:
-                from xpack.plugins.license.models import License
-                if License.has_validated_licence():
-                    template_name = 'users/new_login.html'
-            except ImportError:
-                pass
+        if not settings.XPACK_ENABLED:
+            return template_name
+
+        from xpack.plugins.license.models import License
+        if not License.has_valid_license():
+            return template_name
+
+        template_name = 'users/new_login.html'
         return template_name
 
     def get(self, request, *args, **kwargs):

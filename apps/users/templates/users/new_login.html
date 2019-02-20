@@ -6,12 +6,8 @@
 <!--/*@thymesVar id="message" type="java.lang.String"*/-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    {% if interface_processor %}
-        {% if interface_processor.favicon_logo %}
-            <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface_processor.favicon_logo }}" type="image/x-icon">
-        {% else %}
-                <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
-        {% endif %}
+    {% if interface and interface.favicon %}
+        <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface.favicon }}" type="image/x-icon">
     {% else %}
         <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
     {% endif %}
@@ -47,9 +43,9 @@
         <div class="row" style="height: 472px">
             <div class="col-md-4 col-md-offset-2 input_shadow-1" style="text-align: center;background-color: white; padding-right: 0px;height: 100%">
                 <div style="background-color: white">
-                {% if interface_processor.login_theme %}
+                {% if interface.login_title %}
                     <div style="margin-top: 40px">
-                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface_processor.login_theme }}</span>
+                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface.login_title }}</span>
                     </div>
                 {% else %}
                     <div style="margin-top: 40px">
@@ -111,10 +107,10 @@
                 </div>
             </div>
             <div class="col-md-4 " style="padding-left: 0px; height: 100%">
-                    {% if interface_processor.login_image %}
-                        <img src="{{ MEDIA_URL }}{{ interface_processor.login_image }}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
+                    {% if interface.login_image %}
+                        <img src="{{ MEDIA_URL }}{{ interface.login_image }}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
                     {% else %}
-                        <img src="{% static 'img/login/635-472.jpg' %}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
+                        <img src="{% static 'img/login/login-image.jpg' %}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
                     {% endif %}
             </div>
              </div>
