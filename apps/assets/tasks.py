@@ -23,7 +23,7 @@ TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*2
 disk_pattern = re.compile(r'^hd|sd|xvd|vd')
-PERIOD_TASK = os.environ.get("PERIOD_TASK", "off")
+PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
 
 
 def clean_hosts(assets):
@@ -125,8 +125,6 @@ def update_assets_hardware_info_util(assets, task_name=None):
         pattern='all', options=const.TASK_OPTIONS, run_as_admin=True,
     )
     result = task.run()
-    # Todo: may be somewhere using
-    # Manual run callback function
     set_assets_hardware_info(assets, result)
     return result
 
@@ -213,6 +211,9 @@ def test_admin_user_connectivity_period():
     """
     A period task that update the ansible task period
     """
+    if PERIOD_TASK != "on":
+        logger.debug('Period task off, skip')
+        return
     key = '_JMS_TEST_ADMIN_USER_CONNECTIVITY_PERIOD'
     prev_execute_time = cache.get(key)
     if prev_execute_time:
