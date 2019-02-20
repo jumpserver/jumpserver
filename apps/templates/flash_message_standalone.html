@@ -22,8 +22,19 @@
             <div class="col-md-12">
                 <div class="ibox-content">
                     <div>
+                    {% if interface and interface.logo_logout %}
+                            <img src="{{ MEDIA_URL }}{{ interface.logo_logout }}" style="margin: auto" width="82" height="82">
+                    {% else %}
                         <img src="{% static 'img/logo.png' %}" style="margin: auto" width="82" height="82">
-                        <h2 style="display: inline">Jumpserver</h2>
+                    {% endif %}
+
+                        <h2 style="display: inline">
+                            {% if interface and interface.login_title %}
+                                {{ interface.login_title }}
+                            {% else %}
+                                {% trans 'Welcome to the Jumpserver open source fortress' %}
+                            {% endif %}
+                        </h2>
                     </div>
                     {% if errors %}
                     <p>

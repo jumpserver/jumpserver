@@ -3,7 +3,11 @@
 <li class="nav-header">
     <div class="profile-element" style="height: 65px">
         <div href="http://www.jumpserver.org" target="_blank" style="width: 100%; background-image: url({% static 'img/header-profile.png' %})">
-            <img alt="logo" height="55" width="185" src="/static/img/logo-text.png"/>
+            {% if interface and interface.logo_index %}
+                    <img alt="logo" height="55" width="185" src="{{ MEDIA_URL }}{{ interface.logo_index }}"/>
+            {% else %}
+                  <img alt="logo" height="55" width="185" src="{% static 'img/logo-text.png' %}"/>
+            {% endif %}
         </div>
     </div>
     <div class="logo-element">

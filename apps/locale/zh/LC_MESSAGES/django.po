@@ -193,7 +193,7 @@ msgstr "名称"
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:77 users/models/user.py:53
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64
+#: users/templates/users/login.html:64 users/templates/users/new_login.html:79
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -206,7 +206,7 @@ msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:26 assets/models/base.py:24 common/forms.py:102
 #: users/forms.py:17 users/forms.py:35 users/forms.py:47
-#: users/templates/users/login.html:67
+#: users/templates/users/login.html:67 users/templates/users/new_login.html:84
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -579,6 +579,7 @@ msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
 #: assets/models/cmd_filter.py:50
 #: assets/templates/assets/cmd_filter_rule_list.html:59
+#: xpack/plugins/license/models.py:27
 msgid "Content"
 msgstr "内容"
 
@@ -922,6 +923,7 @@ msgstr "其它"
 #: users/templates/users/user_pubkey_update.html:76
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:35
+#: xpack/plugins/interface/templates/interface/interface.html:50
 msgid "Reset"
 msgstr "重置"
 
@@ -948,12 +950,13 @@ msgstr "重置"
 #: terminal/templates/terminal/session_list.html:127
 #: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
-#: users/templates/users/forgot_password.html:45
+#: users/templates/users/forgot_password.html:49
 #: users/templates/users/user_bulk_update.html:24
 #: users/templates/users/user_list.html:45
 #: users/templates/users/user_password_update.html:72
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
+#: xpack/plugins/interface/templates/interface/interface.html:51
 msgid "Submit"
 msgstr "提交"
 
@@ -1170,6 +1173,7 @@ msgstr "创建日期"
 #: terminal/templates/terminal/session_detail.html:81
 #: users/templates/users/user_detail.html:138
 #: users/templates/users/user_profile.html:146
+#: xpack/plugins/license/templates/license/license_detail.html:81
 msgid "Quick modify"
 msgstr "快速修改"
 
@@ -1216,6 +1220,7 @@ msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:73
 #: users/templates/users/user_list.html:7
+#: xpack/plugins/license/templates/license/license_detail.html:89
 msgid "Import"
 msgstr "导入"
 
@@ -2828,7 +2833,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72
+#: users/templates/users/login.html:72 users/templates/users/new_login.html:90
 msgid "Login"
 msgstr "登录"
 
@@ -2896,9 +2901,9 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_nav.html:10 users/views/group.py:28 users/views/group.py:44
-#: users/views/group.py:60 users/views/group.py:76 users/views/group.py:92
-#: users/views/login.py:349 users/views/user.py:68 users/views/user.py:83
+#: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
+#: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
+#: users/views/login.py:360 users/views/user.py:68 users/views/user.py:83
 #: users/views/user.py:113 users/views/user.py:194 users/views/user.py:355
 #: users/views/user.py:405 users/views/user.py:445
 msgid "Users"
@@ -2972,7 +2977,14 @@ msgstr "语言播放验证码"
 msgid "Captcha"
 msgstr "验证码"
 
-#: templates/flash_message_standalone.html:45
+#: templates/flash_message_standalone.html:35
+#: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
+#: users/templates/users/new_login.html:50
+#: users/templates/users/reset_password.html:25
+msgid "Welcome to the Jumpserver open source fortress"
+msgstr "欢迎使用Jumpserver开源堡垒机"
+
+#: templates/flash_message_standalone.html:56
 msgid "Return"
 msgstr "返回"
 
@@ -3339,6 +3351,7 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: users/api/auth.py:40 users/templates/users/login.html:52
+#: users/templates/users/new_login.html:65
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -3619,7 +3632,7 @@ msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
 #: users/models/user.py:128 users/templates/users/user_update.html:22
-#: users/views/login.py:243 users/views/login.py:302 users/views/user.py:418
+#: users/views/login.py:254 users/views/login.py:313 users/views/user.py:418
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -3722,19 +3735,14 @@ msgid " for more information"
 msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
-#: users/templates/users/forgot_password.html:27
-#: users/templates/users/login.html:83
+#: users/templates/users/forgot_password.html:31
+#: users/templates/users/login.html:83 users/templates/users/new_login.html:94
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: users/templates/users/forgot_password.html:34
+#: users/templates/users/forgot_password.html:38
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
-
-#: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
-#: users/templates/users/reset_password.html:25
-msgid "Welcome to the Jumpserver open source fortress"
-msgstr "欢迎使用Jumpserver开源堡垒机"
 
 #: users/templates/users/login.html:29 users/templates/users/login_otp.html:29
 msgid ""
@@ -3768,11 +3776,11 @@ msgstr ""
 msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
-#: users/templates/users/login.html:54
+#: users/templates/users/login.html:54 users/templates/users/new_login.html:67
 msgid "The user password has expired"
 msgstr "用户密码已过期"
 
-#: users/templates/users/login.html:57
+#: users/templates/users/login.html:57 users/templates/users/new_login.html:70
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3811,6 +3819,14 @@ msgstr "6位数字"
 #: users/templates/users/login_otp.html:70
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
+
+#: users/templates/users/new_login.html:15
+msgid "Login Jumpserver"
+msgstr "登录 Jumpserver"
+
+#: users/templates/users/new_login.html:55
+msgid "Welcome back, please enter username and password to login"
+msgstr "欢迎回来，请输入用户名和密码登录"
 
 #: users/templates/users/reset_password.html:28
 msgid ""
@@ -4018,7 +4034,7 @@ msgstr "重置用户MFA成功"
 
 #: users/templates/users/user_group_detail.html:22
 #: users/templates/users/user_group_granted_asset.html:18
-#: users/views/group.py:77
+#: users/views/group.py:76
 msgid "User group detail"
 msgstr "用户组详情"
 
@@ -4027,7 +4043,7 @@ msgstr "用户组详情"
 msgid "Add user"
 msgstr "添加用户"
 
-#: users/templates/users/user_group_list.html:5 users/views/group.py:45
+#: users/templates/users/user_group_list.html:5 users/views/group.py:44
 msgid "Create user group"
 msgstr "创建用户组"
 
@@ -4360,68 +4376,68 @@ msgstr "禁用或失效"
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
-#: users/views/group.py:29
+#: users/views/group.py:28
 msgid "User group list"
 msgstr "用户组列表"
 
-#: users/views/group.py:61
+#: users/views/group.py:60
 msgid "Update user group"
 msgstr "更新用户组"
 
-#: users/views/group.py:93
+#: users/views/group.py:92
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:69
+#: users/views/login.py:80
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: users/views/login.py:191 users/views/user.py:532 users/views/user.py:557
+#: users/views/login.py:202 users/views/user.py:532 users/views/user.py:557
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: users/views/login.py:223
+#: users/views/login.py:234
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:224
+#: users/views/login.py:235
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:240
+#: users/views/login.py:251
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:256
+#: users/views/login.py:267
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:257
+#: users/views/login.py:268
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:270
+#: users/views/login.py:281
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:271
+#: users/views/login.py:282
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:286 users/views/login.py:305
+#: users/views/login.py:297 users/views/login.py:316
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:298
+#: users/views/login.py:309
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:311 users/views/user.py:128 users/views/user.py:428
+#: users/views/login.py:322 users/views/user.py:128 users/views/user.py:428
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:349
+#: users/views/login.py:360
 msgid "First login"
 msgstr "首次登录"
 
@@ -4684,6 +4700,141 @@ msgstr "同步实例任务列表"
 msgid "Create sync Instance task"
 msgstr "创建同步实例任务"
 
+#: xpack/plugins/interface/forms.py:11 xpack/plugins/interface/models.py:15
+msgid "Title of login page"
+msgstr "登录页面标题"
+
+#: xpack/plugins/interface/forms.py:13
+msgid ""
+"Tips: This will be displayed on the enterprise user login page. (eg: Welcome "
+"to the Jumpserver open source fortress)"
+msgstr "提示：将会显示在企业版用户登录页面（eg: 欢迎使用Jumpserver开源堡垒机）"
+
+#: xpack/plugins/interface/forms.py:19 xpack/plugins/interface/models.py:19
+msgid "Image of login page"
+msgstr "登录页面图片"
+
+#: xpack/plugins/interface/forms.py:21
+msgid ""
+"Tips: This will be displayed on the enterprise user login page. (suggest "
+"image size: 635px*472px)"
+msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 635px*472px）"
+
+#: xpack/plugins/interface/forms.py:27 xpack/plugins/interface/models.py:23
+msgid "Website icon"
+msgstr "网站图标"
+
+#: xpack/plugins/interface/forms.py:29
+msgid "Tips: website icon. (suggest image size: 16px*16px)"
+msgstr "提示：网站图标（建议图片大小为: 16px*16px）"
+
+#: xpack/plugins/interface/forms.py:34 xpack/plugins/interface/models.py:27
+msgid "Logo of management page"
+msgstr "管理页面logo"
+
+#: xpack/plugins/interface/forms.py:36
+msgid ""
+"Tips: This will appear at the top left of the administration page. (suggest "
+"image size: 185px*55px)"
+msgstr "提示：将会显示在管理页面左上方（建议图片大小为: 185px*55px）"
+
+#: xpack/plugins/interface/forms.py:42 xpack/plugins/interface/models.py:31
+msgid "Logo of logout page"
+msgstr "退出页面logo"
+
+#: xpack/plugins/interface/forms.py:44
+msgid ""
+"Tips: This will be displayed on the enterprise user logout page. (suggest "
+"image size: 82px*82px)"
+msgstr "提示：将会显示在企业版用户退出页面（建议图片大小为：82px*82px）"
+
+#: xpack/plugins/interface/meta.py:10
+msgid "Interface settings"
+msgstr "界面设置"
+
+#: xpack/plugins/interface/templates/interface/interface.html:15
+#: xpack/plugins/interface/views.py:21
+msgid "Interface setting"
+msgstr "界面设置"
+
+#: xpack/plugins/interface/views.py:20
+msgid "Interface"
+msgstr "界面"
+
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/views.py:27
+msgid "License"
+msgstr "许可证"
+
+#: xpack/plugins/license/templates/license/_license_import_modal.html:4
+#: xpack/plugins/license/templates/license/license_detail.html:87
+msgid "Import license"
+msgstr "导入许可证"
+
+#: xpack/plugins/license/templates/license/_license_import_modal.html:9
+msgid "License file"
+msgstr "许可证文件"
+
+#: xpack/plugins/license/templates/license/license_detail.html:12
+msgid "Please Import License"
+msgstr "请导入许可证"
+
+#: xpack/plugins/license/templates/license/license_detail.html:17
+msgid "License has expired"
+msgstr "许可证已经过期"
+
+#: xpack/plugins/license/templates/license/license_detail.html:22
+msgid "The license will at "
+msgstr "许可证将在 "
+
+#: xpack/plugins/license/templates/license/license_detail.html:22
+msgid " expired."
+msgstr " 过期。"
+
+#: xpack/plugins/license/templates/license/license_detail.html:37
+#: xpack/plugins/license/views.py:28
+msgid "License detail"
+msgstr "许可证详情"
+
+#: xpack/plugins/license/templates/license/license_detail.html:53
+msgid "Corporation"
+msgstr "公司"
+
+#: xpack/plugins/license/templates/license/license_detail.html:57
+msgid "Expired"
+msgstr "过期时间"
+
+#: xpack/plugins/license/templates/license/license_detail.html:61
+msgid "Count"
+msgstr "数量"
+
+#: xpack/plugins/license/templates/license/license_detail.html:63
+msgid "Unlimited"
+msgstr "无限制"
+
+#: xpack/plugins/license/templates/license/license_detail.html:67
+msgid "Edition"
+msgstr "版本"
+
+#: xpack/plugins/license/templates/license/license_detail.html:69
+msgid "Enterprise edition"
+msgstr "企业版"
+
+#: xpack/plugins/license/templates/license/license_detail.html:93
+msgid "Technology consulting"
+msgstr "技术咨询"
+
+#: xpack/plugins/license/templates/license/license_detail.html:96
+msgid "Consult"
+msgstr "咨询"
+
+#: xpack/plugins/license/views.py:45
+msgid "License import successfully"
+msgstr "许可证导入成功"
+
+#: xpack/plugins/license/views.py:47
+msgid "License is invalid"
+msgstr "无效的许可证"
+
 #: xpack/plugins/orgs/forms.py:14
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:76
 #: xpack/plugins/orgs/templates/orgs/org_list.html:13
@@ -4727,6 +4878,16 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#, fuzzy
+#~| msgid "Delete succeed"
+#~ msgid "Delete success！"
+#~ msgstr "删除成功"
+
+#, fuzzy
+#~| msgid "Username does not exist"
+#~ msgid "This license does not exist！"
+#~ msgstr "用户名不存在"
 
 #~ msgid "Valid"
 #~ msgstr "账户状态"
@@ -4773,11 +4934,6 @@ msgstr "更新组织"
 
 #~ msgid "Bit"
 #~ msgstr " 位"
-
-#, fuzzy
-#~| msgid "Delete succeed"
-#~ msgid "Delete success"
-#~ msgstr "删除成功"
 
 #~ msgid ""
 #~ "Set terminal storage setting, `default` is the using as default,You can "

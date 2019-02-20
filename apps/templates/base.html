@@ -5,8 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
-    <title>Jumpserver</title>
-    <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
+    <title>
+        {% if interface and interface.login_title %}
+            {{ interface.login_title }}
+        {% else %}
+            Jumpserver
+        {% endif %}
+    </title>
+    {% if interface and interface.favicon %}
+            <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface.favicon }}" type="image/x-icon">
+    {% else %}
+        <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
+    {% endif %}
     {% include '_head_css_js.html' %}
     <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
     {% block custom_head_css_js %} {% endblock %}
