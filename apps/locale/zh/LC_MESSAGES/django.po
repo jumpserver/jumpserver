@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-28 12:56+0800\n"
+"POT-Creation-Date: 2019-02-20 16:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:281
+#: assets/api/node.py:282
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:295
+#: assets/api/node.py:296
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -764,48 +764,48 @@ msgstr "获取资产信息失败：{}"
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:136
+#: assets/tasks.py:134
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:161
+#: assets/tasks.py:159
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:185
+#: assets/tasks.py:183
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:224
+#: assets/tasks.py:225
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:231
+#: assets/tasks.py:232
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:270
+#: assets/tasks.py:271
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:277
+#: assets/tasks.py:278
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:290
+#: assets/tasks.py:291
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:362
+#: assets/tasks.py:363
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh: {}"
 
-#: assets/tasks.py:382 assets/tasks.py:396
+#: assets/tasks.py:383 assets/tasks.py:397
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:388
+#: assets/tasks.py:389
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
@@ -1092,7 +1092,7 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:208
-#: assets/templates/assets/asset_list.html:635
+#: assets/templates/assets/asset_list.html:636
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
@@ -1312,7 +1312,7 @@ msgstr "重命名成功"
 msgid "Rename failed, do not change the root node name"
 msgstr "重命名失败，不能更改root节点的名称"
 
-#: assets/templates/assets/asset_list.html:629
+#: assets/templates/assets/asset_list.html:630
 #: assets/templates/assets/system_user_list.html:137
 #: users/templates/users/user_detail.html:382
 #: users/templates/users/user_detail.html:408
@@ -1322,11 +1322,11 @@ msgstr "重命名失败，不能更改root节点的名称"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:630
+#: assets/templates/assets/asset_list.html:631
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:633
+#: assets/templates/assets/asset_list.html:634
 #: assets/templates/assets/system_user_list.html:141
 #: common/templates/common/terminal_setting.html:163
 #: users/templates/users/user_detail.html:386
@@ -1339,16 +1339,16 @@ msgstr "删除选择资产"
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:639
+#: assets/templates/assets/asset_list.html:640
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:640
-#: assets/templates/assets/asset_list.html:645
+#: assets/templates/assets/asset_list.html:641
+#: assets/templates/assets/asset_list.html:646
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:644
+#: assets/templates/assets/asset_list.html:645
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -2314,6 +2314,10 @@ msgstr ""
 "<div>Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, </"
 "div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
 "div>"
+
+#: ops/api/celery.py:54
+msgid "Waiting task start"
+msgstr "等待任务开始"
 
 #: ops/models/adhoc.py:38
 msgid "Interval"
