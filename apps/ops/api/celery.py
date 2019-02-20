@@ -4,6 +4,7 @@
 import os
 import re
 
+from django.utils.translation import ugettext as _
 from celery.result import AsyncResult
 from rest_framework import generics
 
@@ -45,6 +46,12 @@ class CeleryTaskLogApi(LogTailApi):
 
     def is_file_finish_write(self):
         return self.task.ready()
+
+    def get_no_file_message(self, request):
+        if self.mark == 'undefined':
+            return '.'
+        else:
+            return _('Waiting task start')
 
 
 class CeleryResultApi(generics.RetrieveAPIView):

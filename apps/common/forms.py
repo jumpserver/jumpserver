@@ -159,6 +159,10 @@ class TerminalSettingForm(BaseForm):
         help_text=_("Units: days, Session, record, command will be delete "
                     "if more than duration, only in database")
     )
+    TERMINAL_TELNET_REGEX = forms.CharField(
+        required=False, label=_("Telnet login regex"),
+        help_text=_("ex: Last\s*login|success|成功")
+    )
 
 
 class TerminalCommandStorage(BaseForm):

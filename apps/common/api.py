@@ -199,12 +199,17 @@ class LogTailApi(generics.RetrieveAPIView):
     buff_size = 1024 * 10
     serializer_class = OutputSerializer
     end = False
+    mark = ''
+    log_path = ''
 
     def is_file_finish_write(self):
         return True
 
     def get_log_path(self):
         raise NotImplementedError()
+
+    def get_no_file_message(self, request):
+        return 'Not found the log'
 
     def filter_line(self, line):
         """
@@ -214,27 +219,14 @@ class LogTailApi(generics.RetrieveAPIView):
         """
         return line
 
-    def get(self, request, *args, **kwargs):
-        mark = request.query_params.get("mark") or str(uuid.uuid4())
-        log_path = self.get_log_path()
-
-        if not log_path or not os.path.isfile(log_path):
-            if self.is_file_finish_write():
-                return Response({
-                    "data": 'Not found the log',
-                    'end': True,
-                    'mark': mark
-                })
-            else:
-                return Response({"data": "Waiting...\r\n"}, status=200)
-
-        with open(log_path, 'r') as f:
-            offset = cache.get(mark, 0)
+    def read_from_file(self):
+        with open(self.log_path, 'r') as f:
+            offset = cache.get(self.mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')
 
-            mark = str(uuid.uuid4())
-            cache.set(mark, f.tell(), 5)
+            new_mark = str(uuid.uuid4())
+            cache.set(new_mark, f.tell(), 5)
 
             if data == '' and self.is_file_finish_write():
                 self.end = True
@@ -244,4 +236,15 @@ class LogTailApi(generics.RetrieveAPIView):
                 if line == '':
                     continue
                 _data += new_line + '\r\n'
-            return Response({"data": _data, 'end': self.end, 'mark': mark})
+            return _data, self.end, new_mark
+
+    def get(self, request, *args, **kwargs):
+        self.mark = request.query_params.get("mark") or str(uuid.uuid4())
+        self.log_path = self.get_log_path()
+
+        if not self.log_path or not os.path.isfile(self.log_path):
+            msg = self.get_no_file_message(self.request)
+            return Response({"data": msg}, status=200)
+
+        data, end, new_mark = self.read_from_file()
+        return Response({"data": data, 'end': end, 'mark': new_mark})
