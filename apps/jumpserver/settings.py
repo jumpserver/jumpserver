@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
+import socket
 
 import ldap
-# from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 from django.urls import reverse_lazy
 
 from .conf import load_user_config
@@ -23,6 +23,13 @@ from .conf import load_user_config
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 CONFIG = load_user_config()
+LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
+JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
+ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
+GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
+
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -74,8 +81,14 @@ INSTALLED_APPS = [
 
 XPACK_DIR = os.path.join(BASE_DIR, 'xpack')
 XPACK_ENABLED = os.path.isdir(XPACK_DIR)
+XPACK_TEMPLATES_DIR = []
+XPACK_CONTEXT_PROCESSOR = []
+
 if XPACK_ENABLED:
+    from xpack.utils import get_xpack_templates_dir, get_xpack_context_processor
     INSTALLED_APPS.append('xpack.apps.XpackConfig')
+    XPACK_TEMPLATES_DIR = get_xpack_templates_dir(BASE_DIR)
+    XPACK_CONTEXT_PROCESSOR = get_xpack_context_processor()
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -95,33 +108,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'jumpserver.urls'
 
-
-def get_xpack_context_processor():
-    if XPACK_ENABLED:
-        return [
-            'xpack.context_processor.xpack_processor',
-            'xpack.plugins.interface.context_processor.interface_processor'
-        ]
-    return []
-
-
-def get_xpack_templates_dir():
-    if XPACK_ENABLED:
-        dirs = []
-        from xpack.utils import find_enabled_plugins
-        for i in find_enabled_plugins():
-            template_dir = os.path.join(BASE_DIR, 'xpack', 'plugins', i, 'templates')
-            if os.path.isdir(template_dir):
-                dirs.append(template_dir)
-        return dirs
-    else:
-        return []
-
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), *get_xpack_templates_dir()],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), *XPACK_TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,7 +125,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'jumpserver.context_processor.jumpserver_processor',
                 'orgs.context_processor.org_processor',
-                *get_xpack_context_processor(),
+                *XPACK_CONTEXT_PROCESSOR,
             ],
         },
     },
@@ -214,19 +204,29 @@ LOGGING = {
         'file': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': "D",
-            'interval': 1,
-            "backupCount": 7,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024*1024*100,
+            'backupCount': 7,
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log'),
+            'filename': JUMPSERVER_LOG_FILE,
         },
         'ansible_logs': {
             'encoding': 'utf8',
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log'),
+            'maxBytes': 1024*1024*100,
+            'backupCount': 7,
+            'filename': ANSIBLE_LOG_FILE,
+        },
+        'gunicorn_logs': {
+            'encoding': 'utf8',
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'main',
+            'maxBytes': 1024*1024*100,
+            'backupCount': 2,
+            'filename': GUNICORN_LOG_FILE,
         },
     },
     'loggers': {
@@ -264,6 +264,10 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'file'],
             'level': "INFO",
+        },
+        'gunicorn': {
+            'handlers': ['console', 'gunicorn_logs'],
+            'level': LOG_LEVEL,
         },
         # 'django.db': {
         #     'handlers': ['console', 'file'],
@@ -415,6 +419,9 @@ RADIUS_SECRET = CONFIG.RADIUS_SECRET
 if AUTH_RADIUS:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_RADIUS_BACKEND)
 
+# Dump all celery log to here
+CELERY_LOG_DIR = os.path.join(PROJECT_DIR, 'data', 'celery')
+
 # Celery using redis as broker
 CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/%(db)s' % {
     'password': CONFIG.REDIS_PASSWORD,
@@ -428,14 +435,16 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 3600
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_WORKER_LOG_FORMAT = '%(message)s'
-# CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_LOG_FORMAT = '%(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
-CELERY_REDIRECT_STDOUTS = True
-CELERY_REDIRECT_STDOUTS_LEVEL = "INFO"
-CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_WORKER_REDIRECT_STDOUTS = True
+CELERY_WORKER_REDIRECT_STDOUTS_LEVEL = "INFO"
+# CELERY_WORKER_HIJACK_ROOT_LOGGER = True
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 40
 
 # Cache use redis
 CACHES = {

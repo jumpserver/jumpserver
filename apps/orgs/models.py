@@ -122,3 +122,7 @@ class Organization(models.Model):
             return True
         else:
             return False
+
+    def change_to(self):
+        from .utils import set_current_org
+        set_current_org(self)

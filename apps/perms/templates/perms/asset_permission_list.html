@@ -56,7 +56,7 @@
                        <th class="text-center">{% trans 'Asset' %}</th>
                        <th class="text-center">{% trans 'Node'%}</th>
                        <th class="text-center">{% trans 'System user' %}</th>
-                       <th class="text-center">{% trans 'Active' %}</th>
+                       <th class="text-center">{% trans 'Validity' %}</th>
                        <th class="text-center" >{% trans 'Action' %}</th>
                    </tr>
                   </thead>
@@ -67,6 +67,17 @@
        </div>
    </div>
 </div>
+
+<ul class="dropdown-menu search-help">
+    <li><a class="search-item" data-value="name">{% trans 'Name' %}</a></li>
+    <li><a class="search-item" data-value="is_valid">{% trans 'Validity' %}</a></li>
+    <li><a class="search-item" data-value="username">{% trans 'Username' %}</a></li>
+    <li><a class="search-item" data-value="user_group">{% trans 'User group' %}</a></li>
+    <li><a class="search-item" data-value="ip">IP</a></li>
+    <li><a class="search-item" data-value="hostname">{% trans 'Hostname' %}</a></li>
+    <li><a class="search-item" data-value="node">{% trans 'Node' %}</a></li>
+    <li><a class="search-item" data-value="system_user">{% trans 'System user' %}</a></li>
+</ul>
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -79,11 +90,11 @@ function onSelected(event, treeNode) {
     setCookie('node_selected', treeNode.id);
     var url = table.ajax.url();
     if (treeNode.meta.type === 'node') {
-        url = setUrlParam(url, 'asset', "");
-        url = setUrlParam(url, 'node', treeNode.meta.node.id)
+        url = setUrlParam(url, 'asset_id', "");
+        url = setUrlParam(url, 'node_id', treeNode.meta.node.id)
     } else {
-        url = setUrlParam(url, 'node', "");
-        url = setUrlParam(url, 'asset', treeNode.meta.asset.id)
+        url = setUrlParam(url, 'node_id', "");
+        url = setUrlParam(url, 'asset_id', treeNode.meta.asset.id)
     }
     setCookie('node_selected', treeNode.node_id);
     table.ajax.url(url);
@@ -178,7 +189,7 @@ function initTable() {
             {data: "id"}, {data: "name"}, {data: "users"},
             {data: "user_groups"}, {data: "assets"},
             {data: "nodes"}, {data: "system_users"},
-            {data: "is_active", orderable: false}, {data: "id", orderable: false}
+            {data: "is_valid", orderable: false}, {data: "id", orderable: false}
         ],
         select: {},
         op_html: $('#actions').html()
@@ -231,6 +242,7 @@ function toggle() {
 $(document).ready(function(){
     initTable();
     initTree();
+
 })
 .on('click', '.btn-del', function () {
     var $this = $(this);
@@ -279,6 +291,28 @@ $(document).ready(function(){
         }
     }
 
+}).on('click', '#permission_list_table_filter input', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var position = $('#permission_list_table_filter input').offset();
+    var y = position['top'];
+    var x = position['left'];
+    x -= 220;
+    y += 30;
+
+    $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
+    $('.dropdown-menu.search-help').show();
+}).on('click', '.search-item', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var value = $(this).data('value');
+    var old_value = $('#permission_list_table_filter input').val();
+    var new_value = old_value + ' ' + value + ':';
+    $('#permission_list_table_filter input').val(new_value.trim());
+    $('.dropdown-menu.search-help').hide();
+    $('#permission_list_table_filter input').focus()
+}).on('click', 'body', function (e) {
+    $('.dropdown-menu.search-help').hide()
 })
 
 </script>

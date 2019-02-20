@@ -311,6 +311,7 @@ function onRename(event, treeId, treeNode, isCancel){
 function onSelected(event, treeNode) {
     current_node = treeNode;
     current_node_id = treeNode.meta.node.id;
+    zTree.expandNode(current_node, true);
     var url = asset_table.ajax.url();
     url = setUrlParam(url, "node_id", current_node_id);
     url = setUrlParam(url, "show_current_asset", getCookie('show_current_asset'));

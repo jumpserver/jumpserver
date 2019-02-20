@@ -311,8 +311,8 @@ class User(AbstractUser):
         token = cache.get('%s_%s' % (self.id, remote_addr))
         if not token:
             token = uuid.uuid4().hex
-            cache.set(token, self.id, expiration)
-            cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
+        cache.set(token, self.id, expiration)
+        cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
         return token
 
     def refresh_bearer_token(self, token):

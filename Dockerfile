@@ -6,12 +6,13 @@ RUN useradd jumpserver
 
 COPY ./requirements /tmp/requirements
 
-RUN yum -y install epel-release && cd /tmp/requirements && \
+RUN yum -y install epel-release openldap-clients telnet && cd /tmp/requirements && \
     yum -y install $(cat rpm_requirements.txt)
 
-RUN cd /tmp/requirements &&  pip install -r requirements.txt
+RUN cd /tmp/requirements &&  pip install -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt || pip install -r requirements.txt
 
 COPY . /opt/jumpserver
+RUN echo > config.yml
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 

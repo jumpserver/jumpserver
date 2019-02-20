@@ -193,14 +193,16 @@ class Config(dict):
         if self.root_path:
             filename = os.path.join(self.root_path, filename)
         try:
-            with open(filename) as json_file:
-                obj = yaml.load(json_file)
+            with open(filename) as f:
+                obj = yaml.load(f)
         except IOError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
                 return False
             e.strerror = 'Unable to load configuration file (%s)' % e.strerror
             raise
-        return self.from_mapping(obj)
+        if obj:
+            return self.from_mapping(obj)
+        return True
 
     def from_mapping(self, *mapping, **kwargs):
         """Updates the config like :meth:`update` ignoring items with non-upper
@@ -278,6 +280,12 @@ class Config(dict):
             return value
         value = os.environ.get(item, None)
         if value is not None:
+            if value.isdigit():
+                value = int(value)
+            elif value.lower() == 'false':
+                value = False
+            elif value.lower() == 'true':
+                value = True
             return value
         return self.defaults.get(item)
 

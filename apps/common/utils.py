@@ -69,13 +69,13 @@ class Signer(metaclass=Singleton):
         self.secret_key = secret_key
 
     def sign(self, value):
-        s = JSONWebSignatureSerializer(self.secret_key)
+        s = JSONWebSignatureSerializer(self.secret_key, algorithm_name='HS256')
         return s.dumps(value).decode()
 
     def unsign(self, value):
         if value is None:
             return value
-        s = JSONWebSignatureSerializer(self.secret_key)
+        s = JSONWebSignatureSerializer(self.secret_key, algorithm_name='HS256')
         try:
             return s.loads(value)
         except BadSignature:
@@ -404,24 +404,6 @@ def get_replay_storage_setting():
         return default
     value.update(default)
     return value
-
-
-class TeeObj:
-    origin_stdout = sys.stdout
-
-    def __init__(self, file_obj):
-        self.file_obj = file_obj
-
-    def write(self, msg):
-        self.origin_stdout.write(msg)
-        self.file_obj.write(msg.replace('*', ''))
-
-    def flush(self):
-        self.origin_stdout.flush()
-        self.file_obj.flush()
-
-    def close(self):
-        self.file_obj.close()
 
 
 def with_cache(func):

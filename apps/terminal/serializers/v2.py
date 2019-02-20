@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from common.utils import get_request_ip
-from users.serializers.v2 import ServiceAccountRegistrationSerializer
+from users.serializers.v2 import ServiceAccountSerializer
 from ..models import Terminal
 
 
@@ -11,36 +11,48 @@ __all__ = ['TerminalSerializer', 'TerminalRegistrationSerializer']
 
 
 class TerminalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Terminal
-        fields = [
-            'id', 'name', 'remote_addr', 'comment',
-        ]
-        read_only_fields = ['id', 'remote_addr']
-
-
-class TerminalRegistrationSerializer(serializers.ModelSerializer):
-    service_account = ServiceAccountRegistrationSerializer(read_only=True)
-    service_account_serializer = None
+    sa_serializer_class = ServiceAccountSerializer
+    sa_serializer = None
 
     class Meta:
         model = Terminal
         fields = [
-            'id', 'name', 'remote_addr', 'comment', 'service_account'
+            'id', 'name', 'remote_addr', 'command_storage',
+            'replay_storage', 'user', 'is_accepted', 'is_deleted',
+            'date_created', 'comment'
         ]
-        read_only_fields = ['id', 'remote_addr', 'service_account']
+        read_only_fields = ['id', 'remote_addr', 'user', 'date_created']
 
-    def validate(self, attrs):
-        self.service_account_serializer = ServiceAccountRegistrationSerializer(data=attrs)
-        self.service_account_serializer.is_valid(raise_exception=True)
-        return attrs
+    def is_valid(self, raise_exception=False):
+        valid = super().is_valid(raise_exception=raise_exception)
+        if not valid:
+            return valid
+        data = {'name': self.validated_data.get('name')}
+        kwargs = {'data': data}
+        if self.instance and self.instance.user:
+            kwargs['instance'] = self.instance.user
+        self.sa_serializer = ServiceAccountSerializer(**kwargs)
+        valid = self.sa_serializer.is_valid(raise_exception=True)
+        return valid
+
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        sa = self.sa_serializer.save()
+        instance.user = sa
+        instance.save()
+        return instance
 
     def create(self, validated_data):
         request = self.context.get('request')
-        sa = self.service_account_serializer.save()
         instance = super().create(validated_data)
         instance.is_accepted = True
-        instance.user = sa
-        instance.remote_addr = get_request_ip(request)
+        if request:
+            instance.remote_addr = get_request_ip(request)
         instance.save()
         return instance
+
+
+class TerminalRegistrationSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=128)
+    comment = serializers.CharField(max_length=128)
+    service_account = ServiceAccountSerializer(read_only=True)
