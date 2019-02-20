@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-20 16:46+0800\n"
+"POT-Creation-Date: 2019-02-20 18:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2003,45 +2003,54 @@ msgstr ""
 "单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
 "受影响)"
 
-#: common/forms.py:171
+#: common/forms.py:163
+msgid "Telnet login regex"
+msgstr "Telnet 成功正则表达式"
+
+#: common/forms.py:164
+msgid "ex: Last\\s*login|success|成功"
+msgstr ""
+"登录telnet服务器成功后的提示正则表达式，如: Last\\s*login|success|成功 "
+
+#: common/forms.py:175
 msgid "MFA Secondary certification"
 msgstr "MFA 二次认证"
 
-#: common/forms.py:173
+#: common/forms.py:177
 msgid ""
 "After opening, the user login must use MFA secondary authentication (valid "
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: common/forms.py:179
+#: common/forms.py:183
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: common/forms.py:183
+#: common/forms.py:187
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: common/forms.py:185
+#: common/forms.py:189
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: common/forms.py:191
+#: common/forms.py:195
 msgid "Connection max idle time"
 msgstr "SSH最大空闲时间"
 
-#: common/forms.py:193
+#: common/forms.py:197
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
 msgstr "提示：（单位：分）如果超过该配置没有操作，连接会被断开（仅ssh）"
 
-#: common/forms.py:199
+#: common/forms.py:203
 msgid "Password expiration time"
 msgstr "密码过期时间"
 
-#: common/forms.py:202
+#: common/forms.py:206
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -2051,45 +2060,45 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: common/forms.py:211
+#: common/forms.py:215
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: common/forms.py:215
+#: common/forms.py:219
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: common/forms.py:217
+#: common/forms.py:221
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: common/forms.py:222
+#: common/forms.py:226
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: common/forms.py:223
+#: common/forms.py:227
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: common/forms.py:228
+#: common/forms.py:232
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: common/forms.py:229
+#: common/forms.py:233
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: common/forms.py:234
+#: common/forms.py:238
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: common/forms.py:235
+#: common/forms.py:239
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
