@@ -16,13 +16,8 @@ class LDAPAuthorizationBackend(LDAPBackend):
     """
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
-        if password or self.settings.PERMIT_EMPTY_PASSWORD:
-            ldap_user = LDAPUser(self, username=username.strip(), request=request)
-            user = self.authenticate_ldap_user(ldap_user, password)
-        else:
-            logger.debug('Rejecting empty password for {}'.format(username))
-            user = None
-
+        ldap_user = LDAPUser(self, username=username.strip(), request=request)
+        user = self.authenticate_ldap_user(ldap_user, password)
         return user
 
     def get_user(self, user_id):
