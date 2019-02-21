@@ -2264,6 +2264,10 @@ msgstr "宁夏: cn-northwest-1"
 msgid "More"
 msgstr "更多"
 
+#: common/templates/common/replay_storage_create.html:246
+msgid "Submitting"
+msgstr "提交中"
+
 #: common/templates/common/security_setting.html:46
 msgid "Password check rule"
 msgstr "密码校验规则"
@@ -4895,9 +4899,6 @@ msgstr "更新组织"
 
 #~ msgid "Login Jumpserver"
 #~ msgstr "登录 Jumpserver"
-
-#~ msgid "Count"
-#~ msgstr "数量"
 
 #, fuzzy
 #~| msgid "Delete succeed"
