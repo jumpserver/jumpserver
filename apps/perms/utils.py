@@ -5,6 +5,7 @@ from collections import defaultdict
 from django.db.models import Q
 
 from common.utils import get_logger
+from common.tree import TreeNode
 from .models import AssetPermission
 from .hands import Node
 
@@ -193,3 +194,69 @@ def sort_assets(assets, order_by='hostname', reverse=False):
     else:
         assets = sorted(assets, key=lambda asset: getattr(asset, order_by), reverse=reverse)
     return assets
+
+
+def parse_node_to_tree_node(node):
+    from . import serializers
+    name = '{} ({})'.format(node.value, node.assets_amount)
+    node_serializer = serializers.GrantedNodeSerializer(node)
+    data = {
+        'id': node.key,
+        'name': name,
+        'title': name,
+        'pId': node.parent_key,
+        'isParent': True,
+        'open': node.is_root(),
+        'meta': {
+            'node': node_serializer.data,
+            'type': 'node'
+        }
+    }
+    tree_node = TreeNode(**data)
+    return tree_node
+
+
+def parse_asset_to_tree_node(node, asset, system_users):
+    system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
+    icon_skin = 'file'
+    if asset.platform.lower() == 'windows':
+        icon_skin = 'windows'
+    elif asset.platform.lower() == 'linux':
+        icon_skin = 'linux'
+    system_users = []
+    for system_user in system_users_protocol_matched:
+        system_users.append({
+            'id': system_user.id,
+            'name': system_user.name,
+            'username': system_user.username,
+            'protocol': system_user.protocol,
+            'priority': system_user.priority,
+            'login_mode': system_user.login_mode,
+            'comment': system_user.comment,
+        })
+    data = {
+        'id': str(asset.id),
+        'name': asset.hostname,
+        'title': asset.ip,
+        'pId': node.key,
+        'isParent': False,
+        'open': False,
+        'iconSkin': icon_skin,
+        'meta': {
+            'system_users': system_users,
+            'type': 'asset',
+            'asset': {
+                'id': asset.id,
+                'hostname': asset.hostname,
+                'ip': asset.ip,
+                'port': asset.port,
+                'protocol': asset.protocol,
+                'platform': asset.platform,
+                'domain': None if not asset.domain else asset.domain.id,
+                'is_active': asset.is_active,
+                'comment': asset.comment
+            },
+        }
+    }
+    tree_node = TreeNode(**data)
+    return tree_node

@@ -72,6 +72,7 @@ function initTable() {
     } else {
         inited = true;
     }
+    url = "{% url 'api-perms:user-group-assets' pk=object.id %}";
     var options = {
         ele: $('#user_assets_table'),
         columnDefs: [
@@ -106,14 +107,15 @@ function initTable() {
     return asset_table
 }
 
+
 function onSelected(event, treeNode) {
     url = '{% url "api-perms:user-group-node-assets" pk=object.id node_id=DEFAULT_PK %}';
-    url = url.replace("{{ DEFAULT_PK }}", treeNode.id);
-    setCookie('node_selected', treeNode.id);
-    asset_table = initTable();
+    var node_id = treeNode.meta.node.id;
+    url = url.replace("{{ DEFAULT_PK }}", node_id);
     asset_table.ajax.url(url);
     asset_table.ajax.reload();
 }
+
 
 function selectQueryNode() {
     var query_node_id = $.getUrlParam("node");
@@ -149,25 +151,16 @@ function initTree() {
         }
     };
 
-    var zNodes = [];
-    $.get("{% url 'api-perms:user-group-nodes' pk=object.id %}", function(data, status){
-        $.each(data, function (index, value) {
-            value["pId"] = value["parent"];
-            if (value["key"] === "0") {
-                value["open"] = true;
-            }
-            value["name"] = value["value"]
-        });
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree"), setting, zNodes);
+    $.get("{% url 'api-perms:user-group-nodes-assets-as-tree' pk=object.id %}?show_assets=0", function(data, status) {
+        $.fn.zTree.init($("#assetTree"), setting, data);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
-		rMenu = $("#rMenu");
-		selectQueryNode();
     });
+
 }
 
 $(document).ready(function () {
     initTree();
+    initTable();
 });
 </script>
 {% endblock %}
