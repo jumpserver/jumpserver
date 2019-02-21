@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-20 18:56+0800\n"
+"POT-Creation-Date: 2019-02-21 15:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -193,7 +193,7 @@ msgstr "名称"
 #: perms/templates/perms/asset_permission_user.html:55 users/forms.py:15
 #: users/forms.py:33 users/models/authentication.py:77 users/models/user.py:53
 #: users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64 users/templates/users/new_login.html:79
+#: users/templates/users/login.html:64 users/templates/users/new_login.html:85
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -206,7 +206,7 @@ msgstr "密码或密钥密码"
 
 #: assets/forms/user.py:26 assets/models/base.py:24 common/forms.py:102
 #: users/forms.py:17 users/forms.py:35 users/forms.py:47
-#: users/templates/users/login.html:67 users/templates/users/new_login.html:84
+#: users/templates/users/login.html:67 users/templates/users/new_login.html:90
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -1202,6 +1202,7 @@ msgstr "刷新"
 #: assets/templates/assets/asset_detail.html:308
 #: users/templates/users/user_detail.html:307
 #: users/templates/users/user_detail.html:334
+#: xpack/plugins/interface/views.py:31
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -2262,6 +2263,10 @@ msgstr "宁夏: cn-northwest-1"
 msgid "More"
 msgstr "更多"
 
+#: common/templates/common/replay_storage_create.html:246
+msgid "Submitting"
+msgstr "提交中"
+
 #: common/templates/common/security_setting.html:46
 msgid "Password check rule"
 msgstr "密码校验规则"
@@ -2833,7 +2838,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72 users/templates/users/new_login.html:90
+#: users/templates/users/login.html:72 users/templates/users/new_login.html:96
 msgid "Login"
 msgstr "登录"
 
@@ -2979,7 +2984,7 @@ msgstr "验证码"
 
 #: templates/flash_message_standalone.html:35
 #: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
-#: users/templates/users/new_login.html:50
+#: users/templates/users/new_login.html:56
 #: users/templates/users/reset_password.html:25
 msgid "Welcome to the Jumpserver open source fortress"
 msgstr "欢迎使用Jumpserver开源堡垒机"
@@ -3351,7 +3356,7 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: users/api/auth.py:40 users/templates/users/login.html:52
-#: users/templates/users/new_login.html:65
+#: users/templates/users/new_login.html:71
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -3736,7 +3741,7 @@ msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
 #: users/templates/users/forgot_password.html:31
-#: users/templates/users/login.html:83 users/templates/users/new_login.html:94
+#: users/templates/users/login.html:83 users/templates/users/new_login.html:100
 msgid "Forgot password"
 msgstr "忘记密码"
 
@@ -3776,11 +3781,11 @@ msgstr ""
 msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
-#: users/templates/users/login.html:54 users/templates/users/new_login.html:67
+#: users/templates/users/login.html:54 users/templates/users/new_login.html:73
 msgid "The user password has expired"
 msgstr "用户密码已过期"
 
-#: users/templates/users/login.html:57 users/templates/users/new_login.html:70
+#: users/templates/users/login.html:57 users/templates/users/new_login.html:76
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3820,11 +3825,7 @@ msgstr "6位数字"
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
 
-#: users/templates/users/new_login.html:15
-msgid "Login Jumpserver"
-msgstr "登录 Jumpserver"
-
-#: users/templates/users/new_login.html:55
+#: users/templates/users/new_login.html:61
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
@@ -4878,6 +4879,9 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "Login Jumpserver"
+#~ msgstr "登录 Jumpserver"
 
 #, fuzzy
 #~| msgid "Delete succeed"
