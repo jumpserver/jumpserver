@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-21 15:53+0800\n"
+"POT-Creation-Date: 2019-02-21 19:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -233,8 +233,8 @@ msgstr "密码和私钥, 必须输入一个"
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/forms/user.py:145 assets/models/user.py:141
-#: assets/templates/assets/_system_user.html:66
+#: assets/forms/user.py:145 assets/models/cmd_filter.py:31
+#: assets/models/user.py:141 assets/templates/assets/_system_user.html:66
 #: assets/templates/assets/system_user_detail.html:165
 msgid "Command filter"
 msgstr "命令过滤器"
@@ -382,7 +382,7 @@ msgstr "标签管理"
 
 #: assets/models/asset.py:109 assets/models/base.py:30
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:25
-#: assets/models/cmd_filter.py:55 assets/models/group.py:21
+#: assets/models/cmd_filter.py:58 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:125
 #: assets/templates/assets/cmd_filter_detail.html:77
@@ -415,7 +415,7 @@ msgstr "创建日期"
 
 #: assets/models/asset.py:111 assets/models/base.py:27
 #: assets/models/cluster.py:29 assets/models/cmd_filter.py:22
-#: assets/models/cmd_filter.py:52 assets/models/domain.py:21
+#: assets/models/cmd_filter.py:55 assets/models/domain.py:21
 #: assets/models/domain.py:53 assets/models/group.py:23
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:32
@@ -533,11 +533,11 @@ msgstr "北京电信"
 msgid "BGP full netcom"
 msgstr "BGP全网通"
 
-#: assets/models/cmd_filter.py:35
+#: assets/models/cmd_filter.py:38
 msgid "Regex"
 msgstr "正则表达式"
 
-#: assets/models/cmd_filter.py:36 ops/models/command.py:21
+#: assets/models/cmd_filter.py:39 ops/models/command.py:21
 #: ops/templates/ops/command_execution_list.html:60 terminal/models.py:161
 #: terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
@@ -546,19 +546,19 @@ msgstr "正则表达式"
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:41
+#: assets/models/cmd_filter.py:44
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:42
+#: assets/models/cmd_filter.py:45
 msgid "Allow"
 msgstr "允许"
 
-#: assets/models/cmd_filter.py:46
+#: assets/models/cmd_filter.py:49
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:47
+#: assets/models/cmd_filter.py:50
 #: assets/templates/assets/cmd_filter_rule_list.html:58
 #: audits/templates/audits/login_log_list.html:50
 #: common/templates/common/command_storage_create.html:31
@@ -568,26 +568,26 @@ msgstr "过滤器"
 msgid "Type"
 msgstr "类型"
 
-#: assets/models/cmd_filter.py:48 assets/models/user.py:135
+#: assets/models/cmd_filter.py:51 assets/models/user.py:135
 #: assets/templates/assets/cmd_filter_rule_list.html:60
 msgid "Priority"
 msgstr "优先级"
 
-#: assets/models/cmd_filter.py:48
+#: assets/models/cmd_filter.py:51
 msgid "1-100, the higher will be match first"
 msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
-#: assets/models/cmd_filter.py:50
+#: assets/models/cmd_filter.py:53
 #: assets/templates/assets/cmd_filter_rule_list.html:59
 #: xpack/plugins/license/models.py:27
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:50
+#: assets/models/cmd_filter.py:53
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:51
+#: assets/models/cmd_filter.py:54
 #: assets/templates/assets/admin_user_assets.html:52
 #: assets/templates/assets/admin_user_list.html:33
 #: assets/templates/assets/asset_list.html:96
@@ -614,6 +614,10 @@ msgstr "每行一个命令"
 #: xpack/plugins/orgs/templates/orgs/org_list.html:23
 msgid "Action"
 msgstr "动作"
+
+#: assets/models/cmd_filter.py:64
+msgid "Command filter rule"
+msgstr "命令过滤规则"
 
 #: assets/models/domain.py:61 assets/templates/assets/domain_detail.html:21
 #: assets/templates/assets/domain_detail.html:64
@@ -1790,28 +1794,28 @@ msgstr "日期"
 msgid "Datetime"
 msgstr "日期"
 
-#: audits/views.py:68 audits/views.py:112 audits/views.py:148
-#: audits/views.py:192 audits/views.py:223 templates/_nav.html:72
+#: audits/views.py:71 audits/views.py:115 audits/views.py:151
+#: audits/views.py:195 audits/views.py:226 templates/_nav.html:72
 msgid "Audits"
 msgstr "日志审计"
 
-#: audits/views.py:69 templates/_nav.html:76
+#: audits/views.py:72 templates/_nav.html:76
 msgid "FTP log"
 msgstr "FTP日志"
 
-#: audits/views.py:113 templates/_nav.html:77
+#: audits/views.py:116 templates/_nav.html:77
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/views.py:149 templates/_nav.html:78
+#: audits/views.py:152 templates/_nav.html:78
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/views.py:193 templates/_nav.html:75
+#: audits/views.py:196 templates/_nav.html:75
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/views.py:224 ops/views/command.py:44
+#: audits/views.py:227 ops/views/command.py:44
 msgid "Command execution list"
 msgstr "命令执行列表"
 
@@ -2122,6 +2126,11 @@ msgstr ""
 #: users/templates/users/user_detail.html:96
 msgid "Enabled"
 msgstr "启用"
+
+#: common/models.py:126 users/templates/users/reset_password.html:68
+#: users/templates/users/user_profile.html:20
+msgid "Setting"
+msgstr "设置"
 
 #: common/templates/common/basic_setting.html:15
 #: common/templates/common/email_setting.html:15
@@ -3659,7 +3668,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:44 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:51
-#: xpack/plugins/cloud/models.py:60 xpack/plugins/cloud/models.py:120
+#: xpack/plugins/cloud/models.py:120
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:59
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:13
 msgid "Account"
@@ -3880,11 +3889,6 @@ msgstr "密码强度："
 #: users/templates/users/reset_password.html:66
 msgid "Password again"
 msgstr "再次输入密码"
-
-#: users/templates/users/reset_password.html:68
-#: users/templates/users/user_profile.html:20
-msgid "Setting"
-msgstr "设置"
 
 #: users/templates/users/reset_password.html:105
 #: users/templates/users/user_password_update.html:99
@@ -4552,6 +4556,10 @@ msgstr ""
 msgid "Access key secret"
 msgstr ""
 
+#: xpack/plugins/cloud/models.py:60
+msgid "Cloud account"
+msgstr "云账号"
+
 #: xpack/plugins/cloud/models.py:121
 msgid "Regions"
 msgstr "地域"
@@ -4762,7 +4770,8 @@ msgstr "界面设置"
 msgid "Interface"
 msgstr "界面"
 
-#: xpack/plugins/license/meta.py:11 xpack/plugins/license/views.py:27
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:71
+#: xpack/plugins/license/views.py:27
 msgid "License"
 msgstr "许可证"
 
