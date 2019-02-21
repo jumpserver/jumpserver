@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-21 19:03+0800\n"
+"POT-Creation-Date: 2019-02-21 19:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -464,6 +464,7 @@ msgid "Reachable"
 msgstr "可连接"
 
 #: assets/models/asset.py:119 assets/models/base.py:36
+#: xpack/plugins/license/models.py:78
 msgid "Unknown"
 msgstr "未知"
 
@@ -579,7 +580,7 @@ msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
 #: assets/models/cmd_filter.py:53
 #: assets/templates/assets/cmd_filter_rule_list.html:59
-#: xpack/plugins/license/models.py:27
+#: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
@@ -927,7 +928,7 @@ msgstr "其它"
 #: users/templates/users/user_pubkey_update.html:76
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:35
-#: xpack/plugins/interface/templates/interface/interface.html:50
+#: xpack/plugins/interface/templates/interface/interface.html:88
 msgid "Reset"
 msgstr "重置"
 
@@ -960,7 +961,7 @@ msgstr "重置"
 #: users/templates/users/user_password_update.html:72
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
-#: xpack/plugins/interface/templates/interface/interface.html:51
+#: xpack/plugins/interface/templates/interface/interface.html:89
 msgid "Submit"
 msgstr "提交"
 
@@ -1177,7 +1178,7 @@ msgstr "创建日期"
 #: terminal/templates/terminal/session_detail.html:81
 #: users/templates/users/user_detail.html:138
 #: users/templates/users/user_profile.html:146
-#: xpack/plugins/license/templates/license/license_detail.html:81
+#: xpack/plugins/license/templates/license/license_detail.html:93
 msgid "Quick modify"
 msgstr "快速修改"
 
@@ -1225,7 +1226,7 @@ msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:73
 #: users/templates/users/user_list.html:7
-#: xpack/plugins/license/templates/license/license_detail.html:89
+#: xpack/plugins/license/templates/license/license_detail.html:101
 msgid "Import"
 msgstr "导入"
 
@@ -1692,7 +1693,7 @@ msgstr "文件名"
 #: audits/models.py:22 audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/command_execution_list.html:64
 #: ops/templates/ops/task_list.html:39 users/models/authentication.py:73
-#: users/templates/users/user_detail.html:458 xpack/plugins/cloud/api.py:61
+#: users/templates/users/user_detail.html:458 xpack/plugins/cloud/api.py:62
 msgid "Success"
 msgstr "成功"
 
@@ -2730,6 +2731,7 @@ msgid "Validity period"
 msgstr "有效期"
 
 #: perms/templates/perms/asset_permission_detail.html:66
+#: xpack/plugins/license/templates/license/license_detail.html:67
 msgid "User count"
 msgstr "用户数量"
 
@@ -2738,6 +2740,7 @@ msgid "User group count"
 msgstr "用户组列表"
 
 #: perms/templates/perms/asset_permission_detail.html:74
+#: xpack/plugins/license/templates/license/license_detail.html:63
 msgid "Asset count"
 msgstr "资产数量"
 
@@ -2995,6 +2998,7 @@ msgstr "验证码"
 #: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
 #: users/templates/users/new_login.html:56
 #: users/templates/users/reset_password.html:25
+#: xpack/plugins/interface/models.py:36
 msgid "Welcome to the Jumpserver open source fortress"
 msgstr "欢迎使用Jumpserver开源堡垒机"
 
@@ -4494,7 +4498,7 @@ msgstr "MFA 解绑成功"
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
-#: xpack/plugins/cloud/api.py:60 xpack/plugins/cloud/providers/base.py:84
+#: xpack/plugins/cloud/api.py:61 xpack/plugins/cloud/providers/base.py:84
 msgid "Account unavailable"
 msgstr "账户无效"
 
@@ -4709,49 +4713,49 @@ msgstr "同步实例任务列表"
 msgid "Create sync Instance task"
 msgstr "创建同步实例任务"
 
-#: xpack/plugins/interface/forms.py:11 xpack/plugins/interface/models.py:15
+#: xpack/plugins/interface/forms.py:16 xpack/plugins/interface/models.py:15
 msgid "Title of login page"
 msgstr "登录页面标题"
 
-#: xpack/plugins/interface/forms.py:13
+#: xpack/plugins/interface/forms.py:18
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (eg: Welcome "
 "to the Jumpserver open source fortress)"
 msgstr "提示：将会显示在企业版用户登录页面（eg: 欢迎使用Jumpserver开源堡垒机）"
 
-#: xpack/plugins/interface/forms.py:19 xpack/plugins/interface/models.py:19
+#: xpack/plugins/interface/forms.py:24 xpack/plugins/interface/models.py:19
 msgid "Image of login page"
 msgstr "登录页面图片"
 
-#: xpack/plugins/interface/forms.py:21
+#: xpack/plugins/interface/forms.py:26
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (suggest "
 "image size: 635px*472px)"
 msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 635px*472px）"
 
-#: xpack/plugins/interface/forms.py:27 xpack/plugins/interface/models.py:23
+#: xpack/plugins/interface/forms.py:32 xpack/plugins/interface/models.py:23
 msgid "Website icon"
 msgstr "网站图标"
 
-#: xpack/plugins/interface/forms.py:29
+#: xpack/plugins/interface/forms.py:34
 msgid "Tips: website icon. (suggest image size: 16px*16px)"
 msgstr "提示：网站图标（建议图片大小为: 16px*16px）"
 
-#: xpack/plugins/interface/forms.py:34 xpack/plugins/interface/models.py:27
+#: xpack/plugins/interface/forms.py:39 xpack/plugins/interface/models.py:27
 msgid "Logo of management page"
 msgstr "管理页面logo"
 
-#: xpack/plugins/interface/forms.py:36
+#: xpack/plugins/interface/forms.py:41
 msgid ""
 "Tips: This will appear at the top left of the administration page. (suggest "
 "image size: 185px*55px)"
 msgstr "提示：将会显示在管理页面左上方（建议图片大小为: 185px*55px）"
 
-#: xpack/plugins/interface/forms.py:42 xpack/plugins/interface/models.py:31
+#: xpack/plugins/interface/forms.py:47 xpack/plugins/interface/models.py:31
 msgid "Logo of logout page"
 msgstr "退出页面logo"
 
-#: xpack/plugins/interface/forms.py:44
+#: xpack/plugins/interface/forms.py:49
 msgid ""
 "Tips: This will be displayed on the enterprise user logout page. (suggest "
 "image size: 82px*82px)"
@@ -4770,13 +4774,22 @@ msgstr "界面设置"
 msgid "Interface"
 msgstr "界面"
 
-#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:71
-#: xpack/plugins/license/views.py:27
+#: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:95
+#: xpack/plugins/license/templates/license/license_detail.html:50
+#: xpack/plugins/license/views.py:31
 msgid "License"
 msgstr "许可证"
 
+#: xpack/plugins/license/models.py:74
+msgid "Standard edition"
+msgstr ""
+
+#: xpack/plugins/license/models.py:76
+msgid "Enterprise edition"
+msgstr "企业版"
+
 #: xpack/plugins/license/templates/license/_license_import_modal.html:4
-#: xpack/plugins/license/templates/license/license_detail.html:87
+#: xpack/plugins/license/templates/license/license_detail.html:99
 msgid "Import license"
 msgstr "导入许可证"
 
@@ -4801,39 +4814,48 @@ msgid " expired."
 msgstr " 过期。"
 
 #: xpack/plugins/license/templates/license/license_detail.html:37
-#: xpack/plugins/license/views.py:28
+#: xpack/plugins/license/views.py:32
 msgid "License detail"
 msgstr "许可证详情"
 
-#: xpack/plugins/license/templates/license/license_detail.html:53
+#: xpack/plugins/license/templates/license/license_detail.html:51
+msgid "No license"
+msgstr "暂无许可证"
+
+#: xpack/plugins/license/templates/license/license_detail.html:55
 msgid "Corporation"
 msgstr "公司"
 
-#: xpack/plugins/license/templates/license/license_detail.html:57
+#: xpack/plugins/license/templates/license/license_detail.html:59
 msgid "Expired"
 msgstr "过期时间"
 
-#: xpack/plugins/license/templates/license/license_detail.html:61
-msgid "Count"
-msgstr "数量"
-
-#: xpack/plugins/license/templates/license/license_detail.html:63
+#: xpack/plugins/license/templates/license/license_detail.html:64
+#: xpack/plugins/license/templates/license/license_detail.html:68
+#: xpack/plugins/license/templates/license/license_detail.html:72
+#: xpack/plugins/license/templates/license/license_detail.html:76
 msgid "Unlimited"
 msgstr "无限制"
 
-#: xpack/plugins/license/templates/license/license_detail.html:67
+#: xpack/plugins/license/templates/license/license_detail.html:71
+#, fuzzy
+#| msgid "CPU count"
+msgid "Cpu count"
+msgstr "CPU数量"
+
+#: xpack/plugins/license/templates/license/license_detail.html:75
+msgid "Concurrent connections"
+msgstr "并发连接"
+
+#: xpack/plugins/license/templates/license/license_detail.html:80
 msgid "Edition"
 msgstr "版本"
 
-#: xpack/plugins/license/templates/license/license_detail.html:69
-msgid "Enterprise edition"
-msgstr "企业版"
-
-#: xpack/plugins/license/templates/license/license_detail.html:93
+#: xpack/plugins/license/templates/license/license_detail.html:106
 msgid "Technology consulting"
 msgstr "技术咨询"
 
-#: xpack/plugins/license/templates/license/license_detail.html:96
+#: xpack/plugins/license/templates/license/license_detail.html:109
 msgid "Consult"
 msgstr "咨询"
 
