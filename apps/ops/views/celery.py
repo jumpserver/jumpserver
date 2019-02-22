@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-from django.views.generic import DetailView, TemplateView
+from django.views.generic import TemplateView
 
 from common.permissions import AdminUserRequiredMixin
-from ..models import CeleryTask
 
 
 __all__ = ['CeleryTaskLogView']
