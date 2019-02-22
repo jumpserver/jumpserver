@@ -17,6 +17,8 @@ try:
 except ImportError as e:
     print("Not found __version__: {}".format(e))
     print("Sys path: {}".format(sys.path))
+    print("Python is: ")
+    print(subprocess.call('which python', shell=True))
     __version__ = 'Unknown'
     try:
         import apps
@@ -28,7 +30,8 @@ except ImportError as e:
 try:
     from apps.jumpserver.conf import load_user_config
     CONFIG = load_user_config()
-except ImportError:
+except ImportError as e:
+    print("Import error: {}".format(e))
     print("Could not find config file, `cp config_example.yml config.yml`")
     sys.exit(1)
 

@@ -12,9 +12,10 @@ if [[ "$1" != "" ]];then
     service=$1
 fi
 
+trap cleanup EXIT
 if [[ "$1" == "bash" ]];then
     bash
+else
+    python jms start ${service}
 fi
 
-trap cleanup EXIT
-python jms start ${service}
