@@ -14,13 +14,16 @@ from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 def get_resource_type_list():
     from users.models import User, UserGroup
-    from assets.models import Asset, Node, AdminUser, SystemUser, Domain, Gateway
+    from assets.models import (
+        Asset, Node, AdminUser, SystemUser, Domain, Gateway, CommandFilter,
+        CommandFilterRule,
+    )
     from orgs.models import Organization
     from perms.models import AssetPermission
 
     models = [
         User, UserGroup, Asset, Node, AdminUser, SystemUser, Domain,
-        Gateway, Organization, AssetPermission
+        Gateway, Organization, AssetPermission, CommandFilter, CommandFilterRule
     ]
     return [model._meta.verbose_name for model in models]
 

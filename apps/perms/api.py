@@ -16,7 +16,9 @@ from common.tree import TreeNode, TreeNodeSerializer
 from common.utils import get_object_or_none
 from orgs.mixins import RootOrgViewMixin
 from orgs.utils import set_to_root_org
-from .utils import AssetPermissionUtil
+from .utils import (
+    AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node
+)
 from .models import AssetPermission
 from .hands import (
     AssetGrantedSerializer, User, UserGroup, Asset, Node,
@@ -298,71 +300,6 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
         self.system_user_id = request.query_params.get('system_user')
         return super().get(request, *args, **kwargs)
 
-    @staticmethod
-    def parse_node_to_tree_node(node):
-        name = '{} ({})'.format(node.value, node.assets_amount)
-        node_serializer = serializers.GrantedNodeSerializer(node)
-        data = {
-            'id': node.key,
-            'name': name,
-            'title': name,
-            'pId': node.parent_key,
-            'isParent': True,
-            'open': node.is_root(),
-            'meta': {
-                'node': node_serializer.data,
-                'type': 'node'
-            }
-        }
-        tree_node = TreeNode(**data)
-        return tree_node
-
-    @staticmethod
-    def parse_asset_to_tree_node(node, asset, system_users):
-        system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
-        icon_skin = 'file'
-        if asset.platform.lower() == 'windows':
-            icon_skin = 'windows'
-        elif asset.platform.lower() == 'linux':
-            icon_skin = 'linux'
-        system_users = []
-        for system_user in system_users_protocol_matched:
-            system_users.append({
-                'id': system_user.id,
-                'name': system_user.name,
-                'username': system_user.username,
-                'protocol': system_user.protocol,
-                'priority': system_user.priority,
-                'login_mode': system_user.login_mode,
-                'comment': system_user.comment,
-            })
-        data = {
-            'id': str(asset.id),
-            'name': asset.hostname,
-            'title': asset.ip,
-            'pId': node.key,
-            'isParent': False,
-            'open': False,
-            'iconSkin': icon_skin,
-            'meta': {
-                'system_users': system_users,
-                'type': 'asset',
-                'asset': {
-                    'id': asset.id,
-                    'hostname': asset.hostname,
-                    'ip': asset.ip,
-                    'port': asset.port,
-                    'protocol': asset.protocol,
-                    'platform': asset.platform,
-                    'domain': None if not asset.domain else asset.domain.id,
-                    'is_active': asset.is_active,
-                    'comment': asset.comment
-                },
-            }
-        }
-        tree_node = TreeNode(**data)
-        return tree_node
-
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
@@ -381,12 +318,12 @@ class UserGrantedNodesWithAssetsAsTreeApi(ListAPIView):
             util.filter_permission_with_system_user(system_user=self.system_user_id)
         nodes = util.get_nodes_with_assets()
         for node, assets in nodes.items():
-            data = self.parse_node_to_tree_node(node)
+            data = parse_node_to_tree_node(node)
             queryset.append(data)
             if not self.show_assets:
                 continue
             for asset, system_users in assets.items():
-                data = self.parse_asset_to_tree_node(node, asset, system_users)
+                data = parse_asset_to_tree_node(node, asset, system_users)
                 queryset.append(data)
         queryset = sorted(queryset)
         return queryset
@@ -487,6 +424,44 @@ class UserGroupGrantedNodesWithAssetsApi(ListAPIView):
                 asset.system_users_granted = system_users
             node.assets_granted = assets
             queryset.append(node)
+        return queryset
+
+
+class UserGroupGrantedNodesWithAssetsAsTreeApi(ListAPIView):
+    serializer_class = TreeNodeSerializer
+    permission_classes = (IsOrgAdminOrAppUser,)
+    show_assets = True
+    system_user_id = None
+
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+
+    def get(self, request, *args, **kwargs):
+        self.show_assets = request.query_params.get('show_assets', '1') == '1'
+        self.system_user_id = request.query_params.get('system_user')
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.change_org_if_need()
+        user_group_id = self.kwargs.get('pk', '')
+        queryset = []
+        group = get_object_or_404(UserGroup, id=user_group_id)
+        util = AssetPermissionUtil(group)
+        if self.system_user_id:
+            util.filter_permission_with_system_user(system_user=self.system_user_id)
+        nodes = util.get_nodes_with_assets()
+        for node, assets in nodes.items():
+            data = parse_node_to_tree_node(node)
+            queryset.append(data)
+            if not self.show_assets:
+                continue
+            for asset, system_users in assets.items():
+                data = parse_asset_to_tree_node(node, asset, system_users)
+                queryset.append(data)
+        queryset = sorted(queryset)
         return queryset
 
 

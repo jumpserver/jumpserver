@@ -6,14 +6,17 @@ from django.dispatch import receiver
 from django.db import transaction
 
 from jumpserver.utils import current_request
-from common.utils import get_request_ip
+from common.utils import get_request_ip, get_logger
 from users.models import User
 from .models import OperateLog, PasswordChangeLog
+
+logger = get_logger(__name__)
 
 
 MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
-    'Domain', 'Gateway', 'Organization', 'AssetPermission',
+    'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
+    'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
 )
 
 
@@ -26,11 +29,16 @@ def create_operate_log(action, sender, resource):
         return
     resource_type = sender._meta.verbose_name
     remote_addr = get_request_ip(current_request)
+
+    data = {
+        "user": str(user), 'action': action, 'resource_type': resource_type,
+        'resource': str(resource), 'remote_addr': remote_addr,
+    }
     with transaction.atomic():
-        OperateLog.objects.create(
-            user=user, action=action, resource_type=resource_type,
-            resource=resource, remote_addr=remote_addr
-        )
+        try:
+            OperateLog.objects.create(**data)
+        except Exception as e:
+            logger.error("Create operate log error: {}".format(e))
 
 
 @receiver(post_save, dispatch_uid="my_unique_identifier")

@@ -27,6 +27,9 @@ class CommandFilter(OrgModelMixin):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _("Command filter")
+
 
 class CommandFilterRule(OrgModelMixin):
     TYPE_REGEX = 'regex'
@@ -58,6 +61,7 @@ class CommandFilterRule(OrgModelMixin):
 
     class Meta:
         ordering = ('-priority', 'action')
+        verbose_name = _("Command filter rule")
 
     @property
     def _pattern(self):

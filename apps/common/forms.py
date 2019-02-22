@@ -96,7 +96,7 @@ class LDAPSettingForm(BaseForm):
         label=_("LDAP server"),
     )
     AUTH_LDAP_BIND_DN = forms.CharField(
-        label=_("Bind DN"),
+        required=False, label=_("Bind DN"),
     )
     AUTH_LDAP_BIND_PASSWORD = FormEncryptCharField(
         label=_("Password"),
