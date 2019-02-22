@@ -415,7 +415,7 @@
     # ACCESS_KEY: null
 
     # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-    # ACCESS_KEY_STORE: keys/.access_key
+    # ACCESS_KEY_STORE: data/keys/.access_key
 
     # 加密密钥
     # SECRET_KEY: null
@@ -466,6 +466,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -488,7 +489,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -651,7 +652,7 @@
     # ACCESS_KEY: null
 
     # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-    # ACCESS_KEY_STORE: keys/.access_key
+    # ACCESS_KEY_STORE: data/keys/.access_key
 
     # 加密密钥
     # SECRET_KEY: null
@@ -702,6 +703,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -724,7 +726,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -887,7 +889,7 @@
     # ACCESS_KEY: null
 
     # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-    # ACCESS_KEY_STORE: keys/.access_key
+    # ACCESS_KEY_STORE: data/keys/.access_key
 
     # 加密密钥
     # SECRET_KEY: null
@@ -938,6 +940,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -960,7 +963,7 @@
 
     $ cd /opt
     $ rm -rf luna
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -986,7 +989,7 @@
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
-1.4.7 升级到最新版本 (未开放)
+1.4.7 升级到最新版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Jumpserver**
@@ -1023,6 +1026,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh

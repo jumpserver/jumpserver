@@ -6,10 +6,10 @@ RDP 协议资产连接错误排查思路
 .. code-block:: vim
 
     (1). 如果白屏  检查nginx配置文件的guacamole设置ip是否正确,检查终端管理的gua状态是否在线
-    (2). 如果显示没有权限 可能是你在 终端管理里没有接受 guacamole的注册,请接受一下
+    (2). 如果显示没有权限 是你 终端管理里 guacamole 状态为红色或者没有注册成功
     (3). 如果显示未知问题 可能是你的资产填写的端口不对,或者授权的系统用户的协议不是rdp
-    (4). 提示无法连接服务器,请联系管理员或查看日志 一般情况下是登录的系统账户不正确或者防火墙设置有误,可以从Windows的日志查看信息(资产的信息填写不正确也会报这个错误)
-    (5). 提示网络问题无法连接或者超时,请检查网络连接并重试,或联系管理员 一般情况下网络有问题,可以从Windows的日志查看信息(资产的信息填写不正确也会报这个错误)
+    (4). 提示无法连接服务器 一般情况下是登录的系统账户不正确或者防火墙设置有误, 资产的信息填写不正确也会报这个错误
+    (5). 提示网络问题无法连接或者超时,请检查网络连接并重试,或联系管理员 一般情况下网络有问题
 
 1. 检查终端是否在线
 
@@ -17,14 +17,10 @@ RDP 协议资产连接错误排查思路
 
 .. code-block:: shell
 
-    # 如果终端不在线,请检查 Windows 组件是否已经正常运行
+    # 如果终端不在线,请检查 guacamole 的 BOOTSTRAP_TOKEN 是否与 jumpserver 一致, 如果不一致请修改后重启
+    $ cat /opt/jumpserver/config.yml | grep BOOTSTRAP_TOKEN
+    $ env | grep BOOTSTRAP_TOKEN
 
-    # 如果重启后任然不在线,请重新注册 Windows 组件
-    # 在Jumpserver后台 会话管理-终端管理 删掉 guacamole 的注册
-    # 必须到 Jumpserver后台 会话管理-终端管理  删掉 guacamole 的注册
-    # 一定要先到 Jumpserver后台 会话管理-终端管理  删掉 guacamole 的注册
-
-    # 正常部署参照此步骤解决
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
     $ rm -rf /config/guacamole/keys/*
@@ -34,9 +30,9 @@ RDP 协议资产连接错误排查思路
     # docker 部署请直接删除容器后重建,记得一定要先在 终端管理 删除不在线的组件
     $ docker stop jms_guacamole
     $ docker rm jms_guacamole
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_guacamole:1.4.8
 
-    # 正常运行后到Jumpserver 会话管理-终端管理 里面接受gua注册
+    # 正常运行后到Jumpserver 会话管理-终端管理 里面查看 gua 的状态是否为绿色
 
 2. 登录要连接的windows资产,检查远程设置和防火墙设置
 
