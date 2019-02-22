@@ -296,7 +296,7 @@
     # ACCESS_KEY: null
 
     # ACCESS KEY 保存的地址, 默认注册后会保存到该文件中
-    # ACCESS_KEY_STORE: keys/.access_key
+    # ACCESS_KEY_STORE: data/keys/.access_key
 
     # 加密密钥
     # SECRET_KEY: null
@@ -350,7 +350,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 

@@ -216,14 +216,14 @@ CentOS 7 安装文档
 
     # http://<Jumpserver_url> 指向 jumpserver 的服务端口, 如 http://192.168.244.144:8080
     # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.7
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.8
 
 .. code-block:: shell
 
     # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
     $ cd /opt
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.7/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -323,13 +323,13 @@ CentOS 7 安装文档
 .. code-block:: shell
 
     # coco 服务默认运行在单核心下面, 当负载过高时会导致用户访问变慢, 这时可运行多个 docker 容器缓解
-    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.7
-    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.7
+    $ docker run --name jms_coco01 -d -p 2223:2222 -p 5001:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_coco02 -d -p 2224:2222 -p 5002:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.8
     ...
 
     # guacamole 也是一样
-    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.7
-    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_guacamole01 -d -p 8082:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.8
+    $ docker run --name jms_guacamole02 -d -p 8083:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.8
     ...
 
     # nginx 代理设置
