@@ -265,7 +265,7 @@
     $ mkdir keys logs
     $ cp config_example.yml config.yml
 
-    $ sed -i "s/BOOTSTRAP_TOKEN: <ChangeIT>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/coco/config.yml
+    $ sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/coco/config.yml
     $ sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/coco/config.yml
 
     $ vi config.yml
@@ -280,7 +280,7 @@
 
     # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
     # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
-    BOOTSTRAP_TOKEN: <ChangeIT>
+    BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>
 
     # 启动时绑定的ip, 默认 0.0.0.0
     # BIND_HOST: 0.0.0.0
