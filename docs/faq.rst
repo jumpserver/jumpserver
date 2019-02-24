@@ -38,11 +38,6 @@ FAQ
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 
-    # Centos6
-    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-    $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG="zh_CN.UTF-8"' > /etc/sysconfig/i18n
-
     # Ubuntu
     $ apt-get install language-pack-zh-hans
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
@@ -79,6 +74,16 @@ FAQ
     # 新建超级用户的命令如下命令
     $ python manage.py createsuperuser --username=user --email=user@domain.com
 
+    # 登陆提示密码过期可以直接点击忘记密码, 通过邮箱重置; 如果未设置邮箱, 通过以下代码重置
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ cd /opt/jumpserver/apps
+    $ python manage.py shell
+    > from users.models import User
+    > u = User.objects.get(username='admin')  # admin 为你要修改的用户
+    > u.reset_password('password')  # password 为你要修改的密码
+    > u.save()
+
 6. 修改登录超时时间(默认 10 秒)
 
 .. code-block:: shell
@@ -103,6 +108,8 @@ FAQ
     # 如下,设置关闭浏览器 cookie 失效,则修改为
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
+
+    # 86400 单位是秒(s)
 
 8. 资产授权说明
 
