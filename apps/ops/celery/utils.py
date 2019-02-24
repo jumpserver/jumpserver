@@ -4,6 +4,7 @@ import json
 import os
 
 from django.conf import settings
+from django.utils.timezone import get_current_timezone
 from django.db.utils import ProgrammingError, OperationalError
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
 
@@ -49,7 +50,7 @@ def create_or_update_celery_periodic_tasks(tasks):
                 raise SyntaxError("crontab is not valid")
             kwargs = dict(
                 minute=minute, hour=hour, day_of_week=week,
-                day_of_month=day, month_of_year=month,
+                day_of_month=day, month_of_year=month, timezone=get_current_timezone()
             )
             contabs = CrontabSchedule.objects.filter(
                 **kwargs
