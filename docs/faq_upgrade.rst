@@ -85,7 +85,7 @@
 
     $ 参考升级文档继续升级到最新版本即可
 
-    # 删除原数据库命令
+    # 删除原数据库命令(谨慎操作)
     $ mysql -uroot
     > drop database jumpserver;
     > quit
