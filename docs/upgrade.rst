@@ -466,7 +466,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
+    $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -703,7 +703,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
+    $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -940,7 +940,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
+    $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
     $ cd /config
@@ -1026,7 +1026,7 @@
     $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
-    $ ln -sf /config/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
+    $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
