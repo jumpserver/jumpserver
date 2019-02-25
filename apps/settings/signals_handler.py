@@ -9,9 +9,9 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.core.cache import cache
 
 from jumpserver.utils import current_request
+from common.utils import get_logger, ssh_key_gen
+from common.signals import django_ready
 from .models import Setting
-from .utils import get_logger, ssh_key_gen
-from .signals import django_ready
 
 logger = get_logger(__file__)
 

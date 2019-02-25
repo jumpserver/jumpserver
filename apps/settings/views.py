@@ -3,15 +3,15 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
+from common.permissions import SuperUserRequiredMixin
+from common import utils
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm
-from common.permissions import SuperUserRequiredMixin
-from . import utils
 
 
 class BasicSettingView(SuperUserRequiredMixin, TemplateView):
     form_class = BasicSettingForm
-    template_name = "common/basic_setting.html"
+    template_name = "settings/basic_setting.html"
 
     def get_context_data(self, **kwargs):
         context = {
@@ -37,7 +37,7 @@ class BasicSettingView(SuperUserRequiredMixin, TemplateView):
 
 class EmailSettingView(SuperUserRequiredMixin, TemplateView):
     form_class = EmailSettingForm
-    template_name = "common/email_setting.html"
+    template_name = "settings/email_setting.html"
 
     def get_context_data(self, **kwargs):
         context = {
@@ -63,7 +63,7 @@ class EmailSettingView(SuperUserRequiredMixin, TemplateView):
 
 class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
     form_class = LDAPSettingForm
-    template_name = "common/ldap_setting.html"
+    template_name = "settings/ldap_setting.html"
 
     def get_context_data(self, **kwargs):
         context = {
@@ -89,7 +89,7 @@ class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
 
 class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
     form_class = TerminalSettingForm
-    template_name = "common/terminal_setting.html"
+    template_name = "settings/terminal_setting.html"
 
     def get_context_data(self, **kwargs):
         command_storage = utils.get_command_storage_setting()
@@ -131,7 +131,7 @@ class ReplayStorageCreateView(SuperUserRequiredMixin, TemplateView):
 
 
 class CommandStorageCreateView(SuperUserRequiredMixin, TemplateView):
-    template_name = 'common/command_storage_create.html'
+    template_name = 'settings/command_storage_create.html'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -144,7 +144,7 @@ class CommandStorageCreateView(SuperUserRequiredMixin, TemplateView):
 
 class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
     form_class = SecuritySettingForm
-    template_name = "common/security_setting.html"
+    template_name = "settings/security_setting.html"
 
     def get_context_data(self, **kwargs):
         context = {

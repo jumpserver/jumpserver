@@ -6,8 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
 
 from .models import Setting, settings
-from .fields import FormDictField, FormEncryptCharField, \
-    FormEncryptMixin
+from common.fields import (
+    FormDictField, FormEncryptCharField, FormEncryptMixin
+)
 
 
 class BaseForm(forms.Form):

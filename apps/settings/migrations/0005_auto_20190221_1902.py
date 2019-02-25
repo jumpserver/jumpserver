@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0004_setting_encrypted'),
+        ('settings', '0004_setting_encrypted'),
     ]
 
     operations = [

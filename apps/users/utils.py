@@ -6,7 +6,6 @@ import re
 import pyotp
 import base64
 import logging
-import uuid
 
 import requests
 import ipaddress
@@ -20,8 +19,6 @@ from datetime import datetime
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
-from common.forms import SecuritySettingForm
-from common.models import Setting
 from .models import User, LoginLog
 
 
