@@ -1,13 +1,15 @@
-二次认证(Google Auth)入口说明
+MFA 使用说明
 --------------------------------------------------------
 
 .. image:: _static/img/faq_googleauth.jpg
 
+Multi-Factor Authentication (MFA) 遵循基于时间的一次性密码 (TOTP) 标准 (RFC 6238)
+
 .. code-block:: vim
 
     # 关闭也是在这里,点击此处的重置即可
-    # 部分安卓手机无法使用 Google Auth ,可以尝试使用系统自带的【扫一扫】工具
-    # 或者尝试使用第三方软件(如Microsoft Authenticator 、身份宝等)
+    # 部分安卓手机无法使用 Google Authenticator ,可以尝试使用系统自带的【扫一扫】工具
+    # 或者尝试使用第三方软件 (如 Microsoft Authenticator 、身份宝 等)
 
 MFA遗失无法登陆
 

@@ -3,6 +3,7 @@ FAQ
 .. toctree::
    :maxdepth: 1
 
+   MFA 使用说明 <faq_mfa.rst>
    LDAP 使用说明 <faq_ldap.rst>
    SFTP 使用说明 <faq_sftp.rst>
    TELNET 使用说明 <faq_telnet.rst>
@@ -13,7 +14,6 @@ FAQ
    RDP 协议资产连接说明 <faq_rdp.rst>
    SSH 协议资产连接说明 <faq_ssh.rst>
    添加组织 及 组织管理员说明 <faq_org.rst>
-   二次认证(Google Auth)入口说明 <faq_googleauth.rst>
 
 
 其他问题
