@@ -506,12 +506,12 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.7
-    $ docker pull jumpserver/jms_guacamole:1.4.7
+    $ docker pull jumpserver/jms_coco:1.4.8
+    $ docker pull jumpserver/jms_guacamole:1.4.8
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.7
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.8
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -743,12 +743,12 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.7
-    $ docker pull jumpserver/jms_guacamole:1.4.7
+    $ docker pull jumpserver/jms_coco:1.4.8
+    $ docker pull jumpserver/jms_guacamole:1.4.8
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.7
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.8
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -980,16 +980,16 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.7
-    $ docker pull jumpserver/jms_guacamole:1.4.7
+    $ docker pull jumpserver/jms_coco:1.4.8
+    $ docker pull jumpserver/jms_guacamole:1.4.8
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.7
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.7
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.8
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
-1.4.7 升级到最新版本
+1.4.8 升级到最新版本
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Jumpserver**

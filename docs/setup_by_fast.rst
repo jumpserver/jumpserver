@@ -55,8 +55,8 @@
       && pip install -r /opt/jumpserver/requirements/requirements.txt \
       && curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io \
       && systemctl restart docker \
-      && docker pull jumpserver/jms_coco:1.4.7 \
-      && docker pull jumpserver/jms_guacamole:1.4.7 \
+      && docker pull jumpserver/jms_coco:1.4.8 \
+      && docker pull jumpserver/jms_guacamole:1.4.8 \
       && cd /opt \
       && tar xf luna.tar.gz \
       && chown -R root:root luna \
@@ -145,8 +145,8 @@
 
     $ cd /opt/jumpserver \
       && ./jms start all -d \
-      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.7 \
-      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.7 \
+      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.8 \
+      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.8 \
       && echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m" \
       && echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m" \
       && echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m" \
