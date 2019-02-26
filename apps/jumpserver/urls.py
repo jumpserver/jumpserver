@@ -20,7 +20,7 @@ api_v1_patterns = [
         path('ops/v1/', include('ops.urls.api_urls', namespace='api-ops')),
         path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
         path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
-        path('common/v1/', include('common.urls.api_urls', namespace='api-common')),
+        path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
    ]))
 ]
 
@@ -56,8 +56,7 @@ urlpatterns = [
     path('', include(api_v1_patterns)),
     path('luna/', LunaView.as_view(), name='luna-error'),
     path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
-    path('settings/', include('common.urls.view_urls', namespace='settings')),
-    path('common/', include('common.urls.view_urls', namespace='common')),
+    path('settings/', include('settings.urls.view_urls', namespace='settings')),
     # path('api/v2/', include(api_v2_patterns)),
 
     # External apps url

@@ -2,7 +2,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from celery import shared_task
 from .utils import get_logger
-from .models import Setting
 
 
 logger = get_logger(__file__)
