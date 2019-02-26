@@ -341,6 +341,12 @@ def get_push_system_user_tasks(system_user):
             }
         })
     if system_user.sudo:
+        sudo = system_user.sudo.replace('\r\n', '\n').replace('\r', '\n')
+        sudo_list = sudo.split('\n')
+        sudo_tmp = []
+        for s in sudo_list:
+            sudo_tmp.append(s.strip(','))
+        sudo = ','.join(sudo_tmp)
         tasks.append({
             'name': 'Set {} sudo setting'.format(system_user.username),
             'action': {
@@ -348,8 +354,7 @@ def get_push_system_user_tasks(system_user):
                 'args': "dest=/etc/sudoers state=present regexp='^{0} ALL=' "
                         "line='{0} ALL=(ALL) NOPASSWD: {1}' "
                         "validate='visudo -cf %s'".format(
-                    system_user.username,
-                    system_user.sudo,
+                    system_user.username, sudo,
                 )
             }
         })

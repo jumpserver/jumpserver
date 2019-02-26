@@ -150,5 +150,6 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),
             'login_mode': _('If you choose manual login mode, you do not '
-                            'need to fill in the username and password.')
+                            'need to fill in the username and password.'),
+            'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig")
         }
