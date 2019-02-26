@@ -84,7 +84,7 @@ $(document).ready(function () {
         data[field.name] = field.value;
     });
 
-    var the_url = "{% url 'api-common:ldap-testing' %}";
+    var the_url = "{% url 'api-settings:ldap-testing' %}";
 
     function error(message) {
         toastr.error(message)

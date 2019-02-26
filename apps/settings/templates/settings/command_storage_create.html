@@ -159,10 +159,10 @@ $(document).ready(function() {
             data[name] = value
         }
     });
-    var url = "{% url 'api-common:command-storage-create' %}";
+    var url = "{% url 'api-settings:command-storage-create' %}";
     var success = function(data, textStatus) {
         console.log(data, textStatus);
-        location = "{% url 'common:terminal-setting' %}";
+        location = "{% url 'settings:terminal-setting' %}";
     };
     var error = function(data,  textStatus) {
         var error_msg = data.responseJSON.error;

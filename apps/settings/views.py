@@ -119,7 +119,7 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
 
 
 class ReplayStorageCreateView(SuperUserRequiredMixin, TemplateView):
-    template_name = 'common/replay_storage_create.html'
+    template_name = 'settings/replay_storage_create.html'
 
     def get_context_data(self, **kwargs):
         context = {

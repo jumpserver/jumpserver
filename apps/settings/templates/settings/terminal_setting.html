@@ -92,7 +92,7 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="{% url 'common:command-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
+                                    <a href="{% url 'settings:command-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
 
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans "Replay storage" %}</h3>
@@ -114,7 +114,7 @@
                                         {% endfor %}
                                         </tbody>
                                     </table>
-                                    <a href="{% url 'common:replay-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
+                                    <a href="{% url 'settings:replay-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
 
                                     <div class="hr-line-dashed"></div>
                                 </form>
@@ -174,12 +174,12 @@ $(document).ready(function () {
 })
 .on('click', '.btn-del-replay', function(){
     var $this = $(this);
-    var the_url = "{% url 'api-common:replay-storage-delete' %}";
+    var the_url = "{% url 'api-settings:replay-storage-delete' %}";
     deleteStorage($this, the_url);
 })
 .on('click', '.btn-del-command', function() {
     var $this = $(this);
-    var the_url = "{% url 'api-common:command-storage-delete' %}";
+    var the_url = "{% url 'api-settings:command-storage-delete' %}";
     deleteStorage($this, the_url)
 });
 

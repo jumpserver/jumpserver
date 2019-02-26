@@ -20,7 +20,7 @@ api_v1_patterns = [
         path('ops/v1/', include('ops.urls.api_urls', namespace='api-ops')),
         path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
         path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
-        path('settings/v1/', include('settings.urls.api_urls', namespace='api-common')),
+        path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
    ]))
 ]
 

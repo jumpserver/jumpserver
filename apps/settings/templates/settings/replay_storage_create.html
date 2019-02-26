@@ -251,9 +251,9 @@ $(document).ready(function() {
         var name = $(id_field).attr('name');
         data[name] = $(id_field).val();
     });
-    var url = "{% url 'api-common:replay-storage-create' %}";
+    var url = "{% url 'api-settings:replay-storage-create' %}";
     var success = function(data, textStatus) {
-        location = "{% url 'common:terminal-setting' %}";
+        location = "{% url 'settings:terminal-setting' %}";
         submitBtn.removeClass('disabled');
         submitBtn.html(origin_text);
     };
