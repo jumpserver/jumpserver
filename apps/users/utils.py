@@ -62,7 +62,7 @@ def send_user_created_mail(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('authentication:login', external=True),
     }
     if settings.DEBUG:
         try:
@@ -98,7 +98,7 @@ def send_reset_password_mail(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('authentication:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)
@@ -136,7 +136,7 @@ def send_password_expiration_reminder_mail(user):
         'update_password_url': reverse('users:user-password-update', external=True),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('authentication:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)
@@ -158,7 +158,7 @@ def send_reset_ssh_key_mail(user):
     </br>
     """) % {
         'name': user.name,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('authentication:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)

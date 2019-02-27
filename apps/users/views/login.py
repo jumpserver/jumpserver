@@ -24,7 +24,7 @@ from .. import forms
 __all__ = [
     'UserLoginView', 'UserForgotPasswordSendmailSuccessView',
     'UserResetPasswordSuccessView', 'UserResetPasswordSuccessView',
-    'UserResetPasswordView', 'UserForgotPasswordView',
+    'UserResetPasswordView', 'UserForgotPasswordView', 'UserFirstLoginView',
 ]
 
 
@@ -58,7 +58,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
             'title': _('Send reset password message'),
             'messages': _('Send reset password mail success, '
                           'login your mail box and follow it '),
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('authentication:login'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -71,7 +71,7 @@ class UserResetPasswordSuccessView(TemplateView):
         context = {
             'title': _('Reset password success'),
             'messages': _('Reset password success, return to login page'),
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)

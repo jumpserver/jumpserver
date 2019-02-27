@@ -574,7 +574,7 @@ class UserOtpSettingsSuccessView(TemplateView):
             'title': title,
             'messages': describe,
             'interval': 1,
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)

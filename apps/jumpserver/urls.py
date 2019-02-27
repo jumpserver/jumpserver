@@ -21,6 +21,7 @@ api_v1_patterns = [
         path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
         path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
         path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
+       path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
    ]))
 ]
 

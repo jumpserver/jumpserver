@@ -94,10 +94,10 @@
                             <li><a id="switch_user"><i class="fa fa-exchange"></i><span> {% trans 'User page' %}</span></a></li>
                         {% endif %}
                     {% endif %}
-                    <li><a href="{% url 'users:logout' %}"><i class="fa fa-sign-out"></i> {% trans 'Logout' %}</a></li>
+                    <li><a href="{% url 'authentication:logout' %}"><i class="fa fa-sign-out"></i> {% trans 'Logout' %}</a></li>
                 </ul>
                 {% else %}
-                <a href="{% url 'users:login' %}">
+                <a href="{% url 'authentication:login' %}">
                     <i class="fa fa-sign-in"></i>{% trans 'Login' %}
                 </a>
                 {% endif %}

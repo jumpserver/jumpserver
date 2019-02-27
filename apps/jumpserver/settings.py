@@ -135,7 +135,7 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'jumpserver.wsgi.applications'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
-LOGIN_URL = reverse_lazy('users:login')
+LOGIN_URL = reverse_lazy('authentication:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
@@ -343,10 +343,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'users.authentication.AccessKeyAuthentication',
-        'users.authentication.AccessTokenAuthentication',
-        'users.authentication.PrivateTokenAuthentication',
-        'users.authentication.SessionAuthentication',
+        'authentication.authentication.AccessKeyAuthentication',
+        'authentication.authentication.AccessTokenAuthentication',
+        'authentication.authentication.PrivateTokenAuthentication',
+        'authentication.authentication.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',

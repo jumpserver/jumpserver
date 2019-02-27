@@ -1,15 +1,11 @@
 # ~*~ coding: utf-8 ~*~
+#
 
 from __future__ import unicode_literals
 import os
 from django.core.cache import cache
-from django.shortcuts import render
-from django.utils import timezone
 from django.contrib.auth import login as auth_login, logout as auth_logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
-from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -19,23 +15,20 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.conf import settings
-from formtools.wizard.views import SessionWizardView
 
-from common.utils import get_object_or_none, get_request_ip
+from common.utils import get_request_ip
 from authentication.signals import post_auth_success, post_auth_failed
-from users.models import User, LoginLog
-from users.utils import send_reset_password_mail, check_otp_code, \
-    redirect_user_first_login_or_index, get_user_or_tmp_user, \
-    set_tmp_user_to_cache, get_password_check_rules, check_password_rules, \
-    is_block_login, increase_login_failed_count, clean_failed_count
 from users import forms
+from users.models import User, LoginLog
+from users.utils import (
+    check_otp_code, is_block_login, clean_failed_count, get_user_or_tmp_user,
+    set_tmp_user_to_cache, increase_login_failed_count,
+    redirect_user_first_login_or_index,
+)
 
 
 __all__ = [
     'UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
-    'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
-    'UserResetPasswordView', 'UserResetPasswordSuccessView',
-    'UserFirstLoginView', 'LoginLogListView'
 ]
 
 
@@ -122,7 +115,7 @@ class UserLoginView(FormView):
 
         if user.otp_enabled and user.otp_secret_key:
             # 1,2,mfa_setting & T
-            return reverse('users:login-otp')
+            return reverse('authentication:login-otp')
         elif user.otp_enabled and not user.otp_secret_key:
             # 1,2,mfa_setting & F
             return reverse('users:user-otp-enable-authentication')
@@ -169,7 +162,9 @@ class UserLoginOtpView(FormView):
                 success=False, username=user.username,
                 reason=LoginLog.REASON_MFA
             )
-            form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
+            form.add_error(
+                'otp_code', _('MFA code invalid, or ntp sync server time')
+            )
             return super().form_invalid(form)
 
     def get_success_url(self):
@@ -202,7 +197,7 @@ class UserLogoutView(TemplateView):
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
             'interval': 1,
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('authentication:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)

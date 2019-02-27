@@ -2,3 +2,4 @@
 #
 
 from .openid import *
+from .login import *

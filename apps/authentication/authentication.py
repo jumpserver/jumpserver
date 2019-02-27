@@ -14,7 +14,7 @@ from rest_framework import authentication, exceptions
 from rest_framework.authentication import CSRFCheck
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
-from .models import User, AccessKey, PrivateToken
+from users.models import User, AccessKey, PrivateToken
 
 
 def get_request_date_header(request):
