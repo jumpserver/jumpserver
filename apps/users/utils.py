@@ -7,7 +7,6 @@ import pyotp
 import base64
 import logging
 
-import requests
 import ipaddress
 from django.http import Http404
 from django.conf import settings
@@ -18,7 +17,7 @@ from django.core.cache import cache
 from datetime import datetime
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none
+from common.utils import reverse, get_object_or_none, get_ip_city
 from .models import User, LoginLog
 
 
@@ -197,51 +196,6 @@ def check_user_valid(**kwargs):
             if public_key == public_key_saved[1]:
                 return user, ''
     return None, _('Password or SSH public key invalid')
-
-
-def validate_ip(ip):
-    try:
-        ipaddress.ip_address(ip)
-        return True
-    except ValueError:
-        pass
-    return False
-
-
-def write_login_log(*args, **kwargs):
-    ip = kwargs.get('ip', '')
-    if not (ip and validate_ip(ip)):
-        ip = ip[:15]
-        city = "Unknown"
-    else:
-        city = get_ip_city(ip)
-    kwargs.update({'ip': ip, 'city': city})
-    LoginLog.objects.create(**kwargs)
-
-
-def get_ip_city(ip, timeout=10):
-    # Taobao ip api: http://ip.taobao.com/service/getIpInfo.php?ip=8.8.8.8
-    # Sina ip api: http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=8.8.8.8&format=json
-
-    url = 'http://ip.taobao.com/service/getIpInfo.php?ip=%s' % ip
-    try:
-        r = requests.get(url, timeout=timeout)
-    except:
-        r = None
-    city = 'Unknown'
-    if r and r.status_code == 200:
-        try:
-            data = r.json()
-            if not isinstance(data, int) and data['code'] == 0:
-                country = data['data']['country']
-                _city = data['data']['city']
-                if country == 'XX':
-                    city = _city
-                else:
-                    city = ' '.join([country, _city])
-        except ValueError:
-            pass
-    return city
 
 
 def get_user_or_tmp_user(request):

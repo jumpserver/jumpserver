@@ -2,15 +2,13 @@
 #
 
 from django.urls import path
-from authentication.openid import views
+from .. import views
 
 app_name = 'authentication'
 
 urlpatterns = [
     # openid
-    path('openid/login/', views.LoginView.as_view(), name='openid-login'),
-    path('openid/login/complete/', views.LoginCompleteView.as_view(),
+    path('openid/login/', views.OpenIDLoginView.as_view(), name='openid-login'),
+    path('openid/login/complete/', views.OpenIDLoginCompleteView.as_view(),
          name='openid-login-complete'),
-
-    # other
 ]

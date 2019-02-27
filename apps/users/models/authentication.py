@@ -4,6 +4,7 @@
 
 import uuid
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from .user import User
@@ -82,7 +83,7 @@ class LoginLog(models.Model):
     mfa = models.SmallIntegerField(default=MFA_UNKNOWN, choices=MFA_CHOICE, verbose_name=_('MFA'))
     reason = models.SmallIntegerField(default=REASON_NOTHING, choices=REASON_CHOICE, verbose_name=_('Reason'))
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
-    datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
+    datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
 
     class Meta:
         ordering = ['-datetime', 'username']

@@ -14,8 +14,8 @@ from rest_framework.views import APIView
 from common.utils import get_logger, get_request_ip
 from common.permissions import IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
+from authentication.signals import post_auth_success, post_auth_failed
 from ..serializers import UserSerializer
-from ..tasks import write_login_log_async
 from ..models import User, LoginLog
 from ..utils import check_user_valid, check_otp_code, \
     increase_login_failed_count, is_block_login, \
@@ -46,37 +46,22 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             username = request.data.get('username', '')
             exist = User.objects.filter(username=username).first()
             reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
-            data = {
-                'username': username,
-                'mfa': LoginLog.MFA_UNKNOWN,
-                'reason': reason,
-                'status': False
-            }
-            self.write_login_log(request, data)
+            self.send_auth_signal(success=False, username=username, reason=reason)
             increase_login_failed_count(username, ip)
             return Response({'msg': msg}, status=401)
 
         if user.password_has_expired:
-            data = {
-                'username': user.username,
-                'mfa': int(user.otp_enabled),
-                'reason': LoginLog.REASON_PASSWORD_EXPIRED,
-                'status': False
-            }
-            self.write_login_log(request, data)
+            self.send_auth_signal(
+                success=False, username=username,
+                reason=LoginLog.REASON_PASSWORD_EXPIRED
+            )
             msg = _("The user {} password has expired, please update.".format(
                 user.username))
             logger.info(msg)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
-            data = {
-                'username': user.username,
-                'mfa': int(user.otp_enabled),
-                'reason': LoginLog.REASON_NOTHING,
-                'status': True
-            }
-            self.write_login_log(request, data)
+            self.send_auth_signal(success=True, user=user)
             # 登陆成功，清除原来的缓存计数
             clean_failed_count(username, ip)
             token = user.create_bearer_token(request)
@@ -108,22 +93,14 @@ class UserAuthApi(RootOrgViewMixin, APIView):
         )
         return user, msg
 
-    @staticmethod
-    def write_login_log(request, data):
-        login_ip = request.data.get('remote_addr', None)
-        login_type = request.data.get('login_type', '')
-        user_agent = request.data.get('HTTP_USER_AGENT', '')
-
-        if not login_ip:
-            login_ip = get_request_ip(request)
-
-        tmp_data = {
-            'ip': login_ip,
-            'type': login_type,
-            'user_agent': user_agent,
-        }
-        data.update(tmp_data)
-        write_login_log_async.delay(**data)
+    def send_auth_signal(self, success=True, user=None, username='', reason=''):
+        if success:
+            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+        else:
+            post_auth_failed.send(
+                sender=self.__class__, username=username,
+                request=self.request, reason=reason
+            )
 
 
 class UserConnectionTokenApi(RootOrgViewMixin, APIView):
@@ -197,52 +174,25 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
     def post(self, request):
         otp_code = request.data.get('otp_code', '')
         seed = request.data.get('seed', '')
-
         user = cache.get(seed, None)
         if not user:
             return Response(
                 {'msg': _('Please verify the user name and password first')},
                 status=401
             )
-
         if not check_otp_code(user.otp_secret_key, otp_code):
-            data = {
-                'username': user.username,
-                'mfa': int(user.otp_enabled),
-                'reason': LoginLog.REASON_MFA,
-                'status': False
-            }
-            self.write_login_log(request, data)
+            self.send_auth_signal(success=False, username=user.username, reason=LoginLog.REASON_MFA)
             return Response({'msg': _('MFA certification failed')}, status=401)
-
-        data = {
-            'username': user.username,
-            'mfa': int(user.otp_enabled),
-            'reason': LoginLog.REASON_NOTHING,
-            'status': True
-        }
-        self.write_login_log(request, data)
+        self.send_auth_signal(success=True, user=user)
         token = user.create_bearer_token(request)
-        return Response(
-            {
-                'token': token,
-                'user': self.serializer_class(user).data
-             }
-        )
+        data = {'token': token, 'user': self.serializer_class(user).data}
+        return Response(data)
 
-    @staticmethod
-    def write_login_log(request, data):
-        login_ip = request.data.get('remote_addr', None)
-        login_type = request.data.get('login_type', '')
-        user_agent = request.data.get('HTTP_USER_AGENT', '')
-
-        if not login_ip:
-            login_ip = get_request_ip(request)
-
-        tmp_data = {
-            'ip': login_ip,
-            'type': login_type,
-            'user_agent': user_agent
-        }
-        data.update(tmp_data)
-        write_login_log_async.delay(**data)
+    def send_auth_signal(self, success=True, user=None, username='', reason=''):
+        if success:
+            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+        else:
+            post_auth_failed.send(
+                sender=self.__class__, username=username,
+                request=self.request, reason=reason
+            )

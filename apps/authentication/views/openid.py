@@ -14,43 +14,36 @@ from django.http.response import (
     HttpResponseRedirect
 )
 
-from . import client
-from .models import Nonce
-from users.models import LoginLog
-from users.tasks import write_login_log_async
-from common.utils import get_request_ip
+from ..openid import client
+from ..openid.models import Nonce
+from ..signals import post_auth_success
 
 logger = logging.getLogger(__name__)
 
 
-def get_base_site_url():
-    return settings.BASE_SITE_URL
+__all__ = ['OpenIDLoginView', 'OpenIDLoginCompleteView']
 
 
-class LoginView(RedirectView):
+class OpenIDLoginView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
+        redirect_uri = settings.BASE_SITE_URL + \
+                       reverse("authentication:openid-login-complete")
         nonce = Nonce(
-            redirect_uri=get_base_site_url() + reverse(
-                "authentication:openid-login-complete"),
-
+            redirect_uri=redirect_uri,
             next_path=self.request.GET.get('next')
         )
-
         cache.set(str(nonce.state), nonce, 24*3600)
-
         self.request.session['openid_state'] = str(nonce.state)
-
         authorization_url = client.openid_connect_client.\
             authorization_url(
                 redirect_uri=nonce.redirect_uri, scope='code',
                 state=str(nonce.state)
             )
-
         return authorization_url
 
 
-class LoginCompleteView(RedirectView):
+class OpenIDLoginCompleteView(RedirectView):
 
     def get(self, request, *args, **kwargs):
         if 'error' in request.GET:
@@ -79,24 +72,6 @@ class LoginCompleteView(RedirectView):
             return HttpResponseBadRequest()
 
         login(self.request, user)
-
-        data = {
-            'username': user.username,
-            'mfa': int(user.otp_enabled),
-            'reason': LoginLog.REASON_NOTHING,
-            'status': True
-        }
-        self.write_login_log(data)
-
+        post_auth_success.send(sender=self.__class__, user=user, request=self.request)
         return HttpResponseRedirect(nonce.next_path or '/')
 
-    def write_login_log(self, data):
-        login_ip = get_request_ip(self.request)
-        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        tmp_data = {
-            'ip': login_ip,
-            'type': 'W',
-            'user_agent': user_agent
-        }
-        data.update(tmp_data)
-        write_login_log_async.delay(**data)
