@@ -27,7 +27,7 @@ class OpenIDLoginView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         # Todo: 待优化
-        redirect_uri = settings.BASE_SITE_URL + settings.LOGIN_COMPLETE_URL
+        redirect_uri = settings.BASE_SITE_URL + str(settings.LOGIN_COMPLETE_URL)
         nonce = Nonce(
             redirect_uri=redirect_uri,
             next_path=self.request.GET.get('next')

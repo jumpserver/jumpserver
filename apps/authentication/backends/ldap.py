@@ -16,6 +16,8 @@ class LDAPAuthorizationBackend(LDAPBackend):
     """
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
+        if not username:
+            return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         return user

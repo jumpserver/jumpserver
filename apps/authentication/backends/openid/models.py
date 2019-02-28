@@ -39,10 +39,6 @@ class Client(object):
         self.openid_connect_client = self.new_openid_connect_client()
 
     def new_realm(self):
-        """
-        :param authentication.openid.models.Realm realm:
-        :return keycloak.realm.Realm:
-        """
         return KeycloakRealm(
             server_url=self.server_url,
             realm_name=self.realm_name,
@@ -77,7 +73,7 @@ class Client(object):
 
         :param str username: authentication username
         :param str password: authentication password
-        :return: authentication.models.OpenIDTokenProfile
+        :return: OpenIDTokenProfile
         """
         token_response = self.openid_client.token(
             username=username, password=password
@@ -94,7 +90,7 @@ class Client(object):
 
         :param str code: authentication code
         :param str redirect_uri:
-        :rtype: authentication.models.OpenIDTokenProfile
+        :rtype: OpenIDTokenProfile
         """
 
         token_response = self.openid_connect_client.authorization_code(
@@ -115,7 +111,7 @@ class Client(object):
          - refresh_expires_in
 
         :param dict token_response:
-        :rtype: authentication.openid.models.OpenIDTokenProfile
+        :rtype: OpenIDTokenProfile
         """
 
         userinfo = self.openid_connect_client.userinfo(
