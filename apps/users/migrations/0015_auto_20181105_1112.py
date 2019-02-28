@@ -10,14 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='loginlog',
-            name='reason',
-            field=models.SmallIntegerField(choices=[(0, '-'), (1, 'Username/password check failed'), (2, 'MFA authentication failed'), (3, 'Username does not exist')], default=0, verbose_name='Reason'),
-        ),
-        migrations.AlterField(
-            model_name='loginlog',
-            name='username',
-            field=models.CharField(max_length=128, verbose_name='Username'),
-        ),
     ]

@@ -2,15 +2,9 @@
 #
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
-from ..models import User, AccessKey
+from ..models import User
 
-
-class AccessKeySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AccessKey
-        fields = ['id', 'secret']
-        read_only_fields = ['id', 'secret']
+from authentication.serializers import AccessKeySerializer
 
 
 class ServiceAccountSerializer(serializers.ModelSerializer):

@@ -5,7 +5,7 @@ from common.utils import get_ip_city, validate_ip
 
 
 def write_login_log(*args, **kwargs):
-    from users.models import LoginLog
+    from audits.models import UserLoginLog
     default_city = _("Unknown")
     ip = kwargs.get('ip', '')
     if not (ip and validate_ip(ip)):
@@ -14,5 +14,5 @@ def write_login_log(*args, **kwargs):
     else:
         city = get_ip_city(ip) or default_city
     kwargs.update({'ip': ip, 'city': city})
-    LoginLog.objects.create(**kwargs)
+    UserLoginLog.objects.create(**kwargs)
 

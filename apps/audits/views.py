@@ -8,7 +8,6 @@ from common.permissions import AdminUserRequiredMixin
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
-from users.models import User
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 

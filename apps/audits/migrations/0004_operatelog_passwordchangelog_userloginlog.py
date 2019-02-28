@@ -38,14 +38,4 @@ class Migration(migrations.Migration):
                 ('datetime', models.DateTimeField(auto_now=True)),
             ],
         ),
-        migrations.CreateModel(
-            name='UserLoginLog',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-                'indexes': [],
-            },
-            bases=('users.loginlog',),
-        ),
     ]

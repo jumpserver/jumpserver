@@ -17,14 +17,15 @@ from django.views.generic.edit import FormView
 from django.conf import settings
 
 from common.utils import get_request_ip
-from authentication.signals import post_auth_success, post_auth_failed
-from users import forms
-from users.models import User, LoginLog
+from users.models import User
+from audits.models import UserLoginLog as LoginLog
 from users.utils import (
     check_otp_code, is_block_login, clean_failed_count, get_user_or_tmp_user,
     set_tmp_user_to_cache, increase_login_failed_count,
     redirect_user_first_login_or_index,
 )
+from ..signals import post_auth_success, post_auth_failed
+from .. import forms
 
 
 __all__ = [

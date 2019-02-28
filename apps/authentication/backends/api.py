@@ -8,13 +8,13 @@ from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.six import text_type
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
 from rest_framework.authentication import CSRFCheck
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
-from users.models import User, AccessKey, PrivateToken
+from ..models import AccessKey, PrivateToken
 
 
 def get_request_date_header(request):
@@ -42,7 +42,6 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
     失败
     """
     keyword = 'Sign'
-    model = AccessKey
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
@@ -109,7 +108,7 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
     keyword = 'Bearer'
-    model = User
+    model = get_user_model()
     expiration = settings.TOKEN_EXPIRATION or 3600
 
     def authenticate(self, request):
@@ -133,10 +132,9 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
         return self.authenticate_credentials(token)
 
-    @staticmethod
-    def authenticate_credentials(token):
+    def authenticate_credentials(self, token):
         user_id = cache.get(token)
-        user = get_object_or_none(User, id=user_id)
+        user = get_object_or_none(self.model, id=user_id)
 
         if not user:
             msg = _('Invalid token or cache refreshed.')

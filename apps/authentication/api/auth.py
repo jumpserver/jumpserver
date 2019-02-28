@@ -16,8 +16,9 @@ from common.utils import get_logger, get_request_ip
 from common.permissions import IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
 from users.serializers import UserSerializer
-from users.models import User, LoginLog
+from users.models import User
 from assets.models import Asset, SystemUser
+from audits.models import UserLoginLog as LoginLog
 from users.utils import (
     check_user_valid, check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
