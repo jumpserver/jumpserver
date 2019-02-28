@@ -395,7 +395,7 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 }
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
-AUTH_LDAP_BACKEND = 'authentication.ldap.backends.LDAPAuthorizationBackend'
+AUTH_LDAP_BACKEND = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
@@ -421,7 +421,7 @@ if AUTH_OPENID:
 
 # Radius Auth
 AUTH_RADIUS = CONFIG.AUTH_RADIUS
-AUTH_RADIUS_BACKEND = 'authentication.radius.backends.RadiusBackend'
+AUTH_RADIUS_BACKEND = 'authentication.backends.radius.RadiusBackend'
 RADIUS_SERVER = CONFIG.RADIUS_SERVER
 RADIUS_PORT = CONFIG.RADIUS_PORT
 RADIUS_SECRET = CONFIG.RADIUS_SECRET
