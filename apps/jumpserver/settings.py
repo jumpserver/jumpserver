@@ -100,7 +100,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
+    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -343,10 +343,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'authentication.authentication.AccessKeyAuthentication',
-        'authentication.authentication.AccessTokenAuthentication',
-        'authentication.authentication.PrivateTokenAuthentication',
-        'authentication.authentication.SessionAuthentication',
+        'authentication.backends.api.AccessKeyAuthentication',
+        'authentication.backends.api.AccessTokenAuthentication',
+        'authentication.backends.api.PrivateTokenAuthentication',
+        'authentication.backends.api.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -409,12 +409,13 @@ AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
 AUTH_OPENID_BACKENDS = [
-    'authentication.openid.backends.OpenIDAuthorizationPasswordBackend',
-    'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
 ]
 
 if AUTH_OPENID:
-    LOGIN_URL = reverse_lazy("authentication:openid-login")
+    LOGIN_URL = reverse_lazy("authentication:openid:openid-login")
+    LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-login-complete")
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 

@@ -5,7 +5,8 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from keycloak.realm import KeycloakRealm
 from keycloak.keycloak_openid import KeycloakOpenID
-from ..signals import post_create_openid_user
+
+from .signals import post_create_openid_user
 
 OIDT_ACCESS_TOKEN = 'oidt_access_token'
 

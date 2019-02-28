@@ -6,11 +6,12 @@ from django.utils import timezone
 from django_auth_ldap.backend import populate_user
 
 from common.utils import get_request_ip
-from .openid import client
-from .tasks import write_login_log_async
-from .signals import (
-    post_create_openid_user, post_auth_success, post_auth_failed
+from .backends.openid import new_client
+from .backends.openid.signals import (
+    post_create_openid_user, post_openid_login_success
 )
+from .tasks import write_login_log_async
+from .signals import post_auth_success, post_auth_failed
 
 
 @receiver(user_logged_out)
@@ -23,6 +24,7 @@ def on_user_logged_out(sender, request, user, **kwargs):
         'redirect_uri': settings.BASE_SITE_URL
     })
 
+    client = new_client()
     openid_logout_url = "%s?%s" % (
         client.openid_connect_client.get_url(
             name='end_session_endpoint'),
@@ -37,6 +39,11 @@ def on_post_create_openid_user(sender, user=None,  **kwargs):
     if user and user.username != 'admin':
         user.source = user.SOURCE_OPENID
         user.save()
+
+
+@receiver(post_openid_login_success)
+def on_openid_login_success(sender, user=None, request=None, **kwargs):
+    post_auth_success.send(sender=sender, user=user, request=request)
 
 
 @receiver(populate_user)

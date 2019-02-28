@@ -1,7 +1,7 @@
 # coding:utf-8
 #
 
-from django.urls import path
+from django.urls import path, include
 
 from .. import views
 
@@ -9,9 +9,7 @@ app_name = 'authentication'
 
 urlpatterns = [
     # openid
-    path('openid/login/', views.OpenIDLoginView.as_view(), name='openid-login'),
-    path('openid/login/complete/',
-         views.OpenIDLoginCompleteView.as_view(), name='openid-login-complete'),
+    path('openid/', include(('authentication.backends.openid.urls', 'authentication'), namespace='openid')),
 
     # login
     path('login/', views.UserLoginView.as_view(), name='login'),

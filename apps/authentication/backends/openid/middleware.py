@@ -6,12 +6,15 @@ from django.contrib.auth import logout
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.auth import BACKEND_SESSION_KEY
 
-from . import client
 from common.utils import get_logger
-from .backends import BACKEND_OPENID_AUTH_CODE
-from authentication.openid.models import OIDT_ACCESS_TOKEN
+from .utils import new_client
+from .models import OIDT_ACCESS_TOKEN
 
+BACKEND_OPENID_AUTH_CODE = \
+    'authentication.backends.openid.OpenIDAuthorizationCodeBackend'
+client = new_client()
 logger = get_logger(__file__)
+__all__ = ['OpenIDAuthenticationMiddleware']
 
 
 class OpenIDAuthenticationMiddleware(MiddlewareMixin):

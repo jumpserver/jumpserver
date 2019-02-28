@@ -24,8 +24,10 @@ from users.utils import (
 )
 from users.hands import Asset, SystemUser
 
-
 logger = get_logger(__name__)
+__all__ = [
+    'UserAuthApi', 'UserConnectionTokenApi', 'UserOtpAuthApi',
+]
 
 
 class UserAuthApi(RootOrgViewMixin, APIView):
@@ -144,29 +146,6 @@ class UserConnectionTokenApi(RootOrgViewMixin, APIView):
         if self.request.query_params.get('user-only', None):
             self.permission_classes = (AllowAny,)
         return super().get_permissions()
-
-
-class UserToken(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request):
-        if not request.user.is_authenticated:
-            username = request.data.get('username', '')
-            email = request.data.get('email', '')
-            password = request.data.get('password', '')
-            public_key = request.data.get('public_key', '')
-
-            user, msg = check_user_valid(
-                username=username, email=email,
-                password=password, public_key=public_key)
-        else:
-            user = request.user
-            msg = None
-        if user:
-            token = user.create_bearer_token(request)
-            return Response({'Token': token, 'Keyword': 'Bearer'}, status=200)
-        else:
-            return Response({'error': msg}, status=406)
 
 
 class UserOtpAuthApi(RootOrgViewMixin, APIView):

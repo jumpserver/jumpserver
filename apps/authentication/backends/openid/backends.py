@@ -4,16 +4,19 @@
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from . import client
 from common.utils import get_logger
-from authentication.openid.models import OIDT_ACCESS_TOKEN
+from .utils import new_client
+from .models import OIDT_ACCESS_TOKEN
 
 UserModel = get_user_model()
 
 logger = get_logger(__file__)
+client = new_client()
 
-BACKEND_OPENID_AUTH_CODE = \
-    'authentication.openid.backends.OpenIDAuthorizationCodeBackend'
+
+__all__ = [
+    'OpenIDAuthorizationCodeBackend', 'OpenIDAuthorizationPasswordBackend',
+]
 
 
 class BaseOpenIDAuthorizationBackend(object):

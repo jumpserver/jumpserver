@@ -3,7 +3,6 @@
 
 import logging
 
-from django.urls import reverse
 from django.conf import settings
 from django.core.cache import cache
 from django.views.generic.base import RedirectView
@@ -14,12 +13,12 @@ from django.http.response import (
     HttpResponseRedirect
 )
 
-from ..openid import client
-from ..openid.models import Nonce
-from ..signals import post_auth_success
+from .utils import new_client
+from .models import Nonce
+from .signals import post_openid_login_success
 
 logger = logging.getLogger(__name__)
-
+client = new_client()
 
 __all__ = ['OpenIDLoginView', 'OpenIDLoginCompleteView']
 
@@ -27,8 +26,8 @@ __all__ = ['OpenIDLoginView', 'OpenIDLoginCompleteView']
 class OpenIDLoginView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        redirect_uri = settings.BASE_SITE_URL + \
-                       reverse("authentication:openid-login-complete")
+        # Todo: 待优化
+        redirect_uri = settings.BASE_SITE_URL + settings.LOGIN_COMPLETE_URL
         nonce = Nonce(
             redirect_uri=redirect_uri,
             next_path=self.request.GET.get('next')
@@ -72,6 +71,6 @@ class OpenIDLoginCompleteView(RedirectView):
             return HttpResponseBadRequest()
 
         login(self.request, user)
-        post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+        post_openid_login_success.send(sender=self.__class__, user=user, request=self.request)
         return HttpResponseRedirect(nonce.next_path or '/')
 
