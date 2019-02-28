@@ -18,7 +18,7 @@ from datetime import datetime
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none, get_ip_city
-from .models import User, LoginLog
+from .models import User
 
 
 logger = logging.getLogger('jumpserver')

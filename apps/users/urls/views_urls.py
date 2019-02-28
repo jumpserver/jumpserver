@@ -46,7 +46,4 @@ urlpatterns = [
     path('user-group/<uuid:pk>/update/', views.UserGroupUpdateView.as_view(), name='user-group-update'),
     path('user-group/<uuid:pk>/assets/', views.UserGroupGrantedAssetView.as_view(), name='user-group-granted-asset'),
 
-    # Login log
-    # Abandon
-    # path('login-log/', views.LoginLogListView.as_view(), name='login-log-list'),
 ]

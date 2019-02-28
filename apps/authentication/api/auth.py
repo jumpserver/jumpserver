@@ -15,14 +15,15 @@ from rest_framework.views import APIView
 from common.utils import get_logger, get_request_ip
 from common.permissions import IsOrgAdminOrAppUser
 from orgs.mixins import RootOrgViewMixin
-from authentication.signals import post_auth_success, post_auth_failed
 from users.serializers import UserSerializer
 from users.models import User, LoginLog
+from assets.models import Asset, SystemUser
 from users.utils import (
     check_user_valid, check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
 )
-from users.hands import Asset, SystemUser
+
+from ..signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
 __all__ = [

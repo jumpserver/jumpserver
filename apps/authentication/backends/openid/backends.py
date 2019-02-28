@@ -75,7 +75,6 @@ class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
 
         if not settings.AUTH_OPENID:
             return None
-
         elif not username:
             return None
 

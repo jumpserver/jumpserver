@@ -26,7 +26,6 @@ __all__ = ['OpenIDLoginView', 'OpenIDLoginCompleteView']
 class OpenIDLoginView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        # Todo: 待优化
         redirect_uri = settings.BASE_SITE_URL + settings.LOGIN_COMPLETE_URL
         nonce = Nonce(
             redirect_uri=redirect_uri,
@@ -71,6 +70,8 @@ class OpenIDLoginCompleteView(RedirectView):
             return HttpResponseBadRequest()
 
         login(self.request, user)
-        post_openid_login_success.send(sender=self.__class__, user=user, request=self.request)
+        post_openid_login_success.send(
+            sender=self.__class__, user=user, request=self.request
+        )
         return HttpResponseRedirect(nonce.next_path or '/')
 
