@@ -61,6 +61,14 @@ REDIS_PORT: 6379
 # AUTH_OPENID_REALM_NAME: realm-name
 # AUTH_OPENID_CLIENT_ID: client-id
 # AUTH_OPENID_CLIENT_SECRET: client-secret
+#
+# Use Radius authorization
+# 使用Radius来认证
+# AUTH_RADIUS: false
+# RADIUS_SERVER: localhost
+# RADIUS_PORT: 1812
+# RADIUS_SECRET: 
+
 
 # OTP settings
 # OTP/MFA 配置
