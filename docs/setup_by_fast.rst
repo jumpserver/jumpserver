@@ -37,7 +37,8 @@
       && yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo \
       && yum makecache fast \
       && rpm --import https://mirrors.aliyun.com/docker-ce/linux/centos/gpg \
-      && echo -e "[nginx]\nname=nginx repo\nbaseurl=http://nginx.org/packages/centos/7/\$basearch/\ngpgcheck=0\nenabled=1\n" > /etc/yum.repos.d/nginx.repo \
+      && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
+      && rpm --import https://nginx.org/keys/nginx_signing.key \
       && yum -y install redis mariadb mariadb-devel mariadb-server nginx docker-ce \
       && systemctl enable redis mariadb nginx docker \
       && systemctl start redis mariadb \

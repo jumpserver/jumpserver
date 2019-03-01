@@ -51,6 +51,10 @@
 
     $ yum -y install python36 python36-devel
 
+    # 如果下载速度很慢, 可以换国内源
+    $ wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+    $ yum -y install python36 python36-devel
+
 **1.3 建立 Python 虚拟环境**
 
 因为 CentOS 7 自带的是 Python2,而 Yum 等工具依赖原来的 Python,为了不扰乱原来的环境我们来使用 Python 虚拟环境
@@ -64,17 +68,6 @@
     # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-**1.4 自动载入 Python 虚拟环境配置**
-
-此项仅为懒癌晚期的人员使用,防止运行 Jumpserver 时忘记载入 Python 虚拟环境导致程序无法运行。使用autoenv
-
-.. code-block:: shell
-
-    $ cd /opt
-    $ git clone https://github.com/kennethreitz/autoenv.git
-    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
-    $ source ~/.bashrc
-
 二. 安装 Jumpserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -86,10 +79,6 @@
 
     $ cd /opt/
     $ git clone https://github.com/jumpserver/jumpserver.git
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
-
-    # 首次进入 jumpserver 文件夹会有提示,按 y 即可
-    # Are you sure you want to allow this? (y/N) y
 
 **2.2 安装依赖 RPM 包**
 
@@ -104,6 +93,10 @@
 
     $ pip install --upgrade pip setuptools
     $ pip install -r requirements.txt
+
+    # 如果下载速度很慢, 可以换国内源
+    $ pip install --upgrade pip setuptools -i https://mirrors.aliyun.com/pypi/simple/
+    $ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
@@ -244,25 +237,23 @@
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git
-    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
-
-    # 首次进入 coco 文件夹会有提示,按 y 即可
-    # Are you sure you want to allow this? (y/N) y
 
 **3.2 安装依赖**
 
 .. code-block:: shell
 
     $ cd /opt/coco/requirements
-    $ yum -y  install $(cat rpm_requirements.txt)
+    $ yum -y install $(cat rpm_requirements.txt)
     $ pip install -r requirements.txt
+
+    # 如果下载速度很慢, 可以换国内源
+    $ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 **3.3 修改配置文件并运行**
 
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ mkdir keys logs
     $ cp config_example.yml config.yml
 
     $ sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/coco/config.yml
@@ -357,8 +348,6 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 五. 安装 Windows 支持组件(如果不需要管理 windows 资产,可以直接跳过这一步)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Guacamole 需要 Tomcat 来运行
-
 **5.1 安装依赖**
 
 .. code-block:: shell
@@ -441,13 +430,15 @@ Guacamole 需要 Tomcat 来运行
 
 .. code-block:: shell
 
+    $ yum install yum-utils
     $ vi /etc/yum.repos.d/nginx.repo
 
-    [nginx]
-    name=nginx repo
-    baseurl=http://nginx.org/packages/centos/7/$basearch/
-    gpgcheck=0
+    [nginx-stable]
+    name=nginx stable repo
+    baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck=1
     enabled=1
+    gpgkey=https://nginx.org/keys/nginx_signing.key
 
     $ yum install -y nginx
     $ rm -rf /etc/nginx/conf.d/default.conf
