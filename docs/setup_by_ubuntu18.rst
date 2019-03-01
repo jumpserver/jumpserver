@@ -259,6 +259,7 @@ Ubuntu 18.04 安装文档
 
 .. code-block:: shell
 
+    $ apt-get -y install curl gnupg2 ca-certificates lsb-release
     $ add-apt-repository "deb http://nginx.org/packages/ubuntu/ $(lsb_release -cs) nginx"
     $ curl -fsSL http://nginx.org/keys/nginx_signing.key | sudo apt-key add -
     $ apt-get -y install nginx

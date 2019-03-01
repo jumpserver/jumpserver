@@ -54,17 +54,6 @@
     # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
-**1.4 自动载入 Python 虚拟环境配置**
-
-此项仅为懒癌晚期的人员使用,防止运行 Jumpserver 时忘记载入 Python 虚拟环境导致程序无法运行。使用autoenv
-
-.. code-block:: shell
-
-    $ cd /opt
-    $ git clone https://github.com/kennethreitz/autoenv.git
-    $ echo 'source /opt/autoenv/activate.sh' >> ~/.bashrc
-    $ source ~/.bashrc
-
 二. 安装 Jumpserver
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -76,10 +65,6 @@
 
     $ cd /opt/
     $ git clone https://github.com/jumpserver/jumpserver.git
-    $ echo "source /opt/py3/bin/activate" > /opt/jumpserver/.env  # 进入 jumpserver 目录时将自动载入 python 虚拟环境
-
-    # 首次进入 jumpserver 文件夹会有提示,按 y 即可
-    # Are you sure you want to allow this? (y/N) y
 
 **2.2 安装依赖包**
 
@@ -94,6 +79,10 @@
 
     $ pip install --upgrade pip setuptools
     $ pip install -r requirements.txt
+
+    # 如果下载速度很慢, 可以换国内源
+    $ pip install --upgrade pip setuptools -i https://mirrors.aliyun.com/pypi/simple/
+    $ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 **2.4 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
@@ -225,17 +214,11 @@
 
 **3.1 下载或 Clone 项目**
 
-新开一个终端
-
 .. code-block:: shell
 
     $ cd /opt
     $ source /opt/py3/bin/activate
     $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
-    $ echo "source /opt/py3/bin/activate" > /opt/coco/.env  # 进入 coco 目录时将自动载入 python 虚拟环境
-
-    # 首次进入 coco 文件夹会有提示,按 y 即可
-    # Are you sure you want to allow this? (y/N) y
 
 **3.2 安装依赖**
 
@@ -244,12 +227,14 @@
     $ cd /opt/coco/requirements
     $ pip install -r requirements.txt
 
+    # 如果下载速度很慢, 可以换国内源
+    $ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
+
 **3.3 查看配置文件并运行**
 
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ mkdir keys logs
     $ cp config_example.yml config.yml
     $ vim config.yml
 
@@ -318,7 +303,7 @@
 
 .. code-block:: shell
 
-    $ ./cocod start  # 后台运行使用 -d 参数./cocod start -d
+    $ ./cocod start -d  # 后台运行使用 -d 参数./cocod start -d
 
     # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart 后台运行请添加 -d 参数
 
@@ -424,9 +409,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ apt-get -y install nginx
     $ rm -rf /etc/nginx/site-enabled/default
 
-
 **6.2 准备配置文件 修改 /etc/nginx/site-enabled/jumpserver.conf**
-
 
 .. code-block:: nginx
 
@@ -498,7 +481,6 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
     $ nginx -t  # 如果没有报错请继续
     $ nginx -s reload
-
 
 **6.4 开始使用 Jumpserver**
 
