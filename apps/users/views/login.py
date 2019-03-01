@@ -291,7 +291,7 @@ class UserResetPasswordView(TemplateView):
     template_name = 'users/reset_password.html'
 
     def get(self, request, *args, **kwargs):
-        token = request.GET.get('token')
+        token = request.GET.get('token', '')
         user = User.validate_reset_token(token)
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
