@@ -1,6 +1,20 @@
+import csv
+import json
+import uuid
+import codecs
+
+
 from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
+from django.core.cache import cache
+from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.utils.translation import ugettext as _
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from common.mixins import DatetimeSearchMixin
@@ -8,7 +22,6 @@ from common.permissions import AdminUserRequiredMixin
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
-from users.models import User
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 
@@ -233,3 +246,64 @@ class CommandExecutionListView(UserCommandExecutionListView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginLogExportView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        fields = [
+            field for field in UserLoginLog._meta.fields
+        ]
+
+        spm = request.GET.get('spm', '')
+        login_logs = cache.get(spm, [])
+        filename = 'login-logs-{}.csv'.format(
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response.write(codecs.BOM_UTF8)
+        writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
+
+        header = [field.verbose_name for field in fields]
+        writer.writerow(header)
+
+        for log in login_logs:
+            data = [getattr(log, field.name) for field in fields]
+            writer.writerow(data)
+
+        return response
+
+    def get_login_logs(self, date_form=None, date_to=None, user=None, keyword=None):
+        login_logs = UserLoginLog.objects.all()
+
+        if date_form and date_to:
+            login_logs = login_logs.filter(
+                datetime__gt=date_form, datetime__lt=date_to
+            )
+        if user:
+            login_logs = login_logs.filter(username=user)
+        if keyword:
+            login_logs = login_logs.filter(
+                Q(ip__contains=keyword) |
+                Q(city__contains=keyword) |
+                Q(username__contains=keyword)
+            )
+        return login_logs
+
+    def post(self, request):
+        try:
+            date_form = json.loads(request.body).get('date_form', [])
+            date_to = json.loads(request.body).get('date_to', [])
+            user = json.loads(request.body).get('user', [])
+            keyword = json.loads(request.body).get('keyword', [])
+
+            login_logs = self.get_login_logs(date_form, date_to, user, keyword)
+
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().hex
+        cache.set(spm, login_logs, 300)
+        url = reverse('audits:login-log-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
