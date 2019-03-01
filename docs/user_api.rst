@@ -29,6 +29,15 @@ API 文档
     $ curl -H 'Authorization: Bearer 937b38011acf499eb474e2fecb424ab3' -H "Content-Type:application/json" http://localhost/api/users/v1/users/
     # 使用token访问,token有效期 1小时
 
+    # 也可以创建一个永久 private_token , 避免二次认证
+    $ python manage.py shell
+    >>> from users.models import User
+    >>> u = User.objects.get(username='admin')
+    >>> u.create_private_token()
+    937b38011acf499eb474e2fecb424ab3
+
+    $ curl -H 'Authorization: Token 937b38011acf499eb474e2fecb424ab3' -H "Content-Type:application/json" http://localhost/api/users/v1/users/
+
 - python代码示例
 
 .. code-block:: python
