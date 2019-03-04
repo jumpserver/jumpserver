@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     database_operations = [
-        migrations.AlterModelTable(name='accesskey', table='autentication_accesskey'),
-        migrations.AlterModelTable(name='privatetoken', table='autentication_privatetoken'),
+        migrations.AlterModelTable(name='accesskey', table='authentication_accesskey'),
+        migrations.AlterModelTable(name='privatetoken', table='authentication_privatetoken'),
         migrations.AlterModelTable(name='loginlog', table='audits_userloginlog'),
     ]
 
