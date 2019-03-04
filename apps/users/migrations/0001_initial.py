@@ -4,10 +4,8 @@ from __future__ import unicode_literals
 
 import common.utils
 from django.contrib.auth.hashers import make_password
-from django.conf import settings
 import django.contrib.auth.models
 from django.db import migrations, models
-import django.db.models.deletion
 import django.utils.timezone
 import uuid
 
@@ -74,40 +72,6 @@ class Migration(migrations.Migration):
             managers=[
                 ('objects', django.contrib.auth.models.UserManager()),
             ],
-        ),
-        migrations.CreateModel(
-            name='AccessKey',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='AccessKeyID')),
-                ('secret', models.UUIDField(default=uuid.uuid4, editable=False, verbose_name='AccessKeySecret')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='access_key', to=settings.AUTH_USER_MODEL, verbose_name='User')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='LoginLog',
-            fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('username', models.CharField(max_length=20, verbose_name='Username')),
-                ('type', models.CharField(choices=[('W', 'Web'), ('T', 'Terminal')], max_length=2, verbose_name='Login type')),
-                ('ip', models.GenericIPAddressField(verbose_name='Login ip')),
-                ('city', models.CharField(blank=True, max_length=254, null=True, verbose_name='Login city')),
-                ('user_agent', models.CharField(blank=True, max_length=254, null=True, verbose_name='User agent')),
-                ('datetime', models.DateTimeField(auto_now_add=True, verbose_name='Date login')),
-            ],
-            options={
-                'ordering': ['-datetime', 'username'],
-            },
-        ),
-        migrations.CreateModel(
-            name='PrivateToken',
-            fields=[
-                ('key', models.CharField(max_length=40, primary_key=True, serialize=False, verbose_name='Key')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Created')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='auth_token', to=settings.AUTH_USER_MODEL, verbose_name='User')),
-            ],
-            options={
-                'verbose_name': 'Private Token',
-            },
         ),
         migrations.CreateModel(
             name='UserGroup',

@@ -16,7 +16,6 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
-from orgs.utils import current_org
 
 
 __all__ = ['User']
@@ -103,6 +102,8 @@ class User(AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
+
+    user_cache_key_prefix = '_User_{}'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -281,6 +282,7 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
+        self.expire_user_cache()
 
     @property
     def private_token(self):
@@ -422,7 +424,25 @@ class User(AbstractUser):
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
+        self.expire_user_cache()
         return super(User, self).delete()
+
+    def expire_user_cache(self):
+        key = self.user_cache_key_prefix.format(self.id)
+        cache.delete(key)
+
+    @classmethod
+    def get_user_or_from_cache(cls, uid):
+        key = cls.user_cache_key_prefix.format(uid)
+        user = cache.get(key)
+        if user:
+            return user
+        try:
+            user = cls.objects.get(id=uid)
+            cache.set(key, user, 3600)
+        except cls.DoesNotExist:
+            user = None
+        return user
 
     class Meta:
         ordering = ['username']

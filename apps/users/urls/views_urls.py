@@ -9,8 +9,6 @@ app_name = 'users'
 urlpatterns = [
     # Login view
     path('login/', views.UserLoginView.as_view(), name='login'),
-    path('logout/', views.UserLogoutView.as_view(), name='logout'),
-    path('login/otp/', views.UserLoginOtpView.as_view(), name='login-otp'),
     path('password/forgot/', views.UserForgotPasswordView.as_view(), name='forgot-password'),
     path('password/forgot/sendmail-success/', views.UserForgotPasswordSendmailSuccessView.as_view(), name='forgot-password-sendmail-success'),
     path('password/reset/', views.UserResetPasswordView.as_view(), name='reset-password'),
@@ -48,7 +46,4 @@ urlpatterns = [
     path('user-group/<uuid:pk>/update/', views.UserGroupUpdateView.as_view(), name='user-group-update'),
     path('user-group/<uuid:pk>/assets/', views.UserGroupGrantedAssetView.as_view(), name='user-group-granted-asset'),
 
-    # Login log
-    # Abandon
-    path('login-log/', views.LoginLogListView.as_view(), name='login-log-list'),
 ]

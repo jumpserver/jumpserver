@@ -4,6 +4,8 @@
 from django.conf import settings
 from .models import Client
 
+__all__ = ['new_client']
+
 
 def new_client():
     """
@@ -15,6 +17,3 @@ def new_client():
         client_id=settings.AUTH_OPENID_CLIENT_ID,
         client_secret=settings.AUTH_OPENID_CLIENT_SECRET
     )
-
-
-client = new_client()

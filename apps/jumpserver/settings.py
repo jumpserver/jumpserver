@@ -100,7 +100,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
+    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -135,7 +135,7 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'jumpserver.wsgi.applications'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
-LOGIN_URL = reverse_lazy('users:login')
+LOGIN_URL = reverse_lazy('authentication:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
@@ -343,10 +343,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'users.authentication.AccessKeyAuthentication',
-        'users.authentication.AccessTokenAuthentication',
-        'users.authentication.PrivateTokenAuthentication',
-        'users.authentication.SessionAuthentication',
+        'authentication.backends.api.AccessKeyAuthentication',
+        'authentication.backends.api.AccessTokenAuthentication',
+        'authentication.backends.api.PrivateTokenAuthentication',
+        'authentication.backends.api.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -395,7 +395,7 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 }
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
-AUTH_LDAP_BACKEND = 'authentication.ldap.backends.LDAPAuthorizationBackend'
+AUTH_LDAP_BACKEND = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
@@ -409,18 +409,19 @@ AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
 AUTH_OPENID_BACKENDS = [
-    'authentication.openid.backends.OpenIDAuthorizationPasswordBackend',
-    'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
 ]
 
 if AUTH_OPENID:
-    LOGIN_URL = reverse_lazy("authentication:openid-login")
+    LOGIN_URL = reverse_lazy("authentication:openid:openid-login")
+    LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-login-complete")
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 
 # Radius Auth
 AUTH_RADIUS = CONFIG.AUTH_RADIUS
-AUTH_RADIUS_BACKEND = 'authentication.radius.backends.RadiusBackend'
+AUTH_RADIUS_BACKEND = 'authentication.backends.radius.RadiusBackend'
 RADIUS_SERVER = CONFIG.RADIUS_SERVER
 RADIUS_PORT = CONFIG.RADIUS_PORT
 RADIUS_SECRET = CONFIG.RADIUS_SECRET

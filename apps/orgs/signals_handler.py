@@ -23,7 +23,7 @@ def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
         set_current_org(old_org)
 
     if instance and not created:
-        instance.expire_cache()
+        instance.expire_user_cache()
 
 
 @receiver(m2m_changed, sender=Organization.users.through)

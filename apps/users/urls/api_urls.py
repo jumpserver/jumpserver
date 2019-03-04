@@ -5,6 +5,8 @@ from __future__ import absolute_import
 
 from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
+
+from authentication import api as auth_api
 from .. import api
 
 app_name = 'users'
@@ -15,11 +17,12 @@ router.register(r'groups', api.UserGroupViewSet, 'user-group')
 
 
 urlpatterns = [
-    # path('token/', api.UserToken.as_view(), name='user-token'),
-    path('connection-token/', api.UserConnectionTokenApi.as_view(), name='connection-token'),
+    path('connection-token/', auth_api.UserConnectionTokenApi.as_view(),
+         name='connection-token'),
+    path('auth/', auth_api.UserAuthApi.as_view(), name='user-auth'),
+    path('otp/auth/', auth_api.UserOtpAuthApi.as_view(), name='user-otp-auth'),
+
     path('profile/', api.UserProfileApi.as_view(), name='user-profile'),
-    path('auth/', api.UserAuthApi.as_view(), name='user-auth'),
-    path('otp/auth/', api.UserOtpAuthApi.as_view(), name='user-otp-auth'),
     path('otp/reset/', api.UserResetOTPApi.as_view(), name='my-otp-reset'),
     path('users/<uuid:pk>/otp/reset/', api.UserResetOTPApi.as_view(), name='user-reset-otp'),
     path('users/<uuid:pk>/password/', api.UserChangePasswordApi.as_view(), name='change-user-password'),
