@@ -16,13 +16,13 @@ class LDAPAuthorizationBackend(LDAPBackend):
     """
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
-        logger.info('[LDAP backend]: Authenticate by: {}'.format(self.__class__))
+        logger.info('Authentication LDAP backend')
         if not username:
-            logger.info('[LDAP backend]: Authenticate failed: username is None')
+            logger.info('Authenticate failed: username is None')
             return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
-        logger.info('[LDAP backend]: Authenticate user: {}'.format(user))
+        logger.info('Authenticate user: {}'.format(user))
         return user
 
     def get_user(self, user_id):
