@@ -347,6 +347,7 @@ defaults = {
     'RADIUS_SECRET': '',
     'HTTP_BIND_HOST': '0.0.0.0',
     'HTTP_LISTEN_PORT': 8080,
+    'LOGIN_LOG_KEEP_DAYS': 90,
 }
 
 
