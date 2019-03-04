@@ -122,5 +122,5 @@ class Setting(models.Model):
                 settings.AUTHENTICATION_BACKENDS = old_setting
 
     class Meta:
-        db_table = "setting"
+        db_table = "settings_setting"
         verbose_name = _("Setting")

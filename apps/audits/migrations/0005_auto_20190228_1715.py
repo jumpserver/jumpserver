@@ -9,31 +9,47 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('audits', '0004_operatelog_passwordchangelog_userloginlog'),
+        ('users', '0019_auto_20190304_1459'),
     ]
-
-    operations = [
+    state_operations = [
         migrations.CreateModel(
             name='UserLoginLog',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
-                ('username', models.CharField(max_length=128, verbose_name='Username')),
-                ('type', models.CharField(choices=[('W', 'Web'), ('T', 'Terminal')], max_length=2, verbose_name='Login type')),
+                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True,
+                                        serialize=False)),
+                ('username',
+                 models.CharField(max_length=128, verbose_name='Username')),
+                ('type',
+                 models.CharField(choices=[('W', 'Web'), ('T', 'Terminal')],
+                                  max_length=2, verbose_name='Login type')),
                 ('ip', models.GenericIPAddressField(verbose_name='Login ip')),
-                ('city', models.CharField(blank=True, max_length=254, null=True, verbose_name='Login city')),
-                ('user_agent', models.CharField(blank=True, max_length=254, null=True, verbose_name='User agent')),
-                ('mfa', models.SmallIntegerField(choices=[(0, 'Disabled'), (1, 'Enabled'), (2, '-')], default=2, verbose_name='MFA')),
-                ('reason', models.SmallIntegerField(choices=[(0, '-'), (1, 'Username/password check failed'), (2, 'MFA authentication failed'), (3, 'Username does not exist'), (4, 'Password expired')], default=0, verbose_name='Reason')),
-                ('status', models.BooleanField(choices=[(True, 'Success'), (False, 'Failed')], default=True, max_length=2, verbose_name='Status')),
-                ('datetime', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Date login')),
+                ('city', models.CharField(blank=True, max_length=254, null=True,
+                                          verbose_name='Login city')),
+                ('user_agent',
+                 models.CharField(blank=True, max_length=254, null=True,
+                                  verbose_name='User agent')),
+                ('mfa', models.SmallIntegerField(
+                    choices=[(0, 'Disabled'), (1, 'Enabled'), (2, '-')],
+                    default=2, verbose_name='MFA')),
+                ('reason', models.SmallIntegerField(
+                    choices=[(0, '-'), (1, 'Username/password check failed'),
+                             (2, 'MFA authentication failed'),
+                             (3, 'Username does not exist'),
+                             (4, 'Password expired')], default=0,
+                    verbose_name='Reason')),
+                ('status', models.BooleanField(
+                    choices=[(True, 'Success'), (False, 'Failed')],
+                    default=True, max_length=2, verbose_name='Status')),
+                ('datetime',
+                 models.DateTimeField(default=django.utils.timezone.now,
+                                      verbose_name='Date login')),
             ],
             options={
                 'ordering': ['-datetime', 'username'],
             },
         ),
     ]
-    drop_table_sql = "DROP TABLE audits_userloginlog"
-    rename_table_sql = "RENAME TABLE users_loginlog TO audits_userloginlog"
-    table_exist = 'users_loginlog' in connection.introspection.table_names()
-    if table_exist:
-        operations.append(migrations.RunSQL(drop_table_sql))
-        operations.append(migrations.RunSQL(rename_table_sql))
+
+    operations = [
+        migrations.SeparateDatabaseAndState(state_operations=state_operations)
+    ]
