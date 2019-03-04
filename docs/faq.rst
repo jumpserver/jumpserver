@@ -15,7 +15,6 @@ FAQ
    SSH 协议资产连接说明 <faq_ssh.rst>
    添加组织 及 组织管理员说明 <faq_org.rst>
 
-
 其他问题
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -76,7 +75,6 @@ FAQ
 
     # 登陆提示密码过期可以直接点击忘记密码, 通过邮箱重置; 如果未设置邮箱, 通过以下代码重置
     $ source /opt/py3/bin/activate
-    $ cd /opt/jumpserver/apps
     $ cd /opt/jumpserver/apps
     $ python manage.py shell
     > from users.models import User
