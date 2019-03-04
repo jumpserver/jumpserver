@@ -310,7 +310,8 @@ class User(AbstractUser):
         if not isinstance(remote_addr, bytes):
             remote_addr = remote_addr.encode("utf-8")
         remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-        token = cache.get('%s_%s' % (self.id, remote_addr))
+        cache_key = '%s_%s' % (self.id, remote_addr)
+        token = cache.get(cache_key)
         if not token:
             token = uuid.uuid4().hex
         cache.set(token, self.id, expiration)

@@ -3,6 +3,8 @@
 from __future__ import absolute_import, unicode_literals
 from collections import defaultdict
 from django.db.models import Q
+from django.core.cache import cache
+from django.conf import settings
 
 from common.utils import get_logger
 from common.tree import TreeNode
@@ -97,10 +99,15 @@ class AssetPermissionUtil:
         "SystemUser": get_node_permissions,
     }
 
-    def __init__(self, obj):
+    CACHE_KEY = '_ASSET_PERM_CACHE_{}_{}'
+    CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
+    CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
+
+    def __init__(self, obj, cache_policy='0'):
         self.object = obj
         self._permissions = None
         self._assets = None
+        self.cache_policy = cache_policy
 
     @property
     def permissions(self):
@@ -141,7 +148,7 @@ class AssetPermissionUtil:
                 )
         return assets
 
-    def get_assets(self):
+    def get_assets_without_cache(self):
         if self._assets:
             return self._assets
         assets = self.get_assets_direct()
@@ -155,7 +162,26 @@ class AssetPermissionUtil:
         self._assets = assets
         return self._assets
 
-    def get_nodes_with_assets(self):
+    def get_assets_from_cache(self):
+        cache_key = self.CACHE_KEY.format(str(self.object.id), 'ASSETS')
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        assets = self.get_assets_without_cache()
+        self.expire_cache()
+        cache.set(cache_key, assets, self.CACHE_TIME)
+        return assets
+
+    def get_assets(self):
+        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+            return self.get_assets_from_cache()
+        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+            self.expire_cache()
+            return self.get_assets_from_cache()
+        else:
+            return self.get_assets_without_cache()
+
+    def get_nodes_with_assets_without_cache(self):
         """
         返回节点并且包含资产
         {"node": {"assets": set("system_user")}}
@@ -167,12 +193,59 @@ class AssetPermissionUtil:
             tree.add_asset(asset, system_users)
         return tree.get_nodes()
 
-    def get_system_users(self):
+    def get_nodes_with_assets_from_cache(self):
+        cache_key = self.CACHE_KEY.format(str(self.object.id), 'NODES_WITH_ASSETS')
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        nodes = self.get_nodes_with_assets_without_cache()
+        self.expire_cache()
+        cache.set(cache_key, nodes, self.CACHE_TIME)
+        return nodes
+
+    def get_nodes_with_assets(self):
+        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+            return self.get_nodes_with_assets_from_cache()
+        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+            self.expire_cache()
+            return self.get_nodes_with_assets_from_cache()
+        else:
+            return self.get_nodes_with_assets_without_cache()
+
+    def get_system_user_without_cache(self):
         system_users = set()
         permissions = self.permissions.prefetch_related('system_users')
         for perm in permissions:
             system_users.update(perm.system_users.all())
         return system_users
+
+    def get_system_user_from_cache(self):
+        cache_key = self.CACHE_KEY.format(str(self.object.id), 'SYSTEM_USER')
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        self.expire_cache()
+        system_users = self.get_system_user_without_cache()
+        cache.set(cache_key, system_users, self.CACHE_TIME)
+        return system_users
+
+    def get_system_users(self):
+        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+            return self.get_system_user_from_cache()
+        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+            self.expire_cache()
+            return self.get_system_user_from_cache()
+        else:
+            return self.get_system_user_without_cache()
+
+    def expire_cache(self):
+        cache_key = self.CACHE_KEY.format(str(self.object.id), '*')
+        cache.delete_pattern(cache_key)
+
+    @classmethod
+    def expire_all_cache(cls):
+        cache_key = cls.CACHE_KEY.format('*', '*')
+        cache.delete_pattern(cache_key)
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
