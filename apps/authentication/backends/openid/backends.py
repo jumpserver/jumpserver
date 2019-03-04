@@ -42,40 +42,52 @@ class BaseOpenIDAuthorizationBackend(object):
 class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
 
     def authenticate(self, request, **kwargs):
-        logger.info('1.openid code backend')
+        logger.info('[OpenID code backend]: '
+                    'Authenticate by: {}'.format(self.__class__))
 
         code = kwargs.get('code')
         redirect_uri = kwargs.get('redirect_uri')
 
         if not code or not redirect_uri:
+            msg = '[OpenID code backend]: ' \
+                  'Authenticate failed: No code or No redirect uri'
+            logger.info(msg)
             return None
 
         try:
             oidt_profile = client.update_or_create_from_code(
-                    code=code,
-                    redirect_uri=redirect_uri
-                )
+                    code=code, redirect_uri=redirect_uri
+            )
 
         except Exception as e:
-            logger.error(e)
+            msg = '[OpenID code backend]: ' \
+                  'Authenticate failed: get oidt_profile: {}'.format(e)
+            logger.info(msg)
 
         else:
             # Check openid user single logout or not with access_token
             request.session[OIDT_ACCESS_TOKEN] = oidt_profile.access_token
-
             user = oidt_profile.user
-
+            msg = '[OpenID code backend]: ' \
+                  'Authenticate success: user -> {}'.format(user)
+            logger.info(msg)
             return user if self.user_can_authenticate(user) else None
 
 
 class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
-        logger.info('2.openid password backend')
+        logger.info('[OpenID password backend]: '
+                    'Authenticate by: {}'.format(self.__class__))
 
         if not settings.AUTH_OPENID:
+            msg = '[OpenID password backend]: ' \
+                  'Authenticate failed: AUTH_OPENID is False'
+            logger.info(msg)
             return None
         elif not username:
+            msg = '[OpenID password backend]: Authenticate failed: Not username'
+            logger.info(msg)
             return None
 
         try:
@@ -84,9 +96,14 @@ class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
             )
 
         except Exception as e:
-            logger.error(e)
+            msg = '[OpenID password backend]: ' \
+                  'Authenticate failed: get oidt_profile: {}'.format(e)
+            logger.info(msg)
 
         else:
             user = oidt_profile.user
+            msg = '[OpenID password backend]: ' \
+                  'Authenticate success: user -> {}'.format(user)
+            logger.info(msg)
             return user if self.user_can_authenticate(user) else None
 
