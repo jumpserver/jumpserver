@@ -58,6 +58,7 @@ def monkey_patch_settings(sender, **kwargs):
         cache.delete(key)
 
     try:
+        cache.delete_pattern(cache_key_prefix+'*')
         LazySettings.__getattr__ = monkey_patch_getattr
         LazySettings.__setattr__ = monkey_patch_setattr
         LazySettings.__delattr__ = monkey_patch_delattr
