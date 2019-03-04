@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Setting',
-                'db_table': 'setting',
+                'db_table': 'settings_setting',
             },
         ),
     ]
