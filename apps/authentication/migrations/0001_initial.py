@@ -12,9 +12,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('users', '0019_auto_20190304_1459'),
     ]
 
-    operations = [
+    state_operations = [
         migrations.CreateModel(
             name='AccessKey',
             fields=[
@@ -48,4 +49,8 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Private Token',
             },
         ),
+    ]
+
+    operations = [
+        migrations.SeparateDatabaseAndState(state_operations=state_operations)
     ]

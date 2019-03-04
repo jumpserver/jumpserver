@@ -12,4 +12,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='loginlog',
+            name='mfa',
+            field=models.SmallIntegerField(choices=[(0, 'Disabled'), (1, 'Enabled'), (2, '-')], default=2, verbose_name='MFA'),
+        ),
+        migrations.AddField(
+            model_name='loginlog',
+            name='reason',
+            field=models.SmallIntegerField(choices=[(0, '-'), (1, 'Username/password check failed'), (2, 'MFA authentication failed')], default=0, verbose_name='Reason'),
+        ),
+        migrations.AddField(
+            model_name='loginlog',
+            name='status',
+            field=models.BooleanField(choices=[(True, 'Success'), (False, 'Failed')], default=True, max_length=2, verbose_name='Status'),
+        ),
     ]

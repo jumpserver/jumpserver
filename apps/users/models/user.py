@@ -321,8 +321,7 @@ class User(AbstractUser):
         pass
 
     def create_access_key(self):
-        from . import AccessKey
-        access_key = AccessKey.objects.create(user=self)
+        access_key = self.access_keys.create()
         return access_key
 
     @property
@@ -331,11 +330,6 @@ class User(AbstractUser):
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
-            return True
-        return False
-
-    def check_public_key(self, public_key):
-        if self.ssh_public_key == public_key:
             return True
         return False
 
