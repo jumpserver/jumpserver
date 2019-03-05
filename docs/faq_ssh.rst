@@ -20,7 +20,7 @@ SSH 协议资产连接错误排查思路
     $ cat /opt/coco/config.yml | grep BOOTSTRAP_TOKEN
 
     $ cd /opt/coco && ./cocod stop
-    $ rm /opt/coco/data/data/keys/.access_key  # coco, 如果你是按文档安装的, key应该在这里, 如果不存在, 直接下一步
+    $ rm /opt/coco/data/keys/.access_key  # coco, 如果你是按文档安装的, key应该在这里, 如果不存在, 直接下一步
     $ ./cocod start -d
 
     # docker 部署请直接删除容器后重建, 记得一定要先在 终端管理 删除不在线的组件
