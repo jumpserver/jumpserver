@@ -29,7 +29,7 @@
     # 升级系统
     $ yum upgrade -y
 
-    # 设置防火墙,开放 8081 端口 给 nginx 访问
+    # 设置防火墙, 开放 8081 端口 给 nginx 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="8081" accept"
     $ firewall-cmd --reload
 

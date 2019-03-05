@@ -31,7 +31,7 @@ Ubuntu 18.04 安装文档
     $ apt-get update && apt-get -y upgrade
     $ apt-get -y install wget gcc libffi-dev git
 
-    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
+    # 修改字符集, 否则可能报 input/output error的问题, 因为日志里打印了中文
     $ apt-get -y install language-pack-zh-hans
     $ export LC_ALL="zh_CN.utf8"
     $ echo 'LANG="zh_CN.utf8"' > /etc/default/locale
@@ -44,7 +44,7 @@ Ubuntu 18.04 安装文档
 
 **1.3 安装 MySQL**
 
-本教程使用 Mysql 作为数据库,如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
+本教程使用 Mysql 作为数据库, 如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
 
 .. code-block:: shell
 
@@ -74,7 +74,7 @@ Ubuntu 18.04 安装文档
     $ python3.6 -m venv py3
     $ source /opt/py3/bin/activate
 
-    # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,以下所有命令均在该虚拟环境中运行
+    # 看到下面的提示符代表成功, 以后运行 Jumpserver 都要先运行以上 source 命令, 以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
 二. 安装 Jumpserver
@@ -128,11 +128,11 @@ Ubuntu 18.04 安装文档
 .. code-block:: yaml
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    # 加密秘钥 生产环境中请修改为随机字符串, 请勿外泄
     SECRET_KEY:
 
     # SECURITY WARNING: keep the bootstrap token used in production secret!
-    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    # 预共享Token coco和guacamole用来注册服务账号, 不在使用原来的注册接受机制
     BOOTSTRAP_TOKEN:
 
     # Development env open this, when error occur display the full process track, Production disable it
@@ -145,7 +145,7 @@ Ubuntu 18.04 安装文档
     # LOG_DIR:
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
-    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # 浏览器Session过期时间, 默认24小时, 也可以设置浏览器关闭则过期
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
@@ -200,11 +200,11 @@ Ubuntu 18.04 安装文档
 .. code-block:: shell
 
     $ cd /opt/jumpserver
-    $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
+    $ ./jms start all -d  # 后台运行使用 -d 参数./jms start all -d
 
-    # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
-运行不报错,请继续往下操作
+运行不报错, 请继续往下操作
 
 三. 安装 SSH Server 和 WebSocket Server: Coco
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,7 +241,7 @@ Ubuntu 18.04 安装文档
 五. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
+访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包, 直接解压, 不需要编译
 
 **5.1 部署 Luna**
 
@@ -341,7 +341,7 @@ Ubuntu 18.04 安装文档
 
 **6.4 开始使用 Jumpserver**
 
-服务全部启动后,访问 http://192.168.244.144
+服务全部启动后, 访问 http://192.168.244.144
 
 默认账号: admin 密码: admin
 
@@ -351,12 +351,12 @@ Ubuntu 18.04 安装文档
 
 .. code-block:: shell
 
-    如果登录客户端是 macOS 或 Linux ,登录语法如下
+    如果登录客户端是 macOS 或 Linux, 登录语法如下
     $ ssh -p2222 admin@192.168.244.144
     $ sftp -P2222 admin@192.168.244.144
     密码: admin
 
-    如果登录客户端是 Windows ,Xshell Terminal 登录语法如下
+    如果登录客户端是 Windows, Xshell Terminal 登录语法如下
     $ ssh admin@192.168.244.144 2222
     $ sftp admin@192.168.244.144 2222
     密码: admin

@@ -22,10 +22,10 @@ FAQ
 
 .. code-block:: vim
 
-    # 用户管理里面的用户列表 是用来登录jumpserver平台的用户,用户需要先登录jumpserver平台,才能管理或者连接资产
-    # 资产管理里面的管理用户 是jumpserver用来管理资产需要的服务账户,Linux资产需要root或 NOPASSWD: ALL sudo
-    权限,Jumpserver使用该用户来 '推送系统用户'、'获取资产硬件信息'等。Windows资产随意指定一个,暂无作用
-    # 资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户,Linux资产可以自动推送该系统用户到资产上,
+    # 用户管理里面的用户列表 是用来登录jumpserver平台的用户, 用户需要先登录jumpserver平台, 才能管理或者连接资产
+    # 资产管理里面的管理用户 是jumpserver用来管理资产需要的服务账户, Linux资产需要root或 NOPASSWD: ALL sudo
+    权限, Jumpserver使用该用户来 '推送系统用户'、'获取资产硬件信息'等。Windows资产随意指定一个, 暂无作用
+    # 资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户, Linux资产可以自动推送该系统用户到资产上,
     Windows需要指定资产上已经创建的系统用户
 
 2. input/output error, 通常jumpserver所在服务器字符集问题
@@ -41,14 +41,14 @@ FAQ
     $ apt-get install language-pack-zh-hans
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
 
-    如果任然报input/output error,尝试执行 yum update 后重启服务器(仅测试中参考使用,实际运营服务器请谨慎操作)
+    如果任然报input/output error, 尝试执行 yum update 后重启服务器(仅测试中参考使用, 实际运营服务器请谨慎操作)
 
 3. luna 无法访问
 
 .. code-block:: vim
 
-    # Luna 打开网页提示403 Forbidden错误,一般是nginx配置文件的luna路径不正确或者下载了源代码,请重新下载编译好的代码
-    # Luna 打开网页提示502 Bad Gateway错误,一般是selinux和防火墙的问题,请根据nginx的errorlog来检查
+    # Luna 打开网页提示403 Forbidden错误, 一般是nginx配置文件的luna路径不正确或者下载了源代码, 请重新下载编译好的代码
+    # Luna 打开网页提示502 Bad Gateway错误, 一般是selinux和防火墙的问题, 请根据nginx的errorlog来检查
 
 4. 录像问题
 
@@ -56,10 +56,10 @@ FAQ
 
     # 默认录像存储位置在jumpserver/data/media  可以通过映射或者软连接方式来使用其他目录
 
-    # 录像和命令记录存储到其他位置,可以到 Jumpserver 系统设置-终端设置 里面进行设置
+    # 录像和命令记录存储到其他位置, 可以到 Jumpserver 系统设置-终端设置 里面进行设置
 
-    # 修改后,需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
-    # 注意,命令记录需要所有保存地址都正常可用,否则 历史会话 和 命令记录 页面无法正常访问
+    # 修改后, 需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
+    # 注意, 命令记录需要所有保存地址都正常可用, 否则 历史会话 和 命令记录 页面无法正常访问
 
 5. 在终端修改管理员密码及新建超级用户
 
@@ -99,11 +99,11 @@ FAQ
 
 .. code-block:: yaml
 
-    # 找到如下行(可参考 django 设置 session 过期时间),修改你要的设置即可
+    # 找到如下行(可参考 django 设置 session 过期时间), 修改你要的设置即可
     # SESSION_COOKIE_AGE: 86400
     # SESSION_EXPIRE_AT_BROWSER_CLOSE: false
 
-    # 如下,设置关闭浏览器 cookie 失效,则修改为
+    # 如下, 设置关闭浏览器 cookie 失效, 则修改为
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
@@ -120,10 +120,10 @@ FAQ
 
 .. code-block:: nginx
 
-    # 具体表现为在luna页面一会可以连接资产,一会就不行,需要多次刷新页面
-    # 如果从开发者工具里面看,可以看到部分不正常的 502 socket.io
-    # 此问题一般是由最前端一层的nginx反向代理造成的,需要在每层的代理上添加(注意是每层)
-    $ vi /etc/nginx/conf.d/jumpserver.conf  # 配置文件所在目录,自行修改
+    # 具体表现为在luna页面一会可以连接资产, 一会就不行, 需要多次刷新页面
+    # 如果从开发者工具里面看, 可以看到部分不正常的 502 socket.io
+    # 此问题一般是由最前端一层的nginx反向代理造成的, 需要在每层的代理上添加(注意是每层)
+    $ vi /etc/nginx/conf.d/jumpserver.conf  # 配置文件所在目录, 自行修改
 
     ...  # 省略
 
@@ -152,7 +152,7 @@ FAQ
     }
     ...
 
-    # 为了便于理解,附上一份 demo 网站的配置文件参考
+    # 为了便于理解, 附上一份 demo 网站的配置文件参考
     $ vi /etc/nginx/conf.d/jumpserver.conf
     server {
 
@@ -162,7 +162,7 @@ FAQ
         client_max_body_size 100m;  # 上传录像大小限制
 
         location / {
-                # 这里的IP是后端服务器的IP,后端服务器就是文档一步一步安装来的
+                # 这里的IP是后端服务器的IP, 后端服务器就是文档一步一步安装来的
                 proxy_pass http://192.168.244.144;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header Host $host;
@@ -199,12 +199,12 @@ FAQ
 
     # 这是因为系统用户的协议和资产的协议不一致导致的
     # 检查系统用户的协议和资产的协议
-    # 如果是更新了版本 Windows资产 出现的问题,请执行下面代码解决
+    # 如果是更新了版本 Windows资产 出现的问题, 请执行下面代码解决
     $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/utils
     $ sh 2018_07_15_set_win_protocol_to_ssh.sh
 
-    # 如果不存在 2018_07_15_set_win_protocol_to_ssh.sh 脚本,可以手动执行下面命令解决
+    # 如果不存在 2018_07_15_set_win_protocol_to_ssh.sh 脚本, 可以手动执行下面命令解决
     $ source /opt/py3/bin/activate
     $ cd /opt/jumpserver/apps
     $ python manage.py shell
@@ -213,22 +213,22 @@ FAQ
     >>> exit()
 
 
-11. 重启服务器后无法访问 Jumpserver,页面提示502 或者 403等
+11. 重启服务器后无法访问 Jumpserver, 页面提示502 或者 403等
 
 .. code-block:: shell
 
     # CentOS 7 临时关闭
-    $ setenforce 0  # 临时关闭 selinux,重启后失效
-    $ systemctl stop firewalld.service  # 临时关闭防火墙,重启后失效
+    $ setenforce 0  # 临时关闭 selinux, 重启后失效
+    $ systemctl stop firewalld.service  # 临时关闭防火墙, 重启后失效
 
-    # Centos 7 如需永久关闭,还需执行下面步骤
+    # Centos 7 如需永久关闭, 还需执行下面步骤
     $ sed -i "s/enforcing/disabled/g" /etc/selinux/config  # 禁用 selinux
     $ systemctl disable firewalld.service  # 禁用防火墙
 
     # Centos 7 在不关闭 selinux 和 防火墙 的情况下使用 Jumpserver
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
-      --permanent  永久生效,没有此参数重启后失效
+      --permanent  永久生效, 没有此参数重启后失效
 
     $ firewall-cmd --reload  # 重新载入规则
 

@@ -7,7 +7,7 @@ CentOS 7 安装文档
 -  > 开头的行表示需要在 mysql 中执行
 -  $ 开头的行表示需要执行的命令
 
-本文档适用于有一定web运维经验的管理员或者工程师,文中不会对安装的软件做过多的解释,仅对需要执行的内容注部分注释,更详细的内容请参考一步一步安装。
+本文档适用于有一定web运维经验的管理员或者工程师, 文中不会对安装的软件做过多的解释, 仅对需要执行的内容注部分注释, 更详细的内容请参考一步一步安装。
 
 懒人和萌新推荐直接使用 `极速安装文档 <setup_by_fast.html>`_
 
@@ -29,18 +29,18 @@ CentOS 7 安装文档
 
     $ yum update -y
 
-    # 防火墙 与 selinux 设置说明,如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置
+    # 防火墙 与 selinux 设置说明, 如果已经关闭了 防火墙 和 Selinux 的用户请跳过设置
     $ systemctl start firewalld
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent  # nginx 端口
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent  # 用户SSH登录端口 coco
-      --permanent  永久生效,没有此参数重启后失效
+      --permanent  永久生效, 没有此参数重启后失效
 
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setenforce 0
     $ sed -i "s/enforcing/disabled/g" /etc/selinux/config
 
-    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
+    # 修改字符集, 否则可能报 input/output error的问题, 因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
@@ -53,8 +53,8 @@ CentOS 7 安装文档
     $ systemctl enable redis
     $ systemctl start redis
 
-    # 安装 MySQL,如果不使用 Mysql 可以跳过相关 Mysql 安装和配置,支持sqlite3, mysql, postgres等
-    $ yum -y install mariadb mariadb-devel mariadb-server # centos7下叫mariadb,用法与mysql一致
+    # 安装 MySQL, 如果不使用 Mysql 可以跳过相关 Mysql 安装和配置, 支持sqlite3, mysql, postgres等
+    $ yum -y install mariadb mariadb-devel mariadb-server # centos7下叫mariadb, 用法与mysql一致
     $ systemctl enable mariadb
     $ systemctl start mariadb
     # 创建数据库 Jumpserver 并授权
@@ -62,7 +62,7 @@ CentOS 7 安装文档
     $ echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m"
     $ mysql -uroot -e "create database jumpserver default charset 'utf8'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
 
-    # 安装 Nginx ,用作代理服务器整合 Jumpserver 与各个组件
+    # 安装 Nginx, 用作代理服务器整合 Jumpserver 与各个组件
     $ vi /etc/yum.repos.d/nginx.repo
 
     [nginx]
@@ -79,10 +79,10 @@ CentOS 7 安装文档
 
     # 配置并载入 Python3 虚拟环境
     $ cd /opt
-    $ python3.6 -m venv py3  # py3 为虚拟环境名称,可自定义
+    $ python3.6 -m venv py3  # py3 为虚拟环境名称, 可自定义
     $ source /opt/py3/bin/activate  # 退出虚拟环境可以使用 deactivate 命令
 
-    # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,载入环境后默认以下所有命令均在该虚拟环境中运行
+    # 看到下面的提示符代表成功, 以后运行 Jumpserver 都要先运行以上 source 命令, 载入环境后默认以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
     # 下载 Jumpserver
@@ -123,11 +123,11 @@ CentOS 7 安装文档
 .. code-block:: yaml
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    # 加密秘钥 生产环境中请修改为随机字符串, 请勿外泄
     SECRET_KEY:
 
     # SECURITY WARNING: keep the bootstrap token used in production secret!
-    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    # 预共享Token coco和guacamole用来注册服务账号, 不在使用原来的注册接受机制
     BOOTSTRAP_TOKEN:
 
     # Development env open this, when error occur display the full process track, Production disable it
@@ -140,7 +140,7 @@ CentOS 7 安装文档
     # LOG_DIR:
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
-    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # 浏览器Session过期时间, 默认24小时, 也可以设置浏览器关闭则过期
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
@@ -195,7 +195,7 @@ CentOS 7 安装文档
     # 运行 Jumpserver
     $ cd /opt/jumpserver
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
-    # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 .. code-block:: shell
 
@@ -209,7 +209,7 @@ CentOS 7 安装文档
     $ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io
     $ systemctl restart docker
 
-    # 允许 容器ip 访问宿主 8080 端口,(容器的 ip 可以进入容器查看)
+    # 允许 容器ip 访问宿主 8080 端口, (容器的 ip 可以进入容器查看)
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.0/16" port protocol="tcp" port="8080" accept"
     $ firewall-cmd --reload
     # 172.17.0.x 是docker容器默认的IP池, 这里偷懒直接授权ip段了, 可以根据实际情况单独授权IP
@@ -221,7 +221,7 @@ CentOS 7 安装文档
 
 .. code-block:: shell
 
-    # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
+    # 安装 Web Terminal 前端: Luna  需要 Nginx 来运行访问 访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包, 直接解压, 不需要编译
     $ cd /opt
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
     $ tar xf luna.tar.gz
@@ -243,16 +243,16 @@ CentOS 7 安装文档
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
+            alias /opt/luna/;  # luna 路径, 如果修改安装目录, 此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;  # 录像位置,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 录像位置, 如果修改安装目录, 此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;  # 静态资源,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 静态资源, 如果修改安装目录, 此处需要修改
         }
 
         location /socket.io/ {
@@ -302,14 +302,14 @@ CentOS 7 安装文档
     $ nginx -t   # 确保配置没有问题, 有问题请先解决
     $ systemctl start nginx
 
-    # 访问 http://192.168.244.144 (注意,没有 :8080,通过 nginx 代理端口进行访问)
+    # 访问 http://192.168.244.144 (注意 没有 :8080 通过 nginx 代理端口进行访问)
     # 默认账号: admin 密码: admin  到会话管理-终端管理 接受 Coco Guacamole 等应用的注册
     # 测试连接
     $ ssh -p2222 admin@192.168.244.144
     $ sftp -P2222 admin@192.168.244.144
       密码: admin
 
-    # 如果是用在 Windows 下,Xshell Terminal 登录语法如下
+    # 如果是用在 Windows 下, Xshell Terminal 登录语法如下
     $ ssh admin@192.168.244.144 2222
     $ sftp admin@192.168.244.144 2222
       密码: admin

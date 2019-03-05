@@ -14,17 +14,17 @@
 
     export LANG=zh_CN.UTF-8
 
-    # 项目安装位置,默认是/opt
+    # 项目安装位置, 默认是/opt
     Project=/opt
 
     pid=`ps -ef | grep -v grep | egrep '(gunicorn|celery|beat|cocod)' | awk '{print $2}'`
     if [ "$pid" != "" ]; then
-        echo -e "\033[31m 检测到 Jumpserver 进程未退出,结束中 \033[0m"
+        echo -e "\033[31m 检测到 Jumpserver 进程未退出, 结束中 \033[0m"
         cd /opt && sh stop_jms.sh
         sleep 5s
         pid1=`ps -ef | grep -v grep | egrep '(gunicorn|celery|beat|cocod)' | awk '{print $2}'`
         if [ "$pid1" != "" ]; then
-            echo -e "\033[31m 检测到 Jumpserver 进程任未退出,强制结束中 \033[0m"
+            echo -e "\033[31m 检测到 Jumpserver 进程任未退出, 强制结束中 \033[0m"
             kill -9 ${pid1}
         fi
     fi
@@ -56,7 +56,7 @@
     #!/bin/bash
     set -e
 
-    # 项目安装位置,默认是/opt
+    # 项目安装位置, 默认是/opt
     Project=/opt
 
     source $Project/py3/bin/activate
@@ -87,17 +87,17 @@ Docker 组件部署设置自启
 
     export LANG=zh_CN.UTF-8
 
-    # 项目安装位置,默认是/opt
+    # 项目安装位置, 默认是/opt
     Project=/opt
 
     pid=`ps -ef | grep -v grep | egrep '(gunicorn|celery|beat)' | awk '{print $2}'`
     if [ "$pid" != "" ]; then
-        echo -e "\033[31m 检测到 Jumpserver 进程未退出,结束中 \033[0m"
+        echo -e "\033[31m 检测到 Jumpserver 进程未退出, 结束中 \033[0m"
         cd /opt && sh stop_jms.sh
         sleep 5s
         pid1=`ps -ef | grep -v grep | egrep '(gunicorn|celery|beat)' | awk '{print $2}'`
         if [ "$pid1" != "" ]; then
-            echo -e "\033[31m 检测到 Jumpserver 进程任未退出,强制结束中 \033[0m"
+            echo -e "\033[31m 检测到 Jumpserver 进程任未退出, 强制结束中 \033[0m"
             kill -9 ${pid1}
         fi
     fi
@@ -118,7 +118,7 @@ Docker 组件部署设置自启
     #!/bin/bash
     set -e
 
-    # 项目安装位置,默认是/opt
+    # 项目安装位置, 默认是/opt
     Project=/opt
 
     docker stop jms_coco

@@ -28,7 +28,7 @@
     # 升级系统
     $ yum upgrade -y
 
-    # 设置防火墙,开放 2222 5000 端口 给 nginx 访问
+    # 设置防火墙, 开放 2222 5000 端口 给 nginx 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="2222" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="5000" accept"
     $ firewall-cmd --reload
