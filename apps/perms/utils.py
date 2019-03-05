@@ -1,7 +1,9 @@
 # coding: utf-8
 
 from __future__ import absolute_import, unicode_literals
+import uuid
 from collections import defaultdict
+from django.utils import timezone
 from django.db.models import Q
 from django.core.cache import cache
 from django.conf import settings
@@ -100,14 +102,19 @@ class AssetPermissionUtil:
     }
 
     CACHE_KEY = '_ASSET_PERM_CACHE_{}_{}'
+    CACHE_META_KEY = '_ASSET_PERM_META_KEY_{}'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
 
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
+        self.obj_id = str(obj.id)
         self._permissions = None
         self._assets = None
         self.cache_policy = cache_policy
+        self.node_key = self.CACHE_KEY.format(self.obj_id, 'NODES_WITH_ASSETS')
+        self.asset_key = self.CACHE_KEY.format(self.obj_id, 'ASSETS')
+        self.system_key = self.CACHE_KEY.format(self.obj_id, 'SYSTEM_USER')
 
     @property
     def permissions(self):
@@ -163,14 +170,11 @@ class AssetPermissionUtil:
         return self._assets
 
     def get_assets_from_cache(self):
-        cache_key = self.CACHE_KEY.format(str(self.object.id), 'ASSETS')
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        assets = self.get_assets_without_cache()
-        self.expire_cache()
-        cache.set(cache_key, assets, self.CACHE_TIME)
-        return assets
+        cached = cache.get(self.asset_key)
+        if not cached:
+            self.update_cache()
+            cached = cache.get(self.asset_key)
+        return cached
 
     def get_assets(self):
         if self.cache_policy in self.CACHE_POLICY_MAP[1]:
@@ -179,6 +183,7 @@ class AssetPermissionUtil:
             self.expire_cache()
             return self.get_assets_from_cache()
         else:
+            self.expire_cache()
             return self.get_assets_without_cache()
 
     def get_nodes_with_assets_without_cache(self):
@@ -187,21 +192,18 @@ class AssetPermissionUtil:
         {"node": {"assets": set("system_user")}}
         :return:
         """
-        assets = self.get_assets()
+        assets = self.get_assets_without_cache()
         tree = GenerateTree()
         for asset, system_users in assets.items():
             tree.add_asset(asset, system_users)
         return tree.get_nodes()
 
     def get_nodes_with_assets_from_cache(self):
-        cache_key = self.CACHE_KEY.format(str(self.object.id), 'NODES_WITH_ASSETS')
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        nodes = self.get_nodes_with_assets_without_cache()
-        self.expire_cache()
-        cache.set(cache_key, nodes, self.CACHE_TIME)
-        return nodes
+        cached = cache.get(self.node_key)
+        if not cached:
+            self.update_cache()
+            cached = cache.get(self.node_key)
+        return cached
 
     def get_nodes_with_assets(self):
         if self.cache_policy in self.CACHE_POLICY_MAP[1]:
@@ -220,14 +222,11 @@ class AssetPermissionUtil:
         return system_users
 
     def get_system_user_from_cache(self):
-        cache_key = self.CACHE_KEY.format(str(self.object.id), 'SYSTEM_USER')
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        self.expire_cache()
-        system_users = self.get_system_user_without_cache()
-        cache.set(cache_key, system_users, self.CACHE_TIME)
-        return system_users
+        cached = cache.get(self.system_key)
+        if not cached:
+            self.update_cache()
+            cached = cache.get(self.system_key)
+        return cached
 
     def get_system_users(self):
         if self.cache_policy in self.CACHE_POLICY_MAP[1]:
@@ -238,14 +237,51 @@ class AssetPermissionUtil:
         else:
             return self.get_system_user_without_cache()
 
+    @property
+    def cache_meta(self):
+        key = self.CACHE_META_KEY.format(str(self.object.id))
+        return cache.get(key) or {}
+
+    def set_cache_meta(self):
+        key = self.CACHE_META_KEY.format(str(self.object.id))
+        meta = {
+            'id': str(uuid.uuid4()),
+            'datetime': timezone.now(),
+            'object': str(self.object)
+        }
+        cache.set(key, meta, self.CACHE_TIME)
+
+    def expire_cache_meta(self):
+        key = self.CACHE_META_KEY.format(str(self.object.id))
+        cache.delete(key)
+
+    def update_cache(self):
+        assets = self.get_assets_without_cache()
+        nodes = self.get_nodes_with_assets_without_cache()
+        system_users = self.get_system_user_without_cache()
+        cache.set(self.asset_key, assets, self.CACHE_TIME)
+        cache.set(self.node_key, nodes, self.CACHE_TIME)
+        cache.set(self.system_key, system_users, self.CACHE_TIME)
+        self.set_cache_meta()
+
     def expire_cache(self):
-        cache_key = self.CACHE_KEY.format(str(self.object.id), '*')
-        cache.delete_pattern(cache_key)
+        """
+        因为 获取用户的节点，资产，系统用户等都能会缓存，这里会清理所有与该对象有关的
+        缓存，以免造成不统一的情况
+        :return:
+        """
+        key = self.CACHE_KEY.format(str(self.object.id), '*')
+        cache.delete_pattern(key)
+        self.expire_cache_meta()
+
+    def expire_all_cache_meta(self):
+        key = self.CACHE_META_KEY.format('*')
+        cache.delete_pattern(key)
 
     @classmethod
     def expire_all_cache(cls):
-        cache_key = cls.CACHE_KEY.format('*', '*')
-        cache.delete_pattern(cache_key)
+        key = cls.CACHE_KEY.format('*', '*')
+        cache.delete_pattern(key)
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):

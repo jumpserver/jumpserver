@@ -21,7 +21,7 @@ api_v1_patterns = [
         path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
         path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
         path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
-       path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
+        path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
    ]))
 ]
 
@@ -67,6 +67,9 @@ urlpatterns += app_view_patterns
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += js_i18n_patterns
+
+handler404 = 'jumpserver.error_views.handler404'
+handler500 = 'jumpserver.error_views.handler500'
 
 if settings.DEBUG:
     urlpatterns += [

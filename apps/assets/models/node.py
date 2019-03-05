@@ -29,6 +29,7 @@ class Node(OrgModelMixin):
 
     class Meta:
         verbose_name = _("Node")
+        ordering = ['key']
 
     def __str__(self):
         return self.full_value

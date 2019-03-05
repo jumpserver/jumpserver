@@ -286,20 +286,21 @@ class User(AbstractUser):
 
     @property
     def private_token(self):
-        return self.create_private_token()
-
-    def create_private_token(self):
-        from .authentication import PrivateToken
+        from authentication.models import PrivateToken
         try:
             token = PrivateToken.objects.get(user=self)
         except PrivateToken.DoesNotExist:
-            token = PrivateToken.objects.create(user=self)
-        return token.key
+            token = self.create_private_token()
+        return token
+
+    def create_private_token(self):
+        from authentication.models import PrivateToken
+        token = PrivateToken.objects.create(user=self)
+        return token
 
     def refresh_private_token(self):
-        from .authentication import PrivateToken
-        PrivateToken.objects.filter(user=self).delete()
-        return PrivateToken.objects.create(user=self)
+        self.private_token.delete()
+        return self.create_private_token()
 
     def create_bearer_token(self, request=None):
         expiration = settings.TOKEN_EXPIRATION or 3600
