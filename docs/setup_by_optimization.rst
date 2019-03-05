@@ -35,7 +35,7 @@
 
 .. code-block:: shell
 
-    # 先把静态资源上传或同步到 OSS,如果使用其他工具上传,注意设置文件 HTTP 头
+    # 先把静态资源上传或同步到 OSS, 如果使用其他工具上传, 注意设置文件 HTTP 头
     # 静态文件夹包括 jumpserver/data/static 和 luna
     # Bucket ACL 设置为 公共读
     # 防盗链需要添加 Jumpserver域名 和 ossEndPoint域名
@@ -48,7 +48,7 @@
 .. code-block:: nginx
 
     ...
-    # 根据自己的 OSS 所在地域和 域名,自行替换 yourBucket 和 yourEndPoint
+    # 根据自己的 OSS 所在地域和 域名, 自行替换 yourBucket 和 yourEndPoint
     location /static/ {
                 rewrite ^/static/(.*)$ https://yourBucket.oss-cn-yourEndPoint.aliyuncs.com/static/$1 permanent;
                 add_header Access-Control-Allow-Origin 'https://yourBucket.oss-cn-yourEndPoint.aliyuncs.com';

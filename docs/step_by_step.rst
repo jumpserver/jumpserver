@@ -31,7 +31,7 @@
     $ setenforce 0
     $ sed -i "s/enforcing/disabled/g" /etc/selinux/config
 
-    # 修改字符集,否则可能报 input/output error的问题,因为日志里打印了中文
+    # 修改字符集, 否则可能报 input/output error的问题, 因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
     $ export LC_ALL=zh_CN.UTF-8
     $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
@@ -57,7 +57,7 @@
 
 **1.3 建立 Python 虚拟环境**
 
-因为 CentOS 7 自带的是 Python2,而 Yum 等工具依赖原来的 Python,为了不扰乱原来的环境我们来使用 Python 虚拟环境
+因为 CentOS 7 自带的是 Python2, 而 Yum 等工具依赖原来的 Python, 为了不扰乱原来的环境我们来使用 Python 虚拟环境
 
 .. code-block:: shell
 
@@ -65,7 +65,7 @@
     $ python3.6 -m venv py3
     $ source /opt/py3/bin/activate
 
-    # 看到下面的提示符代表成功,以后运行 Jumpserver 都要先运行以上 source 命令,以下所有命令均在该虚拟环境中运行
+    # 看到下面的提示符代表成功, 以后运行 Jumpserver 都要先运行以上 source 命令, 以下所有命令均在该虚拟环境中运行
     (py3) [root@localhost py3]
 
 二. 安装 Jumpserver
@@ -73,7 +73,7 @@
 
 **2.1 下载或 Clone 项目**
 
-项目提交较多 git clone 时较大,你可以选择去 Github 项目页面直接下载zip包。
+项目提交较多 git clone 时较大, 你可以选择去 Github 项目页面直接下载zip包。
 
 .. code-block:: shell
 
@@ -108,7 +108,7 @@
 
 **2.5 安装 MySQL**
 
-本教程使用 Mysql 作为数据库,如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
+本教程使用 Mysql 作为数据库, 如果不使用 Mysql 可以跳过相关 Mysql 安装和配置
 
 .. code-block:: shell
 
@@ -149,11 +149,11 @@
 .. code-block:: yaml
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    # 加密秘钥 生产环境中请修改为随机字符串, 请勿外泄
     SECRET_KEY:
 
     # SECURITY WARNING: keep the bootstrap token used in production secret!
-    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    # 预共享Token coco和guacamole用来注册服务账号, 不在使用原来的注册接受机制
     BOOTSTRAP_TOKEN:
 
     # Development env open this, when error occur display the full process track, Production disable it
@@ -166,7 +166,7 @@
     # LOG_DIR:
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
-    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # 浏览器Session过期时间, 默认24小时, 也可以设置浏览器关闭则过期
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
@@ -223,7 +223,7 @@
     $ cd /opt/jumpserver
     $ ./jms start all -d  # 后台运行使用 -d 参数./jms start all -d
 
-    # 新版本更新了运行脚本,使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
 
 运行不报错, 请继续往下操作
 
@@ -270,7 +270,7 @@
     CORE_HOST: http://127.0.0.1:8080
 
     # Bootstrap Token, 预共享秘钥, 用来注册coco使用的service account和terminal
-    # 请和jumpserver 配置文件中保持一致，注册完成后可以删除
+    # 请和jumpserver 配置文件中保持一致, 注册完成后可以删除
     BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>
 
     # 启动时绑定的ip, 默认 0.0.0.0
@@ -279,10 +279,10 @@
     # 监听的SSH端口号, 默认2222
     # SSHD_PORT: 2222
 
-    # 监听的HTTP/WS端口号，默认5000
+    # 监听的HTTP/WS端口号, 默认5000
     # HTTPD_PORT: 5000
 
-    # 项目使用的ACCESS KEY, 默认会注册,并保存到 ACCESS_KEY_STORE中,
+    # 项目使用的ACCESS KEY, 默认会注册, 并保存到 ACCESS_KEY_STORE中,
     # 如果有需求, 可以写到配置文件中, 格式 access_key_id:access_key_secret
     # ACCESS_KEY: null
 
@@ -301,20 +301,20 @@
     # SSH白名单
     # ALLOW_SSH_USER: all
 
-    # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
+    # SSH黑名单, 如果用户同时在白名单和黑名单, 黑名单优先生效
     # BLOCK_SSH_USER:
     #   -
 
     # 和Jumpserver 保持心跳时间间隔
     # HEARTBEAT_INTERVAL: 5
 
-    # Admin的名字，出问题会提示给用户
+    # Admin的名字, 出问题会提示给用户
     # ADMINS: ''
 
     # SSH连接超时时间 (default 15 seconds)
     # SSH_TIMEOUT: 15
 
-    # 语言 [en,zh]
+    # 语言 [en, zh]
     # LANGUAGE_CODE: zh
 
     # SFTP的根目录, 可选 /tmp, Home其他自定义目录
@@ -327,14 +327,14 @@
 
     $ ./cocod start -d  # 后台运行使用 -d 参数./cocod start -d
 
-    # 新版本更新了运行脚本,使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./cocod start|stop|status|restart  后台运行请添加 -d 参数
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Luna 已改为纯前端,需要 Nginx 来运行访问
+Luna 已改为纯前端, 需要 Nginx 来运行访问
 
-访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包,直接解压,不需要编译
+访问(https://github.com/jumpserver/luna/releases)下载对应版本的 release 包, 直接解压不需要编译
 
 **4.1 解压 Luna**
 
@@ -345,7 +345,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
-五. 安装 Windows 支持组件(如果不需要管理 windows 资产,可以直接跳过这一步)
+五. 安装 Windows 支持组件(如果不需要管理 windows 资产, 可以直接跳过这一步)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **5.1 安装依赖**
@@ -451,27 +451,27 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
     $ vi /etc/nginx/conf.d/jumpserver.conf
 
     server {
-        listen 80;  # 代理端口,以后将通过此端口进行访问,不再通过8080端口
+        listen 80;  # 代理端口, 以后将通过此端口进行访问, 不再通过8080端口
         # server_name demo.jumpserver.org;  # 修改成你的域名或者注释掉
 
         client_max_body_size 100m;  # 录像及文件上传大小限制
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
+            alias /opt/luna/;  # luna 路径, 如果修改安装目录, 此处需要修改
         }
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;  # 录像位置,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 录像位置, 如果修改安装目录, 此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;  # 静态资源,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 静态资源, 如果修改安装目录, 此处需要修改
         }
 
         location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器,请填写它的ip
+            proxy_pass       http://localhost:5000/socket.io/;  # 如果coco安装在别的服务器, 请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -483,7 +483,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
         }
 
         location /coco/ {
-            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器,请填写它的ip
+            proxy_pass       http://localhost:5000/coco/;  # 如果coco安装在别的服务器, 请填写它的ip
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -491,7 +491,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
         }
 
         location /guacamole/ {
-            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器,请填写它的ip
+            proxy_pass       http://localhost:8081/;  # 如果guacamole安装在别的服务器, 请填写它的ip
             proxy_buffering off;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -503,7 +503,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
         }
 
         location / {
-            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器,请填写它的ip
+            proxy_pass http://localhost:8080;  # 如果jumpserver安装在别的服务器, 请填写它的ip
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -524,7 +524,7 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
 检查应用是否已经正常运行
 
-服务全部启动后,访问 http://192.168.244.144,访问nginx代理的端口,不要再通过8080端口访问
+服务全部启动后, 访问 http://192.168.244.144, 访问nginx代理的端口, 不要再通过8080端口访问
 
 默认账号: admin 密码: admin
 
@@ -534,12 +534,12 @@ Luna 已改为纯前端,需要 Nginx 来运行访问
 
 .. code-block:: shell
 
-    如果登录客户端是 macOS 或 Linux ,登录语法如下
+    如果登录客户端是 macOS 或 Linux, 登录语法如下
     $ ssh -p2222 admin@192.168.244.144
     $ sftp -P2222 admin@192.168.244.144
     密码: admin
 
-    如果登录客户端是 Windows ,Xshell Terminal 登录语法如下
+    如果登录客户端是 Windows, Xshell Terminal 登录语法如下
     $ ssh admin@192.168.244.144 2222
     $ sftp admin@192.168.244.144 2222
     密码: admin

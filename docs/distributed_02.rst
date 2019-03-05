@@ -29,7 +29,7 @@
     # 获取 epel-release 源
     $ yum -y install epel-release
 
-    # 设置防火墙,开放 80 443 2222 端口
+    # 设置防火墙, 开放 80 443 2222 端口
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
     $ firewall-cmd --zone=public --add-port=443/tcp --permanent
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent
@@ -156,7 +156,7 @@
     }
 
     server {
-        # 推荐使用 https 访问,如果不使用 https 请自行注释下面的选项
+        # 推荐使用 https 访问, 如果不使用 https 请自行注释下面的选项
         listen 443;
         server_name www.jumpserver.org;  # 自行修改成你的域名
         ssl on;
@@ -179,7 +179,7 @@
 
         location /luna/ {
             try_files $uri / /index.html;
-            alias /opt/luna/;  # luna 路径,如果修改安装目录,此处需要修改
+            alias /opt/luna/;  # luna 路径, 如果修改安装目录, 此处需要修改
         }
 
         location /socket.io/ {
@@ -217,7 +217,7 @@
 
 .. code-block:: shell
 
-    # nginx 测试并启动,如果报错请按报错提示自行解决
+    # nginx 测试并启动, 如果报错请按报错提示自行解决
     $ nginx -t
     $ systemctl start nginx
 
@@ -228,7 +228,7 @@
     $ sftp -P2222 admin@192.168.100.100
     密码: admin
 
-    # 如果是用在 Windows 下,Xshell Terminal 登录语法如下
+    # 如果是用在 Windows 下, Xshell Terminal 登录语法如下
     $ ssh admin@192.168.100.100 2222
     $ sftp admin@192.168.100.100 2222
     密码: admin

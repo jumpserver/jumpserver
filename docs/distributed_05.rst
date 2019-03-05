@@ -29,7 +29,7 @@
     # 安装依赖包
     $ yum -y install gcc epel-release git
 
-    # 设置防火墙,开放 80 端口给 nginx 访问,开放 8080 端口给 coco 和 guacamole 访问
+    # 设置防火墙, 开放 80 端口给 nginx 访问, 开放 8080 端口给 coco 和 guacamole 访问
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.100" port protocol="tcp" port="80" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.40" port protocol="tcp" port="8080" accept"
     $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.50" port protocol="tcp" port="8080" accept"
@@ -77,11 +77,11 @@
 .. code-block:: yaml
 
     # SECURITY WARNING: keep the secret key used in production secret!
-    # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
+    # 加密秘钥 生产环境中请修改为随机字符串, 请勿外泄
     SECRET_KEY:
 
     # SECURITY WARNING: keep the bootstrap token used in production secret!
-    # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
+    # 预共享Token coco和guacamole用来注册服务账号, 不在使用原来的注册接受机制
     BOOTSTRAP_TOKEN:
 
     # Development env open this, when error occur display the full process track, Production disable it
@@ -94,7 +94,7 @@
     # LOG_DIR:
 
     # Session expiration setting, Default 24 hour, Also set expired on on browser close
-    # 浏览器Session过期时间，默认24小时, 也可以设置浏览器关闭则过期
+    # 浏览器Session过期时间, 默认24小时, 也可以设置浏览器关闭则过期
     # SESSION_COOKIE_AGE: 86400
     SESSION_EXPIRE_AT_BROWSER_CLOSE: true
 
@@ -146,7 +146,7 @@
 
 .. code-block:: nginx
 
-    # 修改 nginx 配置文件(如果无法正常访问,请注释掉 nginx.conf 的 server 所有字段)
+    # 修改 nginx 配置文件(如果无法正常访问, 请注释掉 nginx.conf 的 server 所有字段)
     $ vi /etc/nginx/conf.d/jumpserver.conf
 
     server {
@@ -156,11 +156,11 @@
 
         location /media/ {
             add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;  # 录像位置,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 录像位置, 如果修改安装目录, 此处需要修改
         }
 
         location /static/ {
-            root /opt/jumpserver/data/;  # 静态资源,如果修改安装目录,此处需要修改
+            root /opt/jumpserver/data/;  # 静态资源, 如果修改安装目录, 此处需要修改
         }
 
         location / {
@@ -173,15 +173,15 @@
 
 .. code-block:: shell
 
-    # nginx 测试并启动,如果报错请按报错提示自行解决
+    # nginx 测试并启动, 如果报错请按报错提示自行解决
     $ nginx -t
     $ systemctl start nginx
 
     # 运行 Jumpserver
     $ cd /opt/jumpserver
     $ ./jms start all  # 后台运行使用 -d 参数./jms start all -d
-    # 新版本更新了运行脚本,使用方式./jms start|stop|status all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status all  后台运行请添加 -d 参数
 
     # 访问 http://192.168.100.30 默认账号: admin 密码: admin
 
-    # 多节点部署,请参考此文档,设置数据库时请选择从库,其他的一样
+    # 多节点部署, 请参考此文档, 设置数据库时请选择从库, 其他的一样

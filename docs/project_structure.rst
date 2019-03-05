@@ -13,20 +13,20 @@
     ├── README.md
     ├── install                         // 安装说明
     ├── logs                            // 日志目录
-    ├── apps                            // 管理后台目录,也是各 APP 所在目录
+    ├── apps                            // 管理后台目录, 也是各 APP 所在目录
     │   └── assets                      // APP 目录
     │   │   ├── admin.py
     │   │   ├── apps.py                 // 新版本 Django APP 设置文件
     │   │   ├── api.py                  // API 文件
-    │   │   ├── __init__.py             // 对外暴露的接口,放到该文件中,方便别的 APP 引用
+    │   │   ├── __init__.py             // 对外暴露的接口, 放到该文件中, 方便别的 APP 引用
     │   │   ├── migrations              // Models Migrations 版本控制目录
     │   │   │   └── __init__.py
     │   │   ├── models.py               // 数据模型目录
-    │   │   ├── static                  // APP 下静态资源目录,如果需要
-    │   │   │   └── assets              // 多一层目录,防止资源重名
+    │   │   ├── static                  // APP 下静态资源目录, 如果需要
+    │   │   │   └── assets              // 多一层目录, 防止资源重名
     │   │   │       └── some_image.png
     │   │   ├── templates               // APP 下模板目录
-    │   │   │   └── assets              // 多一层目录,防止资源重名
+    │   │   │   └── assets              // 多一层目录, 防止资源重名
     │   │   │       └── asset_list.html
     │   │   ├── templatetags            // 模板标签目录
     │   │   ├── tests.py                // 测试用例文件
