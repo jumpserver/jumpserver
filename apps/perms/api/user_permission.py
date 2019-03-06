@@ -48,28 +48,34 @@ class UserPermissionMixin:
                 kwargs.get('pk') is None:
             set_to_root_org()
 
-    def get_response_from_cache(self, request):
-        if self.cache_policy in ['1', 'using']:
-            path_md5 = md5(request.get_full_path().encode()).hexdigest()
-            obj = self.get_object()
-            util = AssetPermissionUtil(obj, cache_policy=self.cache_policy)
-            cache_id = '{}_{}'.format(path_md5, util.cache_meta.get('id'))
-            response = self.get_cache_response(cache_id)
-            return response
+    def get_object(self):
         return None
 
     def get(self, request, *args, **kwargs):
         self.change_org_if_need(request, kwargs)
         self.cache_policy = request.GET.get('cache_policy', '0')
-        path_md5 = md5(request.get_full_path().encode()).hexdigest()
-        path_cache_key = '{}_{}'.format(path_md5, '*')
-        if self.cache_policy in AssetPermissionUtil.CACHE_POLICY_MAP[0]:
+
+        obj = self.get_object()
+        if obj is None:
+            return super().get(request, *args, **kwargs)
+        request_path_md5 = md5(request.get_full_path().encode()).hexdigest()
+        obj_id = str(obj.id)
+        expire_cache_key = '{}_{}'.format(obj_id, '*')
+        if self.CACHE_TIME <= 0 or \
+                self.cache_policy in AssetPermissionUtil.CACHE_POLICY_MAP[0]:
             return super().get(request, *args, **kwargs)
         elif self.cache_policy in AssetPermissionUtil.CACHE_POLICY_MAP[2]:
-            self.expire_cache_response(path_cache_key)
-        obj = self.get_object()
+            self.expire_cache_response(expire_cache_key)
+
         util = AssetPermissionUtil(obj, cache_policy=self.cache_policy)
-        cache_id = '{}_{}'.format(path_md5, util.cache_meta.get('id'))
+        meta_cache_id = util.cache_meta.get('id')
+        cache_id = '{}_{}_{}'.format(obj_id, request_path_md5, meta_cache_id)
+        # 没有数据缓冲
+        if not meta_cache_id:
+            response = super().get(request, *args, **kwargs)
+            self.set_cache_response(cache_id, response)
+            return response
+        # 从响应缓冲里获取响应
         response = self.get_cache_response(cache_id)
         if not response:
             response = super().get(request, *args, **kwargs)

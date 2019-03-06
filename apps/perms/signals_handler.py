@@ -11,12 +11,12 @@ from .models import AssetPermission
 logger = get_logger(__file__)
 
 
-@receiver(post_save)
+@receiver(post_save, sender=AssetPermission)
 def on_permission_update(sender, **kwargs):
     AssetPermissionUtil.expire_all_cache()
 
 
-@receiver(post_delete)
+@receiver(post_delete, sender=AssetPermission)
 def on_permission_delete(sender, **kwargs):
     AssetPermissionUtil.expire_all_cache()
 

@@ -177,7 +177,7 @@ class AssetPermissionUtil:
         return cached
 
     def get_assets(self):
-        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
             return self.get_assets_from_cache()
         elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
             self.expire_cache()
@@ -206,7 +206,7 @@ class AssetPermissionUtil:
         return cached
 
     def get_nodes_with_assets(self):
-        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
             return self.get_nodes_with_assets_from_cache()
         elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
             self.expire_cache()
@@ -229,7 +229,7 @@ class AssetPermissionUtil:
         return cached
 
     def get_system_users(self):
-        if self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
             return self.get_system_user_from_cache()
         elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
             self.expire_cache()
