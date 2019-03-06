@@ -65,16 +65,18 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 - REDIS_PORT = 6379
 - REDIS_PASSWORD =
 
-- VOLUME /opt/jumpserver/data
+- VOLUME /opt/jumpserver/data/media
 - VOLUME /var/lib/mysql
 
 .. code-block:: shell
 
     $ docker run --name jms_all -d \
         -v /opt/mysql:/var/lib/mysql
+        -v /opt/jumpserver:/opt/jumpserver/data/media
         -p 80:80 \
         -p 2222:2222 \
-        -e BOOTSTRAP_TOKEN=xxx
+        -e SECRET_KEY=xxxxxx \
+        -e BOOTSTRAP_TOKEN=xxx \
         -e DB_ENGINE=mysql \
         -e DB_HOST=192.168.x.x \
         -e DB_PORT=3306 \
