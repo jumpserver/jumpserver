@@ -116,6 +116,9 @@ $(document).ready(function () {
                     + message
             +"</label>" + "&nbsp;&nbsp;"
         );
+        setInterval(function () {
+                        window.location.reload();
+                    }, 1000);
 
     }
 
@@ -139,7 +142,8 @@ $(document).ready(function () {
             +"</label>" + "&nbsp;&nbsp;"
             );
             $("#result").append("<br>");
-        }
+        };
+
 
     }
     APIUpdateAttr({
@@ -156,7 +160,6 @@ $(document).ready(function () {
     var cheked = $("input[name='items']:checked").each(function () {
         user_names.push($(this).val())
     });
-    console.log('3333333');
     console.log(user_names);
     $.ajax({
         url: "{% url "api-settings:ldap-comfirm-sync" %}",
