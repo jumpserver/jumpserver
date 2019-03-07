@@ -79,6 +79,11 @@ RDP 协议资产连接错误排查思路
 
 6. 创建Windows资产(注意端口不要填错)
 
+.. code-block:: vim
+
+    # Windows 7/8/2008/2012 "系统平台"选择 "Windows"
+    # Windows 10/2016 "系统平台"选择 "Windows(2016)"
+
 .. image:: _static/img/faq_windows_05.jpg
 
 7. 创建授权规则
