@@ -8,6 +8,7 @@ FAQ
    SFTP 使用说明 <faq_sftp.rst>
    TELNET 使用说明 <faq_telnet.rst>
    Docker 使用说明 <faq_docker.rst>
+   Radius 使用说明 <faq_radius.rst>
    安装过程 常见问题 <faq_install.rst>
    升级过程 常见问题 <faq_upgrade.rst>
    Firewalld 使用说明 <faq_firewalld.rst>
