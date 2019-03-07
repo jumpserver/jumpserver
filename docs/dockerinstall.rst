@@ -80,7 +80,6 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
         -p 2222:2222 \
         -e SECRET_KEY=xxxxxx \
         -e BOOTSTRAP_TOKEN=xxx \
-        -e DB_ENGINE=mysql \
         -e DB_HOST=192.168.x.x \
         -e DB_PORT=3306 \
         -e DB_USER=root \
