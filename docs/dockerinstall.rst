@@ -19,7 +19,7 @@ Tips: 不建议在生产中使用, 因为所有软件都打包到一个Docker中
     # 最新版本
     $ docker run --name jms_all -d -p 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
 
-环境迁移和更新升级请手动指定SECRET_KEY和BOOTSTRAP_TOKEN, 需要保持一致
+环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密
 
 访问
 ```````````````
