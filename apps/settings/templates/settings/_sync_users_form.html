@@ -1,0 +1,14 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}sync_users_modal{% endblock %}
+{% block modal_title%}{% trans "Synchronization users" %}{% endblock %}
+{% block modal_body %}
+<form method="post" action="" id="fm_sync_user" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div id="result" style="background-color:#FFE4B5; width:300px; "></div>
+</form>
+    <p class="text-danger" id="id_failed"></p>
+{% endblock %}
+{% block modal_confirm_id %}btn_sync_users{% endblock %}
+
+

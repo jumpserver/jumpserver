@@ -31,7 +31,7 @@
                     <div class="tab-content">
                         <div class="col-sm-12" style="padding-left:0">
                                 <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
-                                    <form action="" method="post" class="form-horizontal">
+                                    <form id="ldap_form" action="" method="post" class="form-horizontal">
                                     {% if form.non_field_errors %}
                                          <div class="alert alert-danger">
                                              {{ form.non_field_errors }}
@@ -61,6 +61,7 @@
                                             <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>
                                         </div>
                                     </div>
                                     </form>
@@ -72,6 +73,8 @@
             </div>
         </div>
     </div>
+    {% include 'settings/_sync_users_form.html' %}
+{#    {% include 'settings/_ldap_list_users_modal.html' %}#}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -102,5 +105,76 @@ $(document).ready(function () {
         error: error
     });
 })
+.on("click", ".sync_button", function () {
+    var the_url = "{% url 'api-settings:ldap-sync' %}";
+
+    function error(message) {
+        toastr.error(message);
+        $("#result").empty();
+        $("#result").append(
+            "<label>"
+                    + message
+            +"</label>" + "&nbsp;&nbsp;"
+        );
+
+    }
+
+    function success(message) {
+        console.log(message.users);
+        console.log(typeof(message.users));
+        var users = eval(message.users);
+        console.log(users);
+        console.log(typeof(users));
+        toastr.success(message.msg);
+        $("#result").empty();
+        for(var i=0;i<users.length;i++){
+            console.log(users[i]);
+            console.log(typeof (users[i]));
+            $("#result").append(
+                "<label>"
+                + "<input name='items' type='checkbox' value="
+                    + users[i].username
+                + ">"
+                    + users[i].username + users[i].name + users[i].email+ users[i].is_exist
+            +"</label>" + "&nbsp;&nbsp;"
+            );
+            $("#result").append("<br>");
+        }
+
+    }
+    APIUpdateAttr({
+        url: the_url,
+        method: "GET",
+        flash_message: false,
+        success: success,
+        error: error
+    });
+})
+.on("click","#btn_sync_users",function () {
+
+    var user_names=[];
+    var cheked = $("input[name='items']:checked").each(function () {
+        user_names.push($(this).val())
+    });
+    console.log('3333333');
+    console.log(user_names);
+    $.ajax({
+        url: "{% url "api-settings:ldap-comfirm-sync" %}",
+        type: 'GET',
+        data:{
+            user_names:user_names,
+        },
+        dataType: "json",
+        traditional: true,
+        success: function (message) {
+
+            toastr.success(message.msg);
+        },
+        error: function () {
+            toastr.error('Export failed');
+        }
+    })
+})
+
 </script>
 {% endblock %}
