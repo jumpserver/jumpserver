@@ -3,7 +3,7 @@
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-from assets.models import AdminUser
+from assets.models import AdminUser, Asset
 from .utils import construct_one_authbook_object
 
 
@@ -43,7 +43,11 @@ class AdminUserBackend:
             return [instance]
 
         else:
-            return []
+            instances = []
+            for tmp_asset in Asset.objects.all():
+                instance = construct_one_authbook_object(tmp_asset.admin_user, tmp_asset)
+                instances.append(instance)
+            return instances
 
     @classmethod
     def construct_many_authbook_object(cls, admin_users):

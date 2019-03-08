@@ -30,6 +30,33 @@ class AuthBook(AssetUser):
     class Meta:
         verbose_name = _('Auth book')
 
+    def _set_latest(self):
+        self._remove_pre_obj_latest()
+        self.is_latest = True
+        self.save()
+
+    def _get_pre_obj(self):
+        pre_obj = self.__class__.objects.filter(
+            username=self.username, asset=self.asset).latest_version().first()
+        return pre_obj
+
+    def _remove_pre_obj_latest(self):
+        pre_obj = self._get_pre_obj()
+        if pre_obj:
+            pre_obj.is_latest = False
+            pre_obj.save()
+
+    def _set_version_count(self):
+        pre_obj = self._get_pre_obj()
+        if pre_obj:
+            self.version_count = pre_obj.version_count + 1
+        else:
+            self.version_count = 1
+
+    def set_latest(self):
+        self._set_latest()
+        self._set_version_count()
+
     @property
     def keyword(self):
         return {'username': self.username, 'asset': self.asset}

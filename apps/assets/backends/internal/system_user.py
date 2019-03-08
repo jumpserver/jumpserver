@@ -27,8 +27,8 @@ class SystemUserBackend:
     @classmethod
     def filter(cls, username=None, asset=None):
         if username and asset:
-            system_user = asset.systemuser_set.filter(username=username).\
-                order_by('-priority', '-date_updated').first()
+            system_user = asset.systemuser_set.filter(username=username)\
+                .order_by('-priority', '-date_updated').first()
             if not system_user:
                 return []
             instance = construct_one_authbook_object(system_user, asset)
@@ -56,8 +56,8 @@ class SystemUserBackend:
             queryset = asset.systemuser_set.all().values('username')
             username_list = set([q['username'] for q in queryset])
             for username in username_list:
-                system_user = SystemUser.objects.filter(username=username).\
-                    order_by('-priority', '-date_updated').first()
+                system_user = SystemUser.objects.filter(username=username)\
+                    .order_by('-priority', '-date_updated').first()
                 system_users.append(system_user)
 
             instances = []
