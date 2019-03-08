@@ -52,10 +52,11 @@ class AuthBook(AssetUser):
             self.version_count = pre_obj.version_count + 1
         else:
             self.version_count = 1
+        self.save()
 
     def set_latest(self):
-        self._set_latest()
         self._set_version_count()
+        self._set_latest()
 
     @property
     def keyword(self):

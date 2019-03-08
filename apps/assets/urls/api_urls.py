@@ -17,6 +17,7 @@ router.register(r'nodes', api.NodeViewSet, 'node')
 router.register(r'domain', api.DomainViewSet, 'domain')
 router.register(r'gateway', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filter', api.CommandFilterViewSet, 'cmd-filter')
+router.register(r'asset-user', api.AssetUserViewSet, 'asset-user')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filter', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
@@ -30,6 +31,9 @@ urlpatterns = [
          api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
     path('assets/<uuid:pk>/gateway/',
          api.AssetGatewayApi.as_view(), name='asset-gateway'),
+
+    path('asset-user/auth-info/',
+         api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),
 
     path('admin-user/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
@@ -79,6 +83,7 @@ urlpatterns = [
 
     path('gateway/<uuid:pk>/test-connective/',
          api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
+
 ]
 
 urlpatterns += router.urls + cmd_filter_router.urls
