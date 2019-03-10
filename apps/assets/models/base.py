@@ -45,8 +45,8 @@ class AssetUser(OrgModelMixin):
 
     @password.setter
     def password(self, password_raw):
-        raise AttributeError("Using set_auth do that")
-        # self._password = signer.sign(password_raw)
+        # raise AttributeError("Using set_auth do that")
+        self._password = signer.sign(password_raw)
 
     @property
     def private_key(self):
@@ -55,8 +55,8 @@ class AssetUser(OrgModelMixin):
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        raise AttributeError("Using set_auth do that")
-        # self._private_key = signer.sign(private_key_raw)
+        # raise AttributeError("Using set_auth do that")
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def private_key_obj(self):
@@ -88,6 +88,11 @@ class AssetUser(OrgModelMixin):
         else:
             return None
 
+    @public_key.setter
+    def public_key(self, public_key_raw):
+        # raise AttributeError("Using set_auth do that")
+        self._public_key = signer.sign(public_key_raw)
+
     @property
     def public_key_obj(self):
         if self.public_key:
@@ -114,6 +119,24 @@ class AssetUser(OrgModelMixin):
 
     def get_auth(self, asset=None):
         pass
+
+    def load_related_asset_auth(self, asset):
+        from ..asset_user_manager import AssetUserManager
+        try:
+            other = AssetUserManager.get(username=self.username, asset=asset)
+            self._merge_auth(other)
+        except Exception as e:
+            print(e)
+
+    def _merge_auth(self, other):
+        if not other:
+            return
+        if other.password:
+            self.password = other.password
+        if other.public_key:
+            self.public_key = other.public_key
+        if other.private_key:
+            self.private_key = other.private_key
 
     def clear_auth(self):
         self._password = ''
