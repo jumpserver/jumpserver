@@ -43,8 +43,8 @@ class AssetUserSerializer(serializers.ModelSerializer):
             'name': validated_data.get('name'),
             'username': validated_data.get('username'),
             'asset': validated_data.get('asset'),
-            'comment': validated_data.get('comment'),
-            'org_id': validated_data.get('org_id'),
+            'comment': validated_data.get('comment', ''),
+            'org_id': validated_data.get('org_id', ''),
             'password': validated_data.get('password'),
             'public_key': validated_data.get('public_key'),
             'private_key': validated_data.get('private_key')

@@ -2,8 +2,9 @@
 #
 
 
-from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
+from rest_framework import viewsets, status, generics
+from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsOrgAdminOrAppUser
 from common.utils import get_object_or_none, get_logger
@@ -22,9 +23,10 @@ logger = get_logger(__name__)
 
 
 class AssetUserViewSet(viewsets.GenericViewSet):
+    pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
-    http_method_names = ['get', 'post']
     permission_classes = (IsOrgAdminOrAppUser, )
+    http_method_names = ['get', 'post']
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
