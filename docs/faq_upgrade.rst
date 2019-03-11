@@ -1,6 +1,8 @@
 升级常见问题
 ---------------------
 
+**请务必认真详细阅读每一个文字并理解后才能操作升级事宜**
+
 1. git pull 时提示 error: Your local changes to the following file would be overwritten by merge
 
 .. code-block:: shell
