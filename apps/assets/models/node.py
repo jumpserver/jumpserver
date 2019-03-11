@@ -276,7 +276,8 @@ class Node(OrgModelMixin):
     @classmethod
     def default_node(cls):
         defaults = {'value': 'Default'}
-        return cls.objects.get_or_create(defaults=defaults, key='1')
+        obj, created = cls.objects.get_or_create(defaults=defaults, key='1')
+        return obj
 
     def as_tree_node(self):
         from common.tree import TreeNode
