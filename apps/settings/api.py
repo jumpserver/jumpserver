@@ -4,20 +4,20 @@
 import os
 import json
 import jms_storage
+from django.db.models import Q
 
 from rest_framework.views import Response, APIView
 from rest_framework.generics import GenericAPIView
-from rest_framework.pagination import LimitOffsetPagination
 from ldap3 import Server, Connection
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
 from common.permissions import IsOrgAdmin, IsSuperUser
 from .serializers import (
     MailTestSerializer, LDAPTestSerializer
 )
 from .models import Setting
+from .models import settings
 from users.models import User
 
 
@@ -95,14 +95,14 @@ class LDAPTestingAPI(APIView):
 
 
 def get_ldap_setting():
-    host = Setting.objects.filter(name='AUTH_LDAP_SERVER_URI')
-    bind_dn = Setting.objects.filter(name='AUTH_LDAP_BIND_DN')
-    password = Setting.objects.filter(name='AUTH_LDAP_BIND_PASSWORD')
-    use_ssl = Setting.objects.filter(name='AUTH_LDAP_START_TLS')
-    search_ougroup = Setting.objects.filter(name='AUTH_LDAP_SEARCH_OU')
-    search_filter = Setting.objects.filter(name='AUTH_LDAP_SEARCH_FILTER')
-    attr_map = Setting.objects.filter(name='AUTH_LDAP_USER_ATTR_MAP')
-    auth_ldap = Setting.objects.filter(name='AUTH_LDAP')
+    host = settings.AUTH_LDAP_SERVER_URI
+    bind_dn = settings.AUTH_LDAP_BIND_DN
+    password = settings.AUTH_LDAP_BIND_PASSWORD
+    use_ssl = settings.AUTH_LDAP_START_TLS
+    search_ougroup = settings.AUTH_LDAP_SEARCH_OU
+    search_filter = settings.AUTH_LDAP_SEARCH_FILTER
+    attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
+    auth_ldap = settings.AUTH_LDAP
 
     if not host:
         return Response({'error': _("请设置Ldap站点地址并提交")}, status=401)
@@ -119,40 +119,58 @@ def get_ldap_setting():
     if not auth_ldap:
         return Response({'error': _("请先勾选启用LDAP认证")}, status=401)
 
-    host = eval(host.first().value)
-    bind_dn = eval(bind_dn.first().value)
-    password = password.first().value
-    use_ssl =use_ssl.first().value if use_ssl.first() else False
-    search_ougroup = eval(search_ougroup.first().value)
-    search_filter = eval(search_filter.first().value)
-    attr_map = attr_map.first().value
-    auth_ldap = auth_ldap.first().value
-
-    try:
-        attr_map = json.loads(attr_map)
-    except json.JSONDecodeError:
-        return Response({"error": _("AUTH_LDAP_USER_ATTR_MAP not valid")},
-                        status=401)
-
     ldap_setting = {
         'host': host, 'bind_dn':bind_dn, 'password': password,
         'search_ougroup': search_ougroup, 'search_filter': search_filter,
         'attr_map': attr_map, 'auth_ldap': auth_ldap, 'use_ssl': use_ssl,
     }
-    if not auth_ldap:
-        return Response({'error': _("请先勾选启用LDAP认证")}, status=401)
     return ldap_setting
 
 
-# class LDAPSyncAPI(APIView):
+def save_user(users):
+    if len(users) > 0:
+        exist = []
+        for item in users:
+            if not item.get('email', ''):
+                item['email'] = item['username'] + '@' + item[
+                    'username'] + '.com'
+            item['source'] = 'ldap'
+            user = User.objects.filter(
+                Q(username=item['username']) & ~Q(source='ldap'))
+            if user:
+                exist.append(item['username'])
+                continue
+            user = User.objects.filter(username=item['username'], source='ldap')
+            if user:
+                user = user[0]
+                user.username = item.get('username', '')
+                user.name = item.get('name', '')
+                user.email = item['email']
+                user.source = item['source']
+                user.save()
+            else:
+                try:
+                    user = User.objects.create(**item)
+                except:
+
+                    exist.append(item['username'])
+                    continue
+        if exist:
+            msg = _("导入 {} 个用户成功, 导入 {} 这些用户失败，数据库已经存在同名的用户")\
+                .format(len(users) - len(exist), str(exist))
+        else:
+            msg = _("导入 {} 个用户成功").format(len(users))
+        return Response(
+            {"msg": msg})
+    else:
+        return Response({"error": "Have user but attr mapping error"},
+                        status=401)
+
+
 class LDAPSyncAPI(GenericAPIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = LDAPTestSerializer
-    success_message = _("Test ldap success")
-    auth_ldap_setting = Setting.objects.filter(name__startswith='AUTH_LDAP')
-    pagination_class = LimitOffsetPagination
 
-    def get(self,request):
+    def get(self, request):
 
         ldap_setting = get_ldap_setting()
         if type(ldap_setting) != dict:
@@ -162,6 +180,7 @@ class LDAPSyncAPI(GenericAPIView):
         conn = Connection(server, ldap_setting['bind_dn'], ldap_setting['password'])
         try:
             conn.bind()
+
         except Exception as e:
             return Response({"error": str(e)}, status=401)
 
@@ -176,19 +195,13 @@ class LDAPSyncAPI(GenericAPIView):
 
             for entry in conn.entries:
                 user = {}
-                user['is_exist'] = "不存在"
                 for attr, mapping in ldap_setting['attr_map'].items():
                     if hasattr(entry, mapping):
                         user[attr] = getattr(entry, mapping).value if \
                             getattr(entry, mapping).value else ''
-                        if attr == 'username':
-                            if User.objects.filter(username=getattr(entry, mapping).value if \
-                            getattr(entry, mapping).value else ''):
-                                user['is_exist'] = "存在"
                 users.append(user)
         if len(users) > 0:
-            return Response({"msg": _("Match {} s users").format(len(users)),
-                             'users': str(users)})
+            return Response(users)
         else:
             return Response({"error": "Have user but attr mapping error"},
                             status=401)
@@ -196,8 +209,6 @@ class LDAPSyncAPI(GenericAPIView):
 
 class LDAPConfirmSyncAPI(APIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = LDAPTestSerializer
-    success_message = _("Test ldap success")
 
     def get(self, request):
 
@@ -229,28 +240,44 @@ class LDAPConfirmSyncAPI(APIView):
                         user[attr] = getattr(entry, mapping).value if \
                             getattr(entry, mapping).value else ''
 
-                print('user==', user)
-
-                if user['username'] in user_names:
+                if user.get('username', '') in user_names:
                     users.append(user)
-            print('users======', users)
-        if len(users) > 0:
-            from users.models import User
-            for item in users:
-                user = User()
-                user.username = item['username']
-                user.name = item['name']
-                if not item['email']:
-                    item['email'] = item['username']+'@'+item['username']+'.com'
-                user.email = item['email']
-                user.source = 'ldap'
-                user.save()
-            return Response(
-                {"msg": _("Sync {} s users successfully").format(len(users)),
-                 'users': str(users)})
-        else:
-            return Response({"error": "Have user but attr mapping error"},
-                            status=401)
+        response = save_user(users)
+
+        return response
+        # if len(users) > 0:
+        #     exist=[]
+        #     for item in users:
+        #         if not item.get('email', ''):
+        #             item['email'] = item['username'] + '@' + item[
+        #                 'username'] + '.com'
+        #         item['source'] = 'ldap'
+        #         user = User.objects.filter(Q(username=item['username']) & ~Q(source='ldap') )
+        #         if user:
+        #             # exist.append(item['username'])
+        #             continue
+        #         user = User.objects.filter(username=item['username'], source='ldap')
+        #         if user:
+        #             user = user[0]
+        #             user.username = item.get('username', '')
+        #             user.name = item.get('name', '')
+        #             user.email = item['email']
+        #             user.source = item['source']
+        #             user.save()
+        #         else:
+        #             try:
+        #                 user = User.objects.create(**item)
+        #             except:
+        #
+        #                 exist.append(item['username'])
+        #                 continue
+        #
+        #     return Response(
+        #         {"msg": _("导入 {} 个用户成功, 导入 {} 这些用户失败，数据库已经存在同名的用户")
+        #             .format(len(users)-len(exist), str(exist))})
+        # else:
+        #     return Response({"error": "Have user but attr mapping error"},
+        #                     status=401)
 
 
 class ReplayStorageCreateAPI(APIView):

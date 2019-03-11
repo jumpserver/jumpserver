@@ -378,7 +378,7 @@ OTP_VALID_WINDOW = CONFIG.OTP_VALID_WINDOW
 
 # Auth LDAP settings
 AUTH_LDAP = False
-AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
+# AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=jumpserver,dc=org'
 AUTH_LDAP_BIND_PASSWORD = ''
 AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'

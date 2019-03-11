@@ -61,7 +61,8 @@
                                             <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
-                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>
+{#                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>#}
+                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Sync User' %}</button>
                                         </div>
                                     </div>
                                     </form>
@@ -73,12 +74,13 @@
             </div>
         </div>
     </div>
-    {% include 'settings/_sync_users_form.html' %}
-{#    {% include 'settings/_ldap_list_users_modal.html' %}#}
+{#    {% include 'settings/_sync_users_form.html' %}#}
+    {% include 'settings/_ldap_list_users_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
+
 })
 .on("click", ".btn-test", function () {
     var data = {};
@@ -105,60 +107,12 @@ $(document).ready(function () {
         error: error
     });
 })
-.on("click", ".sync_button", function () {
-    var the_url = "{% url 'api-settings:ldap-sync' %}";
-
-    function error(message) {
-        toastr.error(message);
-        $("#result").empty();
-        $("#result").append(
-            "<label>"
-                    + message
-            +"</label>" + "&nbsp;&nbsp;"
-        );
-        setInterval(function () {
-                        window.location.reload();
-                    }, 1000);
-
-    }
-
-    function success(message) {
-        console.log(message.users);
-        console.log(typeof(message.users));
-        var users = eval(message.users);
-        console.log(users);
-        console.log(typeof(users));
-        toastr.success(message.msg);
-        $("#result").empty();
-        for(var i=0;i<users.length;i++){
-            console.log(users[i]);
-            console.log(typeof (users[i]));
-            $("#result").append(
-                "<label>"
-                + "<input name='items' type='checkbox' value="
-                    + users[i].username
-                + ">"
-                    + users[i].username + users[i].name + users[i].email+ users[i].is_exist
-            +"</label>" + "&nbsp;&nbsp;"
-            );
-            $("#result").append("<br>");
-        };
-
-
-    }
-    APIUpdateAttr({
-        url: the_url,
-        method: "GET",
-        flash_message: false,
-        success: success,
-        error: error
-    });
-})
-.on("click","#btn_sync_users",function () {
+.on("click","#btn_ldap_modal_confirm",function () {
 
     var user_names=[];
-    var cheked = $("input[name='items']:checked").each(function () {
-        user_names.push($(this).val())
+    var cheked = $("tbody input[type='checkbox']:checked").each(function () {
+        user_names.push($(this).attr('id'));
+
     });
     console.log(user_names);
     $.ajax({
@@ -178,6 +132,7 @@ $(document).ready(function () {
         }
     })
 })
+
 
 </script>
 {% endblock %}
