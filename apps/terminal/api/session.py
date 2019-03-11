@@ -9,17 +9,17 @@ from django.http import HttpResponseNotFound
 from django.conf import settings
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
-from rest_framework.views import Response
+from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 import jms_storage
 
 
 from common.utils import is_uuid
 from common.permissions import IsOrgAdminOrAppUser
-from ...hands import SystemUser
-from ...models import Terminal, Session
-from ...serializers import v1 as serializers
-from ...backends import get_command_storage, get_multi_command_storage, \
+from ..hands import SystemUser
+from ..models import Terminal, Session
+from .. import serializers
+from ..backends import get_command_storage, get_multi_command_storage, \
     SessionCommandSerializer
 
 __all__ = ['SessionViewSet', 'SessionReplayViewSet', 'CommandViewSet']

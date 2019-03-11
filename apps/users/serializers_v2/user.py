@@ -6,6 +6,8 @@ from ..models import User
 
 from authentication.serializers import AccessKeySerializer
 
+__all__ = ['ServiceAccountSerializer']
+
 
 class ServiceAccountSerializer(serializers.ModelSerializer):
     access_key = AccessKeySerializer(read_only=True)

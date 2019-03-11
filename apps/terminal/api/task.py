@@ -6,8 +6,8 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.utils import get_object_or_none
 from common.permissions import IsOrgAdminOrAppUser
-from ...models import Session, Task
-from ...serializers import v1 as serializers
+from ..models import Session, Task
+from .. import serializers
 
 
 __all__ = ['TaskViewSet', 'KillSessionAPI']

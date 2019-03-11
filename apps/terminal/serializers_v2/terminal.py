@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from common.utils import get_request_ip
-from users.serializers.v2 import ServiceAccountSerializer
+from users.serializers_v2 import ServiceAccountSerializer
 from ..models import Terminal
 
 
