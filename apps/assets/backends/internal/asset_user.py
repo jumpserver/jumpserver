@@ -3,6 +3,7 @@
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
+from .. import meta
 from .admin_user import AdminUserBackend
 from .system_user import SystemUserBackend
 
@@ -14,14 +15,11 @@ class AssetUserBackend:
         instances = cls.filter(username, asset)
         if len(instances) == 1:
             return instances[0]
-
         elif len(instances) == 0:
-            msg = '{} Object matching query does not exist'.format(cls.__name__)
+            msg = meta.EXCEPTION_MSG_NOT_EXIST.format(cls.__name__)
             raise ObjectDoesNotExist(msg)
-
         else:
-            msg = '{} get() returned more than one object -- it returned {}!' \
-                .format(cls.__name__, len(instances))
+            msg = meta.EXCEPTION_MSG_MULTIPLE.format(cls.__name__, len(instances))
             raise MultipleObjectsReturned(msg)
 
     @classmethod

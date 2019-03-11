@@ -13,6 +13,3 @@ def get_backend():
     else:
         _backend = AuthBookBackend()
     return _backend
-
-
-backend = get_backend()

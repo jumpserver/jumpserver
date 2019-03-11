@@ -3,8 +3,10 @@
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-from .base import BaseBackend
 from assets.models import AuthBook
+
+from .. import meta
+from .base import BaseBackend
 
 
 class AuthBookBackend(BaseBackend):
@@ -15,13 +17,11 @@ class AuthBookBackend(BaseBackend):
             return queryset.first()
 
         elif len(queryset) == 0:
-            msg = '{} Object matching query does not exist'.\
-                format(self.__class__.__name__)
+            msg = meta.EXCEPTION_MSG_NOT_EXIST.format(self.__class__.__name__)
             raise ObjectDoesNotExist(msg)
 
         else:
-            msg = '{} get() returned more than one object -- it returned {}!' \
-                .format(self.__class__.__name__, len(queryset))
+            msg = meta.EXCEPTION_MSG_MULTIPLE.format(self.__class__.__name__, len(queryset))
             raise MultipleObjectsReturned(msg)
 
     def filter(self, username=None, asset=None, latest=True):
