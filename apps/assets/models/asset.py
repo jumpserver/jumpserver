@@ -56,6 +56,8 @@ class Asset(OrgModelMixin):
         ('BSD', 'BSD'),
         ('Windows', 'Windows'),
         ('Windows2016', 'Windows(2016)'),
+        ('MSSQL', 'MSSQL'),
+        ('MySQL', 'MySQL'),
         ('Other', 'Other'),
     )
 
@@ -63,25 +65,32 @@ class Asset(OrgModelMixin):
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
     PROTOCOL_VNC = 'vnc'
+    PROTOCOL_MySQL = 'mysql'
+    PROTOCOL_MSSQL = 'mssql'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
         (PROTOCOL_TELNET, 'telnet (beta)'),
         (PROTOCOL_VNC, 'vnc'),
+        (PROTOCOL_MSSQL, 'mssql'),
+        (PROTOCOL_MySQL, 'mysql'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES,
+                                verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
-    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
+    domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"),
+                               on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True,
+                                   verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
@@ -193,7 +202,7 @@ class Asset(OrgModelMixin):
     @connectivity.setter
     def connectivity(self, value):
         key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        cache.set(key, value, 3600*2)
+        cache.set(key, value, 3600 * 2)
 
     def get_auth_info(self):
         if self.admin_user:
