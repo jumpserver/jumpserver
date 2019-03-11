@@ -141,6 +141,16 @@ SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS = {
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+    'password': CONFIG.REDIS_PASSWORD,
+    'db': CONFIG.REDIS_DB_SESSION,
+    'prefix': 'auth_session',
+    'socket_timeout': 1,
+    'retry_on_timeout': False
+}
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -559,3 +569,6 @@ SWAGGER_SETTINGS = {
 # Default email suffix
 EMAIL_SUFFIX = CONFIG.EMAIL_SUFFIX
 LOGIN_LOG_KEEP_DAYS = CONFIG.LOGIN_LOG_KEEP_DAYS
+
+# User or user group permission cache time, default 3600 seconds
+ASSETS_PERM_CACHE_TIME = CONFIG.ASSETS_PERM_CACHE_TIME

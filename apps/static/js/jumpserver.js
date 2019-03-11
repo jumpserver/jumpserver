@@ -922,3 +922,16 @@ function initSelectedAssets2Table(){
         });
     }
 }
+
+
+function rootNodeAddDom(ztree, callback) {
+    var refreshIcon = "<a id='tree-refresh'><i class='fa fa-refresh'></i></a>";
+    var rootNode = ztree.getNodes()[0];
+    var $rootNodeRef = $("#" + rootNode.tId + "_a");
+    $rootNodeRef.after(refreshIcon);
+    var refreshIconRef = $('#tree-refresh');
+    refreshIconRef.bind('click', function () {
+        ztree.destroy();
+        callback()
+    })
+}

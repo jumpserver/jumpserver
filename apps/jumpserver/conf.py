@@ -311,6 +311,7 @@ defaults = {
     'REDIS_PASSWORD': '',
     'REDIS_DB_CELERY': 3,
     'REDIS_DB_CACHE': 4,
+    'REDIS_DB_SESSION': 5,
     'CAPTCHA_TEST_MODE': None,
     'TOKEN_EXPIRATION': 3600 * 24,
     'DISPLAY_PER_PAGE': 25,
@@ -348,6 +349,7 @@ defaults = {
     'HTTP_BIND_HOST': '0.0.0.0',
     'HTTP_LISTEN_PORT': 8080,
     'LOGIN_LOG_KEEP_DAYS': 90,
+    'ASSETS_PERM_CACHE_TIME': 3600,
 }
 
 

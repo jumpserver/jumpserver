@@ -11,8 +11,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
-from common.permissions import IsOrgAdmin, IsCurrentUserOrReadOnly, \
-    IsOrgAdminOrAppUser
+from common.permissions import (
+    IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
+)
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from orgs.utils import current_org
