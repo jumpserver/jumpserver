@@ -89,7 +89,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function initAssetAuthModalForm(hostname){
+function initAssetUserAuthModalForm(hostname){
     $('#id_hostname_p').html(hostname);
     $('#id_username_p').html(username);
     $('#id_password').parent().removeClass('has-error');
@@ -140,8 +140,8 @@ $(document).ready(function () {
 .on('click', '.btn-setup-asset-user-auth', function() {
     username = $(this).data('username');
     var hostname = "{{ asset.hostname }}";
-    initAssetAuthModalForm(hostname, username);
-    $("#asset_auth_modal").modal();
+    initAssetUserAuthModalForm(hostname, username);
+    $("#asset_user_auth_modal").modal();
 })
 .on('click', '#btn_asset_user_auth_modal_confirm', function(){
     var password = $('#id_password').val();
@@ -163,7 +163,7 @@ $(document).ready(function () {
                 toastr.error("{% trans 'Setup failed!' %}");
             }
         });
-        $("#asset_auth_modal").modal('hide');
+        $("#asset_user_auth_modal").modal('hide');
     }
     else{
         $('#id_password').parent().addClass('has-error');
