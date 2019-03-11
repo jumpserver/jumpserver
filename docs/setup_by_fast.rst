@@ -131,7 +131,9 @@
     $ systemctl start nginx \
       && DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24` \
       && SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50` \
+      && echo "SECRET_KEY=$SECRET_KEY" >> ~/.bashrc \
       && BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16` \
+      && echo "BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc \
       && cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml \
       && Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
       && mysql -uroot -e "create database jumpserver default charset 'utf8';grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD';flush privileges;" \
@@ -152,3 +154,4 @@
       && echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m" \
       && echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m" \
       && echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m"
+      && echo -e "\033[31m 请打开浏览器访问 http://$Server_IP 用户名:admin 密码:admin \033[0m"
