@@ -68,8 +68,9 @@ class CommandStore(CommandBase):
 
         date_from = date_from if date_from else date_from_default
         date_to = date_to if date_to else date_to_default
-        filter_kwargs['timestamp__gte'] = int(date_from.timestamp())
-        filter_kwargs['timestamp__lte'] = int(date_to.timestamp())
+        if session is None:
+            filter_kwargs['timestamp__gte'] = int(date_from.timestamp())
+            filter_kwargs['timestamp__lte'] = int(date_to.timestamp())
 
         if user:
             filter_kwargs["user"] = user
