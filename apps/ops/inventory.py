@@ -33,8 +33,8 @@ class JMSInventory(BaseInventory):
             host_list.append(info)
 
         if run_as:
-            run_user_info = self.get_run_user_info()
             for host in host_list:
+                run_user_info = self.get_run_user_info(host)
                 host.update(run_user_info)
 
         if become_info:
@@ -69,11 +69,13 @@ class JMSInventory(BaseInventory):
             info["groups"].append("domain_"+asset.domain.name)
         return info
 
-    def get_run_user_info(self):
+    def get_run_user_info(self, host):
         system_user = self.run_as
         if not system_user:
             return {}
         else:
+            asset = self.assets.get(id=host.get('id'))
+            system_user.load_related_asset_auth(asset)
             return system_user._to_secret_json()
 
     @staticmethod
