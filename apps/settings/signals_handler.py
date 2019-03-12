@@ -3,7 +3,7 @@
 import json
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save, pre_migrate
+from django.db.models.signals import post_save, pre_save
 from django.conf import LazySettings, empty
 from django.db.utils import ProgrammingError, OperationalError
 from django.core.cache import cache
