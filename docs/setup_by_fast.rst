@@ -153,5 +153,5 @@
       && echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m" \
       && echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m" \
       && echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m" \
-      && echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m"
+      && echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m" \
       && echo -e "\033[31m 请打开浏览器访问 http://$Server_IP 用户名:admin 密码:admin \033[0m"
