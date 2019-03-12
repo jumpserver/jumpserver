@@ -1,65 +1,64 @@
 # -*- coding: utf-8 -*-
 #
 
-from assets.models import SystemUser, Asset
+import itertools
+
+from assets.models import Asset
 
 from ..base import BaseBackend
 from .utils import construct_authbook_object
 
 
 class SystemUserBackend(BaseBackend):
+
     @classmethod
     def filter(cls, username=None, asset=None, **kwargs):
-        system_users = SystemUser.objects.all()
-
-        if username:
-            system_users = system_users.filter(username=username)
-        if asset:
-            system_users = system_users.filter(assets=asset)
-
-        instances = cls.construct_authbook_objects(system_users, asset)
+        instances = cls.construct_authbook_objects(username, asset)
         return instances
 
     @classmethod
-    def _get_unique_assets(cls, username=None):
-        if username is None:
-            return Asset.objects.all()
-
-        assets = set()
-        system_users = SystemUser.objects.filter(username=username)
+    def _construct_authbook_objects(cls, system_users, asset):
+        instances = []
         for system_user in system_users:
-            assets.update(system_user.assets.all())
+            instance = construct_authbook_object(system_user, asset)
+            instances.append(instance)
+        return instances
+
+    @classmethod
+    def _distinct_system_users_by_username(cls, system_users):
+        system_users = system_users.order_by('username', '-priority', '-date_updated')
+        results = itertools.groupby(system_users, key=lambda su: su.username)
+        system_users = [next(result[1]) for result in results]
+        return system_users
+
+    @classmethod
+    def _get_assets_with_system_users(cls, username=None, asset=None):
+        """
+        { 'assets': <QuerySet [<SystemUser>, <SystemUser>, ...]> }
+        """
+        if not asset:
+            _assets = Asset.objects.all().prefetch_related('systemuser_set')
+        else:
+            _assets = [asset]
+
+        if not username:
+            assets = {asset: asset.systemuser_set.all() for asset in _assets}
+        else:
+            assets = {asset: asset.systemuser_set.filter(username=username)
+                      for asset in _assets}
         return assets
 
     @classmethod
-    def _get_unique_username_list(cls, assets):
-        username_set = SystemUser.objects.filter(assets__in=assets)\
-            .values_list('username').distinct()
-        return username_set
-
-    @classmethod
-    def _get_asset_latest_system_user(cls, asset, username):
-        system_user = asset.systemuser_set.filter(username=username) \
-            .order_by('-priority', '-date_updated').first()
-        return system_user
-
-    @classmethod
-    def _construct_authbook_object(cls, asset, username):
-        system_user = cls._get_asset_latest_system_user(asset, username)
-        if not system_user:
-            return None
-        instance = construct_authbook_object(system_user, asset)
-        return instance
-
-    @classmethod
-    def construct_authbook_objects(cls, assets, username_list):
+    def construct_authbook_objects(cls, username, asset):
+        """
+        :return: [<AuthBook>, <AuthBook>, ...]
+        """
         instances = []
-        for asset in assets:
-            for username in username_list:
-                instance = cls._construct_authbook_object(asset, username)
-                if not instance:
-                    continue
-                instances.append(instance)
+        assets = cls._get_assets_with_system_users(username, asset)
+        for asset, system_users in assets.items():
+            _system_users = cls._distinct_system_users_by_username(system_users)
+            _instances = cls._construct_authbook_objects(_system_users, asset)
+            instances.extend(_instances)
         return instances
 
     @classmethod

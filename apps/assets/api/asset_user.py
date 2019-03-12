@@ -9,7 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.permissions import IsOrgAdminOrAppUser
 from common.utils import get_object_or_none, get_logger
 
-from ..asset_user_manager import AssetUserManager
+from ..backends.multi import AssetUserManager
 from ..models import Asset
 from .. import serializers
 

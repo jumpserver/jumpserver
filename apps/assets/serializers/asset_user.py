@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from ..models import AuthBook
-from ..asset_user_manager import AssetUserManager
+from ..backends.multi import AssetUserManager
 
 __all__ = [
     'AssetUserSerializer', 'AssetUserAuthInfoSerializer',

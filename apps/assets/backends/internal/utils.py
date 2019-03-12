@@ -6,10 +6,11 @@ from assets.models import AuthBook
 
 def construct_authbook_object(asset_user, asset):
     """
-    作用: 将 AssetUser 对象构造成为 AuthBook 对象并返回
-    :param asset_user: AdminUser 或 SystemUser 对象
-    :param asset: Asset 对象
-    :return: AuthBook 对象
+    作用: 将<AssetUser>对象构造成为<AuthBook>对象并返回
+
+    :param asset_user: <AdminUser>或<SystemUser>对象
+    :param asset: <Asset>对象
+    :return: <AuthBook>对象
     """
     fields = [
         'name', 'username', 'comment', 'org_id',

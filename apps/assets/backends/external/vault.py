@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from .base import BaseBackend
+from ..base import BaseBackend
 
 
 class VaultBackend(BaseBackend):
