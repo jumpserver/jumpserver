@@ -32,9 +32,9 @@ class BaseBackend:
     def filter(cls, username=None, asset=None, latest=True):
         """
         :param username: 用户名
-        :param asset: 资产对象
+        :param asset: <Asset>对象
         :param latest: 是否是最新记录
-        :return: 元素为AuthBook的可迭代对象(list or queryset)
+        :return: 元素为<AuthBook>的可迭代对象(<list> or <QuerySet>)
         """
         pass
 
@@ -43,8 +43,11 @@ class BaseBackend:
     def create(cls, **kwargs):
         """
         :param kwargs:
-        {name, username, asset, password, public_key, private_key, comment}
-        :return: AuthBook对象
+        {
+            name, username, asset, comment, password, public_key, private_key,
+            (org_id)
+        }
+        :return: <AuthBook>对象
         """
         pass
 
