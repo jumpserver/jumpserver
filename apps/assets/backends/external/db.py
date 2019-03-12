@@ -1,30 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-
 from assets.models import AuthBook
 
-from .. import meta
-from .base import BaseBackend
+from ..base import BaseBackend
 
 
 class AuthBookBackend(BaseBackend):
-
-    def get(self, username, asset):
-        queryset = self.filter(username, asset)
-        if len(queryset) == 1:
-            return queryset.first()
-
-        elif len(queryset) == 0:
-            msg = meta.EXCEPTION_MSG_NOT_EXIST.format(self.__class__.__name__)
-            raise ObjectDoesNotExist(msg)
-
-        else:
-            msg = meta.EXCEPTION_MSG_MULTIPLE.format(self.__class__.__name__, len(queryset))
-            raise MultipleObjectsReturned(msg)
-
-    def filter(self, username=None, asset=None, latest=True):
+    @classmethod
+    def filter(cls, username=None, asset=None, latest=True):
         queryset = AuthBook.objects.all()
         if username:
             queryset = queryset.filter(username=username)
@@ -34,7 +18,8 @@ class AuthBookBackend(BaseBackend):
             queryset = queryset.latest_version()
         return queryset
 
-    def create(self, **kwargs):
+    @classmethod
+    def create(cls, **kwargs):
         auth_info = {
             'password': kwargs.pop('password', ''),
             'public_key': kwargs.pop('public_key', ''),

@@ -32,7 +32,7 @@ class AssetUserSerializer(serializers.ModelSerializer):
         exclude = ('_password', '_public_key', '_private_key')
         read_only_fields = (
             'id', 'date_created', 'date_updated', 'created_by', 'is_latest',
-            'version_count'
+            'version'
         )
         extra_kwargs = {
             'username': {'required': True}
@@ -58,6 +58,6 @@ class AssetUserAuthInfoSerializer(serializers.ModelSerializer):
         model = AuthBook
         fields = [
             'id', 'name', 'username', 'asset', 'comment', 'org_id', 'is_latest',
-            'date_created', 'date_updated', 'created_by', 'version_count',
+            'date_created', 'date_updated', 'created_by', 'version',
             'password', 'private_key', 'public_key'
         ]

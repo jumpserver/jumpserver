@@ -1,47 +1,23 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from assets.models import SystemUser, Asset
 
-from .. import meta
+from ..base import BaseBackend
 from .utils import construct_authbook_object
 
 
-class SystemUserBackend:
-
+class SystemUserBackend(BaseBackend):
     @classmethod
-    def get(cls, username, asset):
-        instances = cls.filter(username, asset)
-        if len(instances) == 1:
-            return instances[0]
-        elif len(instances) == 0:
-            msg = meta.EXCEPTION_MSG_NOT_EXIST.format(cls.__name__)
-            raise ObjectDoesNotExist(msg)
-        else:
-            msg = meta.EXCEPTION_MSG_MULTIPLE.format(cls.__name__,
-                                                     len(instances))
-            raise MultipleObjectsReturned(msg)
+    def filter(cls, username=None, asset=None, **kwargs):
+        system_users = SystemUser.objects.all()
 
-    @classmethod
-    def filter(cls, username=None, asset=None):
-        if username and asset:
-            assets = [asset]
-            username_list = [username]
+        if username:
+            system_users = system_users.filter(username=username)
+        if asset:
+            system_users = system_users.filter(assets=asset)
 
-        elif username and not asset:
-            assets = cls._get_unique_assets(username)
-            username_list = [username]
-
-        elif not username and asset:
-            assets = [asset]
-            username_list = cls._get_unique_username_list([asset])
-
-        else:
-            assets = cls._get_unique_assets()
-            username_list = cls._get_unique_username_list(assets)
-
-        instances = cls.get_authbook_objects(assets, username_list)
+        instances = cls.construct_authbook_objects(system_users, asset)
         return instances
 
     @classmethod
@@ -57,13 +33,8 @@ class SystemUserBackend:
 
     @classmethod
     def _get_unique_username_list(cls, assets):
-        username_set = set()
-        for asset in assets:
-            queryset = asset.systemuser_set.all().values('username')
-            if not queryset:
-                continue
-            username_list = [q['username'] for q in queryset]
-            username_set.update(username_list)
+        username_set = SystemUser.objects.filter(assets__in=assets)\
+            .values_list('username').distinct()
         return username_set
 
     @classmethod
@@ -73,7 +44,7 @@ class SystemUserBackend:
         return system_user
 
     @classmethod
-    def _get_authbook_object(cls, asset, username):
+    def _construct_authbook_object(cls, asset, username):
         system_user = cls._get_asset_latest_system_user(asset, username)
         if not system_user:
             return None
@@ -81,14 +52,18 @@ class SystemUserBackend:
         return instance
 
     @classmethod
-    def get_authbook_objects(cls, assets, username_list):
+    def construct_authbook_objects(cls, assets, username_list):
         instances = []
         for asset in assets:
             for username in username_list:
-                instance = cls._get_authbook_object(asset, username)
+                instance = cls._construct_authbook_object(asset, username)
                 if not instance:
                     continue
                 instances.append(instance)
         return instances
+
+    @classmethod
+    def create(cls, **kwargs):
+        raise Exception("Not support create")
 
 

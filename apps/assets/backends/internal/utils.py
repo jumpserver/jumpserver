@@ -17,7 +17,7 @@ def construct_authbook_object(asset_user, asset):
         'date_created', 'date_updated', 'created_by'
     ]
 
-    obj = AuthBook(asset=asset, version_count=0, is_latest=True)
+    obj = AuthBook(asset=asset, version=0, is_latest=True)
     for field in fields:
         value = getattr(asset_user, field)
         setattr(obj, field, value)

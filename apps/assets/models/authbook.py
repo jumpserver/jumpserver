@@ -23,7 +23,7 @@ class AuthBookManager(OrgManager):
 class AuthBook(AssetUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest'))
-    version_count = models.IntegerField(default=1, verbose_name=_('Version count'))
+    version = models.IntegerField(default=1, verbose_name=_('Version'))
 
     objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
 
@@ -46,16 +46,16 @@ class AuthBook(AssetUser):
             pre_obj.is_latest = False
             pre_obj.save()
 
-    def _set_version_count(self):
+    def _set_version(self):
         pre_obj = self._get_pre_obj()
         if pre_obj:
-            self.version_count = pre_obj.version_count + 1
+            self.version = pre_obj.version + 1
         else:
-            self.version_count = 1
+            self.version = 1
         self.save()
 
     def set_latest(self):
-        self._set_version_count()
+        self._set_version()
         self._set_latest()
 
     @property
