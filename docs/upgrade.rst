@@ -266,6 +266,7 @@
     $ git pull
     $ git clean -df  # 清除未跟踪文件, 请一定要做好备份后再操作此步骤
     $ git reset --hard  # 还原所有修改, 请一定要做好备份后再操作此步骤
+    $ git pull
 
     # 更新 config.yml, 请根据你原备份的 config.yml 内容进行修改
     $ mv config.py config_1.4.4.bak
