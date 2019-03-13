@@ -31,15 +31,15 @@ def clean_hosts(assets):
     for asset in assets:
         if not asset.is_active:
             msg = _("Asset has been disabled, skipped: {}").format(asset)
-            logger.info(msg)
+            print(msg)
             continue
         if not asset.support_ansible():
             msg = _("Asset may not be support ansible, skipped: {}").format(asset)
-            logger.info(msg)
+            print(msg)
             continue
         clean_assets.append(asset)
     if not clean_assets:
-        logger.info(_("No assets matched, stop task"))
+        print(_("No assets matched, stop task"))
     return clean_assets
 
 
