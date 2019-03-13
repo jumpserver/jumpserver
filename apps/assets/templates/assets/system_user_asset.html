@@ -163,7 +163,7 @@ function initAssetsTable() {
                 {% endif %}
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {#var unbound_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-unbound" data-uid="{{ DEFAULT_PK }}">{% trans "Unbound" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
-                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Setup auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
+                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
                 $(td).html(push_btn + test_btn + setup_btn);
 			}}
 		],
@@ -347,10 +347,10 @@ $(document).ready(function () {
             url: "{% url 'api-assets:asset-user-list' %}",
             method: 'POST',
             success: function () {
-                toastr.success("{% trans 'Setup successfully!' %}");
+                toastr.success("{% trans 'Update successfully!' %}");
             },
             error: function () {
-                toastr.error("{% trans 'Setup failed!' %}");
+                toastr.error("{% trans 'Update failed!' %}");
             }
         });
         $("#asset_user_auth_modal").modal('hide');

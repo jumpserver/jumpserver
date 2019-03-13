@@ -46,7 +46,7 @@
                                         <tr>
                                             <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
                                             <th class="text-center">{% trans 'Username' %}</th>
-                                            <th class="text-center">{% trans 'Version count' %}</th>
+                                            <th class="text-center">{% trans 'Version' %}</th>
                                             <th class="text-center">{% trans 'Date updated' %}</th>
                                             <th class="text-center">{% trans 'Action' %}</th>
                                         </tr>
@@ -105,7 +105,7 @@ function initAssetUserTable() {
                 $(td).html(cellData.slice(0, -6));
              }},
             {targets: 4, createdCell: function (td, cellData) {
-                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Setup auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 {#var check_btn = ' <a class="btn btn-xs btn-info btn-check-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Check auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);#}
                 $(td).html(setup_btn);
             }}
@@ -157,10 +157,10 @@ $(document).ready(function () {
             url: "{% url 'api-assets:asset-user-list' %}",
             method: 'POST',
             success: function () {
-                toastr.success("{% trans 'Setup successfully!' %}");
+                toastr.success("{% trans 'Update successfully!' %}");
             },
             error: function () {
-                toastr.error("{% trans 'Setup failed!' %}");
+                toastr.error("{% trans 'Update failed!' %}");
             }
         });
         $("#asset_user_auth_modal").modal('hide');

@@ -10,7 +10,7 @@ from .db import AuthBookBackend
 def get_backend():
     default_backend = AuthBookBackend
 
-    # if settings.ASSET_USER_AUTH_VAULT:
+    # if settings.BACKEND_ASSET_USER_AUTH_VAULT:
     #     return VaultBackend
 
     return default_backend

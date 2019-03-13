@@ -121,7 +121,7 @@ class AssetUser(OrgModelMixin):
         pass
 
     def load_related_asset_auth(self, asset):
-        from ..asset_user_manager import AssetUserManager
+        from ..backends.multi import AssetUserManager
         try:
             other = AssetUserManager.get(username=self.username, asset=asset)
             self._merge_auth(other)
