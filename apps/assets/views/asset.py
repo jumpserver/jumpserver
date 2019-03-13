@@ -59,7 +59,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
 class AssetUserListView(AdminUserRequiredMixin, DetailView):
     model = Asset
     context_object_name = 'asset'
-    template_name = 'assets/asset_user_list.html'
+    template_name = 'assets/asset_asset_user_list.html'
 
     def get_context_data(self, **kwargs):
         context = {

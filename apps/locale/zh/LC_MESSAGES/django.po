@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 14:16+0800\n"
+"POT-Creation-Date: 2019-03-13 17:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -190,7 +190,7 @@ msgstr "名称"
 #: assets/templates/assets/_asset_user_auth_modal.html:15
 #: assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:27
-#: assets/templates/assets/asset_user_list.html:48
+#: assets/templates/assets/asset_asset_user_list.html:48
 #: assets/templates/assets/domain_gateway_list.html:60
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:30 audits/models.py:93
@@ -491,7 +491,8 @@ msgstr "未知"
 msgid "Latest version"
 msgstr "最新版本"
 
-#: assets/models/authbook.py:26 assets/templates/assets/asset_user_list.html:49
+#: assets/models/authbook.py:26
+#: assets/templates/assets/asset_asset_user_list.html:49
 #: ops/templates/ops/adhoc_history.html:58
 #: ops/templates/ops/adhoc_history_detail.html:57
 #: ops/templates/ops/task_adhoc.html:58 ops/templates/ops/task_history.html:64
@@ -625,8 +626,8 @@ msgstr "每行一个命令"
 #: assets/models/cmd_filter.py:54
 #: assets/templates/assets/admin_user_assets.html:52
 #: assets/templates/assets/admin_user_list.html:33
+#: assets/templates/assets/asset_asset_user_list.html:51
 #: assets/templates/assets/asset_list.html:96
-#: assets/templates/assets/asset_user_list.html:51
 #: assets/templates/assets/cmd_filter_list.html:28
 #: assets/templates/assets/cmd_filter_rule_list.html:63
 #: assets/templates/assets/domain_gateway_list.html:62
@@ -1020,8 +1021,8 @@ msgid "Submit"
 msgstr "提交"
 
 #: assets/templates/assets/_user_asset_detail_modal.html:11
-#: assets/templates/assets/asset_detail.html:20
-#: assets/templates/assets/asset_user_list.html:17 assets/views/asset.py:189
+#: assets/templates/assets/asset_asset_user_list.html:17
+#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:189
 msgid "Asset detail"
 msgstr "资产详情"
 
@@ -1065,15 +1066,15 @@ msgid "Quick update"
 msgstr "快速更新"
 
 #: assets/templates/assets/admin_user_assets.html:70
+#: assets/templates/assets/asset_asset_user_list.html:70
 #: assets/templates/assets/asset_detail.html:179
-#: assets/templates/assets/asset_user_list.html:70
 msgid "Test connective"
 msgstr "测试可连接性"
 
 #: assets/templates/assets/admin_user_assets.html:73
 #: assets/templates/assets/admin_user_assets.html:114
+#: assets/templates/assets/asset_asset_user_list.html:73
 #: assets/templates/assets/asset_detail.html:182
-#: assets/templates/assets/asset_user_list.html:73
 #: assets/templates/assets/system_user_asset.html:75
 #: assets/templates/assets/system_user_asset.html:164
 #: assets/templates/assets/system_user_detail.html:151
@@ -1081,14 +1082,14 @@ msgid "Test"
 msgstr "测试"
 
 #: assets/templates/assets/admin_user_assets.html:115
-#: assets/templates/assets/asset_user_list.html:108
+#: assets/templates/assets/asset_asset_user_list.html:108
 #: assets/templates/assets/system_user_asset.html:166
 msgid "Update auth"
 msgstr "更新认证"
 
 #: assets/templates/assets/admin_user_assets.html:191
+#: assets/templates/assets/asset_asset_user_list.html:160
 #: assets/templates/assets/asset_detail.html:311
-#: assets/templates/assets/asset_user_list.html:160
 #: assets/templates/assets/system_user_asset.html:350
 #: users/templates/users/user_detail.html:307
 #: users/templates/users/user_detail.html:334
@@ -1097,7 +1098,7 @@ msgid "Update successfully!"
 msgstr "更新成功"
 
 #: assets/templates/assets/admin_user_assets.html:194
-#: assets/templates/assets/asset_user_list.html:163
+#: assets/templates/assets/asset_asset_user_list.html:163
 #: assets/templates/assets/system_user_asset.html:353
 msgid "Update failed!"
 msgstr "更新失败"
@@ -1229,6 +1230,29 @@ msgstr "创建管理用户"
 msgid "Ratio"
 msgstr "比例"
 
+#: assets/templates/assets/asset_asset_user_list.html:20
+#: assets/templates/assets/asset_detail.html:23 assets/views/asset.py:67
+msgid "Asset user list"
+msgstr "资产用户列表"
+
+#: assets/templates/assets/asset_asset_user_list.html:28
+msgid "Asset users of"
+msgstr "资产用户"
+
+#: assets/templates/assets/asset_asset_user_list.html:50
+#: assets/templates/assets/cmd_filter_detail.html:73
+msgid "Date updated"
+msgstr "更新日期"
+
+#: assets/templates/assets/asset_asset_user_list.html:63
+#: assets/templates/assets/asset_detail.html:148
+#: terminal/templates/terminal/session_detail.html:81
+#: users/templates/users/user_detail.html:138
+#: users/templates/users/user_profile.html:146
+#: xpack/plugins/license/templates/license/license_detail.html:93
+msgid "Quick modify"
+msgstr "快速修改"
+
 #: assets/templates/assets/asset_bulk_update.html:8
 #: users/templates/users/user_bulk_update.html:8
 msgid "Select properties that need to be modified"
@@ -1238,11 +1262,6 @@ msgstr "选择需要修改属性"
 #: users/templates/users/user_bulk_update.html:10
 msgid "Select all"
 msgstr "全选"
-
-#: assets/templates/assets/asset_detail.html:23
-#: assets/templates/assets/asset_user_list.html:20 assets/views/asset.py:67
-msgid "Asset user list"
-msgstr "资产用户列表"
 
 #: assets/templates/assets/asset_detail.html:96
 msgid "CPU"
@@ -1257,15 +1276,6 @@ msgstr "硬盘"
 #: users/templates/users/user_profile.html:104
 msgid "Date joined"
 msgstr "创建日期"
-
-#: assets/templates/assets/asset_detail.html:148
-#: assets/templates/assets/asset_user_list.html:63
-#: terminal/templates/terminal/session_detail.html:81
-#: users/templates/users/user_detail.html:138
-#: users/templates/users/user_profile.html:146
-#: xpack/plugins/license/templates/license/license_detail.html:93
-msgid "Quick modify"
-msgstr "快速修改"
 
 #: assets/templates/assets/asset_detail.html:154
 #: assets/templates/assets/user_asset_list.html:46 perms/models.py:34
@@ -1444,15 +1454,6 @@ msgstr "删除失败"
 #: assets/templates/assets/asset_update.html:60
 msgid "Configuration"
 msgstr "配置"
-
-#: assets/templates/assets/asset_user_list.html:28
-msgid "Asset users of"
-msgstr "资产用户"
-
-#: assets/templates/assets/asset_user_list.html:50
-#: assets/templates/assets/cmd_filter_detail.html:73
-msgid "Date updated"
-msgstr "更新日期"
 
 #: assets/templates/assets/cmd_filter_detail.html:25
 #: assets/templates/assets/cmd_filter_list.html:25
