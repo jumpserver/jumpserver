@@ -17,6 +17,23 @@ class SystemUserBackend(BaseBackend):
         return instances
 
     @classmethod
+    def _distinct_system_users_by_username(cls, system_users):
+        system_users = sorted(
+            system_users,
+            key=lambda su: (su.username, su.priority, su.date_updated),
+            reverse=True,
+        )
+        results = itertools.groupby(system_users, key=lambda su: su.username)
+        system_users = [next(result[1]) for result in results]
+        return system_users
+
+    @classmethod
+    def _filter_system_users_by_username(cls, system_users, username):
+        _system_users = cls._distinct_system_users_by_username(system_users)
+        _system_users = [su for su in _system_users if su.username == username]
+        return _system_users
+
+    @classmethod
     def _construct_authbook_objects(cls, system_users, asset):
         instances = []
         for system_user in system_users:
@@ -25,27 +42,16 @@ class SystemUserBackend(BaseBackend):
         return instances
 
     @classmethod
-    def _distinct_system_users_by_username(cls, system_users):
-        system_users = system_users.order_by('username', '-priority', '-date_updated')
-        results = itertools.groupby(system_users, key=lambda su: su.username)
-        system_users = [next(result[1]) for result in results]
-        return system_users
-
-    @classmethod
-    def _get_assets_with_system_users(cls, username=None, asset=None):
+    def _get_assets_with_system_users(cls, asset=None):
         """
-        { 'assets': <QuerySet [<SystemUser>, <SystemUser>, ...]> }
+        { 'asset': set(<SystemUser>, <SystemUser>, ...) }
         """
         if not asset:
             _assets = Asset.objects.all().prefetch_related('systemuser_set')
         else:
             _assets = [asset]
 
-        if not username:
-            assets = {asset: asset.systemuser_set.all() for asset in _assets}
-        else:
-            assets = {asset: asset.systemuser_set.filter(username=username)
-                      for asset in _assets}
+        assets = {asset: set(asset.systemuser_set.all()) for asset in _assets}
         return assets
 
     @classmethod
@@ -54,10 +60,10 @@ class SystemUserBackend(BaseBackend):
         :return: [<AuthBook>, <AuthBook>, ...]
         """
         instances = []
-        assets = cls._get_assets_with_system_users(username, asset)
-        for asset, system_users in assets.items():
-            _system_users = cls._distinct_system_users_by_username(system_users)
-            _instances = cls._construct_authbook_objects(_system_users, asset)
+        assets = cls._get_assets_with_system_users(asset)
+        for _asset, _system_users in assets.items():
+            _system_users = cls._filter_system_users_by_username(_system_users, username)
+            _instances = cls._construct_authbook_objects(_system_users, _asset)
             instances.extend(_instances)
         return instances
 

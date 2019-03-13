@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.conf import settings
+# from django.conf import settings
 
 from .db import AuthBookBackend
-from .vault import VaultBackend
+# from .vault import VaultBackend
 
 
 def get_backend():
-    if settings.ASSET_AUTH_VAULT:
-        _backend = VaultBackend()
-    else:
-        _backend = AuthBookBackend()
-    return _backend
+    default_backend = AuthBookBackend
+
+    # if settings.ASSET_USER_AUTH_VAULT:
+    #     return VaultBackend
+
+    return default_backend

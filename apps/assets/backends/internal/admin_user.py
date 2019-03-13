@@ -15,24 +15,20 @@ class AdminUserBackend(BaseBackend):
         return instances
 
     @classmethod
-    def _get_assets(cls, username, asset):
+    def _get_assets(cls, asset):
         if not asset:
             assets = Asset.objects.all().prefetch_related('admin_user')
         else:
             assets = [asset]
-
-        if username:
-            assets = [
-                _asset for _asset in assets
-                if _asset.admin_user.username == username
-            ]
         return assets
 
     @classmethod
     def construct_authbook_objects(cls, username, asset):
         instances = []
-        assets = cls._get_assets(username, asset)
+        assets = cls._get_assets(asset)
         for asset in assets:
+            if asset.admin_user.username != username:
+                continue
             instance = construct_authbook_object(asset.admin_user, asset)
             instances.append(instance)
         return instances

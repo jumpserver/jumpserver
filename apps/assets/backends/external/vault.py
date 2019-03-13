@@ -6,11 +6,14 @@ from ..base import BaseBackend
 
 class VaultBackend(BaseBackend):
 
-    def get(self, username, asset):
+    @classmethod
+    def get(cls, username, asset):
         pass
 
-    def filter(self, username=None, asset=None, latest=True):
+    @classmethod
+    def filter(cls, username=None, asset=None, latest=True):
         pass
 
-    def create(self, **kwargs):
+    @classmethod
+    def create(cls, **kwargs):
         pass

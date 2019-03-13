@@ -7,6 +7,7 @@ from ..base import BaseBackend
 
 
 class AuthBookBackend(BaseBackend):
+
     @classmethod
     def filter(cls, username=None, asset=None, latest=True):
         queryset = AuthBook.objects.all()
