@@ -58,10 +58,11 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
             instance = AssetUserManager.get(username, asset)
-            return instance
         except Exception as e:
             logger.debug(e)
             return None
+        else:
+            return instance
 
 
 class AssetUserTestConnectiveApi(generics.RetrieveAPIView):

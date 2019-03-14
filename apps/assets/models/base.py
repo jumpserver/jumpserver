@@ -124,9 +124,10 @@ class AssetUser(OrgModelMixin):
         from ..backends.multi import AssetUserManager
         try:
             other = AssetUserManager.get(username=self.username, asset=asset)
-            self._merge_auth(other)
         except Exception as e:
             print(e)
+        else:
+            self._merge_auth(other)
 
     def _merge_auth(self, other):
         if not other:
