@@ -47,6 +47,13 @@ class AssetUserViewSet(viewsets.GenericViewSet):
         queryset = AssetUserManager.filter(username=username, asset=asset)
         return queryset
 
+    def filter_queryset(self, queryset):
+        queryset = sorted(
+            queryset,
+            key=lambda q: (q.asset.hostname, q.connectivity, q.username)
+        )
+        return queryset
+
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer

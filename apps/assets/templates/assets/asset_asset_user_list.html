@@ -130,11 +130,8 @@ function initAssetUserTable() {
         ],
         ajax_url: '{% url "api-assets:asset-user-list" %}' + '?asset_id={{ asset.id }}',
         columns: [
-            {data: function (){return ''}},
-            {data: "username", orderable: false},
-            {data: "version", orderable: false},
-            {data: "connectivity", orderable: false },
-            {data: "date_updated", orderable: false},
+            {data: function (){return ''}}, {data: "username" },
+            {data: "version"}, {data: "connectivity"}, {data: "date_updated"},
             {data: "username", orderable: false}
         ],
         op_html: $('#actions').html()
