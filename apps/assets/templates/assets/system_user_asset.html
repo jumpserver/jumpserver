@@ -163,8 +163,8 @@ function initAssetsTable() {
                 {% endif %}
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {#var unbound_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-unbound" data-uid="{{ DEFAULT_PK }}">{% trans "Unbound" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
-                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                $(td).html(push_btn + test_btn + setup_btn);
+                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
+                $(td).html(push_btn + test_btn + update_auth_btn);
 			}}
 		],
 		ajax_url: '{% url "api-assets:system-user-assets" pk=system_user.id %}',
@@ -326,7 +326,7 @@ $(document).ready(function () {
         error: error
     })
 })
-.on('click', '.btn-setup-asset-user-auth', function() {
+.on('click', '.btn-update-asset-user-auth', function() {
     assetId = $(this).data('aid');
     var hostname = $(this).data('hostname');
     var username = '{{ system_user.username }}';

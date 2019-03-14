@@ -112,8 +112,8 @@ function initTable() {
 			}},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                $(td).html(test_btn + setup_btn);
+                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
+                $(td).html(test_btn + update_auth_btn);
 			}}
         ],
 
@@ -167,7 +167,7 @@ $(document).ready(function () {
         flash_message: false
     });
 })
-.on('click', '.btn-setup-asset-user-auth', function() {
+.on('click', '.btn-update-asset-user-auth', function() {
     assetId = $(this).data('aid');
     var hostname = $(this).data('hostname');
     var username = '{{ admin_user.username }}';

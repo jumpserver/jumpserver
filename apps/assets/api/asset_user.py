@@ -12,10 +12,11 @@ from common.utils import get_object_or_none, get_logger
 from ..backends.multi import AssetUserManager
 from ..models import Asset
 from .. import serializers
+from ..tasks import test_asset_users_connectivity_manual
 
 
 __all__ = [
-    'AssetUserViewSet', 'AssetUserAuthInfoApi'
+    'AssetUserViewSet', 'AssetUserAuthInfoApi', 'AssetUserTestConnectiveApi',
 ]
 
 
@@ -61,3 +62,24 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         except Exception as e:
             logger.debug(e)
             return None
+
+
+class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
+    """
+    Test asset users connective
+    """
+
+    def get_asset_users(self):
+        username = self.request.GET.get('username')
+        asset_id = self.request.GET.get('asset_id')
+        asset = get_object_or_none(Asset, pk=asset_id)
+        asset_users = AssetUserManager.filter(username=username, asset=asset)
+        return asset_users
+
+    def retrieve(self, request, *args, **kwargs):
+        asset_users = self.get_asset_users()
+        task = test_asset_users_connectivity_manual.delay(asset_users)
+        return Response({"task": task.id})
+
+
+

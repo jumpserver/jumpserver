@@ -30,12 +30,19 @@ class AssetUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthBook
         read_only_fields = (
-            'date_created', 'date_updated', 'created_by', 'is_latest', 'version'
+            'date_created', 'date_updated', 'created_by',
+            'is_latest', 'version', 'connectivity',
         )
-        exclude = ('id', '_password', '_public_key', '_private_key')
+        fields = '__all__'
         extra_kwargs = {
             'username': {'required': True}
         }
+
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields = [f for f in fields if not f.startswith('_') and f != 'id']
+        fields.extend(['connectivity'])
+        return fields
 
     def create(self, validated_data):
         kwargs = {

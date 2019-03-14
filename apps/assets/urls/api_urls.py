@@ -34,6 +34,9 @@ urlpatterns = [
 
     path('asset-user/auth-info/',
          api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),
+    path('asset-user/test-connective/',
+         api.AssetUserTestConnectiveApi.as_view(), name='asset-user-connective'),
+
 
     path('admin-user/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),

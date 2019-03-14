@@ -47,6 +47,7 @@
                                             <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
                                             <th class="text-center">{% trans 'Username' %}</th>
                                             <th class="text-center">{% trans 'Version' %}</th>
+                                            <th class="text-center">{% trans 'Reachable' %}</th>
                                             <th class="text-center">{% trans 'Date updated' %}</th>
                                             <th class="text-center">{% trans 'Action' %}</th>
                                         </tr>
@@ -70,7 +71,7 @@
                                                 <td>{% trans 'Test connective' %}:</td>
                                                 <td>
                                                     <span class="pull-right">
-                                                        <button type="button" class="btn btn-primary btn-xs" id="btn-test-is-alive" style="width: 54px">{% trans 'Test' %}</button>
+                                                        <button type="button" class="btn btn-primary btn-xs" id="btn-bulk-test-connective" style="width: 54px">{% trans 'Test' %}</button>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -96,18 +97,35 @@ function initAssetUserAuthModalForm(hostname){
     $('#id_password').val('');
 }
 function initAssetUserTable() {
+    var reachable = {{ asset.admin_user.REACHABLE }};
+    var unreachable = {{ asset.admin_user.UNREACHABLE }};
     var options = {
         ele: $('#asset_user_list'),
         buttons: [],
         order: [],
         columnDefs: [
             {targets: 3, createdCell: function (td, cellData) {
-                $(td).html(cellData.slice(0, -6));
-             }},
+                if (cellData === unreachable) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else if (cellData === reachable) {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                } else {
+                    $(td).html('')
+                }
+            }},
             {targets: 4, createdCell: function (td, cellData) {
-                var setup_btn = ' <a class="btn btn-xs btn-primary btn-setup-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                $(td).html(cellData.slice(0, -6));
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                {% if asset.protocol == 'ssh' %}
+                    var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                    $(td).html(test_btn + update_auth_btn);
+                {% else %}
+                    $(td).html(update_auth_btn);
+                {% endif %}
                 {#var check_btn = ' <a class="btn btn-xs btn-info btn-check-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Check auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);#}
-                $(td).html(setup_btn);
+
             }}
         ],
         ajax_url: '{% url "api-assets:asset-user-list" %}' + '?asset_id={{ asset.id }}',
@@ -115,6 +133,7 @@ function initAssetUserTable() {
             {data: function (){return ''}},
             {data: "username", orderable: false},
             {data: "version", orderable: false},
+            {data: "connectivity", orderable: false },
             {data: "date_updated", orderable: false},
             {data: "username", orderable: false}
         ],
@@ -137,7 +156,7 @@ $(document).ready(function () {
 {#        }#}
 {#    });#}
 {# })#}
-.on('click', '.btn-setup-asset-user-auth', function() {
+.on('click', '.btn-update-asset-user-auth', function() {
     username = $(this).data('username');
     var hostname = "{{ asset.hostname }}";
     initAssetUserAuthModalForm(hostname, username);
@@ -168,6 +187,35 @@ $(document).ready(function () {
     else{
         $('#id_password').parent().addClass('has-error');
     }
+})
+.on('click', '.btn-test-connective', function () {
+    var username = $(this).data('username');
+    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}" + "&username=" + username;
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+.on('click', '#btn-bulk-test-connective', function () {
+    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}";
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
 })
 </script>
 {% endblock %}

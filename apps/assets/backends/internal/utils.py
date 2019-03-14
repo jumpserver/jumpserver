@@ -13,7 +13,7 @@ def construct_authbook_object(asset_user, asset):
     :return: <AuthBook>对象
     """
     fields = [
-        'name', 'username', 'comment', 'org_id',
+        'id', 'name', 'username', 'comment', 'org_id',
         '_password', '_private_key', '_public_key',
         'date_created', 'date_updated', 'created_by'
     ]

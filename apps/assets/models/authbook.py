@@ -3,9 +3,12 @@
 
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.core.cache import cache
+
+from orgs.mixins import OrgManager
 
 from .base import AssetUser
-from orgs.mixins import OrgManager
+from ..const import ASSET_USER_CONN_CACHE_KEY
 
 __all__ = ['AuthBook']
 
@@ -57,6 +60,32 @@ class AuthBook(AssetUser):
     def set_latest(self):
         self._set_version()
         self._set_latest()
+
+    @property
+    def _conn_cache_key(self):
+        return ASSET_USER_CONN_CACHE_KEY.format(self.id)
+
+    def test_connectivity(self):
+        return self.name
+
+    @property
+    def connectivity(self):
+        value = cache.get(self._conn_cache_key, self.UNKNOWN)
+        return value
+
+    @connectivity.setter
+    def connectivity(self, value):
+        _connectivity = self.UNKNOWN
+
+        for host in value.get('dark', {}).keys():
+            if host == self.asset.hostname:
+                _connectivity = self.UNREACHABLE
+
+        for host in value.get('contacted', {}).keys():
+            if host == self.asset.hostname:
+                _connectivity = self.REACHABLE
+
+        cache.set(self._conn_cache_key, _connectivity, 3600)
 
     @property
     def keyword(self):

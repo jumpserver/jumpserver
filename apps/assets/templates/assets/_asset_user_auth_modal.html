@@ -3,7 +3,7 @@
 {% block modal_id %}asset_user_auth_modal{% endblock %}
 {% block modal_title%}{% trans "Update asset user auth" %}{% endblock %}
 {% block modal_body %}
-<form class="form-horizontal" role="form">
+<form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13){ $('#btn_asset_user_auth_modal_confirm').trigger('click'); return false;}">
     {% csrf_token %}
     <div class="form-group">
         <label class="col-sm-2 control-label">{% trans "Hostname" %}</label>
