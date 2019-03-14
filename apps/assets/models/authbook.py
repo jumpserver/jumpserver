@@ -63,7 +63,7 @@ class AuthBook(AssetUser):
 
     @property
     def _conn_cache_key(self):
-        return ASSET_USER_CONN_CACHE_KEY.format(self.id)
+        return ASSET_USER_CONN_CACHE_KEY.format(self.id, self.asset.id)
 
     def test_connectivity(self):
         return self.name
