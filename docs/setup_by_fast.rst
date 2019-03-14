@@ -14,7 +14,8 @@
 
 .. code-block:: shell
 
-    $ systemctl enable firewalld \
+    $ echo -e "\033[31m 1. 防火墙 Selinux 设置 \033[0m" \
+      && systemctl enable firewalld \
       && systemctl start firewalld \
       && firewall-cmd --zone=public --add-port=80/tcp --permanent \
       && firewall-cmd --zone=public --add-port=2222/tcp --permanent \
@@ -25,7 +26,8 @@
 
 .. code-block:: shell
 
-    $ yum update -y \
+    $ echo -e "\033[31m 2. 部署环境 \033[0m" \
+      && yum update -y \
       && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
       && yum -y install kde-l10n-Chinese \
       && yum -y reinstall glibc-common \
@@ -47,25 +49,24 @@
 
 .. code-block:: shell
 
-    $ cd /opt \
-      && git clone https://github.com/jumpserver/jumpserver.git \
-      && wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz \
+    $ echo -e "\033[31m 3. 下载组件 \033[0m" \
+      && cd /opt \
+      && if [ ! -d "/opt/jumpserver" ]; then git clone https://github.com/jumpserver/jumpserver.git; fi \
+      && if [ ! -f "/opt/luna.tar.gz" ]; then wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz; tar xf luna.tar.gz; chown -R root:root luna; fi \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \
-      && pip install --upgrade pip setuptools \
-      && pip install -r /opt/jumpserver/requirements/requirements.txt \
+      && pip install --upgrade pip setuptools -i https://mirrors.aliyun.com/pypi/simple/ \
+      && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
       && curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io \
       && systemctl restart docker \
       && docker pull jumpserver/jms_coco:1.4.8 \
       && docker pull jumpserver/jms_guacamole:1.4.8 \
-      && cd /opt \
-      && tar xf luna.tar.gz \
-      && chown -R root:root luna \
       && rm -rf /etc/nginx/conf.d/default.conf
 
 .. code-block:: shell
 
-    $ cat << EOF > /etc/nginx/conf.d/jumpserver.conf
+    $ echo -e "\033[31m 4. 配置nginx \033[0m" \
+      && cat << EOF > /etc/nginx/conf.d/jumpserver.conf
     server {
         listen 80;
 
@@ -128,25 +129,19 @@
 
 .. code-block:: shell
 
-    $ systemctl start nginx \
-      && DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24` \
-      && SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50` \
-      && echo "SECRET_KEY=$SECRET_KEY" >> ~/.bashrc \
-      && BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16` \
-      && echo "BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc \
-      && cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml \
-      && Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1` \
-      && mysql -uroot -e "create database jumpserver default charset 'utf8';grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD';flush privileges;" \
-      && sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml \
-      && sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml \
-      && sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml \
-      && sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml \
-      && sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: false/SESSION_EXPIRE_AT_BROWSER_CLOSE: true/g" /opt/jumpserver/config.yml \
-      && sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml
+    $ echo -e "\033[31m 5. 处理配置文件 \033[0m" \
+      && if [ "$DB_PASSWORD" = "" ]; then DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24`; fi \
+      && if [ "$SECRET_KEY" = "" ]; then SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`; echo "SECRET_KEY=$SECRET_KEY" >> ~/.bashrc; fi \
+      && if [ "$BOOTSTRAP_TOKEN" = "" ]; then BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`; echo "BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc; fi \
+      && if [ "$Server_IP" = "" ]; then Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1`; fi \
+      && if [ ! -d "/var/lib/mysql/jumpserver" ]; then mysql -uroot -e "create database jumpserver default charset 'utf8';grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD';flush privileges;"; fi \
+      && if [ ! -f "/opt/jumpserver/config.yml" ]; then cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml; sed -i "s/SECRET_KEY:/SECRET_KEY: $SECRET_KEY/g" /opt/jumpserver/config.yml; sed -i "s/BOOTSTRAP_TOKEN:/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/jumpserver/config.yml; sed -i "s/# DEBUG: true/DEBUG: false/g" /opt/jumpserver/config.yml; sed -i "s/# LOG_LEVEL: DEBUG/LOG_LEVEL: ERROR/g" /opt/jumpserver/config.yml; sed -i "s/# SESSION_EXPIRE_AT_BROWSER_CLOSE: false/SESSION_EXPIRE_AT_BROWSER_CLOSE: true/g" /opt/jumpserver/config.yml; sed -i "s/DB_PASSWORD: /DB_PASSWORD: $DB_PASSWORD/g" /opt/jumpserver/config.yml; fi
 
 .. code-block:: shell
 
-    $ cd /opt/jumpserver \
+    $ echo -e "\033[31m 6. 启动 Jumpserver \033[0m" \
+      && systemctl start nginx \
+      && cd /opt/jumpserver \
       && ./jms start all -d \
       && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.8 \
       && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.8 \
