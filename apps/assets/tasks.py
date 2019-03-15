@@ -380,7 +380,7 @@ def push_system_user_util(system_user, assets, task_name):
     if not hosts:
         return {}
     for host in hosts:
-        system_user.load_related_asset_auth(host)
+        system_user.load_specific_asset_auth(host)
         tasks = get_push_system_user_tasks(system_user)
         task, created = update_or_create_ansible_task(
             task_name=task_name, hosts=[host], tasks=tasks, pattern='all',

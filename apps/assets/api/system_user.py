@@ -80,7 +80,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         instance = super().get_object()
         aid = self.kwargs.get('aid')
         asset = get_object_or_404(Asset, pk=aid)
-        instance.load_related_asset_auth(asset)
+        instance.load_specific_asset_auth(asset)
         return instance
 
 

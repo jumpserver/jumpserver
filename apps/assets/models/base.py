@@ -120,7 +120,7 @@ class AssetUser(OrgModelMixin):
     def get_auth(self, asset=None):
         pass
 
-    def load_related_asset_auth(self, asset):
+    def load_specific_asset_auth(self, asset):
         from ..backends.multi import AssetUserManager
         try:
             other = AssetUserManager.get(username=self.username, asset=asset)
