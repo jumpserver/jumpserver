@@ -26,6 +26,9 @@ SSH 协议资产连接错误排查思路
     # docker 部署请直接删除容器后重建, 记得一定要先在 终端管理 删除不在线的组件
     $ docker stop jms_coco
     $ docker rm jms_coco
+
+    # http://<Jumpserver_url> 指向 jumpserver 的服务url, 如 http://192.168.244.144:8080
+    # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
     $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_coco:1.4.8
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面查看 coco 的状态是否为绿色
@@ -52,36 +55,32 @@ SSH 协议资产连接错误排查思路
     # 检查 coco 的 ws 端口(默认 5000)
     # 检查 nginx 配置的 socket.io 设置是否有误
 
+    $ cd /opt/coco
+    $ source /opt/py3/bin/activate
+    $ ./cocod stop
+    $ ps -ef | grep cocod | awk '{print $2}' | xargs kill -9
+    $ ./cocod start
+
+    # docker容器部署的coco组件请检查防火墙是否无误, 然后进入容器处理
+    $ docker exec it jms_coco /bin/bash
+    $ cd /opt/coco
+    $ source /opt/py3/bin/activate
+    $ ./cocod stop
+    $ ps -ef | grep cocod | awk '{print $2}' | xargs kill -9
+    $ ./cocod start
+
 .. image:: _static/img/faq_linux_03.jpg
 
 4. 登录资产提示 Authentication failed
 
 .. code-block:: vim
 
-    # 请检查推送
+    # 请检查推送 或 系统用户 是否正确, 可以把系统用户设置成手动登录测试
     # 在 资产管理-系统用户 下, 点击相应的 系统用户名称 可以看到 系统用户详情, 右边可以测试
 
 .. image:: _static/img/faq_linux_04.jpg
 
-5. 推送成功后无法登录资产, 或者推送的系统用户 id 不正确 home 目录权限错误
-
-.. code-block:: vim
-
-    # 登录该资产, 删除掉错误权限的用户, 然后重新推送即可
-
-6. coco 启动时报错 Failed register terminal unknow: xxx-xxx.xxx
-
-.. code-block:: shell
-
-    # 这是因为当前系统的 hostname 有 coco 不支持的字符, 需要手动指定 coco 的 NAME
-    $ cd /opt/coco/
-    $ vi config.yml
-
-    # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-    # NAME: {{ Hostname }}
-    NAME: localhost
-
-7. 测试可连接性 及 更新硬件信息
+5. 测试可连接性 及 更新硬件信息
 
 .. code-block:: vim
 
@@ -90,7 +89,7 @@ SSH 协议资产连接错误排查思路
 .. image:: _static/img/faq_linux_05.jpg
 .. image:: _static/img/faq_linux_06.jpg
 
-8. 管理用户 测试可连接性
+6. 管理用户 测试可连接性
 
 .. code-block:: vim
 
@@ -99,7 +98,7 @@ SSH 协议资产连接错误排查思路
 .. image:: _static/img/faq_linux_07.jpg
 .. image:: _static/img/faq_linux_08.jpg
 
-9. 系统用户 推送 测试资产可连接性
+7. 系统用户 推送 测试资产可连接性
 
 .. code-block:: vim
 
@@ -108,13 +107,13 @@ SSH 协议资产连接错误排查思路
 .. image:: _static/img/faq_linux_09.jpg
 .. image:: _static/img/faq_linux_10.jpg
 
-10. ssh 使用key 登录资产提示 所选的用户密钥未在远程主机上注册
+8. ssh 使用key 登录资产提示 所选的用户密钥未在远程主机上注册
 
 .. code-block:: vim
 
     # 这里是信息填写错误, ip端口应该填coco服务器的ip, 端口应该填coco服务的ssh端口(默认2222)
 
-11. 清理celery产生的数据(无法正常推送及连接资产, 一直显示........等可以使用, 请确定字符集是zh_CN.UTF-8)
+9. 清理celery产生的数据(无法正常推送及连接资产, 一直显示........等可以使用, 请确定字符集是zh_CN.UTF-8)
 
 .. code-block:: shell
 
@@ -124,7 +123,7 @@ SSH 协议资产连接错误排查思路
 
     # 如果任然异常, 手动结束所有jumpserver进程, 然后kill掉未能正常结束的jumpserver相关进程, 在重新启动jumpserver即可
 
-12. 连接测试常见错误
+10. 连接测试常见错误
 
 .. code-block:: vim
 

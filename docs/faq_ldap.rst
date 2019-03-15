@@ -11,7 +11,7 @@ LDAP 使用说明
     LDAP地址  ldap://serverurl:389  或者  ldaps://serverurl:636(需要勾选ssl)
     # 此处是设置LDAP的服务器,推荐使用IP, 防止解析问题
 
-    绑定DN  cn=admin,dc=jumpserver,dc=org
+    绑定DN  cn=administrator,cn=Users,dc=jumpserver,dc=org
     # 这里是设置认证用户的信息, jumpserver会使用这个用户去校验ldap的信息是否正确
 
     密码   # 上面认证用户的密码

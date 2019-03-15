@@ -22,9 +22,9 @@
 
 .. code-block:: vim
 
-    # 点击页面上边的"邮件设置" TAB, 进入邮件设置页面
-    # 默认使用 25 端口, 不勾选 SSL 和 TLS;如果需要勾选 SSL, 端口需要修改成 465;如果需要勾选 TLS, 端口需要改成 587
-    # 不可以同时勾选 SSL 和 TLS,
+    # 点击页面上边的"邮件设置", 进入邮件设置页面
+    # 默认使用 25 端口, 不勾选 SSL 和 TLS; 如果需要勾选 SSL, 端口需要修改成 465; 如果需要勾选 TLS, 端口需要改成 587
+    # 不可以同时勾选 SSL 和 TLS
     # 配置邮件服务后, 点击页面的"测试连接"按钮, 如果配置正确, Jumpserver 会发送一条测试邮件到您的 SMTP 账号邮箱里面, 确定收到测试邮件后点击保存即可使用
 
 .. image:: _static/img/smtp_setting.jpg
@@ -36,7 +36,7 @@
 
     # 如果不需要使用"ldap"用户登陆 jumpserver, 可以直接跳过, 不需要设置
     # 先"测试"通过才能保存
-    # DN 和 OU 一定要完整(如 "DN:cn=Manage, ou=Jumpserver, dc=jumpserver, ou=org")
+    # DN 和 OU 一定要完整(如 "DN:cn=Manage,ou=Jumpserver,dc=jumpserver,ou=org")
     # 注：可借用第三方 gui 工具查看 ldap 用户的属性, 新版本已经支持中文名登录, 即cn=中文也可正常使用
 
 .. image:: _static/img/ldap_setting.jpg
@@ -245,7 +245,8 @@
 
 .. code-block:: vim
 
-    注：保存信息后点击"测试连接", 确定设置无误后到资产列表添加需要使用网关登录的资产即可。
+    注: 保存信息后点击"测试连接", 确定设置无误后到资产列表添加需要使用"网关"登录的资产即可。
+    注: "Windows资产"可以使用"ssh网关"
 
 .. image:: _static/img/create_asset02.jpg
 

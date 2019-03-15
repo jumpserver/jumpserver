@@ -29,40 +29,15 @@ FAQ
     # 资产管理里面的系统用户 是jumpserver用户连接资产需要的登录账户, Linux资产可以自动推送该系统用户到资产上,
     Windows需要指定资产上已经创建的系统用户
 
-2. input/output error, 通常jumpserver所在服务器字符集问题
-
-.. code-block:: shell
-
-    # Centos7
-    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-    $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
-
-    # Ubuntu
-    $ apt-get install language-pack-zh-hans
-    $ echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
-
-    如果任然报input/output error, 尝试执行 yum update 后重启服务器(仅测试中参考使用, 实际运营服务器请谨慎操作)
-
-3. luna 无法访问
+2. luna 无法访问
 
 .. code-block:: vim
 
-    # Luna 打开网页提示403 Forbidden错误, 一般是nginx配置文件的luna路径不正确或者下载了源代码, 请重新下载编译好的代码
-    # Luna 打开网页提示502 Bad Gateway错误, 一般是selinux和防火墙的问题, 请根据nginx的errorlog来检查
+    # 访问 Web终端 提示 Luna是单独部署的一个程序, 请不要通过 8080 端口访问 jumpserver, 通过 nginx 代理端口进行访问
+    # 访问 Web终端 提示 403 Forbidden错误, 一般是nginx配置文件的luna路径不正确或者下载了源代码, 请重新下载编译好的代码
+    # 访问 Web终端 提示 502 Bad Gateway错误, 一般是selinux和防火墙的问题, 请根据nginx的errorlog来检查
 
-4. 录像问题
-
-.. code-block:: vim
-
-    # 默认录像存储位置在jumpserver/data/media  可以通过映射或者软连接方式来使用其他目录
-
-    # 录像和命令记录存储到其他位置, 可以到 Jumpserver 系统设置-终端设置 里面进行设置
-
-    # 修改后, 需要修改在Jumpserver 会话管理-终端管理 修改terminal的配置 录像存储 命令记录
-    # 注意, 命令记录需要所有保存地址都正常可用, 否则 历史会话 和 命令记录 页面无法正常访问
-
-5. 在终端修改管理员密码及新建超级用户
+3. 在终端修改管理员密码及新建超级用户
 
 .. code-block:: shell
 
@@ -83,7 +58,7 @@ FAQ
     > u.reset_password('password')  # password 为你要修改的密码
     > u.save()
 
-6. 修改登录超时时间(默认 10 秒)
+4. 修改 SSH 资产登录超时时间(TIMEOUT 默认 10 秒)
 
 .. code-block:: shell
 
@@ -92,13 +67,11 @@ FAQ
     # 把 SSH_TIMEOUT: 15 修改成你想要的数字 单位为：秒
     SSH_TIMEOUT: 60
 
-7. 设置浏览器过期
+5. 设置浏览器会话过期
 
 .. code-block:: shell
 
     $ vi /opt/jumpserver/config.yml
-
-.. code-block:: yaml
 
     # 找到如下行(可参考 django 设置 session 过期时间), 修改你要的设置即可
     # SESSION_COOKIE_AGE: 86400
@@ -110,14 +83,14 @@ FAQ
 
     # 86400 单位是秒(s)
 
-8. 资产授权说明
+6. 资产授权说明
 
 .. code-block:: vim
 
     资产授权就是把 系统用户关联到用户 并授权到 对应的资产
     用户只能看到自己被授权的资产
 
-9. Web Terminal 页面经常需要重新刷新页面才能连接资产
+7. Web Terminal 页面经常需要重新刷新页面才能连接资产
 
 .. code-block:: nginx
 
@@ -194,7 +167,7 @@ FAQ
         }
     }
 
-10. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
+8. 连接资产时提示 System user <xxx> and asset <xxx> protocol are inconsistent.
 
 .. code-block:: shell
 
@@ -214,7 +187,7 @@ FAQ
     >>> exit()
 
 
-11. 重启服务器后无法访问 Jumpserver, 页面提示502 或者 403等
+9. 重启服务器后无法访问 Jumpserver, 页面提示502 或者 403等
 
 .. code-block:: shell
 
@@ -235,17 +208,8 @@ FAQ
 
     $ setsebool -P httpd_can_network_connect 1  # 设置 selinux 允许 http 访问
 
-12. 生成随机 SECRET_KEY
 
-.. code-block:: shell
-
-    $ source /opt/py3/bin/activate
-    $ cd /opt/jumpserver/apps
-    $ python manage.py shell
-    >>> from django.core.management.utils import get_random_secret_key
-    >>> get_random_secret_key()
-
-13. 传递明文数据到 Jumpserver 数据库(数据导入)
+10. 传递明文数据到 Jumpserver 数据库(数据导入)
 
 .. code-block:: shell
 
