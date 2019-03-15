@@ -178,7 +178,6 @@ Systemd 管理启动 Jumpserver
 
     # Guacamole
     $ chkconfig guacd on
-    $ sed -i '143i CATALINA_PID="/config/tomcat8/tomcat.pid"' /config/tomcat8/bin/catalina.sh
     $ vi /usr/lib/systemd/system/guacamole.service
     [Unit]
     Description=guacamole
@@ -187,12 +186,12 @@ Systemd 管理启动 Jumpserver
 
     [Service]
     Type=forking
-    PIDFile=/config/tomcat8/tomcat.pid
+    # PIDFile=/config/tomcat8/tomcat.pid
     # BOOTSTRAP_TOKEN 根据实际情况修改
     Environment="JUMPSERVER_SERVER=http://127.0.0.1:8080" "JUMPSERVER_KEY_DIR=/config/guacamole/keys" "GUACAMOLE_HOME=/config/guacamole" "BOOTSTRAP_TOKEN=******"
     ExecStart=/config/tomcat8/bin/startup.sh
-    ExecReload=/bin/kill -s HUP $MAINPID
-    ExecStop=/bin/kill -s QUIT $MAINPID
+    ExecReload=
+    ExecStop=/config/tomcat8/bin/shutdown.sh
 
     [Install]
     WantedBy=multi-user.target
