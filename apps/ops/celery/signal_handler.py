@@ -27,7 +27,7 @@ def on_app_ready(sender=None, headers=None, **kwargs):
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
     for task in tasks:
-        subtask(task).delay()
+        subtask(task)()
 
 
 @worker_shutdown.connect
