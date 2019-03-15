@@ -59,6 +59,14 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        status_code = status.HTTP_200_OK
+        if not instance:
+            status_code = status.HTTP_400_BAD_REQUEST
+        return Response(serializer.data, status=status_code)
+
     def get_object(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
