@@ -74,7 +74,7 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         try:
             instance = AssetUserManager.get(username, asset)
         except Exception as e:
-            logger.debug(e)
+            logger.error(e, exc_info=True)
             return None
         else:
             return instance
