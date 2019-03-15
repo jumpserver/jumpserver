@@ -57,16 +57,13 @@ class AuthBook(AssetUser):
             self.version = 1
         self.save()
 
-    def set_latest(self):
+    def set_version_and_latest(self):
         self._set_version()
         self._set_latest()
 
     @property
     def _conn_cache_key(self):
         return ASSET_USER_CONN_CACHE_KEY.format(self.id, self.asset.id)
-
-    def test_connectivity(self):
-        return self.name
 
     @property
     def connectivity(self):

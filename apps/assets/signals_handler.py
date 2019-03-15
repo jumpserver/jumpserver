@@ -118,4 +118,4 @@ def on_node_update_or_created(sender, instance=None, created=False, **kwargs):
 def on_auth_book_created(sender, instance=None, created=False, **kwargs):
     if created:
         logger.debug('Receive create auth book object signal.')
-        instance.set_latest()
+        instance.set_version_and_latest()

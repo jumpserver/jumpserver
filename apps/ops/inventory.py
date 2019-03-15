@@ -4,9 +4,14 @@
 from .ansible.inventory import BaseInventory
 from assets.utils import get_assets_by_id_list, get_system_user_by_id
 
+from common.utils import get_logger
+
 __all__ = [
     'JMSInventory'
 ]
+
+
+logger = get_logger(__file__)
 
 
 class JMSInventory(BaseInventory):
@@ -79,7 +84,7 @@ class JMSInventory(BaseInventory):
             asset = self.assets.get(id=host.get('id'))
             run_user = AssetUserManager.get(self.run_as, asset)
         except Exception as e:
-            print(e)
+            logger.error(e, exc_info=True)
             return {}
         else:
             return run_user._to_secret_json()

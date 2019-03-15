@@ -9,12 +9,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils import get_signer, ssh_key_string_to_obj, ssh_key_gen
+from common.utils import (
+    get_signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
+)
 from common.validators import alphanumeric
 from orgs.mixins import OrgModelMixin
 from .utils import private_key_validator
 
 signer = get_signer()
+
+logger = get_logger(__file__)
 
 
 class AssetUser(OrgModelMixin):
@@ -125,7 +129,7 @@ class AssetUser(OrgModelMixin):
         try:
             other = AssetUserManager.get(username=self.username, asset=asset)
         except Exception as e:
-            print(e)
+            logger.error(e, exc_info=True)
         else:
             self._merge_auth(other)
 
