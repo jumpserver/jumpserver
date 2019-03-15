@@ -3,7 +3,7 @@
 import logging
 
 from django.core.cache import cache
-from celery import subtask
+from celery import signature
 from celery.signals import (
     worker_ready, worker_shutdown, after_setup_logger
 )
@@ -27,7 +27,7 @@ def on_app_ready(sender=None, headers=None, **kwargs):
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
     for task in tasks:
-        subtask(task)()
+        signature(task)()
 
 
 @worker_shutdown.connect
