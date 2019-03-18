@@ -572,3 +572,6 @@ LOGIN_LOG_KEEP_DAYS = CONFIG.LOGIN_LOG_KEEP_DAYS
 
 # User or user group permission cache time, default 3600 seconds
 ASSETS_PERM_CACHE_TIME = CONFIG.ASSETS_PERM_CACHE_TIME
+
+# Asset user auth external backend, default AuthBook backend
+BACKEND_ASSET_USER_AUTH_VAULT = False

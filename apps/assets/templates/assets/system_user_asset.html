@@ -132,6 +132,7 @@
             </div>
         </div>
     </div>
+    {% include 'assets/_asset_user_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -155,14 +156,15 @@ function initAssetsTable() {
                     $(td).html('')
                 }
 			}},
-            {targets: 4, createdCell: function (td, cellData) {
+            {targets: 4, createdCell: function (td, cellData, rowData) {
                 var push_btn = '';
                 {% if system_user.auto_push %}
 				push_btn = '<a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {% endif %}
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {#var unbound_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-unbound" data-uid="{{ DEFAULT_PK }}">{% trans "Unbound" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
-                $(td).html(push_btn + test_btn);
+                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
+                $(td).html(push_btn + test_btn + update_auth_btn);
 			}}
 		],
 		ajax_url: '{% url "api-assets:system-user-assets" pk=system_user.id %}',
@@ -201,6 +203,15 @@ function updateSystemUserNode(nodes) {
     });
 }
 jumpserver.nodes_selected = {};
+
+function initAssetUserAuthModalForm(hostname, username){
+    $('#id_hostname_p').html(hostname);
+    $('#id_username_p').html(username);
+    $('#id_password').parent().removeClass('has-error');
+    $('#id_password').val('');
+}
+
+var assetId;
 
 $(document).ready(function () {
 	$('.select2').select2()
@@ -315,6 +326,38 @@ $(document).ready(function () {
         error: error
     })
 })
-
+.on('click', '.btn-update-asset-user-auth', function() {
+    assetId = $(this).data('aid');
+    var hostname = $(this).data('hostname');
+    var username = '{{ system_user.username }}';
+    initAssetUserAuthModalForm(hostname, username);
+    $("#asset_user_auth_modal").modal();
+})
+.on('click', '#btn_asset_user_auth_modal_confirm', function(){
+    var password = $('#id_password').val();
+    if (password){
+        var data = {
+            'name': "{{ system_user.username }}",
+            'asset': assetId,
+            'username': "{{ system_user.username }}",
+            'password': password
+        };
+        formSubmit({
+            data: data,
+            url: "{% url 'api-assets:asset-user-list' %}",
+            method: 'POST',
+            success: function () {
+                toastr.success("{% trans 'Update successfully!' %}");
+            },
+            error: function () {
+                toastr.error("{% trans 'Update failed!' %}");
+            }
+        });
+        $("#asset_user_auth_modal").modal('hide');
+    }
+    else{
+        $('#id_password').parent().addClass('has-error');
+    }
+})
 </script>
 {% endblock %}

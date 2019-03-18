@@ -1,0 +1,28 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}asset_user_auth_modal{% endblock %}
+{% block modal_title%}{% trans "Update asset user auth" %}{% endblock %}
+{% block modal_body %}
+<form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13){ $('#btn_asset_user_auth_modal_confirm').trigger('click'); return false;}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Hostname" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_hostname_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Username" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_username_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Password" %}</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_password" type="password" name="password" placeholder="{% trans 'Please input password' %}"/>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block modal_confirm_id %}btn_asset_user_auth_modal_confirm{% endblock %}
