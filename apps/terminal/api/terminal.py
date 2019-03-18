@@ -14,8 +14,8 @@ from rest_framework.permissions import AllowAny
 
 from common.utils import get_object_or_none
 from common.permissions import IsAppUser, IsOrgAdminOrAppUser, IsSuperUser
-from ...models import Terminal, Status, Session
-from ...serializers import v1 as serializers
+from ..models import Terminal, Status, Session
+from .. import serializers
 
 __all__ = [
     'TerminalViewSet', 'TerminalTokenApi', 'StatusViewSet', 'TerminalConfig',

@@ -45,7 +45,7 @@ def clean_hosts(assets):
             continue
         clean_assets.append(asset)
     if not clean_assets:
-        logger.info(_("No assets matched, stop task"))
+        print(_("No assets matched, stop task"))
     return clean_assets
 
 

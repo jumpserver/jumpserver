@@ -233,6 +233,7 @@ class AdHoc(models.Model):
             history.summary = summary
             return raw, summary
         except Exception as e:
+            logger.error(e, exc_info=True)
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
             history.date_finished = timezone.now()

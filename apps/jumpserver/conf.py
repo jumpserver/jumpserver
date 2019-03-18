@@ -268,25 +268,36 @@ class Config(dict):
             rv[key] = v
         return rv
 
+    def convert_type(self, k, v):
+        default_value = self.defaults.get(k)
+        if default_value is None:
+            return v
+        tp = type(default_value)
+        try:
+            v = tp(v)
+        except Exception:
+            pass
+        return v
+
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
 
     def __getitem__(self, item):
+        # 先从设置的来
         try:
             value = super().__getitem__(item)
         except KeyError:
             value = None
         if value is not None:
-            return value
+            return self.convert_type(item, value)
+        # 其次从环境变量来
         value = os.environ.get(item, None)
         if value is not None:
-            if value.isdigit():
-                value = int(value)
-            elif value.lower() == 'false':
+            if value.lower() == 'false':
                 value = False
             elif value.lower() == 'true':
                 value = True
-            return value
+            return self.convert_type(item, value)
         return self.defaults.get(item)
 
     def __getattr__(self, item):
