@@ -4736,8 +4736,8 @@ msgstr "登录页面图片"
 #: xpack/plugins/interface/forms.py:27
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (suggest "
-"image size: 635px*472px)"
-msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 635px*472px）"
+"image size: 492px*472px)"
+msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 492px*472px）"
 
 #: xpack/plugins/interface/forms.py:33 xpack/plugins/interface/models.py:23
 msgid "Website icon"
