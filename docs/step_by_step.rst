@@ -29,7 +29,7 @@
     $ firewall-cmd --reload  # 重新载入规则
 
     $ setenforce 0
-    $ sed -i "s/enforcing/disabled/g" /etc/selinux/config
+    $ sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
 
     # 修改字符集, 否则可能报 input/output error的问题, 因为日志里打印了中文
     $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
