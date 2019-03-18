@@ -34,6 +34,7 @@
                            <th class="text-center">{% trans 'Username' %}</th>
                            <th class="text-center">{% trans 'Name' %}</th>
                            <th class="text-center">{% trans 'Email' %}</th>
+                           <th class="text-center">{% trans 'Is imported' %}</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -54,7 +55,8 @@ function initTable2() {
         ele: $('#ldap_list_users_table'),
         ajax_url: '{% url "api-settings:ldap-sync" %}',
         columns: [
-           {data: "username" },{data: "username" }, {data: "name" }, {data:"email"},
+            {data: "username" },{data: "username" }, {data: "name" },
+            {data:"email"}, {data:'is_imported'}
         ],
         pageLength: 10
     };

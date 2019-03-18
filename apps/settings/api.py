@@ -118,6 +118,8 @@ class LDAPConfirmSyncAPI(APIView):
     def get(self, request):
 
         user_names = request.GET.getlist('user_names', '')
+        if not user_names:
+            return Response({'error': _('当前无选择用户，请勾选需要导入的用户')}, status=401)
         ldap_setting = get_ldap_setting()
 
         conn = ldap_conn(ldap_setting['host'], ldap_setting['use_ssl'],

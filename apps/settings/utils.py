@@ -38,15 +38,20 @@ def ldap_search(conn, search_ougroup, search_filter, attr_map, user_names=None):
                 if hasattr(entry, mapping):
                     value = getattr(entry, mapping).value
                     user[attr] = value if value else ''
+                    if attr == 'username':
+                        if User.objects.filter(username=value):
+                            user['is_imported'] = _('Yes')
+                        else:
+                            user['is_imported'] = _('No')
             if user_names:
                 if user.get('username', '') in user_names:
-                        users.append(user)
+                    users.append(user)
             else:
                 users.append(user)
     if len(users) > 0:
         return users
     else:
-        return {"error": "Have user but attr mapping error"}
+        return {"error": _("Have user but attr mapping error")}
 
 
 def get_ldap_setting():
@@ -83,46 +88,46 @@ def get_ldap_setting():
 
 
 def save_user(users):
-    if len(users) > 0:
-        exist = []
-        for item in users:
-            if not item.get('email', ''):
-                item['email'] = item['username'] + '@' + item[
-                    'username'] + '.com'
-            item['source'] = 'ldap'
-            user = User.objects.filter(
-                Q(username=item['username']) & ~Q(source='ldap'))
-            if user:
+    if not len(users):
+        return Response({"error": _("Have user but attr mapping error")},
+                        status=401)
+    exist = []
+    for item in users:
+        item = set_default_item(item)
+
+        if User.objects.filter(Q(username=item['username']) & ~Q(source='ldap')):
+            exist.append(item['username'])
+            continue
+
+        user = User.objects.filter(username=item['username'], source='ldap')
+        if user:
+            user = user[0]
+            for key, value in item.items():
+                user.key = value
+                user.save()
+        else:
+            try:
+                user = User.objects.create(**item)
+            except:
+
                 exist.append(item['username'])
                 continue
-            user = User.objects.filter(username=item['username'], source='ldap')
-            if user:
-                user = user[0]
-                for key, value in item.items():
-                    user.key = value
-                    user.save()
-            else:
-                try:
-                    user = User.objects.create(**item)
-                except:
-
-                    exist.append(item['username'])
-                    continue
-        if exist:
-            msg = _("导入 {} 个用户成功, 导入 {} 这些用户失败，数据库已经存在同名的用户")\
-                .format(len(users) - len(exist), str(exist))
-        else:
-            msg = _("导入 {} 个用户成功").format(len(users))
-        return Response(
-            {"msg": msg})
+    if exist:
+        msg = _("导入 {} 个用户成功, 导入 {} 这些用户失败，数据库已经存在同名的用户")\
+            .format(len(users) - len(exist), str(exist))
     else:
-        return Response({"error": "Have user but attr mapping error"},
-                        status=401)
+        msg = _("导入 {} 个用户成功").format(len(users))
+    return Response({"msg": msg})
 
 
+def set_default_item(item):
+    item['source'] = 'ldap'
+    if not item.get('email', ''):
+        item['email'] = item['username'] + '@' + item['username'] + '.com'
 
-
-
+    if 'is_imported' in item.keys():
+        item.pop('is_imported')
+    return item
 
 
 
