@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 10:49+0800\n"
+"POT-Creation-Date: 2019-03-18 16:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -60,7 +60,7 @@ msgstr "标签"
 #: assets/forms/asset.py:37 assets/forms/asset.py:73 assets/models/asset.py:79
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:84
-#: assets/templates/assets/user_asset_list.html:163
+#: assets/templates/assets/user_asset_list.html:169
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
 msgstr "网域"
@@ -107,7 +107,7 @@ msgstr "选择资产"
 #: assets/templates/assets/asset_detail.html:72
 #: assets/templates/assets/domain_gateway_list.html:58
 #: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/user_asset_list.html:158
+#: assets/templates/assets/user_asset_list.html:164
 #: settings/templates/settings/replay_storage_create.html:59
 msgid "Port"
 msgstr "端口"
@@ -276,7 +276,7 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/domain_gateway_list.html:57
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/user_asset_list.html:45
-#: assets/templates/assets/user_asset_list.html:157
+#: assets/templates/assets/user_asset_list.html:163
 #: audits/templates/audits/login_log_list.html:52
 #: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:133
 #: users/templates/users/user_granted_asset.html:45
@@ -291,7 +291,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:92
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:44
-#: assets/templates/assets/user_asset_list.html:156
+#: assets/templates/assets/user_asset_list.html:162
 #: perms/templates/perms/asset_permission_asset.html:54
 #: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:132
 #: users/templates/users/user_granted_asset.html:44
@@ -304,20 +304,20 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:59
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:31
-#: assets/templates/assets/user_asset_list.html:159
+#: assets/templates/assets/user_asset_list.html:165
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
 
 #: assets/models/asset.py:78 assets/templates/assets/asset_detail.html:108
-#: assets/templates/assets/user_asset_list.html:160
+#: assets/templates/assets/user_asset_list.html:166
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:81 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:54 assets/models/label.py:22
 #: assets/templates/assets/asset_detail.html:116
-#: assets/templates/assets/user_asset_list.html:164
+#: assets/templates/assets/user_asset_list.html:170
 msgid "Is active"
 msgstr "激活"
 
@@ -371,7 +371,7 @@ msgid "Disk info"
 msgstr "硬盘信息"
 
 #: assets/models/asset.py:103 assets/templates/assets/asset_detail.html:112
-#: assets/templates/assets/user_asset_list.html:161
+#: assets/templates/assets/user_asset_list.html:167
 msgid "OS"
 msgstr "操作系统"
 
@@ -441,7 +441,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:37
-#: assets/templates/assets/user_asset_list.html:165 ops/models/adhoc.py:43
+#: assets/templates/assets/user_asset_list.html:171 ops/models/adhoc.py:43
 #: orgs/models.py:17 perms/models.py:38 perms/models.py:91
 #: perms/templates/perms/asset_permission_detail.html:102 settings/models.py:34
 #: terminal/models.py:32 terminal/templates/terminal/terminal_detail.html:63
@@ -629,7 +629,8 @@ msgstr "每行一个命令"
 #: assets/templates/assets/domain_list.html:29
 #: assets/templates/assets/label_list.html:17
 #: assets/templates/assets/system_user_asset.html:54
-#: assets/templates/assets/system_user_list.html:38 audits/models.py:37
+#: assets/templates/assets/system_user_list.html:38
+#: assets/templates/assets/user_asset_list.html:48 audits/models.py:37
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
@@ -760,7 +761,7 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:162
+#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:168
 #: audits/models.py:19 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:48
 #: perms/models.py:32 perms/models.py:86
@@ -1650,6 +1651,10 @@ msgstr "删除系统用户"
 #: assets/templates/assets/system_user_list.html:152
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
+
+#: assets/templates/assets/user_asset_list.html:100
+msgid "Connect"
+msgstr "连接"
 
 #: assets/views/admin_user.py:30
 msgid "Admin user list"
@@ -4624,7 +4629,7 @@ msgstr "选择管理员"
 #: xpack/plugins/cloud/views.py:41 xpack/plugins/cloud/views.py:57
 #: xpack/plugins/cloud/views.py:71 xpack/plugins/cloud/views.py:84
 #: xpack/plugins/cloud/views.py:100 xpack/plugins/cloud/views.py:121
-#: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:179
+#: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:187
 msgid "Cloud center"
 msgstr "云管中心"
 
@@ -4755,7 +4760,7 @@ msgstr "同步历史列表"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:28
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:31
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:29
-#: xpack/plugins/cloud/views.py:180
+#: xpack/plugins/cloud/views.py:188
 msgid "Sync instance list"
 msgstr "同步实例列表"
 

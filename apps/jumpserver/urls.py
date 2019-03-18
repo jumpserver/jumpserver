@@ -60,7 +60,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('', include(api_v2_patterns)),
     path('', include(api_v1_patterns)),
-    path('luna/', LunaView.as_view(), name='luna-error'),
+    path('luna/', LunaView.as_view(), name='luna-view'),
     path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),
     # path('api/v2/', include(api_v2_patterns)),
