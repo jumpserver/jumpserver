@@ -40,7 +40,6 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 ```````````````
 - mysql 版本需要大于等于 5.6
 - mariadb 版本需要大于等于 5.5.6
-- PostgreSQL 版本需要大于等于 9.4
 - 数据库编码要求 uft8
 
 创建数据库
@@ -58,7 +57,6 @@ XShell等工具请添加 connection 连接, 默认 ssh 端口 2222
 ```````````````
 - SECRET_KEY = ******
 - BOOTSTRAP_TOKEN = ******
-- DB_ENGINE = mysql
 - DB_HOST = mysql_host
 - DB_PORT = 3306
 - DB_USER = jumpserver

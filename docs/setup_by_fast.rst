@@ -16,7 +16,7 @@
 
     $ echo -e "\033[31m 1. 防火墙 Selinux 设置 \033[0m" \
       && if [ "$(systemctl status firewalld | grep running)" != "" ]; then firewall-cmd --zone=public --add-port=80/tcp --permanent; firewall-cmd --zone=public --add-port=2222/tcp --permanent; firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="172.17.0.0/16" port protocol="tcp" port="8080" accept"; firewall-cmd --reload; fi \
-      && if [ "$(getenforce)" != "Disabled" ]; then setenforce 0; sed -i "s/enforcing/disabled/g" /etc/selinux/config; fi
+      && if [ "$(getenforce)" != "Disabled" ]; then setsebool -P httpd_can_network_connect 1; fi
 
 .. code-block:: shell
 
