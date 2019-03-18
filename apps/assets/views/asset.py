@@ -34,7 +34,7 @@ from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
 
 
 __all__ = [
-    'AssetListView', 'AssetCreateView', 'AssetUpdateView',
+    'AssetListView', 'AssetCreateView', 'AssetUpdateView', 'AssetUserListView',
     'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
     'AssetDeleteView', 'AssetExportView', 'BulkImportAssetView',
 ]
@@ -51,6 +51,20 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
             'action': _('Asset list'),
             'labels': Label.objects.all().order_by('name'),
             'nodes': Node.objects.all().order_by('-key'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class AssetUserListView(AdminUserRequiredMixin, DetailView):
+    model = Asset
+    context_object_name = 'asset'
+    template_name = 'assets/asset_asset_user_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset user list'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
