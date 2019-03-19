@@ -188,6 +188,14 @@ class Session(OrgModelMixin):
             local_path = rel_path
         return local_path
 
+    def can_replay(self):
+        if self.has_replay:
+            return True
+        version = settings.VERSION.split('.')
+        if [int(i) for i in version] > [1, 4, 8]:
+            return False
+        return True
+
     def save_to_storage(self, f):
         local_path = self.get_local_path()
         try:

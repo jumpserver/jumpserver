@@ -66,6 +66,9 @@ class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
             'name', 'ip', 'port', 'username', 'protocol', 'domain', 'password',
             'private_key_file',  'is_active', 'comment',
         ]
+        help_texts = {
+            'protocol': _("SSH gateway support proxy SSH,RDP,VNC")
+        }
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),

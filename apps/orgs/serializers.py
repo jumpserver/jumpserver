@@ -16,7 +16,7 @@ class OrgSerializer(ModelSerializer):
         model = Organization
         list_serializer_class = BulkListSerializer
         fields = '__all__'
-        read_only_fields = ['id', 'created_by', 'date_created']
+        read_only_fields = ['created_by', 'date_created']
 
 
 class OrgReadSerializer(ModelSerializer):
