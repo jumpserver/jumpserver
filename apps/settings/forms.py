@@ -105,7 +105,8 @@ class LDAPSettingForm(BaseForm):
     )
     AUTH_LDAP_SEARCH_OU = forms.CharField(
         label=_("User OU"),
-        help_text=_("Use | split User OUs")
+        help_text=_("Use | split User OUs"),
+        required=False,
     )
     AUTH_LDAP_SEARCH_FILTER = forms.CharField(
         label=_("User search filter"),

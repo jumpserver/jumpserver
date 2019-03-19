@@ -17,7 +17,6 @@
                    <div class="file-manager ">
                        <div id="assetTree" class="ztree">
                        </div>
-
                        <div class="clearfix"></div>
                    </div>
                </div>
@@ -62,16 +61,19 @@
 
 {% block custom_foot_js %}
 <script>
+var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0&cache_policy=1";
 var zTree, asset_table, show=0;
 var inited = false;
 var url;
+
+
 function initTable() {
     if (inited){
         return
     } else {
         inited = true;
     }
-    url = "{% url 'api-perms:my-assets' %}";
+    url = "{% url 'api-perms:my-assets' %}?cache_policy=1";
     var options = {
         ele: $('#user_assets_table'),
         columnDefs: [
@@ -106,7 +108,7 @@ function initTable() {
 }
 
 function onSelected(event, treeNode) {
-    url = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}';
+    url = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1';
     var node_id = treeNode.meta.node.id;
     url = url.replace("{{ DEFAULT_PK }}", node_id);
     setCookie('node_selected', treeNode.id);
@@ -118,7 +120,7 @@ function initTree() {
     var setting = {
         view: {
             dblClickExpand: false,
-            showLine: true
+            showLine: true,
         },
         data: {
             simpleData: {
@@ -131,10 +133,14 @@ function initTree() {
     };
 
     var zNodes = [];
-    $.get("{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0", function(data, status){
+    $.get(treeUrl, function(data, status){
         zNodes = data;
         $.fn.zTree.init($("#assetTree"), setting, zNodes);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
+        rootNodeAddDom(zTree, function () {
+            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
+            initTree();
+        });
     });
 }
 

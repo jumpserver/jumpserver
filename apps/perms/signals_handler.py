@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, post_save, post_delete
 from django.dispatch import receiver
 
 from common.utils import get_logger
+from .utils import AssetPermissionUtil
 from .models import AssetPermission
 
 
 logger = get_logger(__file__)
+
+
+@receiver(post_save, sender=AssetPermission)
+def on_permission_update(sender, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
+
+
+@receiver(post_delete, sender=AssetPermission)
+def on_permission_delete(sender, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)

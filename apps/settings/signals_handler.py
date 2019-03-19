@@ -3,7 +3,7 @@
 import json
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save, pre_migrate
+from django.db.models.signals import post_save, pre_save
 from django.conf import LazySettings, empty
 from django.db.utils import ProgrammingError, OperationalError
 from django.core.cache import cache
@@ -58,6 +58,7 @@ def monkey_patch_settings(sender, **kwargs):
         cache.delete(key)
 
     try:
+        cache.delete_pattern(cache_key_prefix+'*')
         LazySettings.__getattr__ = monkey_patch_getattr
         LazySettings.__setattr__ = monkey_patch_setattr
         LazySettings.__delattr__ = monkey_patch_delattr

@@ -5,7 +5,7 @@
 from django.urls import path
 from rest_framework_bulk.routes import BulkRouter
 
-from ..api import v2 as api
+from .. import api_v2 as api
 
 app_name = 'terminal'
 

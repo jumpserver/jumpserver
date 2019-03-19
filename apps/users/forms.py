@@ -1,32 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
-
-
-class UserLoginForm(AuthenticationForm):
-    username = forms.CharField(label=_('Username'), max_length=100)
-    password = forms.CharField(
-        label=_('Password'), widget=forms.PasswordInput,
-        max_length=128, strip=False
-    )
-
-    def confirm_login_allowed(self, user):
-        if not user.is_staff:
-            raise forms.ValidationError(
-                self.error_messages['inactive'],
-                code='inactive',)
-
-
-class UserLoginCaptchaForm(UserLoginForm):
-    captcha = CaptchaField()
 
 
 class UserCheckPasswordForm(forms.Form):

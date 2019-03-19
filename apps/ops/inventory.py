@@ -4,9 +4,14 @@
 from .ansible.inventory import BaseInventory
 from assets.utils import get_assets_by_id_list, get_system_user_by_id
 
+from common.utils import get_logger
+
 __all__ = [
     'JMSInventory'
 ]
+
+
+logger = get_logger(__file__)
 
 
 class JMSInventory(BaseInventory):
@@ -18,7 +23,7 @@ class JMSInventory(BaseInventory):
         """
         :param host_id_list: ["test1", ]
         :param run_as_admin: True 是否使用管理用户去执行, 每台服务器的管理用户可能不同
-        :param run_as: 是否统一使用某个系统用户去执行
+        :param run_as: 用户名(添加了统一的资产用户管理器之后AssetUserManager加上之后修改为username)
         :param become_info: 是否become成某个用户去执行
         """
         self.assets = assets
@@ -33,8 +38,8 @@ class JMSInventory(BaseInventory):
             host_list.append(info)
 
         if run_as:
-            run_user_info = self.get_run_user_info()
             for host in host_list:
+                run_user_info = self.get_run_user_info(host)
                 host.update(run_user_info)
 
         if become_info:
@@ -69,12 +74,20 @@ class JMSInventory(BaseInventory):
             info["groups"].append("domain_"+asset.domain.name)
         return info
 
-    def get_run_user_info(self):
-        system_user = self.run_as
-        if not system_user:
+    def get_run_user_info(self, host):
+        from assets.backends.multi import AssetUserManager
+
+        if not self.run_as:
+            return {}
+
+        try:
+            asset = self.assets.get(id=host.get('id'))
+            run_user = AssetUserManager.get(self.run_as, asset)
+        except Exception as e:
+            logger.error(e, exc_info=True)
             return {}
         else:
-            return system_user._to_secret_json()
+            return run_user._to_secret_json()
 
     @staticmethod
     def make_proxy_command(asset):

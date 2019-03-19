@@ -32,6 +32,18 @@ TEST_SYSTEM_USER_CONN_TASKS = [
    }
 ]
 
+
+ASSET_USER_CONN_CACHE_KEY = 'ASSET_USER_CONN_{}_{}'
+TEST_ASSET_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "ping",
+        }
+    }
+]
+
+
 TASK_OPTIONS = {
     'timeout': 10,
     'forks': 10,

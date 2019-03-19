@@ -450,3 +450,7 @@ div.dataTables_wrapper div.dataTables_filter {
     content:"*";
     color:red;
 }
+
+#tree-refresh .fa-refresh {
+    font: normal normal normal 14px/1 FontAwesome !important;
+}

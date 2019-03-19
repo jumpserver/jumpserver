@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %}</a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'assets:asset-user-list' pk=asset.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset user list' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Asset users of' %} <b>{{ asset.hostname }} </b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover" id="asset_user_list">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                                            <th class="text-center">{% trans 'Username' %}</th>
+                                            <th class="text-center">{% trans 'Version' %}</th>
+                                            <th class="text-center">{% trans 'Reachable' %}</th>
+                                            <th class="text-center">{% trans 'Date updated' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        {% if asset.protocol == 'ssh' %}
+                                            <tr class="no-borders-tr">
+                                                <td>{% trans 'Test connective' %}:</td>
+                                                <td>
+                                                    <span class="pull-right">
+                                                        <button type="button" class="btn btn-primary btn-xs" id="btn-bulk-test-connective" style="width: 54px">{% trans 'Test' %}</button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'assets/_asset_user_auth_modal.html' %}
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+function initAssetUserAuthModalForm(hostname){
+    $('#id_hostname_p').html(hostname);
+    $('#id_username_p').html(username);
+    $('#id_password').parent().removeClass('has-error');
+    $('#id_password').val('');
+}
+function initAssetUserTable() {
+    var reachable = {{ asset.admin_user.REACHABLE }};
+    var unreachable = {{ asset.admin_user.UNREACHABLE }};
+    var options = {
+        ele: $('#asset_user_list'),
+        buttons: [],
+        order: [],
+        columnDefs: [
+            {targets: 3, createdCell: function (td, cellData) {
+                if (cellData === unreachable) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else if (cellData === reachable) {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                } else {
+                    $(td).html('')
+                }
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                $(td).html(cellData.slice(0, -6));
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                {% if asset.protocol == 'ssh' %}
+                    var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                    $(td).html(test_btn + update_auth_btn);
+                {% else %}
+                    $(td).html(update_auth_btn);
+                {% endif %}
+                {#var check_btn = ' <a class="btn btn-xs btn-info btn-check-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Check auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);#}
+
+            }}
+        ],
+        ajax_url: '{% url "api-assets:asset-user-list" %}' + '?asset_id={{ asset.id }}',
+        columns: [
+            {data: function (){return ''}}, {data: "username" },
+            {data: "version"}, {data: "connectivity"}, {data: "date_updated"},
+            {data: "username", orderable: false}
+        ],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initDataTable(options);
+}
+var username;
+$(document).ready(function () {
+    initAssetUserTable();
+})
+{#.on('click', '.btn-check-asset-user-auth', function(){#}
+{#    var username = $(this).data('username');#}
+{#    var the_url = "{% url 'api-assets:asset-user-auth-info' %}" + '?asset_id={{ asset.id }}' + '&username=' + username;#}
+{#    $.ajax({#}
+{#        url: the_url,#}
+{#        method: 'GET',#}
+{#        success: function (data) {#}
+{#            alert("Password: " + data.password);#}
+{#        }#}
+{#    });#}
+{# })#}
+.on('click', '.btn-update-asset-user-auth', function() {
+    username = $(this).data('username');
+    var hostname = "{{ asset.hostname }}";
+    initAssetUserAuthModalForm(hostname, username);
+    $("#asset_user_auth_modal").modal();
+})
+.on('click', '#btn_asset_user_auth_modal_confirm', function(){
+    var password = $('#id_password').val();
+    if (password){
+        var data = {
+            'name': username,
+            'asset': "{{ asset.id }}",
+            'username': username,
+            'password': password
+        };
+        formSubmit({
+            data: data,
+            url: "{% url 'api-assets:asset-user-list' %}",
+            method: 'POST',
+            success: function () {
+                toastr.success("{% trans 'Update successfully!' %}");
+            },
+            error: function () {
+                toastr.error("{% trans 'Update failed!' %}");
+            }
+        });
+        $("#asset_user_auth_modal").modal('hide');
+    }
+    else{
+        $('#id_password').parent().addClass('has-error');
+    }
+})
+.on('click', '.btn-test-connective', function () {
+    var username = $(this).data('username');
+    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}" + "&username=" + username;
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+.on('click', '#btn-bulk-test-connective', function () {
+    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}";
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+</script>
+{% endblock %}
