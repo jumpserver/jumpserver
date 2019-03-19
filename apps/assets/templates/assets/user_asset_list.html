@@ -45,6 +45,7 @@
                            <th class="text-center">{% trans 'IP' %}</th>
                            <th class="text-center">{% trans 'Active' %}</th>
                            <th class="text-center">{% trans 'System users' %}</th>
+                           <th class="text-center">{% trans 'Action' %}</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -94,13 +95,18 @@ function initTable() {
                     users.push(data.name);
                 });
                 $(td).html(users.join(', '))
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                $(td).html(conn_btn)
             }}
         ],
         ajax_url: url,
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
             {data: "is_active", orderable: false },
-            {data: "system_users_granted", orderable: false}
+            {data: "system_users_granted", orderable: false},
+            {data: "id", orderable: false}
         ]
     };
     asset_table = jumpserver.initServerSideDataTable(options);

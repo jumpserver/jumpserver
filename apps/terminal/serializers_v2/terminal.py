@@ -21,7 +21,7 @@ class TerminalSerializer(serializers.ModelSerializer):
             'replay_storage', 'user', 'is_accepted', 'is_deleted',
             'date_created', 'comment'
         ]
-        read_only_fields = ['id', 'remote_addr', 'user', 'date_created']
+        read_only_fields = ['remote_addr', 'user', 'date_created']
 
     def is_valid(self, raise_exception=False):
         valid = super().is_valid(raise_exception=raise_exception)

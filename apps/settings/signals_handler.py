@@ -4,7 +4,7 @@ import json
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
-from django.conf import LazySettings, empty
+from django.conf import LazySettings, empty, global_settings
 from django.db.utils import ProgrammingError, OperationalError
 from django.core.cache import cache
 
@@ -25,11 +25,18 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 @receiver(django_ready, dispatch_uid="my_unique_identifier")
 def monkey_patch_settings(sender, **kwargs):
     cache_key_prefix = '_SETTING_'
-    uncached_settings = [
-        'CACHES', 'DEBUG', 'SECRET_KEY', 'INSTALLED_APPS',
-        'ROOT_URLCONF', 'TEMPLATES', 'DATABASES', '_wrapped',
-        'CELERY_LOG_DIR'
+    custom_need_cache_settings = [
+        'AUTHENTICATION_BACKENDS'
     ]
+    custom_no_cache_settings = [
+        'BASE_DIR', 'VERSION', 'AUTH_OPENID'
+    ]
+    django_settings = dir(global_settings)
+    uncached_settings = [i for i in django_settings if i.isupper()]
+    uncached_settings = [i for i in uncached_settings if not i.startswith('EMAIL')]
+    uncached_settings = [i for i in uncached_settings if not i.startswith('SESSION_REDIS')]
+    uncached_settings = [i for i in uncached_settings if i not in custom_need_cache_settings]
+    uncached_settings.extend(custom_no_cache_settings)
 
     def monkey_patch_getattr(self, name):
         if name not in uncached_settings:
