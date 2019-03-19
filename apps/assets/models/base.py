@@ -9,12 +9,16 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils import get_signer, ssh_key_string_to_obj, ssh_key_gen
+from common.utils import (
+    get_signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
+)
 from common.validators import alphanumeric
 from orgs.mixins import OrgModelMixin
 from .utils import private_key_validator
 
 signer = get_signer()
+
+logger = get_logger(__file__)
 
 
 class AssetUser(OrgModelMixin):
@@ -45,8 +49,8 @@ class AssetUser(OrgModelMixin):
 
     @password.setter
     def password(self, password_raw):
-        raise AttributeError("Using set_auth do that")
-        # self._password = signer.sign(password_raw)
+        # raise AttributeError("Using set_auth do that")
+        self._password = signer.sign(password_raw)
 
     @property
     def private_key(self):
@@ -55,8 +59,8 @@ class AssetUser(OrgModelMixin):
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        raise AttributeError("Using set_auth do that")
-        # self._private_key = signer.sign(private_key_raw)
+        # raise AttributeError("Using set_auth do that")
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def private_key_obj(self):
@@ -88,6 +92,11 @@ class AssetUser(OrgModelMixin):
         else:
             return None
 
+    @public_key.setter
+    def public_key(self, public_key_raw):
+        # raise AttributeError("Using set_auth do that")
+        self._public_key = signer.sign(public_key_raw)
+
     @property
     def public_key_obj(self):
         if self.public_key:
@@ -114,6 +123,25 @@ class AssetUser(OrgModelMixin):
 
     def get_auth(self, asset=None):
         pass
+
+    def load_specific_asset_auth(self, asset):
+        from ..backends.multi import AssetUserManager
+        try:
+            other = AssetUserManager.get(username=self.username, asset=asset)
+        except Exception as e:
+            logger.error(e, exc_info=True)
+        else:
+            self._merge_auth(other)
+
+    def _merge_auth(self, other):
+        if not other:
+            return
+        if other.password:
+            self.password = other.password
+        if other.public_key:
+            self.public_key = other.public_key
+        if other.private_key:
+            self.private_key = other.private_key
 
     def clear_auth(self):
         self._password = ''

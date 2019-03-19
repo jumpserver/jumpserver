@@ -81,6 +81,8 @@ def clean_celery_tasks_period():
         settings.CELERY_LOG_DIR, expire_days
     )
     subprocess.call(command, shell=True)
+    command = "echo > {}".format(os.path.join(settings.LOG_DIR, 'celery.log'))
+    subprocess.call(command, shell=True)
 
 
 @shared_task

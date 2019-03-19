@@ -555,6 +555,17 @@ jumpserver.initServerSideDataTable = function (options) {
         processing: true,
         ajax: {
             url: options.ajax_url ,
+            error: function(jqXHR, textStatus, errorThrown) {
+                var msg = gettext("Unknown error occur");
+                if (jqXHR.responseJSON) {
+                    if (jqXHR.responseJSON.error) {
+                        msg = jqXHR.responseJSON.error
+                    } else if (jqXHR.responseJSON.msg) {
+                        msg = jqXHR.responseJSON.msg
+                    }
+                }
+                alert(msg)
+            },
             data: function (data) {
                 delete data.columns;
                 if (data.length !== null){

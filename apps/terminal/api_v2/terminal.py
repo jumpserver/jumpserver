@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from common.permissions import IsSuperUser, WithBootstrapToken
 
 
-from ...models import Terminal
-from ...serializers import v2 as serializers
+from ..models import Terminal
+from .. import serializers_v2 as serializers
 
 __all__ = ['TerminalViewSet', 'TerminalRegistrationApi']
 

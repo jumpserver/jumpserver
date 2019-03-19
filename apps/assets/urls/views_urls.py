@@ -15,6 +15,8 @@ urlpatterns = [
     path('asset/<uuid:pk>/update/', views.AssetUpdateView.as_view(), name='asset-update'),
     path('asset/<uuid:pk>/delete/', views.AssetDeleteView.as_view(), name='asset-delete'),
     path('asset/update/', views.AssetBulkUpdateView.as_view(), name='asset-bulk-update'),
+    # Asset user view
+    path('asset/<uuid:pk>/asset-user/', views.AssetUserListView.as_view(), name='asset-user-list'),
 
     # User asset view
     path('user-asset/', views.UserAssetListView.as_view(), name='user-asset-list'),
