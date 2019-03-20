@@ -207,7 +207,7 @@
     $ cd /opt/jumpserver
     $ ./jms start all -d  # 后台运行使用 -d 参数./jms start all -d
 
-    # 新版本更新了运行脚本, 使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status all  后台运行请添加 -d 参数
 
 运行不报错, 请继续往下操作
 
@@ -307,7 +307,7 @@
 
     $ ./cocod start -d  # 后台运行使用 -d 参数./cocod start -d
 
-    # 新版本更新了运行脚本, 使用方式./cocod start|stop|status|restart 后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./cocod start|stop|status 后台运行请添加 -d 参数
 
 四. 安装 Web Terminal 前端: Luna
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,7 +325,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
     $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
-    
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
