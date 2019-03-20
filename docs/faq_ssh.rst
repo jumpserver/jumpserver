@@ -16,6 +16,7 @@ SSH 协议资产连接错误排查思路
 .. code-block:: shell
 
     # 如果不在线请检查 coco 的 BOOTSTRAP_TOKEN 是否与 jumpserver 一致, 如果不一致请修改后重启
+    # 在 终端管理 删除不在线的组件
     $ cat /opt/jumpserver/config.yml | grep BOOTSTRAP_TOKEN
     $ cat /opt/coco/config.yml | grep BOOTSTRAP_TOKEN
 
