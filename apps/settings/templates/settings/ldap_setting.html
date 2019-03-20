@@ -107,31 +107,29 @@ $(document).ready(function () {
     });
 })
 .on("click","#btn_ldap_modal_confirm",function () {
-
     var user_names=[];
     var cheked = $("tbody input[type='checkbox']:checked").each(function () {
         user_names.push($(this).attr('id'));
 
     });
-    console.log(user_names);
-    $.ajax({
-        url: "{% url "api-settings:ldap-comfirm-sync" %}",
-        type: 'GET',
-        data:{
-            user_names:user_names,
-        },
-        dataType: "json",
-        traditional: true,
-        success: function (message) {
+    var the_url =  "{% url "api-settings:ldap-comfirm-sync" %}";
 
-            toastr.success(message.msg);
-        },
-        error: function () {
-            toastr.error('Export failed');
-        }
-    })
-})
+    function error(message) {
+        toastr.error(message)
+    }
 
+    function success(message) {
+        toastr.success(message.msg)
+    }
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify({'user_names':user_names}),
+        method: "POST",
+        flash_message: false,
+        success: success,
+        error: error
+    });
+ })
 
 </script>
 {% endblock %}

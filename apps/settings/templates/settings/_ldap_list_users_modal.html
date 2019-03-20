@@ -47,7 +47,7 @@
 
 <script>
 var ldap_users_table = 0;
-function initTable2() {
+function initLdapTable() {
     if(ldap_users_table){
         return
     }
@@ -68,7 +68,7 @@ function initTable2() {
 
 $(document).ready(function(){
 }).on('show.bs.modal', function () {
-    initTable2();
+    initLdapTable();
 
 })
 .on('click','.close_btn1',function () {
