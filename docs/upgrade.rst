@@ -480,6 +480,10 @@
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz
+
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
@@ -499,6 +503,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -720,6 +728,10 @@
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz
+
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
@@ -739,6 +751,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -959,6 +975,10 @@
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz
+
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
@@ -978,6 +998,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -1054,6 +1078,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -1077,7 +1105,7 @@
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
-1.4.8 升级到最新版本
+1.4.8 升级到最新版本(未开放)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Jumpserver**
@@ -1126,6 +1154,10 @@
     $ cd /opt
     $ rm -rf luna
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 

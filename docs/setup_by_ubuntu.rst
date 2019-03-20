@@ -322,6 +322,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 
     $ cd /opt/
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+    
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -360,6 +364,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 
     $ cd /config
     $ wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz
+
     $ tar xf linux-amd64.tar.gz -C /bin/
     $ chmod +x /bin/ssh-forward
 
