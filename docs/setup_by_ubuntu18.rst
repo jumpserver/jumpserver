@@ -204,7 +204,7 @@ Ubuntu 18.04 安装文档
     $ cd /opt/jumpserver
     $ ./jms start all -d  # 后台运行使用 -d 参数./jms start all -d
 
-    # 新版本更新了运行脚本, 使用方式./jms start|stop|status|restart all  后台运行请添加 -d 参数
+    # 新版本更新了运行脚本, 使用方式./jms start|stop|status all  后台运行请添加 -d 参数
 
 运行不报错, 请继续往下操作
 
@@ -251,6 +251,10 @@ Ubuntu 18.04 安装文档
 
     $ cd /opt/
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.8/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.8/luna.tar.gz
+
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
 
@@ -264,6 +268,7 @@ Ubuntu 18.04 安装文档
     $ apt-get -y install curl gnupg2 ca-certificates lsb-release
     $ add-apt-repository "deb http://nginx.org/packages/ubuntu/ $(lsb_release -cs) nginx"
     $ curl -fsSL http://nginx.org/keys/nginx_signing.key | sudo apt-key add -
+    $ apt-get update
     $ apt-get -y install nginx
 
 **6.2 准备配置文件 /etc/nginx/conf.d/jumpserver.conf**
