@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 19:58+0800\n"
+"POT-Creation-Date: 2019-03-22 00:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -127,7 +127,7 @@ msgstr "选择资产"
 #: terminal/templates/terminal/session_list.html:72
 #: xpack/plugins/change_auth_plan/forms.py:30
 #: xpack/plugins/change_auth_plan/models.py:63
-#: xpack/plugins/change_auth_plan/models.py:412
+#: xpack/plugins/change_auth_plan/models.py:417
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:40
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:13
@@ -179,7 +179,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
-#: xpack/plugins/change_auth_plan/forms.py:110
+#: xpack/plugins/change_auth_plan/forms.py:102
 #: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:61
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
@@ -210,8 +210,8 @@ msgstr "名称"
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
-#: xpack/plugins/change_auth_plan/forms.py:109
-#: xpack/plugins/change_auth_plan/models.py:409
+#: xpack/plugins/change_auth_plan/forms.py:103
+#: xpack/plugins/change_auth_plan/models.py:414
 msgid "Username"
 msgstr "用户名"
 
@@ -233,8 +233,8 @@ msgstr "密码或密钥密码"
 #: users/templates/users/user_pubkey_update.html:40
 #: users/templates/users/user_update.html:20
 #: xpack/plugins/change_auth_plan/forms.py:23
-#: xpack/plugins/change_auth_plan/models.py:85
-#: xpack/plugins/change_auth_plan/models.py:321
+#: xpack/plugins/change_auth_plan/models.py:86
+#: xpack/plugins/change_auth_plan/models.py:326
 #: xpack/plugins/change_auth_plan/serializers.py:19
 msgid "Password"
 msgstr "密码"
@@ -432,7 +432,7 @@ msgstr "标签管理"
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:36
 #: perms/models.py:89 perms/templates/perms/asset_permission_detail.html:98
 #: users/models/user.py:95 users/templates/users/user_detail.html:111
-#: xpack/plugins/change_auth_plan/models.py:98
+#: xpack/plugins/change_auth_plan/models.py:99
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
 #: xpack/plugins/cloud/models.py:55 xpack/plugins/cloud/models.py:127
 msgid "Created by"
@@ -481,7 +481,7 @@ msgstr "创建日期"
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
 #: users/templates/users/user_profile.html:134
-#: xpack/plugins/change_auth_plan/models.py:94
+#: xpack/plugins/change_auth_plan/models.py:95
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:117
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
 #: xpack/plugins/cloud/models.py:54 xpack/plugins/cloud/models.py:125
@@ -532,13 +532,13 @@ msgstr "版本"
 msgid "AuthBook"
 msgstr ""
 
-#: assets/models/base.py:29 xpack/plugins/change_auth_plan/models.py:89
-#: xpack/plugins/change_auth_plan/models.py:325
+#: assets/models/base.py:29 xpack/plugins/change_auth_plan/models.py:90
+#: xpack/plugins/change_auth_plan/models.py:330
 msgid "SSH private key"
 msgstr "ssh密钥"
 
-#: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:92
-#: xpack/plugins/change_auth_plan/models.py:328
+#: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:93
+#: xpack/plugins/change_auth_plan/models.py:333
 msgid "SSH public key"
 msgstr "ssh公钥"
 
@@ -1928,7 +1928,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:55
-#: xpack/plugins/change_auth_plan/models.py:416
+#: xpack/plugins/change_auth_plan/models.py:421
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:15
 #: xpack/plugins/cloud/models.py:172
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:69
@@ -1953,8 +1953,8 @@ msgstr "登录日期"
 #: ops/templates/ops/task_history.html:58 perms/models.py:34
 #: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:165
 #: terminal/templates/terminal/session_list.html:78
-#: xpack/plugins/change_auth_plan/models.py:307
-#: xpack/plugins/change_auth_plan/models.py:419
+#: xpack/plugins/change_auth_plan/models.py:312
+#: xpack/plugins/change_auth_plan/models.py:424
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:59
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:17
 msgid "Date start"
@@ -2284,8 +2284,8 @@ msgstr "完成时间"
 
 #: ops/models/adhoc.py:326 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:33
-#: xpack/plugins/change_auth_plan/models.py:310
-#: xpack/plugins/change_auth_plan/models.py:422
+#: xpack/plugins/change_auth_plan/models.py:315
+#: xpack/plugins/change_auth_plan/models.py:427
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:58
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:16
 msgid "Time"
@@ -4674,7 +4674,7 @@ msgstr "MFA 解绑成功，返回登录页面"
 
 #: xpack/plugins/change_auth_plan/forms.py:19
 #: xpack/plugins/change_auth_plan/models.py:71
-#: xpack/plugins/change_auth_plan/models.py:143
+#: xpack/plugins/change_auth_plan/models.py:148
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:100
 msgid "Cycle perform"
 msgstr "周期执行"
@@ -4687,22 +4687,22 @@ msgstr "提示：（单位： 时）"
 msgid "Password length"
 msgstr "密码长度"
 
-#: xpack/plugins/change_auth_plan/forms.py:58
+#: xpack/plugins/change_auth_plan/forms.py:59
 msgid "* Please enter custom password"
 msgstr "* 请输入自定义密码"
 
-#: xpack/plugins/change_auth_plan/forms.py:76
+#: xpack/plugins/change_auth_plan/forms.py:69
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: xpack/plugins/change_auth_plan/forms.py:114
+#: xpack/plugins/change_auth_plan/forms.py:107
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:81
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:17
 msgid "Timing perform"
 msgstr "定时执行"
 
-#: xpack/plugins/change_auth_plan/forms.py:117
+#: xpack/plugins/change_auth_plan/forms.py:110
 msgid ""
 "eg: Every Sunday 03:05 run (5 3 * * 0) <br> Tips: Using 5 digits linux "
 "crontab expressions (<a href='https://tool.lu/crontab/' "
@@ -4714,15 +4714,15 @@ msgstr ""
 "意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
-#: xpack/plugins/change_auth_plan/models.py:105
-#: xpack/plugins/change_auth_plan/models.py:314
+#: xpack/plugins/change_auth_plan/models.py:106
+#: xpack/plugins/change_auth_plan/models.py:319
 #: xpack/plugins/change_auth_plan/views.py:32
-#: xpack/plugins/change_auth_plan/views.py:55
-#: xpack/plugins/change_auth_plan/views.py:84
-#: xpack/plugins/change_auth_plan/views.py:99
+#: xpack/plugins/change_auth_plan/views.py:48
+#: xpack/plugins/change_auth_plan/views.py:69
+#: xpack/plugins/change_auth_plan/views.py:83
+#: xpack/plugins/change_auth_plan/views.py:110
 #: xpack/plugins/change_auth_plan/views.py:126
-#: xpack/plugins/change_auth_plan/views.py:142
-#: xpack/plugins/change_auth_plan/views.py:156
+#: xpack/plugins/change_auth_plan/views.py:140
 msgid "Change auth plan"
 msgstr "改密计划"
 
@@ -4747,7 +4747,7 @@ msgid "Asset username"
 msgstr "资产用户名"
 
 #: xpack/plugins/change_auth_plan/models.py:75
-#: xpack/plugins/change_auth_plan/models.py:141
+#: xpack/plugins/change_auth_plan/models.py:146
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:92
 msgid "Regularly perform"
 msgstr "定期执行"
@@ -4760,43 +4760,43 @@ msgstr "定期执行"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: xpack/plugins/change_auth_plan/models.py:82
+#: xpack/plugins/change_auth_plan/models.py:83
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:74
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:318
+#: xpack/plugins/change_auth_plan/models.py:323
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:333
-#: xpack/plugins/change_auth_plan/models.py:426
+#: xpack/plugins/change_auth_plan/models.py:338
+#: xpack/plugins/change_auth_plan/models.py:431
 msgid "Change auth plan history"
 msgstr "改密计划历史"
 
-#: xpack/plugins/change_auth_plan/models.py:435
+#: xpack/plugins/change_auth_plan/models.py:440
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
-#: xpack/plugins/change_auth_plan/models.py:453
+#: xpack/plugins/change_auth_plan/models.py:458
 msgid "Authentication failed"
 msgstr "认证失败"
 
-#: xpack/plugins/change_auth_plan/models.py:455
+#: xpack/plugins/change_auth_plan/models.py:460
 msgid "Connection timeout"
 msgstr "连接超时"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:17
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:20
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:17
-#: xpack/plugins/change_auth_plan/views.py:100
+#: xpack/plugins/change_auth_plan/views.py:84
 msgid "Plan detail"
 msgstr "计划详情"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:23
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:26
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:23
-#: xpack/plugins/change_auth_plan/views.py:143
+#: xpack/plugins/change_auth_plan/views.py:127
 msgid "Run history list"
 msgstr "执行历史列表"
 
@@ -4838,7 +4838,7 @@ msgid "Run failed"
 msgstr "执行失败"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:5
-#: xpack/plugins/change_auth_plan/views.py:56
+#: xpack/plugins/change_auth_plan/views.py:49
 msgid "Create plan"
 msgstr "创建计划"
 
@@ -4846,15 +4846,15 @@ msgstr "创建计划"
 msgid "Plan list"
 msgstr "计划列表"
 
-#: xpack/plugins/change_auth_plan/views.py:85
+#: xpack/plugins/change_auth_plan/views.py:70
 msgid "Update plan"
 msgstr "更新计划"
 
-#: xpack/plugins/change_auth_plan/views.py:127
+#: xpack/plugins/change_auth_plan/views.py:111
 msgid "plan asset list"
 msgstr "计划资产列表"
 
-#: xpack/plugins/change_auth_plan/views.py:157
+#: xpack/plugins/change_auth_plan/views.py:141
 msgid "Run history task list"
 msgstr "执行历史任务列表"
 
