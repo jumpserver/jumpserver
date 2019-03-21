@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 16:52+0800\n"
+"POT-Creation-Date: 2019-03-21 19:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -30,8 +30,8 @@ msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
 #: assets/forms/asset.py:27 assets/models/asset.py:80 assets/models/user.py:133
-#: assets/templates/assets/asset_detail.html:193
-#: assets/templates/assets/asset_detail.html:201
+#: assets/templates/assets/asset_detail.html:194
+#: assets/templates/assets/asset_detail.html:202
 #: assets/templates/assets/system_user_asset.html:95 perms/models.py:31
 #: xpack/plugins/change_auth_plan/models.py:67
 msgid "Nodes"
@@ -39,7 +39,7 @@ msgstr "节点管理"
 
 #: assets/forms/asset.py:30 assets/forms/asset.py:66 assets/models/asset.py:84
 #: assets/models/cluster.py:19 assets/models/user.py:91
-#: assets/templates/assets/asset_detail.html:79 templates/_nav.html:24
+#: assets/templates/assets/asset_detail.html:80 templates/_nav.html:24
 #: xpack/plugins/cloud/models.py:124
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:67
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
@@ -59,7 +59,7 @@ msgstr "标签"
 
 #: assets/forms/asset.py:37 assets/forms/asset.py:73 assets/models/asset.py:79
 #: assets/models/domain.py:26 assets/models/domain.py:52
-#: assets/templates/assets/asset_detail.html:83
+#: assets/templates/assets/asset_detail.html:84
 #: assets/templates/assets/user_asset_list.html:169
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
@@ -127,7 +127,7 @@ msgstr "选择资产"
 #: terminal/templates/terminal/session_list.html:72
 #: xpack/plugins/change_auth_plan/forms.py:30
 #: xpack/plugins/change_auth_plan/models.py:63
-#: xpack/plugins/change_auth_plan/models.py:407
+#: xpack/plugins/change_auth_plan/models.py:412
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:40
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:13
@@ -179,7 +179,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: users/templates/users/user_list.html:23
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:53
-#: xpack/plugins/change_auth_plan/forms.py:87
+#: xpack/plugins/change_auth_plan/forms.py:110
 #: xpack/plugins/change_auth_plan/models.py:56
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:61
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
@@ -210,8 +210,8 @@ msgstr "名称"
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
-#: xpack/plugins/change_auth_plan/forms.py:86
-#: xpack/plugins/change_auth_plan/models.py:404
+#: xpack/plugins/change_auth_plan/forms.py:109
+#: xpack/plugins/change_auth_plan/models.py:409
 msgid "Username"
 msgstr "用户名"
 
@@ -234,7 +234,7 @@ msgstr "密码或密钥密码"
 #: users/templates/users/user_update.html:20
 #: xpack/plugins/change_auth_plan/forms.py:23
 #: xpack/plugins/change_auth_plan/models.py:85
-#: xpack/plugins/change_auth_plan/models.py:316
+#: xpack/plugins/change_auth_plan/models.py:321
 #: xpack/plugins/change_auth_plan/serializers.py:19
 msgid "Password"
 msgstr "密码"
@@ -287,7 +287,7 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/models/asset.py:74 assets/models/domain.py:49
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/admin_user_assets.html:49
-#: assets/templates/assets/asset_detail.html:63
+#: assets/templates/assets/asset_detail.html:64
 #: assets/templates/assets/asset_list.html:93
 #: assets/templates/assets/domain_gateway_list.html:68
 #: assets/templates/assets/system_user_asset.html:51
@@ -304,7 +304,7 @@ msgstr "IP"
 #: assets/models/asset.py:75 assets/templates/assets/_asset_list_modal.html:45
 #: assets/templates/assets/_asset_user_auth_modal.html:9
 #: assets/templates/assets/admin_user_assets.html:48
-#: assets/templates/assets/asset_detail.html:59
+#: assets/templates/assets/asset_detail.html:60
 #: assets/templates/assets/asset_list.html:92
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:44
@@ -318,7 +318,7 @@ msgid "Hostname"
 msgstr "主机名"
 
 #: assets/models/asset.py:76 assets/models/domain.py:51
-#: assets/models/user.py:136 assets/templates/assets/asset_detail.html:75
+#: assets/models/user.py:136 assets/templates/assets/asset_detail.html:76
 #: assets/templates/assets/domain_gateway_list.html:70
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:31
@@ -329,7 +329,7 @@ msgstr "协议"
 
 #: assets/models/asset.py:77 assets/models/domain.py:50
 #: assets/templates/assets/admin_user_assets.html:50
-#: assets/templates/assets/asset_detail.html:71
+#: assets/templates/assets/asset_detail.html:72
 #: assets/templates/assets/domain_gateway_list.html:69
 #: assets/templates/assets/system_user_asset.html:52
 #: assets/templates/assets/user_asset_list.html:164
@@ -337,35 +337,35 @@ msgstr "协议"
 msgid "Port"
 msgstr "端口"
 
-#: assets/models/asset.py:78 assets/templates/assets/asset_detail.html:107
+#: assets/models/asset.py:78 assets/templates/assets/asset_detail.html:108
 #: assets/templates/assets/user_asset_list.html:166
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:81 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:54 assets/models/label.py:22
-#: assets/templates/assets/asset_detail.html:115
+#: assets/templates/assets/asset_detail.html:116
 #: assets/templates/assets/user_asset_list.html:170
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:87 assets/templates/assets/asset_detail.html:67
+#: assets/models/asset.py:87 assets/templates/assets/asset_detail.html:68
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:88 assets/templates/assets/asset_detail.html:123
+#: assets/models/asset.py:88 assets/templates/assets/asset_detail.html:124
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:91 assets/templates/assets/asset_detail.html:87
+#: assets/models/asset.py:91 assets/templates/assets/asset_detail.html:88
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:92 assets/templates/assets/asset_detail.html:91
+#: assets/models/asset.py:92 assets/templates/assets/asset_detail.html:92
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:93 assets/templates/assets/asset_detail.html:119
+#: assets/models/asset.py:93 assets/templates/assets/asset_detail.html:120
 msgid "Serial number"
 msgstr "序列号"
 
@@ -386,7 +386,7 @@ msgstr "CPU核数"
 msgid "CPU vcpus"
 msgstr "CPU总数"
 
-#: assets/models/asset.py:99 assets/templates/assets/asset_detail.html:99
+#: assets/models/asset.py:99 assets/templates/assets/asset_detail.html:100
 msgid "Memory"
 msgstr "内存"
 
@@ -398,7 +398,7 @@ msgstr "硬盘大小"
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:103 assets/templates/assets/asset_detail.html:111
+#: assets/models/asset.py:103 assets/templates/assets/asset_detail.html:112
 #: assets/templates/assets/user_asset_list.html:167
 msgid "OS"
 msgstr "操作系统"
@@ -416,7 +416,7 @@ msgid "Hostname raw"
 msgstr "主机名原始"
 
 #: assets/models/asset.py:108 assets/templates/assets/asset_create.html:34
-#: assets/templates/assets/asset_detail.html:230
+#: assets/templates/assets/asset_detail.html:231
 #: assets/templates/assets/asset_update.html:39 templates/_nav.html:26
 msgid "Labels"
 msgstr "标签管理"
@@ -425,7 +425,7 @@ msgstr "标签管理"
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:25
 #: assets/models/cmd_filter.py:58 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
-#: assets/templates/assets/asset_detail.html:127
+#: assets/templates/assets/asset_detail.html:128
 #: assets/templates/assets/cmd_filter_detail.html:77
 #: assets/templates/assets/domain_detail.html:72
 #: assets/templates/assets/system_user_detail.html:100
@@ -463,7 +463,7 @@ msgstr "创建日期"
 #: assets/models/domain.py:53 assets/models/group.py:23
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:32
-#: assets/templates/assets/asset_detail.html:135
+#: assets/templates/assets/asset_detail.html:136
 #: assets/templates/assets/cmd_filter_detail.html:65
 #: assets/templates/assets/cmd_filter_list.html:27
 #: assets/templates/assets/cmd_filter_rule_list.html:62
@@ -533,12 +533,12 @@ msgid "AuthBook"
 msgstr ""
 
 #: assets/models/base.py:29 xpack/plugins/change_auth_plan/models.py:89
-#: xpack/plugins/change_auth_plan/models.py:320
+#: xpack/plugins/change_auth_plan/models.py:325
 msgid "SSH private key"
 msgstr "ssh密钥"
 
 #: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:92
-#: xpack/plugins/change_auth_plan/models.py:323
+#: xpack/plugins/change_auth_plan/models.py:328
 msgid "SSH public key"
 msgstr "ssh公钥"
 
@@ -1124,7 +1124,7 @@ msgstr "快速更新"
 
 #: assets/templates/assets/admin_user_assets.html:70
 #: assets/templates/assets/asset_asset_user_list.html:71
-#: assets/templates/assets/asset_detail.html:178
+#: assets/templates/assets/asset_detail.html:179
 msgid "Test connective"
 msgstr "测试可连接性"
 
@@ -1132,7 +1132,7 @@ msgstr "测试可连接性"
 #: assets/templates/assets/admin_user_assets.html:114
 #: assets/templates/assets/asset_asset_user_list.html:74
 #: assets/templates/assets/asset_asset_user_list.html:122
-#: assets/templates/assets/asset_detail.html:181
+#: assets/templates/assets/asset_detail.html:182
 #: assets/templates/assets/system_user_asset.html:75
 #: assets/templates/assets/system_user_asset.html:164
 #: assets/templates/assets/system_user_detail.html:151
@@ -1147,7 +1147,7 @@ msgstr "更新认证"
 
 #: assets/templates/assets/admin_user_assets.html:191
 #: assets/templates/assets/asset_asset_user_list.html:176
-#: assets/templates/assets/asset_detail.html:310
+#: assets/templates/assets/asset_detail.html:311
 #: assets/templates/assets/system_user_asset.html:350
 #: users/templates/users/user_detail.html:307
 #: users/templates/users/user_detail.html:334
@@ -1197,7 +1197,7 @@ msgstr "更新"
 
 #: assets/templates/assets/admin_user_detail.html:28
 #: assets/templates/assets/admin_user_list.html:89
-#: assets/templates/assets/asset_detail.html:30
+#: assets/templates/assets/asset_detail.html:31
 #: assets/templates/assets/asset_list.html:178
 #: assets/templates/assets/cmd_filter_detail.html:33
 #: assets/templates/assets/cmd_filter_list.html:58
@@ -1243,7 +1243,7 @@ msgid "Select nodes"
 msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
-#: assets/templates/assets/asset_detail.html:210
+#: assets/templates/assets/asset_detail.html:211
 #: assets/templates/assets/asset_list.html:636
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_asset.html:112
@@ -1310,7 +1310,7 @@ msgid "Date updated"
 msgstr "更新日期"
 
 #: assets/templates/assets/asset_asset_user_list.html:64
-#: assets/templates/assets/asset_detail.html:147
+#: assets/templates/assets/asset_detail.html:148
 #: terminal/templates/terminal/session_detail.html:81
 #: users/templates/users/user_detail.html:138
 #: users/templates/users/user_profile.html:146
@@ -1329,21 +1329,21 @@ msgstr "选择需要修改属性"
 msgid "Select all"
 msgstr "全选"
 
-#: assets/templates/assets/asset_detail.html:95
+#: assets/templates/assets/asset_detail.html:96
 msgid "CPU"
 msgstr "CPU"
 
-#: assets/templates/assets/asset_detail.html:103
+#: assets/templates/assets/asset_detail.html:104
 msgid "Disk"
 msgstr "硬盘"
 
-#: assets/templates/assets/asset_detail.html:131
+#: assets/templates/assets/asset_detail.html:132
 #: users/templates/users/user_detail.html:115
 #: users/templates/users/user_profile.html:104
 msgid "Date joined"
 msgstr "创建日期"
 
-#: assets/templates/assets/asset_detail.html:153
+#: assets/templates/assets/asset_detail.html:154
 #: assets/templates/assets/user_asset_list.html:46 perms/models.py:33
 #: perms/models.py:87
 #: perms/templates/perms/asset_permission_create_update.html:52
@@ -1357,11 +1357,11 @@ msgstr "创建日期"
 msgid "Active"
 msgstr "激活中"
 
-#: assets/templates/assets/asset_detail.html:170
+#: assets/templates/assets/asset_detail.html:171
 msgid "Refresh hardware"
 msgstr "更新硬件信息"
 
-#: assets/templates/assets/asset_detail.html:173
+#: assets/templates/assets/asset_detail.html:174
 msgid "Refresh"
 msgstr "刷新"
 
@@ -1928,7 +1928,7 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:55
-#: xpack/plugins/change_auth_plan/models.py:411
+#: xpack/plugins/change_auth_plan/models.py:416
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:15
 #: xpack/plugins/cloud/models.py:172
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:69
@@ -1953,8 +1953,8 @@ msgstr "登录日期"
 #: ops/templates/ops/task_history.html:58 perms/models.py:34
 #: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:165
 #: terminal/templates/terminal/session_list.html:78
-#: xpack/plugins/change_auth_plan/models.py:302
-#: xpack/plugins/change_auth_plan/models.py:414
+#: xpack/plugins/change_auth_plan/models.py:307
+#: xpack/plugins/change_auth_plan/models.py:419
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:59
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:17
 msgid "Date start"
@@ -2284,8 +2284,8 @@ msgstr "完成时间"
 
 #: ops/models/adhoc.py:326 ops/templates/ops/adhoc_history.html:57
 #: ops/templates/ops/task_history.html:63 ops/templates/ops/task_list.html:33
-#: xpack/plugins/change_auth_plan/models.py:305
-#: xpack/plugins/change_auth_plan/models.py:417
+#: xpack/plugins/change_auth_plan/models.py:310
+#: xpack/plugins/change_auth_plan/models.py:422
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:58
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_task_list.html:16
 msgid "Time"
@@ -4687,18 +4687,22 @@ msgstr "提示：（单位： 时）"
 msgid "Password length"
 msgstr "密码长度"
 
-#: xpack/plugins/change_auth_plan/forms.py:60
+#: xpack/plugins/change_auth_plan/forms.py:58
+msgid "* Please enter custom password"
+msgstr "* 请输入自定义密码"
+
+#: xpack/plugins/change_auth_plan/forms.py:76
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: xpack/plugins/change_auth_plan/forms.py:91
+#: xpack/plugins/change_auth_plan/forms.py:114
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:81
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:17
 msgid "Timing perform"
 msgstr "定时执行"
 
-#: xpack/plugins/change_auth_plan/forms.py:94
+#: xpack/plugins/change_auth_plan/forms.py:117
 msgid ""
 "eg: Every Sunday 03:05 run (5 3 * * 0) <br> Tips: Using 5 digits linux "
 "crontab expressions (<a href='https://tool.lu/crontab/' "
@@ -4711,14 +4715,14 @@ msgstr ""
 
 #: xpack/plugins/change_auth_plan/meta.py:9
 #: xpack/plugins/change_auth_plan/models.py:105
-#: xpack/plugins/change_auth_plan/models.py:309
+#: xpack/plugins/change_auth_plan/models.py:314
 #: xpack/plugins/change_auth_plan/views.py:32
-#: xpack/plugins/change_auth_plan/views.py:48
-#: xpack/plugins/change_auth_plan/views.py:69
-#: xpack/plugins/change_auth_plan/views.py:83
-#: xpack/plugins/change_auth_plan/views.py:110
+#: xpack/plugins/change_auth_plan/views.py:55
+#: xpack/plugins/change_auth_plan/views.py:84
+#: xpack/plugins/change_auth_plan/views.py:99
 #: xpack/plugins/change_auth_plan/views.py:126
-#: xpack/plugins/change_auth_plan/views.py:140
+#: xpack/plugins/change_auth_plan/views.py:142
+#: xpack/plugins/change_auth_plan/views.py:156
 msgid "Change auth plan"
 msgstr "改密计划"
 
@@ -4761,38 +4765,38 @@ msgstr "密码策略"
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:313
+#: xpack/plugins/change_auth_plan/models.py:318
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:328
-#: xpack/plugins/change_auth_plan/models.py:421
+#: xpack/plugins/change_auth_plan/models.py:333
+#: xpack/plugins/change_auth_plan/models.py:426
 msgid "Change auth plan history"
 msgstr "改密计划历史"
 
-#: xpack/plugins/change_auth_plan/models.py:430
+#: xpack/plugins/change_auth_plan/models.py:435
 msgid "Change auth plan task"
 msgstr "改密计划任务"
 
-#: xpack/plugins/change_auth_plan/models.py:448
+#: xpack/plugins/change_auth_plan/models.py:453
 msgid "Authentication failed"
 msgstr "认证失败"
 
-#: xpack/plugins/change_auth_plan/models.py:450
+#: xpack/plugins/change_auth_plan/models.py:455
 msgid "Connection timeout"
 msgstr "连接超时"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:17
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:20
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:17
-#: xpack/plugins/change_auth_plan/views.py:84
+#: xpack/plugins/change_auth_plan/views.py:100
 msgid "Plan detail"
 msgstr "计划详情"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:23
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:26
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_history_list.html:23
-#: xpack/plugins/change_auth_plan/views.py:127
+#: xpack/plugins/change_auth_plan/views.py:143
 msgid "Run history list"
 msgstr "执行历史列表"
 
@@ -4834,7 +4838,7 @@ msgid "Run failed"
 msgstr "执行失败"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:5
-#: xpack/plugins/change_auth_plan/views.py:49
+#: xpack/plugins/change_auth_plan/views.py:56
 msgid "Create plan"
 msgstr "创建计划"
 
@@ -4842,15 +4846,15 @@ msgstr "创建计划"
 msgid "Plan list"
 msgstr "计划列表"
 
-#: xpack/plugins/change_auth_plan/views.py:70
+#: xpack/plugins/change_auth_plan/views.py:85
 msgid "Update plan"
 msgstr "更新计划"
 
-#: xpack/plugins/change_auth_plan/views.py:111
+#: xpack/plugins/change_auth_plan/views.py:127
 msgid "plan asset list"
 msgstr "计划资产列表"
 
-#: xpack/plugins/change_auth_plan/views.py:141
+#: xpack/plugins/change_auth_plan/views.py:157
 msgid "Run history task list"
 msgstr "执行历史任务列表"
 
@@ -5260,6 +5264,10 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid ""
+#~ "* When selecting a custom password strategy, please enter the password"
+#~ msgstr "* 选择自定义密码策略时，请输入密码"
 
 #~ msgid "Monitor"
 #~ msgstr "监控"
