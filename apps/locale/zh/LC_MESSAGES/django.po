@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-22 15:45+0800\n"
+"POT-Creation-Date: 2019-03-22 15:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -153,6 +153,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_list.html:72
 #: perms/templates/perms/asset_permission_user.html:54 settings/models.py:29
+#: settings/templates/settings/_ldap_list_users_modal.html:35
 #: settings/templates/settings/command_storage_create.html:41
 #: settings/templates/settings/replay_storage_create.html:44
 #: settings/templates/settings/terminal_setting.html:80
@@ -187,9 +188,10 @@ msgstr "名称"
 #: assets/templates/assets/system_user_list.html:30 audits/models.py:94
 #: audits/templates/audits/login_log_list.html:51 authentication/forms.py:11
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
-#: perms/templates/perms/asset_permission_user.html:55 users/forms.py:13
+#: perms/templates/perms/asset_permission_user.html:55
+#: settings/templates/settings/_ldap_list_users_modal.html:34 users/forms.py:13
 #: users/models/user.py:52 users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64 users/templates/users/new_login.html:85
+#: users/templates/users/login.html:64 users/templates/users/new_login.html:110
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -205,7 +207,7 @@ msgstr "密码或密钥密码"
 #: assets/templates/assets/_asset_user_auth_modal.html:21
 #: authentication/forms.py:13 settings/forms.py:103 users/forms.py:15
 #: users/forms.py:27 users/templates/users/login.html:67
-#: users/templates/users/new_login.html:90
+#: users/templates/users/new_login.html:113
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -572,7 +574,7 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:39 ops/models/command.py:21
-#: ops/templates/ops/command_execution_list.html:60 terminal/models.py:161
+#: ops/templates/ops/command_execution_list.html:61 terminal/models.py:161
 #: terminal/templates/terminal/command_list.html:55
 #: terminal/templates/terminal/command_list.html:71
 #: terminal/templates/terminal/session_detail.html:48
@@ -677,8 +679,8 @@ msgstr "默认资产组"
 #: audits/templates/audits/operate_log_list.html:66
 #: audits/templates/audits/password_change_log_list.html:33
 #: audits/templates/audits/password_change_log_list.html:50
-#: ops/templates/ops/command_execution_list.html:34
-#: ops/templates/ops/command_execution_list.html:59 perms/forms.py:36
+#: ops/templates/ops/command_execution_list.html:35
+#: ops/templates/ops/command_execution_list.html:60 perms/forms.py:36
 #: perms/models.py:28
 #: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:54
@@ -1796,7 +1798,7 @@ msgstr "文件名"
 
 #: audits/models.py:23 audits/models.py:90
 #: audits/templates/audits/ftp_log_list.html:76
-#: ops/templates/ops/command_execution_list.html:64
+#: ops/templates/ops/command_execution_list.html:65
 #: ops/templates/ops/task_list.html:31
 #: users/templates/users/user_detail.html:458 xpack/plugins/cloud/api.py:62
 msgid "Success"
@@ -1895,7 +1897,7 @@ msgstr "登录日期"
 #: audits/templates/audits/ftp_log_list.html:77
 #: ops/templates/ops/adhoc_history.html:52
 #: ops/templates/ops/adhoc_history_detail.html:61
-#: ops/templates/ops/command_execution_list.html:65
+#: ops/templates/ops/command_execution_list.html:66
 #: ops/templates/ops/task_history.html:58 perms/models.py:34
 #: perms/templates/perms/asset_permission_detail.html:86 terminal/models.py:165
 #: terminal/templates/terminal/session_list.html:78
@@ -1911,8 +1913,8 @@ msgstr "选择用户"
 #: audits/templates/audits/login_log_list.html:40
 #: audits/templates/audits/operate_log_list.html:58
 #: audits/templates/audits/password_change_log_list.html:42
-#: ops/templates/ops/command_execution_list.html:42
-#: ops/templates/ops/command_execution_list.html:47
+#: ops/templates/ops/command_execution_list.html:43
+#: ops/templates/ops/command_execution_list.html:48
 #: ops/templates/ops/task_list.html:13 ops/templates/ops/task_list.html:18
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
@@ -1987,7 +1989,7 @@ msgid "Command execution log"
 msgstr "命令执行"
 
 #: authentication/api/auth.py:46 users/templates/users/login.html:52
-#: users/templates/users/new_login.html:71
+#: users/templates/users/new_login.html:97
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -2189,7 +2191,7 @@ msgid "Options"
 msgstr "选项"
 
 #: ops/models/adhoc.py:161 ops/templates/ops/adhoc_detail.html:53
-#: ops/templates/ops/command_execution_list.html:58
+#: ops/templates/ops/command_execution_list.html:59
 #: ops/templates/ops/task_adhoc.html:59 ops/templates/ops/task_list.html:30
 #: settings/templates/settings/command_storage_create.html:49
 msgid "Hosts"
@@ -2285,7 +2287,7 @@ msgstr "执行历史"
 
 #: ops/templates/ops/adhoc_detail.html:72
 #: ops/templates/ops/adhoc_detail.html:77
-#: ops/templates/ops/command_execution_list.html:61
+#: ops/templates/ops/command_execution_list.html:62
 #: ops/templates/ops/task_adhoc.html:61
 msgid "Run as"
 msgstr "运行用户"
@@ -2342,7 +2344,7 @@ msgid "Run history detail"
 msgstr "执行历史详情"
 
 #: ops/templates/ops/adhoc_history_detail.html:22
-#: ops/templates/ops/command_execution_list.html:62
+#: ops/templates/ops/command_execution_list.html:63
 #: terminal/backends/command/models.py:16
 msgid "Output"
 msgstr "输出"
@@ -2408,7 +2410,7 @@ msgstr "没有选择系统用户"
 msgid "Pending"
 msgstr ""
 
-#: ops/templates/ops/command_execution_list.html:63
+#: ops/templates/ops/command_execution_list.html:64
 msgid "Finished"
 msgstr "结束"
 
@@ -2639,33 +2641,38 @@ msgstr "资产授权用户列表"
 msgid "Asset permission asset list"
 msgstr "资产授权资产列表"
 
-#: settings/api.py:24
+#: settings/api.py:23
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:48
+#: settings/api.py:47
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: settings/api.py:78
+#: settings/api.py:77 settings/utils.py:23
 msgid "Search no entry matched in ou {}"
 msgstr "在ou:{}中没有匹配条目"
 
-#: settings/api.py:87
+#: settings/api.py:86
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:110 settings/api.py:146
+#: settings/api.py:109
+msgid ""
+"User is not currently selected, please check the user you want to import"
+msgstr "当前无勾选用户，请勾选你想要导入的用户"
+
+#: settings/api.py:139 settings/api.py:175
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:116 settings/api.py:152
+#: settings/api.py:145 settings/api.py:181
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:134 settings/api.py:172
+#: settings/api.py:163 settings/api.py:201
 #: settings/templates/settings/terminal_setting.html:151
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -2913,6 +2920,20 @@ msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 msgid "Setting"
 msgstr "设置"
 
+#: settings/templates/settings/_ldap_list_users_modal.html:7
+msgid "Ldap users"
+msgstr "Ldap 用户列表"
+
+#: settings/templates/settings/_ldap_list_users_modal.html:36
+#: users/models/user.py:56 users/templates/users/user_detail.html:71
+#: users/templates/users/user_profile.html:59
+msgid "Email"
+msgstr "邮件"
+
+#: settings/templates/settings/_ldap_list_users_modal.html:37
+msgid "Is imported"
+msgstr "是否已经导入"
+
 #: settings/templates/settings/basic_setting.html:15
 #: settings/templates/settings/email_setting.html:15
 #: settings/templates/settings/ldap_setting.html:15
@@ -2966,6 +2987,10 @@ msgstr "索引"
 #: settings/templates/settings/command_storage_create.html:70
 msgid "Doc type"
 msgstr "文档类型"
+
+#: settings/templates/settings/ldap_setting.html:65
+msgid "Sync User"
+msgstr "同步用户"
 
 #: settings/templates/settings/replay_storage_create.html:66
 msgid "Bucket"
@@ -3067,6 +3092,43 @@ msgstr "删除失败"
 msgid "Are you sure about deleting it?"
 msgstr "您确定删除吗?"
 
+#: settings/utils.py:30
+msgid "Have user but attr mapping error"
+msgstr "有用户但attr映射错误"
+
+#: settings/utils.py:60
+msgid "No"
+msgstr "否"
+
+#: settings/utils.py:69
+msgid "Yes"
+msgstr "是"
+
+#: settings/utils.py:134
+msgid ""
+"Import {} users successfully; import {} users failed, the database already "
+"exists with the same name"
+msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户"
+
+#: settings/utils.py:139
+msgid ""
+"Import {} users successfully; import {} users failed, the database already "
+"exists with the same name; import {}users failed, Because’TypeError' object "
+"has no attribute 'keys'"
+msgstr ""
+"导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户; 导入 {} "
+"这些用户失败，因为对象没有属性'keys'"
+
+#: settings/utils.py:145
+msgid "Import {} users successfully"
+msgstr "导入 {} 个用户成功"
+
+#: settings/utils.py:148
+msgid ""
+"Import {} users successfully;import {} users failed, Because’TypeError' "
+"object has no attribute 'keys'"
+msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，因为对象没有属性'keys'"
+
 #: settings/views.py:18 settings/views.py:44 settings/views.py:70
 #: settings/views.py:99 settings/views.py:126 settings/views.py:138
 #: settings/views.py:151 templates/_nav.html:107
@@ -3126,7 +3188,7 @@ msgid "Logout"
 msgstr "注销登录"
 
 #: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72 users/templates/users/new_login.html:96
+#: users/templates/users/login.html:72 users/templates/users/new_login.html:119
 msgid "Login"
 msgstr "登录"
 
@@ -3276,7 +3338,7 @@ msgstr "验证码"
 
 #: templates/flash_message_standalone.html:35
 #: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
-#: users/templates/users/new_login.html:56
+#: users/templates/users/new_login.html:82
 #: users/templates/users/reset_password.html:25
 #: xpack/plugins/interface/models.py:36
 msgid "Welcome to the Jumpserver open source fortress"
@@ -3760,11 +3822,6 @@ msgstr "启用"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:56 users/templates/users/user_detail.html:71
-#: users/templates/users/user_profile.html:59
-msgid "Email"
-msgstr "邮件"
-
 #: users/models/user.py:67
 msgid "Avatar"
 msgstr "头像"
@@ -3888,7 +3945,7 @@ msgstr "获取更多信息"
 
 #: users/templates/users/forgot_password.html:11
 #: users/templates/users/forgot_password.html:31
-#: users/templates/users/login.html:83 users/templates/users/new_login.html:100
+#: users/templates/users/login.html:83 users/templates/users/new_login.html:123
 msgid "Forgot password"
 msgstr "忘记密码"
 
@@ -3928,11 +3985,11 @@ msgstr ""
 msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
-#: users/templates/users/login.html:54 users/templates/users/new_login.html:73
+#: users/templates/users/login.html:54 users/templates/users/new_login.html:99
 msgid "The user password has expired"
 msgstr "用户密码已过期"
 
-#: users/templates/users/login.html:57 users/templates/users/new_login.html:76
+#: users/templates/users/login.html:57 users/templates/users/new_login.html:102
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
@@ -3972,7 +4029,7 @@ msgstr "6位数字"
 msgid "Can't provide security? Please contact the administrator!"
 msgstr "如果不能提供MFA验证码，请联系管理员!"
 
-#: users/templates/users/new_login.html:61
+#: users/templates/users/new_login.html:87
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
@@ -4846,10 +4903,14 @@ msgid "Image of login page"
 msgstr "登录页面图片"
 
 #: xpack/plugins/interface/forms.py:27
+#, fuzzy
+#| msgid ""
+#| "Tips: This will be displayed on the enterprise user login page. (suggest "
+#| "image size: 492px*472px)"
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (suggest "
 "image size: 635px*472px)"
-msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 635px*472px）"
+msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 492px*472px）"
 
 #: xpack/plugins/interface/forms.py:33 xpack/plugins/interface/models.py:23
 msgid "Website icon"
@@ -5023,9 +5084,6 @@ msgstr "创建组织"
 msgid "Update org"
 msgstr "更新组织"
 
-#~ msgid "Command log"
-#~ msgstr "命令日志"
-
 #~ msgid "Cycle perform"
 #~ msgstr "周期执行"
 
@@ -5107,12 +5165,6 @@ msgstr "更新组织"
 
 #~ msgid "Length"
 #~ msgstr "长度"
-
-#~ msgid "Yes"
-#~ msgstr "是"
-
-#~ msgid "No"
-#~ msgstr "否"
 
 #~ msgid "History of plan"
 #~ msgstr "执行历史"
@@ -5267,9 +5319,6 @@ msgstr "更新组织"
 
 #~ msgid "* required Must set exact system platform, Windows, Linux ..."
 #~ msgstr "* required 必须准确设置操作系统平台，如Windows, Linux ..."
-
-#~ msgid "Unblock user successfully. "
-#~ msgstr "解除登录限制成功"
 
 #~ msgid "Clear"
 #~ msgstr "清除"

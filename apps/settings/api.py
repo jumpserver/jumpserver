@@ -5,17 +5,16 @@ import os
 import json
 import jms_storage
 
-from rest_framework.views import Response, APIView
 from ldap3 import Server, Connection
+from rest_framework.views import Response, APIView
+from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 
-from common.permissions import IsOrgAdmin, IsSuperUser
-from .serializers import (
-    MailTestSerializer, LDAPTestSerializer
-)
 from .models import Setting
+from .utils import get_ldap_users_list, save_user
+from common.permissions import IsOrgAdmin, IsSuperUser
+from .serializers import MailTestSerializer, LDAPTestSerializer
 
 
 class MailTestingAPI(APIView):
@@ -89,6 +88,36 @@ class LDAPTestingAPI(APIView):
                 return Response({"error": "Have user but attr mapping error"}, status=401)
         else:
             return Response({"error": str(serializer.errors)}, status=401)
+
+
+class LDAPSyncAPI(APIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def get(self, request):
+        ldap_users_list = get_ldap_users_list()
+        if not isinstance(ldap_users_list, list):
+            return Response(ldap_users_list, status=401)
+        return Response(ldap_users_list)
+
+
+class LDAPConfirmSyncAPI(APIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def post(self, request):
+        user_names = request.data.get('user_names', '')
+        if not user_names:
+            error = _('User is not currently selected, please check the user '
+                      'you want to import')
+            return Response({'error': error}, status=401)
+
+        ldap_users_list = get_ldap_users_list(user_names=user_names)
+        if not isinstance(ldap_users_list, list):
+            return Response(ldap_users_list, status=401)
+
+        save_result = save_user(ldap_users_list)
+        if 'error' in save_result.keys():
+            return Response(save_result, status=401)
+        return Response(save_result)
 
 
 class ReplayStorageCreateAPI(APIView):
