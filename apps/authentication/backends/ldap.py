@@ -88,7 +88,10 @@ class LDAPUser(_LDAPUser):
     def _populate_user_from_attributes(self):
         super()._populate_user_from_attributes()
         if not hasattr(self._user, 'email') or '@' not in self._user.email:
-            email = '{}@{}'.format(self._user.username, settings.EMAIL_SUFFIX)
+            if '@' not in self._user.username:
+                email = '{}@{}'.format(self._user.username, settings.EMAIL_SUFFIX)
+            else:
+                email = self._user.username
             setattr(self._user, 'email', email)
 
 
