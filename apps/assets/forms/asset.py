@@ -97,24 +97,12 @@ class AssetBulkUpdateForm(OrgModelForm):
             }
         )
     )
-    port = forms.IntegerField(
-        label=_('Port'), required=False, min_value=1, max_value=65535,
-    )
-    admin_user = forms.ModelChoiceField(
-        required=False, queryset=AdminUser.objects,
-        label=_("Admin user"),
-        widget=forms.Select(
-            attrs={
-                'class': 'select2',
-                'data-placeholder': _('Admin user')
-            }
-        )
-    )
 
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port',  'admin_user', 'labels', 'nodes', 'platform'
+            'assets', 'port',  'admin_user', 'labels', 'platform',
+            'protocol', 'domain',
         ]
         widgets = {
             'labels': forms.SelectMultiple(
@@ -124,6 +112,13 @@ class AssetBulkUpdateForm(OrgModelForm):
                 attrs={'class': 'select2', 'data-placeholder': _('Node')}
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 重写其他字段为不再required
+        for name, field in self.fields.items():
+            if name != 'assets':
+                field.required = False
 
     def save(self, commit=True):
         changed_fields = []

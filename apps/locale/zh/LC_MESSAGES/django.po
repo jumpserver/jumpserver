@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-20 17:58+0800\n"
+"POT-Creation-Date: 2019-03-22 15:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -36,8 +36,7 @@ msgstr "测试节点下资产是否可连接: {}"
 msgid "Nodes"
 msgstr "节点管理"
 
-#: assets/forms/asset.py:30 assets/forms/asset.py:66 assets/forms/asset.py:105
-#: assets/forms/asset.py:109 assets/models/asset.py:84
+#: assets/forms/asset.py:30 assets/forms/asset.py:66 assets/models/asset.py:84
 #: assets/models/cluster.py:19 assets/models/user.py:91
 #: assets/templates/assets/asset_detail.html:80 templates/_nav.html:24
 #: xpack/plugins/cloud/models.py:124
@@ -46,7 +45,7 @@ msgstr "节点管理"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:33 assets/forms/asset.py:69 assets/forms/asset.py:121
+#: assets/forms/asset.py:33 assets/forms/asset.py:69 assets/forms/asset.py:109
 #: assets/templates/assets/asset_create.html:36
 #: assets/templates/assets/asset_create.html:38
 #: assets/templates/assets/asset_list.html:81
@@ -60,13 +59,13 @@ msgstr "标签"
 #: assets/forms/asset.py:37 assets/forms/asset.py:73 assets/models/asset.py:79
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:84
-#: assets/templates/assets/user_asset_list.html:163
+#: assets/templates/assets/user_asset_list.html:169
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:41 assets/forms/asset.py:63 assets/forms/asset.py:77
-#: assets/forms/asset.py:124 assets/models/node.py:31
+#: assets/forms/asset.py:112 assets/models/node.py:31
 #: assets/templates/assets/asset_create.html:30
 #: assets/templates/assets/asset_update.html:35 perms/forms.py:45
 #: perms/forms.py:52 perms/models.py:84
@@ -102,23 +101,13 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/asset.py:101 assets/models/asset.py:77
-#: assets/models/domain.py:50 assets/templates/assets/admin_user_assets.html:50
-#: assets/templates/assets/asset_detail.html:72
-#: assets/templates/assets/domain_gateway_list.html:58
-#: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/user_asset_list.html:158
-#: settings/templates/settings/replay_storage_create.html:59
-msgid "Port"
-msgstr "端口"
-
 #: assets/forms/domain.py:15 assets/forms/label.py:13
 #: assets/models/asset.py:279 assets/models/authbook.py:27
 #: assets/templates/assets/admin_user_list.html:28
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
-#: assets/templates/assets/system_user_list.html:33 audits/models.py:18
+#: assets/templates/assets/system_user_list.html:33 audits/models.py:19
 #: audits/templates/audits/ftp_log_list.html:41
 #: audits/templates/audits/ftp_log_list.html:71 perms/forms.py:42
 #: perms/models.py:30
@@ -140,7 +129,11 @@ msgstr "资产"
 msgid "Password should not contain special characters"
 msgstr "不能包含特殊字符"
 
-#: assets/forms/domain.py:70 assets/forms/user.py:84 assets/forms/user.py:146
+#: assets/forms/domain.py:70
+msgid "SSH gateway support proxy SSH,RDP,VNC"
+msgstr "SSH网关，支持代理SSH,RDP和VNC"
+
+#: assets/forms/domain.py:73 assets/forms/user.py:84 assets/forms/user.py:146
 #: assets/models/base.py:26 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:20 assets/models/domain.py:20
 #: assets/models/group.py:20 assets/models/label.py:18
@@ -149,7 +142,7 @@ msgstr "不能包含特殊字符"
 #: assets/templates/assets/cmd_filter_detail.html:61
 #: assets/templates/assets/cmd_filter_list.html:24
 #: assets/templates/assets/domain_detail.html:56
-#: assets/templates/assets/domain_gateway_list.html:56
+#: assets/templates/assets/domain_gateway_list.html:67
 #: assets/templates/assets/domain_list.html:25
 #: assets/templates/assets/label_list.html:14
 #: assets/templates/assets/system_user_detail.html:58
@@ -165,7 +158,7 @@ msgstr "不能包含特殊字符"
 #: settings/templates/settings/replay_storage_create.html:44
 #: settings/templates/settings/terminal_setting.html:80
 #: settings/templates/settings/terminal_setting.html:102 terminal/models.py:22
-#: terminal/models.py:233 terminal/templates/terminal/terminal_detail.html:43
+#: terminal/models.py:241 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
 #: users/models/user.py:54 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
@@ -184,16 +177,16 @@ msgstr "不能包含特殊字符"
 msgid "Name"
 msgstr "名称"
 
-#: assets/forms/domain.py:71 assets/forms/user.py:85 assets/forms/user.py:147
+#: assets/forms/domain.py:74 assets/forms/user.py:85 assets/forms/user.py:147
 #: assets/models/base.py:27
 #: assets/templates/assets/_asset_user_auth_modal.html:15
 #: assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:27
 #: assets/templates/assets/asset_asset_user_list.html:48
-#: assets/templates/assets/domain_gateway_list.html:60
+#: assets/templates/assets/domain_gateway_list.html:71
 #: assets/templates/assets/system_user_detail.html:62
-#: assets/templates/assets/system_user_list.html:30 audits/models.py:93
-#: audits/templates/audits/login_log_list.html:49 authentication/forms.py:11
+#: assets/templates/assets/system_user_list.html:30 audits/models.py:94
+#: audits/templates/audits/login_log_list.html:51 authentication/forms.py:11
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
 #: settings/templates/settings/_ldap_list_users_modal.html:34 users/forms.py:13
@@ -275,11 +268,11 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/admin_user_assets.html:49
 #: assets/templates/assets/asset_detail.html:64
 #: assets/templates/assets/asset_list.html:93
-#: assets/templates/assets/domain_gateway_list.html:57
+#: assets/templates/assets/domain_gateway_list.html:68
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/user_asset_list.html:45
-#: assets/templates/assets/user_asset_list.html:157
-#: audits/templates/audits/login_log_list.html:52
+#: assets/templates/assets/user_asset_list.html:163
+#: audits/templates/audits/login_log_list.html:54
 #: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:133
 #: users/templates/users/user_granted_asset.html:45
 #: users/templates/users/user_group_granted_asset.html:45
@@ -293,7 +286,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:92
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:44
-#: assets/templates/assets/user_asset_list.html:156
+#: assets/templates/assets/user_asset_list.html:162
 #: perms/templates/perms/asset_permission_asset.html:54
 #: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:132
 #: users/templates/users/user_granted_asset.html:44
@@ -303,23 +296,33 @@ msgstr "主机名"
 
 #: assets/models/asset.py:76 assets/models/domain.py:51
 #: assets/models/user.py:136 assets/templates/assets/asset_detail.html:76
-#: assets/templates/assets/domain_gateway_list.html:59
+#: assets/templates/assets/domain_gateway_list.html:70
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:31
-#: assets/templates/assets/user_asset_list.html:159
+#: assets/templates/assets/user_asset_list.html:165
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
 
+#: assets/models/asset.py:77 assets/models/domain.py:50
+#: assets/templates/assets/admin_user_assets.html:50
+#: assets/templates/assets/asset_detail.html:72
+#: assets/templates/assets/domain_gateway_list.html:69
+#: assets/templates/assets/system_user_asset.html:52
+#: assets/templates/assets/user_asset_list.html:164
+#: settings/templates/settings/replay_storage_create.html:59
+msgid "Port"
+msgstr "端口"
+
 #: assets/models/asset.py:78 assets/templates/assets/asset_detail.html:108
-#: assets/templates/assets/user_asset_list.html:160
+#: assets/templates/assets/user_asset_list.html:166
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:81 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:54 assets/models/label.py:22
 #: assets/templates/assets/asset_detail.html:116
-#: assets/templates/assets/user_asset_list.html:164
+#: assets/templates/assets/user_asset_list.html:170
 msgid "Is active"
 msgstr "激活"
 
@@ -373,7 +376,7 @@ msgid "Disk info"
 msgstr "硬盘信息"
 
 #: assets/models/asset.py:103 assets/templates/assets/asset_detail.html:112
-#: assets/templates/assets/user_asset_list.html:161
+#: assets/templates/assets/user_asset_list.html:167
 msgid "OS"
 msgstr "操作系统"
 
@@ -439,11 +442,11 @@ msgstr "创建日期"
 #: assets/templates/assets/cmd_filter_list.html:27
 #: assets/templates/assets/cmd_filter_rule_list.html:62
 #: assets/templates/assets/domain_detail.html:76
-#: assets/templates/assets/domain_gateway_list.html:61
+#: assets/templates/assets/domain_gateway_list.html:72
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:37
-#: assets/templates/assets/user_asset_list.html:165 ops/models/adhoc.py:43
+#: assets/templates/assets/user_asset_list.html:171 ops/models/adhoc.py:43
 #: orgs/models.py:17 perms/models.py:38 perms/models.py:91
 #: perms/templates/perms/asset_permission_detail.html:102 settings/models.py:34
 #: terminal/models.py:32 terminal/templates/terminal/terminal_detail.html:63
@@ -593,7 +596,7 @@ msgstr "过滤器"
 
 #: assets/models/cmd_filter.py:50
 #: assets/templates/assets/cmd_filter_rule_list.html:58
-#: audits/templates/audits/login_log_list.html:50
+#: audits/templates/audits/login_log_list.html:52
 #: settings/templates/settings/command_storage_create.html:31
 #: settings/templates/settings/replay_storage_create.html:31
 #: settings/templates/settings/terminal_setting.html:81
@@ -627,11 +630,12 @@ msgstr "每行一个命令"
 #: assets/templates/assets/asset_list.html:96
 #: assets/templates/assets/cmd_filter_list.html:28
 #: assets/templates/assets/cmd_filter_rule_list.html:63
-#: assets/templates/assets/domain_gateway_list.html:62
+#: assets/templates/assets/domain_gateway_list.html:73
 #: assets/templates/assets/domain_list.html:29
 #: assets/templates/assets/label_list.html:17
 #: assets/templates/assets/system_user_asset.html:54
-#: assets/templates/assets/system_user_list.html:38 audits/models.py:37
+#: assets/templates/assets/system_user_list.html:38
+#: assets/templates/assets/user_asset_list.html:48 audits/models.py:38
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
@@ -655,7 +659,7 @@ msgstr "命令过滤规则"
 
 #: assets/models/domain.py:61 assets/templates/assets/domain_detail.html:21
 #: assets/templates/assets/domain_detail.html:64
-#: assets/templates/assets/domain_gateway_list.html:21
+#: assets/templates/assets/domain_gateway_list.html:26
 #: assets/templates/assets/domain_list.html:27
 msgid "Gateway"
 msgstr "网关"
@@ -668,8 +672,8 @@ msgstr "资产组"
 msgid "Default asset group"
 msgstr "默认资产组"
 
-#: assets/models/label.py:15 audits/models.py:16 audits/models.py:36
-#: audits/models.py:49 audits/templates/audits/ftp_log_list.html:33
+#: assets/models/label.py:15 audits/models.py:17 audits/models.py:37
+#: audits/models.py:50 audits/templates/audits/ftp_log_list.html:33
 #: audits/templates/audits/ftp_log_list.html:70
 #: audits/templates/audits/operate_log_list.html:33
 #: audits/templates/audits/operate_log_list.html:66
@@ -762,8 +766,8 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:162
-#: audits/models.py:19 audits/templates/audits/ftp_log_list.html:49
+#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:168
+#: audits/models.py:20 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72 perms/forms.py:48
 #: perms/models.py:32 perms/models.py:86
 #: perms/templates/perms/asset_permission_detail.html:140
@@ -925,6 +929,18 @@ msgstr "更新资产用户认证信息"
 msgid "Please input password"
 msgstr "请输入密码"
 
+#: assets/templates/assets/_gateway_test_modal.html:4
+msgid "Test gateway test connection"
+msgstr "测试连接网关"
+
+#: assets/templates/assets/_gateway_test_modal.html:10 terminal/models.py:24
+msgid "SSH Port"
+msgstr "SSH端口"
+
+#: assets/templates/assets/_gateway_test_modal.html:13
+msgid "If use nat, set the ssh real port"
+msgstr "如果使用了nat端口映射，请设置为ssh真实监听的端口"
+
 #: assets/templates/assets/_system_user.html:37
 #: assets/templates/assets/asset_create.html:16
 #: assets/templates/assets/asset_update.html:21
@@ -998,6 +1014,7 @@ msgstr "重置"
 #: assets/templates/assets/domain_create_update.html:17
 #: assets/templates/assets/gateway_create_update.html:59
 #: assets/templates/assets/label_create_update.html:19
+#: audits/templates/audits/login_log_list.html:89
 #: perms/templates/perms/asset_permission_create_update.html:81
 #: settings/templates/settings/basic_setting.html:62
 #: settings/templates/settings/command_storage_create.html:80
@@ -1007,7 +1024,7 @@ msgstr "重置"
 #: settings/templates/settings/security_setting.html:71
 #: settings/templates/settings/terminal_setting.html:70
 #: terminal/templates/terminal/command_list.html:103
-#: terminal/templates/terminal/session_list.html:127
+#: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
 #: users/templates/users/forgot_password.html:49
@@ -1036,7 +1053,7 @@ msgstr "关闭"
 #: assets/templates/assets/cmd_filter_detail.html:19
 #: assets/templates/assets/cmd_filter_rule_list.html:19
 #: assets/templates/assets/domain_detail.html:18
-#: assets/templates/assets/domain_gateway_list.html:18
+#: assets/templates/assets/domain_gateway_list.html:20
 #: assets/templates/assets/system_user_asset.html:18
 #: assets/templates/assets/system_user_detail.html:18
 #: ops/templates/ops/adhoc_history.html:130
@@ -1113,11 +1130,11 @@ msgstr "更新失败"
 #: assets/templates/assets/cmd_filter_rule_list.html:86
 #: assets/templates/assets/domain_detail.html:24
 #: assets/templates/assets/domain_detail.html:103
-#: assets/templates/assets/domain_gateway_list.html:85
+#: assets/templates/assets/domain_gateway_list.html:97
 #: assets/templates/assets/domain_list.html:53
 #: assets/templates/assets/label_list.html:38
 #: assets/templates/assets/system_user_detail.html:26
-#: assets/templates/assets/system_user_list.html:92 audits/models.py:32
+#: assets/templates/assets/system_user_list.html:92 audits/models.py:33
 #: perms/templates/perms/asset_permission_detail.html:30
 #: perms/templates/perms/asset_permission_list.html:177
 #: terminal/templates/terminal/terminal_detail.html:16
@@ -1145,11 +1162,11 @@ msgstr "更新"
 #: assets/templates/assets/cmd_filter_rule_list.html:87
 #: assets/templates/assets/domain_detail.html:28
 #: assets/templates/assets/domain_detail.html:104
-#: assets/templates/assets/domain_gateway_list.html:86
+#: assets/templates/assets/domain_gateway_list.html:98
 #: assets/templates/assets/domain_list.html:54
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:30
-#: assets/templates/assets/system_user_list.html:93 audits/models.py:33
+#: assets/templates/assets/system_user_list.html:93 audits/models.py:34
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:178
@@ -1520,27 +1537,27 @@ msgstr "确认删除"
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
 
-#: assets/templates/assets/domain_gateway_list.html:31
+#: assets/templates/assets/domain_gateway_list.html:37
 msgid "Gateway list"
 msgstr "网关列表"
 
-#: assets/templates/assets/domain_gateway_list.html:48
+#: assets/templates/assets/domain_gateway_list.html:56
 #: assets/views/domain.py:127
 msgid "Create gateway"
 msgstr "创建网关"
 
-#: assets/templates/assets/domain_gateway_list.html:87
-#: assets/templates/assets/domain_gateway_list.html:89
+#: assets/templates/assets/domain_gateway_list.html:99
+#: assets/templates/assets/domain_gateway_list.html:101
 #: settings/templates/settings/email_setting.html:61
 #: settings/templates/settings/ldap_setting.html:61
 msgid "Test connection"
 msgstr "测试连接"
 
-#: assets/templates/assets/domain_gateway_list.html:123
+#: assets/templates/assets/domain_gateway_list.html:141
 msgid "Can be connected"
 msgstr "可连接"
 
-#: assets/templates/assets/domain_gateway_list.html:124
+#: assets/templates/assets/domain_gateway_list.html:142
 msgid "The connection fails"
 msgstr "连接失败"
 
@@ -1653,6 +1670,10 @@ msgstr "删除系统用户"
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
+#: assets/templates/assets/user_asset_list.html:100
+msgid "Connect"
+msgstr "连接"
+
 #: assets/views/admin_user.py:30
 msgid "Admin user list"
 msgstr "管理用户列表"
@@ -1757,7 +1778,7 @@ msgstr "资产管理"
 msgid "System user asset"
 msgstr "系统用户资产"
 
-#: audits/models.py:17 audits/models.py:40 audits/models.py:51
+#: audits/models.py:18 audits/models.py:41 audits/models.py:52
 #: audits/templates/audits/ftp_log_list.html:73
 #: audits/templates/audits/operate_log_list.html:70
 #: audits/templates/audits/password_change_log_list.html:52
@@ -1766,16 +1787,16 @@ msgstr "系统用户资产"
 msgid "Remote addr"
 msgstr "远端地址"
 
-#: audits/models.py:20 audits/templates/audits/ftp_log_list.html:74
+#: audits/models.py:21 audits/templates/audits/ftp_log_list.html:74
 msgid "Operate"
 msgstr "操作"
 
-#: audits/models.py:21 audits/templates/audits/ftp_log_list.html:56
+#: audits/models.py:22 audits/templates/audits/ftp_log_list.html:56
 #: audits/templates/audits/ftp_log_list.html:75
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:22 audits/models.py:89
+#: audits/models.py:23 audits/models.py:90
 #: audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/command_execution_list.html:64
 #: ops/templates/ops/task_list.html:31
@@ -1783,93 +1804,93 @@ msgstr "文件名"
 msgid "Success"
 msgstr "成功"
 
-#: audits/models.py:31
+#: audits/models.py:32
 msgid "Create"
 msgstr "创建"
 
-#: audits/models.py:38 audits/templates/audits/operate_log_list.html:49
+#: audits/models.py:39 audits/templates/audits/operate_log_list.html:49
 #: audits/templates/audits/operate_log_list.html:68
 msgid "Resource Type"
 msgstr "资源类型"
 
-#: audits/models.py:39 audits/templates/audits/operate_log_list.html:69
+#: audits/models.py:40 audits/templates/audits/operate_log_list.html:69
 msgid "Resource"
 msgstr "资源"
 
-#: audits/models.py:50 audits/templates/audits/password_change_log_list.html:51
+#: audits/models.py:51 audits/templates/audits/password_change_log_list.html:51
 msgid "Change by"
 msgstr "修改者"
 
-#: audits/models.py:69 users/templates/users/user_detail.html:98
+#: audits/models.py:70 users/templates/users/user_detail.html:98
 msgid "Disabled"
 msgstr "禁用"
 
-#: audits/models.py:70 settings/models.py:33
+#: audits/models.py:71 settings/models.py:33
 #: users/templates/users/user_detail.html:96
 msgid "Enabled"
 msgstr "启用"
 
-#: audits/models.py:71 audits/models.py:81
+#: audits/models.py:72 audits/models.py:82
 msgid "-"
 msgstr ""
 
-#: audits/models.py:82
+#: audits/models.py:83
 msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
-#: audits/models.py:83
+#: audits/models.py:84
 msgid "MFA authentication failed"
 msgstr "MFA 认证失败"
 
-#: audits/models.py:84
+#: audits/models.py:85
 msgid "Username does not exist"
 msgstr "用户名不存在"
 
-#: audits/models.py:85
+#: audits/models.py:86
 msgid "Password expired"
 msgstr "密码过期"
 
-#: audits/models.py:90 xpack/plugins/cloud/models.py:164
+#: audits/models.py:91 xpack/plugins/cloud/models.py:164
 #: xpack/plugins/cloud/models.py:178
 msgid "Failed"
 msgstr "失败"
 
-#: audits/models.py:94
+#: audits/models.py:95
 msgid "Login type"
 msgstr "登录方式"
 
-#: audits/models.py:95
+#: audits/models.py:96
 msgid "Login ip"
 msgstr "登录IP"
 
-#: audits/models.py:96
+#: audits/models.py:97
 msgid "Login city"
 msgstr "登录城市"
 
-#: audits/models.py:97
+#: audits/models.py:98
 msgid "User agent"
 msgstr "Agent"
 
-#: audits/models.py:98 audits/templates/audits/login_log_list.html:54
+#: audits/models.py:99 audits/templates/audits/login_log_list.html:56
 #: users/forms.py:142 users/models/user.py:76
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:99 audits/templates/audits/login_log_list.html:55
+#: audits/models.py:100 audits/templates/audits/login_log_list.html:57
 #: xpack/plugins/cloud/models.py:172
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:69
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:100 audits/templates/audits/login_log_list.html:56
+#: audits/models.py:101 audits/templates/audits/login_log_list.html:58
 #: xpack/plugins/cloud/models.py:171 xpack/plugins/cloud/models.py:188
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:67
 msgid "Status"
 msgstr "状态"
 
-#: audits/models.py:101
+#: audits/models.py:102
 msgid "Date login"
 msgstr "登录日期"
 
@@ -1903,7 +1924,7 @@ msgstr "选择用户"
 msgid "Search"
 msgstr "搜索"
 
-#: audits/templates/audits/login_log_list.html:48
+#: audits/templates/audits/login_log_list.html:50
 #: ops/templates/ops/adhoc_detail.html:49
 #: ops/templates/ops/adhoc_history_detail.html:49
 #: ops/templates/ops/task_detail.html:56
@@ -1913,18 +1934,24 @@ msgstr "搜索"
 msgid "ID"
 msgstr "ID"
 
-#: audits/templates/audits/login_log_list.html:51
+#: audits/templates/audits/login_log_list.html:53
 msgid "UA"
 msgstr "Agent"
 
-#: audits/templates/audits/login_log_list.html:53
+#: audits/templates/audits/login_log_list.html:55
 msgid "City"
 msgstr "城市"
 
-#: audits/templates/audits/login_log_list.html:57
+#: audits/templates/audits/login_log_list.html:59
 #: ops/templates/ops/task_list.html:32
 msgid "Date"
 msgstr "日期"
+
+#: audits/templates/audits/login_log_list.html:85
+#, fuzzy
+#| msgid "Login log"
+msgid "Export login log"
+msgstr "登录日志"
 
 #: audits/templates/audits/operate_log_list.html:71
 #: audits/templates/audits/password_change_log_list.html:53
@@ -1934,28 +1961,28 @@ msgstr "日期"
 msgid "Datetime"
 msgstr "日期"
 
-#: audits/views.py:70 audits/views.py:114 audits/views.py:150
-#: audits/views.py:194 audits/views.py:225 templates/_nav.html:72
+#: audits/views.py:85 audits/views.py:129 audits/views.py:165
+#: audits/views.py:209 audits/views.py:240 templates/_nav.html:72
 msgid "Audits"
 msgstr "日志审计"
 
-#: audits/views.py:71 templates/_nav.html:76
+#: audits/views.py:86 templates/_nav.html:76
 msgid "FTP log"
 msgstr "FTP日志"
 
-#: audits/views.py:115 templates/_nav.html:77
+#: audits/views.py:130 templates/_nav.html:77
 msgid "Operate log"
 msgstr "操作日志"
 
-#: audits/views.py:151 templates/_nav.html:78
+#: audits/views.py:166 templates/_nav.html:78
 msgid "Password change log"
 msgstr "改密日志"
 
-#: audits/views.py:195 templates/_nav.html:75
+#: audits/views.py:210 templates/_nav.html:75
 msgid "Login log"
 msgstr "登录日志"
 
-#: audits/views.py:226 ops/views/command.py:44
+#: audits/views.py:241 ops/views/command.py:44
 msgid "Command execution list"
 msgstr "命令执行列表"
 
@@ -2142,7 +2169,7 @@ msgstr "Crontab"
 
 #: ops/models/adhoc.py:39
 msgid "5 * * * *"
-msgstr ""
+msgstr "5 * * * *"
 
 #: ops/models/adhoc.py:41
 msgid "Callback"
@@ -3083,7 +3110,9 @@ msgid ""
 "Import {} users successfully; import {} users failed, the database already "
 "exists with the same name; import {}users failed, Because’TypeError' object "
 "has no attribute 'keys'"
-msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户; 导入 {} 这些用户失败，因为对象没有属性'keys'"
+msgstr ""
+"导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户; 导入 {} "
+"这些用户失败，因为对象没有属性'keys'"
 
 #: settings/utils.py:145
 msgid "Import {} users successfully"
@@ -3491,10 +3520,6 @@ msgstr ""
 msgid "Remote Address"
 msgstr "远端地址"
 
-#: terminal/models.py:24
-msgid "SSH Port"
-msgstr "SSH端口"
-
 #: terminal/models.py:25
 msgid "HTTP Port"
 msgstr "HTTP端口"
@@ -3535,7 +3560,7 @@ msgstr "最后活跃日期"
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models.py:234
+#: terminal/models.py:242
 msgid "Args"
 msgstr "参数"
 
@@ -3581,28 +3606,24 @@ msgstr "登录来源"
 msgid "Duration"
 msgstr "时长"
 
-#: terminal/templates/terminal/session_list.html:106
-msgid "Monitor"
-msgstr "监控"
-
-#: terminal/templates/terminal/session_list.html:108
-#: terminal/templates/terminal/session_list.html:110
+#: terminal/templates/terminal/session_list.html:107
+#: terminal/templates/terminal/session_list.html:109
 msgid "Terminate"
 msgstr "终断"
 
-#: terminal/templates/terminal/session_list.html:122
+#: terminal/templates/terminal/session_list.html:121
 msgid "Terminate selected"
 msgstr "终断所选"
 
-#: terminal/templates/terminal/session_list.html:123
+#: terminal/templates/terminal/session_list.html:122
 msgid "Confirm finished"
 msgstr "确认已完成"
 
-#: terminal/templates/terminal/session_list.html:143
+#: terminal/templates/terminal/session_list.html:142
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
 
-#: terminal/templates/terminal/session_list.html:156
+#: terminal/templates/terminal/session_list.html:155
 msgid "Finish session success"
 msgstr "标记会话完成成功"
 
@@ -5049,6 +5070,122 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "Cycle perform"
+#~ msgstr "周期执行"
+
+#~ msgid "Tips: (Units: hour)"
+#~ msgstr "提示：（单位： 时）"
+
+#~ msgid "Password length"
+#~ msgstr "密码长度"
+
+#~ msgid "* Please enter custom password"
+#~ msgstr "* 请输入自定义密码"
+
+#~ msgid "* Please enter a valid crontab expression"
+#~ msgstr "* 请输入有效的 crontab 表达式"
+
+#~ msgid "Timing perform"
+#~ msgstr "定时执行"
+
+#~ msgid ""
+#~ "eg: Every Sunday 03:05 run (5 3 * * 0) <br> Tips: Using 5 digits linux "
+#~ "crontab expressions (<a href='https://tool.lu/crontab/' "
+#~ "target='_blank'>Online tools</a>) <br>Note: If both Regularly perform and "
+#~ "Cycle perform are set, give priority to Regularly perform"
+#~ msgstr ""
+#~ "eg：每周日 03:05 执行（5 3 * * 0） <br> 提示： 使用5位 Linux crontab 表达"
+#~ "式（<a href='https://tool.lu/crontab/' target='_blank'>在线工具</a>） <br>"
+#~ "注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
+
+#~ msgid "Change auth plan"
+#~ msgstr "改密计划"
+
+#~ msgid "Custom password"
+#~ msgstr "自定义密码"
+
+#~ msgid "All assets use the same random password"
+#~ msgstr "所有资产使用相同的随机密码"
+
+#~ msgid "All assets use different random password"
+#~ msgstr "所有资产使用不同的随机密码"
+
+#~ msgid "Asset username"
+#~ msgstr "资产用户名"
+
+#~ msgid "Regularly perform"
+#~ msgstr "定期执行"
+
+#~ msgid "Password strategy"
+#~ msgstr "密码策略"
+
+#~ msgid "Password rules"
+#~ msgstr "密码规则"
+
+#~ msgid "Change auth plan snapshot"
+#~ msgstr "改密计划快照"
+
+#~ msgid "Change auth plan history"
+#~ msgstr "改密计划历史"
+
+#~ msgid "Change auth plan task"
+#~ msgstr "改密计划任务"
+
+#~ msgid "Authentication failed"
+#~ msgstr "认证失败"
+
+#~ msgid "Connection timeout"
+#~ msgstr "连接超时"
+
+#~ msgid "Plan detail"
+#~ msgstr "计划详情"
+
+#~ msgid "Run history list"
+#~ msgstr "执行历史列表"
+
+#~ msgid "Add asset to this plan"
+#~ msgstr "添加资产"
+
+#~ msgid "Add node to this plan"
+#~ msgstr "添加节点"
+
+#~ msgid "Length"
+#~ msgstr "长度"
+
+#~ msgid "History of plan"
+#~ msgstr "执行历史"
+
+#~ msgid "Log"
+#~ msgstr "日志"
+
+#~ msgid "Retry"
+#~ msgstr "重试"
+
+#~ msgid "Run failed"
+#~ msgstr "执行失败"
+
+#~ msgid "Create plan"
+#~ msgstr "创建计划"
+
+#~ msgid "Plan list"
+#~ msgstr "计划列表"
+
+#~ msgid "Update plan"
+#~ msgstr "更新计划"
+
+#~ msgid "plan asset list"
+#~ msgstr "计划资产列表"
+
+#~ msgid "Run history task list"
+#~ msgstr "执行历史任务列表"
+
+#~ msgid ""
+#~ "* When selecting a custom password strategy, please enter the password"
+#~ msgstr "* 选择自定义密码策略时，请输入密码"
+
+#~ msgid "Monitor"
+#~ msgstr "监控"
 
 #~ msgid "Invalid private key"
 #~ msgstr "ssh密钥不合法"

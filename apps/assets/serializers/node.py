@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
-from rest_framework_bulk.serializers import BulkListSerializer
 
-from common.mixins import BulkSerializerMixin
 from ..models import Asset, Node
-from .asset import AssetGrantedSerializer
 
 
 __all__ = [
@@ -22,7 +19,7 @@ class NodeSerializer(serializers.ModelSerializer):
             'id', 'key', 'value', 'assets_amount', 'org_id',
         ]
         read_only_fields = [
-            'id', 'key', 'assets_amount', 'org_id',
+            'key', 'assets_amount', 'org_id',
         ]
 
     def validate_value(self, data):

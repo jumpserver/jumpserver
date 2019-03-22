@@ -22,6 +22,10 @@ from .conf import load_user_config
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
+sys.path.append(PROJECT_DIR)
+from apps import __version__
+
+VERSION = __version__
 CONFIG = load_user_config()
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
@@ -456,8 +460,8 @@ CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 3600
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(message)s'
-CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
-# CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True

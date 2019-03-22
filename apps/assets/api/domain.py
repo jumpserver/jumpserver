@@ -51,9 +51,10 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     model = Gateway
     object = None
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object(Gateway.objects.all())
-        ok, e = self.object.test_connective()
+        local_port = self.request.data.get('port') or self.object.port
+        ok, e = self.object.test_connective(local_port=local_port)
         if ok:
             return Response("ok")
         else:

@@ -15,7 +15,7 @@ class ServiceAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'access_key']
-        read_only_fields = ['id', 'access_key']
+        read_only_fields = ['access_key']
 
     def get_username(self):
         return self.initial_data.get('name')
