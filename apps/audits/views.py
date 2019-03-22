@@ -236,17 +236,17 @@ class CommandExecutionListView(UserCommandExecutionListView):
         return users
 
     def get_context_data(self, **kwargs):
-        context = {
+        context = super().get_context_data(**kwargs)
+        context.update({
             'app': _('Audits'),
-            'action': _('Command execution list'),
+            'action': _('Command execution log'),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user_list': self.get_user_list(),
             'keyword': self.keyword,
             'user_id': self.user_id,
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+        })
+        return super().get_context_data(**context)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
