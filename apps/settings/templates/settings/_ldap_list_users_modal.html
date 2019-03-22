@@ -1,0 +1,90 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_id %}ldap_list_users_modal{% endblock %}
+{% block modal_title%}{% trans "Ldap users" %}{% endblock %}
+{% block modal_body %}
+<link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+<script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+<style>
+.inmodal .modal-header {
+    padding: 10px 10px;
+    text-align: center;
+}
+
+#assetTree2.ztree * {
+    background-color: #f8fafb;
+}
+#assetTree2.ztree {
+    background-color: #f8fafb;
+}
+</style>
+
+<div class="wrapper wrapper-content">
+   <div class="row">
+       <div class="col-lg-12 animated fadeInRight" id="split-right">
+           <div class="mail-box-header">
+               <table class="table table-striped table-bordered table-hover " id="ldap_list_users_table" style="width: 100%">
+                   <thead>
+                       <tr>
+                           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                           <th class="text-center">{% trans 'Username' %}</th>
+                           <th class="text-center">{% trans 'Name' %}</th>
+                           <th class="text-center">{% trans 'Email' %}</th>
+                           <th class="text-center">{% trans 'Is imported' %}</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                   </tbody>
+               </table>
+           </div>
+       </div>
+   </div>
+</div>
+
+<script>
+var ldap_users_table = 0;
+function initLdapTable() {
+    if(ldap_users_table){
+        return
+    }
+    var options = {
+        ele: $('#ldap_list_users_table'),
+        ajax_url: '{% url "api-settings:ldap-sync" %}',
+        columns: [
+            {data: "username" },{data: "username" }, {data: "name" },
+            {data:"email"}, {data:'is_imported'}
+        ],
+        pageLength: 10
+    };
+
+    ldap_users_table = jumpserver.initDataTable(options);
+    return ldap_users_table
+}
+
+
+$(document).ready(function(){
+}).on('show.bs.modal', function () {
+    initLdapTable();
+
+})
+.on('click','.close_btn1',function () {
+    window.location.reload()
+})
+.on('click','.close_btn2',function () {
+    window.location.reload()
+})
+
+</script>
+{% endblock %}
+
+{% block modal_button %}
+    {{ block.super }}
+{% endblock %}
+{% block modal_confirm_id %}btn_ldap_modal_confirm{% endblock %}
+
+
+

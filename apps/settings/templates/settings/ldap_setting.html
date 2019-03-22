@@ -31,7 +31,7 @@
                     <div class="tab-content">
                         <div class="col-sm-12" style="padding-left:0">
                                 <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
-                                    <form action="" method="post" class="form-horizontal">
+                                    <form id="ldap_form" action="" method="post" class="form-horizontal">
                                     {% if form.non_field_errors %}
                                          <div class="alert alert-danger">
                                              {{ form.non_field_errors }}
@@ -61,6 +61,8 @@
                                             <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+{#                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>#}
+                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Sync User' %}</button>
                                         </div>
                                     </div>
                                     </form>
@@ -72,10 +74,12 @@
             </div>
         </div>
     </div>
+    {% include 'settings/_ldap_list_users_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
+
 })
 .on("click", ".btn-test", function () {
     var data = {};
@@ -102,5 +106,30 @@ $(document).ready(function () {
         error: error
     });
 })
+.on("click","#btn_ldap_modal_confirm",function () {
+    var user_names=[];
+    var cheked = $("tbody input[type='checkbox']:checked").each(function () {
+        user_names.push($(this).attr('id'));
+
+    });
+    var the_url =  "{% url "api-settings:ldap-comfirm-sync" %}";
+
+    function error(message) {
+        toastr.error(message)
+    }
+
+    function success(message) {
+        toastr.success(message.msg)
+    }
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify({'user_names':user_names}),
+        method: "POST",
+        flash_message: false,
+        success: success,
+        error: error
+    });
+ })
+
 </script>
 {% endblock %}
