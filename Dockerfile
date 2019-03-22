@@ -6,6 +6,7 @@ RUN useradd jumpserver
 
 COPY ./requirements /tmp/requirements
 
+RUN rpm -ivh https://repo.mysql.com/mysql57-community-release-el6.rpm
 RUN yum -y install epel-release openldap-clients telnet && cd /tmp/requirements && \
     yum -y install $(cat rpm_requirements.txt)
 
