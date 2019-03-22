@@ -32,95 +32,106 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/plugins/datatables/datatables.min.js' %}"></script>
 
-{#    <script src="{% static 'js/angular.min.js' %}"></script>#}
     <style>
+
+        .box-1{
+            height: 472px;
+            width: 984px;
+            margin-right: auto;
+            margin-left: auto;
+            margin-top: calc((100vh - 470px)/2);
+
+        }
+        .box-2{
+            height: 100%;
+            width: 50%;
+            float: right;
+        }
+        .box-3{
+            text-align: center;
+            background-color: white;
+            height: 100%;
+            width: 50%;
+        }
         .captcha {
             float: right;
         }
+
+
     </style>
 </head>
 
-<body>
-
-<div class="login-dialog">
-    <div class="">
-        <div class="row" style="height: 472px">
-            <div class="col-md-4 col-md-offset-2 input_shadow-1" style="text-align: center;background-color: white; padding-right: 0px;height: 100%">
-                <div style="background-color: white">
-                {% if interface.login_title %}
-                    <div style="margin-top: 40px">
-                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface.login_title }}</span>
-                    </div>
+<body style="height: 100%">
+    <div>
+        <div class="box-1">
+            <div class="box-2">
+                {% if interface.login_image %}
+                    <img src="{{ MEDIA_URL }}{{ interface.login_image }}" style="height: 100%; width: 100%"/>
                 {% else %}
-                    <div style="margin-top: 40px">
-                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{% trans 'Welcome to the Jumpserver open source fortress' %}</span>
-                    </div>
+                    <img src="{% static 'img/login/login_image_1.png' %}" style=" height: 100%; width: 100%"/>
                 {% endif %}
+            </div>
+            <div class="box-3">
+                <div style="background-color: white">
+                    {% if interface.login_title %}
+                        <div style="margin-top: 40px;padding-top: 50px;">
+                            <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface.login_title }}</span>
+                        </div>
+                    {% else %}
+                        <div style="margin-top: 40px;padding-top: 50px;">
+                            <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{% trans 'Welcome to the Jumpserver open source fortress' %}</span>
+                        </div>
+                    {% endif %}
 
                     <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 10px">
-                    {% trans 'Welcome back, please enter username and password to login' %}
+                        {% trans 'Welcome back, please enter username and password to login' %}
                     </div>
                     <div style="margin-bottom: 10px">
-                    <div>
-                        <div class="col-md-1"></div>
-                        <div class="contact-form col-md-10" style="margin-top: 20px;height: 35px">
-                        <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
-                            {% csrf_token %}
-                            <div style="height: 48px;color: red">
-                                {% if block_login %}
-                                <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
-                            {% elif password_expired %}
-                                <p class="red-fonts">{% trans 'The user password has expired' %}</p>
-                            {% elif form.errors %}
-                                {% if 'captcha' in form.errors %}
-                                    <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
-                                {% else %}
-                                    <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
-                                {% endif %}
-                            {% endif %}
-                            </div>
+                        <div>
+                            <div class="col-md-1"></div>
+                            <div class="contact-form col-md-10" style="margin-top: 20px;height: 35px">
+                                <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
+                                    {% csrf_token %}
+                                    <div style="height: 48px;color: red">
+                                        {% if block_login %}
+                                            <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
+                                        {% elif password_expired %}
+                                            <p class="red-fonts">{% trans 'The user password has expired' %}</p>
+                                        {% elif form.errors %}
+                                            {% if 'captcha' in form.errors %}
+                                                <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
+                                            {% else %}
+                                                <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
 
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="{{ form.username.html_name }}"
-                                       placeholder="{% trans 'Username' %}" required=""
-                                       value="{% if form.username.value %}{{ form.username.value }}{% endif %}" style="height: 35px">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}" style="height: 35px">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
+                                    </div>
+                                    <div class="form-group" style="height: 50px;margin-bottom: 0">
+                                        {{ form.captcha }}
+                                    </div>
+                                    <div class="form-group" style="margin-top: 10px">
+                                        <button type="submit" class="btn btn-transparent">{% trans 'Login' %}</button>
+                                    </div>
+                                    <div style="text-align: center">
+                                        <a href="{% url 'users:forgot-password' %}">
+                                            <small>{% trans 'Forgot password' %}?</small>
+                                        </a>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="form-group">
-                                <input type="password" class="form-control" name="{{ form.password.html_name }}"
-                                       placeholder="{% trans 'Password' %}" required="">
-                            </div>
-                            <div class="form-group" style="height: 50px;margin-bottom: 0px">
-                                {{ form.captcha }}
-                            </div>
-                            <div class="form-group" style="margin-top: 10px">
-                                <button type="submit" class="btn btn-transparent">{% trans 'Login' %}</button>
-                            </div>
-                            <div style="text-align: center">
-                                <a href="{% url 'users:forgot-password' %}">
-                                    <small>{% trans 'Forgot password' %}?</small>
-                                </a>
-                            </div>
-                        </form>
+                            <div class="col-md-1"></div>
+                        </div>
                     </div>
-                        <div class="col-md-1"></div>
-                    </div>
-
-                </div>
                 </div>
             </div>
-            <div class="col-md-4 " style="padding-left: 0px; height: 100%">
-                {% if interface.login_image %}
-                    <img src="{{ MEDIA_URL }}{{ interface.login_image }}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
-                {% else %}
-                    <img src="{% static 'img/login/login-image.jpg' %}" style="width: 100%; height: 100%;" class="input_shadow-1"  />
-                {% endif %}
-            </div>
-             </div>
-       <div class="col-md-2"></div>
-
         </div>
     </div>
-</div>
 
 </body>
 </html>

@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -99,6 +100,23 @@ class UserLoginLog(models.Model):
     reason = models.SmallIntegerField(default=0, choices=REASON_CHOICE, verbose_name=_('Reason'))
     status = models.BooleanField(max_length=2, default=True, choices=STATUS_CHOICE, verbose_name=_('Status'))
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
+
+    @classmethod
+    def get_login_logs(cls, date_form=None, date_to=None, user=None, keyword=None):
+        login_logs = cls.objects.all()
+        if date_form and date_to:
+            login_logs = login_logs.filter(
+                datetime__gt=date_form, datetime__lt=date_to
+            )
+        if user:
+            login_logs = login_logs.filter(username=user)
+        if keyword:
+            login_logs = login_logs.filter(
+                Q(ip__contains=keyword) |
+                Q(city__contains=keyword) |
+                Q(username__contains=keyword)
+            )
+        return login_logs
 
     class Meta:
         ordering = ['-datetime', 'username']
