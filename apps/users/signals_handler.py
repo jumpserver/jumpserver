@@ -3,11 +3,13 @@
 
 from django.dispatch import receiver
 # from django.db.models.signals import post_save
+from django_auth_ldap.backend import populate_user
+from django.contrib.auth.signals import user_logged_in
 
 from common.utils import get_logger
 from .signals import post_user_create
 # from .models import User
-
+from .utils import check_ldap_user_group_relation
 logger = get_logger(__file__)
 
 
@@ -29,3 +31,24 @@ def on_user_create(sender, user=None, **kwargs):
     if user.email:
         send_user_created_mail(user)
 
+
+#@receiver(populate_user)
+#def on_ldap_create_user(sender, user, ldap_user, **kwargs):
+#    #logger.debug(">>>>>>>>>> LDAPUSER:")
+#    #logger.debug(str(ldap_user.group_names))
+#    #logger.debug(">>>>>>>>>>>>>>>USER:")
+#    #logger.debug(str(user.groups))
+#    if user and user.name != 'admin':
+#        #user.source = user.SOURCE_LDAP
+#        if user.groups.count() == 0:
+#            logger.debug("users group count == 0")
+#            user.save()
+
+
+def sync_ldap_user_groups(sender, user, request, **kwargs):
+    if user.source == "ldap":
+        check_ldap_user_group_relation(user)
+    else:
+        logger.error("user is not ldap user" )
+
+user_logged_in.connect(sync_ldap_user_groups)
