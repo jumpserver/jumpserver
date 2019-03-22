@@ -160,6 +160,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+DB_OPTIONS = {}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
@@ -169,8 +170,13 @@ DATABASES = {
         'USER': CONFIG.DB_USER,
         'PASSWORD': CONFIG.DB_PASSWORD,
         'ATOMIC_REQUESTS': True,
+        'OPTIONS': DB_OPTIONS
     }
 }
+DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'ca.pem')
+if CONFIG.DB_ENGINE == 'mysql' and os.path.isfile(DB_CA_PATH):
+    DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
