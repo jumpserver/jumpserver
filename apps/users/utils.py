@@ -55,12 +55,16 @@ def create_or_add_user_group(user,groupname,user_group_set=None):
 
 def check_ldap_user_group_relation(user):
     if user.source == "ldap":
-        #logger.error("testtest>>>>>>>>>>>>")
-        user_group_set = user.groups.all()
-        for groupname in user.ldap_user.group_names:
-            logger.debug(str(groupname))
-            create_or_add_user_group(user,groupname,user_group_set)
-        create_or_add_user_group(user,"logview",user_group_set)
+        try:
+            user_group_set = user.groups.all()
+            for groupname in user.ldap_user.group_names:
+                try:
+                    create_or_add_user_group(user,groupname,user_group_set)
+                except Exception as e:
+                    logger.error("create or add group error : " + str(e))
+            create_or_add_user_group(user,"logview", user_group_set)
+        except Exception as e:
+            logger.error("group error : " + str(e))
         user.save()
     else:
         logger.warn("user is not ldap user" )
