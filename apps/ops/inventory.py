@@ -7,17 +7,70 @@ from assets.utils import get_assets_by_id_list, get_system_user_by_id
 from common.utils import get_logger
 
 __all__ = [
-    'JMSInventory'
+    'JMSInventory', 'JMSCustomInventory',
 ]
 
 
 logger = get_logger(__file__)
 
 
-class JMSInventory(BaseInventory):
+class JMSBaseInventory(BaseInventory):
+
+    def convert_to_ansible(self, asset, run_as_admin=False):
+        info = {
+            'id': asset.id,
+            'hostname': asset.hostname,
+            'ip': asset.ip,
+            'port': asset.port,
+            'vars': dict(),
+            'groups': [],
+        }
+        if asset.domain and asset.domain.has_gateway():
+            info["vars"].update(self.make_proxy_command(asset))
+        if run_as_admin:
+            info.update(asset.get_auth_info())
+        for node in asset.nodes.all():
+            info["groups"].append(node.value)
+        for label in asset.labels.all():
+            info["vars"].update({
+                label.name: label.value
+            })
+            info["groups"].append("{}:{}".format(label.name, label.value))
+        if asset.domain:
+            info["vars"].update({
+                "domain": asset.domain.name,
+            })
+            info["groups"].append("domain_"+asset.domain.name)
+        return info
+
+    @staticmethod
+    def make_proxy_command(asset):
+        gateway = asset.domain.random_gateway()
+        proxy_command_list = [
+            "ssh", "-p", str(gateway.port),
+            "-o", "StrictHostKeyChecking=no",
+            "{}@{}".format(gateway.username, gateway.ip),
+            "-W", "%h:%p", "-q",
+        ]
+
+        if gateway.password:
+            proxy_command_list.insert(
+                0, "sshpass -p '{}'".format(gateway.password)
+            )
+        if gateway.private_key:
+            proxy_command_list.append("-i {}".format(gateway.private_key_file))
+
+        proxy_command = "'-o ProxyCommand={}'".format(
+            " ".join(proxy_command_list)
+        )
+        return {"ansible_ssh_common_args": proxy_command}
+
+
+class JMSInventory(JMSBaseInventory):
     """
     JMS Inventory is the manager with jumpserver assets, so you can
-    write you own manager, construct you inventory
+    write you own manager, construct you inventory,
+    user_info  is obtained from admin_user or asset_user
     """
     def __init__(self, assets, run_as_admin=False, run_as=None, become_info=None):
         """
@@ -47,33 +100,6 @@ class JMSInventory(BaseInventory):
                 host.update(become_info)
         super().__init__(host_list=host_list)
 
-    def convert_to_ansible(self, asset, run_as_admin=False):
-        info = {
-            'id': asset.id,
-            'hostname': asset.hostname,
-            'ip': asset.ip,
-            'port': asset.port,
-            'vars': dict(),
-            'groups': [],
-        }
-        if asset.domain and asset.domain.has_gateway():
-            info["vars"].update(self.make_proxy_command(asset))
-        if run_as_admin:
-            info.update(asset.get_auth_info())
-        for node in asset.nodes.all():
-            info["groups"].append(node.value)
-        for label in asset.labels.all():
-            info["vars"].update({
-                label.name: label.value
-            })
-            info["groups"].append("{}:{}".format(label.name, label.value))
-        if asset.domain:
-            info["vars"].update({
-                "domain": asset.domain.name,
-            })
-            info["groups"].append("domain_"+asset.domain.name)
-        return info
-
     def get_run_user_info(self, host):
         from assets.backends.multi import AssetUserManager
 
@@ -89,24 +115,38 @@ class JMSInventory(BaseInventory):
         else:
             return run_user._to_secret_json()
 
-    @staticmethod
-    def make_proxy_command(asset):
-        gateway = asset.domain.random_gateway()
-        proxy_command_list = [
-            "ssh", "-p", str(gateway.port),
-            "-o", "StrictHostKeyChecking=no",
-            "{}@{}".format(gateway.username, gateway.ip),
-            "-W", "%h:%p", "-q",
-        ]
 
-        if gateway.password:
-            proxy_command_list.insert(
-                0, "sshpass -p '{}'".format(gateway.password)
-            )
-        if gateway.private_key:
-            proxy_command_list.append("-i {}".format(gateway.private_key_file))
+class JMSCustomInventory(JMSBaseInventory):
+    """
+    JMS Custom Inventory is the manager with jumpserver assets,
+    user_info  is obtained from custom parameter
+    """
 
-        proxy_command = "'-o ProxyCommand={}'".format(
-            " ".join(proxy_command_list)
-        )
-        return {"ansible_ssh_common_args": proxy_command}
+    def __init__(self, assets, username, password=None, public_key=None, private_key=None):
+        """
+        """
+        self.assets = assets
+        self.username = username
+        self.password = password
+        self.public_key = public_key
+        self.private_key = private_key
+
+        host_list = []
+
+        for asset in assets:
+            info = self.convert_to_ansible(asset)
+            host_list.append(info)
+
+        for host in host_list:
+            run_user_info = self.get_run_user_info()
+            host.update(run_user_info)
+
+        super().__init__(host_list=host_list)
+
+    def get_run_user_info(self):
+        return {
+            'username': self.username,
+            'password': self.password,
+            'public_key': self.public_key,
+            'private_key': self.private_key
+        }

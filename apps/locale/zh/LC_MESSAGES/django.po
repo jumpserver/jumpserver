@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-22 15:57+0800\n"
+"POT-Creation-Date: 2019-03-22 16:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1337,6 +1337,7 @@ msgid "Import"
 msgstr "导入"
 
 #: assets/templates/assets/asset_list.html:76
+#: audits/templates/audits/login_log_list.html:85
 #: users/templates/users/user_list.html:10
 msgid "Export"
 msgstr "导出"
@@ -1947,12 +1948,6 @@ msgstr "城市"
 msgid "Date"
 msgstr "日期"
 
-#: audits/templates/audits/login_log_list.html:85
-#, fuzzy
-#| msgid "Login log"
-msgid "Export login log"
-msgstr "登录日志"
-
 #: audits/templates/audits/operate_log_list.html:71
 #: audits/templates/audits/password_change_log_list.html:53
 #: ops/templates/ops/task_adhoc.html:63
@@ -1983,8 +1978,6 @@ msgid "Login log"
 msgstr "登录日志"
 
 #: audits/views.py:242
-#, fuzzy
-#| msgid "Command execution"
 msgid "Command execution log"
 msgstr "命令执行"
 
@@ -4709,7 +4702,7 @@ msgstr "选择管理员"
 #: xpack/plugins/cloud/views.py:41 xpack/plugins/cloud/views.py:57
 #: xpack/plugins/cloud/views.py:71 xpack/plugins/cloud/views.py:84
 #: xpack/plugins/cloud/views.py:100 xpack/plugins/cloud/views.py:121
-#: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:187
+#: xpack/plugins/cloud/views.py:136 xpack/plugins/cloud/views.py:179
 msgid "Cloud center"
 msgstr "云管中心"
 
@@ -4840,7 +4833,7 @@ msgstr "同步历史列表"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:28
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:31
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:29
-#: xpack/plugins/cloud/views.py:188
+#: xpack/plugins/cloud/views.py:180
 msgid "Sync instance list"
 msgstr "同步实例列表"
 
@@ -4903,14 +4896,10 @@ msgid "Image of login page"
 msgstr "登录页面图片"
 
 #: xpack/plugins/interface/forms.py:27
-#, fuzzy
-#| msgid ""
-#| "Tips: This will be displayed on the enterprise user login page. (suggest "
-#| "image size: 492px*472px)"
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (suggest "
-"image size: 635px*472px)"
-msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 492px*472px）"
+"image size: 492px*472px)"
+msgstr "提示：将会显示在企业版用户登录页面（建议图片大小为: 492*472px）"
 
 #: xpack/plugins/interface/forms.py:33 xpack/plugins/interface/models.py:23
 msgid "Website icon"
@@ -5084,12 +5073,6 @@ msgstr "创建组织"
 msgid "Update org"
 msgstr "更新组织"
 
-#~ msgid "Cycle perform"
-#~ msgstr "周期执行"
-
-#~ msgid "Tips: (Units: hour)"
-#~ msgstr "提示：（单位： 时）"
-
 #~ msgid "Password length"
 #~ msgstr "密码长度"
 
@@ -5099,8 +5082,14 @@ msgstr "更新组织"
 #~ msgid "* Please enter a valid crontab expression"
 #~ msgstr "* 请输入有效的 crontab 表达式"
 
-#~ msgid "Timing perform"
+#~ msgid "Asset username"
+#~ msgstr "资产用户名"
+
+#~ msgid "Periodic perform"
 #~ msgstr "定时执行"
+
+#~ msgid "Tips: (Units: hour)"
+#~ msgstr "提示：（单位： 时）"
 
 #~ msgid ""
 #~ "eg: Every Sunday 03:05 run (5 3 * * 0) <br> Tips: Using 5 digits linux "
@@ -5124,8 +5113,8 @@ msgstr "更新组织"
 #~ msgid "All assets use different random password"
 #~ msgstr "所有资产使用不同的随机密码"
 
-#~ msgid "Asset username"
-#~ msgstr "资产用户名"
+#~ msgid "Cycle perform"
+#~ msgstr "周期执行"
 
 #~ msgid "Regularly perform"
 #~ msgstr "定期执行"
@@ -5139,11 +5128,11 @@ msgstr "更新组织"
 #~ msgid "Change auth plan snapshot"
 #~ msgstr "改密计划快照"
 
-#~ msgid "Change auth plan history"
-#~ msgstr "改密计划历史"
+#~ msgid "Change auth plan execution"
+#~ msgstr "改密计划执行"
 
-#~ msgid "Change auth plan task"
-#~ msgstr "改密计划任务"
+#~ msgid "Change auth plan execution subtask"
+#~ msgstr "改密计划执行子任务"
 
 #~ msgid "Authentication failed"
 #~ msgstr "认证失败"
@@ -5154,8 +5143,8 @@ msgstr "更新组织"
 #~ msgid "Plan detail"
 #~ msgstr "计划详情"
 
-#~ msgid "Run history list"
-#~ msgstr "执行历史列表"
+#~ msgid "Plan execution list"
+#~ msgstr "执行列表"
 
 #~ msgid "Add asset to this plan"
 #~ msgstr "添加资产"
@@ -5166,8 +5155,14 @@ msgstr "更新组织"
 #~ msgid "Length"
 #~ msgstr "长度"
 
-#~ msgid "History of plan"
-#~ msgstr "执行历史"
+#~ msgid "Execute plan"
+#~ msgstr "执行计划"
+
+#~ msgid "Execute failed"
+#~ msgstr "执行失败"
+
+#~ msgid "Execution list of plan"
+#~ msgstr "执行列表"
 
 #~ msgid "Log"
 #~ msgstr "日志"
@@ -5190,12 +5185,8 @@ msgstr "更新组织"
 #~ msgid "plan asset list"
 #~ msgstr "计划资产列表"
 
-#~ msgid "Run history task list"
-#~ msgstr "执行历史任务列表"
-
-#~ msgid ""
-#~ "* When selecting a custom password strategy, please enter the password"
-#~ msgstr "* 选择自定义密码策略时，请输入密码"
+#~ msgid "Plan execution task list"
+#~ msgstr "执行任务列表"
 
 #~ msgid "Monitor"
 #~ msgstr "监控"
