@@ -123,7 +123,10 @@ def save(users, exist):
 def set_default_item(item):
     item['source'] = 'ldap'
     if not item.get('email', ''):
-        item['email'] = item['username'] + '@' + item['username'] + '.com'
+        if '@' in item['username']:
+            item['email'] = item['username']
+        else:
+            item['email'] = item['username'] + '@' + settings.EMAIL_SUFFIX
     if 'is_imported' in item.keys():
         item.pop('is_imported')
     return item
