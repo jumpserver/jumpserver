@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
-
 from orgs.mixins import OrgModelMixin, OrgManager
 
 

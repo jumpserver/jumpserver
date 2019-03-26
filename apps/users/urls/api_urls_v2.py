@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 from django.urls import path, include
 from rest_framework_bulk.routes import BulkRouter
-from ..api import v2 as api
+from .. import api_v2 as api
 
 app_name = 'users'
 

@@ -101,9 +101,8 @@
             <td class="text-center">{{ session.date_start|time_util_with_seconds:session.date_end }}</td>
             <td>
                 {% if session.is_finished %}
-                <a onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
+                <a {% if not session.can_replay %} disabled="" {% endif %} onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
                 {% else %}
-                <!--<a onclick="window.open('/luna/monitor/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>-->
                     {% if session.protocol == 'ssh' %}
                         <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
                     {% else %}

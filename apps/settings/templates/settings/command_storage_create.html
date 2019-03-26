@@ -1,0 +1,175 @@
+{#{% extends 'base.html' %}#}
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+{% load common_tags %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ action }}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ibox-content">
+                        <form action="" method="POST" class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label" for="id_type">{% trans "Type" %}</label>
+                                <div class="col-md-9">
+                                    <select id="id_type" class="selector form-control">
+                                        <option value ="server" selected="selected">server</option>
+                                        <option value ="es">es (elasticsearch)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label" for="id_name">{% trans "Name" %}</label>
+                                <div class="col-md-9">
+                                    <input id="id_name" class="form-control" type="text" name="NAME" value="">
+                                    <div id="id_error" style="color: red;"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: none;" >
+                                <label class="col-md-2 control-label" for="id_hosts">{% trans "Hosts" %}</label>
+                                <div class="col-md-9">
+                                    <input id="id_hosts" class="form-control" type="text" name="HOSTS" value="">
+                                    <div class="help-block">{% trans 'Tips: If there are multiple hosts, separate them with a comma (,)' %}</div>
+                                    <div class="help-block">eg: http://www.jumpserver.a.com, http://www.jumpserver.b.com</div>
+                                </div>
+                            </div>
+{#                            <div class="form-group" style="display: none;" >#}
+{#                                <label class="col-md-2 control-label" for="id_other">{% trans "Other" %}</label>#}
+{#                                <div class="col-md-9">#}
+{#                                    <input id="id_other" class="form-control" type="text" name="OTHER" value="">#}
+{#                                </div>#}
+{#                            </div>#}
+                            <div class="form-group" style="display: none;" >
+                                <label class="col-md-2 control-label" for="id_bucket">{% trans "Index" %}</label>
+                                <div class="col-md-9">
+                                    <input id="id_index" class="form-control" type="text" name="INDEX" value="jumpserver">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: none;" >
+                                <label class="col-md-2 control-label" for="id_doc_type">{% trans "Doc type" %}</label>
+                                <div class="col-md-9">
+                                    <input id="id_doc_type" class="form-control" type="text" name="DOC_TYPE" value="command_store">
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+                                    <a class="btn btn-primary" type="" id="id_submit_button" >{% trans 'Submit' %}</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+
+var field_of_all, need_get_field_of_server, need_get_field_of_es;
+
+function showField(field){
+    $.each(field, function(index, value){
+        $(value).parent('div').parent('div').css('display', '');
+    });
+}
+
+function hiddenField(field){
+    $.each(field, function(index, value){
+        $(value).parent('div').parent('div').css('display', 'none');
+    })
+}
+
+function getFieldByType(type){
+
+    if(type === 'server'){
+        return need_get_field_of_server
+    }
+    else if(type === 'es'){
+        return need_get_field_of_es
+    }
+}
+
+function ajaxAPI(url, data, success, error){
+    $.ajax({
+        url: url,
+        data: data,
+        method: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        success: success,
+        error: error
+    })
+}
+
+$(document).ready(function() {
+    var name_id = '#id_name';
+    var hosts_id = '#id_hosts';
+    {#var other_id = '#id_other';#}
+    var index_id = '#id_index';
+    var doc_type_id = '#id_doc_type';
+
+    field_of_all = [name_id, hosts_id, index_id, doc_type_id];
+    need_get_field_of_server = [name_id];
+    need_get_field_of_es = [name_id, hosts_id, index_id, doc_type_id];
+})
+.on('change', '.selector', function(){
+    var type = $('.selector').val();
+    console.log(type);
+    hiddenField(field_of_all);
+    var field = getFieldByType(type);
+    showField(field)
+})
+
+.on('click', '#id_submit_button', function(){
+    var type = $('.selector').val();
+    var field = getFieldByType(type);
+    var data = {'TYPE': type};
+    $.each(field, function(index, id_field){
+        var name = $(id_field).attr('name');
+        var value =  $(id_field).val();
+        if(name === 'HOSTS'){
+            data[name] = value.split(',');
+        }
+        else{
+            data[name] = value
+        }
+    });
+    var url = "{% url 'api-settings:command-storage-create' %}";
+    var success = function(data, textStatus) {
+        console.log(data, textStatus);
+        location = "{% url 'settings:terminal-setting' %}";
+    };
+    var error = function(data,  textStatus) {
+        var error_msg = data.responseJSON.error;
+        $('#id_error').html(error_msg)
+    };
+    ajaxAPI(url, JSON.stringify(data), success, error)
+
+})
+</script>
+{% endblock %}

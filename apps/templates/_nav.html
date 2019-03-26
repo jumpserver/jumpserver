@@ -64,7 +64,7 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
-        <li id="command-execution"><a href="{% url 'ops:command-execution-start' %}">{% trans 'Command execution' %}</a></li>
+        <li id="command-execution"><a href="{% url 'ops:command-execution-start' %}">{% trans 'Batch command' %}</a></li>
     </ul>
 </li>
 <li id="audits">
@@ -76,7 +76,7 @@
         <li id="ftp-log"><a href="{% url 'audits:ftp-log-list' %}">{% trans 'FTP log' %}</a></li>
         <li id="operate-log"><a href="{% url 'audits:operate-log-list' %}">{% trans 'Operate log' %}</a></li>
         <li id="password-change-log"><a href="{% url 'audits:password-change-log-list' %}">{% trans 'Password change log' %}</a></li>
-        <li id="command-execution-log"><a href="{% url 'audits:command-execution-log-list' %}">{% trans 'Command execution' %}</a></li>
+        <li id="command-execution-log"><a href="{% url 'audits:command-execution-log-list' %}">{% trans 'Batch command' %}</a></li>
     </ul>
 </li>
 {% if XPACK_PLUGINS %}

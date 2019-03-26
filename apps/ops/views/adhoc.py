@@ -33,11 +33,6 @@ class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             queryset = queryset.filter(created_by='')
 
         self.keyword = self.request.GET.get('keyword', '')
-        queryset = queryset.filter(
-            date_created__gt=self.date_from,
-            date_created__lt=self.date_to
-        )
-
         if self.keyword:
             queryset = queryset.filter(
                 name__icontains=self.keyword,

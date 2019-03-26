@@ -1,14 +1,28 @@
+import csv
+import json
+import uuid
+import codecs
+
+
 from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
+from django.core.cache import cache
+from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.utils.translation import ugettext as _
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
+from audits.utils import get_excel_response, write_content_to_excel
 from common.mixins import DatetimeSearchMixin
 from common.permissions import AdminUserRequiredMixin
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
-from users.models import User
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
 
 
@@ -222,14 +236,49 @@ class CommandExecutionListView(UserCommandExecutionListView):
         return users
 
     def get_context_data(self, **kwargs):
-        context = {
+        context = super().get_context_data(**kwargs)
+        context.update({
             'app': _('Audits'),
-            'action': _('Command execution list'),
+            'action': _('Command execution log'),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user_list': self.get_user_list(),
             'keyword': self.keyword,
             'user_id': self.user_id,
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
+        })
+        return super().get_context_data(**context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginLogExportView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        fields = [
+            field for field in UserLoginLog._meta.fields
+        ]
+        filename = 'login-logs-{}.csv'.format(
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
+        excel_response = get_excel_response(filename)
+        header = [field.verbose_name for field in fields]
+        login_logs = cache.get(request.GET.get('spm', ''), [])
+
+        response = write_content_to_excel(excel_response, login_logs=login_logs,
+                                          header=header, fields=fields)
+        return response
+
+    def post(self, request):
+        try:
+            date_form = json.loads(request.body).get('date_form', [])
+            date_to = json.loads(request.body).get('date_to', [])
+            user = json.loads(request.body).get('user', [])
+            keyword = json.loads(request.body).get('keyword', [])
+
+            login_logs = UserLoginLog.get_login_logs(
+                date_form=date_form, date_to=date_to, user=user, keyword=keyword)
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().hex
+        cache.set(spm, login_logs, 300)
+        url = reverse('audits:login-log-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})

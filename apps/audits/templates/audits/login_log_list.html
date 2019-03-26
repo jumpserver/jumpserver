@@ -17,10 +17,10 @@
         <div class="form-group" id="date">
             <div class="input-daterange input-group" id="datepicker">
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d'}}">
+                <input type="text" id="id_date_from" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d'}}">
 {#                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" >#}
                 <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d'}}">
+                <input type="text" id="id_date_to" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d'}}">
             </div>
         </div>
         <div class="input-group">
@@ -32,7 +32,7 @@
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="{% trans 'Search' %}" value="{{ keyword }}">
+            <input type="text" id="search" class="form-control input-sm" name="keyword" placeholder="{% trans 'Search' %}" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -43,38 +43,57 @@
         </div>
     </form>
 {% endblock %}
+{% block table_container %}
+<table class="table table-striped table-bordered table-hover " id="login_log_table" >
+    <thead>
+    	<tr>
+    		<th class="text-center">{% trans 'ID' %}</th>
+		    <th class="text-center">{% trans 'Username' %}</th>
+		    <th class="text-center">{% trans 'Type' %}</th>
+		    <th class="text-center">{% trans 'UA' %}</th>
+		    <th class="text-center">{% trans 'IP' %}</th>
+		    <th class="text-center">{% trans 'City' %}</th>
+		    <th class="text-center">{% trans 'MFA' %}</th>
+		    <th class="text-center">{% trans 'Reason' %}</th>
+		    <th class="text-center">{% trans 'Status' %}</th>
+		    <th class="text-center">{% trans 'Date' %}</th>
+    	</tr>
+    <thead>
 
-{% block table_head %}
-    <th class="text-center">{% trans 'ID' %}</th>
-    <th class="text-center">{% trans 'Username' %}</th>
-    <th class="text-center">{% trans 'Type' %}</th>
-    <th class="text-center">{% trans 'UA' %}</th>
-    <th class="text-center">{% trans 'IP' %}</th>
-    <th class="text-center">{% trans 'City' %}</th>
-    <th class="text-center">{% trans 'MFA' %}</th>
-    <th class="text-center">{% trans 'Reason' %}</th>
-    <th class="text-center">{% trans 'Status' %}</th>
-    <th class="text-center">{% trans 'Date' %}</th>
+    <tbody>
+        {% for login_log in object_list %}
+	        <tr class="gradeX">
+	            <td class="text-center">{{ forloop.counter }}</td>
+	            <td class="text-center">{{ login_log.username }}</td>
+	            <td class="text-center">{{ login_log.get_type_display }}</td>
+	            <td class="text-center">
+	                <span href="javascript:void(0);" data-toggle="tooltips" title="{{ login_log.user_agent  }}">{{ login_log.user_agent | truncatechars:20 }}</span>
+	            </td>
+	            <td class="text-center">{{ login_log.ip }}</td>
+	            <td class="text-center">{{ login_log.city }}</td>
+	            <td class="text-center">{{ login_log.get_mfa_display }}</td>
+	            <td class="text-center">{{ login_log.get_reason_display }}</td>
+	            <td class="text-center">{{ login_log.get_status_display }}</td>
+	            <td class="text-center">{{ login_log.datetime }}</td>
+	        </tr>
+    	{% endfor %}
+    </tbody>
+</table>
+    <div id="actions" class="" style="margin-top: -20px">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="export">{% trans 'Export' %}</option>
+            </select>
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary btn_export">
+                    {% trans 'Submit' %}
+                </button>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
-{% block table_body %}
-    {% for login_log in object_list %}
-        <tr class="gradeX">
-            <td class="text-center">{{ forloop.counter }}</td>
-            <td class="text-center">{{ login_log.username }}</td>
-            <td class="text-center">{{ login_log.get_type_display }}</td>
-            <td class="text-center">
-                <span href="javascript:void(0);" data-toggle="tooltips" title="{{ login_log.user_agent  }}">{{ login_log.user_agent | truncatechars:20 }}</span>
-            </td>
-            <td class="text-center">{{ login_log.ip }}</td>
-            <td class="text-center">{{ login_log.city }}</td>
-            <td class="text-center">{{ login_log.get_mfa_display }}</td>
-            <td class="text-center">{{ login_log.get_reason_display }}</td>
-            <td class="text-center">{{ login_log.get_status_display }}</td>
-            <td class="text-center">{{ login_log.datetime }}</td>
-        </tr>
-    {% endfor %}
-{% endblock %}
 
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
@@ -94,6 +113,29 @@
                 dropdownAutoWidth: true,
                 width: 'auto'
             });
+        })
+        .on('click', '.btn_export', function () {
+            var date_form = $('#id_date_from').val();
+            var date_to = $('#id_date_to').val();
+            var user = $('.select2 option:selected').val();
+            var keyword = $('#search').val();
+            $.ajax({
+                url: "{% url "audits:login-log-export" %}",
+                method: 'POST',
+                data: JSON.stringify({
+                    'date_form':date_form,
+                    'date_to':date_to,
+                    'user':user,
+                    'keyword':keyword
+                }),
+                dataType: "json",
+                success: function (data, textStatus) {
+                    window.open(data.redirect)
+                },
+                error: function () {
+                    toastr.error('Export failed');
+                }
+            })
         })
     </script>
 {% endblock %}

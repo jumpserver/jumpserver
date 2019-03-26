@@ -60,7 +60,9 @@ class Gateway(AssetUser):
         unique_together = [('name', 'org_id')]
         verbose_name = _("Gateway")
 
-    def test_connective(self):
+    def test_connective(self, local_port=None):
+        if local_port is None:
+            local_port = self.port
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         proxy = paramiko.SSHClient()
@@ -76,12 +78,11 @@ class Gateway(AssetUser):
                paramiko.SSHException) as e:
             return False, str(e)
 
-        sock = proxy.get_transport().open_channel(
-            'direct-tcpip', ('127.0.0.1', self.port), ('127.0.0.1', 0)
-        )
-
         try:
-            client.connect("127.0.0.1", port=self.port,
+            sock = proxy.get_transport().open_channel(
+                'direct-tcpip', ('127.0.0.1', local_port), ('127.0.0.1', 0)
+            )
+            client.connect("127.0.0.1", port=local_port,
                            username=self.username,
                            password=self.password,
                            key_filename=self.private_key_file,

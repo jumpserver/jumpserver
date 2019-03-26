@@ -110,9 +110,9 @@ function initTree() {
             onCheck: onCheck
         }
     };
-    var url = "{% url 'api-perms:my-nodes-assets-as-tree' %}";
+    var url = "{% url 'api-perms:my-nodes-assets-as-tree' %}?cache_policy=1";
     if (systemUserId) {
-        url += '?system_user=' + systemUserId
+        url += '&system_user=' + systemUserId
     }
 
     $.get(url, function(data, status){

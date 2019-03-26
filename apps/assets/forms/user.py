@@ -35,8 +35,12 @@ class PasswordAndKeyAuthForm(forms.ModelForm):
         if private_key_file:
             key_string = private_key_file.read()
             private_key_file.seek(0)
+            key_string = key_string.decode()
+
             if not validate_ssh_private_key(key_string, password):
-                raise forms.ValidationError(_('Invalid private key'))
+                msg = _('Invalid private key, Only support '
+                        'RSA/DSA format key')
+                raise forms.ValidationError(msg)
         return private_key_file
 
     def validate_password_key(self):
@@ -150,5 +154,6 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),
             'login_mode': _('If you choose manual login mode, you do not '
-                            'need to fill in the username and password.')
+                            'need to fill in the username and password.'),
+            'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig")
         }

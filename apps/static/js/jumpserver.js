@@ -555,6 +555,17 @@ jumpserver.initServerSideDataTable = function (options) {
         processing: true,
         ajax: {
             url: options.ajax_url ,
+            error: function(jqXHR, textStatus, errorThrown) {
+                var msg = gettext("Unknown error occur");
+                if (jqXHR.responseJSON) {
+                    if (jqXHR.responseJSON.error) {
+                        msg = jqXHR.responseJSON.error
+                    } else if (jqXHR.responseJSON.msg) {
+                        msg = jqXHR.responseJSON.msg
+                    }
+                }
+                alert(msg)
+            },
             data: function (data) {
                 delete data.columns;
                 if (data.length !== null){
@@ -921,4 +932,17 @@ function initSelectedAssets2Table(){
             }
         });
     }
+}
+
+
+function rootNodeAddDom(ztree, callback) {
+    var refreshIcon = "<a id='tree-refresh'><i class='fa fa-refresh'></i></a>";
+    var rootNode = ztree.getNodes()[0];
+    var $rootNodeRef = $("#" + rootNode.tId + "_a");
+    $rootNodeRef.after(refreshIcon);
+    var refreshIconRef = $('#tree-refresh');
+    refreshIconRef.bind('click', function () {
+        ztree.destroy();
+        callback()
+    })
 }

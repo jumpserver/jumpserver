@@ -149,7 +149,7 @@ class AdHoc(models.Model):
     _options: ansible options, more see ops.ansible.runner.Options
     _hosts: ["hostname1", "hostname2"], hostname must be unique key of cmdb
     run_as_admin: if true, then need get every host admin user run it, because every host may be have different admin user, so we choise host level
-    run_as: if not run as admin, it run it as a system/common user from cmdb
+    run_as: username(Add the uniform AssetUserManager <AssetUserManager> and change it to username)
     _become: May be using become [sudo, su] options. {method: "sudo", user: "user", pass: "pass"]
     pattern: Even if we set _hosts, We only use that to make inventory, We also can set `patter` to run task on match hosts
     """
@@ -161,7 +161,7 @@ class AdHoc(models.Model):
     _hosts = models.TextField(blank=True, verbose_name=_('Hosts'))  # ['hostname1', 'hostname2']
     hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
-    run_as = models.ForeignKey('assets.SystemUser', null=True, on_delete=models.CASCADE)
+    run_as = models.CharField(max_length=64, default='', null=True, verbose_name=_('Username'))
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -233,6 +233,7 @@ class AdHoc(models.Model):
             history.summary = summary
             return raw, summary
         except Exception as e:
+            logger.error(e, exc_info=True)
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
             history.date_finished = timezone.now()

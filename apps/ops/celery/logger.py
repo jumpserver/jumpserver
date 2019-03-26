@@ -143,7 +143,7 @@ class CeleryTaskFileHandler(CeleryTaskLoggerHandler):
 
     def emit(self, record):
         msg = self.format(record)
-        if not self.f:
+        if not self.f or self.f.closed:
             return
         self.f.write(msg)
         self.f.write(self.terminator)

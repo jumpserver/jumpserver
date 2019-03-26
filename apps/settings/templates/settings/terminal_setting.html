@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+{% load common_tags %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'settings:basic-setting' %}" class="text-center"><i
+                                        class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'settings:email-setting' %}" class="text-center"><i
+                                        class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i
+                                        class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'settings:terminal-setting' %}" class="text-center"><i
+                                        class="fa fa-hdd-o"></i> {% trans 'Terminal setting' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'settings:security-setting' %}" class="text-center"><i class="fa fa-lock"></i> {% trans 'Security setting' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-12" style="padding-left:0">
+                            <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
+                                <form action="" method="post" class="form-horizontal">
+                                    {% if form.non_field_errors %}
+                                        <div class="alert alert-danger">
+                                            {{ form.non_field_errors }}
+                                        </div>
+                                    {% endif %}
+                                    {% csrf_token %}
+
+                                    <h3>{% trans "Basic setting" %}</h3>
+                                    {% for field in form %}
+                                        {% if not field.field|is_bool_field %}
+                                            {% bootstrap_field field layout="horizontal" %}
+                                        {% else %}
+                                            <div class="form-group">
+                                                <label for="{{ field.id_for_label }}"
+                                                       class="col-sm-2 control-label">{{ field.label }}</label>
+                                                <div class="col-sm-8">
+                                                    <div class="col-sm-1">
+                                                        {{ field }}
+                                                    </div>
+                                                    <div class="col-sm-9">
+                                                        <span class="help-block">{{ field.help_text }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+                                            <button id="submit_button" class="btn btn-primary"
+                                                    type="submit">{% trans 'Submit' %}</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="hr-line-dashed"></div>
+
+                                    <h3>{% trans "Command storage" %}</h3>
+                                    <table class="table table-hover " id="task-history-list-table">
+                                        <thead>
+                                        <tr>
+                                            <th>{% trans 'Name' %}</th>
+                                            <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for name, setting in command_storage.items %}
+                                            <tr>
+                                                <td>{{ name }}</td>
+                                                <td>{{ setting.TYPE }}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command"  {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <a href="{% url 'settings:command-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
+
+                                    <div class="hr-line-dashed"></div>
+                                    <h3>{% trans "Replay storage" %}</h3>
+                                    <table class="table table-hover " id="task-history-list-table">
+                                        <thead>
+                                        <tr>
+                                            <th>{% trans 'Name' %}</th>
+                                            <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for name, setting in replay_storage.items %}
+                                            <tr>
+                                                <td>{{ name }}</td>
+                                                <td>{{ setting.TYPE }}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <a href="{% url 'settings:replay-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
+
+                                    <div class="hr-line-dashed"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+
+function ajaxAPI(url, data, success, error, method){
+    $.ajax({
+        url: url,
+        data: data,
+        method: method,
+        contentType: 'application/json; charset=utf-8',
+        success: success,
+        error: error
+    })
+}
+
+function deleteStorage($this, the_url){
+    var name = $this.data('name');
+    function doDelete(){
+        console.log('delete storage');
+        var data = {"name": name};
+        var method = 'POST';
+        var success = function(){
+            $this.parent().parent().remove();
+            toastr.success("{% trans 'Delete succeed' %}");
+        };
+        var error = function(){
+            toastr.error("{% trans 'Delete failed' %}");
+        };
+        ajaxAPI(the_url, JSON.stringify(data), success, error, method);
+    }
+    swal({
+        title: "{% trans  'Are you sure about deleting it?' %}",
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: "{% trans 'Cancel' %}",
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: true
+    }, function () {
+        doDelete()
+    });
+}
+
+$(document).ready(function () {
+
+})
+.on('click', '.btn-del-replay', function(){
+    var $this = $(this);
+    var the_url = "{% url 'api-settings:replay-storage-delete' %}";
+    deleteStorage($this, the_url);
+})
+.on('click', '.btn-del-command', function() {
+    var $this = $(this);
+    var the_url = "{% url 'api-settings:command-storage-delete' %}";
+    deleteStorage($this, the_url)
+});
+
+</script>
+{% endblock %}

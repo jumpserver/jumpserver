@@ -31,7 +31,7 @@ class CommandExecution(models.Model):
 
     @property
     def inventory(self):
-        return JMSInventory(self.hosts.all(), run_as=self.run_as)
+        return JMSInventory(self.hosts.all(), run_as=self.run_as.username)
 
     @property
     def result(self):

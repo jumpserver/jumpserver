@@ -26,20 +26,26 @@ disk_pattern = re.compile(r'^hd|sd|xvd|vd')
 PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
 
 
+def check_asset_can_run_ansible(asset):
+    if not asset.is_active:
+        msg = _("Asset has been disabled, skipped: {}").format(asset)
+        logger.info(msg)
+        return False
+    if not asset.support_ansible():
+        msg = _("Asset may not be support ansible, skipped: {}").format(asset)
+        logger.info(msg)
+        return False
+    return True
+
+
 def clean_hosts(assets):
     clean_assets = []
     for asset in assets:
-        if not asset.is_active:
-            msg = _("Asset has been disabled, skipped: {}").format(asset)
-            logger.info(msg)
-            continue
-        if not asset.support_ansible():
-            msg = _("Asset may not be support ansible, skipped: {}").format(asset)
-            logger.info(msg)
+        if not check_asset_can_run_ansible(asset):
             continue
         clean_assets.append(asset)
     if not clean_assets:
-        logger.info(_("No assets matched, stop task"))
+        print(_("No assets matched, stop task"))
     return clean_assets
 
 
@@ -259,7 +265,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
-        run_as=system_user, created_by=system_user.org_id,
+        run_as=system_user.username, created_by=system_user.org_id,
     )
     result = task.run()
     set_system_user_connectivity_info(system_user, result)
@@ -341,6 +347,12 @@ def get_push_system_user_tasks(system_user):
             }
         })
     if system_user.sudo:
+        sudo = system_user.sudo.replace('\r\n', '\n').replace('\r', '\n')
+        sudo_list = sudo.split('\n')
+        sudo_tmp = []
+        for s in sudo_list:
+            sudo_tmp.append(s.strip(','))
+        sudo = ','.join(sudo_tmp)
         tasks.append({
             'name': 'Set {} sudo setting'.format(system_user.username),
             'action': {
@@ -348,8 +360,7 @@ def get_push_system_user_tasks(system_user):
                 'args': "dest=/etc/sudoers state=present regexp='^{0} ALL=' "
                         "line='{0} ALL=(ALL) NOPASSWD: {1}' "
                         "validate='visudo -cf %s'".format(
-                    system_user.username,
-                    system_user.sudo,
+                    system_user.username, sudo,
                 )
             }
         })
@@ -365,16 +376,18 @@ def push_system_user_util(system_user, assets, task_name):
         logger.info(msg)
         return
 
-    tasks = get_push_system_user_tasks(system_user)
     hosts = clean_hosts(assets)
     if not hosts:
         return {}
-    task, created = update_or_create_ansible_task(
-        task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS, run_as_admin=True,
-        created_by=system_user.org_id,
-    )
-    return task.run()
+    for host in hosts:
+        system_user.load_specific_asset_auth(host)
+        tasks = get_push_system_user_tasks(system_user)
+        task, created = update_or_create_ansible_task(
+            task_name=task_name, hosts=[host], tasks=tasks, pattern='all',
+            options=const.TASK_OPTIONS, run_as_admin=True,
+            created_by=system_user.org_id,
+        )
+        task.run()
 
 
 @shared_task
@@ -408,6 +421,43 @@ def test_system_user_connectability_period():
 @after_app_shutdown_clean_periodic
 def test_admin_user_connectability_period():
     pass
+
+
+@shared_task
+def set_asset_user_connectivity_info(asset_user, result):
+    summary = result[1]
+    asset_user.connectivity = summary
+
+
+@shared_task
+def test_asset_user_connectivity_util(asset_user, task_name):
+    """
+    :param asset_user: <AuthBook>对象
+    :param task_name:
+    :return:
+    """
+    from ops.utils import update_or_create_ansible_task
+    tasks = const.TEST_ASSET_USER_CONN_TASKS
+    if not check_asset_can_run_ansible(asset_user.asset):
+        return
+
+    task, created = update_or_create_ansible_task(
+        task_name, hosts=[asset_user.asset], tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS,
+        run_as=asset_user.username, created_by=asset_user.org_id
+    )
+    result = task.run()
+    set_asset_user_connectivity_info(asset_user, result)
+
+
+@shared_task
+def test_asset_users_connectivity_manual(asset_users):
+    """
+    :param asset_users: <AuthBook>对象
+    """
+    for asset_user in asset_users:
+        task_name = _("Test asset user connectivity: {}").format(asset_user)
+        test_asset_user_connectivity_util(asset_user, task_name)
 
 
 # @shared_task

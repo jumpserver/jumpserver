@@ -22,6 +22,10 @@ from .conf import load_user_config
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
+sys.path.append(PROJECT_DIR)
+from apps import __version__
+
+VERSION = __version__
 CONFIG = load_user_config()
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
@@ -59,6 +63,7 @@ INSTALLED_APPS = [
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
+    'settings.apps.SettingsConfig',
     'common.apps.CommonConfig',
     'terminal.apps.TerminalConfig',
     'audits.apps.AuditsConfig',
@@ -99,7 +104,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.openid.middleware.OpenIDAuthenticationMiddleware',  # openid
+    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -134,17 +139,28 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'jumpserver.wsgi.applications'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
-LOGIN_URL = reverse_lazy('users:login')
+LOGIN_URL = reverse_lazy('authentication:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE
 SESSION_EXPIRE_AT_BROWSER_CLOSE = CONFIG.SESSION_EXPIRE_AT_BROWSER_CLOSE
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS = {
+    'host': CONFIG.REDIS_HOST,
+    'port': CONFIG.REDIS_PORT,
+    'password': CONFIG.REDIS_PASSWORD,
+    'db': CONFIG.REDIS_DB_SESSION,
+    'prefix': 'auth_session',
+    'socket_timeout': 1,
+    'retry_on_timeout': False
+}
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+DB_OPTIONS = {}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
@@ -154,8 +170,13 @@ DATABASES = {
         'USER': CONFIG.DB_USER,
         'PASSWORD': CONFIG.DB_PASSWORD,
         'ATOMIC_REQUESTS': True,
+        'OPTIONS': DB_OPTIONS
     }
 }
+DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'ca.pem')
+if CONFIG.DB_ENGINE == 'mysql' and os.path.isfile(DB_CA_PATH):
+    DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -342,10 +363,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
-        'users.authentication.AccessKeyAuthentication',
-        'users.authentication.AccessTokenAuthentication',
-        'users.authentication.PrivateTokenAuthentication',
-        'users.authentication.SessionAuthentication',
+        'authentication.backends.api.AccessKeyAuthentication',
+        'authentication.backends.api.AccessTokenAuthentication',
+        'authentication.backends.api.PrivateTokenAuthentication',
+        'authentication.backends.api.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -394,7 +415,7 @@ AUTH_LDAP_CONNECTION_OPTIONS = {
 }
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
-AUTH_LDAP_BACKEND = 'authentication.ldap.backends.LDAPAuthorizationBackend'
+AUTH_LDAP_BACKEND = 'authentication.backends.ldap.LDAPAuthorizationBackend'
 
 if AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, AUTH_LDAP_BACKEND)
@@ -408,18 +429,19 @@ AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
 AUTH_OPENID_BACKENDS = [
-    'authentication.openid.backends.OpenIDAuthorizationPasswordBackend',
-    'authentication.openid.backends.OpenIDAuthorizationCodeBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
+    'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
 ]
 
 if AUTH_OPENID:
-    LOGIN_URL = reverse_lazy("authentication:openid-login")
+    LOGIN_URL = reverse_lazy("authentication:openid:openid-login")
+    LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-login-complete")
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 
 # Radius Auth
 AUTH_RADIUS = CONFIG.AUTH_RADIUS
-AUTH_RADIUS_BACKEND = 'authentication.radius.backends.RadiusBackend'
+AUTH_RADIUS_BACKEND = 'authentication.backends.radius.RadiusBackend'
 RADIUS_SERVER = CONFIG.RADIUS_SERVER
 RADIUS_PORT = CONFIG.RADIUS_PORT
 RADIUS_SECRET = CONFIG.RADIUS_SECRET
@@ -444,8 +466,8 @@ CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 3600
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(message)s'
-CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
-# CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(task_id)s %(task_name)s %(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
 # CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
@@ -526,6 +548,7 @@ TERMINAL_ASSET_LIST_PAGE_SIZE = CONFIG.TERMINAL_ASSET_LIST_PAGE_SIZE
 TERMINAL_SESSION_KEEP_DURATION = CONFIG.TERMINAL_SESSION_KEEP_DURATION
 TERMINAL_HOST_KEY = CONFIG.TERMINAL_HOST_KEY
 TERMINAL_HEADER_TITLE = CONFIG.TERMINAL_HEADER_TITLE
+TERMINAL_TELNET_REGEX = CONFIG.TERMINAL_TELNET_REGEX
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
@@ -555,4 +578,10 @@ SWAGGER_SETTINGS = {
 
 # Default email suffix
 EMAIL_SUFFIX = CONFIG.EMAIL_SUFFIX
-TERMINAL_TELNET_REGEX = CONFIG.TERMINAL_TELNET_REGEX
+LOGIN_LOG_KEEP_DAYS = CONFIG.LOGIN_LOG_KEEP_DAYS
+
+# User or user group permission cache time, default 3600 seconds
+ASSETS_PERM_CACHE_TIME = CONFIG.ASSETS_PERM_CACHE_TIME
+
+# Asset user auth external backend, default AuthBook backend
+BACKEND_ASSET_USER_AUTH_VAULT = False

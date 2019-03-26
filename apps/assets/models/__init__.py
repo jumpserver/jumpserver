@@ -7,3 +7,4 @@ from .node import *
 from .asset import *
 from .cmd_filter import *
 from .utils import *
+from .authbook import *

@@ -15,10 +15,16 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li>
-                                <a href="{% url 'assets:domain-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                                <a href="{% url 'assets:domain-detail' pk=object.id %}"
+                                   class="text-center"><i
+                                        class="fa fa-laptop"></i> {% trans 'Detail' %}
+                                </a>
                             </li>
                             <li class="active">
-                                <a href="{% url 'assets:domain-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Gateway' %} </a>
+                                <a href="{% url 'assets:domain-detail' pk=object.id %}"
+                                   class="text-center"><i
+                                        class="fa fa-laptop"></i> {% trans 'Gateway' %}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -33,7 +39,8 @@
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
                                         </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        <a class="dropdown-toggle"
+                                           data-toggle="dropdown" href="#">
                                             <i class="fa fa-wrench"></i>
                                         </a>
                                         <ul class="dropdown-menu dropdown-user">
@@ -45,13 +52,17 @@
                                 </div>
                                 <div class="ibox-content">
                                     <div class="uc pull-left  m-r-5">
-                                        <a href="{% url 'assets:domain-gateway-create' pk=object.id %}" class="btn btn-sm btn-primary"> {% trans "Create gateway" %} </a>
+                                        <a href="{% url 'assets:domain-gateway-create' pk=object.id %}"
+                                           class="btn btn-sm btn-primary"> {% trans "Create gateway" %} </a>
                                     </div>
-                                    <table class="table table-striped table-bordered table-hover " id="domain_list_table" >
+                                    <table class="table table-striped table-bordered table-hover "
+                                           id="domain_list_table">
                                         <thead>
                                         <tr>
                                             <th class="text-center">
-                                                <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                <input type="checkbox"
+                                                       id="check_all"
+                                                       class="ipt_check_all">
                                             </th>
                                             <th class="text-center">{% trans 'Name' %}</th>
                                             <th class="text-center">{% trans 'IP' %}</th>
@@ -73,6 +84,7 @@
             </div>
         </div>
     </div>
+{% include 'assets/_gateway_test_modal.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
@@ -84,7 +96,7 @@ function initTable() {
             {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:domain-gateway-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
-                var test_btn = '<a class="btn btn-xs btn-warning m-l-xs btn-test" data-uid="{{ DEFAULT_PK }}">{% trans "Test connection" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var test_btn = '<a class="btn btn-xs btn-warning m-l-xs btn-test" data-uid="{{ DEFAULT_PK }}" data-port="PORT">{% trans "Test connection" %}</a>'.replace('{{ DEFAULT_PK }}', cellData).replace("PORT", rowData.port);
                 if(rowData.protocol === 'rdp'){
                     test_btn = '<a class="btn btn-xs btn-warning m-l-xs btn-test" disabled data-uid="{{ DEFAULT_PK }}">{% trans "Test connection" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 }
@@ -114,15 +126,21 @@ $(document).ready(function(){
         $data_table.ajax.reload();
     }, 3000);
 }).on('click', '.btn-test', function () {
-    var $this = $(this);
-    var uid = $this.data('uid');
+    $("#ssh_test_port").val($(this).data('port'));
+    $("#gateway_id").val($(this).data('uid'));
+    $("#gateway_test").modal('show');
+
+}).on('click', '#btn_gateway_test', function () {
+    var data = $("#test_gateway_form").serializeObject();
+    var uid = data.gateway_id;
     var the_url = '{% url "api-assets:test-gateway-connective" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     APIUpdateAttr({
         url: the_url,
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({'port': parseInt(data.port)}),
         success_message: "{% trans 'Can be connected' %}",
         fail_message: "{% trans 'The connection fails' %}"
-    })
+     })
 });
 </script>
 {% endblock %}

@@ -17,7 +17,6 @@
                    <div class="file-manager ">
                        <div id="assetTree" class="ztree">
                        </div>
-
                        <div class="clearfix"></div>
                    </div>
                </div>
@@ -46,6 +45,7 @@
                            <th class="text-center">{% trans 'IP' %}</th>
                            <th class="text-center">{% trans 'Active' %}</th>
                            <th class="text-center">{% trans 'System users' %}</th>
+                           <th class="text-center">{% trans 'Action' %}</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -62,16 +62,19 @@
 
 {% block custom_foot_js %}
 <script>
+var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0&cache_policy=1";
 var zTree, asset_table, show=0;
 var inited = false;
 var url;
+
+
 function initTable() {
     if (inited){
         return
     } else {
         inited = true;
     }
-    url = "{% url 'api-perms:my-assets' %}";
+    url = "{% url 'api-perms:my-assets' %}?cache_policy=1";
     var options = {
         ele: $('#user_assets_table'),
         columnDefs: [
@@ -92,13 +95,18 @@ function initTable() {
                     users.push(data.name);
                 });
                 $(td).html(users.join(', '))
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                $(td).html(conn_btn)
             }}
         ],
         ajax_url: url,
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
             {data: "is_active", orderable: false },
-            {data: "system_users_granted", orderable: false}
+            {data: "system_users_granted", orderable: false},
+            {data: "id", orderable: false}
         ]
     };
     asset_table = jumpserver.initServerSideDataTable(options);
@@ -106,7 +114,7 @@ function initTable() {
 }
 
 function onSelected(event, treeNode) {
-    url = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}';
+    url = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1';
     var node_id = treeNode.meta.node.id;
     url = url.replace("{{ DEFAULT_PK }}", node_id);
     setCookie('node_selected', treeNode.id);
@@ -118,7 +126,7 @@ function initTree() {
     var setting = {
         view: {
             dblClickExpand: false,
-            showLine: true
+            showLine: true,
         },
         data: {
             simpleData: {
@@ -131,10 +139,14 @@ function initTree() {
     };
 
     var zNodes = [];
-    $.get("{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0", function(data, status){
+    $.get(treeUrl, function(data, status){
         zNodes = data;
         $.fn.zTree.init($("#assetTree"), setting, zNodes);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
+        rootNodeAddDom(zTree, function () {
+            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
+            initTree();
+        });
     });
 }
 

@@ -16,7 +16,6 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default
-from orgs.utils import current_org
 
 
 __all__ = ['User']
@@ -103,6 +102,8 @@ class User(AbstractUser):
         auto_now_add=True, blank=True, null=True,
         verbose_name=_('Date password last updated')
     )
+
+    user_cache_key_prefix = '_User_{}'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
@@ -281,23 +282,25 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
+        self.expire_user_cache()
 
     @property
     def private_token(self):
-        return self.create_private_token()
-
-    def create_private_token(self):
-        from .authentication import PrivateToken
+        from authentication.models import PrivateToken
         try:
             token = PrivateToken.objects.get(user=self)
         except PrivateToken.DoesNotExist:
-            token = PrivateToken.objects.create(user=self)
-        return token.key
+            token = self.create_private_token()
+        return token
+
+    def create_private_token(self):
+        from authentication.models import PrivateToken
+        token = PrivateToken.objects.create(user=self)
+        return token
 
     def refresh_private_token(self):
-        from .authentication import PrivateToken
-        PrivateToken.objects.filter(user=self).delete()
-        return PrivateToken.objects.create(user=self)
+        self.private_token.delete()
+        return self.create_private_token()
 
     def create_bearer_token(self, request=None):
         expiration = settings.TOKEN_EXPIRATION or 3600
@@ -308,7 +311,8 @@ class User(AbstractUser):
         if not isinstance(remote_addr, bytes):
             remote_addr = remote_addr.encode("utf-8")
         remote_addr = base64.b16encode(remote_addr)  # .replace(b'=', '')
-        token = cache.get('%s_%s' % (self.id, remote_addr))
+        cache_key = '%s_%s' % (self.id, remote_addr)
+        token = cache.get(cache_key)
         if not token:
             token = uuid.uuid4().hex
         cache.set(token, self.id, expiration)
@@ -319,8 +323,7 @@ class User(AbstractUser):
         pass
 
     def create_access_key(self):
-        from . import AccessKey
-        access_key = AccessKey.objects.create(user=self)
+        access_key = self.access_keys.create()
         return access_key
 
     @property
@@ -329,11 +332,6 @@ class User(AbstractUser):
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
-            return True
-        return False
-
-    def check_public_key(self, public_key):
-        if self.ssh_public_key == public_key:
             return True
         return False
 
@@ -422,7 +420,25 @@ class User(AbstractUser):
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
+        self.expire_user_cache()
         return super(User, self).delete()
+
+    def expire_user_cache(self):
+        key = self.user_cache_key_prefix.format(self.id)
+        cache.delete(key)
+
+    @classmethod
+    def get_user_or_from_cache(cls, uid):
+        key = cls.user_cache_key_prefix.format(uid)
+        user = cache.get(key)
+        if user:
+            return user
+        try:
+            user = cls.objects.get(id=uid)
+            cache.set(key, user, 3600)
+        except cls.DoesNotExist:
+            user = None
+        return user
 
     class Meta:
         ordering = ['username']
