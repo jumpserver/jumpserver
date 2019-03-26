@@ -30,7 +30,7 @@ SSH 协议资产连接错误排查思路
 
     # http://<Jumpserver_url> 指向 jumpserver 的服务url, 如 http://192.168.244.144:8080
     # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_coco:1.4.8
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_coco:1.4.9
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面查看 coco 的状态是否为绿色
 
