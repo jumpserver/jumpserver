@@ -501,7 +501,7 @@
 .. code-block:: shell
 
     $ cd /opt
-    $ rm -rf luna
+    $ rm -rf luna luna.tar.gz
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
@@ -749,7 +749,7 @@
 .. code-block:: shell
 
     $ cd /opt
-    $ rm -rf luna
+    $ rm -rf luna luna.tar.gz
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
@@ -996,7 +996,7 @@
 .. code-block:: shell
 
     $ cd /opt
-    $ rm -rf luna
+    $ rm -rf luna luna.tar.gz
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
@@ -1076,7 +1076,7 @@
 .. code-block:: shell
 
     $ cd /opt
-    $ rm -rf luna
+    $ rm -rf luna luna.tar.gz
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
@@ -1152,7 +1152,7 @@
 .. code-block:: shell
 
     $ cd /opt
-    $ rm -rf luna
+    $ rm -rf luna luna.tar.gz
     $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
