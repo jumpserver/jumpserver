@@ -5,17 +5,17 @@
 
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
+    <link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/codemirror/ambiance.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.exhide.min.js' %}"></script>
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <script src="{% static 'js/plugins/codemirror/codemirror.js' %}"></script>
     <script src="{% static 'js/plugins/codemirror/mode/shell/shell.js' %}"></script>
-    <link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/codemirror/ambiance.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 	<style type="text/css">
         .xterm .xterm-screen canvas {

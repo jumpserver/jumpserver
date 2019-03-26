@@ -3,6 +3,9 @@
 from __future__ import absolute_import, unicode_literals
 import uuid
 from collections import defaultdict
+import json
+from hashlib import md5
+
 from django.utils import timezone
 from django.db.models import Q
 from django.core.cache import cache
@@ -101,8 +104,8 @@ class AssetPermissionUtil:
         "SystemUser": get_node_permissions,
     }
 
-    CACHE_KEY = '_ASSET_PERM_CACHE_{}_{}'
-    CACHE_META_KEY = '_ASSET_PERM_META_KEY_{}'
+    CACHE_KEY = '_ASSET_PERM_CACHE_{obj_id}_{filter_id}_{resource}'
+    CACHE_META_KEY = '_ASSET_PERM_META_KEY_{obj_id}_{filter_id}'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
 
@@ -110,11 +113,31 @@ class AssetPermissionUtil:
         self.object = obj
         self.obj_id = str(obj.id)
         self._permissions = None
+        self._permissions_id = None  # 标记_permission的唯一值
         self._assets = None
+        self._filter_id = ''  # 当通过filter更改 permission是标记
         self.cache_policy = cache_policy
-        self.node_key = self.CACHE_KEY.format(self.obj_id, 'NODES_WITH_ASSETS')
-        self.asset_key = self.CACHE_KEY.format(self.obj_id, 'ASSETS')
-        self.system_key = self.CACHE_KEY.format(self.obj_id, 'SYSTEM_USER')
+
+    @classmethod
+    def is_not_using_cache(cls, cache_policy):
+        return cls.CACHE_TIME == 0 or cache_policy in cls.CACHE_POLICY_MAP[0]
+
+    @classmethod
+    def is_using_cache(cls, cache_policy):
+        return cls.CACHE_TIME != 0 and cache_policy in cls.CACHE_POLICY_MAP[1]
+
+    @classmethod
+    def is_refresh_cache(cls, cache_policy):
+        return cache_policy in cls.CACHE_POLICY_MAP[2]
+
+    def _is_not_using_cache(self):
+        return self.is_not_using_cache(self.cache_policy)
+
+    def _is_using_cache(self):
+        return self.is_using_cache(self.cache_policy)
+
+    def _is_refresh_cache(self):
+        return self.is_refresh_cache(self.cache_policy)
 
     @property
     def permissions(self):
@@ -126,8 +149,10 @@ class AssetPermissionUtil:
         self._permissions = permissions
         return permissions
 
-    def filter_permission_with_system_user(self, system_user):
-        self._permissions = self.permissions.filter(system_users=system_user)
+    def filter_permissions(self, **filters):
+        filters_json = json.dumps(filters, sort_keys=True)
+        self._permissions = self.permissions.filter(**filters)
+        self._filter_id = md5(filters_json.encode()).hexdigest()
 
     def get_nodes_direct(self):
         """
@@ -169,6 +194,24 @@ class AssetPermissionUtil:
         self._assets = assets
         return self._assets
 
+    def get_cache_key(self, resource):
+        return self.CACHE_KEY.format(
+            obj_id=self.obj_id, filter_id=self._filter_id,
+            resource=resource
+        )
+
+    @property
+    def node_key(self):
+        return self.get_cache_key('NODES_WITH_ASSETS')
+
+    @property
+    def asset_key(self):
+        return self.get_cache_key('ASSETS')
+
+    @property
+    def system_key(self):
+        return self.get_cache_key('SYSTEM_USER')
+
     def get_assets_from_cache(self):
         cached = cache.get(self.asset_key)
         if not cached:
@@ -177,9 +220,9 @@ class AssetPermissionUtil:
         return cached
 
     def get_assets(self):
-        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self._is_not_using_cache():
             return self.get_assets_from_cache()
-        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+        elif self._is_refresh_cache():
             self.expire_cache()
             return self.get_assets_from_cache()
         else:
@@ -206,9 +249,9 @@ class AssetPermissionUtil:
         return cached
 
     def get_nodes_with_assets(self):
-        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self._is_using_cache():
             return self.get_nodes_with_assets_from_cache()
-        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+        elif self._is_refresh_cache():
             self.expire_cache()
             return self.get_nodes_with_assets_from_cache()
         else:
@@ -229,21 +272,27 @@ class AssetPermissionUtil:
         return cached
 
     def get_system_users(self):
-        if self.CACHE_TIME <= 0 or self.cache_policy in self.CACHE_POLICY_MAP[1]:
+        if self._is_using_cache():
             return self.get_system_user_from_cache()
-        elif self.cache_policy in self.CACHE_POLICY_MAP[2]:
+        elif self._is_refresh_cache():
             self.expire_cache()
             return self.get_system_user_from_cache()
         else:
             return self.get_system_user_without_cache()
 
+    def get_meta_cache_key(self):
+        key = self.CACHE_META_KEY.format(
+            obj_id=str(self.object.id), filter_id=self._filter_id
+        )
+        return key
+
     @property
     def cache_meta(self):
-        key = self.CACHE_META_KEY.format(str(self.object.id))
+        key = self.get_meta_cache_key()
         return cache.get(key) or {}
 
-    def set_cache_meta(self):
-        key = self.CACHE_META_KEY.format(str(self.object.id))
+    def set_meta_to_cache(self):
+        key = self.get_meta_cache_key()
         meta = {
             'id': str(uuid.uuid4()),
             'datetime': timezone.now(),
@@ -252,7 +301,7 @@ class AssetPermissionUtil:
         cache.set(key, meta, self.CACHE_TIME)
 
     def expire_cache_meta(self):
-        key = self.CACHE_META_KEY.format(str(self.object.id))
+        key = self.get_meta_cache_key()
         cache.delete(key)
 
     def update_cache(self):
@@ -262,7 +311,7 @@ class AssetPermissionUtil:
         cache.set(self.asset_key, assets, self.CACHE_TIME)
         cache.set(self.node_key, nodes, self.CACHE_TIME)
         cache.set(self.system_key, system_users, self.CACHE_TIME)
-        self.set_cache_meta()
+        self.set_meta_to_cache()
 
     def expire_cache(self):
         """
