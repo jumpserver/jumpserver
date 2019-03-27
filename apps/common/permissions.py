@@ -70,6 +70,14 @@ class IsCurrentUserOrReadOnly(permissions.BasePermission):
         return obj == request.user
 
 
+class LoginRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return True
+        else:
+            return False
+
+
 class AdminUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:

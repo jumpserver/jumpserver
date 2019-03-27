@@ -104,8 +104,8 @@ class AssetPermissionUtil:
         "SystemUser": get_node_permissions,
     }
 
-    CACHE_KEY = '_ASSET_PERM_CACHE_{obj_id}_{filter_id}_{resource}'
-    CACHE_META_KEY = '_ASSET_PERM_META_KEY_{obj_id}_{filter_id}'
+    CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
+    CACHE_META_KEY_PREFIX = '_ASSET_PERM_META_KEY_'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
 
@@ -115,7 +115,7 @@ class AssetPermissionUtil:
         self._permissions = None
         self._permissions_id = None  # 标记_permission的唯一值
         self._assets = None
-        self._filter_id = ''  # 当通过filter更改 permission是标记
+        self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.cache_policy = cache_policy
 
     @classmethod
@@ -195,7 +195,8 @@ class AssetPermissionUtil:
         return self._assets
 
     def get_cache_key(self, resource):
-        return self.CACHE_KEY.format(
+        cache_key = self.CACHE_KEY_PREFIX + '{obj_id}_{filter_id}_{resource}'
+        return cache_key.format(
             obj_id=self.obj_id, filter_id=self._filter_id,
             resource=resource
         )
@@ -281,7 +282,8 @@ class AssetPermissionUtil:
             return self.get_system_user_without_cache()
 
     def get_meta_cache_key(self):
-        key = self.CACHE_META_KEY.format(
+        cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_{filter_id}'
+        key = cache_key.format(
             obj_id=str(self.object.id), filter_id=self._filter_id
         )
         return key
@@ -301,8 +303,9 @@ class AssetPermissionUtil:
         cache.set(key, meta, self.CACHE_TIME)
 
     def expire_cache_meta(self):
-        key = self.get_meta_cache_key()
-        cache.delete(key)
+        cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_*'
+        key = cache_key.format(obj_id=str(self.object.id))
+        cache.delete_pattern(key)
 
     def update_cache(self):
         assets = self.get_assets_without_cache()
@@ -319,17 +322,19 @@ class AssetPermissionUtil:
         缓存，以免造成不统一的情况
         :return:
         """
-        key = self.CACHE_KEY.format(str(self.object.id), '*')
+        cache_key = self.CACHE_KEY_PREFIX + '{obj_id}_*'
+        key = cache_key.format(obj_id='*')
         cache.delete_pattern(key)
         self.expire_cache_meta()
 
-    def expire_all_cache_meta(self):
-        key = self.CACHE_META_KEY.format('*')
+    @classmethod
+    def expire_all_cache_meta(cls):
+        key = cls.CACHE_META_KEY_PREFIX + '*'
         cache.delete_pattern(key)
 
     @classmethod
     def expire_all_cache(cls):
-        key = cls.CACHE_KEY.format('*', '*')
+        key = cls.CACHE_KEY_PREFIX + '*'
         cache.delete_pattern(key)
 
 

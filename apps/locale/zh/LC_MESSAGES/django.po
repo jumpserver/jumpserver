@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-22 17:12+0800\n"
+"POT-Creation-Date: 2019-03-27 10:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2434,35 +2434,35 @@ msgstr "任务列表"
 msgid "Go"
 msgstr ""
 
-#: ops/templates/ops/command_execution_create.html:144
+#: ops/templates/ops/command_execution_create.html:148
 msgid "Selected assets"
 msgstr "已选择资产"
 
-#: ops/templates/ops/command_execution_create.html:147
+#: ops/templates/ops/command_execution_create.html:151
 msgid "In total"
 msgstr "总共"
 
-#: ops/templates/ops/command_execution_create.html:182
+#: ops/templates/ops/command_execution_create.html:186
 msgid ""
 "Select the left asset, select the running system user, execute command in "
 "batch"
 msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
 
-#: ops/templates/ops/command_execution_create.html:200
+#: ops/templates/ops/command_execution_create.html:204
 msgid "Unselected assets"
 msgstr "没有选中资产"
 
-#: ops/templates/ops/command_execution_create.html:204
+#: ops/templates/ops/command_execution_create.html:208
 msgid "No input command"
 msgstr "没有输入命令"
 
-#: ops/templates/ops/command_execution_create.html:208
+#: ops/templates/ops/command_execution_create.html:212
 msgid "No system user was selected"
 msgstr "没有选择系统用户"
 
-#: ops/templates/ops/command_execution_create.html:253
+#: ops/templates/ops/command_execution_create.html:257
 msgid "Pending"
-msgstr ""
+msgstr "等待"
 
 #: ops/templates/ops/command_execution_list.html:64
 msgid "Finished"
@@ -2521,7 +2521,7 @@ msgstr "更新任务内容: {}"
 
 #: ops/views/adhoc.py:44 ops/views/adhoc.py:69 ops/views/adhoc.py:82
 #: ops/views/adhoc.py:95 ops/views/adhoc.py:108 ops/views/adhoc.py:121
-#: ops/views/adhoc.py:134 ops/views/command.py:43 ops/views/command.py:67
+#: ops/views/adhoc.py:134 ops/views/command.py:44 ops/views/command.py:68
 msgid "Ops"
 msgstr "作业中心"
 
@@ -2533,11 +2533,11 @@ msgstr "任务列表"
 msgid "Task run history"
 msgstr "执行历史"
 
-#: ops/views/command.py:44
+#: ops/views/command.py:45
 msgid "Command execution list"
 msgstr "命令执行列表"
 
-#: ops/views/command.py:68 templates/_nav_user.html:9
+#: ops/views/command.py:69 templates/_nav_user.html:9
 msgid "Command execution"
 msgstr "命令执行"
 
