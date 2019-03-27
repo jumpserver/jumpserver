@@ -108,7 +108,7 @@ class UserGroupGrantedNodesWithAssetsAsTreeApi(ListAPIView):
         group = get_object_or_404(UserGroup, id=user_group_id)
         util = AssetPermissionUtil(group)
         if self.system_user_id:
-            util.filter_permission_with_system_user(system_user=self.system_user_id)
+            util.filter_permissions(system_users=self.system_user_id)
         nodes = util.get_nodes_with_assets()
         for node, assets in nodes.items():
             data = parse_node_to_tree_node(node)

@@ -43,7 +43,7 @@ class UserLoginView(FormView):
     key_prefix_captcha = "_LOGIN_INVALID_{}"
 
     def get_template_names(self):
-        template_name = 'users/login.html'
+        template_name = 'authentication/login.html'
         if not settings.XPACK_ENABLED:
             return template_name
 
@@ -51,7 +51,7 @@ class UserLoginView(FormView):
         if not License.has_valid_license():
             return template_name
 
-        template_name = 'users/new_login.html'
+        template_name = 'authentication/new_login.html'
         return template_name
 
     def get(self, request, *args, **kwargs):
@@ -145,7 +145,7 @@ class UserLoginView(FormView):
 
 
 class UserLoginOtpView(FormView):
-    template_name = 'users/login_otp.html'
+    template_name = 'authentication/login_otp.html'
     form_class = forms.UserCheckOtpCodeForm
     redirect_field_name = 'next'
 

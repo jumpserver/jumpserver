@@ -5,8 +5,8 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title> Jumpserver </title>
-        <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
+		<title> {{ JMS_TITLE }} </title>
+        <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
 		<link rel="stylesheet" href="{% static 'fonts/font_otp/iconfont.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/otp.css' %}" />
         <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
@@ -19,9 +19,9 @@
 		 <header>
 		 	<div class="logo">
 		 		<a href="{% url 'index' %}">
-		 			<img src="{% static 'img/logo.png' %}" alt="" width="50px" height="50px"/>
+		 			<img src="{{ LOGO_URL }}" alt="" width="50px" height="50px"/>
 		 		</a>
-		 		<a href="{% url 'index' %}">Jumpserver</a>
+		 		<a href="{% url 'index' %}">{{ JMS_TITLE }}</a>
 		 	</div>
 		 	<div>
                 <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
