@@ -6,18 +6,9 @@
 <!--/*@thymesVar id="message" type="java.lang.String"*/-->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    {% if interface and interface.favicon %}
-        <link rel="shortcut icon" href="{{ MEDIA_URL }}{{ interface.favicon }}" type="image/x-icon">
-    {% else %}
-        <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
-    {% endif %}
-
+        <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
     <title>
-        {% if interface and interface.login_title %}
-            {{ interface.login_title }}
-        {% else %}
-            Jumpserver
-        {% endif %}
+        {{ JMS_TITLE }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Stylesheets -->
@@ -65,24 +56,13 @@
     <div>
         <div class="box-1">
             <div class="box-2">
-                {% if interface.login_image %}
-                    <img src="{{ MEDIA_URL }}{{ interface.login_image }}" style="height: 100%; width: 100%"/>
-                {% else %}
-                    <img src="{% static 'img/login/login_image_1.png' %}" style=" height: 100%; width: 100%"/>
-                {% endif %}
+                <img src="{{ LOGIN_IMAGE_URL }}" style="height: 100%; width: 100%"/>
             </div>
             <div class="box-3">
                 <div style="background-color: white">
-                    {% if interface.login_title %}
-                        <div style="margin-top: 40px;padding-top: 50px;">
-                            <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ interface.login_title }}</span>
-                        </div>
-                    {% else %}
-                        <div style="margin-top: 40px;padding-top: 50px;">
-                            <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{% trans 'Welcome to the Jumpserver open source fortress' %}</span>
-                        </div>
-                    {% endif %}
-
+                    <div style="margin-top: 40px;padding-top: 50px;">
+                        <span style="font-size: 24px;font-weight:400;color: #151515;letter-spacing: 0;">{{ JMS_TITLE }}</span>
+                    </div>
                     <div style="font-size: 12px;color: #999999;letter-spacing: 0;line-height: 18px;margin-top: 10px">
                         {% trans 'Welcome back, please enter username and password to login' %}
                     </div>
