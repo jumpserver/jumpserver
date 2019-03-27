@@ -346,9 +346,7 @@ class User(AbstractUser):
             return user_default
 
     def generate_reset_token(self):
-        return signer.sign_t(
-            {'reset': str(self.id), 'email': self.email}, expires_in=3600
-        )
+        return uuid.uuid4()
 
     @property
     def otp_enabled(self):
