@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-27 12:48+0800\n"
+"POT-Creation-Date: 2019-03-27 17:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2322,6 +2322,10 @@ msgstr ""
 msgid "Special char not allowed"
 msgstr "不能包含特殊字符"
 
+#: jumpserver/context_processor.py:18
+msgid "Beijing Duizhan Tech, Inc."
+msgstr "北京堆栈科技有限公司"
+
 #: jumpserver/views.py:185
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, coco, "
@@ -3346,10 +3350,6 @@ msgstr "创建录像存储"
 #: settings/views.py:139
 msgid "Create command storage"
 msgstr "创建命令存储"
-
-#: templates/_copyright.html:2 templates/_footer.html:8
-msgid " Beijing Duizhan Tech, Inc. "
-msgstr " 北京堆栈科技有限公司 "
 
 #: templates/_header_bar.html:31
 msgid "Help"
