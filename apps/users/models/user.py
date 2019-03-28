@@ -3,6 +3,8 @@
 #
 import uuid
 import base64
+import string
+import random
 from collections import OrderedDict
 
 from django.conf import settings
@@ -22,8 +24,6 @@ __all__ = ['User']
 signer = get_signer()
 
 logger = get_logger(__file__)
-
-CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
 
 
 class User(AbstractUser):
@@ -51,6 +51,9 @@ class User(AbstractUser):
         (SOURCE_OPENID, 'OpenID'),
         (SOURCE_RADIUS, 'Radius'),
     )
+
+    CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
         max_length=128, unique=True, verbose_name=_('Username')
@@ -350,11 +353,9 @@ class User(AbstractUser):
             return user_default
 
     def generate_reset_token(self):
-        import string
-        import random
         letter = string.ascii_letters + string.digits
-        token =''.join([random.choice(letter) for _ in range(100)])
-        key = CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        token =''.join([random.choice(letter) for _ in range(50)])
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
         value = {'id': self.id, 'email': self.email}
         cache.set(key, value, 3600)
         return token
@@ -362,19 +363,19 @@ class User(AbstractUser):
     @classmethod
     def validate_reset_password_token(cls, token):
         try:
-            key = CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+            key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
             value = cache.get(key)
             user_id = value.get('id', '')
             email = value.get('email', '')
             user = cls.objects.get(id=user_id, email=email)
-        except Exception as e:
+        except (AttributeError, cls.DoesNotExist) as e:
             logger.error(e, exc_info=True)
             user = None
         return user
 
-    @staticmethod
-    def expired_reset_password_token(token):
-        key = CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+    @classmethod
+    def expired_reset_password_token(cls, token):
+        key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
         cache.delete(key)
 
     @property
