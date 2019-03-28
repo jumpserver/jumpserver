@@ -4,7 +4,10 @@
 
 {% block modal_class %}modal-lg{% endblock %}
 {% block modal_id %}ldap_list_users_modal{% endblock %}
-{% block modal_title%}{% trans "Ldap users" %}{% endblock %}
+{% block modal_title%}{% trans "LDAP user list" %}{% endblock %}
+
+{% block modal_help_message%} <div class="alert alert-info help-message" style="width: 838px; margin-left: 30px">{% trans 'Please submit the LDAP configuration before import' %}</div>{% endblock %}
+
 {% block modal_body %}
 <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
 <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
@@ -34,7 +37,7 @@
                            <th class="text-center">{% trans 'Username' %}</th>
                            <th class="text-center">{% trans 'Name' %}</th>
                            <th class="text-center">{% trans 'Email' %}</th>
-                           <th class="text-center">{% trans 'Is imported' %}</th>
+                           <th class="text-center">{% trans 'Existing' %}</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -47,16 +50,25 @@
 
 <script>
 var ldap_users_table = 0;
-function initLdapTable() {
+function initLdapUsersTable() {
     if(ldap_users_table){
         return
     }
     var options = {
         ele: $('#ldap_list_users_table'),
-        ajax_url: '{% url "api-settings:ldap-sync" %}',
+        ajax_url: '{% url "api-settings:ldap-user-list" %}',
+        columnDefs: [
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                if(cellData){
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }else{
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                }
+            }}
+        ],
         columns: [
             {data: "username" },{data: "username" }, {data: "name" },
-            {data:"email"}, {data:'is_imported'}
+            {data:"email"}, {data:'existing'}
         ],
         pageLength: 10
     };
@@ -68,8 +80,7 @@ function initLdapTable() {
 
 $(document).ready(function(){
 }).on('show.bs.modal', function () {
-    initLdapTable();
-
+    initLdapUsersTable();
 })
 .on('click','.close_btn1',function () {
     window.location.reload()
@@ -82,9 +93,9 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block modal_button %}
-    {{ block.super }}
+    <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+    <button class="btn btn-primary" type="button" id="{% block modal_confirm_id %}btn_ldap_modal_confirm{% endblock %}">{% trans 'Import' %}</button>
 {% endblock %}
-{% block modal_confirm_id %}btn_ldap_modal_confirm{% endblock %}
 
 
 
