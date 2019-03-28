@@ -79,6 +79,8 @@ class Setting(models.Model):
             obj.cleaned_value = data
         else:
             value = obj.cleaned_value
+            if value is None:
+                value = {}
             value.update(data)
             obj.cleaned_value = value
         obj.save()

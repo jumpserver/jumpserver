@@ -58,11 +58,11 @@
                                     <div class="hr-line-dashed"></div>
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">
-                                            <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                            <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
 {#                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>#}
-                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Sync User' %}</button>
+                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                            <button class="btn btn-default sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Bulk import' %}</button>
                                         </div>
                                     </div>
                                     </form>
@@ -108,11 +108,17 @@ $(document).ready(function () {
 })
 .on("click","#btn_ldap_modal_confirm",function () {
     var user_names=[];
-    var cheked = $("tbody input[type='checkbox']:checked").each(function () {
+    $("tbody input[type='checkbox']:checked").each(function () {
         user_names.push($(this).attr('id'));
-
     });
-    var the_url =  "{% url "api-settings:ldap-comfirm-sync" %}";
+
+    if (user_names.length === 0){
+        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}"
+        toastr.error(msg);
+        return
+     }
+
+    var the_url =  "{% url "api-settings:ldap-user-sync" %}";
 
     function error(message) {
         toastr.error(message)

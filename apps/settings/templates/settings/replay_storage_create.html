@@ -108,6 +108,7 @@
                                 <label class="col-md-2 control-label" for="id_endpoint">{% trans "Endpoint" %}</label>
                                 <div class="col-md-9">
                                     <input id="id_endpoint" class="form-control" type="text" name="ENDPOINT" value="" placeholder="Endpoint">
+                                    <div id="endpoint_error" style="color: red;"></div>
                                     <div class="help-block">
                                         <span class="oss">
                                             {% trans 'OSS: http://{REGION_NAME}.aliyuncs.com' %}
@@ -251,6 +252,13 @@ $(document).ready(function() {
         var name = $(id_field).attr('name');
         data[name] = $(id_field).val();
     });
+    if (data['ENDPOINT'] !== '' && data['ENDPOINT'].indexOf('http') === -1) {
+        var msg = "{% trans 'Endpoint need contain protocol, ex: http' %}";
+        $("#endpoint_error").html(msg);
+        submitBtn.removeClass('disabled');
+        submitBtn.html(origin_text);
+        return
+    }
     var url = "{% url 'api-settings:replay-storage-create' %}";
     var success = function(data, textStatus) {
         location = "{% url 'settings:terminal-setting' %}";
