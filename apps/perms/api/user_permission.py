@@ -35,10 +35,11 @@ __all__ = [
 ]
 
 
-class UserPermissionMixin:
+class UserPermissionCacheMixin:
     cache_policy = '0'
     RESP_CACHE_KEY = '_PERMISSION_RESPONSE_CACHE_{}'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
+    _object = None
 
     @staticmethod
     def change_org_if_need(request, kwargs):
@@ -51,56 +52,82 @@ class UserPermissionMixin:
     def get_object(self):
         return None
 
+    # 内部使用可控制缓存
+    def _get_object(self):
+        if not self._object:
+            self._object = self.get_object()
+        return self._object
+
+    def get_object_id(self):
+        obj = self._get_object()
+        if obj:
+            return str(obj.id)
+        return None
+
+    def get_request_md5(self):
+        full_path = self.request.get_full_path()
+        return md5(full_path.encode()).hexdigest()
+
+    def get_meta_cache_id(self):
+        obj = self._get_object()
+        util = AssetPermissionUtil(obj, cache_policy=self.cache_policy)
+        meta_cache_id = util.cache_meta.get('id')
+        return meta_cache_id
+
+    def get_response_cache_id(self):
+        obj_id = self.get_object_id()
+        request_md5 = self.get_request_md5()
+        meta_cache_id = self.get_meta_cache_id()
+        resp_cache_id = '{}_{}_{}'.format(obj_id, request_md5, meta_cache_id)
+        return resp_cache_id
+
+    def get_response_from_cache(self):
+        resp_cache_id = self.get_response_cache_id()
+        # 没有数据缓冲
+        meta_cache_id = self.get_meta_cache_id()
+        if not meta_cache_id:
+            return None
+        # 从响应缓冲里获取响应
+        key = self.RESP_CACHE_KEY.format(resp_cache_id)
+        data = cache.get(key)
+        if not data:
+            return None
+        logger.debug("Get user permission from cache: {}".format(self.get_object()))
+        response = Response(data)
+        return response
+
+    def expire_response_cache(self):
+        obj_id = self.get_object_id()
+        expire_cache_id = '{}_{}'.format(obj_id, '*')
+        key = self.RESP_CACHE_KEY.format(expire_cache_id)
+        cache.delete_pattern(key)
+
+    def set_response_to_cache(self, response):
+        resp_cache_id = self.get_response_cache_id()
+        key = self.RESP_CACHE_KEY.format(resp_cache_id)
+        cache.set(key, response.data, self.CACHE_TIME)
+
     def get(self, request, *args, **kwargs):
         self.change_org_if_need(request, kwargs)
         self.cache_policy = request.GET.get('cache_policy', '0')
 
-        obj = self.get_object()
+        obj = self._get_object()
         if obj is None:
             return super().get(request, *args, **kwargs)
-        request_path_md5 = md5(request.get_full_path().encode()).hexdigest()
-        obj_id = str(obj.id)
-        expire_cache_key = '{}_{}'.format(obj_id, '*')
-        if self.CACHE_TIME <= 0 or \
-                self.cache_policy in AssetPermissionUtil.CACHE_POLICY_MAP[0]:
+
+        if AssetPermissionUtil.is_not_using_cache(self.cache_policy):
             return super().get(request, *args, **kwargs)
-        elif self.cache_policy in AssetPermissionUtil.CACHE_POLICY_MAP[2]:
-            self.expire_cache_response(expire_cache_key)
+        elif AssetPermissionUtil.is_refresh_cache(self.cache_policy):
+            self.expire_response_cache()
 
-        util = AssetPermissionUtil(obj, cache_policy=self.cache_policy)
-        meta_cache_id = util.cache_meta.get('id')
-        cache_id = '{}_{}_{}'.format(obj_id, request_path_md5, meta_cache_id)
-        # 没有数据缓冲
-        if not meta_cache_id:
-            response = super().get(request, *args, **kwargs)
-            self.set_cache_response(cache_id, response)
-            return response
-        # 从响应缓冲里获取响应
-        response = self.get_cache_response(cache_id)
-        if not response:
-            response = super().get(request, *args, **kwargs)
-            self.set_cache_response(cache_id, response)
-        return response
-
-    def get_cache_response(self, _id):
-        if not _id:
-            return None
-        key = self.RESP_CACHE_KEY.format(_id)
-        data = cache.get(key)
-        if not data:
-            return None
-        return Response(data)
-
-    def expire_cache_response(self, _id):
-        key = self.RESP_CACHE_KEY.format(_id)
-        cache.delete(key)
-
-    def set_cache_response(self, _id, response):
-        key = self.RESP_CACHE_KEY.format(_id)
-        cache.set(key, response.data, self.CACHE_TIME)
+        resp = self.get_response_from_cache()
+        if not resp:
+            resp = super().get(request, *args, **kwargs)
+            self.set_response_to_cache(resp)
+        return resp
 
 
-class UserGrantedAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIView):
+class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIView):
     """
     用户授权的所有资产
     """
@@ -110,7 +137,6 @@ class UserGrantedAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIView):
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
-
         if user_id:
             user = get_object_or_404(User, id=user_id)
         else:
@@ -134,7 +160,7 @@ class UserGrantedAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
+class UserGrantedNodesApi(UserPermissionCacheMixin, ListAPIView):
     """
     查询用户授权的所有节点的API, 如果是超级用户或者是 app，切换到root org
     """
@@ -161,7 +187,7 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIView):
+class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIView):
     """
     用户授权的节点并带着节点下资产的api
     """
@@ -202,16 +228,11 @@ class UserGrantedNodesWithAssetsApi(UserPermissionMixin, AssetsFilterMixin, List
         return super().get_permissions()
 
 
-class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionMixin, ListAPIView):
+class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
     show_assets = True
     system_user_id = None
-
-    def get(self, request, *args, **kwargs):
-        self.show_assets = request.query_params.get('show_assets', '1') == '1'
-        self.system_user_id = request.query_params.get('system_user')
-        return super().get(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
@@ -226,13 +247,19 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionMixin, ListAPIView):
             user = get_object_or_404(User, id=user_id)
         return user
 
+    def list(self, request, *args, **kwargs):
+        resp = super().list(request, *args, **kwargs)
+        return resp
+
     def get_queryset(self):
         queryset = []
+        self.show_assets = self.request.query_params.get('show_assets', '1') == '1'
+        self.system_user_id = self.request.query_params.get('system_user')
         user = self.get_object()
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         if self.system_user_id:
-            util.filter_permission_with_system_user(
-                system_user=self.system_user_id
+            util.filter_permissions(
+                system_users=self.system_user_id
             )
         nodes = util.get_nodes_with_assets()
         for node, assets in nodes.items():
@@ -247,7 +274,7 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionMixin, ListAPIView):
         return queryset
 
 
-class UserGrantedNodeAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIView):
+class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIView):
     """
     查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
     """
@@ -283,7 +310,7 @@ class UserGrantedNodeAssetsApi(UserPermissionMixin, AssetsFilterMixin, ListAPIVi
         return super().get_permissions()
 
 
-class UserGrantedNodeChildrenApi(UserPermissionMixin, ListAPIView):
+class UserGrantedNodeChildrenApi(UserPermissionCacheMixin, ListAPIView):
     """
     获取用户自己授权节点下子节点的api
     """
@@ -369,7 +396,7 @@ class UserGrantedNodeChildrenApi(UserPermissionMixin, ListAPIView):
             return self.get_children_queryset()
 
 
-class ValidateUserAssetPermissionApi(UserPermissionMixin, APIView):
+class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):

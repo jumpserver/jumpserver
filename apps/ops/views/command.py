@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.generic import ListView, TemplateView
 
+from common.permissions import AdminUserRequiredMixin, LoginRequiredMixin
 from common.mixins import DatetimeSearchMixin
 from ..models import CommandExecution
 from ..forms import CommandExecutionForm
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-class CommandExecutionListView(DatetimeSearchMixin, ListView):
+class CommandExecutionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     template_name = 'ops/command_execution_list.html'
     model = CommandExecution
     paginate_by = settings.DISPLAY_PER_PAGE
@@ -50,7 +51,7 @@ class CommandExecutionListView(DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class CommandExecutionStartView(TemplateView):
+class CommandExecutionStartView(LoginRequiredMixin, TemplateView):
     template_name = 'ops/command_execution_create.html'
     form_class = CommandExecutionForm
 
