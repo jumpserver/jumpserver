@@ -4,151 +4,159 @@
 from ldap3 import Server, Connection
 from django.utils.translation import ugettext_lazy as _
 
-from .models import settings
 from users.models import User
+from common.utils import get_logger
+from .models import settings
 
 
-def ldap_conn(host, use_ssl, bind_dn, password):
-    server = Server(host, use_ssl=use_ssl)
-    conn = Connection(server, bind_dn, password)
-    return conn
+logger = get_logger(__file__)
 
 
-def ldap_search(conn, search_ougroup, search_filter, attr_map, user_names=None):
-    users_list = []
-    for search_ou in str(search_ougroup).split("|"):
-        ok = conn.search(search_ou, search_filter % ({"user": "*"}),
-                         attributes=list(attr_map.values()))
-        if not ok:
-            error = _("Search no entry matched in ou {}").format(search_ou)
-            return {"error": error}
-
-        ldap_map_users(conn, attr_map, users_list, user_names)
-
-    if len(users_list) > 0:
-        return users_list
-    return {"error": _("Have user but attr mapping error")}
+class LDAPOUGroupException(Exception):
+    pass
 
 
-def get_ldap_users_list(user_names=None):
-    ldap_setting = get_ldap_setting()
-    conn = ldap_conn(ldap_setting['host'], ldap_setting['use_ssl'],
-                     ldap_setting['bind_dn'], ldap_setting['password'])
-    try:
-        conn.bind()
-    except Exception as e:
-        return {"error": str(e)}
+class LDAPUtil:
 
-    result_search = ldap_search(conn, ldap_setting['search_ougroup'],
-                                ldap_setting['search_filter'],
-                                ldap_setting['attr_map'], user_names=user_names)
-    return result_search
+    def __init__(self, use_settings_config=True, server_uri=None, bind_dn=None,
+                 password=None, use_ssl=None, search_ougroup=None,
+                 search_filter=None, attr_map=None, auth_ldap=None):
 
-
-def ldap_map_users(conn, attr_map, users, user_names=None):
-    for entry in conn.entries:
-        user = entry_user(entry, attr_map)
-        if user_names:
-            if user.get('username', '') in user_names:
-                users.append(user)
+        # config
+        if use_settings_config:
+            self._load_config_from_settings()
         else:
-            users.append(user)
+            self.server_uri = server_uri
+            self.bind_dn = bind_dn
+            self.password = password
+            self.use_ssl = use_ssl
+            self.search_ougroup = search_ougroup
+            self.search_filter = search_filter
+            self.attr_map = attr_map
+            self.auth_ldap = auth_ldap
 
+    def _load_config_from_settings(self):
+        self.server_uri = settings.AUTH_LDAP_SERVER_URI
+        self.bind_dn = settings.AUTH_LDAP_BIND_DN
+        self.password = settings.AUTH_LDAP_BIND_PASSWORD
+        self.use_ssl = settings.AUTH_LDAP_START_TLS
+        self.search_ougroup = settings.AUTH_LDAP_SEARCH_OU
+        self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
+        self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
+        self.auth_ldap = settings.AUTH_LDAP
 
-def entry_user(entry, attr_map):
-    user = {}
-    user['is_imported'] = _('No')
-    for attr, mapping in attr_map.items():
-        if not hasattr(entry, mapping):
-            continue
-        value = getattr(entry, mapping).value
-        user[attr] = value if value else ''
-        if attr != 'username':
-            continue
-        if User.objects.filter(username=user[attr]):
-            user['is_imported'] = _('Yes')
-    return user
+    @staticmethod
+    def get_user_by_username(username):
+        try:
+            user = User.objects.get(username=username)
+        except Exception as e:
+            logger.info(e)
+            return None
+        else:
+            return user
 
-
-def get_ldap_setting():
-    host = settings.AUTH_LDAP_SERVER_URI
-    bind_dn = settings.AUTH_LDAP_BIND_DN
-    password = settings.AUTH_LDAP_BIND_PASSWORD
-    use_ssl = settings.AUTH_LDAP_START_TLS
-    search_ougroup = settings.AUTH_LDAP_SEARCH_OU
-    search_filter = settings.AUTH_LDAP_SEARCH_FILTER
-    attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
-    auth_ldap = settings.AUTH_LDAP
-
-    ldap_setting = {
-        'host': host, 'bind_dn': bind_dn, 'password': password,
-        'search_ougroup': search_ougroup, 'search_filter': search_filter,
-        'attr_map': attr_map, 'auth_ldap': auth_ldap, 'use_ssl': use_ssl,
-    }
-    return ldap_setting
-
-
-def save_user(users):
-    exist = []
-    username_list = [item.get('username') for item in users]
-    for name in username_list:
-        if User.objects.filter(username=name).exclude(source='ldap'):
-            exist.append(name)
-    users = [user for user in users if (user.get('username') not in exist)]
-
-    result_save = save(users, exist)
-    return result_save
-
-
-def save(users, exist):
-    fail_user = []
-    for item in users:
-        item = set_default_item(item)
-        user = User.objects.filter(username=item['username'], source='ldap')
-        user = user.first()
-        if not user:
-            try:
-                user = User.objects.create(**item)
-            except Exception as e:
-                fail_user.append(item.get('username'))
+    @staticmethod
+    def _update_user(user, user_item):
+        for field, value in user_item.items():
+            if not hasattr(user, field):
                 continue
-        for key, value in item.items():
-            user.key = value
-            user.save()
+            setattr(user, field, value)
+        user.save()
 
-    get_msg = get_messages(users, exist, fail_user)
-    return get_msg
+    def update_user(self, user_item):
+        user = self.get_user_by_username(user_item['username'])
+        if not user:
+            msg = _('User does not exist')
+            return False, msg
+        if user.source != User.SOURCE_LDAP:
+            msg = _('The user source is not LDAP')
+            return False, msg
 
-
-def set_default_item(item):
-    item['source'] = 'ldap'
-    if not item.get('email', ''):
-        if '@' in item['username']:
-            item['email'] = item['username']
+        try:
+            self._update_user(user, user_item)
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return False, str(e)
         else:
-            item['email'] = item['username'] + '@' + settings.EMAIL_SUFFIX
-    if 'is_imported' in item.keys():
-        item.pop('is_imported')
-    return item
+            return True, None
 
+    @staticmethod
+    def create_user(user_item):
+        user_item['source'] = User.SOURCE_LDAP
+        try:
+            User.objects.create(**user_item)
+        except Exception as e:
+            logger.error(e, exc_info=True)
+            return False, str(e)
+        else:
+            return True, None
 
-def get_messages(users, exist, fail_user):
-    if exist:
-        info = _("Import {} users successfully; import {} users failed, the "
-                 "database already exists with the same name")
-        msg = info.format(len(users), str(exist))
+    @staticmethod
+    def get_or_construct_email(user_item):
+        if not user_item.get('email', None):
+            if '@' in user_item['username']:
+                email = user_item['username']
+            else:
+                email = '{}@{}'.format(
+                    user_item['username'], settings.EMAIL_SUFFIX)
+        else:
+            email = user_item['email']
+        return email
 
-        if fail_user:
-            info = _("Import {} users successfully; import {} users failed, "
-                     "the database already exists with the same name; import {}"
-                     "users failed, Because’TypeError' object has no attribute "
-                     "'keys'")
-            msg = info.format(len(users)-len(fail_user), str(exist), str(fail_user))
-    else:
-        msg = _("Import {} users successfully").format(len(users))
+    def create_or_update_users(self, user_items, force_update=True):
+        succeed = failed = 0
+        for user_item in user_items:
+            user_item['email'] = self.get_or_construct_email(user_item)
+            exist = user_item.pop('existing', None)
+            if exist:
+                ok, error = self.update_user(user_item)
+            else:
+                ok, error = self.create_user(user_item)
+            if not ok:
+                failed += 1
+            else:
+                succeed += 1
+        result = {'total': len(user_items), 'succeed': succeed, 'failed': failed}
+        return result
 
-        if fail_user:
-            info = _("Import {} users successfully;import {} users failed, "
-                     "Because’TypeError' object has no attribute 'keys'")
-            msg = info.format(len(users)-len(fail_user), str(fail_user))
-    return {'msg': msg}
+    def _ldap_entry_to_user_item(self, entry):
+        user_item = {}
+        for attr, mapping in self.attr_map.items():
+            if not hasattr(entry, mapping):
+                continue
+            user_item[attr] = getattr(entry, mapping).value or ''
+        return user_item
+
+    def get_connection(self):
+        server = Server(self.server_uri, use_ssl=self.use_ssl)
+        conn = Connection(server, self.bind_dn, self.password)
+        conn.bind()
+        return conn
+
+    def get_search_user_items(self):
+        conn = self.get_connection()
+        user_items = []
+        search_ougroup = str(self.search_ougroup).split("|")
+        for search_ou in search_ougroup:
+            ok = conn.search(
+                search_ou, self.search_filter % ({"user": "*"}),
+                attributes=list(self.attr_map.values())
+            )
+            if not ok:
+                error = _("Search no entry matched in ou {}".format(search_ou))
+                raise LDAPOUGroupException(error)
+
+            for entry in conn.entries:
+                user_item = self._ldap_entry_to_user_item(entry)
+                user = self.get_user_by_username(user_item['username'])
+                user_item['existing'] = bool(user)
+                user_items.append(user_item)
+
+        return user_items
+
+    def sync_users(self, username_set):
+        user_items = self.get_search_user_items()
+        if username_set:
+            user_items = [u for u in user_items if u['username'] in username_set]
+        result = self.create_or_update_users(user_items)
+        return result
