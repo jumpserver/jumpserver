@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-27 12:48+0800\n"
+"POT-Creation-Date: 2019-03-28 12:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -165,7 +165,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_list.html:72
 #: perms/templates/perms/asset_permission_user.html:54 settings/models.py:29
-#: settings/templates/settings/_ldap_list_users_modal.html:35
+#: settings/templates/settings/_ldap_list_users_modal.html:38
 #: settings/templates/settings/command_storage_create.html:41
 #: settings/templates/settings/replay_storage_create.html:44
 #: settings/templates/settings/terminal_setting.html:80
@@ -207,7 +207,7 @@ msgstr "名称"
 #: authentication/templates/authentication/new_login.html:90
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
-#: settings/templates/settings/_ldap_list_users_modal.html:34 users/forms.py:13
+#: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:13
 #: users/models/user.py:52 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
@@ -1025,8 +1025,8 @@ msgstr "其它"
 #: settings/templates/settings/basic_setting.html:61
 #: settings/templates/settings/command_storage_create.html:79
 #: settings/templates/settings/email_setting.html:62
-#: settings/templates/settings/ldap_setting.html:62
-#: settings/templates/settings/replay_storage_create.html:152
+#: settings/templates/settings/ldap_setting.html:61
+#: settings/templates/settings/replay_storage_create.html:151
 #: settings/templates/settings/security_setting.html:70
 #: settings/templates/settings/terminal_setting.html:68
 #: terminal/templates/terminal/terminal_update.html:45
@@ -1061,8 +1061,8 @@ msgstr "重置"
 #: settings/templates/settings/basic_setting.html:62
 #: settings/templates/settings/command_storage_create.html:80
 #: settings/templates/settings/email_setting.html:63
-#: settings/templates/settings/ldap_setting.html:63
-#: settings/templates/settings/replay_storage_create.html:153
+#: settings/templates/settings/ldap_setting.html:64
+#: settings/templates/settings/replay_storage_create.html:152
 #: settings/templates/settings/security_setting.html:71
 #: settings/templates/settings/terminal_setting.html:70
 #: terminal/templates/terminal/command_list.html:103
@@ -1087,7 +1087,8 @@ msgid "Asset detail"
 msgstr "资产详情"
 
 #: assets/templates/assets/_user_asset_detail_modal.html:23
-#: templates/_modal.html:21
+#: settings/templates/settings/_ldap_list_users_modal.html:96
+#: templates/_modal.html:22
 msgid "Close"
 msgstr "关闭"
 
@@ -1259,7 +1260,7 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:182
 #: assets/templates/assets/system_user_list.html:143
 #: settings/templates/settings/terminal_setting.html:165
-#: templates/_modal.html:22 terminal/templates/terminal/session_detail.html:108
+#: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:388
 #: users/templates/users/user_detail.html:414
 #: users/templates/users/user_detail.html:437
@@ -1392,6 +1393,7 @@ msgid "Create asset"
 msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:73
+#: settings/templates/settings/_ldap_list_users_modal.html:97
 #: users/templates/users/user_list.html:7
 #: xpack/plugins/license/templates/license/license_detail.html:101
 msgid "Import"
@@ -1611,7 +1613,7 @@ msgstr "创建网关"
 #: assets/templates/assets/domain_gateway_list.html:99
 #: assets/templates/assets/domain_gateway_list.html:101
 #: settings/templates/settings/email_setting.html:61
-#: settings/templates/settings/ldap_setting.html:61
+#: settings/templates/settings/ldap_setting.html:62
 msgid "Test connection"
 msgstr "测试连接"
 
@@ -2834,38 +2836,33 @@ msgstr "资产授权用户列表"
 msgid "Asset permission asset list"
 msgstr "资产授权资产列表"
 
-#: settings/api.py:23
+#: settings/api.py:26
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:47
+#: settings/api.py:50
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: settings/api.py:77 settings/utils.py:23
-msgid "Search no entry matched in ou {}"
-msgstr "在ou:{}中没有匹配条目"
-
-#: settings/api.py:86
+#: settings/api.py:87
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:109
-msgid ""
-"User is not currently selected, please check the user you want to import"
-msgstr "当前无勾选用户，请勾选你想要导入的用户"
+#: settings/api.py:120
+msgid "succeed: {} failed: {} total: {}"
+msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:139 settings/api.py:175
+#: settings/api.py:142 settings/api.py:178
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:145 settings/api.py:181
+#: settings/api.py:148 settings/api.py:184
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:163 settings/api.py:201
+#: settings/api.py:166 settings/api.py:204
 #: settings/templates/settings/terminal_setting.html:151
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -3108,24 +3105,28 @@ msgid ""
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 
-#: settings/models.py:126 users/templates/users/reset_password.html:68
+#: settings/models.py:128 users/templates/users/reset_password.html:68
 #: users/templates/users/user_profile.html:20
 msgid "Setting"
 msgstr "设置"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:7
-msgid "Ldap users"
-msgstr "Ldap 用户列表"
+msgid "LDAP user list"
+msgstr "LDAP 用户列表"
 
-#: settings/templates/settings/_ldap_list_users_modal.html:36
+#: settings/templates/settings/_ldap_list_users_modal.html:9
+msgid "Please submit the LDAP configuration before import"
+msgstr "请先提交LDAP配置再进行导入"
+
+#: settings/templates/settings/_ldap_list_users_modal.html:39
 #: users/models/user.py:56 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
 
-#: settings/templates/settings/_ldap_list_users_modal.html:37
-msgid "Is imported"
-msgstr "是否已经导入"
+#: settings/templates/settings/_ldap_list_users_modal.html:40
+msgid "Existing"
+msgstr "已存在"
 
 #: settings/templates/settings/basic_setting.html:15
 #: settings/templates/settings/email_setting.html:15
@@ -3182,8 +3183,13 @@ msgid "Doc type"
 msgstr "文档类型"
 
 #: settings/templates/settings/ldap_setting.html:65
-msgid "Sync User"
-msgstr "同步用户"
+msgid "Bulk import"
+msgstr "一键导入"
+
+#: settings/templates/settings/ldap_setting.html:116
+msgid ""
+"User is not currently selected, please check the user you want to import"
+msgstr "当前无勾选用户，请勾选你想要导入的用户"
 
 #: settings/templates/settings/replay_storage_create.html:66
 msgid "Bucket"
@@ -3289,44 +3295,17 @@ msgstr "删除失败"
 msgid "Are you sure about deleting it?"
 msgstr "您确定删除吗?"
 
-#: settings/utils.py:30
-msgid "Have user but attr mapping error"
-msgstr "有用户但attr映射错误"
-
-#: settings/utils.py:60
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:86
-msgid "No"
-msgstr "否"
-
 #: settings/utils.py:69
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:84
-msgid "Yes"
-msgstr "是"
+msgid "User does not exist"
+msgstr "用户不存在"
 
-#: settings/utils.py:137
-msgid ""
-"Import {} users successfully; import {} users failed, the database already "
-"exists with the same name"
-msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户"
+#: settings/utils.py:72
+msgid "The user source is not LDAP"
+msgstr "用户来源不是LDAP"
 
-#: settings/utils.py:142
-msgid ""
-"Import {} users successfully; import {} users failed, the database already "
-"exists with the same name; import {}users failed, Because’TypeError' object "
-"has no attribute 'keys'"
-msgstr ""
-"导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户; 导入 {} "
-"这些用户失败，因为对象没有属性'keys'"
-
-#: settings/utils.py:148
-msgid "Import {} users successfully"
-msgstr "导入 {} 个用户成功"
-
-#: settings/utils.py:151
-msgid ""
-"Import {} users successfully;import {} users failed, Because’TypeError' "
-"object has no attribute 'keys'"
-msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，因为对象没有属性'keys'"
+#: settings/utils.py:146
+msgid "Search no entry matched in ou {}"
+msgstr "在ou:{}中没有匹配条目"
 
 #: settings/views.py:18 settings/views.py:44 settings/views.py:70
 #: settings/views.py:99 settings/views.py:126 settings/views.py:138
@@ -4920,6 +4899,14 @@ msgstr "更改资产上的用户密码时，将会使用与该资产关联的管
 msgid "Length"
 msgstr "长度"
 
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:84
+msgid "Yes"
+msgstr "是"
+
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:86
+msgid "No"
+msgstr "否"
+
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:134
 msgid "Run plan manually"
 msgstr "手动执行计划"
@@ -5368,6 +5355,33 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "Sync User"
+#~ msgstr "同步用户"
+
+#~ msgid "Have user but attr mapping error"
+#~ msgstr "有用户但attr映射错误"
+
+#~ msgid ""
+#~ "Import {} users successfully; import {} users failed, the database "
+#~ "already exists with the same name"
+#~ msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户"
+
+#~ msgid ""
+#~ "Import {} users successfully; import {} users failed, the database "
+#~ "already exists with the same name; import {}users failed, "
+#~ "Because’TypeError' object has no attribute 'keys'"
+#~ msgstr ""
+#~ "导入 {} 个用户成功; 导入 {} 这些用户失败，数据库已经存在同名的用户; 导入 "
+#~ "{} 这些用户失败，因为对象没有属性'keys'"
+
+#~ msgid "Import {} users successfully"
+#~ msgstr "导入 {} 个用户成功"
+
+#~ msgid ""
+#~ "Import {} users successfully;import {} users failed, Because’TypeError' "
+#~ "object has no attribute 'keys'"
+#~ msgstr "导入 {} 个用户成功; 导入 {} 这些用户失败，因为对象没有属性'keys'"
 
 #~ msgid "Monitor"
 #~ msgstr "监控"
