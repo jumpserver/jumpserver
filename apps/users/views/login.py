@@ -84,7 +84,8 @@ class UserResetPasswordView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token', '')
-        if not cache.get(token, ''):
+        user = User.get_cache_user(token)
+        if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
         else:
             check_rules = get_password_check_rules()
@@ -99,7 +100,7 @@ class UserResetPasswordView(TemplateView):
         if password != password_confirm:
             return self.get(request, errors=_('Password not same'))
 
-        user = cache.get(token)
+        user = User.get_cache_user(token)
         if not user:
             return self.get(request, errors=_('Token invalid or expired'))
         if not user.can_update_password():
@@ -113,8 +114,7 @@ class UserResetPasswordView(TemplateView):
                 errors=_('* Your password does not meet the requirements')
             )
 
-        user.reset_password(password)
-        cache.delete(token)
+        user.reset_password(password, token)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
 
 

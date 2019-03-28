@@ -37,8 +37,6 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
 def send_user_created_mail(user):
     subject = _('Create account successfully')
     recipient_list = [user.email]
-    token = user.generate_reset_token()
-    cache.set(token, user, 60*60)
     message = _("""
     Hello %(name)s:
     </br>
@@ -61,7 +59,7 @@ def send_user_created_mail(user):
         'name': user.name,
         'username': user.username,
         'rest_password_url': reverse('users:reset-password', external=True),
-        'rest_password_token': token,
+        'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
@@ -78,8 +76,6 @@ def send_user_created_mail(user):
 def send_reset_password_mail(user):
     subject = _('Reset password')
     recipient_list = [user.email]
-    token = user.generate_reset_token()
-    cache.set(token, user, 60 * 60)
     message = _("""
     Hello %(name)s:
     </br>
@@ -99,7 +95,7 @@ def send_reset_password_mail(user):
     """) % {
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
-        'rest_password_token': token,
+        'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),

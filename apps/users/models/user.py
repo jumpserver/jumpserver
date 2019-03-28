@@ -346,7 +346,16 @@ class User(AbstractUser):
             return user_default
 
     def generate_reset_token(self):
-        return uuid.uuid4()
+        token = str(self.username) + str(uuid.uuid4())
+        cache.set(token, self, 60*60)
+        return token
+
+    @staticmethod
+    def get_cache_user(token):
+        user = cache.get(token)
+        if user:
+            return user
+        return False
 
     @property
     def otp_enabled(self):
@@ -410,10 +419,11 @@ class User(AbstractUser):
             user = None
         return user
 
-    def reset_password(self, new_password):
+    def reset_password(self, new_password, token):
         self.set_password(new_password)
         self.date_password_last_updated = timezone.now()
         self.save()
+        cache.delete(token)
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
