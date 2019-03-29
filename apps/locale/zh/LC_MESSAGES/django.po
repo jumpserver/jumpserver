@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-26 14:56+0800\n"
+"POT-Creation-Date: 2019-03-29 10:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -172,7 +172,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: settings/templates/settings/terminal_setting.html:102 terminal/models.py:22
 #: terminal/models.py:241 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
-#: users/models/user.py:54 users/templates/users/_select_user_modal.html:13
+#: users/models/user.py:61 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
 #: users/templates/users/user_group_detail.html:55
 #: users/templates/users/user_group_list.html:12
@@ -203,11 +203,12 @@ msgstr "名称"
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:30 audits/models.py:94
 #: audits/templates/audits/login_log_list.html:51 authentication/forms.py:11
+#: authentication/templates/authentication/login.html:64
+#: authentication/templates/authentication/new_login.html:90
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
 #: settings/templates/settings/_ldap_list_users_modal.html:34 users/forms.py:13
-#: users/models/user.py:52 users/templates/users/_select_user_modal.html:14
-#: users/templates/users/login.html:64 users/templates/users/new_login.html:110
+#: users/models/user.py:59 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -228,9 +229,10 @@ msgstr "密码或密钥密码"
 #: assets/forms/user.py:26 assets/models/base.py:28
 #: assets/serializers/asset_user.py:19
 #: assets/templates/assets/_asset_user_auth_modal.html:21
-#: authentication/forms.py:13 settings/forms.py:103 users/forms.py:15
-#: users/forms.py:27 users/templates/users/login.html:67
-#: users/templates/users/new_login.html:113
+#: authentication/forms.py:13
+#: authentication/templates/authentication/login.html:67
+#: authentication/templates/authentication/new_login.html:93
+#: settings/forms.py:103 users/forms.py:15 users/forms.py:27
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_create.html:10
 #: users/templates/users/user_password_authentication.html:18
@@ -244,7 +246,7 @@ msgid "Password"
 msgstr "密码"
 
 #: assets/forms/user.py:29 assets/serializers/asset_user.py:27
-#: users/models/user.py:81
+#: users/models/user.py:88
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -435,7 +437,7 @@ msgstr "标签管理"
 #: assets/templates/assets/system_user_detail.html:100
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:36
 #: perms/models.py:89 perms/templates/perms/asset_permission_detail.html:98
-#: users/models/user.py:95 users/templates/users/user_detail.html:111
+#: users/models/user.py:102 users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:103
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
 #: xpack/plugins/cloud/models.py:55 xpack/plugins/cloud/models.py:127
@@ -480,7 +482,7 @@ msgstr "创建日期"
 #: orgs/models.py:17 perms/models.py:38 perms/models.py:91
 #: perms/templates/perms/asset_permission_detail.html:102 settings/models.py:34
 #: terminal/models.py:32 terminal/templates/terminal/terminal_detail.html:63
-#: users/models/group.py:15 users/models/user.py:87
+#: users/models/group.py:15 users/models/user.py:94
 #: users/templates/users/user_detail.html:127
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
@@ -552,7 +554,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:73
+#: assets/models/cluster.py:22 users/models/user.py:80
 #: users/templates/users/user_detail.html:76
 msgid "Phone"
 msgstr "手机"
@@ -578,7 +580,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:457
+#: users/models/user.py:473
 msgid "System"
 msgstr "系统"
 
@@ -726,7 +728,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:283
-#: users/models/user.py:32 users/models/user.py:445
+#: users/models/user.py:36 users/models/user.py:461
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:386
 #: xpack/plugins/orgs/forms.py:26
@@ -825,7 +827,7 @@ msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
 #: assets/serializers/asset_user.py:23 users/forms.py:230
-#: users/models/user.py:84 users/templates/users/first_login.html:42
+#: users/models/user.py:91 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
 #: users/templates/users/user_profile_update.html:43
@@ -1039,7 +1041,7 @@ msgstr "其它"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:71
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:35
-#: xpack/plugins/interface/templates/interface/interface.html:88
+#: xpack/plugins/interface/templates/interface/interface.html:72
 msgid "Reset"
 msgstr "重置"
 
@@ -1067,14 +1069,14 @@ msgstr "重置"
 #: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
-#: users/templates/users/forgot_password.html:49
+#: users/templates/users/forgot_password.html:42
 #: users/templates/users/user_bulk_update.html:24
 #: users/templates/users/user_list.html:45
 #: users/templates/users/user_password_update.html:72
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:72
-#: xpack/plugins/interface/templates/interface/interface.html:89
+#: xpack/plugins/interface/templates/interface/interface.html:74
 msgid "Submit"
 msgstr "提交"
 
@@ -1158,7 +1160,7 @@ msgstr "更新认证"
 #: assets/templates/assets/system_user_asset.html:350
 #: users/templates/users/user_detail.html:307
 #: users/templates/users/user_detail.html:334
-#: xpack/plugins/interface/views.py:31
+#: xpack/plugins/interface/views.py:34
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -1268,6 +1270,7 @@ msgstr "选择节点"
 #: users/templates/users/user_profile.html:238
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:36
+#: xpack/plugins/interface/templates/interface/interface.html:103
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 msgid "Confirm"
 msgstr "确认"
@@ -1496,6 +1499,7 @@ msgstr "重命名失败，不能更改root节点的名称"
 #: users/templates/users/user_detail.html:476
 #: users/templates/users/user_group_list.html:82
 #: users/templates/users/user_list.html:202
+#: xpack/plugins/interface/templates/interface/interface.html:97
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
@@ -1512,6 +1516,7 @@ msgstr "删除选择资产"
 #: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:206
+#: xpack/plugins/interface/templates/interface/interface.html:101
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
 msgstr "取消"
@@ -1934,7 +1939,7 @@ msgid "User agent"
 msgstr "Agent"
 
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:56
-#: users/forms.py:142 users/models/user.py:76
+#: users/forms.py:142 users/models/user.py:83
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2048,8 +2053,9 @@ msgstr "登录日志"
 msgid "Command execution log"
 msgstr "命令执行"
 
-#: authentication/api/auth.py:46 users/templates/users/login.html:52
-#: users/templates/users/new_login.html:97
+#: authentication/api/auth.py:46
+#: authentication/templates/authentication/login.html:52
+#: authentication/templates/authentication/new_login.html:77
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
@@ -2127,6 +2133,122 @@ msgstr "MFA 验证码"
 #: authentication/models.py:33
 msgid "Private Token"
 msgstr "ssh密钥"
+
+#: authentication/templates/authentication/login.html:27
+#: authentication/templates/authentication/login_otp.html:27
+#: users/templates/users/reset_password.html:25
+#: xpack/plugins/interface/models.py:36
+msgid "Welcome to the Jumpserver open source fortress"
+msgstr "欢迎使用Jumpserver开源堡垒机"
+
+#: authentication/templates/authentication/login.html:29
+#: authentication/templates/authentication/login_otp.html:29
+msgid ""
+"The world's first fully open source fortress, using the GNU GPL v2.0 open "
+"source protocol, is a professional operation and maintenance audit system in "
+"compliance with 4A."
+msgstr ""
+"全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计"
+"系统。"
+
+#: authentication/templates/authentication/login.html:32
+#: authentication/templates/authentication/login_otp.html:32
+msgid ""
+"Developed using Python/Django, following the Web 2.0 specification and "
+"equipped with industry-leading Web Terminal solutions, with beautiful "
+"interactive interface and good user experience."
+msgstr ""
+"使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web "
+"Terminal 解决方案，交互界面美观、用户体验好。"
+
+#: authentication/templates/authentication/login.html:35
+#: authentication/templates/authentication/login_otp.html:35
+msgid ""
+"Distributed architecture is adopted to support multi-machine room deployment "
+"across regions, central node provides API, and each machine room deploys "
+"login node, which can be extended horizontally and without concurrent access "
+"restrictions."
+msgstr ""
+"采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，"
+"可横向扩展、无并发访问限制。"
+
+#: authentication/templates/authentication/login.html:38
+#: authentication/templates/authentication/login_otp.html:38
+msgid "Changes the world, starting with a little bit."
+msgstr "改变世界，从一点点开始。"
+
+#: authentication/templates/authentication/login.html:46
+#: authentication/templates/authentication/login.html:72
+#: authentication/templates/authentication/new_login.html:99
+#: templates/_header_bar.html:101
+msgid "Login"
+msgstr "登录"
+
+#: authentication/templates/authentication/login.html:54
+#: authentication/templates/authentication/new_login.html:79
+msgid "The user password has expired"
+msgstr "用户密码已过期"
+
+#: authentication/templates/authentication/login.html:57
+#: authentication/templates/authentication/new_login.html:82
+msgid "Captcha invalid"
+msgstr "验证码错误"
+
+#: authentication/templates/authentication/login.html:83
+#: authentication/templates/authentication/new_login.html:103
+#: users/templates/users/forgot_password.html:10
+#: users/templates/users/forgot_password.html:25
+msgid "Forgot password"
+msgstr "忘记密码"
+
+#: authentication/templates/authentication/login.html:89
+msgid "More login options"
+msgstr "更多登录方式"
+
+#: authentication/templates/authentication/login.html:93
+msgid "Keycloak"
+msgstr ""
+
+#: authentication/templates/authentication/login_otp.html:46
+#: users/templates/users/user_detail.html:91
+#: users/templates/users/user_profile.html:85
+msgid "MFA certification"
+msgstr "MFA认证"
+
+#: authentication/templates/authentication/login_otp.html:51
+#: users/templates/users/user_otp_authentication.html:11
+msgid ""
+"The account protection has been opened, please complete the following "
+"operations according to the prompts"
+msgstr "账号保护已开启，请根据提示完成以下操作"
+
+#: authentication/templates/authentication/login_otp.html:55
+#: users/templates/users/user_otp_authentication.html:13
+msgid "Open Authenticator and enter the 6-bit dynamic code"
+msgstr "请打开手机Google Authenticator应用，输入6位动态码"
+
+#: authentication/templates/authentication/login_otp.html:65
+#: users/templates/users/user_otp_authentication.html:23
+#: users/templates/users/user_otp_enable_bind.html:26
+msgid "Six figures"
+msgstr "6位数字"
+
+#: authentication/templates/authentication/login_otp.html:67
+#: users/templates/users/first_login.html:105
+#: users/templates/users/user_otp_authentication.html:26
+#: users/templates/users/user_otp_enable_bind.html:29
+#: users/templates/users/user_otp_enable_install_app.html:26
+#: users/templates/users/user_password_authentication.html:21
+msgid "Next"
+msgstr "下一步"
+
+#: authentication/templates/authentication/login_otp.html:70
+msgid "Can't provide security? Please contact the administrator!"
+msgstr "如果不能提供MFA验证码，请联系管理员!"
+
+#: authentication/templates/authentication/new_login.html:67
+msgid "Welcome back, please enter username and password to login"
+msgstr "欢迎回来，请输入用户名和密码登录"
 
 #: authentication/views/login.py:75
 msgid "Please enable cookies and try again."
@@ -2562,7 +2684,7 @@ msgstr "组织管理"
 #: perms/templates/perms/asset_permission_list.html:55
 #: perms/templates/perms/asset_permission_list.html:75
 #: perms/templates/perms/asset_permission_list.html:122 templates/_nav.html:14
-#: users/forms.py:253 users/models/group.py:26 users/models/user.py:60
+#: users/forms.py:253 users/models/group.py:26 users/models/user.py:67
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
 #: users/templates/users/user_list.html:26
@@ -2580,7 +2702,7 @@ msgstr "资产和节点至少选一个"
 
 #: perms/models.py:35 perms/models.py:88
 #: perms/templates/perms/asset_permission_detail.html:90
-#: users/models/user.py:92 users/templates/users/user_detail.html:107
+#: users/models/user.py:99 users/templates/users/user_detail.html:107
 #: users/templates/users/user_profile.html:116
 msgid "Date expired"
 msgstr "失效日期"
@@ -2999,7 +3121,7 @@ msgid "Ldap users"
 msgstr "Ldap 用户列表"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:36
-#: users/models/user.py:56 users/templates/users/user_detail.html:71
+#: users/models/user.py:63 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
@@ -3263,11 +3385,6 @@ msgstr "用户页面"
 msgid "Logout"
 msgstr "注销登录"
 
-#: templates/_header_bar.html:101 users/templates/users/login.html:46
-#: users/templates/users/login.html:72 users/templates/users/new_login.html:119
-msgid "Login"
-msgstr "登录"
-
 #: templates/_header_bar.html:114 templates/_nav.html:4
 msgid "Dashboard"
 msgstr "仪表盘"
@@ -3334,7 +3451,7 @@ msgstr ""
 
 #: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
 #: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
-#: users/views/login.py:151 users/views/user.py:68 users/views/user.py:83
+#: users/views/login.py:153 users/views/user.py:68 users/views/user.py:83
 #: users/views/user.py:113 users/views/user.py:194 users/views/user.py:355
 #: users/views/user.py:405 users/views/user.py:445
 msgid "Users"
@@ -3412,15 +3529,7 @@ msgstr "语言播放验证码"
 msgid "Captcha"
 msgstr "验证码"
 
-#: templates/flash_message_standalone.html:35
-#: users/templates/users/login.html:27 users/templates/users/login_otp.html:27
-#: users/templates/users/new_login.html:82
-#: users/templates/users/reset_password.html:25
-#: xpack/plugins/interface/models.py:36
-msgid "Welcome to the Jumpserver open source fortress"
-msgstr "欢迎使用Jumpserver开源堡垒机"
-
-#: templates/flash_message_standalone.html:56
+#: templates/flash_message_standalone.html:47
 msgid "Return"
 msgstr "返回"
 
@@ -3782,7 +3891,7 @@ msgstr "你可以使用ssh客户端工具连接终端"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:32 users/models/user.py:64
+#: users/forms.py:32 users/models/user.py:71
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:25
@@ -3875,53 +3984,53 @@ msgstr "复制你的公钥到这里"
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/models/user.py:31 users/models/user.py:453
+#: users/models/user.py:35 users/models/user.py:469
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:33
+#: users/models/user.py:37
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:36 users/templates/users/user_profile.html:92
+#: users/models/user.py:40 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:159
 #: users/templates/users/user_profile.html:162
 msgid "Disable"
 msgstr "禁用"
 
-#: users/models/user.py:37 users/templates/users/user_profile.html:90
+#: users/models/user.py:41 users/templates/users/user_profile.html:90
 #: users/templates/users/user_profile.html:166
 msgid "Enable"
 msgstr "启用"
 
-#: users/models/user.py:38 users/templates/users/user_profile.html:88
+#: users/models/user.py:42 users/templates/users/user_profile.html:88
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:67
+#: users/models/user.py:74
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:70 users/templates/users/user_detail.html:82
+#: users/models/user.py:77 users/templates/users/user_detail.html:82
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:99 users/templates/users/user_detail.html:103
+#: users/models/user.py:106 users/templates/users/user_detail.html:103
 #: users/templates/users/user_list.html:27
 #: users/templates/users/user_profile.html:100
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:103
+#: users/models/user.py:110
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:129 users/templates/users/user_update.html:22
-#: users/views/login.py:45 users/views/login.py:104 users/views/user.py:418
+#: users/models/user.py:136 users/templates/users/user_update.html:22
+#: users/views/login.py:46 users/views/login.py:107 users/views/user.py:418
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:456
+#: users/models/user.py:472
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -3998,15 +4107,6 @@ msgstr "请选择同意条款和条件"
 msgid "Previous"
 msgstr "上一步"
 
-#: users/templates/users/first_login.html:105
-#: users/templates/users/login_otp.html:67
-#: users/templates/users/user_otp_authentication.html:26
-#: users/templates/users/user_otp_enable_bind.html:29
-#: users/templates/users/user_otp_enable_install_app.html:26
-#: users/templates/users/user_password_authentication.html:21
-msgid "Next"
-msgstr "下一步"
-
 #: users/templates/users/first_login_done.html:31
 msgid "Welcome to use jumpserver, visit "
 msgstr "欢迎使用Jumpserver开源跳板机系统"
@@ -4019,95 +4119,9 @@ msgstr "向导"
 msgid " for more information"
 msgstr "获取更多信息"
 
-#: users/templates/users/forgot_password.html:11
 #: users/templates/users/forgot_password.html:31
-#: users/templates/users/login.html:83 users/templates/users/new_login.html:123
-msgid "Forgot password"
-msgstr "忘记密码"
-
-#: users/templates/users/forgot_password.html:38
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置邮件到您的邮箱中"
-
-#: users/templates/users/login.html:29 users/templates/users/login_otp.html:29
-msgid ""
-"The world's first fully open source fortress, using the GNU GPL v2.0 open "
-"source protocol, is a professional operation and maintenance audit system in "
-"compliance with 4A."
-msgstr ""
-"全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计"
-"系统。"
-
-#: users/templates/users/login.html:32 users/templates/users/login_otp.html:32
-msgid ""
-"Developed using Python/Django, following the Web 2.0 specification and "
-"equipped with industry-leading Web Terminal solutions, with beautiful "
-"interactive interface and good user experience."
-msgstr ""
-"使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web "
-"Terminal 解决方案，交互界面美观、用户体验好。"
-
-#: users/templates/users/login.html:35 users/templates/users/login_otp.html:35
-msgid ""
-"Distributed architecture is adopted to support multi-machine room deployment "
-"across regions, central node provides API, and each machine room deploys "
-"login node, which can be extended horizontally and without concurrent access "
-"restrictions."
-msgstr ""
-"采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，"
-"可横向扩展、无并发访问限制。"
-
-#: users/templates/users/login.html:38 users/templates/users/login_otp.html:38
-msgid "Changes the world, starting with a little bit."
-msgstr "改变世界，从一点点开始。"
-
-#: users/templates/users/login.html:54 users/templates/users/new_login.html:99
-msgid "The user password has expired"
-msgstr "用户密码已过期"
-
-#: users/templates/users/login.html:57 users/templates/users/new_login.html:102
-msgid "Captcha invalid"
-msgstr "验证码错误"
-
-#: users/templates/users/login.html:89
-msgid "More login options"
-msgstr "更多登录方式"
-
-#: users/templates/users/login.html:93
-msgid "Keycloak"
-msgstr ""
-
-#: users/templates/users/login_otp.html:46
-#: users/templates/users/user_detail.html:91
-#: users/templates/users/user_profile.html:85
-msgid "MFA certification"
-msgstr "MFA认证"
-
-#: users/templates/users/login_otp.html:51
-#: users/templates/users/user_otp_authentication.html:11
-msgid ""
-"The account protection has been opened, please complete the following "
-"operations according to the prompts"
-msgstr "账号保护已开启，请根据提示完成以下操作"
-
-#: users/templates/users/login_otp.html:55
-#: users/templates/users/user_otp_authentication.html:13
-msgid "Open Authenticator and enter the 6-bit dynamic code"
-msgstr "请打开手机Google Authenticator应用，输入6位动态码"
-
-#: users/templates/users/login_otp.html:65
-#: users/templates/users/user_otp_authentication.html:23
-#: users/templates/users/user_otp_enable_bind.html:26
-msgid "Six figures"
-msgstr "6位数字"
-
-#: users/templates/users/login_otp.html:70
-msgid "Can't provide security? Please contact the administrator!"
-msgstr "如果不能提供MFA验证码，请联系管理员!"
-
-#: users/templates/users/new_login.html:87
-msgid "Welcome back, please enter username and password to login"
-msgstr "欢迎回来，请输入用户名和密码登录"
 
 #: users/templates/users/reset_password.html:28
 msgid ""
@@ -4664,40 +4678,40 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:42
+#: users/views/login.py:43
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:58
+#: users/views/login.py:59
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:59
+#: users/views/login.py:60
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:72
+#: users/views/login.py:73
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:73
+#: users/views/login.py:74
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:88 users/views/login.py:107
+#: users/views/login.py:89 users/views/login.py:105
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:100
+#: users/views/login.py:101
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:113 users/views/user.py:128 users/views/user.py:428
+#: users/views/login.py:114 users/views/user.py:128 users/views/user.py:428
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:151
+#: users/views/login.py:153
 msgid "First login"
 msgstr "首次登录"
 
@@ -5215,13 +5229,39 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/templates/interface/interface.html:15
-#: xpack/plugins/interface/views.py:21
+#: xpack/plugins/interface/views.py:24
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/views.py:20
+#: xpack/plugins/interface/templates/interface/interface.html:73
+#: xpack/plugins/interface/templates/interface/interface.html:108
+#: xpack/plugins/interface/templates/interface/interface.html:115
+msgid "Restore Default"
+msgstr "恢复默认"
+
+#: xpack/plugins/interface/templates/interface/interface.html:98
+msgid "This will restore default Settings of the interface !!!"
+msgstr "您确定要恢复默认初始化吗？"
+
+#: xpack/plugins/interface/templates/interface/interface.html:107
+msgid "Restore default successfully."
+msgstr "恢复默认成功！"
+
+#: xpack/plugins/interface/templates/interface/interface.html:114
+msgid "Restore default failed."
+msgstr "恢复默认失败！"
+
+#: xpack/plugins/interface/views.py:23
 msgid "Interface"
 msgstr "界面"
+
+#: xpack/plugins/interface/views.py:49
+msgid "It is already in the default setting state！"
+msgstr "当前已经是初始化状态！"
+
+#: xpack/plugins/interface/views.py:53
+msgid "Restore default successfully！"
+msgstr "恢复默认成功！"
 
 #: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:94
 #: xpack/plugins/license/templates/license/license_detail.html:50
@@ -5231,7 +5271,7 @@ msgstr "许可证"
 
 #: xpack/plugins/license/models.py:74
 msgid "Standard edition"
-msgstr ""
+msgstr "标准版"
 
 #: xpack/plugins/license/models.py:76
 msgid "Enterprise edition"
