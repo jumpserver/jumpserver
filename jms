@@ -13,7 +13,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 
 try:
-    from apps import __version__
+    from apps.jumpserver import const
+    __version__ = const.VERSION
 except ImportError as e:
     print("Not found __version__: {}".format(e))
     print("Sys path: {}".format(sys.path))

@@ -8,11 +8,11 @@
 
 ----
 
-Jumpserver是全球首款完全开源的堡垒机，使用GNU GPL v2.0开源协议，是符合 4A 的专业运维审计系统。
+Jumpserver 是全球首款完全开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 的专业运维审计系统。
 
-Jumpserver使用Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
+Jumpserver 使用 Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
 
-Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发限制。
+Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发限制。
 
 改变世界，从一点点开始。
 
@@ -20,29 +20,30 @@ Jumpserver采纳分布式架构，支持多机房跨区域部署，中心节点�
 
 ### 功能
 
- ![Jumpserver功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver-14.png "Jumpserver功能")
+ ![Jumpserver 功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver-14.png "Jumpserver 功能")
 
 ### 开始使用
 
-快速开始文档  [Docker安装](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
+快速开始文档  [Docker 安装](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
 
-一步一步安装文档 [详细部署](http://docs.jumpserver.org/zh/docs/step_by_step.html)
+Step by Step 安装文档 [详细部署](http://docs.jumpserver.org/zh/docs/step_by_step.html)
 
-也可以查看我们完整文档包括了使用和开发 [文档](http://docs.jumpserver.org)
+也可以查看我们完整文档 [文档](http://docs.jumpserver.org)
 
-### Demo 和 截图
+### Demo、视频 和 截图
 
-我们提供了DEMO和截图可以让你快速了解Jumpserver
+我们提供了 Demo 、演示视频和截图可以让你快速了解 Jumpserver
 
-[DEMO](https://demo.jumpserver.org)
+[Demo](https://demo.jumpserver.org/auth/login/?next=/)
+[视频](https://fit2cloud2-offline-installer.oss-cn-beijing.aliyuncs.com/tools/Jumpserver%20%E4%BB%8B%E7%BB%8Dv1.4.mp4)
 [截图](http://docs.jumpserver.org/zh/docs/snapshot.html)
 
 ### SDK
 
-我们还编写了一些SDK，供你其它系统快速和Jumpserver APi交互，
+我们还编写了一些SDK，供你其它系统快速和 Jumpserver API 交互
 
-- [python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver其它组件使用这个SDK完成交互
-- [java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK
+- [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver其它组件使用这个SDK完成交互
+- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK
 
 
 ### License & Copyright

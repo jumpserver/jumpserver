@@ -1,10 +1,10 @@
 {% load i18n %}
 <div class="footer fixed">
     <div class="pull-right">
-        Version <strong>1.4.9-{% include '_build.html' %}</strong> GPLv2.
+        Version <strong>{{ VERSION }}-{% include '_build.html' %}</strong> GPLv2.
         <!--<img style="display: none" src="http://www.jumpserver.org/img/evaluate_avatar1.jpg">-->
     </div>
     <div>
-        <strong>Copyright</strong> {% trans ' Beijing Duizhan Tech, Inc. ' %}&copy; 2014-2019
+        {% include '_copyright.html' %}
     </div>
 </div>
