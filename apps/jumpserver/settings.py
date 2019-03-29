@@ -12,25 +12,24 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
-import socket
 
 import ldap
 from django.urls import reverse_lazy
 
+from . import const
 from .conf import load_user_config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(PROJECT_DIR)
-from apps import __version__
 
-VERSION = __version__
 CONFIG = load_user_config()
 LOG_DIR = os.path.join(PROJECT_DIR, 'logs')
 JUMPSERVER_LOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 ANSIBLE_LOG_FILE = os.path.join(LOG_DIR, 'ansible.log')
 GUNICORN_LOG_FILE = os.path.join(LOG_DIR, 'gunicorn.log')
+VERSION = const.VERSION
 
 if not os.path.isdir(LOG_DIR):
     os.makedirs(LOG_DIR)
@@ -163,7 +162,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 DB_OPTIONS = {}
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
+        'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE.lower()),
         'NAME': CONFIG.DB_NAME,
         'HOST': CONFIG.DB_HOST,
         'PORT': CONFIG.DB_PORT,
@@ -174,8 +173,10 @@ DATABASES = {
     }
 }
 DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'ca.pem')
-if CONFIG.DB_ENGINE == 'mysql' and os.path.isfile(DB_CA_PATH):
-    DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
+if CONFIG.DB_ENGINE.lower() == 'mysql':
+    DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
+    if os.path.isfile(DB_CA_PATH):
+        DB_OPTIONS['ssl'] = {'ca': DB_CA_PATH}
 
 
 # Password validation
@@ -411,7 +412,7 @@ AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail"}
 #    AUTH_LDAP_GROUP_SEARCH_OU, ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_SEARCH_FILTER
 # )
 AUTH_LDAP_CONNECTION_OPTIONS = {
-    ldap.OPT_TIMEOUT: 5
+    ldap.OPT_TIMEOUT: 30
 }
 AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
