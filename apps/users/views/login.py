@@ -29,7 +29,8 @@ __all__ = [
 
 
 class UserLoginView(RedirectView):
-    urls = reverse_lazy('authentication:login')
+    url = reverse_lazy('authentication:login')
+    query_string = True
 
 
 class UserForgotPasswordView(TemplateView):
