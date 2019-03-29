@@ -37,7 +37,7 @@
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="asset">
+            <select class="select2 form-control" name="action">
                 <option value="">{% trans 'Action' %}</option>
                 {% for k, v in actions.items %}
                     <option value="{{ k }}" {% if k == action %} selected {% endif %}>{{ v }}</option>
@@ -45,7 +45,7 @@
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="system_user">
+            <select class="select2 form-control" name="resource_type">
                 <option value="">{% trans 'Resource Type' %}</option>
                 {% for r in resource_type_list %}
                     <option value="{{ r }}" {% if r == resource_type %} selected {% endif %}>{{ r }}</option>
