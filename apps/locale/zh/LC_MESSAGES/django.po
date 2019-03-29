@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-29 10:26+0800\n"
+"POT-Creation-Date: 2019-03-29 17:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -208,7 +208,7 @@ msgstr "名称"
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
 #: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:13
-#: users/models/user.py:52 users/templates/users/_select_user_modal.html:14
+#: users/models/user.py:59 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -1026,7 +1026,7 @@ msgstr "其它"
 #: settings/templates/settings/command_storage_create.html:79
 #: settings/templates/settings/email_setting.html:62
 #: settings/templates/settings/ldap_setting.html:61
-#: settings/templates/settings/replay_storage_create.html:151
+#: settings/templates/settings/replay_storage_create.html:152
 #: settings/templates/settings/security_setting.html:70
 #: settings/templates/settings/terminal_setting.html:68
 #: terminal/templates/terminal/terminal_update.html:45
@@ -1062,7 +1062,7 @@ msgstr "重置"
 #: settings/templates/settings/command_storage_create.html:80
 #: settings/templates/settings/email_setting.html:63
 #: settings/templates/settings/ldap_setting.html:64
-#: settings/templates/settings/replay_storage_create.html:152
+#: settings/templates/settings/replay_storage_create.html:153
 #: settings/templates/settings/security_setting.html:71
 #: settings/templates/settings/terminal_setting.html:70
 #: terminal/templates/terminal/command_list.html:103
@@ -1076,7 +1076,6 @@ msgstr "重置"
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:72
-
 #: xpack/plugins/interface/templates/interface/interface.html:74
 msgid "Submit"
 msgstr "提交"
@@ -2129,7 +2128,17 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/forms.py:29 users/forms.py:21
+#: authentication/forms.py:19
+msgid ""
+"Please enter a correct username and password. Note that both fields may be "
+"case-sensitive."
+msgstr "请输入正确的用户名和密码. 注意它们是区分大小写."
+
+#: authentication/forms.py:22
+msgid "This account is inactive."
+msgstr "此账户无效"
+
+#: authentication/forms.py:37 users/forms.py:21
 msgid "MFA code"
 msgstr "MFA 验证码"
 
@@ -3127,7 +3136,7 @@ msgid "Please submit the LDAP configuration before import"
 msgstr "请先提交LDAP配置再进行导入"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:39
-#: users/models/user.py:56 users/templates/users/user_detail.html:71
+#: users/models/user.py:63 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
