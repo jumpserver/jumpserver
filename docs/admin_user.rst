@@ -20,25 +20,6 @@
 
 点击邮件中的设置密码链接, 设置好密码后, 您就可以用户名和密码登录 Jumpserver 了。
 
-用户首次登录 Jumpserver, 会被要求完善用户信息。
-
-查看公钥信息：
-
-::
-
-    $ cat ~/.ssh/id_rsa.pub
-    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDadDXxxx......
-
-复制 SSH 公钥, 添加到 Jumpserver 中。
-
-除了使用浏览器登录 Jumpserver 外, 还可使用命令行登录：
-
-命令行登录 Jumpserver 使用如下命令：
-
-::
-
-    $ ssh -p 2222 用户名@Jumpserver IP地址
-
 二、用户组
 ````````````````
 
