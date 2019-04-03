@@ -31,9 +31,6 @@
 
 复制 SSH 公钥, 添加到 Jumpserver 中。
 
-.. image:: _static/img/set_ssh_key.jpg
-
-
 除了使用浏览器登录 Jumpserver 外, 还可使用命令行登录：
 
 命令行登录 Jumpserver 使用如下命令：
@@ -41,10 +38,6 @@
 ::
 
     $ ssh -p 2222 用户名@Jumpserver IP地址
-
-登录成功后界面如下:
-
-.. image:: _static/img/coco_success.jpg
 
 二、用户组
 ````````````````

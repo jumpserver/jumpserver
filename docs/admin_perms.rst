@@ -8,7 +8,7 @@
 
 1.1 查看授权列表
 
-.. image:: _static/admin_perms_asset-permission_list.jpg
+.. image:: _static/img/admin_perms_asset-permission_list.jpg
 
 1.2 创建授权规则
 

@@ -51,7 +51,7 @@
    objectClass: shadowAccount
    ...
 
-可以参考 "FAQ文档" 的 "LDAP 使用说明"
+参考 "FAQ文档" 的 `LDAP 使用说明 <faq_ldap.html>`
 
 四、终端设置
 ````````````````````
