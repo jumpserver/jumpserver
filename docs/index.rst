@@ -18,6 +18,5 @@ Jumpserver 文档
    development
    contributor
    contact
-   snapshot
    faq
    change_log
