@@ -9,4 +9,6 @@ Jumpserver 使用 Python / Django 进行开发, 遵循 Web 2.0 规范, 配备了
 
 Jumpserver 采纳分布式架构, 支持多机房跨区域部署, 中心节点提供 API, 各机房部署登录节点, 可横向扩展、无并发访问限制。
 
+Jumpserver 现已支持管理 SSH、 Telnet、 RDP、 VNC 协议资产。
+
 改变世界, 从一点点开始。
