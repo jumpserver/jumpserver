@@ -1,108 +1,103 @@
 资产管理
 =============
 
-一、资产树
+一、资产列表
 `````````````````
 
 1.1 管理资产树
 
 资产树节点不能重名, 右击节点可以添加、删除和重命名节点, 以及进行资产相关的操作。
 
-.. image:: _static/img/asset_tree.jpg
+.. image:: _static/img/admin_assets_asset_list.jpg
 
-1.2 为资产树节点分配资产
+1.2 为资产树节点创建资产
 
-在资产列表页面, 选择要添加资产的节点, 右键, 选择添加资产到节点。
+在资产列表页面, 先在左侧选择资产要加入的节点, 然后在右侧选择创建资产。
 
-.. image:: _static/img/add_asset_to_node.jpg
+.. image:: _static/img/admin_assets_asset_create.jpg
 
-选择要被添加的资产, 点击"确认"即可。
+二、网域列表
+`````````````````
 
-.. image:: _static/img/select_asset_to_node.jpg
+网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。
 
-1.3 删除节点资产
+2.1 网域列表
 
-选择要被删除的节点, 选择"从节点删除", 点击"提交"即可。
+.. image:: _static/img/admin_assets_domain_list.jpg
 
-.. image:: _static/img/delete_asset_from_node.jpg
+2.2 创建网域
 
-二、标签
-````````````````
+.. image:: _static/img/admin_assets_domain_create.jpg
 
-2.1 创建标签
+2.3 网关列表
 
-点击页面左上角"创建标签"按钮, 进入创建标签页面：
+.. image:: _static/img/admin_assets_domain_gateway_list.jpg
 
-给资产打上标签便于查询和管理。标签信息有名称和值：名称可以是描述功能信息, 例如：用途, 值则可以是具体信息, 例如：组织1-部门1-研发。标签创建的时候可以选择为已存在的资产打上该标签。
+2.4 创建网关
 
-.. image:: _static/img/admin_label_create.jpg
-
-标签名称可以重名, 一个资产可以有多个标签产。标签删除, 资产上的标签信息会自动消失：
-
-.. image:: _static/img/admin_label_delete.jpg
+.. image:: _static/img/admin_assets_domain_gateway_create.jpg
 
 三、管理用户
 `````````````````````
 
-3.1 创建管理用户
+管理用户是资产（被控服务器）上的root，或拥有 NOPASSWD: ALL sudo权限的用户， Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。 暂不支持 Windows或其它硬件, 可以随意设置一个
 
-管理用户是服务器的 root, 或拥有 NOPASSWD: ALL sudo 权限的用户, Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。
+3.1 管理用户列表
 
-名称可以按资产树来命名。用户名 root。密码和 SSH 私钥必填一个。
+.. image:: _static/img/admin_assets_admin-user_list.jpg
 
-.. image:: _static/img/create_asset_admin_user.jpg
+3.2 创建管理用户
 
-3.2 创建 Windows 管理用户
-
-同 Linux 系统的管理用户一样, 名称可以按资产树来命名, 用户名是管理员用户名, 密码是管理员的密码。
-
-.. image:: _static/img/create_windows_admin.jpg
+.. image:: _static/img/admin_assets_admin-user_create.jpg
 
 四、系统用户
 `````````````````````
 
-4.1 创建系统用户
+系统用户是 Jumpserver跳转登录资产时使用的用户，可以理解为登录资产用户，如 web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器(`ssh xiaoming@some-host`); 简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资产。 系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。目前还不支持Windows的自动推送
 
-系统用户是 Jumpserver 跳转登录资产时使用的用户, 可以理解为登录资产用户, 如 web, sa, dba('ssh web@some-host'), 而不是使用某个用户的用户名跳转登录服务器('ssh xiaoming@some-host'); 简单来说是 用户使用自己的用户名登录 Jumpserver, Jumpserver 使用系统用户登录资产。
+4.1 系统用户列表
 
-系统用户创建时, 如果选择了自动推送 Jumpserver 会使用 Ansible 自动推送系统用户到资产中, 如果资产(交换机、Windows)不支持 Ansible, 请手动填写账号密码。
+.. image:: _static/img/admin_assets_system-user_list.jpg
 
-Linux 系统协议项务必选择 ssh 。如果用户在系统中已存在, 请去掉自动生成密钥、自动推送勾选。
+4.2 创建系统用户
 
-.. image:: _static/img/create_asset_system_user.jpg
+.. image:: _static/img/admin_assets_system-user_create_01.jpg
+.. image:: _static/img/admin_assets_system-user_create_02.jpg
 
-.. _update_admin_system_user:
+五、标签管理
+````````````````
 
-4.2 创建 Windows 系统系统用户
+给资产打上标签便于查询和管理。标签信息有名称和值：名称可以是描述功能信息, 例如：用途, 值则可以是具体信息, 例如：组织1-部门1-研发。标签创建的时候可以选择为已存在的资产打上该标签。
 
-由于目前 Windows 不支持自动推送, 所以 Windows 的系统用户设置成与管理用户同一个用户。
+5.1 标签列表
 
-Windows 资产协议务必选择 rdp。
+.. image:: _static/img/admin_assets_label_list.jpg
 
-.. image:: _static/img/create_windows_user.jpg
+5.2 创建标签
 
-五、资产
-````````````
-5.1 创建资产
+点击页面左上角"创建标签"按钮, 进入创建标签页面：
 
-点击页面左侧的"资产管理"菜单下的"资产列表"按钮, 查看当前所有的资产列表。
+.. image:: _static/img/admin_assets_label_create.jpg
 
-点击页面左上角的"创建资产"按钮, 进入资产创建页面, 填写资产信息。
+标签名称可以重名, 一个资产可以有多个标签产。标签删除, 资产上的标签信息会自动消失
 
-IP 地址和管理用户要确保正确, 确保所选的管理用户的用户名和密码能"牢靠"地登录指定的 IP 主机上。资产的系统平台也务必正确填写。公网 IP 信息只用于展示, 可不填, Jumpserver 连接资产主机使用的是 IP 信息。
+六、命令过滤
+````````````````
 
-.. image:: _static/img/create_asset.jpg
+系统用户可以绑定一些命令过滤器，一个过滤器可以定义一些规则 当用户使用这个系统用户登录资产，然后执行一个命令 这个命令需要被绑定过滤器的所有规则匹配，高优先级先被匹配, 当一个规则匹配到了，如果规则的动作是 允许, 这个命令会被放行, 如果规则的动作是 禁止，命令将会被禁止执行, 否则就匹配下一个规则，如果最后没有匹配到规则，则允许执行
 
-资产创建信息填写好保存之后, 可测试资产是否能正确连接：
+6.1 命令过滤器列表
 
-.. image:: _static/img/check_asset_connect.jpg
+.. image:: _static/img/admin_assets_cmd-filter_list.jpg
 
-如果资产不能正常连接, 请检查管理用户的用户名和密钥是否正确以及该管理用户是否能使用 SSH 从 Jumpserver 主机正确登录到资产主机上。
+6.2 创建命令过滤器
 
-5.2 创建 Windows 资产
+.. image:: _static/img/admin_assets_cmd-filter_create.jpg
 
-同创建 Linux 资产一样。
+6.3 命令过滤器规则列表
 
-创建 Windows 资产, 系统平台请选择正确的 Windows, 端口号为3389, IP 和 管理用户请正确选择, 确保管理用户能正确登录到指定的 IP 主机上。
+.. image:: _static/img/admin_assets_cmd-filter_rule_list.jpg
 
-.. image:: _static/img/create_windows_asset.jpg
+6.4 创建规则
+
+.. image:: _static/img/admin_assets_cmd-filter_rule_create.jpg
