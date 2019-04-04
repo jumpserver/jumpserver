@@ -153,7 +153,7 @@ class Asset(OrgModelMixin):
         nodes = []
         for node in self.get_nodes():
             _nodes = node.get_ancestor(with_self=True)
-            _nodes.append(_nodes)
+            nodes.append(_nodes)
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
