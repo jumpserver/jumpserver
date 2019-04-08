@@ -7,8 +7,6 @@ CentOS 7 安装文档
 -  > 开头的行表示需要在 mysql 中执行
 -  $ 开头的行表示需要执行的命令
 
-本文档适用于有一定web运维经验的管理员或者工程师, 文中不会对安装的软件做过多的解释, 仅对需要执行的内容注部分注释, 更详细的内容请参考一步一步安装。
-
 云服务器快速部署参考 `极速安装 <setup_by_fast.html>`_
 
 安装过程中遇到问题可参考 `安装过程中常见的问题 <faq_install.html>`_
@@ -478,5 +476,5 @@ CentOS 7 安装文档
     $ nginx -t
     $ nginx -s reload
 
-后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+后续的使用请参考 `快速入门 <quick_start.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

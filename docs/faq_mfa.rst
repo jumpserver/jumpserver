@@ -1,8 +1,6 @@
 MFA 使用说明
 --------------------------------------------------------
 
-.. image:: _static/img/faq_googleauth.jpg
-
 Multi-Factor Authentication (MFA) 遵循基于时间的一次性密码 (TOTP) 标准 (RFC 6238)
 
 .. code-block:: vim

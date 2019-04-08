@@ -1,7 +1,7 @@
 一步一步安装(Ubuntu)
 --------------------------
 
-本文档旨在帮助用户了解各组件之间的关系, 生产环境部署建议参考 `进阶安装文档 <quickinstall.html>`_
+本文档旨在帮助用户了解各组件之间的关系, 生产环境部署建议参考 `进阶安装文档 <setup_by_prod.html>`_
 
 云服务器快速部署参考 `极速安装 <setup_by_fast.html>`_
 
@@ -520,5 +520,5 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     # sftp默认上传的位置在资产的 /tmp 目录下
     # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
 
-后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+后续的使用请参考 `快速入门 <quick_start.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_
