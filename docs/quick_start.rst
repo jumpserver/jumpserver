@@ -69,7 +69,7 @@
     # "密码校验规则"设置立即生效
 
 .. image:: _static/img/admin_settings_security_list_01.jpg
-.. image:: _static/img/admin_settings_security_list_01.jpg
+.. image:: _static/img/admin_settings_security_list_02.jpg
 
 二、用户管理
 `````````````````````
