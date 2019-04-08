@@ -203,7 +203,7 @@ class AssetPermissionUtil:
             for system_user in system_users:
                 actions = set()
                 # 再过滤当前系统用户的授权规则
-                _perms = perms.filter(system_user=system_user)
+                _perms = perms.filter(system_users=system_user)
                 for _perm in _perms:
                     actions.update(_perm.actions.all())
 
