@@ -476,5 +476,5 @@ CentOS 7 安装文档
     $ nginx -t
     $ nginx -s reload
 
-后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+后续的使用请参考 `快速入门 <admin_guide.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_

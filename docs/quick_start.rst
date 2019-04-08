@@ -209,8 +209,10 @@
     # 如果资产不能正常连接, 请检查"管理用户"的用户名和密钥是否正确以及该"管理用户"是否能使用 SSH 从 Jumpserver 主机正确登录到资产主机上
 
 SSH 协议参考 `SSH 协议资产连接说明 <faq_ssh.html>`_
+
 RDP 协议参考 `RDP 协议资产连接说明 <faq_rdp.html>`_
-Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`
+
+Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`_
 
 四、创建授权规则
 `````````````````````
@@ -230,6 +232,9 @@ Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`
 
 .. image:: _static/img/admin_perms_asset-permission_create.jpg
 
+五、用户登录
+`````````````````````
+
 **5.1 登录 Jumpserver**
 -----------------------
 
@@ -239,10 +244,8 @@ Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`
 
 .. image:: _static/img/user_assets_user-asset_list.jpg
 
-**5.2 使用资产**
-----------------
-
-**5.2.1 连接资产**
+**5.2 连接资产**
+-----------------------
 
 .. code-block:: vim
 
@@ -256,13 +259,15 @@ Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`
     # 点击 "资产" 名字, 就连上资产了
     # 如果显示连接超时, 请参考 FAQ 文档进行处理
 
-**5.2.2 断开资产**
+**5.3 断开资产**
+-----------------------
 
 .. code-block:: vim
 
     # 点击页面顶部的 "Server" 按钮会弹出选个选项, 第一个断开所选的连接, 第二个断开所有连接。
 
-**5.2.3 文件管理**
+**5.4 文件管理**
+-----------------------
 
 .. code-block:: vim
 
@@ -270,7 +275,7 @@ Telnet 协议参考 `Telnet 协议资产连接说明 <faq_telnet.html>`
     # 先在左边选择资产, 目前只支持自动登录的 SSH 协议资产
     # 也可以使用 sftp 方式进行文件管理
 
-参考 `SFTP 连接说明 <faq_sftp.html>`
+参考 `SFTP 连接说明 <faq_sftp.html>`_
 
 .. image:: _static/img/user_terminal_web-sftp_list.jpg
 

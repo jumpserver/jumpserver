@@ -241,5 +241,5 @@
     # sftp默认上传的位置在资产的 /tmp 目录下
     # windows拖拽上传的位置在资产的 Guacamole RDP上的 G 目录下
 
-后续的使用请参考 `快速入门 <admin_create_asset.html>`_
+后续的使用请参考 `快速入门 <admin_guide.html>`_
 如遇到问题可参考 `FAQ <faq.html>`_
