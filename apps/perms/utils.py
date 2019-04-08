@@ -101,7 +101,7 @@ class AssetPermissionUtil:
         "UserGroup": get_user_group_permissions,
         "Asset": get_asset_permissions,
         "Node": get_node_permissions,
-        "SystemUser": get_node_permissions,
+        "SystemUser": get_system_user_permissions,
     }
 
     CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
@@ -180,6 +180,35 @@ class AssetPermissionUtil:
                 )
         return assets
 
+    def dynamic_setattr_actions_to_system_user(self):
+        """
+        功能:
+            为复合资源(asset + system_user)动态添加属性 => actions
+        取值:
+            获取授权规则的actions的并集
+            获取授权规则: 资产的所有直接授权规则和所有祖先节点的所有授权规则中,
+            属于self.permissions的, 并包含system_user的授权规则
+
+            如果不以资产和资产祖先节点的授权规则为准，后面通过asset过滤出的授权规则中，
+            会丢失授权给了资产的祖先节点但没有授权给资产的授权规则
+        """
+        for asset, system_users in self._assets.items():
+            # 先获取资产和资产的祖先节点的所有授权规则
+            perms = get_asset_permissions(asset, include_node=True)
+            # 再过滤当前self.object的授权规则
+            perms = perms.filter(
+                id__in=[perm.id for perm in self.permissions]
+            ).prefetch_related('actions')
+
+            for system_user in system_users:
+                actions = set()
+                # 再过滤当前系统用户的授权规则
+                _perms = perms.filter(system_user=system_user)
+                for _perm in _perms:
+                    actions.update(_perm.actions.all())
+
+                setattr(system_user, 'actions', actions)
+
     def get_assets_without_cache(self):
         if self._assets:
             return self._assets
@@ -192,6 +221,7 @@ class AssetPermissionUtil:
                     [s for s in system_users if s.protocol == asset.protocol]
                 )
         self._assets = assets
+        self.dynamic_setattr_actions_to_system_user()
         return self._assets
 
     def get_cache_key(self, resource):
