@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
-from .models import AssetPermission
+from .models import AssetPermission, Action
 from assets.models import Node, Asset, SystemUser
 from assets.serializers import AssetGrantedSerializer
 
@@ -13,7 +13,14 @@ __all__ = [
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
     'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
+    'ActionSerializer',
 ]
+
+
+class ActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = '__all__'
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
