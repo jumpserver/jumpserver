@@ -8,6 +8,30 @@ from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin, OrgManager
 
 
+class Action(models.Model):
+    NAME_ALL = 'all'
+    NAME_CONNECT = 'connect'
+    NAME_UPLOAD_FILE = 'upload_file'
+    NAME_DOWNLOAD_FILE = 'download_file'
+    NAME_CHOICES = (
+        (NAME_ALL, _('All')),
+        (NAME_CONNECT, _('Connect')),
+        (NAME_UPLOAD_FILE, _('Upload file')),
+        (NAME_DOWNLOAD_FILE, _('Download file'))
+    )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(
+        max_length=128, choices=NAME_CHOICES, unique=True,
+        verbose_name=_('Name')
+    )
+
+    class Meta:
+        verbose_name = _('Action')
+
+    def __str__(self):
+        return self.name
+
+
 class AssetPermissionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)
@@ -30,6 +54,7 @@ class AssetPermission(OrgModelMixin):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
+    actions = models.ManyToManyField('Action', related_name='permissions', blank=True, verbose_name=_("Action"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
