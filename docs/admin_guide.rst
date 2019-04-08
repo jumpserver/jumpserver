@@ -6,7 +6,7 @@
 .. toctree::
    :maxdepth: 1
 
-   admin_instruction
+   quick_start
    admin_user
    admin_asset
    admin_perms

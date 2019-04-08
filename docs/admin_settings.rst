@@ -67,5 +67,5 @@
 
 点击页面上边的 "安全设置" 按钮, 进入安全设置页面
 
-.. image:: _static/img/admin_terminal_security_list_01.jpg
-.. image:: _static/img/admin_terminal_security_list_02.jpg
+.. image:: _static/img/admin_settings_security_list_01.jpg
+.. image:: _static/img/admin_settings_security_list_02.jpg
