@@ -6,26 +6,28 @@
 
 1.1 管理资产树
 
-资产树节点不能重名, 右击节点可以添加、删除和重命名节点, 以及进行资产相关的操作。
+资产树节点不能重名, 右击节点可以添加、删除和重命名节点, 以及进行资产相关的操作
 
 .. image:: _static/img/admin_assets_asset_list.jpg
 
 1.2 为资产树节点创建资产
 
-在资产列表页面, 先在左侧选择资产要加入的节点, 然后在右侧选择创建资产。
+在资产列表页面, 先在左侧选择资产要加入的节点, 然后在右侧选择创建资产
 
 .. image:: _static/img/admin_assets_asset_create.jpg
 
 二、网域列表
 `````````````````
 
-网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录。
+网域功能是为了解决部分环境（如：混合云）无法直接连接而新增的功能，原理是通过网关服务器进行跳转登录
 
 2.1 网域列表
 
 .. image:: _static/img/admin_assets_domain_list.jpg
 
 2.2 创建网域
+
+在网域列表页面, 在右侧选择创建网域
 
 .. image:: _static/img/admin_assets_domain_create.jpg
 
@@ -34,6 +36,8 @@
 .. image:: _static/img/admin_assets_domain_gateway_list.jpg
 
 2.4 创建网关
+
+在网域列表页面, 点击网关下面的数字进入网关列表, 点击创建网关, 网关可以是一台任意装有 ssh 服务的资产
 
 .. image:: _static/img/admin_assets_domain_gateway_create.jpg
 
@@ -92,12 +96,18 @@
 
 6.2 创建命令过滤器
 
+在命令过滤器列表页面点击创建命令过滤器
+
 .. image:: _static/img/admin_assets_cmd-filter_create.jpg
 
 6.3 命令过滤器规则列表
 
+在命令过滤器列表页面点击规则下面的数字进入规则页面
+
 .. image:: _static/img/admin_assets_cmd-filter_rule_list.jpg
 
 6.4 创建规则
+
+在命令过滤器列表页面点击规则下面的数字进入规则页面, 点击创建规则
 
 .. image:: _static/img/admin_assets_cmd-filter_rule_create.jpg
