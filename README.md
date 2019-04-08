@@ -20,7 +20,7 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
 
 ### 功能
 
- ![Jumpserver 功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver-14.png "Jumpserver 功能")
+ ![Jumpserver 功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver148.jpeg "Jumpserver 功能")
 
 ### 开始使用
 
