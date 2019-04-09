@@ -1,4 +1,4 @@
-## Jumpserver [中文版](https://github.com/jumpserver/README_EN.md)
+## Jumpserver 
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
@@ -7,6 +7,8 @@
 
 
 ----
+
+- [中文版](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
 Jumpserver is the first fully open source bastion in the world, based on the GNU GPL v2.0 open source protocol. Jumpserver is a  professional operation and maintenance audit system conforms to 4A specifications.
 

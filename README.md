@@ -1,4 +1,4 @@
-## Jumpserver  [English](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
+## Jumpserver  
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
@@ -7,6 +7,8 @@
 
 
 ----
+
+- [English Version](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
 Jumpserver 是全球首款完全开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 的专业运维审计系统。
 
