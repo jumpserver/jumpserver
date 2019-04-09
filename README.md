@@ -1,4 +1,4 @@
-## Jumpserver
+## Jumpserver  [English](https://github.com/jumpserver/README_EN.md)
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
@@ -40,7 +40,7 @@ Step by Step 安装文档 [详细部署](http://docs.jumpserver.org/zh/docs/step
 
 ### SDK
 
-我们还编写了一些SDK，供你其它系统快速和 Jumpserver API 交互
+我们还编写了一些SDK，供你的其它系统快速和 Jumpserver API 交互
 
 - [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver其它组件使用这个SDK完成交互
 - [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK
