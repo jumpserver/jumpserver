@@ -56,19 +56,15 @@ SSH 协议资产连接错误排查思路
     # 检查 coco 的 ws 端口(默认 5000)
     # 检查 nginx 配置的 socket.io 设置是否有误
 
+    # 正常部署的 coco 组件请使用如下命令
     $ cd /opt/coco
     $ source /opt/py3/bin/activate
     $ ./cocod stop
     $ ps -ef | grep cocod | awk '{print $2}' | xargs kill -9
     $ ./cocod start
 
-    # docker容器部署的coco组件请检查防火墙是否无误, 然后进入容器处理
-    $ docker exec it jms_coco /bin/bash
-    $ cd /opt/coco
-    $ source /opt/py3/bin/activate
-    $ ./cocod stop
-    $ ps -ef | grep cocod | awk '{print $2}' | xargs kill -9
-    $ ./cocod start
+    # docker 容器部署的 coco 组件请检查防火墙是否无误, 重启容器即可
+    $ docker restart jms_coco
 
 .. image:: _static/img/faq_linux_03.jpg
 

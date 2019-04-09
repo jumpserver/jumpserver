@@ -21,12 +21,13 @@
     $ echo -e "\033[31m 2. 部署环境 \033[0m" \
       && yum update -y \
       && yum -y install wget gcc epel-release git \
-      && curl -o /etc/yum.repos.d/epel.repo http://mirrors.cloud.tencent.com/repo/epel-7.repo \
+      && curl -o /etc/yum.repos.d/epel.repo http://mirrors.tencentyun.com/repo/epel-7.repo \
+      && sed -i "s/mirrors.cloud.tencent.com/mirrors.tencentyun.com/g" /etc/yum.repos.d/epel.repo \
       && yum clean all \
       && yum makecache \
       && yum install -y yum-utils device-mapper-persistent-data lvm2 \
       && curl -o /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo \
-      && sed -i 's+download.docker.com+mirrors.cloud.tencent.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo \
+      && sed -i "s@https://download.docker.com@http://mirrors.tencentyun.com/docker-ce@g" /etc/yum.repos.d/docker-ce.repo \
       && yum makecache fast \
       && rpm --import https://mirrors.cloud.tencent.com/docker-ce/linux/centos/gpg \
       && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
@@ -45,8 +46,8 @@
       && if [ ! -f "/opt/luna.tar.gz" ]; then wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz; tar xf luna.tar.gz; chown -R root:root luna; fi \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \
-      && pip install --upgrade pip setuptools -i https://mirrors.cloud.tencent.com/pypi/simple \
-      && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple \
+      && pip install --upgrade pip setuptools -i http://mirrors.tencentyun.com/pypi/simple \
+      && pip install -r /opt/jumpserver/requirements/requirements.txt -i http://mirrors.tencentyun.com/pypi/simple \
       && curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io \
       && systemctl restart docker \
       && docker pull jumpserver/jms_coco:1.4.9 \
