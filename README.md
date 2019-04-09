@@ -1,4 +1,4 @@
-## Jumpserver  [English](https://github.com/jumpserver/README_EN.md)
+## Jumpserver  [English](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
