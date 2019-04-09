@@ -1,4 +1,4 @@
-## Jumpserver  
+## Jumpserver 多云环境下更好用的堡垒机
 
 [![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/django-2.1-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
@@ -18,7 +18,6 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
 
 - [English Version](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
 
-----
 
 ### 功能
 ----
