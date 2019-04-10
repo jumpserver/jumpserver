@@ -26,5 +26,5 @@ Telnet 使用说明
           of current VTY users on line is 1.
     <RA-L7-RD>
 
-    # 把 <RA-L7-RD> 写入到 Web "系统设置"-"终端设置"-"Telnet 成功正则表达式" 里面
+    # 把 <RA-L7-RD> 写入到 Web "系统设置"-"终端设置"-"Telnet 成功正则表达式" 里面, 多个不一样的字符串用 | 隔开, 如 <RA-L7-RD>|<CHXZ-Group-S7503-LB2>|success|成功
     # <RA-L7-RD> 正则可用 <.*>+? 表示
