@@ -31,7 +31,7 @@
 .. code-block:: shell
 
     # 一定要知道自己升级之前的版本, 在升级之前可以通过如下代码进行查询, 记住是升级之前, 也可以通过 web 页面的右下角来查看当前版本信息
-    $ cat /opt/jumpserver/apps/__init__.py | grep version
+    $ cat /opt/jumpserver/apps/jumpserver/context_processor.py | grep version
     $ cat /opt/jumpserver/apps/templates/_footer.html | grep Version
 
     # 备份当前版本数据库, 忽略 django_migrations 表
