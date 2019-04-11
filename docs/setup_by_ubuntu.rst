@@ -419,13 +419,13 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ apt-get -y install nginx
-    $ rm -rf /etc/nginx/site-enabled/default
+    $ rm -rf /etc/nginx/sites-enabled/default
 
-**6.2 准备配置文件 修改 /etc/nginx/site-enabled/jumpserver.conf**
+**6.2 准备配置文件 修改 /etc/nginx/sites-enabled/jumpserver.conf**
 
 .. code-block:: nginx
 
-    $ vim /etc/nginx/site-enabled/jumpserver.conf
+    $ vim /etc/nginx/sites-enabled/jumpserver.conf
 
     server {
         listen 80;

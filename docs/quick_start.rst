@@ -63,9 +63,9 @@
 
 .. code-block:: vim
 
-    # "MAF二次认证"勾选会开启全局强制"MFA", 所有jumpserver用户必须使用动态口令进行认证登录(即时生效)
-    # "限制登录失败"和"限制登录时间"设置需要重启jumpserver才能生效
-    # "SSH最大空闲时间"设置需要重启jumpserver才能生效
+    # "MAF二次认证"勾选会开启全局强制"MFA", 所有 jumpserver 用户必须使用动态口令进行认证登录(即时生效)
+    # "限制登录失败"和"限制登录时间"设置需要重启 jumpserver 才能生效
+    # "SSH最大空闲时间"设置需要重启 coco 才能生效
     # "密码校验规则"设置立即生效
 
 .. image:: _static/img/admin_settings_security_list_01.jpg
