@@ -7,7 +7,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404,
+    ListAPIView, get_object_or_404, RetrieveAPIView
 )
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -20,7 +20,7 @@ from ..utils import (
 )
 from ..hands import (
     AssetGrantedSerializer, User, Asset, Node,
-    SystemUser, NodeSerializer
+    SystemUser, NodeSerializer, AssetSystemUserSerializer
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
@@ -31,7 +31,7 @@ __all__ = [
     'UserGrantedAssetsApi', 'UserGrantedNodesApi',
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
-    'UserGrantedNodesWithAssetsAsTreeApi',
+    'UserGrantedNodesWithAssetsAsTreeApi', 'UserGrantedSystemUserOfAssetApi'
 ]
 
 
@@ -416,3 +416,45 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
             return Response({'msg': False}, status=403)
 
 
+class UserGrantedSystemUserOfAssetApi(UserPermissionCacheMixin, RetrieveAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = AssetSystemUserSerializer
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        system_user = self.get_system_user_object()
+        for su in queryset:
+            if su.id == system_user.id:
+                return su
+
+    def get_user_object(self):
+        user_id = self.kwargs.get('pk', '')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+        else:
+            user = self.request.user
+        return user
+
+    def get_asset_object(self):
+        asset_id = self.kwargs.get('asset_id', '')
+        if asset_id:
+            asset = get_object_or_404(Asset, id=asset_id)
+        else:
+            asset = None
+        return asset
+
+    def get_system_user_object(self):
+        system_user_id = self.kwargs.get('system_user_id', '')
+        if system_user_id:
+            system_user = get_object_or_404(SystemUser, id=system_user_id)
+        else:
+            system_user = None
+        return system_user
+
+    def get_queryset(self):
+        user = self.get_user_object()
+        util = AssetPermissionUtil(user)
+        assets = util.get_assets()
+        asset = self.get_asset_object()
+        system_users = assets.get(asset)
+        return system_users

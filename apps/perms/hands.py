@@ -4,7 +4,6 @@
 from common.permissions import AdminUserRequiredMixin
 from users.models import User, UserGroup
 from assets.models import Asset, SystemUser, Node
-from assets.serializers import AssetGrantedSerializer, NodeSerializer
-
-
+from assets.serializers import AssetGrantedSerializer, NodeSerializer, \
+    AssetSystemUserSerializer
 
