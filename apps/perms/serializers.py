@@ -35,6 +35,7 @@ class AssetPermissionListSerializer(serializers.ModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
+    actions = StringManyToManyField(many=True, read_only=True)
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 

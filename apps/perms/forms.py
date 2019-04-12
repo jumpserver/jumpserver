@@ -47,6 +47,9 @@ class AssetPermissionForm(OrgModelForm):
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
+            'actions': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('Action')}
+            )
         }
         labels = {
             'nodes': _("Node"),

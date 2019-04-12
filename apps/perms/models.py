@@ -21,7 +21,7 @@ class Action(models.Model):
         verbose_name = _('Action')
 
     def __str__(self):
-        return self.name
+        return self.get_name_display()
 
 
 class AssetPermissionQuerySet(models.QuerySet):
@@ -46,6 +46,7 @@ class AssetPermission(OrgModelMixin):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
+    actions = models.ManyToManyField('Action', related_name='permissions', blank=True, verbose_name=_('Action'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))
