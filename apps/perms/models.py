@@ -7,6 +7,22 @@ from django.utils import timezone
 from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin, OrgManager
 
+from .const import PERMS_ACTION_NAME_CHOICES
+
+
+class Action(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(
+        max_length=128, unique=True, choices=PERMS_ACTION_NAME_CHOICES,
+        verbose_name=_('Name')
+    )
+
+    class Meta:
+        verbose_name = _('Action')
+
+    def __str__(self):
+        return self.name
+
 
 class AssetPermissionQuerySet(models.QuerySet):
     def active(self):
