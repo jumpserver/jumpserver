@@ -9,7 +9,8 @@ from .system_user import AssetSystemUserSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
-    'AssetAsNodeSerializer', 'AssetSimpleSerializer',
+    'AssetAsNodeSerializer', 'AssetSimpleSerializer', 'AssetExportSerializer',
+    'AssetImportTemplateSerializer'
 ]
 
 
@@ -84,3 +85,30 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = ['id', 'hostname', 'port', 'ip', 'connectivity']
+
+
+class AssetExportSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    admin_user = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_admin_user(obj):
+        return obj.admin_user
+
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
+            'is_active', 'admin_user', 'public_ip', 'number', 'vendor', 'model',
+            'sn', 'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
+            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
+            'hostname_raw', 'created_by', 'comment'
+        ]
+
+
+class AssetImportTemplateSerializer(AssetExportSerializer):
+    class Meta:
+        model = Asset
+        fields = [
+            'id', 'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
+            'is_active', 'admin_user', 'public_ip',
+        ]

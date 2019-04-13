@@ -1,31 +1,41 @@
 # -*- coding: utf-8 -*-
 #
 
+import uuid
 import random
+
+from django.db.models import Q
+from django.core.cache import cache
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
-from common.utils import get_logger
+from common.utils.export import BaseExportAPIView
+from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from ..models import Asset, AdminUser, Node
+
 from .. import serializers
-from ..tasks import update_asset_hardware_info_manual, \
-    test_asset_connectivity_manual
 from ..utils import LabelFilter
+from ..models import Asset, AdminUser, Node
+from ..tasks import (
+    update_asset_hardware_info_manual, test_asset_connectivity_manual
+)
 
 
 logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetListUpdateApi',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi'
+    'AssetGatewayApi', 'AssetExportApi',
 ]
 
 
@@ -138,3 +148,51 @@ class AssetGatewayApi(generics.RetrieveAPIView):
             return Response(serializer.data)
         else:
             return Response({"msg": "Not have gateway"}, status=404)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AssetExportApi(BaseExportAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    csv_filename_prefix = 'assets'
+
+    def get_export_fields(self):
+        import_fields = [
+            field for field in Asset._meta.fields
+            if field.name in self.get_serializer().Meta.fields
+        ]
+        return import_fields
+
+    def get_export_header(self):
+        export_fields = self.get_export_fields()
+        header = [field.verbose_name for field in export_fields]
+        return header
+
+    def get_queryset(self):
+        spm = self.request.query_params.get('spm', '')
+        assets_id_default = [
+            Asset.objects.first().id] if Asset.objects.first() else []
+        assets_id = cache.get(spm, assets_id_default)
+        return Asset.objects.filter(id__in=assets_id)
+
+    def get_serializer_class(self):
+        if self.request.query_params.get('spm', ''):
+            return serializers.AssetExportSerializer
+        return serializers.AssetImportTemplateSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            assets_id = request.data.get('assets_id', [])
+            node_id = request.data.get('node_id', [])
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+
+        if not assets_id:
+            node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
+            assets = node.get_all_assets()
+            for asset in assets:
+                assets_id.append(asset.id)
+
+        spm = uuid.uuid4().hex
+        cache.set(spm, assets_id, 300)
+        url = reverse_lazy('api-assets:asset-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
