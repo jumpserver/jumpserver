@@ -355,10 +355,12 @@ class User(AbstractUser):
     def generate_reset_token(self):
         letter = string.ascii_letters + string.digits
         token =''.join([random.choice(letter) for _ in range(50)])
-        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        value = {'id': self.id, 'email': self.email}
-        cache.set(key, value, 3600)
+        self.set_cache(token)
         return token
+
+    def set_cache(self, token):
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
 
     @classmethod
     def validate_reset_password_token(cls, token):
