@@ -15,6 +15,7 @@ from common.utils import get_logger
 from common.tree import TreeNode
 from .models import AssetPermission
 from .hands import Node
+from .const import PERMS_ACTION_NAME_ALL
 
 logger = get_logger(__file__)
 
@@ -443,3 +444,24 @@ def parse_asset_to_tree_node(node, asset, system_users):
     }
     tree_node = TreeNode(**data)
     return tree_node
+
+
+#
+# check system user actions
+#
+
+
+def check_system_user_action(system_user, action):
+    """
+    :param system_user: 包含actions属性的SystemUser对象
+    :param action: utils.PERMS_ACTION_NAME_CHOICES
+    :return:
+    """
+    check_actions = [PERMS_ACTION_NAME_ALL, action]
+    granted_actions = getattr(system_user, 'actions', [])
+    actions = [action for action in granted_actions if action.name in check_actions]
+    # logger
+    logger.info('Check actions: {}, Granted actions: {}'.format(
+        check_actions, granted_actions)
+    )
+    return bool(actions)
