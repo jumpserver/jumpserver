@@ -28,6 +28,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
 from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
+from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from orgs.utils import current_org
 from .. import forms
 from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
@@ -120,15 +121,12 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     form = None
 
     def get(self, request, *args, **kwargs):
-        assets_id = self.request.GET.get('assets_id', '')
-        self.id_list = [i for i in assets_id.split(',')]
-
+        spm = request.GET.get('spm', '')
+        assets_id = cache.get(CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX.format(spm))
         if kwargs.get('form'):
             self.form = kwargs['form']
         elif assets_id:
-            self.form = self.form_class(
-                initial={'assets': self.id_list}
-            )
+            self.form = self.form_class(initial={'assets': assets_id})
         else:
             self.form = self.form_class()
         return super().get(request, *args, **kwargs)
