@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-27 17:33+0800\n"
+"POT-Creation-Date: 2019-03-29 17:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -172,7 +172,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: settings/templates/settings/terminal_setting.html:102 terminal/models.py:22
 #: terminal/models.py:241 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
-#: users/models/user.py:54 users/templates/users/_select_user_modal.html:13
+#: users/models/user.py:61 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
 #: users/templates/users/user_group_detail.html:55
 #: users/templates/users/user_group_list.html:12
@@ -208,7 +208,7 @@ msgstr "名称"
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
 #: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:13
-#: users/models/user.py:52 users/templates/users/_select_user_modal.html:14
+#: users/models/user.py:59 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:24
 #: users/templates/users/user_profile.html:47
@@ -246,7 +246,7 @@ msgid "Password"
 msgstr "密码"
 
 #: assets/forms/user.py:29 assets/serializers/asset_user.py:27
-#: users/models/user.py:81
+#: users/models/user.py:88
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -437,7 +437,7 @@ msgstr "标签管理"
 #: assets/templates/assets/system_user_detail.html:100
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:15 perms/models.py:36
 #: perms/models.py:89 perms/templates/perms/asset_permission_detail.html:98
-#: users/models/user.py:95 users/templates/users/user_detail.html:111
+#: users/models/user.py:102 users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:103
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
 #: xpack/plugins/cloud/models.py:55 xpack/plugins/cloud/models.py:127
@@ -482,7 +482,7 @@ msgstr "创建日期"
 #: orgs/models.py:17 perms/models.py:38 perms/models.py:91
 #: perms/templates/perms/asset_permission_detail.html:102 settings/models.py:34
 #: terminal/models.py:32 terminal/templates/terminal/terminal_detail.html:63
-#: users/models/group.py:15 users/models/user.py:87
+#: users/models/group.py:15 users/models/user.py:94
 #: users/templates/users/user_detail.html:127
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:14
@@ -554,7 +554,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:73
+#: assets/models/cluster.py:22 users/models/user.py:80
 #: users/templates/users/user_detail.html:76
 msgid "Phone"
 msgstr "手机"
@@ -580,7 +580,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:457
+#: users/models/user.py:473
 msgid "System"
 msgstr "系统"
 
@@ -728,7 +728,7 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:283
-#: users/models/user.py:32 users/models/user.py:445
+#: users/models/user.py:36 users/models/user.py:461
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:13 users/views/user.py:386
 #: xpack/plugins/orgs/forms.py:26
@@ -827,7 +827,7 @@ msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
 #: assets/serializers/asset_user.py:23 users/forms.py:230
-#: users/models/user.py:84 users/templates/users/first_login.html:42
+#: users/models/user.py:91 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
 #: users/templates/users/user_profile_update.html:43
@@ -1026,7 +1026,7 @@ msgstr "其它"
 #: settings/templates/settings/command_storage_create.html:79
 #: settings/templates/settings/email_setting.html:62
 #: settings/templates/settings/ldap_setting.html:61
-#: settings/templates/settings/replay_storage_create.html:151
+#: settings/templates/settings/replay_storage_create.html:152
 #: settings/templates/settings/security_setting.html:70
 #: settings/templates/settings/terminal_setting.html:68
 #: terminal/templates/terminal/terminal_update.html:45
@@ -1062,7 +1062,7 @@ msgstr "重置"
 #: settings/templates/settings/command_storage_create.html:80
 #: settings/templates/settings/email_setting.html:63
 #: settings/templates/settings/ldap_setting.html:64
-#: settings/templates/settings/replay_storage_create.html:152
+#: settings/templates/settings/replay_storage_create.html:153
 #: settings/templates/settings/security_setting.html:71
 #: settings/templates/settings/terminal_setting.html:70
 #: terminal/templates/terminal/command_list.html:103
@@ -1076,7 +1076,7 @@ msgstr "重置"
 #: users/templates/users/user_profile_update.html:64
 #: users/templates/users/user_pubkey_update.html:77
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:72
-#: xpack/plugins/interface/templates/interface/interface.html:73
+#: xpack/plugins/interface/templates/interface/interface.html:74
 msgid "Submit"
 msgstr "提交"
 
@@ -1161,7 +1161,7 @@ msgstr "更新认证"
 #: assets/templates/assets/system_user_asset.html:350
 #: users/templates/users/user_detail.html:307
 #: users/templates/users/user_detail.html:334
-#: xpack/plugins/interface/views.py:31
+#: xpack/plugins/interface/views.py:34
 msgid "Update successfully!"
 msgstr "更新成功"
 
@@ -1271,6 +1271,7 @@ msgstr "选择节点"
 #: users/templates/users/user_profile.html:238
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:36
+#: xpack/plugins/interface/templates/interface/interface.html:103
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 msgid "Confirm"
 msgstr "确认"
@@ -1500,6 +1501,7 @@ msgstr "重命名失败，不能更改root节点的名称"
 #: users/templates/users/user_detail.html:476
 #: users/templates/users/user_group_list.html:82
 #: users/templates/users/user_list.html:202
+#: xpack/plugins/interface/templates/interface/interface.html:97
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
@@ -1516,6 +1518,7 @@ msgstr "删除选择资产"
 #: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:86
 #: users/templates/users/user_list.html:206
+#: xpack/plugins/interface/templates/interface/interface.html:101
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
 msgstr "取消"
@@ -1938,7 +1941,7 @@ msgid "User agent"
 msgstr "Agent"
 
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:56
-#: users/forms.py:142 users/models/user.py:76
+#: users/forms.py:142 users/models/user.py:83
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2125,7 +2128,17 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/forms.py:29 users/forms.py:21
+#: authentication/forms.py:19
+msgid ""
+"Please enter a correct username and password. Note that both fields may be "
+"case-sensitive."
+msgstr "请输入正确的用户名和密码. 注意它们是区分大小写."
+
+#: authentication/forms.py:22
+msgid "This account is inactive."
+msgstr "此账户无效"
+
+#: authentication/forms.py:37 users/forms.py:21
 msgid "MFA code"
 msgstr "MFA 验证码"
 
@@ -2687,7 +2700,7 @@ msgstr "组织管理"
 #: perms/templates/perms/asset_permission_list.html:55
 #: perms/templates/perms/asset_permission_list.html:75
 #: perms/templates/perms/asset_permission_list.html:122 templates/_nav.html:14
-#: users/forms.py:253 users/models/group.py:26 users/models/user.py:60
+#: users/forms.py:253 users/models/group.py:26 users/models/user.py:67
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
 #: users/templates/users/user_list.html:26
@@ -2705,7 +2718,7 @@ msgstr "资产和节点至少选一个"
 
 #: perms/models.py:35 perms/models.py:88
 #: perms/templates/perms/asset_permission_detail.html:90
-#: users/models/user.py:92 users/templates/users/user_detail.html:107
+#: users/models/user.py:99 users/templates/users/user_detail.html:107
 #: users/templates/users/user_profile.html:116
 msgid "Date expired"
 msgstr "失效日期"
@@ -3123,7 +3136,7 @@ msgid "Please submit the LDAP configuration before import"
 msgstr "请先提交LDAP配置再进行导入"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:39
-#: users/models/user.py:56 users/templates/users/user_detail.html:71
+#: users/models/user.py:63 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
@@ -3431,7 +3444,7 @@ msgstr ""
 
 #: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
 #: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
-#: users/views/login.py:151 users/views/user.py:68 users/views/user.py:83
+#: users/views/login.py:153 users/views/user.py:68 users/views/user.py:83
 #: users/views/user.py:113 users/views/user.py:194 users/views/user.py:355
 #: users/views/user.py:405 users/views/user.py:445
 msgid "Users"
@@ -3871,7 +3884,7 @@ msgstr "你可以使用ssh客户端工具连接终端"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:32 users/models/user.py:64
+#: users/forms.py:32 users/models/user.py:71
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:25
@@ -3964,53 +3977,53 @@ msgstr "复制你的公钥到这里"
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/models/user.py:31 users/models/user.py:453
+#: users/models/user.py:35 users/models/user.py:469
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:33
+#: users/models/user.py:37
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:36 users/templates/users/user_profile.html:92
+#: users/models/user.py:40 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:159
 #: users/templates/users/user_profile.html:162
 msgid "Disable"
 msgstr "禁用"
 
-#: users/models/user.py:37 users/templates/users/user_profile.html:90
+#: users/models/user.py:41 users/templates/users/user_profile.html:90
 #: users/templates/users/user_profile.html:166
 msgid "Enable"
 msgstr "启用"
 
-#: users/models/user.py:38 users/templates/users/user_profile.html:88
+#: users/models/user.py:42 users/templates/users/user_profile.html:88
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:67
+#: users/models/user.py:74
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:70 users/templates/users/user_detail.html:82
+#: users/models/user.py:77 users/templates/users/user_detail.html:82
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:99 users/templates/users/user_detail.html:103
+#: users/models/user.py:106 users/templates/users/user_detail.html:103
 #: users/templates/users/user_list.html:27
 #: users/templates/users/user_profile.html:100
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:103
+#: users/models/user.py:110
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:129 users/templates/users/user_update.html:22
-#: users/views/login.py:45 users/views/login.py:104 users/views/user.py:418
+#: users/models/user.py:136 users/templates/users/user_update.html:22
+#: users/views/login.py:46 users/views/login.py:107 users/views/user.py:418
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:456
+#: users/models/user.py:472
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -4658,40 +4671,40 @@ msgstr "更新用户组"
 msgid "User group granted asset"
 msgstr "用户组授权资产"
 
-#: users/views/login.py:42
+#: users/views/login.py:43
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:58
+#: users/views/login.py:59
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:59
+#: users/views/login.py:60
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:72
+#: users/views/login.py:73
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:73
+#: users/views/login.py:74
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:88 users/views/login.py:107
+#: users/views/login.py:89 users/views/login.py:105
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:100
+#: users/views/login.py:101
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:113 users/views/user.py:128 users/views/user.py:428
+#: users/views/login.py:114 users/views/user.py:128 users/views/user.py:428
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:151
+#: users/views/login.py:153
 msgid "First login"
 msgstr "首次登录"
 
@@ -5217,13 +5230,39 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/templates/interface/interface.html:15
-#: xpack/plugins/interface/views.py:21
+#: xpack/plugins/interface/views.py:24
 msgid "Interface setting"
 msgstr "界面设置"
 
-#: xpack/plugins/interface/views.py:20
+#: xpack/plugins/interface/templates/interface/interface.html:73
+#: xpack/plugins/interface/templates/interface/interface.html:108
+#: xpack/plugins/interface/templates/interface/interface.html:115
+msgid "Restore Default"
+msgstr "恢复默认"
+
+#: xpack/plugins/interface/templates/interface/interface.html:98
+msgid "This will restore default Settings of the interface !!!"
+msgstr "您确定要恢复默认初始化吗？"
+
+#: xpack/plugins/interface/templates/interface/interface.html:107
+msgid "Restore default successfully."
+msgstr "恢复默认成功！"
+
+#: xpack/plugins/interface/templates/interface/interface.html:114
+msgid "Restore default failed."
+msgstr "恢复默认失败！"
+
+#: xpack/plugins/interface/views.py:23
 msgid "Interface"
 msgstr "界面"
+
+#: xpack/plugins/interface/views.py:49
+msgid "It is already in the default setting state！"
+msgstr "当前已经是初始化状态！"
+
+#: xpack/plugins/interface/views.py:53
+msgid "Restore default successfully！"
+msgstr "恢复默认成功！"
 
 #: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:94
 #: xpack/plugins/license/templates/license/license_detail.html:50
@@ -5233,7 +5272,7 @@ msgstr "许可证"
 
 #: xpack/plugins/license/models.py:74
 msgid "Standard edition"
-msgstr ""
+msgstr "标准版"
 
 #: xpack/plugins/license/models.py:76
 msgid "Enterprise edition"

@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+from django.core.cache import cache
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import RedirectView
@@ -84,7 +85,7 @@ class UserResetPasswordView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         token = request.GET.get('token', '')
-        user = User.validate_reset_token(token)
+        user = User.validate_reset_password_token(token)
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
         else:
@@ -100,12 +101,12 @@ class UserResetPasswordView(TemplateView):
         if password != password_confirm:
             return self.get(request, errors=_('Password not same'))
 
-        user = User.validate_reset_token(token)
+        user = User.validate_reset_password_token(token)
+        if not user:
+            return self.get(request, errors=_('Token invalid or expired'))
         if not user.can_update_password():
             error = _('User auth from {}, go there change password'.format(user.source))
             return self.get(request, errors=error)
-        if not user:
-            return self.get(request, errors=_('Token invalid or expired'))
 
         is_ok = check_password_rules(password)
         if not is_ok:
@@ -115,6 +116,7 @@ class UserResetPasswordView(TemplateView):
             )
 
         user.reset_password(password)
+        User.expired_reset_password_token(token)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
 
 
