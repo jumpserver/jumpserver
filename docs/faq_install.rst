@@ -87,14 +87,22 @@
 
     # 这是严格模式的警告, 可以参考后面的url解决, 或者忽略
 
-12. 启动 jumpserver 后, 访问 8080 端口页面显示不正常
+12. 启动 Jumpserver 或者 coco 报错 Error: expected '<document start>', but found '<scalar>'
+
+.. code-block:: vim
+
+    # 这是因为你的 config.yml 文件格式有误
+    # 常见的错误就是字段为空或者: 后面有一个空格
+    # SECRET_KEY: xxxxx  # 不要忽略: 后面的空格
+
+13. 启动 jumpserver 后, 访问 8080 端口页面显示不正常
 
 .. code-block:: vim
 
     # 这是因为你在 config.yml 里面设置了 DEBUG: false
     # 跟着教程继续操作, 后面搭建 nginx 代理即可正常访问
 
-13. 执行 ./cocod start 后提示 No module named 'jms'
+14. 执行 ./cocod start 后提示 No module named 'jms'
 
 .. code-block:: shell
 
@@ -109,7 +117,7 @@
     $ pip install -r requirements/requirements.txt
     # 然后重新执行 ./cocod start 即可
 
-14. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
+15. 执行 ./cocod start 后提示 Failed register terminal xxxx exist already
 
 .. code-block:: shell
 
@@ -121,7 +129,7 @@
     $ rm /opt/coco/data/keys/.access_key  # coco, 如果你是按文档安装的, key应该在这里, 如果不存在key文件直接下一步
     $ ./cocod start -d  # 正常运行后到Jumpserver 会话管理-终端管理 里面接受coco注册
 
-15. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
+16. 执行 ./cocod start 后提示 Failed register terminal unknow: xxxx
 
 .. code-block:: vim
 
@@ -135,7 +143,7 @@
 
     保存后重新执行 ./cocod start 即可
 
-16. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
+17. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
 
 .. code-block:: shell
 
@@ -145,20 +153,20 @@
 
     保存后重新执行 ./cocod start 即可
 
-17. 运行 ./cocod start 后提示 Connect endpoint http://xxxx:8080 error: HTTPConnectionPool(host='xxxx', port=8080)
+18. 运行 ./cocod start 后提示 Connect endpoint http://xxxx:8080 error: HTTPConnectionPool(host='xxxx', port=8080)
 
 .. code-block:: vim
 
     # 这是因为 coco 无法连接到 jumpserver 报的错误, 确定 http://xxxx:8080 设置正确(配置文件 coco/config.yml)
     # 如果 jumpserver 的IP和端口不对, 请手动修改 config.yml 的 CORE_HOST
 
-18. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
+19. 运行 ./cocod start 后提示 Unexpected error occur: 'AppService' object has no attribute 'get_system_user_cmd_filter_rules'
 
 .. code-block:: vim
 
     # 这是因为你的 pip 依赖包未正确安装, 参考本文档第 4 条
 
-19. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
+20. 通过 nginx 代理的端口访问 jumpserver 页面显示不正常
 
 .. code-block:: nginx
 
@@ -222,7 +230,7 @@
 
     ...
 
-20. 访问 luna 页面提示 Luna是单独部署的一个程序, 你需要部署luna, coco, 配置nginx做url分发...
+21. 访问 luna 页面提示 Luna是单独部署的一个程序, 你需要部署luna, coco, 配置nginx做url分发...
 
 .. code-block:: vim
 
