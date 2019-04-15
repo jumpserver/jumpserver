@@ -35,7 +35,7 @@ class IsSuperUser(IsValidUser):
 class IsSuperUserOrAppUser(IsSuperUser):
     def has_permission(self, request, view):
         return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-            and (request.user.is_superuser or request.user.is_app)
+            or request.user.is_app
 
 
 class IsOrgAdmin(IsValidUser):
