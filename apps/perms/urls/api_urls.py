@@ -7,8 +7,8 @@ from .. import api
 app_name = 'perms'
 
 router = routers.DefaultRouter()
-router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 router.register('actions', api.ActionViewSet, 'action')
+router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 
 urlpatterns = [
     # 查询某个用户授权的资产和资产组
