@@ -154,18 +154,7 @@ class AssetGatewayApi(generics.RetrieveAPIView):
 class AssetExportApi(BaseExportAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     csv_filename_prefix = 'assets'
-
-    def get_export_fields(self):
-        import_fields = [
-            field for field in Asset._meta.fields
-            if field.name in self.get_serializer().Meta.fields
-        ]
-        return import_fields
-
-    def get_export_header(self):
-        export_fields = self.get_export_fields()
-        header = [field.verbose_name for field in export_fields]
-        return header
+    model = Asset
 
     def get_queryset(self):
         spm = self.request.query_params.get('spm', '')

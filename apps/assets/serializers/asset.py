@@ -96,13 +96,7 @@ class AssetExportSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Asset
-        fields = [
-            'id', 'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
-            'is_active', 'admin_user', 'public_ip', 'number', 'vendor', 'model',
-            'sn', 'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
-            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
-            'hostname_raw', 'created_by', 'comment'
-        ]
+        fields = '__all__'
 
 
 class AssetImportTemplateSerializer(AssetExportSerializer):
