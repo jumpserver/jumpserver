@@ -109,7 +109,7 @@
 
     # "管理用户"是资产上的 root, 或拥有 NOPASSWD: ALL sudo 权限的用户, Jumpserver 使用该用户来推送系统用户、获取资产硬件信息等。 Windows或其它硬件可以随意设置一个
     # "名称" 不能重复
-    # "ssh私钥" 如果有密码, 请把key的密码填在密码栏上
+    # "ssh私钥" 如果私钥有密码, 请把key的密码填在密码栏上, 目前仅支持 RSA DSA 格式私钥
 
 .. image:: _static/img/admin_assets_admin-user_create.jpg
 
@@ -122,6 +122,7 @@
     # "自动生成密码"、"自动推送"、"Sudo"等功能需要对应资产的"管理用户"是且有root权限, 否则自动推送失败
     # ssh 协议的 "Sudo" 栏设定用户的 sudo 权限,
     # ssh 协议如果创建的"系统用户"已在资产上面存在, "推送"将会覆盖掉原用户的"home"目录权限(注: 替换成700权限)
+    # ssh 协议的 "ssh私钥" 如果私钥有密码, 请把key的密码填在密码栏上, 目前仅支持 RSA DSA 格式私钥
 
     # 这里简单举几个 "sudo" 设置例子
     Sudo /bin/su  # 当前系统用户可以免sudo密码执行sudo su命令
