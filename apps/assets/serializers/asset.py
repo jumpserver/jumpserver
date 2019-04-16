@@ -9,8 +9,8 @@ from .system_user import AssetSystemUserSerializer
 
 __all__ = [
     'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
-    'AssetAsNodeSerializer', 'AssetSimpleSerializer', 'AssetExportSerializer',
-    'AssetImportTemplateSerializer'
+    'AssetAsNodeSerializer', 'AssetSimpleSerializer',
+    'AssetImportTemplateSerializer',
 ]
 
 
@@ -87,19 +87,15 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
         fields = ['id', 'hostname', 'port', 'ip', 'connectivity']
 
 
-class AssetExportSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class AssetImportTemplateSerializer(BulkSerializerMixin,
+                                    serializers.ModelSerializer
+                                    ):
     admin_user = serializers.SerializerMethodField()
 
     @staticmethod
     def get_admin_user(obj):
         return obj.admin_user
 
-    class Meta:
-        model = Asset
-        fields = '__all__'
-
-
-class AssetImportTemplateSerializer(AssetExportSerializer):
     class Meta:
         model = Asset
         fields = [

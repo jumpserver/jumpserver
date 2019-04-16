@@ -13,15 +13,16 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.mixins import IDInFilterMixin
-from common.utils.export import BaseExportAPIView
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from common.utils.export import BulkModelViewSetAndExportImportView
 
 from .. import serializers
 from ..utils import LabelFilter
@@ -39,7 +40,8 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInFilterMixin, LabelFilter,
+                   BulkModelViewSetAndExportImportView):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -50,6 +52,8 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
+    csv_filename_prefix = 'assets'
+    model = Asset
 
     def filter_node(self, queryset):
         node_id = self.request.query_params.get("node_id")
@@ -89,8 +93,22 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().distinct()
-        queryset = self.get_serializer_class().setup_eager_loading(queryset)
+        if not self.request.query_params.get('format') == 'csv':
+            queryset = self.get_serializer_class().setup_eager_loading(queryset)
+            return queryset
+
+        spm = self.request.query_params.get('spm', '')
+        assets_id_default = [Asset.objects.first().id] if queryset else []
+        assets_id = cache.get(spm, assets_id_default)
+        queryset = queryset.filter(id__in=assets_id)
         return queryset
+
+    def get_serializer_class(self):
+        serializer = super().get_serializer_class()
+        if self.request.query_params.get('format', '') and \
+                (self.request.query_params.get('spm') == ''):
+            serializer = serializers.AssetImportTemplateSerializer
+        return serializer
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
@@ -151,22 +169,7 @@ class AssetGatewayApi(generics.RetrieveAPIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportApi(BaseExportAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-    csv_filename_prefix = 'assets'
-    model = Asset
-
-    def get_queryset(self):
-        spm = self.request.query_params.get('spm', '')
-        assets_id_default = [
-            Asset.objects.first().id] if Asset.objects.first() else []
-        assets_id = cache.get(spm, assets_id_default)
-        return Asset.objects.filter(id__in=assets_id)
-
-    def get_serializer_class(self):
-        if self.request.query_params.get('spm', ''):
-            return serializers.AssetExportSerializer
-        return serializers.AssetImportTemplateSerializer
+class AssetExportApi(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
@@ -183,5 +186,5 @@ class AssetExportApi(BaseExportAPIView):
 
         spm = uuid.uuid4().hex
         cache.set(spm, assets_id, 300)
-        url = reverse_lazy('api-assets:asset-export') + '?spm=%s' % spm
+        url = reverse_lazy('api-assets:asset-list')+'?spm=%s&format=csv' % spm
         return JsonResponse({'redirect': url})
