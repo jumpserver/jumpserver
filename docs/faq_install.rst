@@ -133,7 +133,7 @@
 
 .. code-block:: vim
 
-    这是因为当前系统的 hostname 有 coco 不支持的字符, 需要手动指定 coco 的 NAME
+    # 这是因为当前系统的 hostname 有 coco 不支持的字符, 需要手动指定 coco 的 NAME
     $ cd /opt/coco/
     $ vi config.yml
 
@@ -141,17 +141,17 @@
     # NAME: {{ Hostname }}
     NAME: localhost
 
-    保存后重新执行 ./cocod start 即可
+    # 保存后重新执行 ./cocod start 即可
 
-17. 运行 ./cocod start 后提示 No such file or directory: '/opt/coco/xxx/xxx'
+17. 运行 ./cocod start 后提示 "detail":"身份认证信息未提供。" Failed register terminal
 
 .. code-block:: shell
 
-    这是一个小 bug, 之后的版本会修复掉
-    $ cd /opt/coco
-    $ mkdir keys logs
+    # 保证 coco 的 BOOTSTRAP_TOKEN 与 jumpserver/config.yml 里面的内容不一致
+    $ cat /opt/jumpserver/config.yml | grep BOOTSTRAP_TOKEN
+    $ cat /opt/coco/config.yml | grep BOOTSTRAP_TOKEN
 
-    保存后重新执行 ./cocod start 即可
+    # 修改成一致保存后 重新执行 ./cocod start 即可
 
 18. 运行 ./cocod start 后提示 Connect endpoint http://xxxx:8080 error: HTTPConnectionPool(host='xxxx', port=8080)
 
@@ -170,7 +170,7 @@
 
 .. code-block:: nginx
 
-    这是因为你没有按照教程进行安装, 修改了安装目录, 需要在 nginx 的配置文件里面修改资源路径
+    # 这是因为你没有按照教程进行安装, 修改了安装目录, 需要在 nginx 的配置文件里面修改资源路径
     $ vi /etc/nginx/conf.d/jumpserver.conf
 
     ...
