@@ -7,7 +7,7 @@ from django.utils import timezone
 from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin, OrgManager
 
-from .const import PERMS_ACTION_NAME_CHOICES
+from .const import PERMS_ACTION_NAME_CHOICES, PERMS_ACTION_NAME_ALL
 
 
 class Action(models.Model):
@@ -22,6 +22,11 @@ class Action(models.Model):
 
     def __str__(self):
         return self.get_name_display()
+
+    @classmethod
+    def get_action_all(cls):
+        return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
+
 
 
 class AssetPermissionQuerySet(models.QuerySet):

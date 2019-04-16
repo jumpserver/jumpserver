@@ -1,6 +1,5 @@
 # coding: utf-8
 
-from __future__ import absolute_import, unicode_literals
 import uuid
 from collections import defaultdict
 import json
@@ -102,7 +101,7 @@ class AssetPermissionUtil:
         "UserGroup": get_user_group_permissions,
         "Asset": get_asset_permissions,
         "Node": get_node_permissions,
-        "SystemUser": get_node_permissions,
+        "SystemUser": get_system_user_permissions,
     }
 
     CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
@@ -447,7 +446,7 @@ def parse_asset_to_tree_node(node, asset, system_users):
 
 
 #
-# check system user actions
+# actions
 #
 
 
@@ -462,6 +461,5 @@ def check_system_user_action(system_user, action):
     actions = [action for action in granted_actions if action.name in check_actions]
     # logger
     logger.info('Check actions: {}, Granted actions: {}'.format(
-        check_actions, granted_actions)
-    )
+        check_actions, granted_actions))
     return bool(actions)
