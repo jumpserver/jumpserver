@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.core.cache import cache
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
@@ -19,7 +19,7 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
-from common.mixins import IDInFilterMixin
+from common.mixins import IDInFilterMixin, IDInCacheFiterMixin
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from common.utils.export import BulkModelViewSetAndExportImportView
@@ -36,11 +36,11 @@ logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetListUpdateApi',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi', 'AssetExportApi',
+    'AssetGatewayApi', 'ExportCacheApi',
 ]
 
 
-class AssetViewSet(IDInFilterMixin, LabelFilter,
+class AssetViewSet(IDInCacheFiterMixin, IDInFilterMixin, LabelFilter,
                    BulkModelViewSetAndExportImportView):
     """
     API endpoint that allows Asset to be viewed or edited.
@@ -95,12 +95,6 @@ class AssetViewSet(IDInFilterMixin, LabelFilter,
         queryset = super().get_queryset().distinct()
         if not self.request.query_params.get('format') == 'csv':
             queryset = self.get_serializer_class().setup_eager_loading(queryset)
-            return queryset
-
-        spm = self.request.query_params.get('spm', '')
-        assets_id_default = [Asset.objects.first().id] if queryset else []
-        assets_id = cache.get(spm, assets_id_default)
-        queryset = queryset.filter(id__in=assets_id)
         return queryset
 
     def get_serializer_class(self):
@@ -169,22 +163,22 @@ class AssetGatewayApi(generics.RetrieveAPIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportApi(APIView):
+class ExportCacheApi(APIView):
 
     def post(self, request, *args, **kwargs):
-        try:
-            assets_id = request.data.get('assets_id', [])
-            node_id = request.data.get('node_id', [])
-        except ValueError:
-            return HttpResponse('Json object not valid', status=400)
-
-        if not assets_id:
-            node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
-            assets = node.get_all_assets()
-            for asset in assets:
-                assets_id.append(asset.id)
-
+        objs_id = request.data.get('objs_id', [])
         spm = uuid.uuid4().hex
-        cache.set(spm, assets_id, 300)
-        url = reverse_lazy('api-assets:asset-list')+'?spm=%s&format=csv' % spm
+        if self.request.query_params.get('sourse') == 'assets':
+            url = reverse_lazy('api-assets:asset-list')+'?spm=%s&format=csv' % spm
+            if not objs_id:
+                node_id = request.data.get('node_id', [])
+                node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
+                assets = node.get_all_assets()
+                for asset in assets:
+                    objs_id.append(asset.id)
+        if self.request.query_params.get('source') == 'admin_user':
+            pass
+        if self.request.query_params.get('source') == 'user':
+            pass
+        cache.set(spm, objs_id, 300)
         return JsonResponse({'redirect': url})

@@ -464,9 +464,9 @@ $(document).ready(function(){
         assets.push(obj.id)
     });
     $.ajax({
-        url:"{% url "api-assets:asset-export" %}",
+        url:"{% url "api-assets:export-cache" %}?sourse=assets",
         method: 'POST',
-        data: JSON.stringify({assets_id: assets, node_id: current_node_id}),
+        data: JSON.stringify({objs_id: assets, node_id: current_node_id}),
         dataType: "json",
         contentType :"application/json",
         success: function (data, textStatus) {

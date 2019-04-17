@@ -1,9 +1,14 @@
 # coding: utf-8
 
 from django.db import models
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
+from common.utils import get_logger
+
+logger = get_logger(__file__)
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
@@ -58,6 +63,24 @@ class IDInFilterMixin(object):
                 return queryset
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)
+        return queryset
+
+
+class IDInCacheFiterMixin(object):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        if self.request.query_params.get('format') == 'csv':
+            spm = self.request.query_params.get('spm', '')
+            objs_id = cache.get(spm, [])
+            if objs_id:
+                return queryset.filter(id__in=objs_id)
+            if not self.model:
+                error = "'%s' should either include a `model` attribute, "
+                logger.error(error % self.__class__.__name__)
+                return []
+            obj_default = self.model.objects.first()
+            obj_id_default = [obj_default.id] if obj_default else []
+            return queryset.filter(id__in=obj_id_default)
         return queryset
 
 

@@ -37,7 +37,7 @@ urlpatterns = [
     path('asset-user/test-connective/',
          api.AssetUserTestConnectiveApi.as_view(), name='asset-user-connective'),
 
-    path('asset/export/', api.AssetExportApi.as_view(), name='asset-export'),
+    path('export/cache/', api.ExportCacheApi.as_view(), name='export-cache'),
 
     path('admin-user/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
