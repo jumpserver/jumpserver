@@ -387,10 +387,10 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ git pull
     $ source /opt/py3/bin/activate
     $ ./cocod stop
     $ mv conf.py conf.bak
+    $ git pull
 
     # 更新 config.yml, 请根据你原备份的 conf.bak 内容进行修改
     $ cp config_example.yml config.yml
@@ -472,9 +472,9 @@
 .. code-block:: shell
 
     $ cd /opt/docker-guacamole
-    $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ git pull
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
@@ -637,10 +637,10 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ git pull
     $ source /opt/py3/bin/activate
     $ ./cocod stop
     $ mv conf.py conf.bak
+    $ git pull
 
     # 更新 config.yml, 请根据你原备份的 conf.bak 内容进行修改
     $ cp config_example.yml config.yml
@@ -720,9 +720,9 @@
 .. code-block:: shell
 
     $ cd /opt/docker-guacamole
-    $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ git pull
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
@@ -884,10 +884,10 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ git pull
     $ source /opt/py3/bin/activate
     $ ./cocod stop
     $ mv conf.py conf.bak
+    $ git pull
 
     # 更新 config.yml, 请根据你原备份的 config.yml 内容进行修改
     $ cp config_example.yml config.yml
@@ -967,9 +967,9 @@
 .. code-block:: shell
 
     $ cd /opt/docker-guacamole
-    $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ git pull
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war
     $ ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/guacamole-auth-jumpserver-0.9.14.jar
 
@@ -1036,6 +1036,7 @@
 
     $ cd /opt/jumpserver
     $ source /opt/py3/bin/activate
+    $ ./jms stop
     $ git pull
     $ pip install -r requirements/requirements.txt
 
@@ -1049,8 +1050,9 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ git pull
     $ source /opt/py3/bin/activate
+    $ ./cocod stop
+    $ git pull
     $ pip install -r requirements/requirements.txt
     $ ./cocod start -d
 
@@ -1114,6 +1116,7 @@
 
     $ cd /opt/jumpserver
     $ source /opt/py3/bin/activate
+    $ ./jms stop
     $ git pull
     $ pip install -r requirements/requirements.txt
 
@@ -1127,8 +1130,9 @@
 .. code-block:: shell
 
     $ cd /opt/coco
-    $ git pull
     $ source /opt/py3/bin/activate
+    $ ./cocod stop
+    $ git pull
     $ pip install -r requirements/requirements.txt
     $ ./cocod start -d
 

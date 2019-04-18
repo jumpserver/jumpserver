@@ -393,7 +393,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties  # guacamole 配置文件
 
     $ cd /config
-    $ wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.39/bin/apache-tomcat-8.5.39.tar.gz
+    $ wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.39.tar.gz
     $ tar xf apache-tomcat-8.5.39.tar.gz
     $ rm -rf apache-tomcat-8.5.39.tar.gz
     $ mv apache-tomcat-8.5.39 tomcat8
@@ -415,6 +415,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 
 .. code-block:: shell
 
+    # 勿多次执行以下环境设置
     $ export JUMPSERVER_SERVER=http://127.0.0.1:8080  # http://127.0.0.1:8080 指 jumpserver 访问地址
     $ echo "export JUMPSERVER_SERVER=http://127.0.0.1:8080" >> ~/.bashrc
 
@@ -450,6 +451,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     enabled=1
     gpgkey=https://nginx.org/keys/nginx_signing.key
 
+    $ yum makecache fast
     $ yum install -y nginx
     $ rm -rf /etc/nginx/conf.d/default.conf
     $ systemctl enable nginx
