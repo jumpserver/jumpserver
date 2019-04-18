@@ -252,7 +252,7 @@ $(document).ready(function() {
         var name = $(id_field).attr('name');
         data[name] = $(id_field).val();
     });
-    if (data['ENDPOINT'] !== '' && data['ENDPOINT'].indexOf('http') === -1) {
+    if (data['ENDPOINT'] && data['ENDPOINT'].indexOf('http') === -1) {
         var msg = "{% trans 'Endpoint need contain protocol, ex: http' %}";
         $("#endpoint_error").html(msg);
         submitBtn.removeClass('disabled');
