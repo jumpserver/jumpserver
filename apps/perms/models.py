@@ -28,7 +28,6 @@ class Action(models.Model):
         return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
 
 
-
 class AssetPermissionQuerySet(models.QuerySet):
     def active(self):
         return self.filter(is_active=True)

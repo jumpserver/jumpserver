@@ -12,9 +12,8 @@ from django.conf import settings
 
 from common.utils import get_logger
 from common.tree import TreeNode
-from .models import AssetPermission
+from .models import AssetPermission, Action
 from .hands import Node
-from .const import PERMS_ACTION_NAME_ALL
 
 logger = get_logger(__file__)
 
@@ -456,10 +455,8 @@ def check_system_user_action(system_user, action):
     :param action: utils.PERMS_ACTION_NAME_CHOICES
     :return:
     """
-    check_actions = [PERMS_ACTION_NAME_ALL, action]
+
+    check_actions = [Action.get_action_all(), action]
     granted_actions = getattr(system_user, 'actions', [])
-    actions = [action for action in granted_actions if action.name in check_actions]
-    # logger
-    logger.info('Check actions: {}, Granted actions: {}'.format(
-        check_actions, granted_actions))
+    actions = list(set(granted_actions).intersection(set(check_actions)))
     return bool(actions)

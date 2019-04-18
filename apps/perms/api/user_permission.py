@@ -25,7 +25,7 @@ from ..hands import (
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
-from ..const import PERMS_ACTION_NAME_CONNECT
+from ..models import Action
 
 logger = get_logger(__name__)
 
@@ -405,10 +405,12 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
         user_id = request.query_params.get('user_id', '')
         asset_id = request.query_params.get('asset_id', '')
         system_id = request.query_params.get('system_user_id', '')
+        action_name = request.query_params.get('action_name', '')
 
         user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)
         su = get_object_or_404(SystemUser, id=system_id)
+        action = get_object_or_404(Action, name=action_name)
 
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         granted_assets = util.get_assets()
@@ -418,7 +420,7 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
             return Response({'msg': False}, status=403)
 
         _su = next((s for s in granted_system_users if s.id == su.id), None)
-        if not check_system_user_action(_su, PERMS_ACTION_NAME_CONNECT):
+        if not check_system_user_action(_su, action):
             return Response({'msg': False}, status=403)
 
         return Response({'msg': True}, status=200)
