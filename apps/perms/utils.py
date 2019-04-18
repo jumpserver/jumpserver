@@ -451,9 +451,9 @@ def parse_asset_to_tree_node(node, asset, system_users):
 
 def check_system_user_action(system_user, action):
     """
-    :param system_user: 包含actions属性的SystemUser对象
-    :param action: utils.PERMS_ACTION_NAME_CHOICES
-    :return:
+    :param system_user: SystemUser object (包含动态属性: actions)
+    :param action: Action object
+    :return: bool
     """
 
     check_actions = [Action.get_action_all(), action]
