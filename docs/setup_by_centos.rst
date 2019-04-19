@@ -358,8 +358,6 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 
 .. code-block:: shell
 
-    $ mkdir /usr/local/lib/freerdp/
-    $ ln -s /usr/local/lib/freerdp /usr/lib64/freerdp
     $ rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
     $ rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
     $ yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
@@ -367,6 +365,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ yum install -y java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
+    $ ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/guacai.so
+    $ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/guacdr.so
+    $ ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/guacsnd.so
+    $ ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/guacsvc.so
 
 **5.2 编译安装 guacamole 服务**
 
@@ -393,10 +395,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties  # guacamole 配置文件
 
     $ cd /config
-    $ wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.39.tar.gz
-    $ tar xf apache-tomcat-8.5.39.tar.gz
-    $ rm -rf apache-tomcat-8.5.39.tar.gz
-    $ mv apache-tomcat-8.5.39 tomcat8
+    $ wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz
+    $ tar xf apache-tomcat-8.5.40.tar.gz
+    $ rm -rf apache-tomcat-8.5.40.tar.gz
+    $ mv apache-tomcat-8.5.40 tomcat8
     $ rm -rf /config/tomcat8/webapps/*
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat8/conf/server.xml  # 修改默认端口为 8081

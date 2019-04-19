@@ -341,7 +341,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ apt-get -y install libtool autoconf
     $ apt-get -y install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libossp-uuid-dev
     $ apt-get -y install libavcodec-dev libavutil-dev libswscale-dev libfreerdp-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev ghostscript
-    $ ln -s /usr/local/lib/freerdp /usr/lib/x86_64-linux-gnu/freerdp
+    $ ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/guacai.so
+    $ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/guacdr.so
+    $ ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/guacsnd.so
+    $ ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/guacsvc.so
     $ apt-get -y install default-jre default-jdk
 
 **5.2 编译安装 guacamole 服务**
@@ -378,10 +381,10 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ cd /config
-    $ wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.39.tar.gz
-    $ tar xf apache-tomcat-8.5.39.tar.gz
-    $ rm -rf apache-tomcat-8.5.39.tar.gz
-    $ mv apache-tomcat-8.5.39 tomcat8
+    $ wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz
+    $ tar xf apache-tomcat-8.5.40.tar.gz
+    $ rm -rf apache-tomcat-8.5.40.tar.gz
+    $ mv apache-tomcat-8.5.40 tomcat8
     $ rm -rf /config/tomcat8/webapps/*
     $ ln -sf /opt/docker-guacamole/guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war  # guacamole client
     $ sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat8/conf/server.xml  # 修改默认端口为 8081
