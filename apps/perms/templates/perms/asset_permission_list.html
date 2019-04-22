@@ -130,6 +130,9 @@ function format(d) {
     if (d.system_users.length > 0) {
         data += makeLabel(["{% trans 'System user' %}", d.system_users.join(", ")])
     }
+    if (d.actions.length > 0) {
+        data += makeLabel(["{% trans 'Action' %}", d.actions.join(", ")])
+    }
     return data
 }
 
