@@ -25,6 +25,8 @@ cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-r
 
 urlpatterns = [
     path('assets-bulk/', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
+    path('asset/update/select/',
+         api.AssetBulkUpdateSelectAPI.as_view(), name='asset-bulk-update-select'),
     path('assets/<uuid:pk>/refresh/',
          api.AssetRefreshHardwareApi.as_view(), name='asset-refresh'),
     path('assets/<uuid:pk>/alive/',

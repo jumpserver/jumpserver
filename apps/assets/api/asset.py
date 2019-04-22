@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -27,6 +28,7 @@ from common.utils.export import BulkModelViewSetAndExportImportView
 from .. import serializers
 from ..utils import LabelFilter
 from ..models import Asset, AdminUser, Node
+from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..tasks import (
     update_asset_hardware_info_manual, test_asset_connectivity_manual
 )
@@ -34,9 +36,9 @@ from ..tasks import (
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet', 'AssetListUpdateApi',
-    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi', 'ExportCacheApi',
+    'AssetViewSet', 'AssetListUpdateApi', 'AssetRefreshHardwareApi',
+    'AssetAdminUserTestApi', 'AssetGatewayApi', 'ExportCacheApi',
+    'AssetBulkUpdateSelectAPI',
 ]
 
 
@@ -116,6 +118,21 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsOrgAdmin,)
+
+
+class AssetBulkUpdateSelectAPI(APIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def post(self, request, *args, **kwargs):
+        assets_id = request.data.get('assets_id', '')
+        if assets_id:
+            spm = uuid.uuid4().hex
+            key = CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX.format(spm)
+            cache.set(key, assets_id, 300)
+            url = reverse_lazy('assets:asset-bulk-update') + '?spm=%s' % spm
+            return Response({'url': url})
+        error = _('Please select assets that need to be updated')
+        return Response({'error': error}, status=400)
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):

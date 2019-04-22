@@ -48,3 +48,6 @@ TASK_OPTIONS = {
     'timeout': 10,
     'forks': 10,
 }
+
+CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX = '_KEY_ASSET_BULK_UPDATE_ID_{}'
+

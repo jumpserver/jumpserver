@@ -11,8 +11,9 @@ from django.conf import settings
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
 from .hands import Node, Asset, SystemUser, User, UserGroup
-from .models import AssetPermission
+from .models import AssetPermission, Action
 from .forms import AssetPermissionForm
+from .const import PERMS_ACTION_NAME_ALL
 
 
 class AssetPermissionListView(AdminUserRequiredMixin, TemplateView):
@@ -46,6 +47,8 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
             form['assets'].initial = assets
+        form['actions'].initial = Action.objects.get(name=PERMS_ACTION_NAME_ALL)
+
         return form
 
     def get_context_data(self, **kwargs):

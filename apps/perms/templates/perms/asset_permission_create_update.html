@@ -47,6 +47,9 @@
                             {% bootstrap_field form.nodes layout="horizontal" %}
                             {% bootstrap_field form.system_users layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
+                            <h3>{% trans 'Action' %}</h3>
+                            {% bootstrap_field form.actions layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Other' %}</h3>
                             <div class="form-group">
                                 <label for="{{ form.is_active.id_for_label }}" class="col-sm-2 control-label">{% trans 'Active' %}</label>
