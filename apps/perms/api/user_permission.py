@@ -16,7 +16,8 @@ from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from orgs.utils import set_to_root_org
 from ..utils import (
-    AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node
+    AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
+    check_system_user_action
 )
 from ..hands import (
     AssetGrantedSerializer, User, Asset, Node,
@@ -24,6 +25,7 @@ from ..hands import (
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
+from ..models import Action
 
 logger = get_logger(__name__)
 
@@ -31,7 +33,7 @@ __all__ = [
     'UserGrantedAssetsApi', 'UserGrantedNodesApi',
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
-    'UserGrantedNodesWithAssetsAsTreeApi',
+    'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
 ]
 
 
@@ -403,16 +405,45 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
         user_id = request.query_params.get('user_id', '')
         asset_id = request.query_params.get('asset_id', '')
         system_id = request.query_params.get('system_user_id', '')
+        action_name = request.query_params.get('action_name', '')
 
         user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)
-        system_user = get_object_or_404(SystemUser, id=system_id)
+        su = get_object_or_404(SystemUser, id=system_id)
+        action = get_object_or_404(Action, name=action_name)
 
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
-        assets_granted = util.get_assets()
-        if system_user in assets_granted.get(asset, []):
-            return Response({'msg': True}, status=200)
-        else:
+        granted_assets = util.get_assets()
+        granted_system_users = granted_assets.get(asset, [])
+
+        if su not in granted_system_users:
             return Response({'msg': False}, status=403)
 
+        _su = next((s for s in granted_system_users if s.id == su.id), None)
+        if not check_system_user_action(_su, action):
+            return Response({'msg': False}, status=403)
 
+        return Response({'msg': True}, status=200)
+
+
+class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', '')
+        asset_id = request.query_params.get('asset_id', '')
+        system_id = request.query_params.get('system_user_id', '')
+
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        su = get_object_or_404(SystemUser, id=system_id)
+
+        util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
+        granted_assets = util.get_assets()
+        granted_system_users = granted_assets.get(asset, [])
+        _su = next((s for s in granted_system_users if s.id == su.id), None)
+        if not _su:
+            return Response({'actions': []}, status=403)
+
+        actions = [action.name for action in getattr(_su, 'actions', [])]
+        return Response({'actions': actions}, status=200)
