@@ -72,7 +72,7 @@ class IDInCacheFiterMixin(object):
         if self.request.query_params.get('format') == 'csv':
             spm = self.request.query_params.get('spm', '')
             objs_id = cache.get(spm, [])
-            if objs_id:
+            if spm:
                 return queryset.filter(id__in=objs_id)
             if not self.model:
                 error = "'%s' should either include a `model` attribute, "

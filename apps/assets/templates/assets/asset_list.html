@@ -480,26 +480,33 @@ $(document).ready(function(){
 .on('click', '#btn_asset_import', function () {
     var $form = $('#fm_asset_import');
     var action = $form.attr("action");
+    var file = document.getElementById('id_assets').files[0];
     if (current_node_id){
         action = setUrlParam(action, 'node_id', current_node_id);
         $form.attr("action", action)
     }
     $form.find('.help-block').remove();
-    function success (data) {
-        if (data.valid === false) {
-            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
-        } else {
-            $('#id_created').html(data.created_info);
-            $('#id_created_detail').html(data.created.join(', '));
-            $('#id_updated').html(data.updated_info);
-            $('#id_updated_detail').html(data.updated.join(', '));
-            $('#id_failed').html(data.failed_info);
-            $('#id_failed_detail').html(data.failed.join(', '));
-            var $data_table = $('#asset_list_table').DataTable();
-            $data_table.ajax.reload();
-        }
+    $.ajax({
+    url: action,
+    type: "POST",
+    processData: false,
+    contentType: 'text/csv',
+    data: file,
+    success: function(data){
+        $('#id_failed').html('');
+        $('#id_failed_detail').html('');
+        var $data_table = $('#asset_list_table').DataTable();
+        $('#id_created').html('{% trans 'Create:' %}'+ data.length);
+        $data_table.ajax.reload()
+
+    },
+    error: function(error){
+        $('#id_created').html('');
+        $('#id_failed').html('{% trans '导入失败 ' %}');
+        $('#id_failed_detail').html(error.responseText);
     }
-    $form.ajaxSubmit({success: success});
+ });
+
 })
 .on('click', '.btn-create-asset', function () {
     var url = "{% url 'assets:asset-create' %}";

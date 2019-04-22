@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 #
+
+import uuid
+
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
+from common.utils import get_object_or_none
 from common.mixins import BulkSerializerMixin
-from ..models import Asset
+from ..models import Asset, Domain, AdminUser, Node
 from .system_user import AssetSystemUserSerializer
 
 __all__ = [
@@ -90,15 +94,44 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
 class AssetImportTemplateSerializer(BulkSerializerMixin,
                                     serializers.ModelSerializer
                                     ):
-    admin_user = serializers.SerializerMethodField()
+    admin_user = serializers.CharField(required=False, allow_blank=True)
+    ip = serializers.IPAddressField(max_length=32, required=True)
+    hostname = serializers.CharField(max_length=128, required=True)
+    protocol = serializers.CharField(required=False, allow_blank=True)
+    port = serializers.CharField(required=False, allow_blank=True)
+    platform = serializers.CharField(required=False, allow_blank=True)
+    domain = serializers.CharField(required=False, allow_blank=True)
+    public_ip = serializers.IPAddressField(required=False, allow_blank=True)
+    is_active = serializers.CharField(required=False, allow_blank=True)
 
-    @staticmethod
-    def get_admin_user(obj):
-        return obj.admin_user
+    def create(self, validated_data):
+        for k, v in validated_data.items():
+            str(v).strip()
+            if k == 'protocol':
+                v = 'ssh' if v == '' else v
+            elif k == 'port':
+                v = 22 if v == '' else int(v)
+            elif k == 'platform':
+                v = 'Linux' if v == '' else v.lower().capitalize()
+            elif k == 'domain':
+                v = get_object_or_none(Domain, name=v)
+            elif k == 'is_active':
+                v = False if v in ['False', 0, 'false'] else True
+            elif k == 'admin_user':
+                v = get_object_or_none(AdminUser, name=v)
+            if v != '':
+                validated_data[k] = v
+
+        node_id = self.context['request'].query_params.get('node_id', '')
+        node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
+        validated_data['nodes'] = [node]
+
+        return super().create(validated_data)
 
     class Meta:
         model = Asset
+        list_serializer_class = BulkListSerializer
         fields = [
-            'id', 'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
-            'is_active', 'admin_user', 'public_ip',
+            'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
+            'is_active', 'admin_user', 'public_ip'
         ]

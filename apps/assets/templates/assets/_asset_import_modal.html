@@ -3,7 +3,7 @@
 {% block modal_id %}asset_import_modal{% endblock %}
 {% block modal_title%}{% trans "Import asset" %}{% endblock %}
 {% block modal_body %}
-<form method="post" action="{% url 'assets:asset-import' %}" id="fm_asset_import" enctype="multipart/form-data">
+<form method="post" action="/api/assets/v1/assets/?file=csv" id="fm_asset_import" enctype="text/csv">
     {% csrf_token %}
     <div class="form-group">
         <label class="control-label" for="id_assets">{% trans "Template" %}</label>

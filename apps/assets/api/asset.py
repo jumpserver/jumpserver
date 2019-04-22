@@ -93,14 +93,18 @@ class AssetViewSet(IDInCacheFiterMixin, IDInFilterMixin, LabelFilter,
 
     def get_queryset(self):
         queryset = super().get_queryset().distinct()
+        if self.request.query_params.get('file') == 'csv':
+            return queryset
         if not self.request.query_params.get('format') == 'csv':
             queryset = self.get_serializer_class().setup_eager_loading(queryset)
         return queryset
 
     def get_serializer_class(self):
         serializer = super().get_serializer_class()
-        if self.request.query_params.get('format', '') and \
+        if self.request.query_params.get('format') == 'csv' and \
                 (self.request.query_params.get('spm') == ''):
+            serializer = serializers.AssetImportTemplateSerializer
+        if self.request.query_params.get('file') == 'csv':
             serializer = serializers.AssetImportTemplateSerializer
         return serializer
 
