@@ -23,7 +23,6 @@ class OpenIDAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         # Don't need openid auth if AUTH_OPENID is False
         if not settings.AUTH_OPENID:
-            logger.info("Not settings.AUTH_OPENID")
             return
         # Don't need check single logout if user not authenticated
         if not request.user.is_authenticated:
