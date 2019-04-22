@@ -54,6 +54,10 @@ class AssetPermissionForm(OrgModelForm):
         labels = {
             'nodes': _("Node"),
         }
+        help_texts = {
+            'actions': _('Tips: The RDP protocol does not support separate '
+                         'controls for uploading or downloading files')
+        }
 
     def clean_user_groups(self):
         users = self.cleaned_data.get('users')
