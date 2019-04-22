@@ -33,7 +33,7 @@ __all__ = [
     'UserGrantedAssetsApi', 'UserGrantedNodesApi',
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
-    'UserGrantedNodesWithAssetsAsTreeApi',
+    'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
 ]
 
 
@@ -424,3 +424,26 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
             return Response({'msg': False}, status=403)
 
         return Response({'msg': True}, status=200)
+
+
+class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', '')
+        asset_id = request.query_params.get('asset_id', '')
+        system_id = request.query_params.get('system_user_id', '')
+
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        su = get_object_or_404(SystemUser, id=system_id)
+
+        util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
+        granted_assets = util.get_assets()
+        granted_system_users = granted_assets.get(asset, [])
+        _su = next((s for s in granted_system_users if s.id == su.id), None)
+        if not _su:
+            return Response({'actions': []}, status=403)
+
+        actions = [action.name for action in getattr(_su, 'actions', [])]
+        return Response({'actions': actions}, status=200)

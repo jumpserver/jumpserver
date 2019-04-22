@@ -68,6 +68,8 @@ urlpatterns = [
     # 验证用户是否有某个资产和系统用户的权限
     path('asset-permission/user/validate/', api.ValidateUserAssetPermissionApi.as_view(),
          name='validate-user-asset-permission'),
+    path('asset-permission/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(),
+         name='get-user-asset-permission-actions'),
 ]
 
 urlpatterns += router.urls
