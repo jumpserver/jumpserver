@@ -1,6 +1,5 @@
 # coding: utf-8
 
-from __future__ import absolute_import, unicode_literals
 import uuid
 from collections import defaultdict
 import json
@@ -13,7 +12,7 @@ from django.conf import settings
 
 from common.utils import get_logger
 from common.tree import TreeNode
-from .models import AssetPermission
+from .models import AssetPermission, Action
 from .hands import Node
 
 logger = get_logger(__file__)
@@ -101,7 +100,7 @@ class AssetPermissionUtil:
         "UserGroup": get_user_group_permissions,
         "Asset": get_asset_permissions,
         "Node": get_node_permissions,
-        "SystemUser": get_node_permissions,
+        "SystemUser": get_system_user_permissions,
     }
 
     CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
@@ -180,6 +179,24 @@ class AssetPermissionUtil:
                 )
         return assets
 
+    def _setattr_actions_to_system_user(self):
+        """
+        动态给system_use设置属性actions
+        """
+        for asset, system_users in self._assets.items():
+            # 获取资产和资产的祖先节点的所有授权规则
+            perms = get_asset_permissions(asset, include_node=True)
+            # 过滤当前self.permission的授权规则
+            perms = perms.filter(id__in=[perm.id for perm in self.permissions])
+
+            for system_user in system_users:
+                actions = set()
+                _perms = perms.filter(system_users=system_user).\
+                    prefetch_related('actions')
+                for _perm in _perms:
+                    actions.update(_perm.actions.all())
+                setattr(system_user, 'actions', actions)
+
     def get_assets_without_cache(self):
         if self._assets:
             return self._assets
@@ -192,6 +209,7 @@ class AssetPermissionUtil:
                     [s for s in system_users if s.protocol == asset.protocol]
                 )
         self._assets = assets
+        self._setattr_actions_to_system_user()
         return self._assets
 
     def get_cache_key(self, resource):
@@ -395,6 +413,7 @@ def parse_asset_to_tree_node(node, asset, system_users):
             'protocol': system_user.protocol,
             'priority': system_user.priority,
             'login_mode': system_user.login_mode,
+            'actions': [action.name for action in system_user.actions],
             'comment': system_user.comment,
         })
     data = {
@@ -423,3 +442,21 @@ def parse_asset_to_tree_node(node, asset, system_users):
     }
     tree_node = TreeNode(**data)
     return tree_node
+
+
+#
+# actions
+#
+
+
+def check_system_user_action(system_user, action):
+    """
+    :param system_user: SystemUser object (包含动态属性: actions)
+    :param action: Action object
+    :return: bool
+    """
+
+    check_actions = [Action.get_action_all(), action]
+    granted_actions = getattr(system_user, 'actions', [])
+    actions = list(set(granted_actions).intersection(set(check_actions)))
+    return bool(actions)
