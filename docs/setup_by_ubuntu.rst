@@ -66,7 +66,7 @@
 .. code-block:: shell
 
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git
+    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git
 
 **2.2 安装依赖包**
 
@@ -222,7 +222,7 @@
 
     $ cd /opt
     $ source /opt/py3/bin/activate
-    $ git clone https://github.com/jumpserver/coco.git && cd coco && git checkout master
+    $ git clone --depth=1 https://github.com/jumpserver/coco.git && cd coco && git checkout master
 
 **3.2 安装依赖**
 
@@ -349,7 +349,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
 .. code-block:: shell
 
     $ cd /opt
-    $ git clone https://github.com/jumpserver/docker-guacamole.git
+    $ git clone --depth=1 https://github.com/jumpserver/docker-guacamole.git
     $ cd docker-guacamole
     $ tar xf guacamole-server-0.9.14.tar.gz
     $ cd guacamole-server-0.9.14

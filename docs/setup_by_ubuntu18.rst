@@ -85,7 +85,7 @@ Ubuntu 18.04 安装文档
 .. code-block:: shell
 
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git
+    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git
 
 **2.2 安装依赖包**
 

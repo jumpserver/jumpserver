@@ -40,7 +40,7 @@
 
     $ echo -e "\033[31m 3. 下载组件 \033[0m" \
       && cd /opt \
-      && if [ ! -d "/opt/jumpserver" ]; then git clone https://github.com/jumpserver/jumpserver.git; fi \
+      && if [ ! -d "/opt/jumpserver" ]; then git clone --depth=1 https://github.com/jumpserver/jumpserver.git; fi \
       && if [ ! -f "/opt/luna.tar.gz" ]; then wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz; tar xf luna.tar.gz; chown -R root:root luna; fi \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \

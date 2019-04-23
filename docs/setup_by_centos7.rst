@@ -85,7 +85,7 @@ CentOS 7 安装文档
 
     # 下载 Jumpserver
     $ cd /opt/
-    $ git clone https://github.com/jumpserver/jumpserver.git
+    $ git clone --depth=1 https://github.com/jumpserver/jumpserver.git
 
     # 安装依赖 RPM 包
     $ yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
