@@ -20,10 +20,9 @@ from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 
-from common.mixins import IDInFilterMixin, IDInCacheFiterMixin
+from common.mixins import IDInFilterMixin, IDInCacheFiterMixin, FileViewMixin
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from common.utils.export import BulkModelViewSetAndExportImportView
 
 from .. import serializers
 from ..utils import LabelFilter
@@ -43,7 +42,7 @@ __all__ = [
 
 
 class AssetViewSet(IDInCacheFiterMixin, IDInFilterMixin, LabelFilter,
-                   BulkModelViewSetAndExportImportView):
+                   FileViewMixin, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """

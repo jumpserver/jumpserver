@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
-
+from rest_framework.utils import html
 from rest_framework import serializers
+from rest_framework.fields import SkipField
+from rest_framework.settings import api_settings
+from rest_framework.exceptions import ValidationError
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.utils import get_object_or_none
@@ -91,6 +93,63 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
         fields = ['id', 'hostname', 'port', 'ip', 'connectivity']
 
 
+class AssetBulkListSerializer(BulkListSerializer):
+    def create(self, validated_data):
+        instances = []
+        i = 2
+        for attrs in validated_data:
+            try:
+                instance = self.child.create(attrs)
+                instances.append(instance)
+                i += 1
+            except Exception as e:
+                msg = "导入失败，第 %s 行 有误，已经存在重复的条目," % i
+                raise TypeError(msg)
+        return instances
+
+    def to_internal_value(self, data):
+        """
+        List of dicts of native values <- List of dicts of primitive datatypes.
+        """
+        if html.is_html_input(data):
+            data = html.parse_html_list(data)
+
+        if not isinstance(data, list):
+            message = self.error_messages['not_a_list'].format(
+                input_type=type(data).__name__
+            )
+            raise ValidationError({
+                api_settings.NON_FIELD_ERRORS_KEY: [message]
+            }, code='not_a_list')
+
+        if not self.allow_empty and len(data) == 0:
+            if self.parent and self.partial:
+                raise SkipField()
+
+            message = self.error_messages['empty']
+            raise ValidationError({
+                api_settings.NON_FIELD_ERRORS_KEY: [message]
+            }, code='empty')
+
+        ret = []
+        errors = []
+        i = 2
+        for item in data:
+            try:
+                validated = self.child.run_validation(item)
+            except ValidationError as exc:
+                err = {"第 %s 行" % i: exc.detail}
+                errors.append(err)
+                i += 1
+            else:
+                ret.append(validated)
+                i += 1
+        if any(errors):
+            raise ValidationError(errors)
+
+        return ret
+
+
 class AssetImportTemplateSerializer(BulkSerializerMixin,
                                     serializers.ModelSerializer
                                     ):
@@ -130,7 +189,7 @@ class AssetImportTemplateSerializer(BulkSerializerMixin,
 
     class Meta:
         model = Asset
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AssetBulkListSerializer
         fields = [
             'ip', 'hostname', 'protocol', 'port', 'platform', 'domain',
             'is_active', 'admin_user', 'public_ip'

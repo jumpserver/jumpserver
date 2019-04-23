@@ -6,6 +6,11 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework_csv import renderers, parsers
+
 from common.utils import get_logger
 
 logger = get_logger(__file__)
@@ -140,3 +145,75 @@ class DatetimeSearchMixin:
     def get(self, request, *args, **kwargs):
         self.get_date_range()
         return super().get(request, *args, **kwargs)
+
+
+class FileViewMixin:
+    model = ''
+    csv_filename_prefix = ''
+
+    def generate_filename(self):
+        """
+        根据csv_filename_prefix生成带有csv后缀的文件名
+        """
+        filename = '{}-{}.csv'.format(
+            self.csv_filename_prefix,
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
+        )
+        return filename
+
+    def get_parsers(self):
+        """
+        增加csv解析器
+        """
+        _parsers = api_settings.DEFAULT_PARSER_CLASSES
+        _parsers.append(parsers.CSVParser)
+        self.parser_classes = _parsers
+        return super().get_parsers()
+
+    def get_renderers(self):
+        """
+        如果是导出和下载模板，使用CSV渲染器
+        """
+        if self.request.query_params.get('format', '') in ('csv', 'CSV'):
+            self.renderer_classes = (renderers.CSVStreamingRenderer,)
+        return super().get_renderers()
+
+    def get_renderer_context(self):
+        """
+        如果是导出和下载模板请求，构造csv表头
+        csv中英文表头
+        """
+        context = super().get_renderer_context()
+        fields = self.get_serializer_class()().get_fields()
+
+        header = [field for field in fields]
+        if self.request.query_params.get('spm'):
+            labels = dict([(k, v.label if v.label else k) for k, v in fields.items()])
+            context.update({'labels': labels})
+
+        context.update({'header': header})
+        return context
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        构造导出csv的文件名
+        """
+        if request._request.GET.get('format', '') == 'csv':
+            response['Content-Disposition'] = 'attachment; filename="%s"' \
+                                              % self.generate_filename()
+        return super().finalize_response(request, response, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        bulk = isinstance(request.data, list)
+
+        if not bulk:
+            return super().create(request, *args, **kwargs)
+        else:
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            try:
+                self.perform_bulk_create(serializer)
+            except Exception as e:
+                return Response(str(e), status=status.HTTP_409_CONFLICT)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
