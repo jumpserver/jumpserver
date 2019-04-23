@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
 
+from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -52,7 +53,39 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
+    def _deny_handle(self, instance):
+        """
+        check current user has permission to handle instance
+        (update, destroy, bulk_update, bulk destroy)
+        """
+        return not self.request.user.is_superuser and instance.is_superuser
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if self._deny_handle(instance):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if self._deny_handle(instance):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        return super().update(request, *args, **kwargs)
+
+    def _deny_bulk_handle(self, instances):
+        deny_instances = [i for i in instances if self._deny_handle(i)]
+        if len(deny_instances) > 0:
+            return True
+        else:
+            return False
+
     def allow_bulk_destroy(self, qs, filtered):
+        if self._deny_bulk_handle(filtered):
+            return False
         return qs.count() != filtered.count()
 
 
