@@ -4,7 +4,7 @@
 {% block modal_title%}{% trans "Import user" %}{% endblock %}
 {% block modal_body %}
 <p class="text-success">{% trans "Download template or use export csv format" %}</p>
-<form method="post" action="/api/users/v1/users/" id="fm_user_import" enctype="text/csv">
+<form method="post" action="{% url 'api-users:user-list' %}" id="fm_user_import" enctype="text/csv">
     {% csrf_token %}
     <div class="form-group">
         <label class="control-label" for="id_users">{% trans "Template" %}</label>
