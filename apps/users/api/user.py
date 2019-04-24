@@ -61,6 +61,9 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
         return not self.request.user.is_superuser and instance.is_superuser
 
     def destroy(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin destroy superuser
+        """
         instance = self.get_object()
         if self._deny_permission(instance):
             data = {'msg': _("You do not have permission.")}
@@ -69,6 +72,9 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin update superuser
+        """
         instance = self.get_object()
         if self._deny_permission(instance):
             data = {'msg': _("You do not have permission.")}
@@ -87,6 +93,31 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
         if self._bulk_deny_permission(filtered):
             return False
         return qs.count() != filtered.count()
+
+    def bulk_update(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin update superuser
+        """
+        partial = kwargs.pop('partial', False)
+
+        # restrict the update to the filtered queryset
+        queryset = self.filter_queryset(self.get_queryset())
+        if self._bulk_deny_permission(queryset):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(
+            queryset, data=request.data, many=True, partial=partial,
+        )
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            data = {'error': str(e)}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_bulk_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
