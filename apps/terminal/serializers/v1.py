@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
 from ..models import Terminal, Status, Session, Task
 
 
@@ -29,7 +29,7 @@ class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
 
 
@@ -44,7 +44,7 @@ class TaskSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Task
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
 
 
 class ReplaySerializer(serializers.Serializer):

@@ -3,24 +3,20 @@
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
-from rest_framework_bulk import BulkListSerializer
 
 from common.utils import get_signer, validate_ssh_public_key
-from common.mixins import BulkSerializerMixin, BulkListSerializerMixin
+from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
 from ..models import User, UserGroup
 
 signer = get_signer()
-
-
-class UserBulkListSerializer(BulkListSerializerMixin, BulkListSerializer):
-    pass
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
-        list_serializer_class = UserBulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'username', 'email', 'groups', 'groups_display',
             'role', 'role_display', 'avatar_url', 'wechat', 'phone',
@@ -56,7 +52,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = UserGroup
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
         read_only_fields = ['created_by']
 

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from common.serializers import AdaptedBulkListSerializer
+
 from ..models import SystemUser, Asset
 from .base import AuthSerializer
 
@@ -17,6 +19,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         exclude = ('_password', '_private_key', '_public_key')
+        list_serializer_class = AdaptedBulkListSerializer
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
