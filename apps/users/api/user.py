@@ -53,7 +53,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
-    def _deny_handle(self, instance):
+    def _deny_permission(self, instance):
         """
         check current user has permission to handle instance
         (update, destroy, bulk_update, bulk destroy)
@@ -62,7 +62,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if self._deny_handle(instance):
+        if self._deny_permission(instance):
             data = {'msg': _("You do not have permission.")}
             return Response(data=data, status=status.HTTP_403_FORBIDDEN)
 
@@ -70,21 +70,21 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        if self._deny_handle(instance):
+        if self._deny_permission(instance):
             data = {'msg': _("You do not have permission.")}
             return Response(data=data, status=status.HTTP_403_FORBIDDEN)
 
         return super().update(request, *args, **kwargs)
 
-    def _deny_bulk_handle(self, instances):
-        deny_instances = [i for i in instances if self._deny_handle(i)]
+    def _bulk_deny_permission(self, instances):
+        deny_instances = [i for i in instances if self._deny_permission(i)]
         if len(deny_instances) > 0:
             return True
         else:
             return False
 
     def allow_bulk_destroy(self, qs, filtered):
-        if self._deny_bulk_handle(filtered):
+        if self._bulk_deny_permission(filtered):
             return False
         return qs.count() != filtered.count()
 
