@@ -25,6 +25,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired',
         ]
+        csv_fields = ['name', 'username', 'email']
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

@@ -122,10 +122,11 @@ $(document).ready(function(){
             users.push(obj.id)
         });
         $.ajax({
-            url: "{% url 'users:user-export' %}",
+            url: "{% url 'api-users:user-export-cache' %}",
             method: 'POST',
             data: JSON.stringify({users_id: users}),
             dataType: "json",
+            contentType :"application/json",
             success: function (data, textStatus) {
                 window.open(data.redirect)
             },
@@ -137,22 +138,32 @@ $(document).ready(function(){
 
     $('#btn_user_import').click(function() {
         var $form = $('#fm_user_import');
+        var action = $form.attr("action");
+        var file = document.getElementById('id_users').files[0];
         $form.find('.help-block').remove();
-        function success (data) {
-            if (data.valid === false) {
-                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
-            } else {
-                $('#id_created').html(data.created_info);
-                $('#id_created_detail').html(data.created.join(', '));
-                $('#id_updated').html(data.updated_info);
-                $('#id_updated_detail').html(data.updated.join(', '));
-                $('#id_failed').html(data.failed_info);
-                $('#id_failed_detail').html(data.failed.join(', '));
+        $.ajax({
+            url: action,
+            type: "POST",
+            processData: false,
+            contentType: 'text/csv',
+            data: file,
+            success: function(data){
+                console.log(data);
+                $('#id_failed').html('');
+                $('#id_failed_detail').html('');
                 var $data_table = $('#user_list_table').DataTable();
-                $data_table.ajax.reload();
-            }
-        }
-        $form.ajaxSubmit({success: success});
+                $('#id_created').html('{% trans 'Import Success:' %}'+ data.length);
+                $data_table.ajax.reload()
+
+                },
+            error: function(error){
+                console.log(error);
+                $('#id_created').html('');
+                $('#id_failed').html('{% trans '导入失败 ' %}');
+                $('#id_failed_detail').html(error.responseText);
+                }
+         });
+
     })
 
 }).on('click', '#btn_bulk_update', function(){

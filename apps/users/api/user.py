@@ -2,10 +2,14 @@
 import uuid
 
 from django.core.cache import cache
+from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
@@ -28,6 +32,7 @@ __all__ = [
     'UserViewSet', 'UserChangePasswordApi', 'UserUpdateGroupApi',
     'UserResetPasswordApi', 'UserResetPKApi', 'UserUpdatePKApi',
     'UserUnblockPKApi', 'UserProfileApi', 'UserResetOTPApi',
+    'UserExportCacheApi'
 ]
 
 
@@ -150,3 +155,13 @@ class UserResetOTPApi(generics.RetrieveAPIView):
             user.save()
             logout(request)
         return Response({"msg": "success"})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserExportCacheApi(APIView):
+    def post(self, request, *args, **kwargs):
+        users_id = request.data.get('users_id', [])
+        spm = uuid.uuid4().hex
+        cache.set(spm, users_id, 300)
+        url = reverse_lazy('api-users:user-list') + '?spm=%s&format=csv' % spm
+        return Response({'redirect': url})

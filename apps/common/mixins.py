@@ -3,6 +3,7 @@
 from django.db import models
 from django.http import JsonResponse
 from django.utils import timezone
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -58,6 +59,12 @@ class IDInFilterMixin(object):
                 return queryset
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)
+        if self.request.query_params.get('format') == 'csv':
+            spm = self.request.query_params.get('spm')
+            id_list = cache.get(spm, [])
+            if not id_list:
+                return []
+            queryset = queryset.filter(id__in=id_list)
         return queryset
 
 
