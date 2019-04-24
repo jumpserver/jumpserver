@@ -13,8 +13,15 @@ class JMSCSVRender(CSVStreamingRenderer):
         if not serializer:
             return super().render(data, media_type=media_type,
                                   renderer_context=renderer_context)
+        request = renderer_context.get("request")
+        if not request:
+            return super().render(data, media_type=media_type,
+                                  renderer_context=renderer_context)
+        csv_fields = [field for field, v in serializer.get_fields().items()]
+        if request.query_params.get('format') == 'csv' and (not request.query_params.get('spm')):
+            csv_fields = getattr(serializer.Meta, "csv_fields", None)
+
         labels = {}
-        csv_fields = getattr(serializer.Meta, "csv_fields", None)
         header = []
         for name, field in serializer.get_fields().items():
             if field.write_only:
