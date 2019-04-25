@@ -28,6 +28,7 @@ $(document).ready(function() {
         buttons: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
                 var detail_btn = '<a href="{% url "users:user-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
@@ -36,6 +37,7 @@ $(document).ready(function() {
                 $(td).html(html);
              }},
             {targets: 3, createdCell: function (td, cellData) {
+                cellData = htmlEscape(cellData);
                 var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},

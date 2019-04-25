@@ -30,6 +30,7 @@ function initTable() {
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
 {#                var detail_btn = '<a href="{% url "assets:label-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';#}
+                cellData = htmlEscape(cellData);
                 var detail_btn = '<a>' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
