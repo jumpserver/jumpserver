@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from rest_framework_bulk.serializers import BulkListSerializer
+
+from common.serializers import AdaptedBulkListSerializer
 
 from ..models import Label
 
@@ -12,7 +13,7 @@ class LabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
         fields = '__all__'
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):

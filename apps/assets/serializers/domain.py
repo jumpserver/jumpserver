@@ -2,6 +2,8 @@
 #
 from rest_framework import serializers
 
+from common.serializers import AdaptedBulkListSerializer
+
 from ..models import Domain, Gateway
 
 
@@ -12,6 +14,7 @@ class DomainSerializer(serializers.ModelSerializer):
     class Meta:
         model = Domain
         fields = '__all__'
+        list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
     def get_asset_count(obj):
@@ -25,6 +28,7 @@ class DomainSerializer(serializers.ModelSerializer):
 class GatewaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gateway
+        list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'ip', 'port', 'protocol', 'username',
             'domain', 'is_active', 'date_created', 'date_updated',
