@@ -3,9 +3,15 @@
 import os
 import uuid
 
-from rest_framework.views import Response
-from rest_framework import generics, serializers
 from django.core.cache import cache
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import generics, serializers
+
+from users.models import User
+from assets.models import Node
+from .utils import get_object_or_none
 
 
 class OutputSerializer(serializers.Serializer):
@@ -68,3 +74,24 @@ class LogTailApi(generics.RetrieveAPIView):
 
         data, end, new_mark = self.read_from_file()
         return Response({"data": data, 'end': end, 'mark': new_mark})
+
+
+class ResourcesIdCacheApi(APIView):
+    def post(self, request, *args, **kwargs):
+        objs_id = request.data.get('objs_id', [])
+        spm = uuid.uuid4().hex
+        if objs_id:
+            cache.set(spm, objs_id, 300)
+            return Response({'spm': spm})
+        if self.request.query_params.get('resourse') == 'users':
+            users = User.objects.all()
+            if users:
+                objs_id = [user.id for user in users]
+        if self.request.query_params.get('resource') == 'assets':
+            node_id = request.data.get('node_id', [])
+            node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
+            assets = node.get_all_assets()
+            if assets:
+                objs_id = [asset.id for asset in assets]
+        cache.set(spm, objs_id, 300)
+        return Response({'spm': spm})

@@ -17,15 +17,17 @@ class JMSCSVRender(CSVStreamingRenderer):
         if not request:
             return super().render(data, media_type=media_type,
                                   renderer_context=renderer_context)
-        csv_fields = [field for field, v in serializer.get_fields().items()]
-        if request.query_params.get('format') == 'csv' and (not request.query_params.get('spm')):
-            csv_fields = getattr(serializer.Meta, "csv_fields", None)
-
         labels = {}
         header = []
+        csv_fields = getattr(serializer.Meta, "csv_fields", None)
+
         for name, field in serializer.get_fields().items():
-            if field.write_only:
-                continue
+            if request.query_params.get('action') == 'import':
+                if field.read_only:
+                    continue
+            else:
+                if field.write_only:
+                    continue
             if csv_fields and name not in csv_fields:
                 continue
             header.append(name)

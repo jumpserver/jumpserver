@@ -113,22 +113,23 @@ $(document).ready(function(){
         console.log(value)
     });
     $('.btn_export').click(function () {
-        var users = [];
+        var users_id = [];
         var rows = table.rows('.selected').data();
         if(rows.length===0){
             rows = table.rows().data();
         }
         $.each(rows, function (index, obj) {
-            users.push(obj.id)
+            users_id.push(obj.id)
         });
         $.ajax({
-            url: "{% url 'api-users:user-export-cache' %}",
+            url: "{% url 'api-common:resources-id-cache' %}",
             method: 'POST',
-            data: JSON.stringify({users_id: users}),
+            data: JSON.stringify({objs_id: users_id}),
             dataType: "json",
             contentType :"application/json",
             success: function (data, textStatus) {
-                window.open(data.redirect)
+                window.open('{% url 'api-users:user-list' %}' +'?format=csv&spm='+ data.spm)
+
             },
             error: function () {
                 toastr.error('Export failed');

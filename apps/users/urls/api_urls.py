@@ -32,7 +32,6 @@ urlpatterns = [
     path('users/<uuid:pk>/unblock/', api.UserUnblockPKApi.as_view(), name='user-unblock'),
     path('users/<uuid:pk>/groups/', api.UserUpdateGroupApi.as_view(), name='user-update-group'),
     path('groups/<uuid:pk>/users/', api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
-    path('user/export/cache/', api.UserExportCacheApi.as_view(), name='user-export-cache')
 ]
 urlpatterns += router.urls
 
