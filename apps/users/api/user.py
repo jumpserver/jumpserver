@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
 
+from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -52,8 +53,71 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
+    def _deny_permission(self, instance):
+        """
+        check current user has permission to handle instance
+        (update, destroy, bulk_update, bulk destroy)
+        """
+        return not self.request.user.is_superuser and instance.is_superuser
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin destroy superuser
+        """
+        instance = self.get_object()
+        if self._deny_permission(instance):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        return super().destroy(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin update superuser
+        """
+        instance = self.get_object()
+        if self._deny_permission(instance):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        return super().update(request, *args, **kwargs)
+
+    def _bulk_deny_permission(self, instances):
+        deny_instances = [i for i in instances if self._deny_permission(i)]
+        if len(deny_instances) > 0:
+            return True
+        else:
+            return False
+
     def allow_bulk_destroy(self, qs, filtered):
+        if self._bulk_deny_permission(filtered):
+            return False
         return qs.count() != filtered.count()
+
+    def bulk_update(self, request, *args, **kwargs):
+        """
+        rewrite because limit org_admin update superuser
+        """
+        partial = kwargs.pop('partial', False)
+
+        # restrict the update to the filtered queryset
+        queryset = self.filter_queryset(self.get_queryset())
+        if self._bulk_deny_permission(queryset):
+            data = {'msg': _("You do not have permission.")}
+            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(
+            queryset, data=request.data, many=True, partial=partial,
+        )
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            data = {'error': str(e)}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_bulk_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):

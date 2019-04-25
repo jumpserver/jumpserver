@@ -1,11 +1,11 @@
 
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from rest_framework_bulk import BulkListSerializer
 
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
+from common.serializers import AdaptedBulkListSerializer
 from .utils import set_current_org, get_current_org
 from .models import Organization
 from .mixins import OrgMembershipSerializerMixin
@@ -14,7 +14,7 @@ from .mixins import OrgMembershipSerializerMixin
 class OrgSerializer(ModelSerializer):
     class Meta:
         model = Organization
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
         read_only_fields = ['created_by', 'date_created']
 
@@ -70,12 +70,12 @@ class OrgReadSerializer(ModelSerializer):
 class OrgMembershipAdminSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
         model = Organization.admins.through
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
 
 
 class OrgMembershipUserSerializer(OrgMembershipSerializerMixin, ModelSerializer):
     class Meta:
         model = Organization.users.through
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
