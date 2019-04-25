@@ -91,7 +91,7 @@ $(document).ready(function(){
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
-                  {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment", render: $.fn.dataTable.render.text()}, {data: "id" }]
+                  {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment"}]
     };
     jumpserver.initServerSideDataTable(options)
 })
