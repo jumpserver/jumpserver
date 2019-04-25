@@ -12,6 +12,7 @@ from rest_framework import generics, serializers
 from users.models import User
 from assets.models import Node
 from .utils import get_object_or_none
+from .const import CACHE_KEY_RESOURCES_ID_PREFIX
 
 
 class OutputSerializer(serializers.Serializer):
@@ -80,8 +81,9 @@ class ResourcesIdCacheApi(APIView):
     def post(self, request, *args, **kwargs):
         objs_id = request.data.get('objs_id', [])
         spm = uuid.uuid4().hex
+        key = CACHE_KEY_RESOURCES_ID_PREFIX.format(spm)
         if objs_id:
-            cache.set(spm, objs_id, 300)
+            cache.set(key, objs_id, 300)
             return Response({'spm': spm})
         if self.request.query_params.get('resourse') == 'users':
             users = User.objects.all()
@@ -93,5 +95,5 @@ class ResourcesIdCacheApi(APIView):
             assets = node.get_all_assets()
             if assets:
                 objs_id = [asset.id for asset in assets]
-        cache.set(spm, objs_id, 300)
+        cache.set(key, objs_id, 300)
         return Response({'spm': spm})

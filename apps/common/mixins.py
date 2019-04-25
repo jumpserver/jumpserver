@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
+from .const import CACHE_KEY_RESOURCES_ID_PREFIX
+
 
 class NoDeleteQuerySet(models.query.QuerySet):
 
@@ -61,7 +63,8 @@ class IDInFilterMixin(object):
                 queryset = queryset.filter(id__in=ids)
         if self.request.query_params.get('format') == 'csv':
             spm = self.request.query_params.get('spm')
-            id_list = cache.get(spm, [])
+            key = CACHE_KEY_RESOURCES_ID_PREFIX.format(spm)
+            id_list = cache.get(key, [])
             if not id_list:
                 return []
             queryset = queryset.filter(id__in=id_list)
