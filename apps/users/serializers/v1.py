@@ -13,7 +13,9 @@ signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-
+    date_expired = serializers.DateTimeField(format="%Y-%m-%d", read_only=True,
+                                             required=False
+                                             )
     class Meta:
         model = User
         list_serializer_class = BulkListSerializer
@@ -29,7 +31,8 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
                       'phone', 'source', 'date_expired'
                       ]
         extra_kwargs = {
-            'id': {'read_only': True}
+            'id': {'read_only': True},
+            'date_expired': {'read_only': True}
         }
 
 

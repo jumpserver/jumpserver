@@ -11,60 +11,43 @@ class JMSCSVParser(CSVParser):
     serializer = None
 
     def parse(self, stream, media_type=None, parser_context=None):
-        if parser_context is None:
-            parser_context = {}
-        view = parser_context.get("view")
-        if not view:
-            return super().parse(stream, media_type=None,
-                                 parser_context=parser_context)
-        serializer = view.get_serializer()
-        if not serializer:
-            return super().parse(stream, media_type=None,
-                                 parser_context=parser_context)
-        self.serializer = serializer
-
+        parser_context = parser_context or {}
+        self.serializer = parser_context['view'].get_serializer()
         delimiter = parser_context.get('delimiter', ',')
         encoding = parser_context.get('encoding', settings.DEFAULT_CHARSET)
+
         try:
             strdata = stream.read()
             binary = universal_newlines(strdata)
             rows = unicode_csv_reader(binary, delimiter=delimiter, charset=encoding)
             data = OrderedRows(next(rows))
+            header = self.trans_header_to_field_name(data.header)
             for row in rows:
-                row_data = dict(zip(data.header, row))
+                row_data = dict(zip(header, row))
                 row_data = self.row_data_pop_empty(row_data)
                 data.append(row_data)
             if not data:
                 msg = 'Please fill in the valid data to csv before import'
                 raise NotFound(msg)
-            trans_data = self.trans_data(data)
-            return trans_data
+            return data
         except Exception as exc:
             raise ParseError('CSV parse error - %s' % str(exc))
 
-    def trans_data(self, data):
-        new_data = []
-        for entry in data:
-            entry = self.filter_valid_data(entry)
-            new_data.append(entry)
-        return new_data
+    def trans_header_to_field_name(self, header):
+        fields = self.serializer.get_fields()
+        csv_fields = getattr(self.serializer.Meta, "csv_fields", None)
+        field_name_list = []
 
-    def trans_entry(self, entry):
-        new_entry = {}
-        for k, v in entry.items():
-            entry = {name: v for name, field in
-                     self.serializer.get_fields().items() if k == field.label}
-            new_entry.update(entry)
-        return new_entry
-
-    def filter_valid_data(self, entry):
-        entry = self.trans_entry(entry)
-        if entry:
-            entry = {k: v for k, v in entry.items() if k in
-                     getattr(self.serializer.Meta, "csv_fields", None)}
-        if not entry:
-            raise NotFound('Please upload the right template of CSV file！')
-        return entry
+        for ele in header:
+            field_name = [name for name, field in fields.items()
+                          if ele == field.label]
+            if not field_name and ele not in csv_fields:
+                raise ParseError('[%s]是无效字段，请上传有效的csv文件' % ele)
+            if field_name:
+                field_name_list.append(field_name[0])
+            else:
+                field_name_list.append(ele)
+        return field_name_list
 
     def row_data_pop_empty(self, row_data):
         data = {k: v for k, v in row_data.items() if v}
