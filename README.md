@@ -182,6 +182,8 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
 
 - 也可以查看我们完整文档 [文档](http://docs.jumpserver.org)
 
+- 第三方提供的[docker-compose的便捷部署脚本](https://github.com/marksugar/jumpserver-deploy),version:1.4.9
+
 ### Demo、视频 和 截图
 ----
 
