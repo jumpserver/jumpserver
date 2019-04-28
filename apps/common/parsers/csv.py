@@ -16,7 +16,6 @@ class JMSCSVParser(BaseParser):
     """
 
     media_type = 'text/csv'
-    serializer = None
 
     @staticmethod
     def _get_fields_map(serializer):
