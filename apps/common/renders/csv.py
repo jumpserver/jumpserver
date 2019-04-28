@@ -13,11 +13,6 @@ class JMSCSVRender(BaseRenderer):
     format = 'csv'
 
     @staticmethod
-    def _get_labels(fields):
-        labels = {k: v.label for k, v in fields.items() if v.label}
-        return labels
-
-    @staticmethod
     def _get_header(fields, action):
         if action == 'import':
             header = [k for k, v in fields.items() if not v.read_only]
@@ -44,8 +39,8 @@ class JMSCSVRender(BaseRenderer):
         fields = serializer.get_fields()
         action = renderer_context['request'].query_params.get('action', 'export')
 
+        labels = {k: v.label for k, v in fields.items() if v.label}
         header = self._get_header(fields, action)
-        labels = self._get_labels(fields)
         table = self._gen_table(data, header, labels)
 
         csv_buffer = BytesIO()
