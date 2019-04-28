@@ -1,71 +1,75 @@
-from django.conf import settings
+# ~*~ coding: utf-8 ~*~
+#
 
-from rest_framework.exceptions import ParseError, NotFound
-from rest_framework_csv.orderedrows import OrderedRows
-from rest_framework_csv.parsers import (
-    CSVParser, unicode_csv_reader, universal_newlines
-)
+import unicodecsv
+
+from rest_framework.parsers import BaseParser
+
+from ..utils import get_logger
+
+logger = get_logger(__file__)
 
 
-class JMSCSVParser(CSVParser):
-    serializer = None
+def universal_newlines(stream):
+    """
+    保证在通用换行模式下打开文件
+    """
+    for line in stream.splitlines():
+        yield line
+
+
+def generate_rows(csv_data, charset='utf-8', **kwargs):
+    csv_reader = unicodecsv.reader(csv_data, encoding=charset, **kwargs)
+    for row in csv_reader:
+        # 空行
+        if not any(row):
+            continue
+        yield row
+
+
+class JMSCSVParser(BaseParser):
+    """
+    Parses CSV file to serializer data
+    """
+
+    media_type = 'text/csv'
+    view = None
+
+    @staticmethod
+    def _get_data(header, rows):
+        data = []
+        for row in rows:
+            row_data = dict(zip(header, row))
+            row_data = {
+                k: v for k, v in row_data.items() if k.strip() and v.strip()
+            }
+            data.append(row_data)
+        return data
+
+    def _get_header_fields_map(self):
+        fields_map = {}
+        serializer = self.view.get_serializer_class()()
+        fields = serializer.get_fields()
+        fields_map.update({v.label: k for k, v in fields.items()})
+        fields_map.update({k: k for k, _ in fields.items()})
+        return fields_map
+
+    def _convert_header(self, header):
+        fields_map = self._get_header_fields_map()
+        _header = [fields_map.get(name, '') for name in header]
+        return _header
 
     def parse(self, stream, media_type=None, parser_context=None):
-        if parser_context is None:
-            parser_context = {}
-        view = parser_context.get("view")
-        if not view:
-            return super().parse(stream, media_type=None,
-                                 parser_context=parser_context)
-        serializer = view.get_serializer()
-        if not serializer:
-            return super().parse(stream, media_type=None,
-                                 parser_context=parser_context)
-        self.serializer = serializer
-
-        delimiter = parser_context.get('delimiter', ',')
-        encoding = parser_context.get('encoding', settings.DEFAULT_CHARSET)
+        parser_context = parser_context or {}
+        encoding = parser_context.get('encoding', 'utf-8')
+        self.view = parser_context.get("view")
         try:
-            strdata = stream.read()
-            binary = universal_newlines(strdata)
-            rows = unicode_csv_reader(binary, delimiter=delimiter, charset=encoding)
-            data = OrderedRows(next(rows))
-            for row in rows:
-                row_data = dict(zip(data.header, row))
-                row_data = self.row_data_pop_empty(row_data)
-                data.append(row_data)
-            if not data:
-                msg = 'Please fill in the valid data to csv before import'
-                raise NotFound(msg)
-            trans_data = self.trans_data(data)
-            return trans_data
-        except Exception as exc:
-            raise ParseError('CSV parse error - %s' % str(exc))
-
-    def trans_data(self, data):
-        new_data = []
-        for entry in data:
-            entry = self.filter_valid_data(entry)
-            new_data.append(entry)
-        return new_data
-
-    def trans_entry(self, entry):
-        new_entry = {}
-        for k, v in entry.items():
-            entry = {name: v for name, field in
-                     self.serializer.get_fields().items() if k == field.label}
-            new_entry.update(entry)
-        return new_entry
-
-    def filter_valid_data(self, entry):
-        entry = self.trans_entry(entry)
-        if entry:
-            entry = {k: v for k, v in entry.items() if k in
-                     getattr(self.serializer.Meta, "csv_fields", None)}
-        if not entry:
-            raise NotFound('Please upload the right template of CSV file！')
-        return entry
-
-    def row_data_pop_empty(self, row_data):
-        data = {k: v for k, v in row_data.items() if v}
-        return data
+            stream_data = stream.read()
+            binary = universal_newlines(stream_data)
+            rows = generate_rows(binary, charset=encoding)
+            header = next(rows)
+            header = self._convert_header(header)
+            data = self._get_data(header, rows)
+            return data
+        except Exception as e:
+            logger.debug(e, exc_info=True)

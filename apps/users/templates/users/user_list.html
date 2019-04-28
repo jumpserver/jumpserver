@@ -139,11 +139,11 @@ $(document).ready(function(){
 
     $('#btn_user_import').click(function() {
         var $form = $('#fm_user_import');
-        var action = $form.attr("action");
+        var url = $form.attr("action");
         var file = document.getElementById('id_users').files[0];
         $form.find('.help-block').remove();
         $.ajax({
-            url: action,
+            url: url,
             type: "POST",
             processData: false,
             contentType: 'text/csv',
