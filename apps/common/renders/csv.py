@@ -15,10 +15,9 @@ class JMSCSVRender(BaseRenderer):
     @staticmethod
     def _get_header(fields, action):
         if action == 'import':
-            header = [k for k, v in fields.items() if not v.read_only]
+            header = [k for k, v in fields.items() if not v.read_only and k != 'id']
         elif action == 'update':
             header = [k for k, v in fields.items() if not v.read_only]
-            header.insert(0, 'id')
         else:
             header = [k for k, v in fields.items() if not v.write_only]
         return header
