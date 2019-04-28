@@ -10,23 +10,6 @@ from ..utils import get_logger
 logger = get_logger(__file__)
 
 
-def universal_newlines(stream):
-    """
-    保证在`通用换行模式`下打开文件
-    """
-    for line in stream.splitlines():
-        yield line
-
-
-def generate_rows(csv_data, charset='utf-8', **kwargs):
-    csv_reader = unicodecsv.reader(csv_data, encoding=charset, **kwargs)
-    for row in csv_reader:
-        # 空行
-        if not any(row):
-            continue
-        yield row
-
-
 class JMSCSVParser(BaseParser):
     """
     Parses CSV file to serializer data
