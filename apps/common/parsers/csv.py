@@ -44,19 +44,32 @@ class JMSCSVParser(BaseParser):
         return fields_map
 
     @staticmethod
-    def _process_row_data(row):
+    def _process_row(row):
         """
-        处理数据格式
+        构建json数据前的行处理
         """
         _row = []
         for col in row:
             # 列表转换
             if isinstance(col, str) and col.find("[") != -1 and col.find("]") != -1:
                 # 替换中文格式引号
-                col = col.replace("“", '"').replace("'", '"').replace("”", '"')
+                col = col.replace("“", '"').replace("”", '"').\
+                    replace("‘", '"').replace('’', '"').replace("'", '"')
                 col = json.loads(col)
             _row.append(col)
         return _row
+
+    @staticmethod
+    def _process_row_data(row_data):
+        """
+        构建json数据后的行数据处理
+        """
+        _row_data = {}
+        for k, v in row_data.items():
+            if isinstance(v, list) \
+                    or isinstance(v, str) and k.strip() and v.strip():
+                _row_data[k] = v
+        return _row_data
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
@@ -78,12 +91,9 @@ class JMSCSVParser(BaseParser):
 
             data = []
             for row in rows:
-                row = self._process_row_data(row)
+                row = self._process_row(row)
                 row_data = dict(zip(header, row))
-                row_data = {
-                    k: v for k, v in row_data.items()
-                    if isinstance(v, str) and k.strip() and v.strip()
-                }
+                row_data = self._process_row_data(row_data)
                 data.append(row_data)
             return data
         except Exception as e:
