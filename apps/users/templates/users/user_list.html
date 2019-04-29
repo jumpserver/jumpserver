@@ -138,10 +138,12 @@ $(document).ready(function(){
     $('#btn_user_import').click(function() {
         var $form = $('#fm_user_import');
         $form.find('.help-block').remove();
-
-        {#var url = $form.attr("action");#}
         var url = "{% url 'api-users:user-list' %}";
         var file = document.getElementById('id_users').files[0];
+        if(file === undefined){
+            toastr.error("{% trans "Please upload CSV file!" %}");
+            return
+        }
         var data_table = $('#user_list_table').DataTable();
         APIImportData({
             url: url,
