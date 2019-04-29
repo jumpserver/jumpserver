@@ -975,7 +975,10 @@ function APIImportData(props){
         data: props.body,
         contentType: props.content_type || 'text/csv',
         success: function (data) {
-            $('#id_created').html("Import Success: " + data.length);
+            $('#id_failed').html('');
+            $('#id_failed_detail').html('');
+            $('#id_created').html("Import Success");
+            $('#id_created_detail').html("Count" + ": " + data.length);
             props.data_table.ajax.reload()
         },
         error: function (error) {
@@ -987,7 +990,7 @@ function APIImportData(props){
                 $.each(data, function(index, item){
                     err = '';
                     for (var prop in item){
-                        err += prop + ": " + item[prop][0]
+                        err += prop + ": " + item[prop][0] + " "
                     }
                     if(err){
                         li = "<li>Line " + (++index) + ". " + err + "</li>";
@@ -999,6 +1002,8 @@ function APIImportData(props){
             else{
                 html = error.responseText
             }
+            $('#id_created').html('');
+            $('#id_created_detail').html('');
             $('#id_failed').html("Import failed");
             $('#id_failed_detail').html(html);
         }
