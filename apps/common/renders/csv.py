@@ -6,6 +6,10 @@ import unicodecsv
 from six import BytesIO
 from rest_framework.renderers import BaseRenderer
 
+from ..utils import get_logger
+
+logger = get_logger(__file__)
+
 
 class JMSCSVRender(BaseRenderer):
 
@@ -34,17 +38,26 @@ class JMSCSVRender(BaseRenderer):
     def render(self, data, media_type=None, renderer_context=None):
         renderer_context = renderer_context or {}
         encoding = renderer_context.get('encoding', 'utf-8')
-        serializer = renderer_context['view'].get_serializer_class()()
-        fields = serializer.get_fields()
-        action = renderer_context['request'].query_params.get('action', 'export')
+        request = renderer_context['request']
+        action = request.query_params.get('action', 'export')
+        view = renderer_context['view']
 
-        labels = {k: v.label for k, v in fields.items() if v.label}
-        header = self._get_header(fields, action)
-        table = self._gen_table(data, header, labels)
+        try:
+            serializer = view.get_serializerd()
+        except Exception as e:
+            logger.debug(e, exc_info=True)
+            value = 'The resource not support export!'.encode('utf-8')
+        else:
+            fields = serializer.get_fields()
+            header = self._get_header(fields, action)
+            labels = {k: v.label for k, v in fields.items() if v.label}
+            table = self._gen_table(data, header, labels)
 
-        csv_buffer = BytesIO()
-        csv_writer = unicodecsv.writer(csv_buffer, encoding=encoding)
-        for row in table:
-            csv_writer.writerow(row)
+            csv_buffer = BytesIO()
+            csv_writer = unicodecsv.writer(csv_buffer, encoding=encoding)
+            for row in table:
+                csv_writer.writerow(row)
 
-        return csv_buffer.getvalue()
+            value = csv_buffer.getvalue()
+
+        return value
