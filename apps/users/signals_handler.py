@@ -23,16 +23,8 @@ logger = get_logger(__file__)
 
 @receiver(post_user_create)
 def on_user_create(sender, user=None, **kwargs):
+    logger.debug("Receive user `{}` create signal".format(user.name))
     from .utils import send_user_created_mail
-    if isinstance(user, list):
-        for obj in user:
-            logger.debug("Receive user `{}` create signal".format(obj.name))
-            logger.info("   - Sending welcome mail ...".format(obj.name))
-            if obj.email:
-                send_user_created_mail(obj)
-    else:
-        logger.debug("Receive user `{}` create signal".format(user.name))
-        logger.info("   - Sending welcome mail ...".format(user.name))
-        if user.email:
-            send_user_created_mail(user)
-
+    logger.info("   - Sending welcome mail ...".format(user.name))
+    if user.email:
+        send_user_created_mail(user)

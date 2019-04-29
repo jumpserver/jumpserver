@@ -4,6 +4,7 @@
 import unicodecsv
 
 from rest_framework.parsers import BaseParser
+from rest_framework.exceptions import ParseError
 
 from ..utils import get_logger
 
@@ -31,7 +32,6 @@ class JMSCSVParser(BaseParser):
         for row in csv_reader:
             if not any(row):  # 空行
                 continue
-
             yield row
 
     @staticmethod
@@ -45,7 +45,12 @@ class JMSCSVParser(BaseParser):
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
         encoding = parser_context.get('encoding', 'utf-8')
-        serializer = parser_context["view"].get_serializer_class()()
+
+        try:
+            serializer = parser_context["view"].get_serializer()
+        except Exception as e:
+            logger.debug(e, exc_info=True)
+            raise ParseError('The resource does not support imports!')
 
         try:
             stream_data = stream.read()
@@ -65,3 +70,4 @@ class JMSCSVParser(BaseParser):
 
         except Exception as e:
             logger.debug(e, exc_info=True)
+            raise ParseError('CSV parse error!')

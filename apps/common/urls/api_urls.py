@@ -8,5 +8,6 @@ from .. import api
 app_name = 'common'
 
 urlpatterns = [
-    path('resources-id/cache/', api.ResourcesIdCacheApi.as_view(), name='resources-id-cache'),
-    ]
+    path('resources/cache/',
+         api.ResourcesIDCacheApi.as_view(), name='resources-cache'),
+]
