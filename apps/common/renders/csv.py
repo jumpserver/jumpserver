@@ -5,6 +5,7 @@ import unicodecsv
 
 from six import BytesIO
 from rest_framework.renderers import BaseRenderer
+from rest_framework.utils import encoders, json
 
 from ..utils import get_logger
 
@@ -36,6 +37,8 @@ class JMSCSVRender(BaseRenderer):
             yield row
 
     def render(self, data, media_type=None, renderer_context=None):
+        # 处理多对多字段的显示
+        data = json.loads(json.dumps(data, cls=encoders.JSONEncoder))
         renderer_context = renderer_context or {}
         encoding = renderer_context.get('encoding', 'utf-8')
         request = renderer_context['request']

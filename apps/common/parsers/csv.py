@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 
+import json
 import unicodecsv
 
 from rest_framework.parsers import BaseParser
@@ -19,12 +20,12 @@ class JMSCSVParser(BaseParser):
     media_type = 'text/csv'
 
     @staticmethod
-    def _get_fields_map(serializer):
-        fields_map = {}
-        fields = serializer.get_fields()
-        fields_map.update({v.label: k for k, v in fields.items()})
-        fields_map.update({k: k for k, _ in fields.items()})
-        return fields_map
+    def _universal_newlines(stream):
+        """
+        保证在`通用换行模式`下打开文件
+        """
+        for line in stream.splitlines():
+            yield line
 
     @staticmethod
     def _gen_rows(csv_data, charset='utf-8', **kwargs):
@@ -35,17 +36,31 @@ class JMSCSVParser(BaseParser):
             yield row
 
     @staticmethod
-    def _universal_newlines(stream):
+    def _get_fields_map(serializer):
+        fields_map = {}
+        fields = serializer.get_fields()
+        fields_map.update({v.label: k for k, v in fields.items()})
+        fields_map.update({k: k for k, _ in fields.items()})
+        return fields_map
+
+    @staticmethod
+    def _process_row_data(row):
         """
-        保证在`通用换行模式`下打开文件
+        处理数据格式
         """
-        for line in stream.splitlines():
-            yield line
+        _row = []
+        for col in row:
+            # 列表转换
+            if isinstance(col, str) and col.find("[") != -1 and col.find("]") != -1:
+                # 替换中文格式引号
+                col = col.replace("“", '"').replace("'", '"').replace("”", '"')
+                col = json.loads(col)
+            _row.append(col)
+        return _row
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
         encoding = parser_context.get('encoding', 'utf-8')
-
         try:
             serializer = parser_context["view"].get_serializer()
         except Exception as e:
@@ -63,11 +78,14 @@ class JMSCSVParser(BaseParser):
 
             data = []
             for row in rows:
+                row = self._process_row_data(row)
                 row_data = dict(zip(header, row))
-                row_data = {k: v for k, v in row_data.items() if k.strip() and v.strip()}
+                row_data = {
+                    k: v for k, v in row_data.items()
+                    if isinstance(v, str) and k.strip() and v.strip()
+                }
                 data.append(row_data)
             return data
-
         except Exception as e:
             logger.debug(e, exc_info=True)
             raise ParseError('CSV parse error!')
