@@ -39,9 +39,15 @@ class UserViewSet(IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
 
+    def send_created_signal(self, users):
+        if not isinstance(users, list):
+            users = [users]
+        for user in users:
+            post_user_create.send(self.__class__, user=user)
+
     def perform_create(self, serializer):
-        user = serializer.save()
-        post_user_create.send(self.__class__, user=user)
+        users = serializer.save()
+        self.send_created_signal(users)
 
     def get_queryset(self):
         queryset = current_org.get_org_users()
