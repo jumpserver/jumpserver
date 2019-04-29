@@ -946,3 +946,44 @@ function rootNodeAddDom(ztree, callback) {
         callback()
     })
 }
+
+function APIResourceCache(props) {
+    props = props || {};
+    var success_url = props.success_url;
+    $.ajax({
+        url: props.url,
+        type: props.method || "POST",
+        data: props.body,
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json",
+        success: function (data) {
+                window.open(success_url+data.spm)
+            },
+        error: function () {
+                toastr.error('Export failed');
+            }
+    })
+}
+
+function APIImportData(props){
+    props = props || {};
+    var data_table = props.data_table;
+    $.ajax({
+        url: props.url,
+        type: props.method || "POST",
+        processData: false,
+        data: props.body,
+        contentType: 'text/csv',
+        success: function (data) {
+                $('#id_failed').html('');
+                $('#id_failed_detail').html('');
+                $('#id_created').html('{% trans "Import Success:" %}'+ data.length);
+                data_table.ajax.reload()
+            },
+        error: function (error) {
+                $('#id_created').html('');
+                $('#id_failed').html('{% trans "导入失败" %}');
+                $('#id_failed_detail').html(error.responseText);
+            }
+    })
+}
