@@ -117,15 +117,14 @@ $(document).ready(function(){
         var users = [];
         var rows = table.rows('.selected').data();
         if(rows.length>0){
-            rows = table.rows().data();
-        }
-        $.each(rows, function (index, obj) {
+            $.each(rows, function (index, obj) {
             users.push(obj.id)
         });
+        }
         APIResourceCache({
             url:"{% url 'api-common:resources-cache' %}",
             method:"POST",
-            body:JSON.stringify({'resources_id': users}),
+            body:JSON.stringify({'resources': users}),
             success_url:"{% url 'api-users:user-list' %}?format=csv&spm="
         });
     });

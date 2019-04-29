@@ -8,7 +8,7 @@
     {% csrf_token %}
     <div class="form-group">
         <label class="control-label" for="id_users">{% trans "Template" %}</label>
-        <a href="{% url 'api-users:user-list' %}?spm=&format=csv&action=import" style="display: block">{% trans 'Download' %}</a>
+        <a href="{% url 'api-users:user-list' %}?format=csv&action=import" style="display: block">{% trans 'Download' %}</a>
     </div>
     <div class="form-group">
         <label class="control-label" for="id_users">{% trans "Users csv file" %}</label>
