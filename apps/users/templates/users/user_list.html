@@ -137,15 +137,17 @@ $(document).ready(function(){
 
     $('#btn_user_import').click(function() {
         var $form = $('#fm_user_import');
-        var url = $form.attr("action");
+        $form.find('.help-block').remove();
+
+        {#var url = $form.attr("action");#}
+        var url = "{% url 'api-users:user-list' %}";
         var file = document.getElementById('id_users').files[0];
         var data_table = $('#user_list_table').DataTable();
-        $form.find('.help-block').remove();
         APIImportData({
-            url:url,
-            method:"POST",
-            body:file,
-            data_table:data_table
+            url: url,
+            method: "POST",
+            body: file,
+            data_table: data_table
         });
     })
 

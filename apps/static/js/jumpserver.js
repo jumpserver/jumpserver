@@ -968,23 +968,39 @@ function APIExportData(props) {
 
 function APIImportData(props){
     props = props || {};
-    var data_table = props.data_table;
     $.ajax({
         url: props.url,
         type: props.method || "POST",
         processData: false,
         data: props.body,
-        contentType: 'text/csv',
+        contentType: props.content_type || 'text/csv',
         success: function (data) {
-                $('#id_failed').html('');
-                $('#id_failed_detail').html('');
-                $('#id_created').html('{% trans "Import Success:" %}'+ data.length);
-                data_table.ajax.reload()
-            },
+            $('#id_created').html("Import Success: " + data.length);
+            props.data_table.ajax.reload()
+        },
         error: function (error) {
-                $('#id_created').html('');
-                $('#id_failed').html('{% trans "导入失败" %}');
-                $('#id_failed_detail').html(error.responseText);
+            var data = error.responseJSON;
+            if (data instanceof Array){
+                var html = '';
+                var li = '';
+                var err = '';
+                $.each(data, function(index, item){
+                    err = '';
+                    for (var prop in item){
+                        err += prop + ": " + item[prop][0]
+                    }
+                    if(err){
+                        li = "<li>Line " + (++index) + ". " + err + "</li>";
+                        html += li
+                    }
+                });
+                html = "<ul>" + html + "</ul>"
             }
+            else{
+                html = error.responseText
+            }
+            $('#id_failed').html("Import failed");
+            $('#id_failed_detail').html(html);
+        }
     })
 }
