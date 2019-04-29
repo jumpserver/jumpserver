@@ -79,7 +79,7 @@ class IDInCacheFilterMixin(object):
 class IDExportFilterMixin(object):
     def filter_queryset(self, queryset):
         # 下载导入模版
-        if self.request.query_params.get('action') == 'import':
+        if self.request.query_params.get('template') == 'import':
             return []
         else:
             return super(IDExportFilterMixin, self).filter_queryset(queryset)

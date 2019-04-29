@@ -18,12 +18,13 @@ class JMSCSVRender(BaseRenderer):
     format = 'csv'
 
     @staticmethod
-    def _get_header(fields, action):
-        if action == 'import':
+    def _get_header(fields, template):
+        if template == 'import':
             header = [k for k, v in fields.items() if not v.read_only and k != 'id']
-        elif action == 'update':
+        elif template == 'update':
             header = [k for k, v in fields.items() if not v.read_only]
         else:
+            # template in ['export']
             header = [k for k, v in fields.items() if not v.write_only]
         return header
 
@@ -42,7 +43,7 @@ class JMSCSVRender(BaseRenderer):
         renderer_context = renderer_context or {}
         encoding = renderer_context.get('encoding', 'utf-8')
         request = renderer_context['request']
-        action = request.query_params.get('action', 'export')
+        template = request.query_params.get('template', 'export')
         view = renderer_context['view']
 
         try:
@@ -52,7 +53,7 @@ class JMSCSVRender(BaseRenderer):
             value = 'The resource not support export!'.encode('utf-8')
         else:
             fields = serializer.get_fields()
-            header = self._get_header(fields, action)
+            header = self._get_header(fields, template)
             labels = {k: v.label for k, v in fields.items() if v.label}
             table = self._gen_table(data, header, labels)
 
