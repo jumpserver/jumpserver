@@ -132,6 +132,8 @@ Docker 组件部署自启 (Centos 7)
     #!/bin/bash
     set -e
 
+    export LANG=zh_CN.UTF-8
+
     docker stop jms_coco
     docker stop jms_guacamole
     systemctl stop jms
@@ -176,7 +178,7 @@ Docker 组件部署自启 (Ubuntu 18)
     #!/bin/bash
     set -e
 
-    export LANG=zh_CN.UTF-8
+    export LANG=zh_CN.utf8
 
     systemctl start jms
     docker start jms_coco
@@ -191,6 +193,8 @@ Docker 组件部署自启 (Ubuntu 18)
 
     #!/bin/bash
     set -e
+
+    export LANG=zh_CN.utf8
 
     docker stop jms_coco
     docker stop jms_guacamole
