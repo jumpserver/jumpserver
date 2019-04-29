@@ -81,8 +81,9 @@ class LogTailApi(generics.RetrieveAPIView):
 class ResourcesIDCacheApi(APIView):
 
     def post(self, request, *args, **kwargs):
-        spm = KEY_PREFIX_CACHE_RESOURCES_ID.format(str(uuid.uuid4()))
-        resources_id = request.data.get('resources_id', [])
+        spm = str(uuid.uuid4())
+        resources_id = request.data.get('resources')
         if resources_id:
-            cache.set(spm, resources_id, 300)
+            cache_key = KEY_PREFIX_CACHE_RESOURCES_ID.format(spm)
+            cache.set(cache_key, resources_id, 300)
         return Response({'spm': spm})
