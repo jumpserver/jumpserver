@@ -79,7 +79,7 @@
       && echo -e "\033[31m 你的服务器IP是 $Server_IP \033[0m" \
       && echo -e "\033[31m 请打开浏览器访问 http://$Server_IP 用户名:admin 密码:admin \033[0m"
 
-code-block:: shell
+.. code-block:: shell
 
     $ echo -e "\033[31m 6. 配置自启 \033[0m" \
       && if [ ! -f "/usr/lib/systemd/system/jms.service" ]; then curl -o /usr/lib/systemd/system/jms.service https://demo.jumpserver.org/download/shell/centos/jms.service; chmod 755 /usr/lib/systemd/system/jms.service; fi \
