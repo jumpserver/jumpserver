@@ -9,9 +9,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
 
-from users.models import User
-from assets.models import Node
-from .utils import get_object_or_none
+from .const import KEY_PREFIX_CACHE_RESOURCES_ID
+
+__all__ = [
+    'LogTailApi', 'ResourcesIDCacheApi',
+]
 
 
 class OutputSerializer(serializers.Serializer):
@@ -76,22 +78,11 @@ class LogTailApi(generics.RetrieveAPIView):
         return Response({"data": data, 'end': end, 'mark': new_mark})
 
 
-class ResourcesIdCacheApi(APIView):
+class ResourcesIDCacheApi(APIView):
+
     def post(self, request, *args, **kwargs):
-        objs_id = request.data.get('objs_id', [])
-        spm = uuid.uuid4().hex
-        if objs_id:
-            cache.set(spm, objs_id, 300)
-            return Response({'spm': spm})
-        if self.request.query_params.get('resourse') == 'users':
-            users = User.objects.all()
-            if users:
-                objs_id = [user.id for user in users]
-        if self.request.query_params.get('resource') == 'assets':
-            node_id = request.data.get('node_id', [])
-            node = get_object_or_none(Node, id=node_id) if node_id else Node.root()
-            assets = node.get_all_assets()
-            if assets:
-                objs_id = [asset.id for asset in assets]
-        cache.set(spm, objs_id, 300)
+        spm = KEY_PREFIX_CACHE_RESOURCES_ID.format(str(uuid.uuid4()))
+        resources_id = request.data.get('resources_id', [])
+        if resources_id:
+            cache.set(spm, resources_id, 300)
         return Response({'spm': spm})
