@@ -25,12 +25,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired',
         ]
-        csv_fields = ['id', 'name', 'username', 'email', 'role', 'wechat',
-                      'phone', 'source', 'date_expired'
-                      ]
-        extra_kwargs = {
-            'id': {'read_only': True}
-        }
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

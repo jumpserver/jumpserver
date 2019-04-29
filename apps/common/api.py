@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
 
-from .const import KEY_PREFIX_CACHE_RESOURCES_ID
+from .const import KEY_CACHE_RESOURCES_ID
 
 __all__ = [
     'LogTailApi', 'ResourcesIDCacheApi',
@@ -84,6 +84,6 @@ class ResourcesIDCacheApi(APIView):
         spm = str(uuid.uuid4())
         resources_id = request.data.get('resources')
         if resources_id:
-            cache_key = KEY_PREFIX_CACHE_RESOURCES_ID.format(spm)
+            cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
             cache.set(cache_key, resources_id, 300)
         return Response({'spm': spm})

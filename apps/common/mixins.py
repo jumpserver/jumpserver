@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 
-from .const import KEY_PREFIX_CACHE_RESOURCES_ID
+from .const import KEY_CACHE_RESOURCES_ID
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
@@ -69,7 +69,7 @@ class IDInCacheFilterMixin(object):
     def filter_queryset(self, queryset):
         queryset = super(IDInCacheFilterMixin, self).filter_queryset(queryset)
         spm = self.request.query_params.get('spm')
-        cache_key = KEY_PREFIX_CACHE_RESOURCES_ID.format(spm)
+        cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
         resources_id = cache.get(cache_key)
         if resources_id and isinstance(resources_id, list):
             queryset = queryset.filter(id__in=resources_id)

@@ -7,4 +7,4 @@ create_success_msg = _("<b>%(name)s</b> was created successfully")
 update_success_msg = _("<b>%(name)s</b> was updated successfully")
 FILE_END_GUARD = ">>> Content End <<<"
 celery_task_pre_key = "CELERY_"
-KEY_PREFIX_CACHE_RESOURCES_ID = "RESOURCES_ID_{}"
+KEY_CACHE_RESOURCES_ID = "RESOURCES_ID_{}"
