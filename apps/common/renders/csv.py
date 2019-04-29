@@ -43,7 +43,7 @@ class JMSCSVRender(BaseRenderer):
         view = renderer_context['view']
 
         try:
-            serializer = view.get_serializerd()
+            serializer = view.get_serializer()
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'The resource not support export!'.encode('utf-8')
