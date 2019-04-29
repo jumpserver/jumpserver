@@ -82,6 +82,7 @@
 <script>
 var zTree, show = 0;
 var systemUserId = null;
+var url = null;
 var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?cache_policy=1";
 
 function initTree() {
@@ -113,6 +114,9 @@ function initTree() {
     };
     if (systemUserId) {
         url = treeUrl + '&system_user=' + systemUserId
+    }
+    else{
+        url = treeUrl
     }
 
     $.get(url, function(data, status){

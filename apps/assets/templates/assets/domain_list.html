@@ -41,6 +41,7 @@ function initTable() {
         ele: $('#domain_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
                 var detail_btn = '<a href="{% url "assets:domain-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
