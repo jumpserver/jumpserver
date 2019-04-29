@@ -947,21 +947,22 @@ function rootNodeAddDom(ztree, callback) {
     })
 }
 
-function APIResourceCache(props) {
+function APIExportData(props) {
     props = props || {};
-    var success_url = props.success_url;
     $.ajax({
-        url: props.url,
+        url: '/api/common/v1/resources/cache/',
         type: props.method || "POST",
         data: props.body,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json",
         success: function (data) {
-                window.open(success_url+data.spm)
-            },
+            var params = '?format=' + props.format + '&spm=' + data.spm +'&search=' + props.search;
+            var success_url = props.success_url + params;
+            window.open(success_url)
+        },
         error: function () {
-                toastr.error('Export failed');
-            }
+            toastr.error('Export failed');
+        }
     })
 }
 

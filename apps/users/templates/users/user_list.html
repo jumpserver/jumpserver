@@ -116,18 +116,23 @@ $(document).ready(function(){
     $('.btn_export').click(function () {
         var users = [];
         var rows = table.rows('.selected').data();
-        if(rows.length>0){
-            rows = table.rows().data();
+        if(rows.length!==0){
+            $.each(rows, function (index, obj) {
+                users.push(obj.id)
+            });
         }
-        $.each(rows, function (index, obj) {
-            users.push(obj.id)
-        });
-        APIResourceCache({
-            url:"{% url 'api-common:resources-cache' %}",
-            method:"POST",
-            body:JSON.stringify({'resources_id': users}),
-            success_url:"{% url 'api-users:user-list' %}?format=csv&spm="
-        });
+        var data = {
+            'resources': users
+        };
+        var search = $("input[type='search']").val();
+        var props = {
+            method: "POST",
+            body: JSON.stringify(data),
+            success_url: "{% url 'api-users:user-list' %}",
+            format: 'csv',
+            search: search
+        };
+        APIExportData(props);
     });
 
     $('#btn_user_import').click(function() {
