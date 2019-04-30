@@ -8,9 +8,12 @@ from django.shortcuts import redirect, get_object_or_404
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
+from rest_framework import serializers
 
 from common.utils import get_logger
-from .utils import current_org, set_current_org, set_to_root_org
+from .utils import (
+    current_org, set_current_org, set_to_root_org, get_current_org_id
+)
 from .models import Organization
 
 logger = get_logger(__file__)
@@ -18,7 +21,8 @@ tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
-    'RootOrgViewMixin', 'OrgMembershipSerializerMixin', 'OrgMembershipModelViewSetMixin'
+    'RootOrgViewMixin', 'OrgMembershipSerializerMixin',
+    'OrgMembershipModelViewSetMixin', 'OrgResourceSerializerMixin',
 ]
 
 
@@ -202,3 +206,7 @@ class OrgMembershipModelViewSetMixin:
     def get_queryset(self):
         queryset = self.membership_class.objects.filter(organization=self.org)
         return queryset
+
+
+class OrgResourceSerializerMixin(serializers.Serializer):
+    org_id = serializers.HiddenField(default=get_current_org_id)

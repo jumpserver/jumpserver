@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
+from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
 from ..models import Asset
 from .system_user import AssetSystemUserSerializer
@@ -13,7 +14,7 @@ __all__ = [
 ]
 
 
-class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResourceSerializerMixin):
     """
     资产的数据结构
     """
@@ -21,7 +22,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = Asset
         list_serializer_class = BulkListSerializer
         fields = '__all__'
-        validators = []
+        # validators = []
         read_only_fields = (
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
