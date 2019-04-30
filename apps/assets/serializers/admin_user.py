@@ -4,6 +4,8 @@ from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
+from common.serializers import AdaptedBulkListSerializer
+
 from ..models import Node, AdminUser
 from ..const import ADMIN_USER_CONN_CACHE_KEY
 
@@ -22,6 +24,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
     reachable_amount = serializers.SerializerMethodField()
 
     class Meta:
+        list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = '__all__'
         read_only_fields = [

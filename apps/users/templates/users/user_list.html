@@ -59,6 +59,7 @@ function initTable() {
         ele: $('#user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
                 var detail_btn = '<a href="{% url "users:user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
@@ -77,10 +78,16 @@ function initTable() {
                 }
              }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "users:user-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
+                var update_btn = "";
+                if (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin')) {
+                    update_btn = '<a class="btn btn-xs disabled btn-info">{% trans "Update" %}</a>';
+                }
+                else{
+                    update_btn = '<a href="{% url "users:user-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
+                }
 
                 var del_btn = "";
-                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ request.user.username }}") {
+                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ request.user.username }}" || (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin'))) {
                     del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', rowData.name);

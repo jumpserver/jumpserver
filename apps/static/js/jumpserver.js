@@ -538,7 +538,11 @@ jumpserver.initServerSideDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      {className: 'text-center', targets: '_all'}
+      {
+          targets: '_all',
+          className: 'text-center',
+          render: $.fn.dataTable.render.text()
+      }
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {
@@ -992,19 +996,19 @@ function APIImportData(props){
                 var html = '';
                 var li = '';
                 var err = '';
-                $.each(data, function(index, item){
+                $.each(data, function (index, item){
                     err = '';
-                    for (var prop in item){
+                    for (var prop in item) {
                         err += prop + ": " + item[prop][0] + " "
                     }
-                    if(err){
-                        li = "<li>Line " + (++index) + ". " + err + "</li>";
+                    if (err) {
+                        li = "<li>" + "Line " + (++index) + ". " + err + "</li>";
                         html += li
                     }
                 });
                 html = "<ul>" + html + "</ul>"
             }
-            else{
+            else {
                 html = error.responseText
             }
             $('#id_created').html('');
@@ -1013,4 +1017,10 @@ function APIImportData(props){
             $('#id_failed_detail').html(html);
         }
     })
+}
+
+function htmlEscape ( d ) {
+    return typeof d === 'string' ?
+        d.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') :
+        d;
 }

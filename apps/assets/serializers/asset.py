@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from rest_framework_bulk.serializers import BulkListSerializer
 
 from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset
 from .system_user import AssetSystemUserSerializer
 
@@ -20,9 +20,9 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResou
     """
     class Meta:
         model = Asset
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
-        # validators = []
+        # validators = [] # 解决批量导入时unique_together字段校验失败
         read_only_fields = (
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',

@@ -107,6 +107,15 @@ class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('users:user-list')
     success_message = update_success_msg
 
+    def _deny_permission(self):
+        obj = self.get_object()
+        return not self.request.user.is_superuser and obj.is_superuser
+
+    def get(self, request, *args, **kwargs):
+        if self._deny_permission():
+            return redirect(self.success_url)
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         check_rules = get_password_check_rules()
         context = {

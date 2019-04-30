@@ -23,15 +23,15 @@ class OpenIDAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         # Don't need openid auth if AUTH_OPENID is False
         if not settings.AUTH_OPENID:
-            logger.info("Not settings.AUTH_OPENID")
+            logger.debug("Not settings.AUTH_OPENID")
             return
         # Don't need check single logout if user not authenticated
         if not request.user.is_authenticated:
-            logger.info("User is not authenticated")
+            logger.debug("User is not authenticated")
             return
         elif not request.session[BACKEND_SESSION_KEY].endswith(
                 BACKEND_OPENID_AUTH_CODE):
-            logger.info("BACKEND_SESSION_KEY is not BACKEND_OPENID_AUTH_CODE")
+            logger.debug("BACKEND_SESSION_KEY is not BACKEND_OPENID_AUTH_CODE")
             return
 
         # Check openid user single logout or not with access_token
@@ -40,7 +40,6 @@ class OpenIDAuthenticationMiddleware(MiddlewareMixin):
             client.openid_connect_client.userinfo(
                 token=request.session.get(OIDT_ACCESS_TOKEN)
             )
-
         except Exception as e:
             logout(request)
             logger.error(e)
