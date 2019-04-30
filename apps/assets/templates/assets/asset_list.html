@@ -473,7 +473,7 @@ $(document).ready(function(){
         body: JSON.stringify(data),
         success_url: "{% url 'api-assets:asset-list' %}",
         format: 'csv',
-        filter: {
+        params: {
             search: search,
             node_id: current_node_id || ''
         }

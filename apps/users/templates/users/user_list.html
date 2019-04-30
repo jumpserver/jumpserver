@@ -128,7 +128,7 @@ $(document).ready(function(){
             body: JSON.stringify(data),
             success_url: "{% url 'api-users:user-list' %}",
             format: 'csv',
-            filter: {
+            params: {
                 search: search
             }
         };

@@ -957,7 +957,7 @@ function APIExportData(props) {
         dataType: props.data_type || "json",
         success: function (data) {
             var export_url = props.success_url;
-            var params = props.filter || {};
+            var params = props.params || {};
             params['format'] = props.format;
             params['spm'] = data.spm;
             for (var k in params){
