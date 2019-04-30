@@ -114,13 +114,11 @@ $(document).ready(function(){
         console.log(value)
     });
     $('.btn_export').click(function () {
-        var users = [];
         var rows = table.rows('.selected').data();
-        if(rows.length > 0){
-            $.each(rows, function (index, obj) {
-                users.push(obj.id)
-            });
-        }
+        var users = [];
+        $.each(rows, function (index, obj) {
+            users.push(obj.id)
+        });
         var data = {
             'resources': users
         };
@@ -130,14 +128,14 @@ $(document).ready(function(){
             body: JSON.stringify(data),
             success_url: "{% url 'api-users:user-list' %}",
             format: 'csv',
-            search: search
+            filter: {
+                search: search
+            }
         };
         APIExportData(props);
     });
 
     $('#btn_import_confirm').click(function() {
-        var $form = $('#fm_import');
-        $form.find('.help-block').remove();
         var url = "{% url 'api-users:user-list' %}";
         var file = document.getElementById('id_file').files[0];
         if(!file){
