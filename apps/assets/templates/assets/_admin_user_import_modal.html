@@ -1,0 +1,6 @@
+{% extends '_import_modal.html' %}
+{% load i18n %}
+
+{% block modal_title%}{% trans "Import admin user" %}{% endblock %}
+
+{% block import_modal_download_template_url %}{% url "api-assets:admin-user-list" %}{% endblock %}

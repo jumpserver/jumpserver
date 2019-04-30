@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.core.cache import cache
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from ..models import Node, AdminUser
@@ -13,6 +14,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
     """
     管理用户
     """
+    password = serializers.CharField(
+        required=False, write_only=True, label=_('Password')
+    )
     assets_amount = serializers.SerializerMethodField()
     unreachable_amount = serializers.SerializerMethodField()
     reachable_amount = serializers.SerializerMethodField()
@@ -20,6 +24,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminUser
         fields = '__all__'
+        read_only_fields = [
+            'become', 'become_method', 'become_user', 'created_by',
+        ]
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)
