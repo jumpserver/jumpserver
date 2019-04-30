@@ -20,7 +20,7 @@ from common.mixins import (
     IDInFilterMixin, IDInCacheFilterMixin, IDExportFilterMixin
 )
 
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
@@ -49,6 +49,23 @@ class AssetViewSet(IDExportFilterMixin, IDInCacheFilterMixin, IDInFilterMixin, L
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
+
+    def set_assets_node(self, assets):
+        if not isinstance(assets, list):
+            assets = [assets]
+
+        node_id = self.request.query_params.get('node_id')
+        if not node_id:
+            return
+        node = get_object_or_none(Node, pk=node_id)
+        if not node:
+            return
+
+        node.assets.set(assets)
+
+    def perform_create(self, serializer):
+        assets = serializer.save()
+        self.set_assets_node(assets)
 
     def filter_node(self, queryset):
         node_id = self.request.query_params.get("node_id")
