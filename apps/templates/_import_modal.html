@@ -1,6 +1,10 @@
 {% extends '_modal.html' %}
 {% load i18n %}
 
+{% block modal_id %}import_modal{% endblock %}
+
+{% block modal_confirm_id %}btn_import_confirm{% endblock %}
+
 {% block modal_body %}
     <form method="post" id="fm_import">
         {% csrf_token %}

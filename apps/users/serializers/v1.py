@@ -25,6 +25,11 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired',
         ]
+        extra_kwargs = {
+            'source': {'read_only': True},
+            'created_by': {'read_only': True},
+            'is_first_login': {'read_only': True},
+        }
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
