@@ -148,7 +148,7 @@ class Node(OrgModelMixin):
         )
 
     def get_all_children(self, with_self=False):
-        pattern = r'^{0}$|^{0}:' if with_self else r'^{0}'
+        pattern = r'^{0}$|^{0}:' if with_self else r'^{0}:'
         return self.__class__.objects.filter(
             key__regex=pattern.format(self.key)
         )
