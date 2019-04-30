@@ -33,7 +33,7 @@ RDP 协议资产连接错误排查思路
 
     # http://<Jumpserver_url> 指向 jumpserver 的服务url, 如 http://192.168.244.144:8080
     # BOOTSTRAP_TOKEN 为 Jumpserver/config.yml 里面的 BOOTSTRAP_TOKEN
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_guacamole:1.4.9
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=xxxxxx jumpserver/jms_guacamole:1.4.10
 
     # 正常运行后到Jumpserver 会话管理-终端管理 里面查看 gua 的状态是否为绿色(等待大概5s后刷新页面)
 

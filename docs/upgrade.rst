@@ -502,10 +502,10 @@
 
     $ cd /opt
     $ rm -rf luna luna.tar.gz
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
@@ -523,13 +523,13 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.9
-    $ docker pull jumpserver/jms_guacamole:1.4.9
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
     $ Server_IP=`ip addr | grep inet | egrep -v '(127.0.0.1|inet6|docker)' | awk '{print $2}' | tr -d "addr:" | head -n 1 | cut -d / -f1`
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.9
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.9
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.10
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -750,10 +750,10 @@
 
     $ cd /opt
     $ rm -rf luna luna.tar.gz
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
@@ -771,12 +771,12 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.9
-    $ docker pull jumpserver/jms_guacamole:1.4.9
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.9
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.9
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.10
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -997,10 +997,10 @@
 
     $ cd /opt
     $ rm -rf luna luna.tar.gz
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
@@ -1018,12 +1018,12 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.9
-    $ docker pull jumpserver/jms_guacamole:1.4.9
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
 
     # BOOTSTRAP_TOKEN 请和 jumpserver 配置文件中保持一致
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.9
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.9
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=***** jumpserver/jms_guacamole:1.4.10
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -1079,10 +1079,10 @@
 
     $ cd /opt
     $ rm -rf luna luna.tar.gz
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
@@ -1100,10 +1100,10 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.9
-    $ docker pull jumpserver/jms_guacamole:1.4.9
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.9
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.9
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=****** jumpserver/jms_guacamole:1.4.10
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
 
@@ -1157,10 +1157,10 @@
 
     $ cd /opt
     $ rm -rf luna luna.tar.gz
-    $ wget https://github.com/jumpserver/luna/releases/download/1.4.9/luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.4.9/luna.tar.gz
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
@@ -1178,9 +1178,87 @@
     $ docker stop jms_guacamole
     $ docker rm jms_coco
     $ docker rm jms_guacamole
-    $ docker pull jumpserver/jms_coco:1.4.9
-    $ docker pull jumpserver/jms_guacamole:1.4.9
-    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.9
-    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.9
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.10
+
+    # 到 Web 会话管理 - 终端管理 查看组件是否已经在线
+
+1.4.9 升级到最新版本
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Jumpserver**
+
+.. code-block:: shell
+
+    $ cd /opt/jumpserver
+    $ source /opt/py3/bin/activate
+    $ ./jms stop
+    $ git pull
+    $ pip install -r requirements/requirements.txt
+
+    $ cd ../
+    $ ./jms start all -d
+
+**Coco**
+
+说明: Docker 部署的请跳过
+
+.. code-block:: shell
+
+    $ cd /opt/coco
+    $ source /opt/py3/bin/activate
+    $ ./cocod stop
+    $ git pull
+    $ pip install -r requirements/requirements.txt
+    $ ./cocod start -d
+
+**Guacamole**
+
+说明: Docker 部署的请跳过
+
+.. code-block:: shell
+
+    $ cd /opt/docker-guacamole
+    $ git pull
+    $ /etc/init.d/guacd stop
+    $ sh /config/tomcat8/bin/shutdown.sh
+    $ /etc/init.d/guacd start
+    $ sh /config/tomcat8/bin/startup.sh
+
+**Luna**
+
+说明: 直接下载 release 包
+
+.. code-block:: shell
+
+    $ cd /opt
+    $ rm -rf luna luna.tar.gz
+    $ wget https://github.com/jumpserver/luna/releases/download/1.4.10/luna.tar.gz
+
+    # 如果网络有问题导致下载无法完成可以使用下面地址
+    $ wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz
+
+    $ tar xf luna.tar.gz
+    $ chown -R root:root luna
+
+    # 注意把浏览器缓存清理下
+
+**Docker Coco Guacamole**
+
+说明: Docker 部署的 coco 与 guacamole 升级说明
+
+.. code-block:: shell
+
+    # 先到 Web 会话管理 - 终端管理 删掉所有组件
+    $ docker stop jms_coco
+    $ docker stop jms_guacamole
+    $ docker rm jms_coco
+    $ docker rm jms_guacamole
+    $ docker pull jumpserver/jms_coco:1.4.10
+    $ docker pull jumpserver/jms_guacamole:1.4.10
+    $ docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.10
+    $ docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://<Jumpserver_url> -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.10
 
     # 到 Web 会话管理 - 终端管理 查看组件是否已经在线

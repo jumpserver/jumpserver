@@ -14,10 +14,11 @@ sftp 使用说明
     $ cd 你的系统用户
     # 此处即是当前资产的 home 目录
 
-    # 如果需要修改 /tmp 为其他目录
-    $ vi coco/conf.yml
+如果需要修改 /tmp 为其他目录
 
 .. code-block:: vim
+
+    $ vi coco/conf.yml
 
     # SFTP的根目录, 可选 /tmp, Home其他自定义目录
     SFTP_ROOT: /tmp
