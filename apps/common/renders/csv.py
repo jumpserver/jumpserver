@@ -20,7 +20,10 @@ class JMSCSVRender(BaseRenderer):
     @staticmethod
     def _get_header(fields, template):
         if template == 'import':
-            header = [k for k, v in fields.items() if not v.read_only and k != 'id']
+            header = [
+                k for k, v in fields.items()
+                if not v.read_only and k != 'id' and k != 'org_id'
+            ]
         elif template == 'update':
             header = [k for k, v in fields.items() if not v.read_only]
         else:
