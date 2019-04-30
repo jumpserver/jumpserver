@@ -136,12 +136,12 @@ $(document).ready(function(){
     });
 
     $('#btn_user_import').click(function() {
-        var $form = $('#fm_user_import');
+        var $form = $('#fm_import');
         $form.find('.help-block').remove();
         var url = "{% url 'api-users:user-list' %}";
-        var file = document.getElementById('id_users').files[0];
-        if(file === undefined){
-            toastr.error("{% trans "Please upload CSV file!" %}");
+        var file = document.getElementById('id_file').files[0];
+        if(!file){
+            toastr.error("{% trans "Please select file" %}");
             return
         }
         var data_table = $('#user_list_table').DataTable();
