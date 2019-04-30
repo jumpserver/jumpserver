@@ -956,9 +956,14 @@ function APIExportData(props) {
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json",
         success: function (data) {
-            var params = '?format=' + props.format + '&spm=' + data.spm +'&search=' + props.search;
-            var success_url = props.success_url + params;
-            window.open(success_url)
+            var export_url = props.success_url;
+            var params = props.filter || {};
+            params['format'] = props.format;
+            params['spm'] = data.spm;
+            for (var k in params){
+                export_url = setUrlParam(export_url, k, params[k])
+            }
+            window.open(export_url);
         },
         error: function () {
             toastr.error('Export failed');
