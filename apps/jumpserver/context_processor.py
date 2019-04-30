@@ -15,7 +15,7 @@ def jumpserver_processor(request):
         'FAVICON_URL': static('img/facio.ico'),
         'JMS_TITLE': 'Jumpserver',
         'VERSION': settings.VERSION,
-        'COPYRIGHT': _('Beijing Duizhan Tech, Inc.') + ' © 2014-2019'
+        'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2019'
     }
     return context
 

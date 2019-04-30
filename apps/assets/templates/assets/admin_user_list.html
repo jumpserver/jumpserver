@@ -44,9 +44,10 @@ $(document).ready(function(){
     var options = {
         ele: $('#admin_user_list_table'),
         columnDefs: [
-            {targets: 1, createdCell: function (td, cellData, rowData) {
+            {targets: 1, render: function (cellData, tp, rowData, meta) {
+                cellData = htmlEscape(cellData);
                 var detail_btn = '<a href="{% url "assets:admin-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+                return detail_btn.replace('{{ DEFAULT_PK }}', rowData.id);
             }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = "";
@@ -82,7 +83,6 @@ $(document).ready(function(){
                     innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:admin-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
@@ -90,8 +90,8 @@ $(document).ready(function(){
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" },
-                  {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }]
+        columns: [{data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
+                  {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment"}, {data: "id"}]
     };
     jumpserver.initServerSideDataTable(options)
 })

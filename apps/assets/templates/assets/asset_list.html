@@ -156,6 +156,7 @@ function initTable() {
         ele: $('#asset_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
                 {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
@@ -657,9 +658,23 @@ $(document).ready(function(){
         });
     }
     function doUpdate() {
-        var id_list_string = id_list.join(',');
-        var url = "{% url 'assets:asset-bulk-update' %}?assets_id=" + id_list_string;
-        location.href = url
+        var data = {
+            'assets_id':id_list
+        };
+        function error(data) {
+            toastr.error(JSON.parse(data).error)
+        }
+        function success(data) {
+            location.href = data.url;
+         }
+        APIUpdateAttr({
+            'url': "{% url 'api-assets:asset-bulk-update-select' %}",
+            'method': 'POST',
+            'body': JSON.stringify(data),
+            'flash_message': false,
+            'success': success,
+             'error': error,
+        })
     }
 
     function doRemove() {

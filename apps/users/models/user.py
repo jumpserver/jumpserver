@@ -3,23 +3,27 @@
 #
 import uuid
 import base64
+import string
+import random
 from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
-from django.core import signing
 from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from common.utils import get_signer, date_expired_default
+from common.utils import get_signer, date_expired_default, get_logger
 
 
 __all__ = ['User']
+
 signer = get_signer()
+
+logger = get_logger(__file__)
 
 
 class User(AbstractUser):
@@ -47,6 +51,9 @@ class User(AbstractUser):
         (SOURCE_OPENID, 'OpenID'),
         (SOURCE_RADIUS, 'Radius'),
     )
+
+    CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(
         max_length=128, unique=True, verbose_name=_('Username')
@@ -346,9 +353,32 @@ class User(AbstractUser):
             return user_default
 
     def generate_reset_token(self):
-        return signer.sign_t(
-            {'reset': str(self.id), 'email': self.email}, expires_in=3600
-        )
+        letter = string.ascii_letters + string.digits
+        token =''.join([random.choice(letter) for _ in range(50)])
+        self.set_cache(token)
+        return token
+
+    def set_cache(self, token):
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
+
+    @classmethod
+    def validate_reset_password_token(cls, token):
+        try:
+            key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+            value = cache.get(key)
+            user_id = value.get('id', '')
+            email = value.get('email', '')
+            user = cls.objects.get(id=user_id, email=email)
+        except (AttributeError, cls.DoesNotExist) as e:
+            logger.error(e, exc_info=True)
+            user = None
+        return user
+
+    @classmethod
+    def expired_reset_password_token(cls, token):
+        key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.delete(key)
 
     @property
     def otp_enabled(self):
@@ -399,18 +429,6 @@ class User(AbstractUser):
         )
         access_key = app.create_access_key()
         return app, access_key
-
-    @classmethod
-    def validate_reset_token(cls, token):
-        try:
-            data = signer.unsign_t(token)
-            user_id = data.get('reset', None)
-            user_email = data.get('email', '')
-            user = cls.objects.get(id=user_id, email=user_email)
-
-        except (signing.BadSignature, cls.DoesNotExist):
-            user = None
-        return user
 
     def reset_password(self, new_password):
         self.set_password(new_password)

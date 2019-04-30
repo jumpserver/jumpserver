@@ -538,7 +538,11 @@ jumpserver.initServerSideDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      {className: 'text-center', targets: '_all'}
+      {
+          targets: '_all',
+          className: 'text-center',
+          render: $.fn.dataTable.render.text()
+      }
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {
@@ -945,4 +949,11 @@ function rootNodeAddDom(ztree, callback) {
         ztree.destroy();
         callback()
     })
+}
+
+
+function htmlEscape ( d ) {
+    return typeof d === 'string' ?
+        d.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') :
+        d;
 }

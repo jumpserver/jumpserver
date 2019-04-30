@@ -77,6 +77,7 @@ function initTable() {
         ele: $('#user_assets_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
                 {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
@@ -91,7 +92,8 @@ function initTable() {
             {targets: 4, createdCell: function (td, cellData) {
                 var users = [];
                 $.each(cellData, function (id, data) {
-                    users.push(data.name);
+                    var name = htmlEscape(data.name);
+                    users.push(name);
                 });
                 $(td).html(users.join(', '))
             }}

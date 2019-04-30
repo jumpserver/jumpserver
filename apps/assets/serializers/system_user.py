@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from common.serializers import AdaptedBulkListSerializer
+
 from ..models import SystemUser, Asset
 from .base import AuthSerializer
 
@@ -17,6 +19,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         exclude = ('_password', '_private_key', '_public_key')
+        list_serializer_class = AdaptedBulkListSerializer
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
@@ -61,12 +64,18 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
     """
     查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少
     """
+    actions = serializers.SerializerMethodField()
+
     class Meta:
         model = SystemUser
         fields = (
             'id', 'name', 'username', 'priority',
-            'protocol',  'comment', 'login_mode'
+            'protocol',  'comment', 'login_mode', 'actions',
         )
+
+    @staticmethod
+    def get_actions(obj):
+        return [action.name for action in obj.actions]
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):

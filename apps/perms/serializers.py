@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
-from .models import AssetPermission
+from .models import AssetPermission, Action
 from assets.models import Node, Asset, SystemUser
 from assets.serializers import AssetGrantedSerializer
 
@@ -13,7 +13,14 @@ __all__ = [
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
     'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
+    'ActionSerializer',
 ]
+
+
+class ActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = '__all__'
 
 
 class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
@@ -28,6 +35,7 @@ class AssetPermissionListSerializer(serializers.ModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
+    actions = StringManyToManyField(many=True, read_only=True)
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 

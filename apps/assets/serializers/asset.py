@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
-from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset
 from .system_user import AssetSystemUserSerializer
 
@@ -19,7 +19,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     """
     class Meta:
         model = Asset
-        list_serializer_class = BulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
         validators = []
 

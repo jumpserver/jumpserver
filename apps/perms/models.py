@@ -7,6 +7,26 @@ from django.utils import timezone
 from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin, OrgManager
 
+from .const import PERMS_ACTION_NAME_CHOICES, PERMS_ACTION_NAME_ALL
+
+
+class Action(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(
+        max_length=128, unique=True, choices=PERMS_ACTION_NAME_CHOICES,
+        verbose_name=_('Name')
+    )
+
+    class Meta:
+        verbose_name = _('Action')
+
+    def __str__(self):
+        return self.get_name_display()
+
+    @classmethod
+    def get_action_all(cls):
+        return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
+
 
 class AssetPermissionQuerySet(models.QuerySet):
     def active(self):
@@ -30,6 +50,7 @@ class AssetPermission(OrgModelMixin):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
+    actions = models.ManyToManyField('Action', related_name='permissions', blank=True, verbose_name=_('Action'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))

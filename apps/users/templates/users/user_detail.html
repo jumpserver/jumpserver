@@ -22,11 +22,11 @@
                                 <a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                                <a class="btn btn-outline {% if user_object.is_superuser and not request.user.is_superuser %} disabled {% else %} btn-default {% endif %}" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
 
                             <li class="pull-right">
-                                <a class="btn btn-outline {% if request.user != user_object and user_object.username != "admin" %} btn-danger btn-delete-user {% else %} disabled {% endif %}">
+                                <a class="btn btn-outline {% if request.user == user_object or user_object.username == "admin" or user_object.is_superuser and not request.user.is_superuser %} disabled  {% else %} btn-danger btn-delete-user {% endif %}">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
