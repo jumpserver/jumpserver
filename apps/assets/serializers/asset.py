@@ -22,6 +22,12 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         list_serializer_class = BulkListSerializer
         fields = '__all__'
         validators = []
+        read_only_fields = (
+            'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
+            'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
+            'os', 'os_version', 'os_arch', 'hostname_raw',
+            'created_by', 'date_created',
+        )
 
     @classmethod
     def setup_eager_loading(cls, queryset):

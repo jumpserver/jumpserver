@@ -69,7 +69,7 @@
                <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
                <div class="html5buttons">
                    <div class="dt-buttons btn-group">
-                       <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
+                       <a class="btn btn-default btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
                            <span>{% trans "Import" %}</span>
                        </a>
                        <a class="btn btn-default btn_export" tabindex="0">
@@ -463,42 +463,41 @@ $(document).ready(function(){
     $.each(rows, function (index, obj) {
         assets.push(obj.id)
     });
-    $.ajax({
-        url: "{% url "assets:asset-export" %}",
-        method: 'POST',
-        data: JSON.stringify({assets_id: assets, node_id: current_node_id}),
-        dataType: "json",
-        success: function (data, textStatus) {
-            window.open(data.redirect)
-        },
-        error: function () {
-            toastr.error('Export failed');
+
+    var data = {
+        'resources': assets
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:asset-list' %}",
+        format: 'csv',
+        filter: {
+            search: search,
+            node_id: current_node_id || ''
         }
-    })
+    };
+    APIExportData(props);
 })
-.on('click', '#btn_asset_import', function () {
-    var $form = $('#fm_asset_import');
-    var action = $form.attr("action");
+.on('click', '#btn_import_confirm', function () {
+    var file = document.getElementById('id_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var url = "{% url 'api-assets:asset-list' %}";
     if (current_node_id){
-        action = setUrlParam(action, 'node_id', current_node_id);
-        $form.attr("action", action)
+        url = setUrlParam(url, 'node_id', current_node_id);
     }
-    $form.find('.help-block').remove();
-    function success (data) {
-        if (data.valid === false) {
-            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
-        } else {
-            $('#id_created').html(data.created_info);
-            $('#id_created_detail').html(data.created.join(', '));
-            $('#id_updated').html(data.updated_info);
-            $('#id_updated_detail').html(data.updated.join(', '));
-            $('#id_failed').html(data.failed_info);
-            $('#id_failed_detail').html(data.failed.join(', '));
-            var $data_table = $('#asset_list_table').DataTable();
-            $data_table.ajax.reload();
-        }
-    }
-    $form.ajaxSubmit({success: success});
+    var data_table = $('#asset_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "POST",
+        body: file,
+        data_table: data_table
+    });
 })
 .on('click', '.btn-create-asset', function () {
     var url = "{% url 'assets:asset-create' %}";
