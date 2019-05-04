@@ -1143,9 +1143,9 @@
 .. code-block:: shell
 
     $ cd /opt/docker-guacamole
-    $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ git pull
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
@@ -1221,9 +1221,9 @@
 .. code-block:: shell
 
     $ cd /opt/docker-guacamole
-    $ git pull
     $ /etc/init.d/guacd stop
     $ sh /config/tomcat8/bin/shutdown.sh
+    $ git pull
     $ /etc/init.d/guacd start
     $ sh /config/tomcat8/bin/startup.sh
 
