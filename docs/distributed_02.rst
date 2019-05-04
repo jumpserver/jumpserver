@@ -17,6 +17,8 @@
 +==========+============+=================+===============+========================+
 |    TCP   |    Nginx   | 192.168.100.100 | 80, 443, 2222 |           All          |
 +----------+------------+-----------------+---------------+------------------------+
+|    TCP   |    Nginx   | 192.168.100.100 |      3306     |       Jumpserver       |
++----------+------------+-----------------+---------------+------------------------+
 
 开始安装
 ~~~~~~~~~~~~
@@ -33,11 +35,14 @@
     $ firewall-cmd --zone=public --add-port=80/tcp --permanent
     $ firewall-cmd --zone=public --add-port=443/tcp --permanent
     $ firewall-cmd --zone=public --add-port=2222/tcp --permanent
+    $ firewall-cmd --permanent --add-rich-rule="rule family="ipv4" source address="192.168.100.0/24" port protocol="tcp" port="3306" accept"
+    # 192.168.100.0/24 为整个 Jumpserver 网络网段, 这里就偷懒了, 自己根据实际情况修改即可
+
     $ firewall-cmd --reload
 
-    # 设置 http 访问权限
-    $ setsebool -P httpd_can_network_connect 1
-    $ semanage port -a -t http_port_t -p tcp 2222
+    # 设置 selinux
+    $ setenforce 0
+    $ sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
 
 .. code-block:: shell
 
@@ -92,17 +97,30 @@
         access_log /var/log/nginx/tcp-access.log  proxy;
         open_log_file_cache off;
 
-        upstream cocossh {
-            server 192.168.100.40:2222 weight=1;
-            server 192.168.100.40:2223 weight=1;  # 多节点
-            # 这里是 coco ssh 的后端ip
-            hash $remote_addr;
+        upstream MariaDB {
+            server 192.168.100.10:3306;
+            server 192.168.100.11:3306 backup;  # 多节点
+            server 192.168.100.12:3306 down;  # 多节点
+            # 这里是 Mariadb 的后端ip
         }
+
+        upstream cocossh {
+            server 192.168.100.40:2222;
+            server 192.168.100.40:2223;  # 多节点
+            # 这里是 coco ssh 的后端ip
+            least_conn;
+        }
+
+        server {
+            listen 3306;
+            proxy_pass MariaDB;
+            proxy_connect_timeout 1s;  # detect failure quickly
+        }
+
         server {
             listen 2222;
             proxy_pass cocossh;
-            proxy_connect_timeout 10s;
-            proxy_timeout 24h;   #代理超时
+            proxy_connect_timeout 1s;  # detect failure quickly
         }
     }
 

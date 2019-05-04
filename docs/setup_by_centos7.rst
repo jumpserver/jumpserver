@@ -370,7 +370,6 @@ CentOS 7 安装文档
             listen 2220;  # 不能使用已经使用的端口, 自行修改, 用户ssh登录时的端口
             proxy_pass cocossh;
             proxy_connect_timeout 10s;
-            proxy_timeout 24h;   #代理超时
         }
     }
     # 到此结束

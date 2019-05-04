@@ -112,7 +112,7 @@
     # MySQL or postgres setting like:
     # 使用Mysql作为数据库
     DB_ENGINE: mysql
-    DB_HOST: 127.0.0.1
+    DB_HOST: 192.168.100.100
     DB_PORT: 3306
     DB_USER: jumpserver
     DB_PASSWORD: 你的数据库密码

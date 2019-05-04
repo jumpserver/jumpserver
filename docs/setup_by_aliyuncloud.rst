@@ -50,75 +50,12 @@
       && systemctl restart docker \
       && docker pull jumpserver/jms_coco:1.4.10 \
       && docker pull jumpserver/jms_guacamole:1.4.10 \
-      && rm -rf /etc/nginx/conf.d/default.conf
+      && rm -rf /etc/nginx/conf.d/default.conf \
+      && curl -o /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf
 
 .. code-block:: shell
 
-    $ echo -e "\033[31m 4. 配置nginx \033[0m" \
-      && cat << EOF > /etc/nginx/conf.d/jumpserver.conf
-    server {
-        listen 80;
-
-        client_max_body_size 100m;  # 录像及文件上传大小限制
-
-        location /luna/ {
-            try_files \$uri / /index.html;
-            alias /opt/luna/;
-        }
-
-        location /media/ {
-            add_header Content-Encoding gzip;
-            root /opt/jumpserver/data/;
-        }
-
-        location /static/ {
-            root /opt/jumpserver/data/;
-        }
-
-        location /socket.io/ {
-            proxy_pass       http://localhost:5000/socket.io/;
-            proxy_buffering off;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            access_log off;
-        }
-
-        location /coco/ {
-            proxy_pass       http://localhost:5000/coco/;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            access_log off;
-        }
-
-        location /guacamole/ {
-            proxy_pass       http://localhost:8081/;
-            proxy_buffering off;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade \$http_upgrade;
-            proxy_set_header Connection \$http_connection;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            access_log off;
-        }
-
-        location / {
-            proxy_pass http://localhost:8080;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        }
-    }
-    EOF
-
-.. code-block:: shell
-
-    $ echo -e "\033[31m 5. 处理配置文件 \033[0m" \
+    $ echo -e "\033[31m 4. 处理配置文件 \033[0m" \
       && if [ "$DB_PASSWORD" = "" ]; then DB_PASSWORD=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 24`; fi \
       && if [ "$SECRET_KEY" = "" ]; then SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`; echo "SECRET_KEY=$SECRET_KEY" >> ~/.bashrc; fi \
       && if [ "$BOOTSTRAP_TOKEN" = "" ]; then BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`; echo "BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc; fi \
@@ -128,7 +65,7 @@
 
 .. code-block:: shell
 
-    $ echo -e "\033[31m 6. 启动 Jumpserver \033[0m" \
+    $ echo -e "\033[31m 5. 启动 Jumpserver \033[0m" \
       && systemctl start nginx \
       && cd /opt/jumpserver \
       && ./jms start all -d \
