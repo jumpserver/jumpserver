@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
+
 from common.serializers import AdaptedBulkListSerializer
 
 from ..models import SystemUser, Asset
@@ -10,6 +12,10 @@ class SystemUserSerializer(serializers.ModelSerializer):
     """
     系统用户
     """
+    password = serializers.CharField(
+        required=False, write_only=True, label=_('Password')
+    )
+
     unreachable_amount = serializers.SerializerMethodField()
     reachable_amount = serializers.SerializerMethodField()
     unreachable_assets = serializers.SerializerMethodField()
@@ -20,6 +26,9 @@ class SystemUserSerializer(serializers.ModelSerializer):
         model = SystemUser
         exclude = ('_password', '_private_key', '_public_key')
         list_serializer_class = AdaptedBulkListSerializer
+        read_only_fields = (
+            "created_by", "nodes", "assets"
+        )
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
