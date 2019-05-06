@@ -47,7 +47,7 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
             form['assets'].initial = assets
-        form['actions'].initial = Action.objects.get(name=PERMS_ACTION_NAME_ALL)
+        form['actions'].initial = Action.get_action_all()
 
         return form
 

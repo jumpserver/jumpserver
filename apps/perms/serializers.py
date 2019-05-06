@@ -28,6 +28,14 @@ class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
         model = AssetPermission
         exclude = ('created_by', 'date_created')
 
+    def create(self, validated_data):
+        instance = super().create(validated_data=validated_data)
+        # add action: all
+        actions = instance.actions.all()
+        if not actions:
+            instance.actions.add(Action.get_action_all())
+        return instance
+
 
 class AssetPermissionListSerializer(serializers.ModelSerializer):
     users = StringManyToManyField(many=True, read_only=True)
