@@ -365,7 +365,6 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ yum install -y java-1.8.0-openjdk libtool
     $ yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel
     $ yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript
-    $ ln -s /usr/local/lib/freerdp/*.so /usr/lib64/freerdp/
 
 **5.2 编译安装 guacamole 服务**
 
@@ -379,6 +378,7 @@ Luna 已改为纯前端, 需要 Nginx 来运行访问
     $ autoreconf -fi
     $ ./configure --with-init-dir=/etc/init.d
     $ make && make install
+    $ ln -s /usr/local/lib/freerdp/*.so /usr/lib64/freerdp/
     $ cd ..
     $ rm -rf guacamole-server-0.9.14
     $ ldconfig
