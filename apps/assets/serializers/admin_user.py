@@ -19,14 +19,19 @@ class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=False, write_only=True, label=_('Password')
     )
-    assets_amount = serializers.SerializerMethodField()
-    unreachable_amount = serializers.SerializerMethodField()
-    reachable_amount = serializers.SerializerMethodField()
+    assets_amount = serializers.SerializerMethodField(label=_('Asset'))
+    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
+    reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
 
     class Meta:
         list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
-        fields = '__all__'
+        fields = [
+            'id', 'org_id', 'name', 'username', 'assets_amount',
+            'reachable_amount', 'unreachable_amount', 'password', 'comment',
+            'date_created', 'date_updated', 'become', 'become_method',
+            'become_user', 'created_by',
+        ]
         read_only_fields = [
             'become', 'become_method', 'become_user', 'created_by',
         ]

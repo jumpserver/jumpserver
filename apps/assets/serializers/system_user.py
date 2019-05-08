@@ -16,16 +16,22 @@ class SystemUserSerializer(serializers.ModelSerializer):
         required=False, write_only=True, label=_('Password')
     )
 
-    unreachable_amount = serializers.SerializerMethodField()
-    reachable_amount = serializers.SerializerMethodField()
-    unreachable_assets = serializers.SerializerMethodField()
-    reachable_assets = serializers.SerializerMethodField()
-    assets_amount = serializers.SerializerMethodField()
+    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
+    reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
+    unreachable_assets = serializers.SerializerMethodField(label=_('Unreachable assets'))
+    reachable_assets = serializers.SerializerMethodField(label=_('Reachable assets'))
+    assets_amount = serializers.SerializerMethodField(label=_('Asset'))
 
     class Meta:
         model = SystemUser
-        exclude = ('_password', '_private_key', '_public_key')
         list_serializer_class = AdaptedBulkListSerializer
+        fields = [
+            'id', 'org_id', 'name', 'username', 'login_mode',
+            'login_mode_display', 'priority', 'protocol', 'auto_push',
+            'password', 'assets_amount', 'reachable_amount', 'reachable_assets',
+            'unreachable_amount', 'unreachable_assets', 'cmd_filters', 'sudo',
+            'shell', 'comment', 'nodes', 'assets'
+        ]
         read_only_fields = (
             "created_by", "nodes", "assets"
         )

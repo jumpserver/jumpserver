@@ -21,8 +21,16 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResou
     class Meta:
         model = Asset
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
         # validators = [] # 解决批量导入时unique_together字段校验失败
+        fields = [
+            'id', 'org_id', 'org_name', 'ip', 'hostname', 'protocol', 'port',
+            'platform', 'is_active', 'public_ip', 'domain', 'admin_user',
+            'nodes', 'labels', 'number', 'vendor', 'model', 'sn',
+            'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
+            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
+            'hostname_raw', 'comment', 'created_by', 'date_created',
+            'hardware_info', 'connectivity'
+        ]
         read_only_fields = (
             'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',

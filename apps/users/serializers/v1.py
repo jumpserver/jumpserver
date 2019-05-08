@@ -19,11 +19,10 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'username', 'email', 'groups', 'groups_display',
-            'role', 'role_display', 'avatar_url', 'wechat', 'phone',
-            'otp_level', 'comment', 'source', 'source_display',
-            'is_valid', 'is_expired', 'is_active',
-            'created_by', 'is_first_login',
-            'date_password_last_updated', 'date_expired',
+            'role', 'role_display',  'wechat', 'phone', 'otp_level',
+            'comment', 'source', 'source_display', 'is_valid', 'is_expired',
+            'is_active', 'created_by', 'is_first_login',
+            'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
         read_only_fields = (
             'source', 'created_by', 'is_first_login'
@@ -51,12 +50,15 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    users = serializers.SerializerMethodField()
+    users = serializers.SerializerMethodField(label=_('User'))
 
     class Meta:
         model = UserGroup
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
+        fields = [
+            'id', 'org_id', 'name',  'users', 'comment', 'date_created',
+            'created_by',
+        ]
         read_only_fields = ('created_by',)
 
     @staticmethod
