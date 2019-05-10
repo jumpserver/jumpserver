@@ -122,6 +122,7 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
             nodes_invalid = Node.objects.exclude(key__startswith=self.node.key)
             queryset.extend(list(nodes_invalid))
         queryset = [node.as_tree_node() for node in queryset]
+        queryset = sorted(queryset)
         return queryset
 
     def filter_assets(self, queryset):
