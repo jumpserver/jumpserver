@@ -15,11 +15,20 @@ class SystemUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=False, write_only=True, label=_('Password')
     )
+    login_mode_display = serializers.CharField(
+        read_only=True, label=_('Login mode display')
+    )
+    unreachable_amount = serializers.SerializerMethodField(
+        label=_('Unreachable')
+    )
+    unreachable_assets = serializers.SerializerMethodField(
+        label=_('Unreachable assets')
+    )
 
-    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
+    reachable_assets = serializers.SerializerMethodField(
+        label=_('Reachable assets')
+    )
     reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
-    unreachable_assets = serializers.SerializerMethodField(label=_('Unreachable assets'))
-    reachable_assets = serializers.SerializerMethodField(label=_('Reachable assets'))
     assets_amount = serializers.SerializerMethodField(label=_('Asset'))
 
     class Meta:

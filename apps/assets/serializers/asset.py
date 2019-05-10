@@ -2,6 +2,8 @@
 #
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
+
 from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
@@ -15,6 +17,13 @@ __all__ = [
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResourceSerializerMixin):
+    org_name = serializers.CharField(read_only=True, label=_('Org name'))
+    hardware_info = serializers.CharField(
+        read_only=True, label=_('Hardware info')
+    )
+    connectivity = serializers.CharField(
+        read_only=True, label=_('Connectivity')
+    )
     """
     资产的数据结构
     """

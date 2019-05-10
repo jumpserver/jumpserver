@@ -19,8 +19,16 @@ class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=False, write_only=True, label=_('Password')
     )
+    date_created = serializers.DateTimeField(
+        read_only=True, label=_('Date created')
+    )
+    date_updated = serializers.DateTimeField(
+        read_only=True, label=_('Date updated')
+    )
+    unreachable_amount = serializers.SerializerMethodField(
+        label=_('Unreachable')
+    )
     assets_amount = serializers.SerializerMethodField(label=_('Asset'))
-    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
     reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
 
     class Meta:

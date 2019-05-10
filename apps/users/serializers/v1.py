@@ -13,6 +13,19 @@ signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    groups_display = serializers.CharField(
+        read_only=True, label=_('Groups name')
+    )
+    source_display = serializers.CharField(
+        read_only=True, label=_('Source name')
+    )
+    is_first_login = serializers.BooleanField(
+        read_only=True, label=_('Is first login')
+    )
+    role_display = serializers.CharField(read_only=True, label=_('Role name'))
+    is_valid = serializers.BooleanField(read_only=True, label=_('Is valid'))
+    is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
+    avatar_url = serializers.CharField(read_only=True, label=_('Avatar url'))
 
     class Meta:
         model = User
@@ -51,6 +64,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     users = serializers.SerializerMethodField(label=_('User'))
+    created_by = serializers.CharField(read_only=True, label=_('Created by'))
 
     class Meta:
         model = UserGroup
