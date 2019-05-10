@@ -44,7 +44,15 @@ class Node(OrgModelMixin):
             return True
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]
-        return self_key.__lt__(other_key)
+        self_parent_key = self_key[:-1]
+        other_parent_key = other_key[:-1]
+
+        if self_parent_key == other_parent_key:
+            return self.name > other.name
+        if self_key != other_key:
+            return self_key > other_key
+        else:
+            return self.name > other.name
 
     def __lt__(self, other):
         return not self.__gt__(other)
@@ -305,5 +313,3 @@ class Node(OrgModelMixin):
         for i in range(count):
             node = random.choice(cls.objects.all())
             node.create_child('Node {}'.format(i))
-
-
