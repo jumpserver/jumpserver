@@ -49,10 +49,7 @@ class Node(OrgModelMixin):
 
         if self_parent_key == other_parent_key:
             return self.name > other.name
-        if self_key != other_key:
-            return self_key > other_key
-        else:
-            return self.name > other.name
+        return self_key > other_key
 
     def __lt__(self, other):
         return not self.__gt__(other)
