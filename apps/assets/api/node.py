@@ -136,6 +136,7 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
     def filter_queryset(self, queryset):
         queryset = self.filter_assets(queryset)
         queryset = self.filter_refresh_nodes(queryset)
+        queryset = sorted(queryset, key=lambda x: x.name)
         return queryset
 
     def filter_refresh_nodes(self, queryset):
