@@ -41,13 +41,14 @@ class JMSCSVRender(BaseRenderer):
             yield row
 
     def render(self, data, media_type=None, renderer_context=None):
-        # 处理多对多字段的显示
-        data = json.loads(json.dumps(data, cls=encoders.JSONEncoder))
         renderer_context = renderer_context or {}
         encoding = renderer_context.get('encoding', 'utf-8')
         request = renderer_context['request']
         template = request.query_params.get('template', 'export')
         view = renderer_context['view']
+        data = json.loads(json.dumps(data, cls=encoders.JSONEncoder))
+        if template == 'import':
+            data = [data[0]] if data else data
 
         try:
             serializer = view.get_serializer()

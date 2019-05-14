@@ -38,7 +38,7 @@ __all__ = [
 ]
 
 
-class AdminUserViewSet(IDExportFilterMixin, IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
+class AdminUserViewSet(IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """

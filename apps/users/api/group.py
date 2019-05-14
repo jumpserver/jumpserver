@@ -17,8 +17,7 @@ from common.mixins import (
 __all__ = ['UserGroupViewSet', 'UserGroupUpdateUserApi']
 
 
-class UserGroupViewSet(IDExportFilterMixin, IDInCacheFilterMixin,
-                       IDInFilterMixin, BulkModelViewSet):
+class UserGroupViewSet(IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
     filter_fields = ("name",)
     search_fields = filter_fields
     queryset = UserGroup.objects.all()

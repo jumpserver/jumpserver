@@ -38,7 +38,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDExportFilterMixin, IDInCacheFilterMixin, IDInFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInCacheFilterMixin, IDInFilterMixin, LabelFilter, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """

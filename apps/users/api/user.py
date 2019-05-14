@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 
-class UserViewSet(IDExportFilterMixin, IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
+class UserViewSet(IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)

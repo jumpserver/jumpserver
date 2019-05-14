@@ -39,7 +39,7 @@ __all__ = [
 ]
 
 
-class SystemUserViewSet(IDExportFilterMixin, IDInCacheFilterMixin, BulkModelViewSet):
+class SystemUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """
