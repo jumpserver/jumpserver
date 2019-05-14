@@ -22,6 +22,7 @@ class UserCheckOtpCodeForm(forms.Form):
 
 
 class UserCreateUpdateForm(OrgModelForm):
+    auto_password = forms.BooleanField(initial=True, required=False)
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,

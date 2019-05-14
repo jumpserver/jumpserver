@@ -2,15 +2,44 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
-{#{% block username %}#}
-{#    {% bootstrap_field form.username layout="horizontal" %}#}
-{#{% endblock %}#}
+
 {% block password %}
     <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans 'Auto password' %}</label>
+        <div class="col-sm-8">
+            {{ form.auto_password }}
+        </div>
+    </div>
+    <div class="form-group auto_email_password">
         <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
         <div class="col-sm-8 controls" style="margin-top: 8px;">
             {% trans 'Reset link will be generated and sent to the user. ' %}
         </div>
     </div>
+    <div class="group manual_password">
+        {% bootstrap_field form.password layout="horizontal" %}
+    </div>
+
+<script>
+    function authFieldsDisplay() {
+    if ($(auto_password_id).prop('checked')) {
+        $('.manual_password').addClass('hidden');
+        $('.auto_email_password').removeClass('hidden');
+    } else {
+        $('.auto_email_password').addClass('hidden');
+        $('.manual_password').removeClass('hidden')
+    }
+}
+    var auto_password_id = '#' + '{{ form.auto_password.id_for_label }}';
+    $(document).ready(function () {
+         $('.manual_password').addClass('hidden');
+
+})
+.on('change', auto_password_id, function () {
+       authFieldsDisplay()
+});
+
+</script>
 {% endblock %}
+
 
