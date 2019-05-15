@@ -63,7 +63,9 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    users = serializers.SerializerMethodField(label=_('User'))
+    users = serializers.PrimaryKeyRelatedField(
+        required=False, many=True, queryset=User.objects.all(), label=_('User')
+    )
     created_by = serializers.CharField(read_only=True, label=_('Created by'))
 
     class Meta:
@@ -74,10 +76,6 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by',
         ]
         read_only_fields = ('created_by',)
-
-    @staticmethod
-    def get_users(obj):
-        return [user.name for user in obj.users.all()]
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):
