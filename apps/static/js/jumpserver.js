@@ -984,10 +984,18 @@ function APIImportData(props){
         data: props.body,
         contentType: props.content_type || 'text/csv',
         success: function (data) {
-            $('#id_failed').html('');
-            $('#id_failed_detail').html('');
-            $('#id_created').html("Import Success");
-            $('#id_created_detail').html("Count" + ": " + data.length);
+            if(props.method === 'POST'){
+                $('#created_failed').html('');
+                $('#created_failed_detail').html('');
+                $('#success_created').html("Import Success");
+                $('#success_created_detail').html("Count" + ": " + data.length);
+            }else{
+                $('#updated_failed').html('');
+                $('#updated_failed_detail').html('');
+                $('#success_updated').html("Update Success");
+                $('#success_updated_detail').html("Count" + ": " + data.length);
+            }
+
             props.data_table.ajax.reload()
         },
         error: function (error) {
@@ -1011,13 +1019,21 @@ function APIImportData(props){
             else {
                 html = error.responseText
             }
-            $('#id_created').html('');
-            $('#id_created_detail').html('');
-            $('#id_failed').html("Import failed");
-            $('#id_failed_detail').html(html);
+            if(props.method === 'POST'){
+                $('#success_created').html('');
+                $('#success_created_detail').html('');
+                $('#created_failed').html("Import failed");
+                $('#created_failed_detail').html(html);
+            }else{
+                $('#success_updated').html('');
+                $('#success_updated_detail').html('');
+                $('#updated_failed').html("Update failed");
+                $('#updated_failed_detail').html(html);
+            }
         }
     })
 }
+
 
 function htmlEscape ( d ) {
     return typeof d === 'string' ?

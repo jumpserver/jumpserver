@@ -53,15 +53,11 @@ class AssetViewSet(IDInCacheFilterMixin, IDInFilterMixin, LabelFilter, BulkModel
     def set_assets_node(self, assets):
         if not isinstance(assets, list):
             assets = [assets]
-
+        node = Node.objects.get(value='Default')
         node_id = self.request.query_params.get('node_id')
-        if not node_id:
-            return
-        node = get_object_or_none(Node, pk=node_id)
-        if not node:
-            return
-
-        node.assets.set(assets)
+        if node_id:
+            node = get_object_or_none(Node, pk=node_id)
+        node.assets.add(*assets)
 
     def perform_create(self, serializer):
         assets = serializer.save()

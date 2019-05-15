@@ -67,14 +67,26 @@
            </div>
            <div class="mail-box-header">
                <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
-               <div class="html5buttons">
-                   <div class="dt-buttons btn-group">
-                       <a class="btn btn-default btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                           <span>{% trans "Import" %}</span>
-                       </a>
-                       <a class="btn btn-default btn_export" tabindex="0">
-                           <span>{% trans "Export" %}</span>
-                       </a>
+               <div class="" style="float: right">
+                   <div class=" btn-group">
+                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class=" btn_export" tabindex="0">
+                                <span>{% trans "Export" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                                <span>{% trans "Import" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                                <span>{% trans "Update" %}</span>
+                                </a>
+                            </li>
+                        </ul>
                    </div>
                </div>
                <div class="btn-group" style="float: right">
@@ -140,7 +152,7 @@
 {#        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>#}
     </ul>
 </div>
-
+{% include 'assets/_asset_update_modal.html' %}
 {% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
@@ -496,6 +508,50 @@ $(document).ready(function(){
     APIImportData({
         url: url,
         method: "POST",
+        body: file,
+        data_table: data_table
+    });
+})
+.on('click', '#download_update_template', function () {
+    var $data_table = $('#asset_list_table').DataTable();
+    var rows = $data_table.rows('.selected').data();
+
+    var assets = [];
+    $.each(rows, function (index, obj) {
+        assets.push(obj.id)
+    });
+
+    var data = {
+        'resources': assets
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:asset-list' %}?format=csv&template=update",
+        format: 'csv',
+        params: {
+            search: search,
+            node_id: current_node_id || ''
+        }
+    };
+    APIExportData(props);
+})
+.on('click', '#btn_update_confirm', function () {
+    var file = document.getElementById('update_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var url = "{% url 'api-assets:asset-list' %}";
+    if (current_node_id){
+        url = setUrlParam(url, 'node_id', current_node_id);
+    }
+    var data_table = $('#asset_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "PUT",
         body: file,
         data_table: data_table
     });
