@@ -30,7 +30,7 @@ class SystemUserBackend(BaseBackend):
     @classmethod
     def _filter_system_users_by_username(cls, system_users, username):
         _system_users = cls._distinct_system_users_by_username(system_users)
-        if username:
+        if username is not None:
             _system_users = [su for su in _system_users if username == su.username]
         return _system_users
 

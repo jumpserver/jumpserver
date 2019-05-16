@@ -39,6 +39,8 @@ __all__ = [
 
 
 class NodeViewSet(viewsets.ModelViewSet):
+    filter_fields = ('value', 'key', )
+    search_fields = filter_fields
     queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer

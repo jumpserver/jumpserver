@@ -27,7 +27,7 @@ class AdminUserBackend(BaseBackend):
         instances = []
         assets = cls._get_assets(asset)
         for asset in assets:
-            if username and asset.admin_user.username != username:
+            if username is not None and asset.admin_user.username != username:
                 continue
             instance = construct_authbook_object(asset.admin_user, asset)
             instances.append(instance)
