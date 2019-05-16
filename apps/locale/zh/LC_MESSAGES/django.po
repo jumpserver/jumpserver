@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 12:22+0800\n"
+"POT-Creation-Date: 2019-05-16 11:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -25,11 +25,11 @@ msgstr "请选择需要更新的资产"
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:282
+#: assets/api/node.py:283
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:296
+#: assets/api/node.py:297
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -236,9 +236,9 @@ msgstr "密码或密钥密码"
 #: authentication/forms.py:13
 #: authentication/templates/authentication/login.html:67
 #: authentication/templates/authentication/new_login.html:93
-#: settings/forms.py:103 users/forms.py:15 users/forms.py:27
+#: settings/forms.py:103 users/forms.py:15 users/forms.py:28
 #: users/templates/users/reset_password.html:53
-#: users/templates/users/user_create.html:10
+#: users/templates/users/user_create.html:14
 #: users/templates/users/user_password_authentication.html:18
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_profile_update.html:40
@@ -734,10 +734,10 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:283
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:284
 #: users/models/user.py:36 users/models/user.py:463
 #: users/templates/users/user_group_detail.html:78
-#: users/templates/users/user_group_list.html:13 users/views/user.py:395
+#: users/templates/users/user_group_list.html:13 users/views/user.py:396
 #: xpack/plugins/orgs/forms.py:26
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:113
 #: xpack/plugins/orgs/templates/orgs/org_list.html:14
@@ -757,7 +757,7 @@ msgstr "分类"
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:128
+#: assets/models/node.py:133
 msgid "New node"
 msgstr "新节点"
 
@@ -833,7 +833,7 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/serializers/asset_user.py:23 users/forms.py:230
+#: assets/serializers/asset_user.py:23 users/forms.py:231
 #: users/models/user.py:91 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
@@ -1949,7 +1949,7 @@ msgid "User agent"
 msgstr "Agent"
 
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:56
-#: users/forms.py:142 users/models/user.py:83
+#: users/forms.py:143 users/models/user.py:83
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2274,8 +2274,8 @@ msgstr "欢迎回来，请输入用户名和密码登录"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172 users/views/user.py:541
-#: users/views/user.py:566
+#: authentication/views/login.py:172 users/views/user.py:542
+#: users/views/user.py:567
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -2716,7 +2716,7 @@ msgstr "下载文件"
 #: perms/templates/perms/asset_permission_list.html:55
 #: perms/templates/perms/asset_permission_list.html:75
 #: perms/templates/perms/asset_permission_list.html:122 templates/_nav.html:14
-#: users/forms.py:253 users/models/group.py:26 users/models/user.py:67
+#: users/forms.py:254 users/models/group.py:26 users/models/user.py:67
 #: users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
 #: users/templates/users/user_list.html:26
@@ -3373,14 +3373,14 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:14 users/forms.py:121
+#: templates/_header_bar.html:89 templates/_nav_user.html:14 users/forms.py:122
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
 #: users/templates/users/user_profile.html:17
 #: users/templates/users/user_profile_update.html:37
 #: users/templates/users/user_profile_update.html:57
-#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:377
+#: users/templates/users/user_pubkey_update.html:37 users/views/user.py:378
 msgid "Profile"
 msgstr "个人信息"
 
@@ -3463,8 +3463,8 @@ msgstr ""
 #: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
 #: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
 #: users/views/login.py:154 users/views/user.py:68 users/views/user.py:83
-#: users/views/user.py:122 users/views/user.py:203 users/views/user.py:364
-#: users/views/user.py:414 users/views/user.py:454
+#: users/views/user.py:123 users/views/user.py:204 users/views/user.py:365
+#: users/views/user.py:415 users/views/user.py:455
 msgid "Users"
 msgstr "用户管理"
 
@@ -3906,7 +3906,7 @@ msgstr "你没有权限"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:32 users/models/user.py:71
+#: users/forms.py:33 users/models/user.py:71
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:25
@@ -3914,31 +3914,31 @@ msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:35 users/forms.py:200
+#: users/forms.py:36 users/forms.py:201
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:36 users/forms.py:201
+#: users/forms.py:37 users/forms.py:202
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:37
+#: users/forms.py:38
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:51 users/templates/users/user_detail.html:221
+#: users/forms.py:52 users/templates/users/user_detail.html:221
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:85 users/forms.py:215
+#: users/forms.py:86 users/forms.py:216
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:89 users/forms.py:219 users/serializers/v1.py:38
+#: users/forms.py:90 users/forms.py:220 users/serializers/v1.py:38
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:127
+#: users/forms.py:128
 msgid ""
 "Tip: when enabled, you will enter the MFA binding process the next time you "
 "log in. you can also directly bind in \"personal information -> quick "
@@ -3947,11 +3947,11 @@ msgstr ""
 "提示：启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修"
 "改->更改MFA设置）中直接绑定!"
 
-#: users/forms.py:137
+#: users/forms.py:138
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全."
 
-#: users/forms.py:147
+#: users/forms.py:148
 msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
@@ -3960,41 +3960,41 @@ msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
 "设置复杂密码，启用MFA认证）"
 
-#: users/forms.py:154 users/templates/users/first_login.html:48
+#: users/forms.py:155 users/templates/users/first_login.html:48
 #: users/templates/users/first_login.html:107
 #: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
 
-#: users/forms.py:160
+#: users/forms.py:161
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:165
+#: users/forms.py:166
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:170
+#: users/forms.py:171
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:180
+#: users/forms.py:181
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:188
+#: users/forms.py:189
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:198
+#: users/forms.py:199
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms.py:202
+#: users/forms.py:203
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:236 users/forms.py:241 users/forms.py:287
+#: users/forms.py:237 users/forms.py:242 users/forms.py:288
 #: xpack/plugins/orgs/forms.py:30
 msgid "Select users"
 msgstr "选择用户"
@@ -4041,7 +4041,7 @@ msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
 #: users/models/user.py:136 users/templates/users/user_update.html:22
-#: users/views/login.py:47 users/views/login.py:108 users/views/user.py:427
+#: users/views/login.py:47 users/views/login.py:108 users/views/user.py:428
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
@@ -4231,12 +4231,16 @@ msgstr "很强"
 msgid "Create user"
 msgstr "创建用户"
 
-#: users/templates/users/user_create.html:12
+#: users/templates/users/user_create.html:8
+msgid "Auto password"
+msgstr "自动设置密码"
+
+#: users/templates/users/user_create.html:16
 msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
-#: users/templates/users/user_granted_asset.html:18 users/views/user.py:204
+#: users/templates/users/user_granted_asset.html:18 users/views/user.py:205
 msgid "User detail"
 msgstr "用户详情"
 
@@ -4439,8 +4443,8 @@ msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接
 msgid "Administrator Settings force MFA login"
 msgstr "管理员设置强制使用MFA登录"
 
-#: users/templates/users/user_profile.html:120 users/views/user.py:240
-#: users/views/user.py:294
+#: users/templates/users/user_profile.html:120 users/views/user.py:241
+#: users/views/user.py:295
 msgid "User groups"
 msgstr "用户组"
 
@@ -4490,7 +4494,7 @@ msgid ""
 "corresponding private key."
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
-#: users/templates/users/user_update.html:4 users/views/user.py:123
+#: users/templates/users/user_update.html:4 users/views/user.py:124
 msgid "Update user"
 msgstr "更新用户"
 
@@ -4722,7 +4726,7 @@ msgstr "Token错误或失效"
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:115 users/views/user.py:137 users/views/user.py:437
+#: users/views/login.py:115 users/views/user.py:138 users/views/user.py:438
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
@@ -4730,51 +4734,51 @@ msgstr "* 您的密码不符合要求"
 msgid "First login"
 msgstr "首次登录"
 
-#: users/views/user.py:154
+#: users/views/user.py:155
 msgid "Bulk update user success"
 msgstr "批量更新用户成功"
 
-#: users/views/user.py:184
+#: users/views/user.py:185
 msgid "Bulk update user"
 msgstr "批量更新用户"
 
-#: users/views/user.py:269
+#: users/views/user.py:270
 msgid "Invalid file."
 msgstr "文件不合法"
 
-#: users/views/user.py:365
+#: users/views/user.py:366
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:396
+#: users/views/user.py:397
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:415
+#: users/views/user.py:416
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:455
+#: users/views/user.py:456
 msgid "Public key update"
 msgstr "密钥更新"
 
-#: users/views/user.py:496
+#: users/views/user.py:497
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:596
+#: users/views/user.py:597
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:597
+#: users/views/user.py:598
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:599
+#: users/views/user.py:600
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:600
+#: users/views/user.py:601
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 
