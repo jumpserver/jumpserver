@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from common.permissions import SuperUserRequiredMixin
 from common import utils
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
-    TerminalSettingForm, SecuritySettingForm
+    TerminalSettingForm, SecuritySettingForm, EmailContentSettingForm
 
 
 class BasicSettingView(SuperUserRequiredMixin, TemplateView):
@@ -166,3 +166,16 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
             context = self.get_context_data()
             context.update({"form": form})
             return render(request, self.template_name, context)
+
+
+class EmailContentSetting(SuperUserRequiredMixin,TemplateView):
+    template_name = "settings/email_content_setting.html"
+    form_class = EmailContentSettingForm
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Settings'),
+            'action': _('Email content setting'),
+            'form': self.form_class(),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

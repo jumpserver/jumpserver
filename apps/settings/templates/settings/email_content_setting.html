@@ -11,13 +11,13 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
+                            <li>
+                                <a href="{% url 'settings:basic-setting' %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
                             </li>
                             <li>
                                 <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
                             </li>
-                            <li>
+                            <li class="active">
                                 <a href="{% url 'settings:email-content-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email content setting' %} </a>
                             </li>
                             <li>
@@ -41,24 +41,13 @@
                                          </div>
                                     {% endif %}
                                     {% csrf_token %}
-                                    {% for field in form %}
-                                        {% if not field.field|is_bool_field %}
-                                            {% bootstrap_field field layout="horizontal" %}
-                                        {% else %}
-                                            <div class="form-group">
-                                                <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                                                <div class="col-sm-8">
-                                                    <div class="col-sm-1">
-                                                        {{ field }}
-                                                    </div>
-                                                    <div class="col-sm-9">
-                                                        <span class="help-block" >{{ field.help_text }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
+
+                                    <h3>{% trans "Create User" %}</h3>
+                                    {% bootstrap_field form.CREATE_USER_SUBJECT layout="horizontal" %}
+                                    {% bootstrap_field form.CREATE_USER_EMAIL_APPELLATION layout="horizontal" %}
+                                    {% bootstrap_field form.CREATE_USER_CONTENT layout="horizontal" %}
                                     <div class="hr-line-dashed"></div>
+
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
@@ -77,7 +66,5 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).ready(function () {
-})
 </script>
 {% endblock %}
