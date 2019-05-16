@@ -17,13 +17,6 @@ __all__ = [
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResourceSerializerMixin):
-    org_name = serializers.CharField(read_only=True, label=_('Org name'))
-    hardware_info = serializers.CharField(
-        read_only=True, label=_('Hardware info')
-    )
-    connectivity = serializers.CharField(
-        read_only=True, label=_('Connectivity')
-    )
     """
     资产的数据结构
     """
@@ -46,6 +39,12 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResou
             'os', 'os_version', 'os_arch', 'hostname_raw',
             'created_by', 'date_created',
         )
+        extra_kwargs = {
+            'hardware_info': {'label': _('Hardware info')},
+            'connectivity': {'label': _('Connectivity')},
+            'org_name': {'label': _('Org name')}
+
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):

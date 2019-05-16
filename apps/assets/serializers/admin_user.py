@@ -19,15 +19,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=False, write_only=True, label=_('Password')
     )
-    date_created = serializers.DateTimeField(
-        read_only=True, label=_('Date created')
-    )
-    date_updated = serializers.DateTimeField(
-        read_only=True, label=_('Date updated')
-    )
-    unreachable_amount = serializers.SerializerMethodField(
-        label=_('Unreachable')
-    )
+    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
     assets_amount = serializers.SerializerMethodField(label=_('Asset'))
     reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
 
@@ -40,9 +32,13 @@ class AdminUserSerializer(serializers.ModelSerializer):
             'date_created', 'date_updated', 'become', 'become_method',
             'become_user', 'created_by',
         ]
-        read_only_fields = [
-            'become', 'become_method', 'become_user', 'created_by',
-        ]
+
+        extra_kwargs = {
+            'date_created': {'label': _('Date created')},
+            'date_updated': {'label': _('Date updated')},
+            'become': {'read_only': True}, 'become_method': {'read_only': True},
+            'become_user': {'read_only': True}, 'created_by': {'read_only': True}
+        }
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

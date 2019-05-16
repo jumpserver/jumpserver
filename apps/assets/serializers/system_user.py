@@ -15,16 +15,12 @@ class SystemUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         required=False, write_only=True, label=_('Password')
     )
-    login_mode_display = serializers.CharField(
-        read_only=True, label=_('Login mode display')
-    )
     unreachable_amount = serializers.SerializerMethodField(
         label=_('Unreachable')
     )
     unreachable_assets = serializers.SerializerMethodField(
         label=_('Unreachable assets')
     )
-
     reachable_assets = serializers.SerializerMethodField(
         label=_('Reachable assets')
     )
@@ -41,9 +37,11 @@ class SystemUserSerializer(serializers.ModelSerializer):
             'unreachable_amount', 'unreachable_assets', 'cmd_filters', 'sudo',
             'shell', 'comment', 'nodes', 'assets'
         ]
-        read_only_fields = (
-            "created_by", "nodes", "assets"
-        )
+        extra_kwargs = {
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True}, 'nodes': {'read_only': True},
+            'assets': {'read_only': True}
+        }
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)

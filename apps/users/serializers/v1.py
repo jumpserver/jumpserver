@@ -13,19 +13,6 @@ signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    groups_display = serializers.CharField(
-        read_only=True, label=_('Groups name')
-    )
-    source_display = serializers.CharField(
-        read_only=True, label=_('Source name')
-    )
-    is_first_login = serializers.BooleanField(
-        read_only=True, label=_('Is first login')
-    )
-    role_display = serializers.CharField(read_only=True, label=_('Role name'))
-    is_valid = serializers.BooleanField(read_only=True, label=_('Is valid'))
-    is_expired = serializers.BooleanField(read_only=True, label=_('Is expired'))
-    avatar_url = serializers.CharField(read_only=True, label=_('Avatar url'))
 
     class Meta:
         model = User
@@ -37,9 +24,16 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
-        read_only_fields = (
-            'source', 'created_by', 'is_first_login'
-        )
+        extra_kwargs = {
+            'groups_display': {'label': _('Groups name')},
+            'source_display': {'label': _('Source name')},
+            'is_first_login': {'label': _('Is first login'), 'read_only': True},
+            'role_display': {'label': _('Role name')},
+            'is_valid': {'label': _('Is valid')},
+            'is_expired': {'label': _('Is expired')},
+            'avatar_url': {'label': _('Avatar url')},
+            'created_by': {'read_only': True}, 'source': {'read_only': True}
+        }
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
@@ -66,7 +60,6 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
         required=False, many=True, queryset=User.objects.all(), label=_('User')
     )
-    created_by = serializers.CharField(read_only=True, label=_('Created by'))
 
     class Meta:
         model = UserGroup
@@ -75,7 +68,9 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'id', 'org_id', 'name',  'users', 'comment', 'date_created',
             'created_by',
         ]
-        read_only_fields = ('created_by',)
+        extra_kwargs = {
+            'created_by': {'label': _('Created by'), 'read_only': True}
+        }
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):
