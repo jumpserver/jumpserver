@@ -12,19 +12,27 @@ from ..models import RemoteApp
 
 
 __all__ = [
-    'RemoteAppSerializer',
+    'RemoteAppSerializer', 'RemoteAppConnectionInfoSerializer',
 ]
 
 
-class RemoteAppTypeParamsDictField(serializers.DictField):
+class RemoteAppParamsDictField(serializers.DictField):
+    """
+    RemoteApp field => params
+    """
 
     @staticmethod
     def filter_attribute(attribute, instance):
         """
         过滤掉params字段值中write_only特性的key-value值
+        For example, the chrome_password field is not returned when serializing
+        {
+            'chrome_target': 'http://www.jumpserver.org/',
+            'chrome_username': 'admin',
+            'chrome_password': 'admin',
+        }
         """
-        fields = const.REMOTE_APP_TYPE_MAP_FIELDS[instance.type]
-        for field in fields:
+        for field in const.REMOTE_APP_TYPE_MAP_FIELDS[instance.type]:
             if field.get('write_only', False):
                 attribute.pop(field['name'], None)
         return attribute
@@ -32,12 +40,6 @@ class RemoteAppTypeParamsDictField(serializers.DictField):
     def get_attribute(self, instance):
         """
         序列化时调用
-        For example, the chrome_password field is not returned when serializing
-        {
-            'chrome_target': 'http://www.jumpserver.org/',
-            'chrome_username': 'admin',
-            'chrome_password': 'admin',
-        }
         """
         attribute = super().get_attribute(instance)
         attribute = self.filter_attribute(attribute, instance)
@@ -67,7 +69,7 @@ class RemoteAppTypeParamsDictField(serializers.DictField):
 
 class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
-    params = RemoteAppTypeParamsDictField()
+    params = RemoteAppParamsDictField()
 
     class Meta:
         model = RemoteApp
@@ -76,3 +78,23 @@ class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'id', 'name', 'asset', 'system_user', 'type', 'path', 'params',
             'comment', 'created_by', 'date_created',
         ]
+
+
+class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
+
+    parameter_remote_app = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RemoteApp
+        fields = [
+            'id', 'name', 'asset', 'system_user', 'parameter_remote_app',
+        ]
+
+    @staticmethod
+    def get_parameter_remote_app(obj):
+        parameter = {
+            'program': const.REMOTE_APP_BOOT_PROGRAM_NAME,
+            'working_directory': '',
+            'parameters': obj.parameters,
+        }
+        return parameter

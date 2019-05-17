@@ -35,7 +35,7 @@ class RemoteApp(OrgModelMixin):
         verbose_name=_('RemoteApp path')
     )
     params = EncryptJsonDictTextField(
-        max_length=4096, blank=True, null=True, verbose_name=_('parameters')
+        max_length=4096, blank=True, null=True, verbose_name=_('Parameters')
     )
     created_by = models.CharField(
         max_length=32, null=True, blank=True, verbose_name=_('Created by')
@@ -53,3 +53,20 @@ class RemoteApp(OrgModelMixin):
 
     def __str__(self):
         return self.name
+
+    @property
+    def parameters(self):
+        """
+        返回Guacamole需要的RemoteApp配置参数信息中的parameters参数
+        """
+        _parameters = list()
+        _parameters.append(self.type)
+        path = '\"%s\"' % self.path
+        _parameters.append(path)
+        for field in const.REMOTE_APP_TYPE_MAP_FIELDS[self.type]:
+            value = self.params.get(field['name'])
+            if value is None:
+                continue
+            _parameters.append(value)
+        _parameters = ' '.join(_parameters)
+        return _parameters

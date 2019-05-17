@@ -92,6 +92,9 @@ urlpatterns = [
     path('gateway/<uuid:pk>/test-connective/',
          api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
 
+    path('remote-apps/<uuid:pk>/connection-info/',
+         api.RemoteAppConnectionInfoApi.as_view(), name='remote-app-connection-info')
+
 ]
 
 urlpatterns += router.urls + cmd_filter_router.urls
