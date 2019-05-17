@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import time
 
 from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -114,3 +115,28 @@ class WithBootstrapToken(permissions.BasePermission):
             return False
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
+
+
+class WithinMFAAuthPeriod(permissions.BasePermission):
+    """
+    一些安全应用需要进入认证，保证安全
+    """
+    duration = 60 * 10
+
+    def has_permission(self, request, view):
+        t = int(request.session.get("MFA_AUTH_TIME", 0))
+        now = int(time.time())
+        if t and now - t < self.duration:
+            return True
+        return False
+
+
+class WithinMFAAuthPeriodMeta(type):
+    def __new__(cls, *args, **kwargs):
+        if kwargs.get('duration'):
+            duration = kwargs["duration"]
+        elif len(args) == 1:
+            duration = args[0]
+        else:
+            duration = 60 * 10
+        return type('WithinMFAAuthPeriod', (), {'duration': duration})

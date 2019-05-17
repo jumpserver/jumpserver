@@ -1,0 +1,73 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+{% block modal_id %}asset_user_auth_view{% endblock %}
+{% block modal_title%}{% trans "Asset user auth" %}{% endblock %}
+{% block modal_body %}
+<form class="form-horizontal" action="" style="padding-top: 20px">
+<div class="form-group mfa-field">
+    <label for="mfa" class="col-sm-2 control-label">{% trans 'MFA' %}</label>
+    <div class="col-sm-8">
+        <input type="text" id="mfa" class="form-control input-sm" name="mfa">
+        <span id="mfa_error" class="help-block">{% trans "Need otp auth for view auth" %}</span>
+    </div>
+    <div class="col-sm-2">
+        <a class="btn btn-primary btn-sm">{% trans "Confirm" %}</a>
+    </div>
+</div>
+<div hidden class="auth-field">
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Host' %}</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Username' %}</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-8">
+            <input id="asset-password" type="password" class="form-control" value="">
+        </div>
+        <div class="col-sm-2" style="padding-left: 2px">
+            <a class="btn btn-white btn-sm btn-show-password"><i class="fa fa-eye"></i></a>
+            <a class="btn btn-white btn-sm btn-copy-password"><i class="fa fa-copy"></i></a>
+        </div>
+    </div>
+</div>
+</form>
+<script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
+<script>
+var showPassword = false;
+function initClipboard() {
+    var clipboard = new Clipboard('.btn-copy-password', {
+        text: function (trigger) {
+            return $("#asset-password").val()
+        }
+    });
+    clipboard.on("success", function (e) {
+        toastr.success("{% trans "Copy success" %}")
+    })
+}
+
+
+$(document).ready(function () {
+    initClipboard();
+
+}).on("click", ".btn-show-password", function () {
+    showPassword = !showPassword;
+    if (showPassword) {
+        $("#asset-password").attr("type", "text")
+    } else {
+        $("#asset-password").attr("type", "password")
+    }
+})
+</script>
+{% endblock %}
+{% block modal_button %}
+  <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+{% endblock %}

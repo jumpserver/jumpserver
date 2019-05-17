@@ -4,6 +4,11 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
+    <style>
+    .inmodal .modal-body {
+        background: #fff;
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -87,6 +92,7 @@
         </div>
     </div>
     {% include 'assets/_asset_user_auth_modal.html' %}
+    {% include 'assets/_asset_user_view_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -117,14 +123,14 @@ function initAssetUserTable() {
                 $(td).html(cellData.slice(0, -6));
             }},
             {targets: 5, createdCell: function (td, cellData) {
-                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var btn = '<a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-username="DEFAULT_USERNAME">{% trans "View auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 {% if asset.protocol == 'ssh' %}
-                    var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
-                    $(td).html(test_btn + update_auth_btn);
-                {% else %}
-                    $(td).html(update_auth_btn);
+                    btn += test_btn;
                 {% endif %}
-                {#var check_btn = ' <a class="btn btn-xs btn-info btn-check-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Check auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);#}
+                btn += view_btn;
+                $(td).html(btn);
 
             }}
         ],
@@ -213,6 +219,38 @@ $(document).ready(function () {
         success: success,
         flash_message: false
     });
+})
+.on("click", ".btn-view-auth", function () {
+    {#var otp_verify_time = getCookie("otp_expiration");#}
+    {#var now = new Date();#}
+    {#if (!otp_verify_time || otp_verify_time * 1000 < now.getTime()) {#}
+    {#    $("#otp_check_modal").modal()#}
+    {# } else {#}
+        $("#asset_user_auth_view").modal();
+    {# }#}
+})
+.on("click", "#otp_verify_btn", function () {
+    var the_url = "{% url 'api-auth:user-otp-verify' %}";
+    var success = function (data) {
+        var expiration = data.expiration;
+        setCookie("otp_expiration", expiration, expiration*1000);
+        $("#otp_check_modal").modal('hide');
+        $("#asset_user_auth_view").modal();
+    };
+    var failed = function () {
+        $("#mfa_error").html("MFA error")
+    };
+    var data = {
+        code: $("#mfa").val()
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: "POST",
+        success: success,
+        error: failed,
+        flash_message: false,
+        body: JSON.stringify(data)
+    })
 })
 </script>
 {% endblock %}

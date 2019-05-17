@@ -1,0 +1,18 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}otp_check_modal{% endblock %}
+{% block modal_title%}{% trans "MFA Confirm" %}{% endblock %}
+{% block modal_body %}
+<form method="post" class="form-horizontal" action="" style="padding-top: 20px">
+<div class="form-group">
+    <label for="" class="col-sm-2 control-label">{% trans 'MFA' %}</label>
+    <div class="col-sm-8">
+        <input type="text" id="mfa" class="form-control input-sm" name="mfa">
+        <span id="mfa_error" class="help-block text-danger"></span>
+    </div>
+</div>
+</form>
+{% endblock %}
+{% block modal_confirm_id %}otp_verify_btn{% endblock %}
+<script>
+</script>
