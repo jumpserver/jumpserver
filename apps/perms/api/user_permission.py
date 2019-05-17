@@ -20,8 +20,8 @@ from ..utils import (
     check_system_user_action, RemoteAppPermissionUtil,
 )
 from ..hands import (
-    AssetGrantedSerializer, User, Asset, Node,
-    SystemUser, NodeSerializer, RemoteAppSerializer,
+    User, Asset, Node, SystemUser, RemoteApp,
+    AssetGrantedSerializer, NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
@@ -34,7 +34,7 @@ __all__ = [
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
     'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
-    'UserGrantedRemoteAppsApi',
+    'UserGrantedRemoteAppsApi', 'ValidateUserRemoteAppPermissionApi',
 ]
 
 
@@ -474,3 +474,19 @@ class UserGrantedRemoteAppsApi(ListAPIView):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class ValidateUserRemoteAppPermissionApi(APIView):
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get('user_id', '')
+        remote_app_id = request.query_params.get('remote_app_id', '')
+        user = get_object_or_404(User, id=user_id)
+        remote_app = get_object_or_404(RemoteApp, id=remote_app_id)
+
+        util = RemoteAppPermissionUtil(user)
+        remote_apps = util.get_remote_apps()
+        if remote_app not in remote_apps:
+            return Response({'msg': False}, status=403)
+
+        return Response({'msg': True}, status=200)

@@ -3,7 +3,7 @@
 
 from common.permissions import AdminUserRequiredMixin
 from users.models import User, UserGroup
-from assets.models import Asset, SystemUser, Node
+from assets.models import Asset, SystemUser, Node, RemoteApp
 from assets.serializers import (
     AssetGrantedSerializer, NodeSerializer, RemoteAppSerializer
 )
