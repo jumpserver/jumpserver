@@ -74,7 +74,15 @@ asset_permission_urlpatterns = [
 
 
 remote_app_permission_urlpatterns = [
+    # 查询用户授权的RemoteApp
+    path('user/<uuid:pk>/remote-apps/',
+         api.UserGrantedRemoteAppsApi.as_view(), name='user-remote-apps'),
+    path('user/remote-apps/',
+         api.UserGrantedRemoteAppsApi.as_view(), name='my-remote-apps'),
 
+    path('user-group/<uuid:pk>/remote-apps/',
+         api.UserGroupGrantedRemoteAppsApi.as_view(),
+         name='user-group-remote-apps'),
 ]
 
 urlpatterns = asset_permission_urlpatterns + remote_app_permission_urlpatterns

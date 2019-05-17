@@ -17,11 +17,11 @@ from common.utils import get_logger
 from orgs.utils import set_to_root_org
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
-    check_system_user_action
+    check_system_user_action, RemoteAppPermissionUtil,
 )
 from ..hands import (
     AssetGrantedSerializer, User, Asset, Node,
-    SystemUser, NodeSerializer
+    SystemUser, NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
@@ -34,6 +34,7 @@ __all__ = [
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
     'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
+    'UserGrantedRemoteAppsApi',
 ]
 
 
@@ -447,3 +448,29 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
         actions = [action.name for action in getattr(_su, 'actions', [])]
         return Response({'actions': actions}, status=200)
+
+
+# RemoteApp permission
+
+class UserGrantedRemoteAppsApi(ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = RemoteAppSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_object(self):
+        user_id = self.kwargs.get('pk', '')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+        else:
+            user = self.request.user
+        return user
+
+    def get_queryset(self):
+        util = RemoteAppPermissionUtil(self.get_object())
+        queryset = util.get_remote_apps()
+        return queryset
+
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
