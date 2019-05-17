@@ -90,27 +90,29 @@ REMOTE_APP_TYPE_CHOICES = (
 
 )
 
+# Fields attribute write_only default => False
+
 REMOTE_APP_TYPE_CHROME_FIELDS = [
     {'name': 'chrome_target'},
     {'name': 'chrome_username'},
-    {'name': 'chrome_password'}
+    {'name': 'chrome_password', 'write_only': True}
 ]
 REMOTE_APP_TYPE_MYSQL_WORKBENCH_FIELDS = [
     {'name': 'mysql_workbench_ip'},
     {'name': 'mysql_workbench_name'},
     {'name': 'mysql_workbench_username'},
-    {'name': 'mysql_workbench_password'}
+    {'name': 'mysql_workbench_password', 'write_only': True}
 ]
 REMOTE_APP_TYPE_VMWARE_CLIENT_FIELDS = [
     {'name': 'vmware_target'},
     {'name': 'vmware_username'},
-    {'name': 'vmware_password'}
+    {'name': 'vmware_password', 'write_only': True}
 ]
 REMOTE_APP_TYPE_CUSTOM_FIELDS = [
     {'name': 'custom_cmdline'},
     {'name': 'custom_target'},
     {'name': 'custom_username'},
-    {'name': 'custom_password'}
+    {'name': 'custom_password', 'write_only': True}
 ]
 
 REMOTE_APP_TYPE_MAP_FIELDS = {

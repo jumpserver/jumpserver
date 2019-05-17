@@ -28,11 +28,11 @@ class RemoteApp(OrgModelMixin):
     type = models.CharField(
         default=const.REMOTE_APP_TYPE_CHROME,
         choices=const.REMOTE_APP_TYPE_CHOICES,
-        max_length=128, verbose_name=_('Application type')
+        max_length=128, verbose_name=_('RemoteApp type')
     )
     path = models.CharField(
         max_length=128, blank=False, null=False,
-        verbose_name=_('Application path')
+        verbose_name=_('RemoteApp path')
     )
     params = EncryptJsonDictTextField(
         max_length=4096, blank=True, null=True, verbose_name=_('parameters')
