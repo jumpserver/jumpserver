@@ -9,8 +9,9 @@ app_name = 'perms'
 router = routers.DefaultRouter()
 router.register('actions', api.ActionViewSet, 'action')
 router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
+router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remote-app-permission')
 
-urlpatterns = [
+asset_permission_urlpatterns = [
     # 查询某个用户授权的资产和资产组
     path('user/<uuid:pk>/assets/',
          api.UserGrantedAssetsApi.as_view(), name='user-assets'),
@@ -34,7 +35,6 @@ urlpatterns = [
          api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='user-nodes-assets-as-tree'),
     path('user/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(),
          name='my-nodes-assets-as-tree'),
-
 
     # 查询某个用户组授权的资产和资产组
     path('user-group/<uuid:pk>/assets/',
@@ -71,6 +71,13 @@ urlpatterns = [
     path('asset-permission/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(),
          name='get-user-asset-permission-actions'),
 ]
+
+
+remote_app_permission_urlpatterns = [
+
+]
+
+urlpatterns = asset_permission_urlpatterns + remote_app_permission_urlpatterns
 
 urlpatterns += router.urls
 
