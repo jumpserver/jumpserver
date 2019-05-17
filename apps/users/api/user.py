@@ -15,9 +15,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 )
-from common.mixins import (
-    IDInFilterMixin, IDInCacheFilterMixin, IDExportFilterMixin
-)
+from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from ..serializers import UserSerializer, UserPKUpdateSerializer, \
@@ -34,7 +32,7 @@ __all__ = [
 ]
 
 
-class UserViewSet(IDInCacheFilterMixin, IDInFilterMixin, BulkModelViewSet):
+class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)

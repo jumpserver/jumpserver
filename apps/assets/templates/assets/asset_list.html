@@ -648,6 +648,12 @@ $(document).ready(function(){
         return false;
     }
     var the_url = "{% url 'api-assets:asset-list' %}";
+    var data = {
+        'resources': id_list
+    };
+    function refreshTag() {
+        $('#asset_list_table').DataTable().ajax.reload();
+    }
 
     function doDeactive() {
         var data = [];
@@ -656,7 +662,8 @@ $(document).ready(function(){
             data.push(obj);
         });
         function success() {
-            asset_table.ajax.reload()
+            setTimeout( function () {
+                window.location.reload();}, 500);
         }
         APIUpdateAttr({
             url: the_url,
@@ -672,7 +679,8 @@ $(document).ready(function(){
             data.push(obj);
         });
         function success() {
-            asset_table.ajax.reload()
+            setTimeout( function () {
+                window.location.reload();}, 300);
         }
         APIUpdateAttr({
             url: the_url,
@@ -691,68 +699,72 @@ $(document).ready(function(){
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "{% trans 'Confirm' %}",
             closeOnConfirm: false
-        }, function() {
-            var success = function() {
+        },function () {
+            function success(data) {
+                url = setUrlParam(the_url, 'spm', data.spm);
+                APIUpdateAttr({
+                    url:url,
+                    method:'DELETE',
+                    success:refreshTag,
+                    flash_message:false,
+                });
                 var msg = "{% trans 'Asset Deleted.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "success");
-                $('#asset_list_table').DataTable().ajax.reload();
-            };
-            var fail = function() {
+            }
+            function fail() {
                 var msg = "{% trans 'Asset Deleting failed.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "error");
-            };
-            var url_delete = the_url + '?id__in=' + JSON.stringify(id_list);
+            }
             APIUpdateAttr({
-                url: url_delete,
-                method: 'DELETE',
-                success: success,
-                error: fail
-            });
-            $data_table.ajax.reload();
-            jumpserver.checked = false;
-        });
+                url: "{% url 'api-common:resources-cache' %}",
+                method:'POST',
+                body:JSON.stringify(data),
+                success:success,
+                error:fail
+             })
+        })
     }
+
     function doUpdate() {
-        var data = {
-            'assets_id':id_list
-        };
-        function error(data) {
-            toastr.error(JSON.parse(data).error)
+        function fail(data) {
+            toastr.error(JSON.parse(data))
         }
         function success(data) {
-            location.href = data.url;
+            var url = "{% url 'assets:asset-bulk-update' %}";
+            location.href= setUrlParam(url, 'spm', data.spm);
          }
         APIUpdateAttr({
-            'url': "{% url 'api-assets:asset-bulk-update-select' %}",
-            'method': 'POST',
-            'body': JSON.stringify(data),
-            'flash_message': false,
-            'success': success,
-             'error': error,
+            url: "{% url 'api-common:resources-cache' %}",
+            method:'POST',
+            body:JSON.stringify(data),
+            flash_message:false,
+            success:success,
+            error:fail
         })
-    }
+     }
 
     function doRemove() {
-        var nodes = zTree.getSelectedNodes();
-        if (!current_node_id) {
-            return
-        }
+       var nodes = zTree.getSelectedNodes();
+       if (!current_node_id) {
+           return
+       }
 
-        var data = {
-            'assets': id_list
-        };
+       var data = {
+           'assets': id_list
+       };
 
-        var success = function () {
-            asset_table.ajax.reload()
-        };
+       var success = function () {
+           asset_table.ajax.reload()
+       };
 
-        APIUpdateAttr({
-            'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
-            'method': 'PUT',
-            'body': JSON.stringify(data),
-            'success': success
-        })
+       APIUpdateAttr({
+           'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
+           'method': 'PUT',
+           'body': JSON.stringify(data),
+           'success': success
+       })
     }
+
     switch(action) {
         case 'deactive':
             doDeactive();

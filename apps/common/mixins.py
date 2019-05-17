@@ -155,7 +155,11 @@ class BulkListSerializerMixin(object):
         for item in data:
             try:
                 # prepare child serializer to only handle one instance
-                self.child.instance = self.instance.get(id=item['id']) if self.instance else None
+                if 'id' in item.keys():
+                    self.child.instance = self.instance.get(id=item['id']) if self.instance else None
+                if 'pk' in item.keys():
+                    self.child.instance = self.instance.get(id=item['pk']) if self.instance else None
+
                 self.child.initial_data = item
                 # raw
                 validated = self.child.run_validation(item)

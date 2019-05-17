@@ -16,9 +16,7 @@ from django.urls import reverse_lazy
 from django.core.cache import cache
 from django.db.models import Q
 
-from common.mixins import (
-    IDInFilterMixin, IDInCacheFilterMixin, IDExportFilterMixin
-)
+from common.mixins import IDInCacheFilterMixin
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
@@ -38,7 +36,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDInCacheFilterMixin, IDInFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInCacheFilterMixin, LabelFilter, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -105,7 +103,7 @@ class AssetViewSet(IDInCacheFilterMixin, IDInFilterMixin, LabelFilter, BulkModel
         return queryset
 
 
-class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
+class AssetListUpdateApi(IDInCacheFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     Asset bulk update api
     """

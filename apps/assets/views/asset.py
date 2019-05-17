@@ -27,7 +27,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
 from common.permissions import AdminUserRequiredMixin
-from common.const import create_success_msg, update_success_msg
+from common.const import (
+    create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
+)
 from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from orgs.utils import current_org
 from .. import forms
@@ -122,7 +124,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
-        assets_id = cache.get(CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX.format(spm))
+        assets_id = cache.get(KEY_CACHE_RESOURCES_ID.format(spm))
         if kwargs.get('form'):
             self.form = kwargs['form']
         elif assets_id:
