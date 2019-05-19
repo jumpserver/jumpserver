@@ -18,10 +18,11 @@ from orgs.utils import set_to_root_org
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
     check_system_user_action, RemoteAppPermissionUtil,
+    construct_remote_apps_tree_root, parse_remote_app_to_tree_node,
 )
 from ..hands import (
-    User, Asset, Node, SystemUser, RemoteApp,
-    AssetGrantedSerializer, NodeSerializer, RemoteAppSerializer,
+    User, Asset, Node, SystemUser, RemoteApp, AssetGrantedSerializer,
+    NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers
 from ..mixins import AssetsFilterMixin
@@ -35,6 +36,7 @@ __all__ = [
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
     'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
     'UserGrantedRemoteAppsApi', 'ValidateUserRemoteAppPermissionApi',
+    'UserGrantedRemoteAppsAsTreeApi',
 ]
 
 
@@ -474,6 +476,33 @@ class UserGrantedRemoteAppsApi(ListAPIView):
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
+    serializer_class = TreeNodeSerializer
+    permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get_object(self):
+        user_id = self.kwargs.get('pk', '')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+        else:
+            user = None
+        return user
+
+    def get_queryset(self):
+        queryset = []
+        tree_root = construct_remote_apps_tree_root()
+        queryset.append(tree_root)
+
+        util = RemoteAppPermissionUtil(self.get_object())
+        remote_apps = util.get_remote_apps()
+        for remote_app in remote_apps:
+            node = parse_remote_app_to_tree_node(tree_root, remote_app)
+            queryset.append(node)
+
+        queryset = sorted(queryset)
+        return queryset
 
 
 class ValidateUserRemoteAppPermissionApi(APIView):

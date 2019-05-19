@@ -3,11 +3,15 @@
 
 from django.db.models import Q
 
+from common.tree import TreeNode
+
 from ..models import RemoteAppPermission
 
 
 __all__ = [
     'RemoteAppPermissionUtil',
+    'construct_remote_apps_tree_root',
+    'parse_remote_app_to_tree_node',
 ]
 
 
@@ -47,3 +51,31 @@ class RemoteAppPermissionUtil:
         for perm in self.permissions:
             remote_apps.update(list(perm.remote_apps.all()))
         return remote_apps
+
+
+def construct_remote_apps_tree_root():
+    tree_root = {
+        'id': 'ID_REMOTE_APP_ROOT',
+        'name': 'RemoteApp',
+        'title': 'RemoteApp',
+        'pId': '',
+        'open': True,
+        'isParent': True,
+        'iconSkin': '',
+        'meta': {}
+    }
+    return TreeNode(**tree_root)
+
+
+def parse_remote_app_to_tree_node(parent, remote_app):
+    tree_node = {
+        'id': remote_app.id,
+        'name': remote_app.name,
+        'title': remote_app.name,
+        'pId': parent.id,
+        'open': False,
+        'isParent': False,
+        'iconSkin': '#',
+        'meta': {}
+    }
+    return TreeNode(**tree_node)
