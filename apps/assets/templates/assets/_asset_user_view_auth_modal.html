@@ -12,20 +12,20 @@
         <span id="mfa_error" class="help-block">{% trans "Need otp auth for view auth" %}</span>
     </div>
     <div class="col-sm-2">
-        <a class="btn btn-primary btn-sm">{% trans "Confirm" %}</a>
+        <a class="btn btn-primary btn-sm btn-mfa">{% trans "Confirm" %}</a>
     </div>
 </div>
 <div hidden class="auth-field">
     <div class="form-group">
         <label for="" class="col-sm-2 control-label">{% trans 'Host' %}</label>
         <div class="col-sm-8">
-            <input type="text" class="form-control" value="">
+            <input type="text" id="host" class="form-control" value="">
         </div>
     </div>
     <div class="form-group">
         <label for="" class="col-sm-2 control-label">{% trans 'Username' %}</label>
         <div class="col-sm-8">
-            <input type="text" class="form-control" value="">
+            <input type="text" id="username" class="form-control" value="">
         </div>
     </div>
     <div class="form-group">
@@ -43,6 +43,12 @@
 <script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
 <script>
 var showPassword = false;
+var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+var asset_id = "";
+var host = "";
+var username = "";
+var password = "";
+
 function initClipboard() {
     var clipboard = new Clipboard('.btn-copy-password', {
         text: function (trigger) {
@@ -54,10 +60,31 @@ function initClipboard() {
     })
 }
 
+function showAuth() {
+    $(".mfa-field").hide();
+    $(".auth-field").show();
+
+    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + asset_id + "&username=" + username;
+    $("#username").val(username);
+    $("#host").val(host);
+    var success = function (data) {
+        var password = data.password;
+        $("#asset-password").val(password);
+    };
+    APIUpdateAttr({
+        url: url,
+        method: "GET",
+        success: success
+    })
+}
+
+function showMFA() {
+    $(".mfa-field").show();
+    $(".auth-field").hide();
+}
 
 $(document).ready(function () {
     initClipboard();
-
 }).on("click", ".btn-show-password", function () {
     showPassword = !showPassword;
     if (showPassword) {
@@ -65,6 +92,36 @@ $(document).ready(function () {
     } else {
         $("#asset-password").attr("type", "password")
     }
+}).on("show.bs.modal", "#asset_user_auth_view", function () {
+    var now = new Date();
+    if (lastMFATime === "") {
+        lastMFATime = 0
+    }
+    var nowTime = now.getTime() / 1000;
+    if (nowTime - lastMFATime < 60*10 ) {
+        showAuth();
+    }
+}).on("click", ".btn-mfa", function () {
+    var url = "{% url 'api-auth:user-otp-verify' %}";
+    var data = {
+        code: $("#mfa").val()
+    };
+    var success = function () {
+        var now = new Date();
+        lastMFATime = now.getTime() / 1000;
+        showAuth()
+    };
+    var error = function () {
+        $("mfa_error").addClass("error").html("Code error");
+    };
+    APIUpdateAttr({
+        url: url,
+        method: "POST",
+        body: JSON.stringify(data),
+        success: success,
+        flash_message: false,
+        error: error
+    })
 })
 </script>
 {% endblock %}

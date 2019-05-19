@@ -2,6 +2,7 @@
 #
 
 import uuid
+import time
 
 from django.core.cache import cache
 from django.urls import reverse
@@ -10,10 +11,11 @@ from django.utils.translation import ugettext as _
 
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 
 from common.utils import get_logger, get_request_ip
-from common.permissions import IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins import RootOrgViewMixin
 from users.serializers import UserSerializer
 from users.models import User
@@ -23,12 +25,13 @@ from users.utils import (
     check_user_valid, check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
 )
-
+from ..serializers import OtpVerifySerializer
 from ..signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
 __all__ = [
     'UserAuthApi', 'UserConnectionTokenApi', 'UserOtpAuthApi',
+    'UserOtpVerifyApi',
 ]
 
 
@@ -179,3 +182,20 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
                 sender=self.__class__, username=username,
                 request=self.request, reason=reason
             )
+
+
+class UserOtpVerifyApi(CreateAPIView):
+    permission_classes = (IsValidUser,)
+    serializer_class = OtpVerifySerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = serializer.validated_data["code"]
+
+        if request.user.check_otp(code):
+            request.session["OTP_LAST_VERIFY_TIME"] = int(time.time())
+            return Response({"ok": "1"})
+        else:
+            return Response({"error": "Code not valid"}, status=400)
+

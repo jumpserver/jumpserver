@@ -148,17 +148,6 @@ var username;
 $(document).ready(function () {
     initAssetUserTable();
 })
-{#.on('click', '.btn-check-asset-user-auth', function(){#}
-{#    var username = $(this).data('username');#}
-{#    var the_url = "{% url 'api-assets:asset-user-auth-info' %}" + '?asset_id={{ asset.id }}' + '&username=' + username;#}
-{#    $.ajax({#}
-{#        url: the_url,#}
-{#        method: 'GET',#}
-{#        success: function (data) {#}
-{#            alert("Password: " + data.password);#}
-{#        }#}
-{#    });#}
-{# })#}
 .on('click', '.btn-update-asset-user-auth', function() {
     username = $(this).data('username');
     var hostname = "{{ asset.hostname }}";
@@ -220,37 +209,11 @@ $(document).ready(function () {
         flash_message: false
     });
 })
-.on("click", ".btn-view-auth", function () {
-    {#var otp_verify_time = getCookie("otp_expiration");#}
-    {#var now = new Date();#}
-    {#if (!otp_verify_time || otp_verify_time * 1000 < now.getTime()) {#}
-    {#    $("#otp_check_modal").modal()#}
-    {# } else {#}
-        $("#asset_user_auth_view").modal();
-    {# }#}
-})
-.on("click", "#otp_verify_btn", function () {
-    var the_url = "{% url 'api-auth:user-otp-verify' %}";
-    var success = function (data) {
-        var expiration = data.expiration;
-        setCookie("otp_expiration", expiration, expiration*1000);
-        $("#otp_check_modal").modal('hide');
-        $("#asset_user_auth_view").modal();
-    };
-    var failed = function () {
-        $("#mfa_error").html("MFA error")
-    };
-    var data = {
-        code: $("#mfa").val()
-    };
-    APIUpdateAttr({
-        url: the_url,
-        method: "POST",
-        success: success,
-        error: failed,
-        flash_message: false,
-        body: JSON.stringify(data)
-    })
+.on("click", ".btn-view-auth", function (evt) {
+    asset_id = "{{ asset.id }}" ;
+    host = "{{ asset.hostname }}";
+    username = $(this).data("username");
+    $("#asset_user_auth_view").modal();
 })
 </script>
 {% endblock %}
