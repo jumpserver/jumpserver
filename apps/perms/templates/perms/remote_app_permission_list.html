@@ -1,0 +1,93 @@
+{% extends '_base_list.html' %}
+{% load i18n static %}
+{% block table_search %}{% endblock %}
+{% block table_container %}
+    <div class="uc pull-left  m-r-5">
+        <a href="{% url 'perms:remote-app-permission-create' %}" class="btn btn-sm btn-primary"> {% trans "Create permission" %} </a>
+    </div>
+    <table class="table table-striped table-bordered table-hover " id="remote_app_permission_list_table" >
+        <thead>
+        <tr>
+            <th class="text-center">
+                <input type="checkbox" id="check_all" class="ipt_check_all" >
+            </th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'User' %}</th>
+            <th class="text-center">{% trans 'User group' %}</th>
+            <th class="text-center">{% trans 'RemoteApp' %}</th>
+            <th class="text-center">{% trans 'Validity' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+{% endblock %}
+{% block content_bottom_left %}{% endblock %}
+{% block custom_foot_js %}
+<script>
+function initTable() {
+    var options = {
+        ele: $('#remote_app_permission_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                    cellData = htmlEscape(cellData);
+                    {% url 'perms:remote-app-permission-detail' pk=DEFAULT_PK as the_url  %}
+                    var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                    $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+                }},
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                    var num = cellData.length;
+                    $(td).html(num);
+                }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                    var num = cellData.length;
+                    $(td).html(num);
+                }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                    var num = cellData.length;
+                    $(td).html(num);
+                }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                    if (!cellData) {
+                        $(td).html('<i class="fa fa-times text-danger"></i>')
+                    } else {
+                        $(td).html('<i class="fa fa-check text-navy"></i>')
+                    }
+                }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                    var update_btn = '<a href="{% url "perms:remote-app-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-rid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    $(td).html(update_btn + del_btn)
+                }}
+        ],
+        ajax_url: '{% url "api-perms:remote-app-permission-list" %}',
+        columns: [
+            {data: "id"},
+            {data: "name" },
+            {data: "users", orderable: false},
+            {data: "user_groups", orderable: false},
+            {data: "remote_apps", orderable: false},
+            {data: "is_valid", orderable: false},
+            {data: "id", orderable: false}
+        ],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initServerSideDataTable(options);
+}
+$(document).ready(function(){
+    initTable();
+})
+.on('click', '.btn-delete', function () {
+    var $this = $(this);
+    var $data_table = $('#remote_app_list_table').DataTable();
+    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var rid = $this.data('rid');
+    var the_url = '{% url "api-perms:remote-app-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    objectDelete($this, name, the_url);
+    setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
+});
+</script>
+{% endblock %}

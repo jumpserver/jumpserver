@@ -6,8 +6,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
-from .models import AssetPermission
+from perms.models import AssetPermission
 from assets.models import Asset
+
+__all__ = [
+    'AssetPermissionForm',
+]
 
 
 class AssetPermissionForm(OrgModelForm):
