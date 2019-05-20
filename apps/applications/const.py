@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 # RemoteApp
 
-REMOTE_APP_BOOT_PROGRAM_NAME = '||boot-program'
+REMOTE_APP_BOOT_PROGRAM_NAME = '||jmservisor'
 
 REMOTE_APP_TYPE_CHROME = 'chrome'
 REMOTE_APP_TYPE_MYSQL_WORKBENCH = 'mysql_workbench'
@@ -32,12 +32,7 @@ REMOTE_APP_TYPE_CHOICES = (
             (REMOTE_APP_TYPE_VMWARE_CLIENT, 'VMware Client'),
         )
     ),
-    (
-        _('Custom'),
-        (
-            (REMOTE_APP_TYPE_CUSTOM, 'Custom'),
-        )
-    )
+    (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
 
 )
 
