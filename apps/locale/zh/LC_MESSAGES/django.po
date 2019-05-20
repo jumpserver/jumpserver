@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-29 12:22+0800\n"
+"POT-Creation-Date: 2019-05-20 12:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "Please select assets that need to be updated"
 msgstr "请选择需要更新的资产"
 
-#: assets/api/node.py:58
+#: assets/api/node.py:60
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:282
+#: assets/api/node.py:285
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:296
+#: assets/api/node.py:299
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -172,8 +172,8 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: settings/templates/settings/_ldap_list_users_modal.html:38
 #: settings/templates/settings/command_storage_create.html:41
 #: settings/templates/settings/replay_storage_create.html:44
-#: settings/templates/settings/terminal_setting.html:80
-#: settings/templates/settings/terminal_setting.html:102 terminal/models.py:22
+#: settings/templates/settings/terminal_setting.html:83
+#: settings/templates/settings/terminal_setting.html:105 terminal/models.py:22
 #: terminal/models.py:241 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
 #: users/models/user.py:61 users/templates/users/_select_user_modal.html:13
@@ -638,8 +638,8 @@ msgstr "过滤器"
 #: audits/templates/audits/login_log_list.html:52
 #: settings/templates/settings/command_storage_create.html:31
 #: settings/templates/settings/replay_storage_create.html:31
-#: settings/templates/settings/terminal_setting.html:81
-#: settings/templates/settings/terminal_setting.html:103
+#: settings/templates/settings/terminal_setting.html:84
+#: settings/templates/settings/terminal_setting.html:106
 msgid "Type"
 msgstr "类型"
 
@@ -683,8 +683,8 @@ msgstr "每行一个命令"
 #: perms/templates/perms/asset_permission_create_update.html:50
 #: perms/templates/perms/asset_permission_list.html:60
 #: perms/templates/perms/asset_permission_list.html:134
-#: settings/templates/settings/terminal_setting.html:82
-#: settings/templates/settings/terminal_setting.html:104
+#: settings/templates/settings/terminal_setting.html:85
+#: settings/templates/settings/terminal_setting.html:107
 #: terminal/templates/terminal/session_list.html:81
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:15
@@ -757,7 +757,7 @@ msgstr "分类"
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:128
+#: assets/models/node.py:133
 msgid "New node"
 msgstr "新节点"
 
@@ -1029,13 +1029,14 @@ msgstr "其它"
 #: assets/templates/assets/gateway_create_update.html:58
 #: assets/templates/assets/label_create_update.html:18
 #: perms/templates/perms/asset_permission_create_update.html:83
-#: settings/templates/settings/basic_setting.html:61
+#: settings/templates/settings/basic_setting.html:64
 #: settings/templates/settings/command_storage_create.html:79
-#: settings/templates/settings/email_setting.html:62
-#: settings/templates/settings/ldap_setting.html:61
+#: settings/templates/settings/email_content_setting.html:54
+#: settings/templates/settings/email_setting.html:65
+#: settings/templates/settings/ldap_setting.html:64
 #: settings/templates/settings/replay_storage_create.html:152
-#: settings/templates/settings/security_setting.html:70
-#: settings/templates/settings/terminal_setting.html:68
+#: settings/templates/settings/security_setting.html:73
+#: settings/templates/settings/terminal_setting.html:71
 #: terminal/templates/terminal/terminal_update.html:45
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
@@ -1065,13 +1066,14 @@ msgstr "重置"
 #: assets/templates/assets/label_create_update.html:19
 #: audits/templates/audits/login_log_list.html:89
 #: perms/templates/perms/asset_permission_create_update.html:84
-#: settings/templates/settings/basic_setting.html:62
+#: settings/templates/settings/basic_setting.html:65
 #: settings/templates/settings/command_storage_create.html:80
-#: settings/templates/settings/email_setting.html:63
-#: settings/templates/settings/ldap_setting.html:64
+#: settings/templates/settings/email_content_setting.html:55
+#: settings/templates/settings/email_setting.html:66
+#: settings/templates/settings/ldap_setting.html:67
 #: settings/templates/settings/replay_storage_create.html:153
-#: settings/templates/settings/security_setting.html:71
-#: settings/templates/settings/terminal_setting.html:70
+#: settings/templates/settings/security_setting.html:74
+#: settings/templates/settings/terminal_setting.html:73
 #: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:46
@@ -1230,8 +1232,8 @@ msgstr "更新"
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:182
-#: settings/templates/settings/terminal_setting.html:90
-#: settings/templates/settings/terminal_setting.html:112
+#: settings/templates/settings/terminal_setting.html:93
+#: settings/templates/settings/terminal_setting.html:115
 #: terminal/templates/terminal/terminal_list.html:74
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
@@ -1267,7 +1269,7 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
 #: assets/templates/assets/system_user_list.html:144
-#: settings/templates/settings/terminal_setting.html:165
+#: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:388
 #: users/templates/users/user_detail.html:414
@@ -1519,7 +1521,7 @@ msgstr "删除选择资产"
 
 #: assets/templates/assets/asset_list.html:635
 #: assets/templates/assets/system_user_list.html:142
-#: settings/templates/settings/terminal_setting.html:163
+#: settings/templates/settings/terminal_setting.html:166
 #: users/templates/users/user_detail.html:386
 #: users/templates/users/user_detail.html:412
 #: users/templates/users/user_detail.html:480
@@ -1623,8 +1625,8 @@ msgstr "创建网关"
 
 #: assets/templates/assets/domain_gateway_list.html:99
 #: assets/templates/assets/domain_gateway_list.html:101
-#: settings/templates/settings/email_setting.html:61
-#: settings/templates/settings/ldap_setting.html:62
+#: settings/templates/settings/email_setting.html:64
+#: settings/templates/settings/ldap_setting.html:65
 msgid "Test connection"
 msgstr "测试连接"
 
@@ -2772,8 +2774,8 @@ msgstr "添加资产"
 #: perms/templates/perms/asset_permission_detail.html:157
 #: perms/templates/perms/asset_permission_user.html:97
 #: perms/templates/perms/asset_permission_user.html:125
-#: settings/templates/settings/terminal_setting.html:95
-#: settings/templates/settings/terminal_setting.html:117
+#: settings/templates/settings/terminal_setting.html:98
+#: settings/templates/settings/terminal_setting.html:120
 #: users/templates/users/user_group_detail.html:95
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:93
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:93
@@ -2902,7 +2904,7 @@ msgid "Create succeed"
 msgstr "创建成功"
 
 #: settings/api.py:166 settings/api.py:204
-#: settings/templates/settings/terminal_setting.html:151
+#: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
 
@@ -3140,6 +3142,40 @@ msgid ""
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 
+#: settings/forms.py:250
+msgid "Create user email subject"
+msgstr "创建用户邮件的主题"
+
+#: settings/forms.py:251
+msgid ""
+"Tips: When creating a user, send the subject of the email (eg:Create account "
+"successfully)"
+msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
+
+#: settings/forms.py:257
+msgid "Create user honorific"
+msgstr "创建用户邮件的敬语"
+
+#: settings/forms.py:258
+msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
+msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
+
+#: settings/forms.py:264
+msgid "Create user email content"
+msgstr "创建用户邮件的内容"
+
+#: settings/forms.py:266
+msgid "Tips:When creating a user, send the content of the email"
+msgstr "提示: 创建用户时，发送设置密码邮件的内容"
+
+#: settings/forms.py:271
+msgid "Signature"
+msgstr "署名"
+
+#: settings/forms.py:272
+msgid "Tips: Email signature (eg:jumpserver)"
+msgstr "提示: 邮件的署名 (例如: jumpserver)"
+
 #: settings/models.py:128 users/templates/users/reset_password.html:68
 #: users/templates/users/user_profile.html:20
 msgid "Setting"
@@ -3164,15 +3200,17 @@ msgid "Existing"
 msgstr "已存在"
 
 #: settings/templates/settings/basic_setting.html:15
+#: settings/templates/settings/email_content_setting.html:15
 #: settings/templates/settings/email_setting.html:15
 #: settings/templates/settings/ldap_setting.html:15
 #: settings/templates/settings/security_setting.html:15
 #: settings/templates/settings/terminal_setting.html:16
-#: settings/templates/settings/terminal_setting.html:46 settings/views.py:19
+#: settings/templates/settings/terminal_setting.html:49 settings/views.py:19
 msgid "Basic setting"
 msgstr "基本设置"
 
 #: settings/templates/settings/basic_setting.html:18
+#: settings/templates/settings/email_content_setting.html:18
 #: settings/templates/settings/email_setting.html:18
 #: settings/templates/settings/ldap_setting.html:18
 #: settings/templates/settings/security_setting.html:18
@@ -3181,27 +3219,39 @@ msgid "Email setting"
 msgstr "邮件设置"
 
 #: settings/templates/settings/basic_setting.html:21
+#: settings/templates/settings/email_content_setting.html:21
 #: settings/templates/settings/email_setting.html:21
 #: settings/templates/settings/ldap_setting.html:21
 #: settings/templates/settings/security_setting.html:21
-#: settings/templates/settings/terminal_setting.html:24 settings/views.py:71
-msgid "LDAP setting"
-msgstr "LDAP设置"
+#: settings/templates/settings/terminal_setting.html:23 settings/views.py:178
+msgid "Email content setting"
+msgstr "邮件内容设置"
 
 #: settings/templates/settings/basic_setting.html:24
+#: settings/templates/settings/email_content_setting.html:24
 #: settings/templates/settings/email_setting.html:24
 #: settings/templates/settings/ldap_setting.html:24
 #: settings/templates/settings/security_setting.html:24
-#: settings/templates/settings/terminal_setting.html:28 settings/views.py:100
-msgid "Terminal setting"
-msgstr "终端设置"
+#: settings/templates/settings/terminal_setting.html:27 settings/views.py:71
+msgid "LDAP setting"
+msgstr "LDAP设置"
 
 #: settings/templates/settings/basic_setting.html:27
+#: settings/templates/settings/email_content_setting.html:27
 #: settings/templates/settings/email_setting.html:27
 #: settings/templates/settings/ldap_setting.html:27
 #: settings/templates/settings/security_setting.html:27
-#: settings/templates/settings/security_setting.html:42
-#: settings/templates/settings/terminal_setting.html:31 settings/views.py:152
+#: settings/templates/settings/terminal_setting.html:31 settings/views.py:100
+msgid "Terminal setting"
+msgstr "终端设置"
+
+#: settings/templates/settings/basic_setting.html:30
+#: settings/templates/settings/email_content_setting.html:30
+#: settings/templates/settings/email_setting.html:30
+#: settings/templates/settings/ldap_setting.html:30
+#: settings/templates/settings/security_setting.html:30
+#: settings/templates/settings/security_setting.html:45
+#: settings/templates/settings/terminal_setting.html:34 settings/views.py:152
 msgid "Security setting"
 msgstr "安全设置"
 
@@ -3217,11 +3267,15 @@ msgstr "索引"
 msgid "Doc type"
 msgstr "文档类型"
 
-#: settings/templates/settings/ldap_setting.html:65
+#: settings/templates/settings/email_content_setting.html:45
+msgid "Create User setting"
+msgstr "创建用户设置"
+
+#: settings/templates/settings/ldap_setting.html:68
 msgid "Bulk import"
 msgstr "一键导入"
 
-#: settings/templates/settings/ldap_setting.html:116
+#: settings/templates/settings/ldap_setting.html:119
 msgid ""
 "User is not currently selected, please check the user you want to import"
 msgstr "当前无勾选用户，请勾选你想要导入的用户"
@@ -3308,25 +3362,25 @@ msgstr "提交中"
 msgid "Endpoint need contain protocol, ex: http"
 msgstr "端点需要包含协议，如 http"
 
-#: settings/templates/settings/security_setting.html:46
+#: settings/templates/settings/security_setting.html:49
 msgid "Password check rule"
 msgstr "密码校验规则"
 
-#: settings/templates/settings/terminal_setting.html:76 terminal/forms.py:27
+#: settings/templates/settings/terminal_setting.html:79 terminal/forms.py:27
 #: terminal/models.py:26
 msgid "Command storage"
 msgstr "命令存储"
 
-#: settings/templates/settings/terminal_setting.html:98 terminal/forms.py:32
+#: settings/templates/settings/terminal_setting.html:101 terminal/forms.py:32
 #: terminal/models.py:27
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: settings/templates/settings/terminal_setting.html:154
+#: settings/templates/settings/terminal_setting.html:157
 msgid "Delete failed"
 msgstr "删除失败"
 
-#: settings/templates/settings/terminal_setting.html:159
+#: settings/templates/settings/terminal_setting.html:162
 msgid "Are you sure about deleting it?"
 msgstr "您确定删除吗?"
 
@@ -3344,12 +3398,12 @@ msgstr "在ou:{}中没有匹配条目"
 
 #: settings/views.py:18 settings/views.py:44 settings/views.py:70
 #: settings/views.py:99 settings/views.py:126 settings/views.py:138
-#: settings/views.py:151 templates/_nav.html:107
+#: settings/views.py:151 settings/views.py:177 templates/_nav.html:107
 msgid "Settings"
 msgstr "系统设置"
 
 #: settings/views.py:29 settings/views.py:55 settings/views.py:81
-#: settings/views.py:112 settings/views.py:162
+#: settings/views.py:112 settings/views.py:162 settings/views.py:188
 msgid "Update setting successfully"
 msgstr "更新设置成功"
 
@@ -4170,7 +4224,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:373 users/utils.py:77
+#: users/templates/users/user_detail.html:373 users/utils.py:117
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -4494,56 +4548,140 @@ msgstr "新的公钥已设置成功，请下载对应的私钥"
 msgid "Update user"
 msgstr "更新用户"
 
-#: users/utils.py:38
+#: users/utils.py:39
+#, python-format
+#| msgid ""
+#| "\n"
+#| "    Hello %(name)s:\n"
+#| "    </br>\n"
+#| "    Your account has been created successfully\n"
+#| "    </br>\n"
+#| "    Username: %(username)s\n"
+#| "    </br>\n"
+#| "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
+#| "here to set your password</a>\n"
+#| "    </br>\n"
+#| "    This link is valid for 1 hour. After it expires, <a href="
+#| "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+#| "\n"
+#| "    </br>\n"
+#| "    ---\n"
+#| "\n"
+#| "    </br>\n"
+#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
+#| "\n"
+#| "    </br>\n"
+#| "    "
+msgid ""
+"\n"
+"        <p style=\"text-indent:2em;\">\n"
+"            <span>\n"
+"                <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"\">click here to set your password</a>\n"
+"            </span>    \n"
+"            <span>\n"
+"                This link is valid for 1 hour. After it expires, <a href="
+"\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+"            </span> \n"
+"            <span>\n"
+"                <a href=\"%(login_url)s\">Login direct</a>\n"
+"            </span>\n"
+"        </p>\n"
+"        "
+msgstr ""
+"\n"
+"        <p style=\"text-indent:2em;\">\n"
+"            <span>\n"
+"                <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"\">请点击这里设置密码</a>\n"
+"            </span>    \n"
+"            <span>\n"
+"                这个链接有效期1小时, 超过时间您可以, <a href="
+"\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
+"            </span> \n"
+"            <span>\n"
+"                <a href=\"%(login_url)s\">Login direct</a>\n"
+"            </span>\n"
+"        </p>\n"
+"        "
+
+#: users/utils.py:65
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:40
+#: users/utils.py:69
 #, python-format
+msgid "Hello %(name)s"
+msgstr "您好 %(name)s"
+
+#: users/utils.py:73
+#, python-format
+#| msgid ""
+#| "\n"
+#| "    Hello %(name)s:\n"
+#| "    </br>\n"
+#| "    Your account has been created successfully\n"
+#| "    </br>\n"
+#| "    Username: %(username)s\n"
+#| "    </br>\n"
+#| "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
+#| "here to set your password</a>\n"
+#| "    </br>\n"
+#| "    This link is valid for 1 hour. After it expires, <a href="
+#| "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+#| "\n"
+#| "    </br>\n"
+#| "    ---\n"
+#| "\n"
+#| "    </br>\n"
+#| "    <a href=\"%(login_url)s\">Login direct</a>\n"
+#| "\n"
+#| "    </br>\n"
+#| "    "
 msgid ""
 "\n"
-"    Hello %(name)s:\n"
-"    </br>\n"
-"    Your account has been created successfully\n"
-"    </br>\n"
-"    Username: %(username)s\n"
-"    </br>\n"
-"    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
-"here to set your password</a>\n"
-"    </br>\n"
-"    This link is valid for 1 hour. After it expires, <a href="
+"    <p style=\"text-indent:2em;\">Your account has been created "
+"successfully</p> \n"
+"    <p style=\"text-indent:2em;\">\n"
+"        <span>\n"
+"            Username: %(username)s.\n"
+"        </span>\n"
+"        <span>\n"
+"            <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"\">click here to set your password</a>\n"
+"        </span>    \n"
+"        <span>\n"
+"            This link is valid for 1 hour. After it expires, <a href="
 "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-"\n"
-"    </br>\n"
-"    ---\n"
-"\n"
-"    </br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
-"\n"
-"    </br>\n"
+"        </span> \n"
+"        <span>\n"
+"            <a href=\"%(login_url)s\">Login direct</a>\n"
+"        </span>\n"
+"    </p>\n"
 "    "
 msgstr ""
 "\n"
-"    你好 %(name)s:\n"
-"    </br>\n"
-"    恭喜您，您的账号已经创建成功    </br>\n"
-"    用户名: %(username)s\n"
-"    </br>\n"
-"     <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点击这"
-"里设置密码</a>    </br>\n"
-"    这个链接有效期1小时, 超过时间您可以 <a href=\"%(forget_password_url)s?"
-"email=%(email)s\">重新申请</a>\n"
-"\n"
-"    </br>\n"
-"    ---\n"
-"\n"
-"    </br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
-"\n"
-"    </br>\n"
+"    <p style=\"text-indent:2em;\">恭喜您，您的账号已经创建成功！ "
+"</p> \n"
+"    <p style=\"text-indent:2em;\">\n"
+"        <span>\n"
+"            用户名: %(username)s.\n"
+"        </span>\n"
+"        <span>\n"
+"            <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"\">请点击这里设置密码</a>\n"
+"        </span>    \n"
+"        <span>\n"
+"            这个链接有效期1小时, 超过时间您可以 <a href="
+"\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
+"        </span> \n"
+"        <span>\n"
+"            <a href=\"%(login_url)s\">Login direct</a>\n"
+"        </span>\n"
+"    </p>\n"
 "    "
 
-#: users/utils.py:79
+#: users/utils.py:119
 #, python-format
 msgid ""
 "\n"
@@ -4587,11 +4725,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:110
+#: users/utils.py:150
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:112
+#: users/utils.py:152
 #, python-format
 msgid ""
 "\n"
@@ -4640,11 +4778,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:148
+#: users/utils.py:188
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:150
+#: users/utils.py:190
 #, python-format
 msgid ""
 "\n"
@@ -4669,15 +4807,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:183
+#: users/utils.py:223
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:185
+#: users/utils.py:225
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:198
+#: users/utils.py:238
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 

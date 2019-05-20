@@ -245,20 +245,23 @@ class SecuritySettingForm(BaseForm):
 
 class EmailContentSettingForm(BaseForm):
     CREATE_USER_SUBJECT = forms.CharField(
-        max_length=1024, label=_("创建用户邮件主题"), required=False,
-        help_text=_("Tips: 创建用户发送邮件设置密码的主题(eg:创建账户成功)")
+        max_length=1024, label=_("Create user email subject"), required=False,
+        help_text=_("Tips: When creating a user, send the subject of the email"
+                    " (eg:Create account successfully)")
+    )
+    CREATE_USER_EMAIL_HONORIFIC = forms.CharField(
+        max_length=1024, label=_("Create user honorific"), required=False,
+        help_text=_("Tips: When creating a user, send the honorific of the "
+                    "email (eg:Hello)")
     )
     CREATE_USER_CONTENT = forms.CharField(
-        label=_('创建用户邮件内容'), max_length=5000, required=False,
-        widget=forms.Textarea(attrs={'placeholder': _(
-            'Your account has been created successfully!，'
-            'Please follow these steps to change your password')}),
-        help_text=_('Tips:创建用户发送邮件设置密码的内容')
+        label=_('Create user email content'), max_length=5000,
+        required=False, widget=forms.Textarea(),
+        help_text=_('Tips:When creating a user, send the content of the email')
     )
-
-    CREATE_USER_EMAIL_APPELLATION = forms.CharField(
-        max_length=1024, label=_("创建用户邮件称谓"), required=False,
-        help_text=_("Tips: 创建用户发送邮件的称谓(eg:尊敬的用户)")
+    SIGNATURE = forms.CharField(
+        max_length=512, label=_("Signature"), required=False,
+        help_text=_("Tips: Email signature (eg:jumpserver)")
     )
 
 

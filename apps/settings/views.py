@@ -168,9 +168,10 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class EmailContentSetting(SuperUserRequiredMixin,TemplateView):
+class EmailContentSetting(SuperUserRequiredMixin, TemplateView):
     template_name = "settings/email_content_setting.html"
     form_class = EmailContentSettingForm
+
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Settings'),
@@ -179,3 +180,15 @@ class EmailContentSetting(SuperUserRequiredMixin,TemplateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            msg = _("Update setting successfully")
+            messages.success(request, msg)
+            return redirect('settings:email-content-setting')
+        else:
+            context = self.get_context_data()
+            context.update({"form": form})
+            return render(request, self.template_name, context)

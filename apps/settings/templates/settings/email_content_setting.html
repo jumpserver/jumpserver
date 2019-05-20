@@ -42,10 +42,11 @@
                                     {% endif %}
                                     {% csrf_token %}
 
-                                    <h3>{% trans "Create User" %}</h3>
+                                    <h3>{% trans "Create User setting" %}</h3>
                                     {% bootstrap_field form.CREATE_USER_SUBJECT layout="horizontal" %}
-                                    {% bootstrap_field form.CREATE_USER_EMAIL_APPELLATION layout="horizontal" %}
+                                    {% bootstrap_field form.CREATE_USER_EMAIL_HONORIFIC layout="horizontal" %}
                                     {% bootstrap_field form.CREATE_USER_CONTENT layout="horizontal" %}
+                                    {% bootstrap_field form.SIGNATURE layout="horizontal" %}
                                     <div class="hr-line-dashed"></div>
 
                                     <div class="form-group">
@@ -63,6 +64,7 @@
             </div>
         </div>
     </div>
+
 {% endblock %}
 {% block custom_foot_js %}
 <script>

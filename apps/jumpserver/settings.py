@@ -356,6 +356,12 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = False
 EMAIL_SUBJECT_PREFIX = '[JMS] '
 
+#Email custom content
+CREATE_USER_SUBJECT = ''
+CREATE_USER_EMAIL_HONORIFIC = ''
+CREATE_USER_CONTENT = ''
+SIGNATURE = ''
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.

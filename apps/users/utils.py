@@ -34,29 +34,59 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
+def get_email_custom_content(user):
+    email_content = '<p style="text-indent:2em">' + settings.CREATE_USER_CONTENT + '</p>'
+    suffix_message = _("""
+        <p style="text-indent:2em;">
+            <span>
+                <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
+            </span>    
+            <span>
+                This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
+            </span> 
+            <span>
+                <a href="%(login_url)s">Login direct</a>
+            </span>
+        </p>
+        """) % {
+            'rest_password_url': reverse('users:reset-password', external=True),
+            'rest_password_token': user.generate_reset_token(),
+            'forget_password_url': reverse('users:forgot-password', external=True),
+            'email': user.email,
+            'login_url': reverse('authentication:login', external=True),
+        }
+
+    message = email_content + suffix_message
+    return message
+
+
 def send_user_created_mail(user):
-    subject = _('Create account successfully')
     recipient_list = [user.email]
+    subject = _('Create account successfully')
+    if settings.CREATE_USER_SUBJECT:
+        subject = settings.CREATE_USER_SUBJECT
+
+    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
+    if settings.CREATE_USER_EMAIL_HONORIFIC:
+        honorific = '<p>' + settings.CREATE_USER_EMAIL_HONORIFIC + ':</p>'
+
     message = _("""
-    Hello %(name)s:
-    </br>
-    Your account has been created successfully
-    </br>
-    Username: %(username)s
-    </br>
-    <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
-    </br>
-    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-
-    </br>
-    ---
-
-    </br>
-    <a href="%(login_url)s">Login direct</a>
-
-    </br>
+    <p style="text-indent:2em;">Your account has been created successfully</p> 
+    <p style="text-indent:2em;">
+        <span>
+            Username: %(username)s.
+        </span>
+        <span>
+            <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
+        </span>    
+        <span>
+            This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
+        </span> 
+        <span>
+            <a href="%(login_url)s">Login direct</a>
+        </span>
+    </p>
     """) % {
-        'name': user.name,
         'username': user.username,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
@@ -64,6 +94,15 @@ def send_user_created_mail(user):
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
+    if settings.CREATE_USER_CONTENT:
+       message = get_email_custom_content(user)
+
+    email_signature = '<p style="float:right">'+'jumpserver'+'</p>'
+    if settings.SIGNATURE:
+        email_signature = '<p style="float:right">' + settings.SIGNATURE + '</p>'
+
+    email_format = honorific + message + email_signature
+    message = '<div style="padding-right: 55%">' + email_format + '</div>'
     if settings.DEBUG:
         try:
             print(message)
