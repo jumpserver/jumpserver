@@ -14,3 +14,7 @@ class AccessKeySerializer(serializers.ModelSerializer):
         model = AccessKey
         fields = ['id', 'secret']
         read_only_fields = ['id', 'secret']
+
+
+class OtpVerifySerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=6, min_length=6)
