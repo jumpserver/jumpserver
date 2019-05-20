@@ -147,6 +147,10 @@ class User(AbstractUser):
     def otp_secret_key(self, item):
         self._otp_secret_key = signer.sign(item)
 
+    def check_otp(self, code):
+        from ..utils import check_otp_code
+        return check_otp_code(self.otp_secret_key, code)
+
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
 

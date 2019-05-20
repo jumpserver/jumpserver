@@ -374,6 +374,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ),
+    'DEFAULT_METADATA_CLASS': 'common.drfmetadata.SimpleMetadataWithFilters',
     'ORDERING_PARAM': "order",
     'SEARCH_PARAM': "search",
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',

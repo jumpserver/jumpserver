@@ -124,6 +124,9 @@ class AdHocResultCallback(CallbackMixin, CallbackModule, CMDCallBackModule):
     def display_ok_hosts(self):
         pass
 
+    def display_failed_stderr(self):
+        pass
+
 
 class CommandResultCallback(AdHocResultCallback):
     """

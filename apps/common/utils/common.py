@@ -144,6 +144,7 @@ def is_uuid(seq):
 
 def get_request_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')
+
     if x_forwarded_for and x_forwarded_for[0]:
         login_ip = x_forwarded_for[0]
     else:
