@@ -2,15 +2,6 @@
 {% load common_tags %}
 {% load static %}
 {% load i18n %}
-
-{% block custom_head_css_js %}
-    <style>
-    .inmodal .modal-body {
-        background: #fff;
-    }
-    </style>
-{% endblock %}
-
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -126,10 +117,10 @@ function initAssetUserTable() {
                 var btn = '<a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-username="DEFAULT_USERNAME">{% trans "View auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                btn += view_btn;
                 {% if asset.protocol == 'ssh' %}
                     btn += test_btn;
                 {% endif %}
-                btn += view_btn;
                 $(td).html(btn);
 
             }}

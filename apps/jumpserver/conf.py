@@ -194,7 +194,7 @@ class Config(dict):
             filename = os.path.join(self.root_path, filename)
         try:
             with open(filename, 'rt', encoding='utf8') as f:
-                obj = yaml.load(f)
+                obj = yaml.safe_load(f)
         except IOError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
                 return False
