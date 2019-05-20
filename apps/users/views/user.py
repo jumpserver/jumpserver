@@ -89,8 +89,8 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user.save()
         if current_org and current_org.is_real():
             user.orgs.add(current_org.id)
-        if form.cleaned_data.get('auto_password'):
-            post_user_create.send(self.__class__, user=user)
+
+        post_user_create.send(self.__class__, user=user)
         return super().form_valid(form)
 
     def get_form_kwargs(self):
