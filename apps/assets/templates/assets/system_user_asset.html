@@ -161,7 +161,7 @@ function initAssetsTable() {
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var push_btn = '';
                 {% if system_user.auto_push %}
-				push_btn = '<a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+				push_btn = ' <a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {% endif %}
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "View auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
