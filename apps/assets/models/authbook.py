@@ -78,7 +78,7 @@ class AuthBook(AssetUser):
             if host == self.asset.hostname:
                 _connectivity = self.UNREACHABLE
 
-        for host in value.get('contacted', {}).keys():
+        for host in value.get('contacted', []):
             if host == self.asset.hostname:
                 _connectivity = self.REACHABLE
 

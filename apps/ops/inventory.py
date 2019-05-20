@@ -35,7 +35,6 @@ class JMSBaseInventory(BaseInventory):
             info["vars"].update({
                 label.name: label.value
             })
-            info["groups"].append("{}:{}".format(label.name, label.value))
         if asset.domain:
             info["vars"].update({
                 "domain": asset.domain.name,
