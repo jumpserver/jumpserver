@@ -4,6 +4,7 @@
 
 from rest_framework import serializers
 
+from assets.serializers import AssetSimpleSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 
@@ -76,7 +77,8 @@ class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'asset', 'system_user', 'type', 'path', 'params',
-            'comment', 'created_by', 'date_created',
+            'comment', 'created_by', 'date_created', 'asset_info',
+            'system_user_info', 'get_type_display',
         ]
 
 

@@ -1,8 +1,20 @@
 {% load i18n %}
 <li id="assets">
-    <a href="{% url 'assets:user-asset-list' %}">
-        <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
+    <a>
+        <i class="fa fa-inbox" style="width: 14px"></i> <span class="nav-label">{% trans 'My resource' %}</span><span class="fa arrow"></span>
     </a>
+    <ul class="nav nav-second-level">
+        <li id="user-asset">
+            <a href="{% url 'assets:user-asset-list' %}">
+                <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
+            </a>
+        </li>
+        <li id="user-remote-app">
+            <a href="{% url 'assets:user-remote-app-list' %}">
+                <i class="fa fa-th" style="width: 14px"></i><span class="nav-label">{% trans 'My RemoteApp' %}</span><span class="label label-info pull-right"></span>
+            </a>
+        </li>
+    </ul>
 </li>
 <li id="ops">
     <a href="{% url 'ops:command-execution-start' %}">

@@ -470,6 +470,7 @@ class UserGrantedRemoteAppsApi(ListAPIView):
     def get_queryset(self):
         util = RemoteAppPermissionUtil(self.get_object())
         queryset = util.get_remote_apps()
+        queryset = list(queryset)
         return queryset
 
     def get_permissions(self):

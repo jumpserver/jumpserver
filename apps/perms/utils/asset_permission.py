@@ -385,7 +385,7 @@ def sort_assets(assets, order_by='hostname', reverse=False):
 
 
 def parse_node_to_tree_node(node):
-    from . import serializers
+    from .. import serializers
     name = '{} ({})'.format(node.value, node.assets_amount)
     node_serializer = serializers.GrantedNodeSerializer(node)
     data = {

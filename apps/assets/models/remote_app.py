@@ -28,14 +28,15 @@ class RemoteApp(OrgModelMixin):
     type = models.CharField(
         default=const.REMOTE_APP_TYPE_CHROME,
         choices=const.REMOTE_APP_TYPE_CHOICES,
-        max_length=128, verbose_name=_('RemoteApp type')
+        max_length=128, verbose_name=_('App type')
     )
     path = models.CharField(
         max_length=128, blank=False, null=False,
-        verbose_name=_('RemoteApp path')
+        verbose_name=_('App path')
     )
     params = EncryptJsonDictTextField(
-        max_length=4096, blank=True, null=True, verbose_name=_('Parameters')
+        max_length=4096, default={}, blank=True, null=True,
+        verbose_name=_('Parameters')
     )
     created_by = models.CharField(
         max_length=32, null=True, blank=True, verbose_name=_('Created by')
@@ -50,6 +51,7 @@ class RemoteApp(OrgModelMixin):
     class Meta:
         verbose_name = _("RemoteApp")
         unique_together = [('org_id', 'name')]
+        ordering = ('name', )
 
     def __str__(self):
         return self.name
@@ -70,3 +72,17 @@ class RemoteApp(OrgModelMixin):
             _parameters.append(value)
         _parameters = ' '.join(_parameters)
         return _parameters
+
+    @property
+    def asset_info(self):
+        return {
+            'id': self.asset.id,
+            'hostname': self.asset.hostname
+        }
+
+    @property
+    def system_user_info(self):
+        return {
+            'id': self.system_user.id,
+            'name': self.system_user.name
+        }
