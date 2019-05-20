@@ -54,8 +54,8 @@ function initTable() {
                     $(td).html(name);
                 }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
-                    var connect_btn = '<a href="#" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                    $(td).html(connect_btn)
+                    var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                    $(td).html(conn_btn)
                 }}
         ],
         ajax_url: url,
