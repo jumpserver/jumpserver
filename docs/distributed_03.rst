@@ -11,7 +11,6 @@
 ~~~~~~~
 
 -  系统: CentOS 7
--  IP: 192.168.100.10
 -  服务: MariaDB Galera Cluster
 
 +----------+------------+-----------------+---------------+------------------------+
@@ -95,6 +94,7 @@
     binlog_format=row
     default_storage_engine=InnoDB
     innodb_autoinc_lock_mode=2
+    ...
 
     # 在 192.168.100.12 上执行以下命令
     $ vi /etc/my.cnf.d/server.cnf
