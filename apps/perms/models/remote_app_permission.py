@@ -46,6 +46,7 @@ class RemoteAppPermission(OrgModelMixin):
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _('RemoteApp permission')
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -61,3 +62,14 @@ class RemoteAppPermission(OrgModelMixin):
         if not self.is_expired and self.is_active:
             return True
         return False
+
+    def get_all_users(self):
+        users = set(self.users.all())
+        for group in self.user_groups.all():
+            _users = group.users.all()
+            set_or_append_attr_bulk(_users, 'inherit', group.name)
+            users.update(set(_users))
+        return users
+
+    def get_all_remote_apps(self):
+        return set(self.remote_apps.all())

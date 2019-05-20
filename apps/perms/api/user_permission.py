@@ -485,10 +485,10 @@ class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
-        if user_id:
-            user = get_object_or_404(User, id=user_id)
+        if not user_id:
+            user = self.request.user
         else:
-            user = None
+            user = get_object_or_404(User, id=user_id)
         return user
 
     def get_queryset(self):
@@ -504,6 +504,11 @@ class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
 
         queryset = sorted(queryset)
         return queryset
+
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
 
 
 class ValidateUserRemoteAppPermissionApi(APIView):

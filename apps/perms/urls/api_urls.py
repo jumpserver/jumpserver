@@ -83,7 +83,10 @@ remote_app_permission_urlpatterns = [
     # 获取用户授权的RemoteApp树
     path('user/<uuid:pk>/remote-apps/tree/',
          api.UserGrantedRemoteAppsAsTreeApi.as_view(),
-         name='user-remote-apps-tree'),
+         name='user-remote-apps-as-tree'),
+    path('user/remote-apps/tree/',
+         api.UserGrantedRemoteAppsAsTreeApi.as_view(),
+         name='my-remote-apps-as-tree'),
 
     # 查询用户组授权的RemoteApp
     path('user-group/<uuid:pk>/remote-apps/',
