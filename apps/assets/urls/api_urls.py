@@ -18,7 +18,6 @@ router.register(r'domain', api.DomainViewSet, 'domain')
 router.register(r'gateway', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filter', api.CommandFilterViewSet, 'cmd-filter')
 router.register(r'asset-user', api.AssetUserViewSet, 'asset-user')
-router.register(r'remote-app', api.RemoteAppViewSet, 'remote-app')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filter', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
@@ -91,9 +90,6 @@ urlpatterns = [
 
     path('gateway/<uuid:pk>/test-connective/',
          api.GatewayTestConnectionApi.as_view(), name='test-gateway-connective'),
-
-    path('remote-apps/<uuid:pk>/connection-info/',
-         api.RemoteAppConnectionInfoApi.as_view(), name='remote-app-connection-info')
 
 ]
 

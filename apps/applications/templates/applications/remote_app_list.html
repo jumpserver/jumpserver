@@ -9,7 +9,7 @@
 {% block table_search %}{% endblock %}
 {% block table_container %}
     <div class="uc pull-left  m-r-5">
-        <a href="{% url 'assets:remote-app-create' %}" class="btn btn-sm btn-primary"> {% trans "Create RemoteApp" %} </a>
+        <a href="{% url 'applications:remote-app-create' %}" class="btn btn-sm btn-primary"> {% trans "Create RemoteApp" %} </a>
     </div>
     <table class="table table-striped table-bordered table-hover " id="remote_app_list_table" >
         <thead>
@@ -38,7 +38,7 @@ function initTable() {
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                     cellData = htmlEscape(cellData);
-                    {% url 'assets:remote-app-detail' pk=DEFAULT_PK as the_url  %}
+                    {% url 'applications:remote-app-detail' pk=DEFAULT_PK as the_url  %}
                     var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                     $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                 }},
@@ -53,12 +53,12 @@ function initTable() {
                     $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', cellData.id));
                 }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
-                    var update_btn = '<a href="{% url "assets:remote-app-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                    var update_btn = '<a href="{% url "applications:remote-app-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                     var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-rid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                     $(td).html(update_btn + del_btn)
                 }}
         ],
-        ajax_url: '{% url "api-assets:remote-app-list" %}',
+        ajax_url: '{% url "api-applications:remote-app-list" %}',
         columns: [
             {data: "id"},
             {data: "name" },
@@ -80,7 +80,7 @@ $(document).ready(function(){
     var $data_table = $('#remote_app_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var rid = $this.data('rid');
-    var the_url = '{% url "api-assets:remote-app-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    var the_url = '{% url "api-applications:remote-app-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();

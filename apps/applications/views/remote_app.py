@@ -12,6 +12,7 @@ from django.urls import reverse_lazy
 
 from common.permissions import AdminUserRequiredMixin
 from common.const import create_success_msg, update_success_msg
+
 from ..models import RemoteApp
 from .. import forms
 
@@ -23,7 +24,7 @@ __all__ = [
 
 
 class RemoteAppListView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'assets/remote_app_list.html'
+    template_name = 'applications/remote_app_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -35,10 +36,10 @@ class RemoteAppListView(AdminUserRequiredMixin, TemplateView):
 
 
 class RemoteAppCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
-    template_name = 'assets/remote_app_create_update.html'
+    template_name = 'applications/remote_app_create_update.html'
     model = RemoteApp
     form_class = forms.RemoteAppCreateUpdateForm
-    success_url = reverse_lazy('assets:remote-app-list')
+    success_url = reverse_lazy('applications:remote-app-list')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -53,10 +54,10 @@ class RemoteAppCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
 
 
 class RemoteAppUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
-    template_name = 'assets/remote_app_create_update.html'
+    template_name = 'applications/remote_app_create_update.html'
     model = RemoteApp
     form_class = forms.RemoteAppCreateUpdateForm
-    success_url = reverse_lazy('assets:remote-app-list')
+    success_url = reverse_lazy('applications:remote-app-list')
 
     def get_initial(self):
         return {k: v for k, v in self.object.params.items()}
@@ -74,7 +75,7 @@ class RemoteAppUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateVie
 
 
 class RemoteAppDetailView(AdminUserRequiredMixin, DetailView):
-    template_name = 'assets/remote_app_detail.html'
+    template_name = 'applications/remote_app_detail.html'
     model = RemoteApp
     context_object_name = 'remote_app'
 
@@ -88,7 +89,7 @@ class RemoteAppDetailView(AdminUserRequiredMixin, DetailView):
 
 
 class UserRemoteAppListView(LoginRequiredMixin, TemplateView):
-    template_name = 'assets/user_remote_app_list.html'
+    template_name = 'applications/user_remote_app_list.html'
 
     def get_context_data(self, **kwargs):
         context = {

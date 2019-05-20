@@ -33,7 +33,7 @@ class RemoteAppPermission(OrgModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', related_name='remote_app_permissions', blank=True, verbose_name=_("User"))
     user_groups = models.ManyToManyField('users.UserGroup', related_name='remote_app_permissions', blank=True, verbose_name=_("User group"))
-    remote_apps = models.ManyToManyField('assets.RemoteApp', related_name='remote_app_permissions', blank=True, verbose_name=_("RemoteApp"))
+    remote_apps = models.ManyToManyField('applications.RemoteApp', related_name='remote_app_permissions', blank=True, verbose_name=_("RemoteApp"))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_start = models.DateTimeField(default=timezone.now, db_index=True, verbose_name=_("Date start"))
     date_expired = models.DateTimeField(default=date_expired_default, db_index=True, verbose_name=_('Date expired'))

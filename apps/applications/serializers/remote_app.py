@@ -4,7 +4,6 @@
 
 from rest_framework import serializers
 
-from assets.serializers import AssetSimpleSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 

@@ -15,10 +15,10 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="{% url 'assets:remote-app-detail' pk=remote_app.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                                <a href="{% url 'applications:remote-app-detail' pk=remote_app.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:remote-app-update' pk=remote_app.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'applications:remote-app-update' pk=remote_app.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-application">
@@ -101,8 +101,8 @@ $(document).ready(function () {
     var $this = $(this);
     var name = "{{ remote_app.name }}";
     var rid = "{{ remote_app.id }}";
-    var the_url = '{% url "api-assets:remote-app-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
-    var redirect_url = "{% url 'assets:remote-app-list' %}";
+    var the_url = '{% url "api-applications:remote-app-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    var redirect_url = "{% url 'applications:remote-app-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })
 </script>
