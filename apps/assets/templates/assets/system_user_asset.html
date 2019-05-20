@@ -133,6 +133,7 @@
         </div>
     </div>
     {% include 'assets/_asset_user_auth_modal.html' %}
+    {% include 'assets/_asset_user_view_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -160,12 +161,13 @@ function initAssetsTable() {
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var push_btn = '';
                 {% if system_user.auto_push %}
-				push_btn = '<a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+				push_btn = ' <a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 {% endif %}
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "View auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
                 {#var unbound_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-unbound" data-uid="{{ DEFAULT_PK }}">{% trans "Unbound" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
                 var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                $(td).html(push_btn + test_btn + update_auth_btn);
+                $(td).html(update_auth_btn + view_btn + push_btn + test_btn);
 			}}
 		],
 		ajax_url: '{% url "api-assets:system-user-assets" pk=system_user.id %}',
@@ -359,6 +361,12 @@ $(document).ready(function () {
     else{
         $('#id_password').parent().addClass('has-error');
     }
+})
+.on("click", ".btn-view-auth", function (evt) {
+    asset_id = $(this).data("aid") ;
+    host = $(this).data("hostname");
+    username = "{{ system_user.username }}";
+    $("#asset_user_auth_view").modal();
 })
 </script>
 {% endblock %}
