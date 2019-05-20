@@ -715,9 +715,12 @@ String.prototype.format = function(args) {
     return result;
 };
 
-function setCookie(key, value) {
+function setCookie(key, value, time) {
     var expires = new Date();
-    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+    if (!time) {
+        time =  expires.getTime() + (24 * 60 * 60 * 1000);
+    }
+    expires.setTime(time);
     document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
 }
 
