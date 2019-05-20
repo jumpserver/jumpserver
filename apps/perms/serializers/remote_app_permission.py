@@ -14,7 +14,6 @@ __all__ = [
 
 
 class RemoteAppPermissionSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RemoteAppPermission
         fields = [
@@ -22,17 +21,16 @@ class RemoteAppPermissionSerializer(serializers.ModelSerializer):
             'is_active', 'date_start', 'date_expired', 'is_valid',
             'created_by', 'date_created', 'org_id'
         ]
+        read_only_fields = ['created_by', 'date_created']
 
 
 class RemoteAppPermissionUpdateUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RemoteAppPermission
         fields = ['id', 'users']
 
 
 class RemoteAppPermissionUpdateRemoteAppSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RemoteAppPermission
         fields = ['id', 'remote_apps']

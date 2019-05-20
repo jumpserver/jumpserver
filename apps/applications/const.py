@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 # RemoteApp
-
 REMOTE_APP_BOOT_PROGRAM_NAME = '||jmservisor'
 
 REMOTE_APP_TYPE_CHROME = 'chrome'

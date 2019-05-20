@@ -83,7 +83,6 @@ class RemoteAppTypeForms(
 
 
 class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
-
     def __init__(self, *args, **kwargs):
         # 过滤RDP资产和系统用户
         super().__init__(*args, **kwargs)

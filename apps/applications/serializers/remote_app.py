@@ -20,7 +20,6 @@ class RemoteAppParamsDictField(serializers.DictField):
     """
     RemoteApp field => params
     """
-
     @staticmethod
     def filter_attribute(attribute, instance):
         """
@@ -68,7 +67,6 @@ class RemoteAppParamsDictField(serializers.DictField):
 
 
 class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-
     params = RemoteAppParamsDictField()
 
     class Meta:
@@ -79,10 +77,13 @@ class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'created_by', 'date_created', 'asset_info',
             'system_user_info', 'get_type_display',
         ]
+        read_only_fields = [
+            'created_by', 'date_created', 'asset_info',
+            'system_user_info', 'get_type_display'
+        ]
 
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
-
     parameter_remote_app = serializers.SerializerMethodField()
 
     class Meta:
@@ -90,6 +91,7 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'asset', 'system_user', 'parameter_remote_app',
         ]
+        read_only_fields = ['parameter_remote_app']
 
     @staticmethod
     def get_parameter_remote_app(obj):
