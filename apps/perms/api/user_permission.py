@@ -25,7 +25,7 @@ from ..hands import (
     NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers
-from ..mixins import AssetsFilterMixin
+from ..mixins import AssetsFilterMixin, RemoteAppFilterMixin
 from ..models import Action
 
 logger = get_logger(__name__)
@@ -454,7 +454,7 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
 # RemoteApp permission
 
-class UserGrantedRemoteAppsApi(ListAPIView):
+class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
     pagination_class = LimitOffsetPagination

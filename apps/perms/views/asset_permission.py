@@ -93,7 +93,7 @@ class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Update asset permission'),
+            'action': _('Asset permission detail'),
             'system_users_remain': SystemUser.objects.exclude(
                 granted_by_permissions=self.object
             ),

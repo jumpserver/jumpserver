@@ -24,7 +24,8 @@ __all__ = [
 
 
 class RemoteAppPermissionViewSet(viewsets.ModelViewSet):
-    filter_fields = ['name']
+    filter_fields = ('name', )
+    search_fields = filter_fields
     queryset = RemoteAppPermission.objects.all()
     serializer_class = RemoteAppPermissionSerializer
     pagination_class = LimitOffsetPagination
