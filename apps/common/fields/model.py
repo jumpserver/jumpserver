@@ -11,7 +11,7 @@ __all__ = [
     'JsonMixin', 'JsonDictMixin', 'JsonListMixin', 'JsonTypeMixin',
     'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
     'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
-    'EncryptTextField', 'EncryptMixin',
+    'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
 ]
 signer = get_signer()
 
@@ -128,5 +128,8 @@ class EncryptCharField(EncryptMixin, models.CharField):
         kwargs['max_length'] = 2048
         super().__init__(*args, **kwargs)
 
+
+class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):
+    pass
 
 

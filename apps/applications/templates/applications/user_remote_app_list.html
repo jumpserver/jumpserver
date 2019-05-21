@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block custom_head_css_js %}
+    <script src="{% static 'js/jquery.form.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mail-box-header">
+    <table class="table table-striped table-bordered table-hover " id="remote_app_list_table" >
+        <thead>
+        <tr>
+            <th class="text-center">
+                <input type="checkbox" id="check_all" class="ipt_check_all" >
+            </th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'App type' %}</th>
+            <th class="text-center">{% trans 'Asset' %}</th>
+            <th class="text-center">{% trans 'System user' %}</th>
+            <th class="text-center">{% trans 'Comment' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+var inited = false;
+var remote_app_table, url;
+
+function initTable() {
+    if (inited){
+        return
+    } else {
+        inited = true;
+    }
+    url = '{% url "api-perms:my-remote-apps" %}';
+    var options = {
+        ele: $('#remote_app_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                    var name = htmlEscape(cellData);
+                    $(td).html(name)
+                }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                    var hostname = htmlEscape(cellData.hostname);
+                    $(td).html(hostname);
+                }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                    var name = htmlEscape(cellData.name);
+                    $(td).html(name);
+                }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                    var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                    $(td).html(conn_btn)
+                }}
+        ],
+        ajax_url: url,
+        columns: [
+            {data: "id"},
+            {data: "name"},
+            {data: "get_type_display", orderable: false},
+            {data: "asset_info", orderable: false},
+            {data: "system_user_info", orderable: false},
+            {data: "comment", orderable: false},
+            {data: "id", orderable: false}
+        ]
+    };
+    remote_app_table = jumpserver.initServerSideDataTable(options);
+    return remote_app_table
+}
+$(document).ready(function(){
+    initTable();
+})
+</script>
+{% endblock %}

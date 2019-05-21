@@ -4,6 +4,18 @@
         <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
+<li id="applications">
+    <a>
+        <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'My Applications' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="user-remote-app">
+            <a href="{% url 'applications:user-remote-app-list' %}">
+                <i class="" style="width: 14px"></i><span class="nav-label">{% trans 'RemoteApp' %}</span><span class="label label-info pull-right"></span>
+            </a>
+        </li>
+    </ul>
+</li>
 <li id="ops">
     <a href="{% url 'ops:command-execution-start' %}">
         <i class="fa fa-terminal" style="width: 14px"></i> <span class="nav-label">{% trans 'Command execution' %}</span><span class="label label-info pull-right"></span>
