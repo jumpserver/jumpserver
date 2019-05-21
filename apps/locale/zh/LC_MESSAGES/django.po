@@ -585,7 +585,6 @@ msgid "My RemoteApp"
 msgstr "我的远程应用"
 
 #: assets/api/asset.py:112
->>>>>>> dev
 msgid "Please select assets that need to be updated"
 msgstr "请选择需要更新的资产"
 
@@ -6187,7 +6186,6 @@ msgstr "创建组织"
 msgid "Update org"
 msgstr "更新组织"
 
-<<<<<<< HEAD
 
 #~ msgid "Template"
 #~ msgstr "模板"
@@ -6260,7 +6258,6 @@ msgstr "更新组织"
 #~ msgid "Invalid private key"
 #~ msgstr "ssh密钥不合法"
 
-<<<<<<< HEAD
 #, fuzzy
 #~| msgid "CPU count"
 #~ msgid "Cpu count"
