@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-20 19:37+0800\n"
+"POT-Creation-Date: 2019-05-21 11:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -298,7 +298,7 @@ msgstr "备注"
 #: perms/templates/perms/remote_app_permission_list.html:17
 #: perms/templates/perms/remote_app_permission_remote_app.html:26
 #: perms/templates/perms/remote_app_permission_user.html:26
-#: templates/_nav.html:35 templates/_nav_user.html:14
+#: templates/_nav.html:35 templates/_nav.html:45 templates/_nav_user.html:14
 msgid "RemoteApp"
 msgstr "远程应用"
 
@@ -2973,7 +2973,7 @@ msgstr "失效日期"
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/remote_app_permission.py:48 templates/_nav.html:45
+#: perms/models/remote_app_permission.py:48
 msgid "RemoteApp permission"
 msgstr "远程应用授权"
 
