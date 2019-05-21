@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'perms:remote-app-permission-detail' pk=remote_app_permission.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'perms:remote-app-permission-user-list' pk=remote_app_permission.id %}" class="text-center">
+                                    <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:remote-app-permission-remote-app-list' pk=remote_app_permission.id %}" class="text-center">
+                                    <i class="fa fa-th"></i> {% trans 'RemoteApp' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'User list of ' %} <b>{{ remote_app_permission.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>{% trans 'Name' %}</th>
+                                            <th>{% trans 'Username' %}</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for user in object_list %}
+                                            <tr>
+                                                <td>{{ user.name }}</td>
+                                                <td>{{ user.username }}</td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn-remove-user {% if user.inherit %} disabled {% endif %}" data-gid="{{ user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        {% include '_pagination.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user to this permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2 user" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for user in users_remain %}
+                                                            <option value="{{ user.id }}">{{ user }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user group to this permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2 user-group" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for user_group in user_groups_remain %}
+                                                            <option value="{{ user_group.id }}" id="opt_{{ user_group.id }}">{{ user_group }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-group">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for user_group in remote_app_permission.user_groups.all %}
+                                            <tr>
+                                                <td ><b class="bdg_group" data-gid={{ user_group.id }}>{{ user_group }}</b></td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn-remove-group" type="button" data-gid="{{ user_group.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+    jumpserver.users_selected = {};
+    jumpserver.user_groups_selected = {};
+    function addUsers(users) {
+        var the_url = "{% url 'api-perms:remote-app-permission-add-user' pk=remote_app_permission.id %}";
+        var body = {
+            users: users
+        };
+        var success = function(data) {
+            location.reload();
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success: success
+        });
+    }
+    function removeUser(users) {
+        var the_url = "{% url 'api-perms:remote-app-permission-remove-user' pk=remote_app_permission.id %}";
+        var body = {
+            users: users
+        };
+        var success = function(data) {
+            location.reload();
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success: success
+        });
+    }
+    function updateGroup(groups) {
+        var the_url = "{% url 'api-perms:remote-app-permission-detail' pk=remote_app_permission.id %}";
+        var body = {
+            user_groups: groups
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body)
+        });
+    }
+    $(document).ready(function () {
+        $('.select2.user').select2()
+            .on('select2:select', function(evt) {
+                var data = evt.params.data;
+                jumpserver.users_selected[data.id] = data.text;
+            })
+            .on('select2:unselect', function(evt) {
+                var data = evt.params.data;
+                delete jumpserver.users_selected[data.id]
+            });
+        $('.select2.user-group').select2()
+            .on('select2:select', function(evt) {
+                var data = evt.params.data;
+                jumpserver.user_groups_selected[data.id] = data.text;
+            })
+            .on('select2:unselect', function(evt) {
+                var data = evt.params.data;
+                delete jumpserver.user_groups_selected[data.id]
+            })
+    }).on('click', '.btn-add-user', function () {
+        if (Object.keys(jumpserver.users_selected).length === 0) {
+            return false;
+        }
+        var users_id = [];
+        $.map(jumpserver.users_selected, function(value, index) {
+            users_id.push(index);
+        });
+        addUsers(users_id);
+    }).on('click', '.btn-remove-user', function () {
+        var user_id = $(this).data("gid");
+        if (user_id === "") {
+            return
+        }
+        var users = [user_id];
+        removeUser(users)
+    }).on('click', '#btn-add-group', function () {
+        if (Object.keys(jumpserver.user_groups_selected).length === 0) {
+            return false;
+        }
+        var groups = $('.bdg_group').map(function() {
+            return $(this).data('gid');
+        }).get();
+        $.map(jumpserver.user_groups_selected, function(group_name, index) {
+            groups.push(index);
+            $('#opt_' + index).remove();
+            $('.group_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        updateGroup(groups);
+    }).on('click', '.btn-remove-group', function () {
+        var $this = $(this);
+        var $tr = $this.closest('tr');
+        var groups = $('.bdg_group').map(function() {
+            if ($(this).data('gid') !== $this.data('gid')){
+                return $(this).data('gid');
+            }
+        }).get();
+        updateGroup(groups);
+        $tr.remove()
+    })
+</script>
+{% endblock %}

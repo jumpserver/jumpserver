@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.utils.translation import ugettext_lazy as _
+
+
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {
        'name': "setup",
@@ -50,4 +53,5 @@ TASK_OPTIONS = {
 }
 
 CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX = '_KEY_ASSET_BULK_UPDATE_ID_{}'
+
 
