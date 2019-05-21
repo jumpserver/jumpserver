@@ -37,6 +37,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
 def get_email_custom_content(user):
     email_content = '<p style="text-indent:2em">' + settings.CREATE_USER_CONTENT + '</p>'
     suffix_message = _("""
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <p style="text-indent:2em;">
             <span>
                 <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
@@ -71,6 +72,7 @@ def send_user_created_mail(user):
         honorific = '<p>' + settings.CREATE_USER_EMAIL_HONORIFIC + ':</p>'
 
     message = _("""
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <p style="text-indent:2em;">Your account has been created successfully</p> 
     <p style="text-indent:2em;">
         <span>
@@ -101,8 +103,7 @@ def send_user_created_mail(user):
     if settings.SIGNATURE:
         email_signature = '<p style="float:right">' + settings.SIGNATURE + '</p>'
 
-    email_format = honorific + message + email_signature
-    message = '<div style="padding-right: 55%">' + email_format + '</div>'
+    message = honorific + message + email_signature
     if settings.DEBUG:
         try:
             print(message)
