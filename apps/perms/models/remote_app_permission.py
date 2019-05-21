@@ -4,8 +4,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgModelMixin
-
 from .base import BasePermission
 
 __all__ = [
