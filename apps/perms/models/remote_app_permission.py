@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-class RemoteAppPermission(OrgModelMixin, BasePermission):
+class RemoteAppPermission(BasePermission):
     remote_apps = models.ManyToManyField('applications.RemoteApp', related_name='granted_by_permissions', blank=True, verbose_name=_("RemoteApp"))
 
     class Meta:
