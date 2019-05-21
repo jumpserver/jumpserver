@@ -38,4 +38,10 @@ def get_current_org():
     return _find('current_org')
 
 
+def get_current_org_id():
+    org = get_current_org()
+    org_id = str(org.id) if org.is_real() else ''
+    return org_id
+
+
 current_org = LocalProxy(partial(_find, 'current_org'))

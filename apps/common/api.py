@@ -3,9 +3,17 @@
 import os
 import uuid
 
-from rest_framework.views import Response
-from rest_framework import generics, serializers
 from django.core.cache import cache
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import generics, serializers
+
+from .const import KEY_CACHE_RESOURCES_ID
+
+__all__ = [
+    'LogTailApi', 'ResourcesIDCacheApi',
+]
 
 
 class OutputSerializer(serializers.Serializer):
@@ -68,3 +76,14 @@ class LogTailApi(generics.RetrieveAPIView):
 
         data, end, new_mark = self.read_from_file()
         return Response({"data": data, 'end': end, 'mark': new_mark})
+
+
+class ResourcesIDCacheApi(APIView):
+
+    def post(self, request, *args, **kwargs):
+        spm = str(uuid.uuid4())
+        resources_id = request.data.get('resources')
+        if resources_id:
+            cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
+            cache.set(cache_key, resources_id, 300)
+        return Response({'spm': spm})

@@ -2,6 +2,9 @@
 #
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
+
+from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset
@@ -13,15 +16,35 @@ __all__ = [
 ]
 
 
-class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResourceSerializerMixin):
     """
     资产的数据结构
     """
     class Meta:
         model = Asset
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
-        validators = []
+        # validators = [] # 解决批量导入时unique_together字段校验失败
+        fields = [
+            'id', 'org_id', 'org_name', 'ip', 'hostname', 'protocol', 'port',
+            'platform', 'is_active', 'public_ip', 'domain', 'admin_user',
+            'nodes', 'labels', 'number', 'vendor', 'model', 'sn',
+            'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
+            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
+            'hostname_raw', 'comment', 'created_by', 'date_created',
+            'hardware_info', 'connectivity'
+        ]
+        read_only_fields = (
+            'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
+            'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
+            'os', 'os_version', 'os_arch', 'hostname_raw',
+            'created_by', 'date_created',
+        )
+        extra_kwargs = {
+            'hardware_info': {'label': _('Hardware info')},
+            'connectivity': {'label': _('Connectivity')},
+            'org_name': {'label': _('Org name')}
+
+        }
 
     @classmethod
     def setup_eager_loading(cls, queryset):

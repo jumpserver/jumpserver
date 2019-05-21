@@ -9,13 +9,13 @@ from ..serializers import UserGroupSerializer, \
     UserGroupUpdateMemberSerializer
 from ..models import UserGroup
 from common.permissions import IsOrgAdmin
-from common.mixins import IDInFilterMixin
+from common.mixins import IDInCacheFilterMixin
 
 
 __all__ = ['UserGroupViewSet', 'UserGroupUpdateUserApi']
 
 
-class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
+class UserGroupViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     filter_fields = ("name",)
     search_fields = filter_fields
     queryset = UserGroup.objects.all()

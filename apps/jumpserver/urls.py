@@ -20,6 +20,7 @@ api_v1 = [
    path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
    path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
    path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
+   path('common/v1/', include('common.urls.api_urls', namespace='api-common')),
    path('applications/v1/', include('applications.urls.api_urls', namespace='api-applications')),
 ]
 

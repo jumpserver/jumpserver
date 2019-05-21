@@ -19,12 +19,21 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'username', 'email', 'groups', 'groups_display',
-            'role', 'role_display', 'avatar_url', 'wechat', 'phone',
-            'otp_level', 'comment', 'source', 'source_display',
-            'is_valid', 'is_expired', 'is_active',
-            'created_by', 'is_first_login',
-            'date_password_last_updated', 'date_expired',
+            'role', 'role_display',  'wechat', 'phone', 'otp_level',
+            'comment', 'source', 'source_display', 'is_valid', 'is_expired',
+            'is_active', 'created_by', 'is_first_login',
+            'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
+        extra_kwargs = {
+            'groups_display': {'label': _('Groups name')},
+            'source_display': {'label': _('Source name')},
+            'is_first_login': {'label': _('Is first login'), 'read_only': True},
+            'role_display': {'label': _('Role name')},
+            'is_valid': {'label': _('Is valid')},
+            'is_expired': {'label': _('Is expired')},
+            'avatar_url': {'label': _('Avatar url')},
+            'created_by': {'read_only': True}, 'source': {'read_only': True}
+        }
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
@@ -48,17 +57,20 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    users = serializers.SerializerMethodField()
+    users = serializers.PrimaryKeyRelatedField(
+        required=False, many=True, queryset=User.objects.all(), label=_('User')
+    )
 
     class Meta:
         model = UserGroup
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
-        read_only_fields = ['created_by']
-
-    @staticmethod
-    def get_users(obj):
-        return [user.name for user in obj.users.all()]
+        fields = [
+            'id', 'org_id', 'name',  'users', 'comment', 'date_created',
+            'created_by',
+        ]
+        extra_kwargs = {
+            'created_by': {'label': _('Created by'), 'read_only': True}
+        }
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):

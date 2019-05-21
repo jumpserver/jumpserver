@@ -28,4 +28,3 @@ def on_user_create(sender, user=None, **kwargs):
     logger.info("   - Sending welcome mail ...".format(user.name))
     if user.email:
         send_user_created_mail(user)
-

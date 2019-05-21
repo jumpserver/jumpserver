@@ -8,7 +8,7 @@
     <div class="modal-dialog {% block modal_class %}{% endblock %}">
         <div class="modal-content animated fadeIn">
             <div class="modal-header">
-                <button data-dismiss="modal" class="close close_btn1" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <button data-dismiss="modal" id="close_button1" class="close close_btn1 " type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title">{% block modal_title %}{% endblock %}</h4>
                 <small>{% block modal_comment %}{% endblock %}</small>
             </div>
@@ -19,10 +19,32 @@
             </div>
             <div class="modal-footer">
               {% block modal_button %}
-              <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+              <button id="close_button2" data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
               <button class="btn btn-primary" type="button" id="{% block modal_confirm_id %}{% endblock %}">{% trans 'Confirm' %}</button>
               {% endblock %}
             </div>
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function(){
+
+})
+.on('click', '#close_button1', function () {
+         SetMessageLabelEmpty()
+})
+.on('click', '#close_button2', function () {
+         SetMessageLabelEmpty()
+});
+function SetMessageLabelEmpty() {
+    $('#success_created').html('');
+    $('#success_created_detail').html('');
+    $('#created_failed').html('');
+    $('#created_failed_detail').html('');
+    $('#success_updated').html('');
+    $('#success_updated_detail').html('');
+    $('#updated_failed').html('');
+    $('#updated_failed_detail').html('');
+
+}
+</script>
