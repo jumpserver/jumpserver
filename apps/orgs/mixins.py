@@ -8,9 +8,12 @@ from django.shortcuts import redirect, get_object_or_404
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
+from rest_framework import serializers
 
 from common.utils import get_logger
-from .utils import current_org, set_current_org, set_to_root_org
+from .utils import (
+    current_org, set_current_org, set_to_root_org, get_current_org_id
+)
 from .models import Organization
 
 logger = get_logger(__file__)
@@ -18,7 +21,8 @@ tl = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
-    'RootOrgViewMixin', 'OrgMembershipSerializerMixin', 'OrgMembershipModelViewSetMixin'
+    'RootOrgViewMixin', 'OrgMembershipSerializerMixin',
+    'OrgMembershipModelViewSetMixin', 'OrgResourceSerializerMixin',
 ]
 
 
@@ -202,3 +206,11 @@ class OrgMembershipModelViewSetMixin:
     def get_queryset(self):
         queryset = self.membership_class.objects.filter(organization=self.org)
         return queryset
+
+
+class OrgResourceSerializerMixin(serializers.Serializer):
+    """
+    通过API批量操作资源时, 自动给每个资源添加所需属性org_id的值为current_org_id
+    (同时为serializer.is_valid()对Model的unique_together校验做准备)
+    """
+    org_id = serializers.HiddenField(default=get_current_org_id)

@@ -14,6 +14,28 @@
 {% endblock %}
 
 {% block table_search %}
+    <div class="" style="float: right">
+                   <div class=" btn-group">
+                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class=" btn_export" tabindex="0">
+                                <span>{% trans "Export" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                                <span>{% trans "Import" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                                <span>{% trans "Update" %}</span>
+                                </a>
+                            </li>
+                        </ul>
+                   </div>
+               </div>
 {% endblock %}
 
 {% block table_container %}
@@ -41,6 +63,8 @@
     <tbody>
     </tbody>
 </table>
+    {% include 'assets/_system_user_import_modal.html' %}
+    {% include 'assets/_system_user_update_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -172,6 +196,81 @@ $(document).ready(function(){
         default:
             break;
     }
+})
+.on('click', '.btn_export', function () {
+    var data_table = $('#system_user_list_table').DataTable();
+    var rows = data_table.rows('.selected').data();
+    var system_users = [];
+    $.each(rows, function (index, obj) {
+        system_users.push(obj.id)
+    });
+    var data = {
+        'resources': system_users
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:system-user-list' %}",
+        format: "csv",
+        params:{
+            search:search
+        }
+    };
+    APIExportData(props);
+})
+.on('click', '#btn_import_confirm', function () {
+    var url = "{% url 'api-assets:system-user-list' %}";
+    var file = document.getElementById('id_file').files[0];
+    if(!file){
+        toastr.error("{% trans 'Please select file' %}");
+        return
+    }
+    var data_table = $('#system_user_list_table').DataTable();
+    APIImportData({
+        url: url,
+        method: "POST",
+        body: file,
+        data_table: data_table
+    });
+})
+.on('click', '#download_update_template', function () {
+    var data_table = $('#system_user_list_table').DataTable();
+    var rows = data_table.rows('.selected').data();
+    var system_users = [];
+    $.each(rows, function (index, obj) {
+        system_users.push(obj.id)
+    });
+    var data = {
+        'resources': system_users
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:system-user-list' %}?format=csv&template=update",
+        format: "csv",
+        params:{
+            search:search
+        }
+    };
+    APIExportData(props);
+})
+.on('click', '#btn_update_confirm', function () {
+    var file = document.getElementById('update_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var url = "{% url 'api-assets:system-user-list' %}";
+    var data_table = $('#system_user_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "PUT",
+        body: file,
+        data_table: data_table
+    });
 })
 </script>
 {% endblock %}
