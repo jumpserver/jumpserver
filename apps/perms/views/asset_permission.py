@@ -130,10 +130,10 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
             'app': _('Perms'),
             'action': _('Asset permission user list'),
             'users_remain': current_org.get_org_users().exclude(
-                asset_permissions=self.object
+                assetpermission=self.object
             ),
             'user_groups_remain': UserGroup.objects.exclude(
-                asset_permissions=self.object
+                assetpermission=self.object
             )
         }
         kwargs.update(context)
