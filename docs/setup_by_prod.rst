@@ -3,16 +3,16 @@
 
 组件说明
 ~~~~~~~~~~~~~~
-- Jumpserver 为管理后台, 管理员可以通过Web页面进行资产管理、用户管理、资产授权等操作
-- Coco 为 SSH Server 和 Web Terminal Server 。用户可以通过使用自己的账户登录 SSH 或者 Web Terminal 直接访问被授权的资产。不需要知道服务器的账户密码
+- Jumpserver 为管理后台, 管理员可以通过 Web 页面进行资产管理、用户管理、资产授权等操作, 用户可以通过 Web 页面进行资产登录, 文件管理等操作
+- Coco 为 SSH Server 和 Web Terminal Server 。用户可以使用自己的账户通过 SSH 或者 Web Terminal 访问 SSH 协议和 Telnet 协议资产
 - Luna 为 Web Terminal Server 前端页面, 用户使用 Web Terminal 方式登录所需要的组件
-- Guacamole 为 Windows 组件, 用户可以通过 Web Terminal 来连接 Windows 资产 (暂时只能通过 Web Terminal 来访问)
+- Guacamole 为 RDP 协议和 VNC 协议资产组件, 用户可以通过 Web Terminal 来连接 RDP 协议和 VNC 协议资产 (暂时只能通过 Web Terminal 来访问)
 
 端口说明
 ~~~~~~~~~~~~~~
-- Jumpserver 默认端口为 8080/tcp 配置文件在 jumpserver/config.yml
+- Jumpserver 默认端口为 8080/tcp 配置文件 jumpserver/config.yml
 - Coco 默认 SSH 端口为 2222/tcp, 默认 Web Terminal 端口为 5000/tcp 配置文件在 coco/config.yml
-- Guacamole 默认端口为 8081/tcp
+- Guacamole 默认端口为 8081/tcp, 配置文件 /config/tomcat8/conf/server.xml
 - Nginx 默认端口为 80/tcp
 - Redis 默认端口为 6379/tcp
 - Mysql 默认端口为 3306/tcp
