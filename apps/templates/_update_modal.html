@@ -1,0 +1,28 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+
+{% block modal_id %}update_modal{% endblock %}
+
+{% block modal_confirm_id %}btn_update_confirm{% endblock %}
+
+{% block modal_body %}
+    <form method="post" id="fm_import">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="control-label">{% trans "Download the update template or use the exported CSV file format" %}</label>
+            <a id="download_update_template" style="display: block">{% trans 'Download the update template' %}</a>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label" for="update_file">{% trans "Select the CSV file to import" %}</label>
+            <input id="update_file" type="file" name="file" />
+        </div>
+    </form>
+
+    <div>
+        <p class="text-warning" id="success_updated"></p>
+        <p id="success_updated_detail"></p>
+        <p class="text-danger" id="updated_failed"></p>
+        <p id="updated_failed_detail"></p>
+    </div>
+{% endblock %}

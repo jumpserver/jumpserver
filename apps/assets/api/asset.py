@@ -16,8 +16,9 @@ from django.urls import reverse_lazy
 from django.core.cache import cache
 from django.db.models import Q
 
-from common.mixins import IDInFilterMixin
-from common.utils import get_logger
+from common.mixins import IDInCacheFilterMixin
+
+from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
@@ -35,7 +36,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInCacheFilterMixin, LabelFilter, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -46,6 +47,19 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
+
+    def set_assets_node(self, assets):
+        if not isinstance(assets, list):
+            assets = [assets]
+        node = Node.objects.get(value='Default')
+        node_id = self.request.query_params.get('node_id')
+        if node_id:
+            node = get_object_or_none(Node, pk=node_id)
+        node.assets.add(*assets)
+
+    def perform_create(self, serializer):
+        assets = serializer.save()
+        self.set_assets_node(assets)
 
     def filter_node(self, queryset):
         node_id = self.request.query_params.get("node_id")
@@ -89,7 +103,7 @@ class AssetViewSet(IDInFilterMixin, LabelFilter, BulkModelViewSet):
         return queryset
 
 
-class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
+class AssetListUpdateApi(IDInCacheFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
     Asset bulk update api
     """

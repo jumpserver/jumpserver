@@ -954,6 +954,89 @@ function rootNodeAddDom(ztree, callback) {
     })
 }
 
+function APIExportData(props) {
+    props = props || {};
+    $.ajax({
+        url: '/api/common/v1/resources/cache/',
+        type: props.method || "POST",
+        data: props.body,
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json",
+        success: function (data) {
+            var export_url = props.success_url;
+            var params = props.params || {};
+            params['format'] = props.format;
+            params['spm'] = data.spm;
+            for (var k in params){
+                export_url = setUrlParam(export_url, k, params[k])
+            }
+            window.open(export_url);
+        },
+        error: function () {
+            toastr.error('Export failed');
+        }
+    })
+}
+
+function APIImportData(props){
+    props = props || {};
+    $.ajax({
+        url: props.url,
+        type: props.method || "POST",
+        processData: false,
+        data: props.body,
+        contentType: props.content_type || 'text/csv',
+        success: function (data) {
+            if(props.method === 'POST'){
+                $('#created_failed').html('');
+                $('#created_failed_detail').html('');
+                $('#success_created').html("Import Success");
+                $('#success_created_detail').html("Count" + ": " + data.length);
+            }else{
+                $('#updated_failed').html('');
+                $('#updated_failed_detail').html('');
+                $('#success_updated').html("Update Success");
+                $('#success_updated_detail').html("Count" + ": " + data.length);
+            }
+
+            props.data_table.ajax.reload()
+        },
+        error: function (error) {
+            var data = error.responseJSON;
+            if (data instanceof Array){
+                var html = '';
+                var li = '';
+                var err = '';
+                $.each(data, function (index, item){
+                    err = '';
+                    for (var prop in item) {
+                        err += prop + ": " + item[prop][0] + " "
+                    }
+                    if (err) {
+                        li = "<li>" + "Line " + (++index) + ". " + err + "</li>";
+                        html += li
+                    }
+                });
+                html = "<ul>" + html + "</ul>"
+            }
+            else {
+                html = error.responseText
+            }
+            if(props.method === 'POST'){
+                $('#success_created').html('');
+                $('#success_created_detail').html('');
+                $('#created_failed').html("Import failed");
+                $('#created_failed_detail').html(html);
+            }else{
+                $('#success_updated').html('');
+                $('#success_updated_detail').html('');
+                $('#updated_failed').html("Update failed");
+                $('#updated_failed_detail').html(html);
+            }
+        }
+    })
+}
+
 
 function htmlEscape ( d ) {
     return typeof d === 'string' ?

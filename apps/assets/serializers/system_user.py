@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.utils.translation import ugettext_lazy as _
+
 from common.serializers import AdaptedBulkListSerializer
 
 from ..models import SystemUser, Asset
@@ -10,16 +12,36 @@ class SystemUserSerializer(serializers.ModelSerializer):
     """
     系统用户
     """
-    unreachable_amount = serializers.SerializerMethodField()
-    reachable_amount = serializers.SerializerMethodField()
-    unreachable_assets = serializers.SerializerMethodField()
-    reachable_assets = serializers.SerializerMethodField()
-    assets_amount = serializers.SerializerMethodField()
+    password = serializers.CharField(
+        required=False, write_only=True, label=_('Password')
+    )
+    unreachable_amount = serializers.SerializerMethodField(
+        label=_('Unreachable')
+    )
+    unreachable_assets = serializers.SerializerMethodField(
+        label=_('Unreachable assets')
+    )
+    reachable_assets = serializers.SerializerMethodField(
+        label=_('Reachable assets')
+    )
+    reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
+    assets_amount = serializers.SerializerMethodField(label=_('Asset'))
 
     class Meta:
         model = SystemUser
-        exclude = ('_password', '_private_key', '_public_key')
         list_serializer_class = AdaptedBulkListSerializer
+        fields = [
+            'id', 'org_id', 'name', 'username', 'login_mode',
+            'login_mode_display', 'priority', 'protocol', 'auto_push',
+            'password', 'assets_amount', 'reachable_amount', 'reachable_assets',
+            'unreachable_amount', 'unreachable_assets', 'cmd_filters', 'sudo',
+            'shell', 'comment', 'nodes', 'assets'
+        ]
+        extra_kwargs = {
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True}, 'nodes': {'read_only': True},
+            'assets': {'read_only': True}
+        }
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
