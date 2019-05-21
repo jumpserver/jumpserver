@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(blank=True, max_length=128, verbose_name='Created by')),
                 ('date_created', models.DateTimeField(auto_now_add=True, verbose_name='Date created')),
                 ('comment', models.TextField(blank=True, verbose_name='Comment')),
-                ('remote_apps', models.ManyToManyField(blank=True, related_name='remote_app_permissions', to='applications.RemoteApp', verbose_name='RemoteApp')),
+                ('remote_apps', models.ManyToManyField(blank=True, related_name='granted_by_permissions', to='applications.RemoteApp', verbose_name='RemoteApp')),
                 ('user_groups', models.ManyToManyField(blank=True, related_name='remote_app_permissions', to='users.UserGroup', verbose_name='User group')),
                 ('users', models.ManyToManyField(blank=True, related_name='remote_app_permissions', to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
