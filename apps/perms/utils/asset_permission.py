@@ -12,10 +12,17 @@ from django.conf import settings
 
 from common.utils import get_logger
 from common.tree import TreeNode
-from .models import AssetPermission, Action
-from .hands import Node
+from perms.models import AssetPermission, Action
+from perms.hands import Node
 
 logger = get_logger(__file__)
+
+
+__all__ = [
+    'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
+    'parse_asset_to_tree_node', 'parse_node_to_tree_node',
+    'check_system_user_action',
+]
 
 
 class GenerateTree:
@@ -378,7 +385,7 @@ def sort_assets(assets, order_by='hostname', reverse=False):
 
 
 def parse_node_to_tree_node(node):
-    from . import serializers
+    from .. import serializers
     name = '{} ({})'.format(node.value, node.assets_amount)
     node_serializer = serializers.GrantedNodeSerializer(node)
     data = {
@@ -442,11 +449,6 @@ def parse_asset_to_tree_node(node, asset, system_users):
     }
     tree_node = TreeNode(**data)
     return tree_node
-
-
-#
-# actions
-#
 
 
 def check_system_user_action(system_user, action):

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'applications:remote-app-detail' pk=remote_app.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'applications:remote-app-update' pk=remote_app.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-application">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ remote_app.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Name' %}:</td>
+                                            <td><b>{{ remote_app.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Asset' %}:</td>
+                                            <td><b><a href="{% url 'assets:asset-detail' pk=remote_app.asset.id %}">{{ remote_app.asset.hostname }}</a></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'System user' %}:</td>
+                                            <td><b><a href="{% url 'assets:system-user-detail' pk=remote_app.system_user.id %}">{{ remote_app.system_user.name }}</a></b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'App type' %}:</td>
+                                            <td><b>{{ remote_app.get_type_display }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'App path' %}:</td>
+                                            <td><b>{{ remote_app.path }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ remote_app.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}:</td>
+                                            <td><b>{{ remote_app.created_by  }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ remote_app.comment }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+jumpserver.nodes_selected = {};
+$(document).ready(function () {
+})
+.on('click', '.btn-delete-application', function () {
+    var $this = $(this);
+    var name = "{{ remote_app.name }}";
+    var rid = "{{ remote_app.id }}";
+    var the_url = '{% url "api-applications:remote-app-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    var redirect_url = "{% url 'applications:remote-app-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+})
+</script>
+{% endblock %}
