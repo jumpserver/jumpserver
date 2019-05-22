@@ -86,13 +86,23 @@ class LDAPUser(_LDAPUser):
         return user_dn
 
     def _populate_user_from_attributes(self):
-        super()._populate_user_from_attributes()
+        for field, attr in self.settings.USER_ATTR_MAP.items():
+            try:
+                value = self.attrs[attr][0]
+            except LookupError:
+                logger.warning("{} does not have a value for the attribute {}".format(self.dn, attr))
+            else:
+                if not hasattr(self._user, field):
+                    continue
+                if isinstance(getattr(self._user, field), bool):
+                    value = bool(int(value == 'true'))
+                setattr(self._user, field, value)
+
         if not hasattr(self._user, 'email') or '@' not in self._user.email:
             if '@' not in self._user.username:
                 email = '{}@{}'.format(self._user.username, settings.EMAIL_SUFFIX)
             else:
                 email = self._user.username
             setattr(self._user, 'email', email)
-
 
 
