@@ -512,6 +512,7 @@ class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
 
 
 class ValidateUserRemoteAppPermissionApi(APIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')
