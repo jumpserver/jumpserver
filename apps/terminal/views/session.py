@@ -19,7 +19,6 @@ __all__ = [
     'SessionDetailView',
 ]
 
-command_store = get_multi_command_storage()
 
 
 class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
@@ -108,6 +107,7 @@ class SessionDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
+        command_store = get_multi_command_storage()
         return command_store.filter(session=self.object.id)
 
     def get_context_data(self, **kwargs):

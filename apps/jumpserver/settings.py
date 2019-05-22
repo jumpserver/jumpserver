@@ -519,12 +519,7 @@ DEFAULT_TERMINAL_COMMAND_STORAGE = {
     },
 }
 
-TERMINAL_COMMAND_STORAGE = {
-    # 'ali-es': {
-    #     'TYPE': 'elasticsearch',
-    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
-    # },
-}
+TERMINAL_COMMAND_STORAGE = CONFIG.TERMINAL_COMMAND_STORAGE
 
 DEFAULT_TERMINAL_REPLAY_STORAGE = {
     "default": {
