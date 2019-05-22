@@ -60,6 +60,8 @@ class LDAPUtil:
         for field, value in user_item.items():
             if not hasattr(user, field):
                 continue
+            if isinstance(getattr(user, field), bool):
+                value = bool(int(value == 'true'))
             setattr(user, field, value)
         user.save()
 
@@ -82,6 +84,13 @@ class LDAPUtil:
 
     @staticmethod
     def create_user(user_item):
+        user = User()
+        for field, value in user_item.items():
+            if not hasattr(user, field):
+                continue
+            if isinstance(getattr(user, field), bool):
+                value = bool(int(value == 'true'))
+                user_item[field] = value
         user_item['source'] = User.SOURCE_LDAP
         try:
             User.objects.create(**user_item)
