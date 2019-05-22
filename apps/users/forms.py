@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
@@ -22,6 +23,14 @@ class UserCheckOtpCodeForm(forms.Form):
 
 
 class UserCreateUpdateForm(OrgModelForm):
+    INITIAL_PASSWORD = 'default'
+    CUSTOM_PASSWORD = 'custom'
+    EMAIL_SET_PASSWORD = 'auto'
+    PASSWORD_STRATEGY_CHOICES = (
+        (INITIAL_PASSWORD, _('INITIAL_PASSWORD')),
+        (CUSTOM_PASSWORD, _('CUSTOM_PASSWORD')),
+        (EMAIL_SET_PASSWORD, _('EMAIL_SET_PASSWORD'))
+    )
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
@@ -35,6 +44,11 @@ class UserCreateUpdateForm(OrgModelForm):
         label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
+    )
+    password_strategy = forms.ChoiceField(
+        choices=PASSWORD_STRATEGY_CHOICES, required=True,
+        initial=INITIAL_PASSWORD, label=_('Password strategy'),
+        widget=forms.RadioSelect()
     )
 
     class Meta:
@@ -91,6 +105,8 @@ class UserCreateUpdateForm(OrgModelForm):
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
+        if self.cleaned_data.get('password_strategy') == 'default':
+            password = settings.USER_INITIAL_PASSWORD
         otp_level = self.cleaned_data.get('otp_level')
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)

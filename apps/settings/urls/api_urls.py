@@ -16,4 +16,5 @@ urlpatterns = [
     path('terminal/command-storage/create/', api.CommandStorageCreateAPI.as_view(), name='command-storage-create'),
     path('terminal/command-storage/delete/', api.CommandStorageDeleteAPI.as_view(), name='command-storage-delete'),
     path('django-settings/', api.DjangoSettingsAPI.as_view(), name='django-settings'),
+    path('initial-password/delete/', api.InitialPasswordDeleteAPI.as_view(), name='initial-password-delete')
 ]

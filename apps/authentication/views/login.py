@@ -78,7 +78,15 @@ class UserLoginView(FormView):
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
+
         user = form.get_user()
+        # 登录时，密码等于初始化密码跳转至设置密码
+        if form.cleaned_data.get('password') == settings.USER_INITIAL_PASSWORD:
+            url = "%(rest_password_url)s?token=%(rest_password_token)s" % {
+                'rest_password_url': reverse('users:reset-password'),
+                'rest_password_token': user.generate_reset_token()
+            }
+            return redirect(url)
         # user password expired
         if user.password_has_expired:
             reason = LoginLog.REASON_PASSWORD_EXPIRED

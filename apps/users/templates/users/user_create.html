@@ -2,15 +2,49 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
-{#{% block username %}#}
-{#    {% bootstrap_field form.username layout="horizontal" %}#}
-{#{% endblock %}#}
 {% block password %}
-    <div class="form-group">
+    {% bootstrap_field form.password_strategy layout="horizontal" %}
+    <div class="form-group" id="initial_password">
+        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-8 controls" style="margin-top: 8px;">
+            {% trans 'This will use the default initial password by the system. Please go to the system Settings application to set the initial password' %}
+        </div>
+    </div>
+    <div class="form-group" id="custom_password">
+        {% bootstrap_field form.password layout="horizontal" %}
+    </div>
+    <div class="form-group" id="auto_password">
         <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
         <div class="col-sm-8 controls" style="margin-top: 8px;">
             {% trans 'Reset link will be generated and sent to the user. ' %}
         </div>
     </div>
+<script>
+var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
+function passwordStrategyFieldsDisplay(){
+    var initial_password = $('#id_password_strategy_0').is(":checked");
+    var custom_password = $('#id_password_strategy_1').is(":checked");
+    if(initial_password){
+        $('#initial_password').removeClass('hidden');
+        $('#auto_password').addClass('hidden');
+        $('#custom_password').addClass('hidden');
+    }else if(custom_password){
+        $('#custom_password').removeClass('hidden');
+        $('#auto_password').addClass('hidden');
+        $('#initial_password').addClass('hidden')
+    }else{
+        $('#auto_password').removeClass('hidden');
+        $('#initial_password').addClass('hidden');
+        $('#custom_password').addClass('hidden');
+    }
+}
+$(document).ready(function () {
+    $('#auto_password').addClass('hidden');
+    $('#custom_password').addClass('hidden');
+
+}).on('change', password_strategy_radio_input, function(){
+        passwordStrategyFieldsDisplay()
+})
+</script>
 {% endblock %}
 
