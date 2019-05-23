@@ -59,7 +59,6 @@
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-                                            <button id="clear_initial_password" class="btn btn-primary" type="button">{% trans 'Clear initial password' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                         </div>
                                     </div>
@@ -74,38 +73,4 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-<script>
-$(document).ready(function () {
-}).on('click', '#clear_initial_password', function () {
-    swal({
-            title: "{% trans 'Are you sure?' %}",
-            text: "{% trans 'This will be clear the initial password !!!' %}",
-            type: "warning",
-            showCancelButton: true,
-            cancelButtonText: "{% trans 'Cancel' %}",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "{% trans 'Confirm' %}",
-            closeOnConfirm: false
-        }, function() {
-            var success = function() {
-                var msg = "{% trans 'Clear initial password successfully.' %}";
-                swal("{% trans 'Clear Initial Password' %}", msg, "success");
-                setTimeout( function () {
-                    window.location.reload();}, 1000);
-
-            };
-            var fail = function() {
-                var msg = "{% trans 'Clear initial password failed.' %}";
-                swal("{% trans 'Clear Initial Password' %}", msg, "error");
-            };
-            var the_url =  "{% url "api-settings:initial-password-delete" %}";
-            APIUpdateAttr({
-                url:the_url,
-                method: 'GET',
-                success:success,
-                error:fail
-            });
-        });
-})
-</script>
 {% endblock %}

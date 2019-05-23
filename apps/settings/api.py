@@ -7,7 +7,6 @@ import jms_storage
 
 from rest_framework.views import Response, APIView
 from django.conf import settings
-from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 
@@ -225,12 +224,13 @@ class DjangoSettingsAPI(APIView):
 
 
 class InitialPasswordDeleteAPI(APIView):
-    def get(self, request):
+    permission_classes = (IsSuperUser,)
+
+    def delete(self, request):
         initial_password = Setting.objects.filter(name='USER_INITIAL_PASSWORD')
         if not initial_password:
-            return JsonResponse(
+            return Response(
                 {"error": _('The initial password has been cleared.')},
-                status=400, json_dumps_params={'ensure_ascii': False}
-            )
+                status=400)
         initial_password.delete()
-        return JsonResponse({"success": _('Clear initial password successfully.')})
+        return Response({"success": _('Clear initial password successfully.')})

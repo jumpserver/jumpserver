@@ -68,10 +68,6 @@ class BasicSettingForm(BaseForm):
         max_length=1024, label=_("Email Subject Prefix"),
         help_text=_("Tips: Some word will be intercept by mail provider")
     )
-    USER_INITIAL_PASSWORD = forms.CharField(
-        label=_('User Initial Password'), widget=forms.PasswordInput,
-        max_length=128, strip=False, required=False
-    )
 
 
 class EmailSettingForm(BaseForm):
@@ -183,6 +179,11 @@ class SecuritySettingForm(BaseForm):
             'After opening, the user login must use MFA secondary '
             'authentication (valid for all users, including administrators)'
         )
+    )
+    # user initial password
+    USER_INITIAL_PASSWORD = forms.CharField(
+        max_length=128, strip=True, required=False,
+        label=_('User Initial Password'), widget=forms.PasswordInput,
     )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
