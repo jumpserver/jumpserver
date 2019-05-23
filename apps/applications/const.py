@@ -28,7 +28,7 @@ REMOTE_APP_TYPE_CHOICES = (
     (
         _('Virtualization tools'),
         (
-            (REMOTE_APP_TYPE_VMWARE_CLIENT, 'VMware Client'),
+            (REMOTE_APP_TYPE_VMWARE_CLIENT, 'vSphere Client'),
         )
     ),
     (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
