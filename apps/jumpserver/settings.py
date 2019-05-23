@@ -348,8 +348,6 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 
-# User initial password
-USER_INITIAL_PASSWORD = ''
 
 # Email config
 EMAIL_HOST = 'smtp.jumpserver.org'
@@ -539,6 +537,7 @@ TERMINAL_REPLAY_STORAGE = {
 }
 
 
+SECURITY_USER_INITIAL_PASSWORD = ''
 SECURITY_MFA_AUTH = False
 SECURITY_LOGIN_LIMIT_COUNT = 7
 SECURITY_LOGIN_LIMIT_TIME = 30  # Unit: minute

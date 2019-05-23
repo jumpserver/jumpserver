@@ -3,7 +3,31 @@
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
 {% block password %}
-    {% bootstrap_field form.password_strategy layout="horizontal" %}
+    <div class="form-group required">
+        <label class="col-md-2 control-label" for="id_password_strategy_0">{% trans 'Password strategy' %}</label>
+        <div class="col-md-9">
+            <div id="id_password_strategy">
+                <div class="radio">
+                    <label for="id_password_strategy_0">
+                        <input type="radio" name="password_strategy" value="0" class="" title="" required="" id="id_password_strategy_0" {% if form.get_user_initial_password %}checked {% endif %}>
+                        {% trans 'INITIAL_PASSWORD' %}
+                    </label>
+                </div>
+                <div class="radio">
+                    <label for="id_password_strategy_1">
+                        <input type="radio" name="password_strategy" value="1" class="" title="" required="" id="id_password_strategy_1">
+                        {% trans 'CUSTOM_PASSWORD' %}
+                    </label>
+                </div>
+                <div class="radio">
+                    <label for="id_password_strategy_2">
+                        <input type="radio" name="password_strategy" value="2" class="" title="" required="" id="id_password_strategy_2" {% if not form.get_user_initial_password %}checked {% endif %}>
+                        {% trans 'EMAIL_SET_PASSWORD' %}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="form-group" id="initial_password">
         <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
         <div class="col-sm-8 controls" style="margin-top: 8px;">
@@ -39,6 +63,12 @@ function passwordStrategyFieldsDisplay(){
     }
 }
 $(document).ready(function () {
+    var initial_password = $('#id_password_strategy_0').is(":checked");
+    if (initial_password ){
+        $('#id_password_strategy_0').parent().removeClass('hidden')
+    }else{
+       $('#id_password_strategy_0').parent().addClass('hidden')
+    }
     $('#auto_password').addClass('hidden');
     $('#custom_password').addClass('hidden');
 

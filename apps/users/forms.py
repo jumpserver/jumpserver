@@ -9,6 +9,8 @@ from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
 
+from settings.models import Setting
+
 
 class UserCheckPasswordForm(forms.Form):
     username = forms.CharField(label=_('Username'), max_length=100)
@@ -23,13 +25,10 @@ class UserCheckOtpCodeForm(forms.Form):
 
 
 class UserCreateUpdateForm(OrgModelForm):
-    INITIAL_PASSWORD = 'default'
-    CUSTOM_PASSWORD = 'custom'
-    EMAIL_SET_PASSWORD = 'auto'
     PASSWORD_STRATEGY_CHOICES = (
-        (INITIAL_PASSWORD, _('INITIAL_PASSWORD')),
-        (CUSTOM_PASSWORD, _('CUSTOM_PASSWORD')),
-        (EMAIL_SET_PASSWORD, _('EMAIL_SET_PASSWORD'))
+        (0, _('INITIAL_PASSWORD')),
+        (1, _('CUSTOM_PASSWORD')),
+        (2, _('EMAIL_SET_PASSWORD'))
     )
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
@@ -47,8 +46,7 @@ class UserCreateUpdateForm(OrgModelForm):
     )
     password_strategy = forms.ChoiceField(
         choices=PASSWORD_STRATEGY_CHOICES, required=True,
-        initial=INITIAL_PASSWORD, label=_('Password strategy'),
-        widget=forms.RadioSelect()
+        label=_('Password strategy'), widget=forms.RadioSelect()
     )
 
     class Meta:
@@ -91,6 +89,12 @@ class UserCreateUpdateForm(OrgModelForm):
         field = self.fields['role']
         field.choices = set(roles)
 
+    @staticmethod
+    def get_user_initial_password():
+        if Setting.objects.filter(name='USER_INITIAL_PASSWORD'):
+            return True
+        return False
+
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
         if not public_key:
@@ -105,8 +109,6 @@ class UserCreateUpdateForm(OrgModelForm):
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
-        if self.cleaned_data.get('password_strategy') == 'default':
-            password = settings.USER_INITIAL_PASSWORD
         otp_level = self.cleaned_data.get('otp_level')
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)

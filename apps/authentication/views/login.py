@@ -73,20 +73,20 @@ class UserLoginView(FormView):
         username = self.request.POST.get('username')
         if is_block_login(username, ip):
             return self.render_to_response(self.get_context_data(block_login=True))
+
+        reset_password_token = self.user_login_yes_or_no_reset_password(username)
+        if reset_password_token:
+            url = "%(rest_password_url)s?token=%(rest_password_token)s" % {
+                    'rest_password_url': reverse('users:reset-password'),
+                    'rest_password_token': reset_password_token
+                    }
+            return redirect(url)
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
-
         user = form.get_user()
-        # 登录时，密码等于初始化密码跳转至设置密码
-        if form.cleaned_data.get('password') == settings.USER_INITIAL_PASSWORD:
-            url = "%(rest_password_url)s?token=%(rest_password_token)s" % {
-                'rest_password_url': reverse('users:reset-password'),
-                'rest_password_token': user.generate_reset_token()
-            }
-            return redirect(url)
         # user password expired
         if user.password_has_expired:
             reason = LoginLog.REASON_PASSWORD_EXPIRED
@@ -155,6 +155,15 @@ class UserLoginView(FormView):
                 sender=self.__class__, username=username,
                 request=self.request, reason=reason
             )
+
+    def user_login_yes_or_no_reset_password(self, username):
+        user = User.objects.filter(username=username)
+        if user:
+            user = user[0]
+            password = self.request.POST.get('password')
+            if password == settings.USER_INITIAL_PASSWORD and not user.password:
+                return user.generate_reset_token()
+        return False
 
 
 class UserLoginOtpView(FormView):
