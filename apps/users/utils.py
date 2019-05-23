@@ -34,46 +34,24 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
-def get_email_custom_content(user):
-    email_content = '<p style="text-indent:2em">' + settings.CREATE_USER_CONTENT + '</p>'
-    suffix_message = _("""
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <p style="text-indent:2em;">
-            <span>
-                <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
-            </span>    
-            <span>
-                This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-            </span> 
-            <span>
-                <a href="%(login_url)s">Login direct</a>
-            </span>
-        </p>
-        """) % {
-            'rest_password_url': reverse('users:reset-password', external=True),
-            'rest_password_token': user.generate_reset_token(),
-            'forget_password_url': reverse('users:forgot-password', external=True),
-            'email': user.email,
-            'login_url': reverse('authentication:login', external=True),
-        }
-
-    message = email_content + suffix_message
+def get_email_custom_body(email_body):
+    email_content = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
+    message = email_content + email_body
     return message
 
 
 def send_user_created_mail(user):
     recipient_list = [user.email]
     subject = _('Create account successfully')
-    if settings.CREATE_USER_SUBJECT:
-        subject = settings.CREATE_USER_SUBJECT
+    if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
+        subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
 
-    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
-    if settings.CREATE_USER_EMAIL_HONORIFIC:
-        honorific = '<p>' + settings.CREATE_USER_EMAIL_HONORIFIC + ':</p>'
+    email_honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
+        email_honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
 
-    message = _("""
+    email_body = _("""
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <p style="text-indent:2em;">Your account has been created successfully</p> 
     <p style="text-indent:2em;">
         <span>
             Username: %(username)s.
@@ -96,14 +74,14 @@ def send_user_created_mail(user):
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
-    if settings.CREATE_USER_CONTENT:
-       message = get_email_custom_content(user)
+    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
+       email_body = get_email_custom_body(email_body)
 
-    email_signature = '<p style="float:right">'+'jumpserver'+'</p>'
-    if settings.SIGNATURE:
-        email_signature = '<p style="float:right">' + settings.SIGNATURE + '</p>'
+    email_signature = '<p style="float:right">jumpserver</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
+        email_signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
 
-    message = honorific + message + email_signature
+    message = email_honorific + email_body + email_signature
     if settings.DEBUG:
         try:
             print(message)

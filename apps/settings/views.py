@@ -168,7 +168,7 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class EmailContentSetting(SuperUserRequiredMixin, TemplateView):
+class EmailContentSettingView(SuperUserRequiredMixin, TemplateView):
     template_name = "settings/email_content_setting.html"
     form_class = EmailContentSettingForm
 

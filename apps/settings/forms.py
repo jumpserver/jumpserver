@@ -244,23 +244,23 @@ class SecuritySettingForm(BaseForm):
 
 
 class EmailContentSettingForm(BaseForm):
-    CREATE_USER_SUBJECT = forms.CharField(
-        max_length=1024, label=_("Create user email subject"), required=False,
+    EMAIL_CUSTOM_USER_CREATED_SUBJECT = forms.CharField(
+        max_length=1024,  required=False, label=_("Create user email subject"),
         help_text=_("Tips: When creating a user, send the subject of the email"
                     " (eg:Create account successfully)")
     )
-    CREATE_USER_EMAIL_HONORIFIC = forms.CharField(
-        max_length=1024, label=_("Create user honorific"), required=False,
+    EMAIL_CUSTOM_USER_CREATED_HONORIFIC = forms.CharField(
+        max_length=1024, required=False, label=_("Create user honorific"),
         help_text=_("Tips: When creating a user, send the honorific of the "
                     "email (eg:Hello)")
     )
-    CREATE_USER_CONTENT = forms.CharField(
-        label=_('Create user email content'), max_length=5000,
-        required=False, widget=forms.Textarea(),
+    EMAIL_CUSTOM_USER_CREATED_BODY = forms.CharField(
+        max_length=5000, required=False, widget=forms.Textarea(),
+        label=_('Create user email content'),
         help_text=_('Tips:When creating a user, send the content of the email')
     )
-    SIGNATURE = forms.CharField(
-        max_length=512, label=_("Signature"), required=False,
+    EMAIL_CUSTOM_USER_CREATED_SIGNATURE = forms.CharField(
+        max_length=512, required=False, label=_("Signature"),
         help_text=_("Tips: Email signature (eg:jumpserver)")
     )
 

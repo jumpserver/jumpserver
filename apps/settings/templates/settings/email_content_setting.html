@@ -43,10 +43,10 @@
                                     {% csrf_token %}
 
                                     <h3>{% trans "Create User setting" %}</h3>
-                                    {% bootstrap_field form.CREATE_USER_SUBJECT layout="horizontal" %}
-                                    {% bootstrap_field form.CREATE_USER_EMAIL_HONORIFIC layout="horizontal" %}
-                                    {% bootstrap_field form.CREATE_USER_CONTENT layout="horizontal" %}
-                                    {% bootstrap_field form.SIGNATURE layout="horizontal" %}
+                                    {% bootstrap_field form.EMAIL_CUSTOM_USER_CREATED_SUBJECT layout="horizontal" %}
+                                    {% bootstrap_field form.EMAIL_CUSTOM_USER_CREATED_HONORIFIC layout="horizontal" %}
+                                    {% bootstrap_field form.EMAIL_CUSTOM_USER_CREATED_BODY layout="horizontal" %}
+                                    {% bootstrap_field form.EMAIL_CUSTOM_USER_CREATED_SIGNATURE layout="horizontal" %}
                                     <div class="hr-line-dashed"></div>
 
                                     <div class="form-group">
