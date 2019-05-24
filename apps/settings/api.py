@@ -227,7 +227,7 @@ class InitialPasswordDeleteAPI(APIView):
     permission_classes = (IsSuperUser,)
 
     def delete(self, request):
-        initial_password = Setting.objects.filter(name='USER_INITIAL_PASSWORD')
+        initial_password = Setting.objects.filter(name='SECURITY_USER_INITIAL_PASSWORD')
         if not initial_password:
             return Response(
                 {"error": _('The initial password has been cleared.')},

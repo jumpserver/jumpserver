@@ -181,7 +181,7 @@ class SecuritySettingForm(BaseForm):
         )
     )
     # user initial password
-    USER_INITIAL_PASSWORD = forms.CharField(
+    SECURITY_USER_INITIAL_PASSWORD = forms.CharField(
         max_length=128, strip=True, required=False,
         label=_('User Initial Password'), widget=forms.PasswordInput,
     )

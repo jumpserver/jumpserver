@@ -161,7 +161,7 @@ class UserLoginView(FormView):
         if user:
             user = user[0]
             password = self.request.POST.get('password')
-            if password == settings.USER_INITIAL_PASSWORD and not user.password:
+            if password == settings.SECURITY_USER_INITIAL_PASSWORD and not user.password:
                 return user.generate_reset_token()
         return False
 

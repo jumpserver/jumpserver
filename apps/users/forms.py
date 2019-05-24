@@ -91,7 +91,7 @@ class UserCreateUpdateForm(OrgModelForm):
 
     @staticmethod
     def get_user_initial_password():
-        if Setting.objects.filter(name='USER_INITIAL_PASSWORD'):
+        if Setting.objects.filter(name='SECURITY_USER_INITIAL_PASSWORD'):
             return True
         return False
 
