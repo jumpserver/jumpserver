@@ -10,20 +10,19 @@
 <script>
 var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
 function passwordStrategyFieldsDisplay(){
-    var custom_password = $('#id_password_strategy_1').is(":checked");
-    if(custom_password){
-        $('#custom_password').removeClass('hidden');
-    }else{
-        $('#custom_password').addClass('hidden');
+    var val = $('input:radio[name="password_strategy"]:checked').val();
+    if(val === '0'){
+        $('#custom_password').addClass('hidden')
+    }else {
+        $('#custom_password').removeClass('hidden')
     }
-
 }
 $(document).ready(function () {
-    $('#custom_password').addClass('hidden');
+    passwordStrategyFieldsDisplay()
 
 }).on('change', password_strategy_radio_input, function(){
         passwordStrategyFieldsDisplay()
-})
+   })
 </script>
 {% endblock %}
 
