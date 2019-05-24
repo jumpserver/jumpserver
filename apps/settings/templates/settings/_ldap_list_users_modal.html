@@ -58,6 +58,9 @@ function initLdapUsersTable() {
         ele: $('#ldap_list_users_table'),
         ajax_url: '{% url "api-settings:ldap-user-list" %}',
         columnDefs: [
+            {targets: 0, createdCell: function (td, cellData, rowData) {
+                $(td).html("<input type='checkbox' class='text-center ipt_check' id='ID_USERNAME'>".replace("ID_USERNAME", cellData))
+            }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 if(cellData){
                     $(td).html('<i class="fa fa-check text-navy"></i>')

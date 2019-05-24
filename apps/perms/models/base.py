@@ -5,6 +5,7 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.utils import timezone
+from orgs.mixins import OrgModelMixin
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgManager
@@ -29,7 +30,7 @@ class BasePermissionManager(OrgManager):
         return self.get_queryset().valid()
 
 
-class BasePermission(models.Model):
+class BasePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField('users.User', blank=True, verbose_name=_("User"))

@@ -33,7 +33,7 @@ class Action(models.Model):
         return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
 
 
-class AssetPermission(OrgModelMixin, BasePermission):
+class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
