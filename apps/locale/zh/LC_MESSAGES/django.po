@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-21 21:09+0800\n"
+"POT-Creation-Date: 2019-05-24 12:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -33,45 +33,45 @@ msgstr "虚拟化工具"
 msgid "Custom"
 msgstr "自定义"
 
-#: applications/forms/remote_app.py:20
+#: applications/forms/remote_app.py:21
 msgid "Target URL"
 msgstr "目标URL"
 
-#: applications/forms/remote_app.py:23 applications/forms/remote_app.py:52
-#: applications/forms/remote_app.py:68
+#: applications/forms/remote_app.py:24 applications/forms/remote_app.py:53
+#: applications/forms/remote_app.py:69
 msgid "Login username"
 msgstr "登录账号"
 
-#: applications/forms/remote_app.py:27 applications/forms/remote_app.py:56
-#: applications/forms/remote_app.py:72
+#: applications/forms/remote_app.py:28 applications/forms/remote_app.py:57
+#: applications/forms/remote_app.py:73
 msgid "Login password"
 msgstr "登录密码"
 
-#: applications/forms/remote_app.py:33
+#: applications/forms/remote_app.py:34
 msgid "Database IP"
 msgstr "数据库IP"
 
-#: applications/forms/remote_app.py:36
+#: applications/forms/remote_app.py:37
 msgid "Database name"
 msgstr "数据库名"
 
-#: applications/forms/remote_app.py:39
+#: applications/forms/remote_app.py:40
 msgid "Database username"
 msgstr "数据库账号"
 
-#: applications/forms/remote_app.py:43
+#: applications/forms/remote_app.py:44
 msgid "Database password"
 msgstr "数据库密码"
 
-#: applications/forms/remote_app.py:49 applications/forms/remote_app.py:65
+#: applications/forms/remote_app.py:50 applications/forms/remote_app.py:66
 msgid "Target address"
 msgstr "目标地址"
 
-#: applications/forms/remote_app.py:62
+#: applications/forms/remote_app.py:63
 msgid "Operating parameter"
 msgstr "运行参数"
 
-#: applications/forms/remote_app.py:105 applications/models/remote_app.py:23
+#: applications/forms/remote_app.py:106 applications/models/remote_app.py:23
 #: applications/templates/applications/remote_app_detail.html:57
 #: applications/templates/applications/remote_app_list.html:22
 #: applications/templates/applications/user_remote_app_list.html:18
@@ -101,12 +101,12 @@ msgstr "运行参数"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:13
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:14
 #: xpack/plugins/cloud/models.py:187
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
 #: xpack/plugins/orgs/templates/orgs/org_list.html:16
 msgid "Asset"
 msgstr "资产"
 
-#: applications/forms/remote_app.py:108 applications/models/remote_app.py:27
+#: applications/forms/remote_app.py:109 applications/models/remote_app.py:27
 #: applications/templates/applications/remote_app_detail.html:61
 #: applications/templates/applications/remote_app_list.html:23
 #: applications/templates/applications/user_remote_app_list.html:19
@@ -161,8 +161,8 @@ msgstr "系统用户"
 #: settings/templates/settings/_ldap_list_users_modal.html:38
 #: settings/templates/settings/command_storage_create.html:41
 #: settings/templates/settings/replay_storage_create.html:44
-#: settings/templates/settings/terminal_setting.html:80
-#: settings/templates/settings/terminal_setting.html:102 terminal/models.py:22
+#: settings/templates/settings/terminal_setting.html:83
+#: settings/templates/settings/terminal_setting.html:105 terminal/models.py:22
 #: terminal/models.py:241 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
 #: users/models/user.py:61 users/templates/users/_select_user_modal.html:13
@@ -177,9 +177,9 @@ msgstr "系统用户"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:61
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
 #: xpack/plugins/cloud/models.py:49 xpack/plugins/cloud/models.py:119
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:50
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:52
 #: xpack/plugins/cloud/templates/cloud/account_list.html:12
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:53
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:55
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:12
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:52
 #: xpack/plugins/orgs/templates/orgs/org_list.html:12
@@ -224,6 +224,8 @@ msgstr "参数"
 msgid "Created by"
 msgstr "创建者"
 
+# msgid "Created by"
+# msgstr "创建者"
 #: applications/models/remote_app.py:46
 #: applications/templates/applications/remote_app_detail.html:73
 #: assets/models/asset.py:110 assets/models/cluster.py:26
@@ -242,12 +244,14 @@ msgstr "创建者"
 #: users/templates/users/user_group_detail.html:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:105
 #: xpack/plugins/cloud/models.py:56 xpack/plugins/cloud/models.py:128
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:66
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:77
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:68
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:79
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:60
 msgid "Date created"
 msgstr "创建日期"
 
+# msgid "Date created"
+# msgstr "创建日期"
 #: applications/models/remote_app.py:49
 #: applications/templates/applications/remote_app_detail.html:81
 #: applications/templates/applications/remote_app_list.html:24
@@ -282,9 +286,9 @@ msgstr "创建日期"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:117
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
 #: xpack/plugins/cloud/models.py:54 xpack/plugins/cloud/models.py:125
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:70
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:72
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:69
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:71
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:16
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_list.html:22
@@ -315,13 +319,14 @@ msgstr "远程应用"
 #: assets/templates/assets/label_create_update.html:18
 #: perms/templates/perms/asset_permission_create_update.html:83
 #: perms/templates/perms/remote_app_permission_create_update.html:83
-#: settings/templates/settings/basic_setting.html:61
+#: settings/templates/settings/basic_setting.html:64
 #: settings/templates/settings/command_storage_create.html:79
-#: settings/templates/settings/email_setting.html:62
-#: settings/templates/settings/ldap_setting.html:61
+#: settings/templates/settings/email_content_setting.html:54
+#: settings/templates/settings/email_setting.html:65
+#: settings/templates/settings/ldap_setting.html:64
 #: settings/templates/settings/replay_storage_create.html:152
-#: settings/templates/settings/security_setting.html:70
-#: settings/templates/settings/terminal_setting.html:68
+#: settings/templates/settings/security_setting.html:73
+#: settings/templates/settings/terminal_setting.html:71
 #: terminal/templates/terminal/terminal_update.html:45
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
@@ -353,13 +358,14 @@ msgstr "重置"
 #: audits/templates/audits/login_log_list.html:89
 #: perms/templates/perms/asset_permission_create_update.html:84
 #: perms/templates/perms/remote_app_permission_create_update.html:84
-#: settings/templates/settings/basic_setting.html:62
+#: settings/templates/settings/basic_setting.html:65
 #: settings/templates/settings/command_storage_create.html:80
-#: settings/templates/settings/email_setting.html:63
-#: settings/templates/settings/ldap_setting.html:64
+#: settings/templates/settings/email_content_setting.html:55
+#: settings/templates/settings/email_setting.html:66
+#: settings/templates/settings/ldap_setting.html:67
 #: settings/templates/settings/replay_storage_create.html:153
-#: settings/templates/settings/security_setting.html:71
-#: settings/templates/settings/terminal_setting.html:70
+#: settings/templates/settings/security_setting.html:74
+#: settings/templates/settings/terminal_setting.html:73
 #: terminal/templates/terminal/command_list.html:103
 #: terminal/templates/terminal/session_list.html:126
 #: terminal/templates/terminal/terminal_update.html:46
@@ -437,11 +443,11 @@ msgstr "详情"
 #: users/templates/users/user_profile.html:187
 #: users/templates/users/user_profile.html:196
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:29
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:55
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:23
-#: xpack/plugins/cloud/templates/cloud/account_list.html:39
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:54
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:25
+#: xpack/plugins/cloud/templates/cloud/account_list.html:38
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:25
-#: xpack/plugins/orgs/templates/orgs/org_list.html:87
+#: xpack/plugins/orgs/templates/orgs/org_list.html:85
 msgid "Update"
 msgstr "更新"
 
@@ -466,8 +472,8 @@ msgstr "更新"
 #: perms/templates/perms/asset_permission_list.html:182
 #: perms/templates/perms/remote_app_permission_detail.html:34
 #: perms/templates/perms/remote_app_permission_list.html:60
-#: settings/templates/settings/terminal_setting.html:90
-#: settings/templates/settings/terminal_setting.html:112
+#: settings/templates/settings/terminal_setting.html:93
+#: settings/templates/settings/terminal_setting.html:115
 #: terminal/templates/terminal/terminal_list.html:74
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
@@ -475,13 +481,13 @@ msgstr "更新"
 #: users/templates/users/user_list.html:104
 #: users/templates/users/user_list.html:108
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:33
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:57
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:27
-#: xpack/plugins/cloud/templates/cloud/account_list.html:41
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:30
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:55
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:56
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:29
+#: xpack/plugins/cloud/templates/cloud/account_list.html:40
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:32
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:54
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
-#: xpack/plugins/orgs/templates/orgs/org_list.html:89
+#: xpack/plugins/orgs/templates/orgs/org_list.html:87
 msgid "Delete"
 msgstr "删除"
 
@@ -528,8 +534,8 @@ msgstr "创建远程应用"
 #: perms/templates/perms/asset_permission_list.html:60
 #: perms/templates/perms/asset_permission_list.html:134
 #: perms/templates/perms/remote_app_permission_list.html:19
-#: settings/templates/settings/terminal_setting.html:82
-#: settings/templates/settings/terminal_setting.html:104
+#: settings/templates/settings/terminal_setting.html:85
+#: settings/templates/settings/terminal_setting.html:107
 #: terminal/templates/terminal/session_list.html:81
 #: terminal/templates/terminal/terminal_list.html:36
 #: users/templates/users/user_group_list.html:38
@@ -618,7 +624,7 @@ msgstr "节点管理"
 #: assets/models/cluster.py:19 assets/models/user.py:91
 #: assets/templates/assets/asset_detail.html:80 templates/_nav.html:24
 #: xpack/plugins/cloud/models.py:124
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:65
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:67
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
 msgid "Admin user"
 msgstr "管理用户"
@@ -655,8 +661,8 @@ msgstr "网域"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:55
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:15
 #: xpack/plugins/cloud/models.py:123
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:61
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:63
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:66
 msgid "Node"
 msgstr "节点"
 
@@ -1069,8 +1075,8 @@ msgstr "过滤器"
 #: perms/templates/perms/remote_app_permission_remote_app.html:54
 #: settings/templates/settings/command_storage_create.html:31
 #: settings/templates/settings/replay_storage_create.html:31
-#: settings/templates/settings/terminal_setting.html:81
-#: settings/templates/settings/terminal_setting.html:103
+#: settings/templates/settings/terminal_setting.html:84
+#: settings/templates/settings/terminal_setting.html:106
 msgid "Type"
 msgstr "类型"
 
@@ -1382,7 +1388,7 @@ msgstr "需要二次认证来查看账号信息"
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
 #: assets/templates/assets/system_user_list.html:168
-#: settings/templates/settings/terminal_setting.html:165
+#: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:388
 #: users/templates/users/user_detail.html:414
@@ -1409,7 +1415,7 @@ msgstr "获取认证信息错误"
 
 #: assets/templates/assets/_asset_user_view_auth_modal.html:139
 #: assets/templates/assets/_user_asset_detail_modal.html:23
-#: settings/templates/settings/_ldap_list_users_modal.html:96
+#: settings/templates/settings/_ldap_list_users_modal.html:99
 #: templates/_modal.html:22
 msgid "Close"
 msgstr "关闭"
@@ -1578,7 +1584,7 @@ msgstr "导出"
 #: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/asset_list.html:81
 #: assets/templates/assets/system_user_list.html:28
-#: settings/templates/settings/_ldap_list_users_modal.html:97
+#: settings/templates/settings/_ldap_list_users_modal.html:100
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:15
 #: xpack/plugins/license/templates/license/license_detail.html:110
@@ -1799,7 +1805,7 @@ msgstr "删除选择资产"
 
 #: assets/templates/assets/asset_list.html:698
 #: assets/templates/assets/system_user_list.html:166
-#: settings/templates/settings/terminal_setting.html:163
+#: settings/templates/settings/terminal_setting.html:166
 #: users/templates/users/user_detail.html:386
 #: users/templates/users/user_detail.html:412
 #: users/templates/users/user_detail.html:480
@@ -1903,8 +1909,8 @@ msgstr "创建网关"
 
 #: assets/templates/assets/domain_gateway_list.html:99
 #: assets/templates/assets/domain_gateway_list.html:101
-#: settings/templates/settings/email_setting.html:61
-#: settings/templates/settings/ldap_setting.html:62
+#: settings/templates/settings/email_setting.html:64
+#: settings/templates/settings/ldap_setting.html:65
 msgid "Test connection"
 msgstr "测试连接"
 
@@ -2227,7 +2233,7 @@ msgstr "原因"
 #: audits/models.py:101 audits/templates/audits/login_log_list.html:58
 #: xpack/plugins/cloud/models.py:171 xpack/plugins/cloud/models.py:188
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:67
 msgid "Status"
 msgstr "状态"
 
@@ -2267,7 +2273,7 @@ msgstr "选择用户"
 #: terminal/templates/terminal/command_list.html:60
 #: terminal/templates/terminal/session_list.html:61
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:48
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:50
 msgid "Search"
 msgstr "搜索"
 
@@ -2277,7 +2283,7 @@ msgstr "搜索"
 #: ops/templates/ops/task_detail.html:56
 #: terminal/templates/terminal/session_list.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:64
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:60
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
 msgid "ID"
 msgstr "ID"
 
@@ -2679,7 +2685,7 @@ msgid "Become"
 msgstr "Become"
 
 #: ops/models/adhoc.py:166 users/templates/users/user_group_detail.html:59
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:62
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:64
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:56
 msgid "Create by"
 msgstr "创建者"
@@ -2925,8 +2931,8 @@ msgstr "版本"
 
 #: ops/templates/ops/task_list.html:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:137
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:53
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:53
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:52
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:52
 msgid "Run"
 msgstr "执行"
 
@@ -3050,8 +3056,8 @@ msgstr "添加资产"
 #: perms/templates/perms/remote_app_permission_remote_app.html:96
 #: perms/templates/perms/remote_app_permission_user.html:96
 #: perms/templates/perms/remote_app_permission_user.html:124
-#: settings/templates/settings/terminal_setting.html:95
-#: settings/templates/settings/terminal_setting.html:117
+#: settings/templates/settings/terminal_setting.html:98
+#: settings/templates/settings/terminal_setting.html:120
 #: users/templates/users/user_group_detail.html:95
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:93
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:93
@@ -3111,7 +3117,7 @@ msgstr "创建授权规则"
 #: perms/templates/perms/asset_permission_list.html:73
 #: perms/templates/perms/remote_app_permission_list.html:18
 #: users/templates/users/user_list.html:40 xpack/plugins/cloud/models.py:53
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:58
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:60
 #: xpack/plugins/cloud/templates/cloud/account_list.html:14
 msgid "Validity"
 msgstr "有效"
@@ -3246,7 +3252,7 @@ msgid "Create succeed"
 msgstr "创建成功"
 
 #: settings/api.py:166 settings/api.py:204
-#: settings/templates/settings/terminal_setting.html:151
+#: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
 
@@ -3484,6 +3490,40 @@ msgid ""
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 
+#: settings/forms.py:248
+msgid "Create user email subject"
+msgstr "创建用户邮件的主题"
+
+#: settings/forms.py:249
+msgid ""
+"Tips: When creating a user, send the subject of the email (eg:Create account "
+"successfully)"
+msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
+
+#: settings/forms.py:253
+msgid "Create user honorific"
+msgstr "创建用户邮件的敬语"
+
+#: settings/forms.py:254
+msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
+msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
+
+#: settings/forms.py:259
+msgid "Create user email content"
+msgstr "创建用户邮件的内容"
+
+#: settings/forms.py:260
+msgid "Tips:When creating a user, send the content of the email"
+msgstr "提示: 创建用户时，发送设置密码邮件的内容"
+
+#: settings/forms.py:263
+msgid "Signature"
+msgstr "署名"
+
+#: settings/forms.py:264
+msgid "Tips: Email signature (eg:jumpserver)"
+msgstr "提示: 邮件的署名 (例如: jumpserver)"
+
 #: settings/models.py:128 users/templates/users/reset_password.html:68
 #: users/templates/users/user_profile.html:20
 msgid "Setting"
@@ -3508,15 +3548,17 @@ msgid "Existing"
 msgstr "已存在"
 
 #: settings/templates/settings/basic_setting.html:15
+#: settings/templates/settings/email_content_setting.html:15
 #: settings/templates/settings/email_setting.html:15
 #: settings/templates/settings/ldap_setting.html:15
 #: settings/templates/settings/security_setting.html:15
 #: settings/templates/settings/terminal_setting.html:16
-#: settings/templates/settings/terminal_setting.html:46 settings/views.py:19
+#: settings/templates/settings/terminal_setting.html:49 settings/views.py:19
 msgid "Basic setting"
 msgstr "基本设置"
 
 #: settings/templates/settings/basic_setting.html:18
+#: settings/templates/settings/email_content_setting.html:18
 #: settings/templates/settings/email_setting.html:18
 #: settings/templates/settings/ldap_setting.html:18
 #: settings/templates/settings/security_setting.html:18
@@ -3525,27 +3567,39 @@ msgid "Email setting"
 msgstr "邮件设置"
 
 #: settings/templates/settings/basic_setting.html:21
+#: settings/templates/settings/email_content_setting.html:21
 #: settings/templates/settings/email_setting.html:21
 #: settings/templates/settings/ldap_setting.html:21
 #: settings/templates/settings/security_setting.html:21
-#: settings/templates/settings/terminal_setting.html:24 settings/views.py:71
-msgid "LDAP setting"
-msgstr "LDAP设置"
+#: settings/templates/settings/terminal_setting.html:23 settings/views.py:178
+msgid "Email content setting"
+msgstr "邮件内容设置"
 
 #: settings/templates/settings/basic_setting.html:24
+#: settings/templates/settings/email_content_setting.html:24
 #: settings/templates/settings/email_setting.html:24
 #: settings/templates/settings/ldap_setting.html:24
 #: settings/templates/settings/security_setting.html:24
-#: settings/templates/settings/terminal_setting.html:28 settings/views.py:100
-msgid "Terminal setting"
-msgstr "终端设置"
+#: settings/templates/settings/terminal_setting.html:27 settings/views.py:71
+msgid "LDAP setting"
+msgstr "LDAP设置"
 
 #: settings/templates/settings/basic_setting.html:27
+#: settings/templates/settings/email_content_setting.html:27
 #: settings/templates/settings/email_setting.html:27
 #: settings/templates/settings/ldap_setting.html:27
 #: settings/templates/settings/security_setting.html:27
-#: settings/templates/settings/security_setting.html:42
-#: settings/templates/settings/terminal_setting.html:31 settings/views.py:152
+#: settings/templates/settings/terminal_setting.html:31 settings/views.py:100
+msgid "Terminal setting"
+msgstr "终端设置"
+
+#: settings/templates/settings/basic_setting.html:30
+#: settings/templates/settings/email_content_setting.html:30
+#: settings/templates/settings/email_setting.html:30
+#: settings/templates/settings/ldap_setting.html:30
+#: settings/templates/settings/security_setting.html:30
+#: settings/templates/settings/security_setting.html:45
+#: settings/templates/settings/terminal_setting.html:34 settings/views.py:152
 msgid "Security setting"
 msgstr "安全设置"
 
@@ -3561,11 +3615,15 @@ msgstr "索引"
 msgid "Doc type"
 msgstr "文档类型"
 
-#: settings/templates/settings/ldap_setting.html:65
+#: settings/templates/settings/email_content_setting.html:45
+msgid "Create User setting"
+msgstr "创建用户设置"
+
+#: settings/templates/settings/ldap_setting.html:68
 msgid "Bulk import"
 msgstr "一键导入"
 
-#: settings/templates/settings/ldap_setting.html:116
+#: settings/templates/settings/ldap_setting.html:119
 msgid ""
 "User is not currently selected, please check the user you want to import"
 msgstr "当前无勾选用户，请勾选你想要导入的用户"
@@ -3627,8 +3685,8 @@ msgstr "端点后缀"
 
 #: settings/templates/settings/replay_storage_create.html:136
 #: xpack/plugins/cloud/models.py:186
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:81
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:83
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
 msgid "Region"
 msgstr "地域"
 
@@ -3652,48 +3710,48 @@ msgstr "提交中"
 msgid "Endpoint need contain protocol, ex: http"
 msgstr "端点需要包含协议，如 http"
 
-#: settings/templates/settings/security_setting.html:46
+#: settings/templates/settings/security_setting.html:49
 msgid "Password check rule"
 msgstr "密码校验规则"
 
-#: settings/templates/settings/terminal_setting.html:76 terminal/forms.py:27
+#: settings/templates/settings/terminal_setting.html:79 terminal/forms.py:27
 #: terminal/models.py:26
 msgid "Command storage"
 msgstr "命令存储"
 
-#: settings/templates/settings/terminal_setting.html:98 terminal/forms.py:32
+#: settings/templates/settings/terminal_setting.html:101 terminal/forms.py:32
 #: terminal/models.py:27
 msgid "Replay storage"
 msgstr "录像存储"
 
-#: settings/templates/settings/terminal_setting.html:154
+#: settings/templates/settings/terminal_setting.html:157
 msgid "Delete failed"
 msgstr "删除失败"
 
-#: settings/templates/settings/terminal_setting.html:159
+#: settings/templates/settings/terminal_setting.html:162
 msgid "Are you sure about deleting it?"
 msgstr "您确定删除吗?"
 
-#: settings/utils.py:69
+#: settings/utils.py:71
 msgid "User does not exist"
 msgstr "用户不存在"
 
-#: settings/utils.py:72
+#: settings/utils.py:74
 msgid "The user source is not LDAP"
 msgstr "用户来源不是LDAP"
 
-#: settings/utils.py:146
+#: settings/utils.py:155
 msgid "Search no entry matched in ou {}"
 msgstr "在ou:{}中没有匹配条目"
 
 #: settings/views.py:18 settings/views.py:44 settings/views.py:70
 #: settings/views.py:99 settings/views.py:126 settings/views.py:138
-#: settings/views.py:151 templates/_nav.html:118
+#: settings/views.py:151 settings/views.py:177 templates/_nav.html:118
 msgid "Settings"
 msgstr "系统设置"
 
 #: settings/views.py:29 settings/views.py:55 settings/views.py:81
-#: settings/views.py:112 settings/views.py:162
+#: settings/views.py:112 settings/views.py:162 settings/views.py:188
 msgid "Update setting successfully"
 msgstr "更新设置成功"
 
@@ -4464,7 +4522,7 @@ msgstr "安全令牌验证"
 #: users/templates/users/_base_otp.html:44 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:51
 #: xpack/plugins/cloud/models.py:120
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:57
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:59
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:13
 msgid "Account"
 msgstr "账户"
@@ -4572,7 +4630,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:373 users/utils.py:77
+#: users/templates/users/user_detail.html:373 users/utils.py:98
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -4893,55 +4951,60 @@ msgid ""
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
 #: users/utils.py:38
-msgid "Create account successfully"
-msgstr "创建账户成功"
-
-#: users/utils.py:40
 #, python-format
 msgid ""
 "\n"
-"    Hello %(name)s:\n"
-"    </br>\n"
-"    Your account has been created successfully\n"
-"    </br>\n"
-"    Username: %(username)s\n"
-"    </br>\n"
-"    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
-"here to set your password</a>\n"
-"    </br>\n"
-"    This link is valid for 1 hour. After it expires, <a href="
+"        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
+"bootstrap/3.2.0/css/bootstrap.min.css\">\n"
+"        <p style=\"text-indent:2em;\">\n"
+"            <span>\n"
+"                Username: %(username)s.\n"
+"            </span>\n"
+"            <span>\n"
+"                <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"\">click here to set your password</a>\n"
+"            </span>    \n"
+"            <span>\n"
+"                This link is valid for 1 hour. After it expires, <a href="
 "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-"\n"
-"    </br>\n"
-"    ---\n"
-"\n"
-"    </br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
-"\n"
-"    </br>\n"
-"    "
+"            </span> \n"
+"            <span>\n"
+"                <a href=\"%(login_url)s\">Login direct</a>\n"
+"            </span>\n"
+"        </p>\n"
+"        "
 msgstr ""
 "\n"
-"    你好 %(name)s:\n"
-"    </br>\n"
-"    恭喜您，您的账号已经创建成功    </br>\n"
-"    用户名: %(username)s\n"
-"    </br>\n"
-"     <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点击这"
-"里设置密码</a>    </br>\n"
-"    这个链接有效期1小时, 超过时间您可以 <a href=\"%(forget_password_url)s?"
-"email=%(email)s\">重新申请</a>\n"
-"\n"
-"    </br>\n"
-"    ---\n"
-"\n"
-"    </br>\n"
-"    <a href=\"%(login_url)s\">Login direct</a>\n"
-"\n"
-"    </br>\n"
+"    <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
+"bootstrap/3.2.0/css/bootstrap.min.css\">\n"
+"    <p style=\"text-indent:2em;\">\n"
+"        <span>\n"
+"            用户名: %(username)s.\n"
+"        </span>\n"
+"        <span>\n"
+"            <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">"
+"请点击这里设置密码</a>\n"
+"        </span>    \n"
+"        <span>\n"
+"            这个链接有效期1小时, 超过时间您可以 <a href="
+"\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
+"        </span> \n"
+"        <span>\n"
+"            <a href=\"%(login_url)s\">---登录页面</a>\n"
+"        </span>\n"
+"    </p>\n"
 "    "
 
-#: users/utils.py:79
+#: users/utils.py:73
+msgid "Create account successfully"
+msgstr "创建账户成功"
+
+#: users/utils.py:77
+#, python-format
+msgid "Hello %(name)s"
+msgstr "您好 %(name)s"
+
+#: users/utils.py:100
 #, python-format
 msgid ""
 "\n"
@@ -4985,11 +5048,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:110
+#: users/utils.py:131
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:112
+#: users/utils.py:133
 #, python-format
 msgid ""
 "\n"
@@ -5038,11 +5101,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:148
+#: users/utils.py:169
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:150
+#: users/utils.py:171
 #, python-format
 msgid ""
 "\n"
@@ -5067,15 +5130,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:183
+#: users/utils.py:204
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:185
+#: users/utils.py:206
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:198
+#: users/utils.py:219
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
@@ -5341,7 +5404,7 @@ msgid "Run plan manually"
 msgstr "手动执行计划"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:179
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:102
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:101
 msgid "Execute failed"
 msgstr "执行失败"
 
@@ -5427,7 +5490,7 @@ msgid "Unavailable"
 msgstr "无效"
 
 #: xpack/plugins/cloud/models.py:50
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:54
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:56
 #: xpack/plugins/cloud/templates/cloud/account_list.html:13
 msgid "Provider"
 msgstr "云服务商"
@@ -5453,7 +5516,7 @@ msgid "Instances"
 msgstr "实例"
 
 #: xpack/plugins/cloud/models.py:126
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:73
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:75
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:17
 msgid "Date last sync"
 msgstr "最后同步日期"
@@ -5472,7 +5535,7 @@ msgstr ""
 
 #: xpack/plugins/cloud/models.py:173 xpack/plugins/cloud/models.py:189
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:71
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:68
 msgid "Date sync"
 msgstr "同步日期"
 
@@ -5489,8 +5552,8 @@ msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
 #: xpack/plugins/cloud/models.py:185
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:89
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:61
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:91
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
 msgid "Instance"
 msgstr "实例"
 
@@ -5510,7 +5573,7 @@ msgstr "AWS (国际)"
 msgid "Qcloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:20
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:22
 #: xpack/plugins/cloud/views.py:72
 msgid "Account detail"
 msgstr "账户详情"
@@ -5528,23 +5591,23 @@ msgstr "加载中..."
 msgid "Load failed"
 msgstr "加载失败"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:20
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:22
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:25
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:21
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:23
 #: xpack/plugins/cloud/views.py:122
 msgid "Sync task detail"
 msgstr "同步任务详情"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:23
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:25
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:28
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:24
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:26
 #: xpack/plugins/cloud/views.py:137
 msgid "Sync task history"
 msgstr "同步历史列表"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:28
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:31
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:27
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:29
 #: xpack/plugins/cloud/views.py:188
 msgid "Sync instance list"
 msgstr "同步实例列表"
@@ -5577,7 +5640,7 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:93
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:92
 msgid "Sync success"
 msgstr "同步成功"
 
@@ -5661,7 +5724,6 @@ msgid "This will restore default Settings of the interface !!!"
 msgstr "您确定要恢复默认初始化吗？"
 
 #: xpack/plugins/interface/templates/interface/interface.html:107
-#: xpack/plugins/interface/views.py:53
 msgid "Restore default successfully."
 msgstr "恢复默认成功！"
 
@@ -5674,8 +5736,12 @@ msgid "Interface"
 msgstr "界面"
 
 #: xpack/plugins/interface/views.py:49
-msgid "It is already in the default setting state!"
+msgid "It is already in the default setting state！"
 msgstr "当前已经是初始化状态！"
+
+#: xpack/plugins/interface/views.py:53
+msgid "Restore default successfully！"
+msgstr "恢复默认成功！"
 
 #: xpack/plugins/license/meta.py:11 xpack/plugins/license/models.py:94
 #: xpack/plugins/license/templates/license/license_detail.html:50
@@ -5817,6 +5883,45 @@ msgstr "更新组织"
 #~ msgid "Update user groups"
 #~ msgstr "更新用户组"
 
+# msgid "Update user"
+# msgstr "更新用户"
+#~ msgid ""
+#~ "\n"
+#~ "        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
+#~ "bootstrap/3.2.0/css/bootstrap.min.css\">\n"
+#~ "        <p style=\"text-indent:2em;\">\n"
+#~ "            <span>\n"
+#~ "                <a href=\"%(rest_password_url)s?token="
+#~ "%(rest_password_token)s\">click here to set your password</a>\n"
+#~ "            </span>    \n"
+#~ "            <span>\n"
+#~ "                This link is valid for 1 hour. After it expires, <a href="
+#~ "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+#~ "            </span> \n"
+#~ "            <span>\n"
+#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "            </span>\n"
+#~ "        </p>\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
+#~ "bootstrap/3.2.0/css/bootstrap.min.css\">\n"
+#~ "        <p style=\"text-indent:2em;\">\n"
+#~ "            <span>\n"
+#~ "                <a href=\"%(rest_password_url)s?token="
+#~ "%(rest_password_token)s\">请点击这里设置密码</a>\n"
+#~ "            </span>    \n"
+#~ "            <span>\n"
+#~ "                这个链接有效期1小时, 超过时间您可以, <a href="
+#~ "\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
+#~ "            </span> \n"
+#~ "            <span>\n"
+#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "            </span>\n"
+#~ "        </p>\n"
+#~ "        "
+
 #~ msgid "Template"
 #~ msgstr "模板"
 
@@ -5850,9 +5955,6 @@ msgstr "更新组织"
 #~| msgid "Select Asset"
 #~ msgid "Select host"
 #~ msgstr "选择资产"
-
-#~ msgid "Restore default successfully！"
-#~ msgstr "恢复默认成功！"
 
 #~ msgid "Beijing Duizhan Tech, Inc."
 #~ msgstr "北京堆栈科技有限公司"
