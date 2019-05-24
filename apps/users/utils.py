@@ -35,9 +35,9 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
 
 
 def get_email_custom_body(email_body):
-    email_content = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
-    message = email_content + email_body
-    return message
+    email_custom_content = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
+    email_custom_body = email_custom_content + email_body
+    return email_custom_body
 
 
 def send_user_created_mail(user):
