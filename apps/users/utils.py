@@ -313,3 +313,13 @@ def is_need_unblock(key_block):
     if not cache.get(key_block):
         return False
     return True
+
+
+def construct_user_email(username, email):
+    if '@' not in email:
+        if '@' in username:
+            email = username
+        else:
+            email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
+    return email
+
