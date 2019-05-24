@@ -81,9 +81,14 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Create user')})
-        return context
+        check_rules = get_password_check_rules()
+        context = {
+            'app': _('Users'),
+            'action': _('Create user'),
+            'password_check_rules': check_rules,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         user = form.save(commit=False)

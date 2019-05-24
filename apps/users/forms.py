@@ -23,7 +23,7 @@ class UserCheckOtpCodeForm(forms.Form):
 
 class UserCreateUpdateForm(OrgModelForm):
     EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
-    CUSTOM_PASSWORD = _('Custom password')
+    CUSTOM_PASSWORD = _('Set password')
     PASSWORD_STRATEGY_CHOICES = (
         (0, EMAIL_SET_PASSWORD),
         (1, CUSTOM_PASSWORD)
@@ -38,7 +38,7 @@ class UserCreateUpdateForm(OrgModelForm):
         initial=User.ROLE_USER, label=_("Role")
     )
     public_key = forms.CharField(
-        label=_('ssh public key'), max_length=4096, required=False,
+        label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
     )
