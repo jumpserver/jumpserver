@@ -64,8 +64,8 @@ def construct_user_created_email_body(user):
         custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
     else:
         custom_body = ''
-    default_body = custom_body + default_body
-    return default_body
+    body = custom_body + default_body
+    return body
 
 
 def send_user_created_mail(user):
