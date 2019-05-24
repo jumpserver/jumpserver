@@ -2,7 +2,7 @@
 -------------
 
 对 Jumpserver 服务进行迁移, 只需要备份 "数据库" 和 "jumpserver目录" 即可
-注：1.4.5及之后的版本迁移, 只需要迁移 "数据库" "配置文件" 和 "录像目录"
+注：1.4.5 及之后的版本迁移, 只需要迁移 "数据库" "配置文件" 和 "录像目录"
 
 1. 备份数据到新的服务器
 
@@ -17,12 +17,7 @@
 
 .. code-block:: shell
 
-    $ localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
-    $ export LC_ALL=zh_CN.UTF-8
-    $ echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
-
     $ yum -y install wget gcc epel-release git
-
     $ yum -y install mariadb mariadb-devel mariadb-server
     $ yum -y install redis
 

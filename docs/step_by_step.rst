@@ -13,3 +13,4 @@
    start_automatically
    upgrade
    migration
+   uninstall
