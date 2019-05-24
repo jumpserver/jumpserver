@@ -242,3 +242,26 @@ class SecuritySettingForm(BaseForm):
                     'and resets must contain special characters')
     )
 
+
+class EmailContentSettingForm(BaseForm):
+    EMAIL_CUSTOM_USER_CREATED_SUBJECT = forms.CharField(
+        max_length=1024,  required=False, label=_("Create user email subject"),
+        help_text=_("Tips: When creating a user, send the subject of the email"
+                    " (eg:Create account successfully)")
+    )
+    EMAIL_CUSTOM_USER_CREATED_HONORIFIC = forms.CharField(
+        max_length=1024, required=False, label=_("Create user honorific"),
+        help_text=_("Tips: When creating a user, send the honorific of the "
+                    "email (eg:Hello)")
+    )
+    EMAIL_CUSTOM_USER_CREATED_BODY = forms.CharField(
+        max_length=4096, required=False, widget=forms.Textarea(),
+        label=_('Create user email content'),
+        help_text=_('Tips:When creating a user, send the content of the email')
+    )
+    EMAIL_CUSTOM_USER_CREATED_SIGNATURE = forms.CharField(
+        max_length=512, required=False, label=_("Signature"),
+        help_text=_("Tips: Email signature (eg:jumpserver)")
+    )
+
+
