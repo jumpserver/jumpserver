@@ -7,28 +7,19 @@
     <div class="form-group" id="custom_password">
         {% bootstrap_field form.password layout="horizontal" %}
     </div>
-    <div class="form-group" id="auto_password">
-        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
-        <div class="col-sm-8 controls" style="margin-top: 8px;">
-            {% trans 'Reset link will be generated and sent to the user. ' %}
-        </div>
-    </div>
 <script>
 var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
 function passwordStrategyFieldsDisplay(){
-    var custom_password = $('#id_password_strategy_0').is(":checked");
+    var custom_password = $('#id_password_strategy_1').is(":checked");
     if(custom_password){
-        $('#auto_password').addClass('hidden');
         $('#custom_password').removeClass('hidden');
     }else{
-        $('#auto_password').removeClass('hidden');
         $('#custom_password').addClass('hidden');
     }
 
 }
 $(document).ready(function () {
-    $('#auto_password').addClass('hidden');
-    $('#custom_password').removeClass('hidden');
+    $('#custom_password').addClass('hidden');
 
 }).on('change', password_strategy_radio_input, function(){
         passwordStrategyFieldsDisplay()

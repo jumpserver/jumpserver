@@ -22,9 +22,11 @@ class UserCheckOtpCodeForm(forms.Form):
 
 
 class UserCreateUpdateForm(OrgModelForm):
+    EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
+    CUSTOM_PASSWORD = _('Custom password')
     PASSWORD_STRATEGY_CHOICES = (
-        (0, _('CUSTOM_PASSWORD')),
-        (1, _('EMAIL_SET_PASSWORD'))
+        (0, EMAIL_SET_PASSWORD),
+        (1, CUSTOM_PASSWORD)
     )
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
@@ -52,7 +54,11 @@ class UserCreateUpdateForm(OrgModelForm):
             'phone', 'role', 'date_expired', 'comment', 'otp_level'
         ]
         widgets = {
-            'otp_level': forms.RadioSelect(),
+            'otp_level': forms.RadioSelect(
+                attrs={
+                    'class': 'form-inline'
+                }
+            ),
             'groups': forms.SelectMultiple(
                 attrs={
                     'class': 'select2',

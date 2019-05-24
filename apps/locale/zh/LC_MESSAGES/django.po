@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-22 18:17+0800\n"
+"POT-Creation-Date: 2019-05-24 15:53+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -353,7 +353,7 @@ msgstr "重置"
 #: audits/templates/audits/login_log_list.html:89
 #: perms/templates/perms/asset_permission_create_update.html:84
 #: perms/templates/perms/remote_app_permission_create_update.html:84
-#: settings/templates/settings/basic_setting.html:63
+#: settings/templates/settings/basic_setting.html:62
 #: settings/templates/settings/command_storage_create.html:80
 #: settings/templates/settings/email_setting.html:63
 #: settings/templates/settings/ldap_setting.html:64
@@ -709,7 +709,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_user.html:55
 #: perms/templates/perms/remote_app_permission_user.html:54
-#: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:14
+#: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:13
 #: users/models/user.py:59 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:36
@@ -736,10 +736,8 @@ msgstr "密码或密钥密码"
 #: authentication/forms.py:13
 #: authentication/templates/authentication/login.html:67
 #: authentication/templates/authentication/new_login.html:93
-#: settings/forms.py:107 users/forms.py:16 users/forms.py:36
+#: settings/forms.py:103 users/forms.py:15 users/forms.py:33
 #: users/templates/users/reset_password.html:53
-#: users/templates/users/user_create.html:8
-#: users/templates/users/user_create.html:17
 #: users/templates/users/user_password_authentication.html:18
 #: users/templates/users/user_password_update.html:43
 #: users/templates/users/user_profile_update.html:40
@@ -805,7 +803,7 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/user_asset_list.html:45
 #: assets/templates/assets/user_asset_list.html:163
 #: audits/templates/audits/login_log_list.html:54
-#: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:137
+#: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:133
 #: users/templates/users/user_granted_asset.html:45
 #: users/templates/users/user_group_granted_asset.html:45
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:51
@@ -822,7 +820,7 @@ msgstr "IP"
 #: assets/templates/assets/user_asset_list.html:44
 #: assets/templates/assets/user_asset_list.html:162
 #: perms/templates/perms/asset_permission_asset.html:54
-#: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:136
+#: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:132
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:50
@@ -1133,7 +1131,7 @@ msgstr "默认资产组"
 #: terminal/models.py:154 terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:299
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:297
 #: users/models/user.py:36 users/models/user.py:467 users/serializers/v1.py:61
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:36 users/views/user.py:394
@@ -1211,7 +1209,7 @@ msgstr "连接"
 msgid "Org name"
 msgstr "组织名"
 
-#: assets/serializers/asset_user.py:23 users/forms.py:246
+#: assets/serializers/asset_user.py:23 users/forms.py:244
 #: users/models/user.py:91 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
@@ -1366,7 +1364,7 @@ msgstr "资产用户信息"
 
 #: assets/templates/assets/_asset_user_view_auth_modal.html:14
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:56
-#: users/forms.py:158 users/models/user.py:83
+#: users/forms.py:156 users/models/user.py:83
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -1383,7 +1381,6 @@ msgstr "需要二次认证来查看账号信息"
 #: assets/templates/assets/system_user_asset.html:112
 #: assets/templates/assets/system_user_detail.html:182
 #: assets/templates/assets/system_user_list.html:168
-#: settings/templates/settings/basic_setting.html:87
 #: settings/templates/settings/terminal_setting.html:165
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
 #: users/templates/users/user_detail.html:388
@@ -1786,7 +1783,6 @@ msgstr "重命名失败，不能更改root节点的名称"
 
 #: assets/templates/assets/asset_list.html:694
 #: assets/templates/assets/system_user_list.html:162
-#: settings/templates/settings/basic_setting.html:81
 #: users/templates/users/user_detail.html:382
 #: users/templates/users/user_detail.html:408
 #: users/templates/users/user_detail.html:476
@@ -1802,7 +1798,6 @@ msgstr "删除选择资产"
 
 #: assets/templates/assets/asset_list.html:698
 #: assets/templates/assets/system_user_list.html:166
-#: settings/templates/settings/basic_setting.html:85
 #: settings/templates/settings/terminal_setting.html:163
 #: users/templates/users/user_detail.html:386
 #: users/templates/users/user_detail.html:412
@@ -2414,7 +2409,7 @@ msgstr "请输入正确的用户名和密码. 注意它们是区分大小写."
 msgid "This account is inactive."
 msgstr "此账户无效"
 
-#: authentication/forms.py:37 users/forms.py:22
+#: authentication/forms.py:37 users/forms.py:21
 msgid "MFA code"
 msgstr "MFA 验证码"
 
@@ -2542,16 +2537,16 @@ msgstr "欢迎回来，请输入用户名和密码登录"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:180 users/views/user.py:540
+#: authentication/views/login.py:172 users/views/user.py:540
 #: users/views/user.py:565
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/views/login.py:211
+#: authentication/views/login.py:203
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:212
+#: authentication/views/login.py:204
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2631,7 +2626,7 @@ msgstr "等待任务开始"
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/models/adhoc.py:38 settings/forms.py:155
+#: ops/models/adhoc.py:38 settings/forms.py:151
 msgid "Units: seconds"
 msgstr "单位: 秒"
 
@@ -2968,7 +2963,7 @@ msgstr "命令执行"
 msgid "Organization"
 msgstr "组织管理"
 
-#: perms/const.py:18 settings/forms.py:140
+#: perms/const.py:18 settings/forms.py:136
 msgid "All"
 msgstr "全部"
 
@@ -2986,7 +2981,7 @@ msgstr "下载文件"
 #: perms/templates/perms/asset_permission_list.html:75
 #: perms/templates/perms/asset_permission_list.html:122
 #: perms/templates/perms/remote_app_permission_list.html:16
-#: templates/_nav.html:14 users/forms.py:269 users/models/group.py:26
+#: templates/_nav.html:14 users/forms.py:267 users/models/group.py:26
 #: users/models/user.py:67 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
 #: users/templates/users/user_list.html:38
@@ -3223,44 +3218,36 @@ msgstr "远程应用授权用户列表"
 msgid "RemoteApp permission RemoteApp list"
 msgstr "远程应用授权远程应用列表"
 
-#: settings/api.py:27
+#: settings/api.py:26
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:51
+#: settings/api.py:50
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: settings/api.py:88
+#: settings/api.py:87
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:121
+#: settings/api.py:120
 msgid "succeed: {} failed: {} total: {}"
 msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:143 settings/api.py:179
+#: settings/api.py:142 settings/api.py:178
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:149 settings/api.py:185
+#: settings/api.py:148 settings/api.py:184
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:167 settings/api.py:205
+#: settings/api.py:166 settings/api.py:204
 #: settings/templates/settings/terminal_setting.html:151
 msgid "Delete succeed"
 msgstr "删除成功"
-
-#: settings/api.py:232
-msgid "The initial password has been cleared."
-msgstr "当前初始密码已经清除."
-
-#: settings/api.py:236 settings/templates/settings/basic_setting.html:91
-msgid "Clear initial password successfully."
-msgstr "清除初始密码成功."
 
 #: settings/forms.py:60
 msgid "Current SITE URL"
@@ -3282,76 +3269,72 @@ msgstr "Email主题前缀"
 msgid "Tips: Some word will be intercept by mail provider"
 msgstr "提示: 一些关键字可能会被邮件提供商拦截，如 跳板机、Jumpserver"
 
-#: settings/forms.py:72
-msgid "User Initial Password"
-msgstr "用户初始密码"
-
-#: settings/forms.py:79
+#: settings/forms.py:75
 msgid "SMTP host"
 msgstr "SMTP主机"
 
-#: settings/forms.py:81
+#: settings/forms.py:77
 msgid "SMTP port"
 msgstr "SMTP端口"
 
-#: settings/forms.py:83
+#: settings/forms.py:79
 msgid "SMTP user"
 msgstr "SMTP账号"
 
-#: settings/forms.py:86
+#: settings/forms.py:82
 msgid "SMTP password"
 msgstr "SMTP密码"
 
-#: settings/forms.py:87
+#: settings/forms.py:83
 msgid "Some provider use token except password"
 msgstr "一些邮件提供商需要输入的是Token"
 
-#: settings/forms.py:90 settings/forms.py:129
+#: settings/forms.py:86 settings/forms.py:125
 msgid "Use SSL"
 msgstr "使用SSL"
 
-#: settings/forms.py:91
+#: settings/forms.py:87
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用SSL"
 
-#: settings/forms.py:94
+#: settings/forms.py:90
 msgid "Use TLS"
 msgstr "使用TLS"
 
-#: settings/forms.py:95
+#: settings/forms.py:91
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用TLS"
 
-#: settings/forms.py:101
+#: settings/forms.py:97
 msgid "LDAP server"
 msgstr "LDAP地址"
 
-#: settings/forms.py:104
+#: settings/forms.py:100
 msgid "Bind DN"
 msgstr "绑定DN"
 
-#: settings/forms.py:111
+#: settings/forms.py:107
 msgid "User OU"
 msgstr "用户OU"
 
-#: settings/forms.py:112
+#: settings/forms.py:108
 msgid "Use | split User OUs"
 msgstr "使用|分隔各OU"
 
-#: settings/forms.py:116
+#: settings/forms.py:112
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/forms.py:117
+#: settings/forms.py:113
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/forms.py:120
+#: settings/forms.py:116
 msgid "User attr map"
 msgstr "LDAP属性映射"
 
-#: settings/forms.py:122
+#: settings/forms.py:118
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -3359,39 +3342,39 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的属性"
 
-#: settings/forms.py:131
+#: settings/forms.py:127
 msgid "Enable LDAP auth"
 msgstr "启用LDAP认证"
 
-#: settings/forms.py:141
+#: settings/forms.py:137
 msgid "Auto"
 msgstr "自动"
 
-#: settings/forms.py:148
+#: settings/forms.py:144
 msgid "Password auth"
 msgstr "密码认证"
 
-#: settings/forms.py:151
+#: settings/forms.py:147
 msgid "Public key auth"
 msgstr "密钥认证"
 
-#: settings/forms.py:154
+#: settings/forms.py:150
 msgid "Heartbeat interval"
 msgstr "心跳间隔"
 
-#: settings/forms.py:158
+#: settings/forms.py:154
 msgid "List sort by"
 msgstr "资产列表排序"
 
-#: settings/forms.py:161
+#: settings/forms.py:157
 msgid "List page size"
 msgstr "资产分页每页数量"
 
-#: settings/forms.py:164
+#: settings/forms.py:160
 msgid "Session keep duration"
 msgstr "会话保留时长"
 
-#: settings/forms.py:165
+#: settings/forms.py:161
 msgid ""
 "Units: days, Session, record, command will be delete if more than duration, "
 "only in database"
@@ -3399,54 +3382,54 @@ msgstr ""
 "单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
 "受影响)"
 
-#: settings/forms.py:169
+#: settings/forms.py:165
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/forms.py:170
+#: settings/forms.py:166
 msgid "ex: Last\\s*login|success|成功"
 msgstr ""
 "登录telnet服务器成功后的提示正则表达式，如: Last\\s*login|success|成功 "
 
-#: settings/forms.py:181
+#: settings/forms.py:177
 msgid "MFA Secondary certification"
 msgstr "MFA 二次认证"
 
-#: settings/forms.py:183
+#: settings/forms.py:179
 msgid ""
 "After opening, the user login must use MFA secondary authentication (valid "
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: settings/forms.py:189
+#: settings/forms.py:185
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: settings/forms.py:193
+#: settings/forms.py:189
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: settings/forms.py:195
+#: settings/forms.py:191
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/forms.py:201
+#: settings/forms.py:197
 msgid "Connection max idle time"
 msgstr "SSH最大空闲时间"
 
-#: settings/forms.py:203
+#: settings/forms.py:199
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
 msgstr "提示：（单位：分）如果超过该配置没有操作，连接会被断开（仅ssh）"
 
-#: settings/forms.py:209
+#: settings/forms.py:205
 msgid "Password expiration time"
 msgstr "密码过期时间"
 
-#: settings/forms.py:212
+#: settings/forms.py:208
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -3456,45 +3439,45 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/forms.py:221
+#: settings/forms.py:217
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: settings/forms.py:225
+#: settings/forms.py:221
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: settings/forms.py:227
+#: settings/forms.py:223
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: settings/forms.py:232
+#: settings/forms.py:228
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: settings/forms.py:233
+#: settings/forms.py:229
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: settings/forms.py:238
+#: settings/forms.py:234
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: settings/forms.py:239
+#: settings/forms.py:235
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: settings/forms.py:244
+#: settings/forms.py:240
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: settings/forms.py:245
+#: settings/forms.py:241
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
@@ -3564,23 +3547,6 @@ msgstr "终端设置"
 #: settings/templates/settings/terminal_setting.html:31 settings/views.py:152
 msgid "Security setting"
 msgstr "安全设置"
-
-#: settings/templates/settings/basic_setting.html:62
-msgid "Clear initial password"
-msgstr "清除初始密码"
-
-#: settings/templates/settings/basic_setting.html:82
-msgid "This will be clear the initial password !!!"
-msgstr "这将会清除用户初始密码!!!"
-
-#: settings/templates/settings/basic_setting.html:92
-#: settings/templates/settings/basic_setting.html:99
-msgid "Clear Initial Password"
-msgstr "清除初始密码"
-
-#: settings/templates/settings/basic_setting.html:98
-msgid "Clear initial password failed."
-msgstr "清除初始密码失败."
 
 #: settings/templates/settings/command_storage_create.html:52
 msgid "Tips: If there are multiple hosts, separate them with a comma (,)"
@@ -3750,7 +3716,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:26 users/forms.py:137
+#: templates/_header_bar.html:89 templates/_nav_user.html:26 users/forms.py:135
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -3851,7 +3817,7 @@ msgstr ""
 
 #: templates/_nav.html:10 users/views/group.py:27 users/views/group.py:43
 #: users/views/group.py:59 users/views/group.py:75 users/views/group.py:91
-#: users/views/login.py:158 users/views/user.py:70 users/views/user.py:85
+#: users/views/login.py:154 users/views/user.py:70 users/views/user.py:85
 #: users/views/user.py:124 users/views/user.py:202 users/views/user.py:363
 #: users/views/user.py:413 users/views/user.py:453
 msgid "Users"
@@ -4311,19 +4277,15 @@ msgstr "你没有权限"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:30
-msgid "INITIAL_PASSWORD"
-msgstr "初始化密码"
+#: users/forms.py:25
+msgid "Reset link will be generated and sent to the user"
+msgstr "生成重置密码连接，通过邮件发送给用户"
 
-#: users/forms.py:31
-msgid "CUSTOM_PASSWORD"
+#: users/forms.py:26 xpack/plugins/change_auth_plan/models.py:52
+msgid "Custom password"
 msgstr "自定义密码"
 
-#: users/forms.py:32
-msgid "EMAIL_SET_PASSWORD"
-msgstr "邮件设置密码"
-
-#: users/forms.py:41 users/models/user.py:71
+#: users/forms.py:38 users/models/user.py:71
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:37
@@ -4331,19 +4293,19 @@ msgstr "邮件设置密码"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:44 users/forms.py:216
+#: users/forms.py:41 users/forms.py:214
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:45 users/forms.py:217
+#: users/forms.py:42 users/forms.py:215
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:46
+#: users/forms.py:43
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:50 xpack/plugins/change_auth_plan/models.py:83
+#: users/forms.py:47 xpack/plugins/change_auth_plan/models.py:83
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:51
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:69
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:57
@@ -4355,15 +4317,15 @@ msgstr "密码策略"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:99 users/forms.py:231
+#: users/forms.py:99 users/forms.py:229
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:103 users/forms.py:235 users/serializers/v1.py:47
+#: users/forms.py:103 users/forms.py:233 users/serializers/v1.py:47
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:143
+#: users/forms.py:141
 msgid ""
 "Tip: when enabled, you will enter the MFA binding process the next time you "
 "log in. you can also directly bind in \"personal information -> quick "
@@ -4372,11 +4334,11 @@ msgstr ""
 "提示：启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修"
 "改->更改MFA设置）中直接绑定!"
 
-#: users/forms.py:153
+#: users/forms.py:151
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全."
 
-#: users/forms.py:163
+#: users/forms.py:161
 msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
@@ -4385,41 +4347,41 @@ msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
 "设置复杂密码，启用MFA认证）"
 
-#: users/forms.py:170 users/templates/users/first_login.html:48
+#: users/forms.py:168 users/templates/users/first_login.html:48
 #: users/templates/users/first_login.html:107
 #: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
 
-#: users/forms.py:176
+#: users/forms.py:174
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:181
+#: users/forms.py:179
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:186
+#: users/forms.py:184
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:196
+#: users/forms.py:194
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:204
+#: users/forms.py:202
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:214
+#: users/forms.py:212
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms.py:218
+#: users/forms.py:216
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:252 users/forms.py:257 users/forms.py:303
+#: users/forms.py:250 users/forms.py:255 users/forms.py:301
 #: xpack/plugins/orgs/forms.py:30
 msgid "Select users"
 msgstr "选择用户"
@@ -4685,16 +4647,6 @@ msgstr "很强"
 #: users/templates/users/user_list.html:28 users/views/user.py:85
 msgid "Create user"
 msgstr "创建用户"
-
-#: users/templates/users/user_create.html:10
-msgid ""
-"This will use the default initial password by the system. Please go to the "
-"system Settings application to set the initial password"
-msgstr "这将会使用系统设置的初始密码. 请先到系统设置应用里去设置初始密码."
-
-#: users/templates/users/user_create.html:19
-msgid "Reset link will be generated and sent to the user. "
-msgstr "生成重置密码连接，通过邮件发送给用户"
 
 #: users/templates/users/user_detail.html:19
 #: users/templates/users/user_granted_asset.html:18 users/views/user.py:203
@@ -5179,11 +5131,7 @@ msgstr "密码不一致"
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/views/login.py:119
-msgid "The password cannot be the same as the initial password"
-msgstr "密码设置不能和系统设置的初始密码一致"
-
-#: users/views/login.py:158
+#: users/views/login.py:154
 msgid "First login"
 msgstr "首次登录"
 
@@ -5299,10 +5247,6 @@ msgstr ""
 #: xpack/plugins/change_auth_plan/views.py:139
 msgid "Change auth plan"
 msgstr "改密计划"
-
-#: xpack/plugins/change_auth_plan/models.py:52
-msgid "Custom password"
-msgstr "自定义密码"
 
 #: xpack/plugins/change_auth_plan/models.py:53
 msgid "All assets use the same random password"
@@ -5728,8 +5672,6 @@ msgid "Interface"
 msgstr "界面"
 
 #: xpack/plugins/interface/views.py:49
-#, fuzzy
-#| msgid "It is already in the default setting state!"
 msgid "It is already in the default setting state！"
 msgstr "当前已经是初始化状态！"
 
@@ -5873,6 +5815,44 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#~ msgid "The initial password has been cleared."
+#~ msgstr "当前初始密码已经清除."
+
+#~ msgid "Clear initial password successfully."
+#~ msgstr "清除初始密码成功."
+
+#~ msgid "User Initial Password"
+#~ msgstr "用户初始密码"
+
+#~ msgid "Clear initial password"
+#~ msgstr "清除初始密码"
+
+#~ msgid "This will be clear the initial password !!!"
+#~ msgstr "这将会清除用户初始密码!!!"
+
+#~ msgid "Clear Initial Password"
+#~ msgstr "清除初始密码"
+
+#~ msgid "Clear initial password failed."
+#~ msgstr "清除初始密码失败."
+
+#~ msgid "INITIAL_PASSWORD"
+#~ msgstr "初始化密码"
+
+#~ msgid "CUSTOM_PASSWORD"
+#~ msgstr "自定义密码"
+
+#~ msgid "EMAIL_SET_PASSWORD"
+#~ msgstr "邮件设置密码"
+
+#~ msgid ""
+#~ "This will use the default initial password by the system. Please go to "
+#~ "the system Settings application to set the initial password"
+#~ msgstr "这将会使用系统设置的初始密码. 请先到系统设置应用里去设置初始密码."
+
+#~ msgid "The password cannot be the same as the initial password"
+#~ msgstr "密码设置不能和系统设置的初始密码一致"
 
 #~ msgid "Update user groups"
 #~ msgstr "更新用户组"
