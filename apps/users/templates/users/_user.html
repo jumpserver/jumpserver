@@ -74,6 +74,8 @@
         $(document).ready(function () {
             $('.select2').select2();
             $('#id_date_expired').daterangepicker(dateOptions);
+            var mfa_radio = $('#id_otp_level').children();
+            mfa_radio.css("margin-right","15px")
         })
     </script>
 {% endblock %}

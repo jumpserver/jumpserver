@@ -4279,7 +4279,7 @@ msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
 #: users/forms.py:25
 msgid "Reset link will be generated and sent to the user"
-msgstr "生成重置密码连接，通过邮件发送给用户"
+msgstr "生成重置密码链接，通过邮件发送给用户"
 
 #: users/forms.py:26 xpack/plugins/change_auth_plan/models.py:52
 msgid "Custom password"
