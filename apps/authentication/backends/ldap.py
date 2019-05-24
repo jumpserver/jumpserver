@@ -7,6 +7,8 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
+from users.utils import construct_user_email
+
 logger = _LDAPConfig.get_logger()
 
 
@@ -95,14 +97,9 @@ class LDAPUser(_LDAPUser):
                 if not hasattr(self._user, field):
                     continue
                 if isinstance(getattr(self._user, field), bool):
-                    value = bool(int(value == 'true'))
+                    value = value.lower() in ['true', '1']
                 setattr(self._user, field, value)
 
-        if not hasattr(self._user, 'email') or '@' not in self._user.email:
-            if '@' not in self._user.username:
-                email = '{}@{}'.format(self._user.username, settings.EMAIL_SUFFIX)
-            else:
-                email = self._user.username
-            setattr(self._user, 'email', email)
-
-
+        email = getattr(self._user, 'email', '')
+        email = construct_user_email(email, self._user.username)
+        setattr(self._user, 'email', email)

@@ -107,13 +107,13 @@ $(document).ready(function () {
     });
 })
 .on("click","#btn_ldap_modal_confirm",function () {
-    var user_names=[];
+    var username_list=[];
     $("tbody input[type='checkbox']:checked").each(function () {
-        user_names.push($(this).attr('id'));
+        username_list.push($(this).attr('id'));
     });
 
-    if (user_names.length === 0){
-        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}"
+    if (username_list.length === 0){
+        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}";
         toastr.error(msg);
         return
      }
@@ -129,7 +129,7 @@ $(document).ready(function () {
     }
     APIUpdateAttr({
         url: the_url,
-        body: JSON.stringify({'user_names':user_names}),
+        body: JSON.stringify({'username_list':username_list}),
         method: "POST",
         flash_message: false,
         success: success,
