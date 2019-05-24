@@ -34,10 +34,38 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
-def get_email_custom_body(email_body):
-    email_custom_content = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
-    email_custom_body = email_custom_content + email_body
-    return email_custom_body
+def construct_user_created_email_body(user):
+    default_body = _("""
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <p style="text-indent:2em;">
+            <span>
+                Username: %(username)s.
+            </span>
+            <span>
+                <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
+            </span>    
+            <span>
+                This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
+            </span> 
+            <span>
+                <a href="%(login_url)s">Login direct</a>
+            </span>
+        </p>
+        """) % {
+        'username': user.username,
+        'rest_password_url': reverse('users:reset-password', external=True),
+        'rest_password_token': user.generate_reset_token(),
+        'forget_password_url': reverse('users:forgot-password', external=True),
+        'email': user.email,
+        'login_url': reverse('authentication:login', external=True),
+    }
+
+    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
+        custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
+    else:
+        custom_body = ''
+    default_body = custom_body + default_body
+    return default_body
 
 
 def send_user_created_mail(user):
@@ -46,42 +74,17 @@ def send_user_created_mail(user):
     if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
         subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
 
-    email_honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
+    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
     if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
-        email_honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
+        honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
 
-    email_body = _("""
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <p style="text-indent:2em;">
-        <span>
-            Username: %(username)s.
-        </span>
-        <span>
-            <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
-        </span>    
-        <span>
-            This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-        </span> 
-        <span>
-            <a href="%(login_url)s">Login direct</a>
-        </span>
-    </p>
-    """) % {
-        'username': user.username,
-        'rest_password_url': reverse('users:reset-password', external=True),
-        'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('users:forgot-password', external=True),
-        'email': user.email,
-        'login_url': reverse('authentication:login', external=True),
-    }
-    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
-       email_body = get_email_custom_body(email_body)
+    body = construct_user_created_email_body(user)
 
-    email_signature = '<p style="float:right">jumpserver</p>'
+    signature = '<p style="float:right">jumpserver</p>'
     if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
-        email_signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
+        signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
 
-    message = email_honorific + email_body + email_signature
+    message = honorific + body + signature
     if settings.DEBUG:
         try:
             print(message)

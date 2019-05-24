@@ -255,7 +255,7 @@ class EmailContentSettingForm(BaseForm):
                     "email (eg:Hello)")
     )
     EMAIL_CUSTOM_USER_CREATED_BODY = forms.CharField(
-        max_length=5000, required=False, widget=forms.Textarea(),
+        max_length=4096, required=False, widget=forms.Textarea(),
         label=_('Create user email content'),
         help_text=_('Tips:When creating a user, send the content of the email')
     )

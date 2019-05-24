@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-24 09:42+0800\n"
+"POT-Creation-Date: 2019-05-24 12:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -4630,7 +4630,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:373 users/utils.py:95
+#: users/templates/users/user_detail.html:373 users/utils.py:98
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -4950,38 +4950,29 @@ msgid ""
 "corresponding private key."
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
-#: users/utils.py:45
-msgid "Create account successfully"
-msgstr "创建账户成功"
-
-#: users/utils.py:49
-#, python-format
-msgid "Hello %(name)s"
-msgstr "您好 %(name)s"
-
-#: users/utils.py:53
+#: users/utils.py:38
 #, python-format
 msgid ""
 "\n"
-"    <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
+"        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
 "bootstrap/3.2.0/css/bootstrap.min.css\">\n"
-"    <p style=\"text-indent:2em;\">\n"
-"        <span>\n"
-"            Username: %(username)s.\n"
-"        </span>\n"
-"        <span>\n"
-"            <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
+"        <p style=\"text-indent:2em;\">\n"
+"            <span>\n"
+"                Username: %(username)s.\n"
+"            </span>\n"
+"            <span>\n"
+"                <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
 "\">click here to set your password</a>\n"
-"        </span>    \n"
-"        <span>\n"
-"            This link is valid for 1 hour. After it expires, <a href="
+"            </span>    \n"
+"            <span>\n"
+"                This link is valid for 1 hour. After it expires, <a href="
 "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-"        </span> \n"
-"        <span>\n"
-"            <a href=\"%(login_url)s\">Login direct</a>\n"
-"        </span>\n"
-"    </p>\n"
-"    "
+"            </span> \n"
+"            <span>\n"
+"                <a href=\"%(login_url)s\">Login direct</a>\n"
+"            </span>\n"
+"        </p>\n"
+"        "
 msgstr ""
 "\n"
 "    <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
@@ -4999,12 +4990,21 @@ msgstr ""
 "\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
 "        </span> \n"
 "        <span>\n"
-"            <a href=\"%(login_url)s\">---Login direct</a>\n"
+"            <a href=\"%(login_url)s\">---登录页面</a>\n"
 "        </span>\n"
 "    </p>\n"
 "    "
 
-#: users/utils.py:97
+#: users/utils.py:73
+msgid "Create account successfully"
+msgstr "创建账户成功"
+
+#: users/utils.py:77
+#, python-format
+msgid "Hello %(name)s"
+msgstr "您好 %(name)s"
+
+#: users/utils.py:100
 #, python-format
 msgid ""
 "\n"
@@ -5048,11 +5048,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:128
+#: users/utils.py:131
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:130
+#: users/utils.py:133
 #, python-format
 msgid ""
 "\n"
@@ -5101,11 +5101,11 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:166
+#: users/utils.py:169
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:168
+#: users/utils.py:171
 #, python-format
 msgid ""
 "\n"
@@ -5130,15 +5130,15 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/utils.py:201
+#: users/utils.py:204
 msgid "User not exist"
 msgstr "用户不存在"
 
-#: users/utils.py:203
+#: users/utils.py:206
 msgid "Disabled or expired"
 msgstr "禁用或失效"
 
-#: users/utils.py:216
+#: users/utils.py:219
 msgid "Password or SSH public key invalid"
 msgstr "密码或密钥不合法"
 
