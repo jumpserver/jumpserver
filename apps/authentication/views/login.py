@@ -74,13 +74,6 @@ class UserLoginView(FormView):
         if is_block_login(username, ip):
             return self.render_to_response(self.get_context_data(block_login=True))
 
-        reset_password_token = self.user_login_yes_or_no_reset_password(username)
-        if reset_password_token:
-            url = "%(rest_password_url)s?token=%(rest_password_token)s" % {
-                    'rest_password_url': reverse('users:reset-password'),
-                    'rest_password_token': reset_password_token
-                    }
-            return redirect(url)
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):

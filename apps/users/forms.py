@@ -26,9 +26,8 @@ class UserCheckOtpCodeForm(forms.Form):
 
 class UserCreateUpdateForm(OrgModelForm):
     PASSWORD_STRATEGY_CHOICES = (
-        (0, _('INITIAL_PASSWORD')),
-        (1, _('CUSTOM_PASSWORD')),
-        (2, _('EMAIL_SET_PASSWORD'))
+        (0, _('CUSTOM_PASSWORD')),
+        (1, _('EMAIL_SET_PASSWORD'))
     )
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
@@ -40,13 +39,13 @@ class UserCreateUpdateForm(OrgModelForm):
         initial=User.ROLE_USER, label=_("Role")
     )
     public_key = forms.CharField(
-        label=_('ssh public key'), max_length=5000, required=False,
+        label=_('ssh public key'), max_length=4096, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
     )
     password_strategy = forms.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=True,
-        label=_('Password strategy'), widget=forms.RadioSelect()
+        choices=PASSWORD_STRATEGY_CHOICES, required=True, initial=0,
+        widget=forms.RadioSelect(), label=_('Password strategy')
     )
 
     class Meta:

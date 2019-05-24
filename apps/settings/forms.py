@@ -180,11 +180,6 @@ class SecuritySettingForm(BaseForm):
             'authentication (valid for all users, including administrators)'
         )
     )
-    # user initial password
-    SECURITY_USER_INITIAL_PASSWORD = forms.CharField(
-        max_length=128, strip=True, required=False,
-        label=_('User Initial Password'), widget=forms.PasswordInput,
-    )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
         min_value=3, label=_("Limit the number of login failures")

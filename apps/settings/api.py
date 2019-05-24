@@ -221,16 +221,3 @@ class DjangoSettingsAPI(APIView):
                     except (json.JSONDecodeError, TypeError):
                         data[k] = str(v)
         return Response(data)
-
-
-class InitialPasswordDeleteAPI(APIView):
-    permission_classes = (IsSuperUser,)
-
-    def delete(self, request):
-        initial_password = Setting.objects.filter(name='SECURITY_USER_INITIAL_PASSWORD')
-        if not initial_password:
-            return Response(
-                {"error": _('The initial password has been cleared.')},
-                status=400)
-        initial_password.delete()
-        return Response({"success": _('Clear initial password successfully.')})

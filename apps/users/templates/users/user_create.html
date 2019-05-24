@@ -3,37 +3,7 @@
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
 {% block password %}
-    <div class="form-group required">
-        <label class="col-md-2 control-label" for="id_password_strategy_0">{% trans 'Password strategy' %}</label>
-        <div class="col-md-9">
-            <div id="id_password_strategy">
-                <div class="radio">
-                    <label for="id_password_strategy_0">
-                        <input type="radio" name="password_strategy" value="0" class="" title="" required="" id="id_password_strategy_0" {% if form.get_user_initial_password %}checked {% endif %}>
-                        {% trans 'INITIAL_PASSWORD' %}
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="id_password_strategy_1">
-                        <input type="radio" name="password_strategy" value="1" class="" title="" required="" id="id_password_strategy_1">
-                        {% trans 'CUSTOM_PASSWORD' %}
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="id_password_strategy_2">
-                        <input type="radio" name="password_strategy" value="2" class="" title="" required="" id="id_password_strategy_2" {% if not form.get_user_initial_password %}checked {% endif %}>
-                        {% trans 'EMAIL_SET_PASSWORD' %}
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="form-group" id="initial_password">
-        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
-        <div class="col-sm-8 controls" style="margin-top: 8px;">
-            {% trans 'This will use the default initial password by the system. Please go to the system Settings application to set the initial password' %}
-        </div>
-    </div>
+    {% bootstrap_field form.password_strategy layout="horizontal" %}
     <div class="form-group" id="custom_password">
         {% bootstrap_field form.password layout="horizontal" %}
     </div>
@@ -46,31 +16,19 @@
 <script>
 var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
 function passwordStrategyFieldsDisplay(){
-    var initial_password = $('#id_password_strategy_0').is(":checked");
-    var custom_password = $('#id_password_strategy_1').is(":checked");
-    if(initial_password){
-        $('#initial_password').removeClass('hidden');
+    var custom_password = $('#id_password_strategy_0').is(":checked");
+    if(custom_password){
         $('#auto_password').addClass('hidden');
-        $('#custom_password').addClass('hidden');
-    }else if(custom_password){
         $('#custom_password').removeClass('hidden');
-        $('#auto_password').addClass('hidden');
-        $('#initial_password').addClass('hidden')
     }else{
         $('#auto_password').removeClass('hidden');
-        $('#initial_password').addClass('hidden');
         $('#custom_password').addClass('hidden');
     }
+
 }
 $(document).ready(function () {
-    var initial_password = $('#id_password_strategy_0').is(":checked");
-    if (initial_password ){
-        $('#id_password_strategy_0').parent().removeClass('hidden')
-    }else{
-       $('#id_password_strategy_0').parent().addClass('hidden')
-    }
     $('#auto_password').addClass('hidden');
-    $('#custom_password').addClass('hidden');
+    $('#custom_password').removeClass('hidden');
 
 }).on('change', password_strategy_radio_input, function(){
         passwordStrategyFieldsDisplay()

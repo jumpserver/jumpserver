@@ -42,27 +42,13 @@
                                     <h3>{% trans "Security setting" %}</h3>
                                     {% for field in form %}
 
-                                        {% if forloop.counter == 7 %}
+                                        {% if forloop.counter == 6 %}
                                             <div class="hr-line-dashed"></div>
                                             <h3>{% trans "Password check rule" %}</h3>
                                         {% endif %}
 
                                         {% if not field.field|is_bool_field %}
-                                            {% if forloop.counter == 2 %}
-                                                <div style="padding-bottom: 15px;padding-left: 1.3%">
-                                                    <div style="width:89%">
-                                                        <label  class="col-md-2 control-label" for="id_SECURITY_USER_INITIAL_PASSWORD">{% trans 'User Initial Password' %}</label>
-                                                        <div class="col-md-9" >
-                                                            <input  type="password" name="SECURITY_USER_INITIAL_PASSWORD" maxlength="128" class="form-control" title="" id="id_SECURITY_USER_INITIAL_PASSWORD">
-                                                        </div>
-                                                    </div>
-                                                    <div >
-                                                        <button id="clear_initial_password" class="btn btn-default" style="width: 9.7%;" type="reset"> {% trans 'Clear initial password' %}</button>
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                {% bootstrap_field field layout="horizontal" %}
-                                            {% endif %}
+                                            {% bootstrap_field field layout="horizontal" %}
                                         {% else %}
                                             <div class="form-group">
                                                 <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
@@ -99,37 +85,5 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).ready(function () {
-}).on('click', '#clear_initial_password', function () {
-    swal({
-        title: "{% trans 'Are you sure?' %}",
-        text: "{% trans 'This will be clear the initial password !!!' %}",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: "{% trans 'Cancel' %}",
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "{% trans 'Confirm' %}",
-        closeOnConfirm: false
-        }, function() {
-            var success = function() {
-                var msg = "{% trans 'Clear initial password successfully.' %}";
-                swal("{% trans 'Clear Initial Password' %}", msg, "success");
-                setTimeout( function () {
-                    window.location.reload();}, 1000);
-
-            };
-            var fail = function() {
-                var msg = "{% trans 'Clear initial password failed.' %}";
-                swal("{% trans 'Clear Initial Password' %}", msg, "error");
-            };
-            var the_url =  "{% url "api-settings:initial-password" %}";
-            APIUpdateAttr({
-                url:the_url,
-                method: 'DELETE',
-                success:success,
-                error:fail
-            });
-    });
-})
 </script>
 {% endblock %}

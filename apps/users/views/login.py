@@ -114,10 +114,6 @@ class UserResetPasswordView(TemplateView):
                 request,
                 errors=_('* Your password does not meet the requirements')
             )
-        # 设置的密码不能和系统设置的初始化密码一样
-        if password == settings.SECURITY_USER_INITIAL_PASSWORD:
-            error = _('The password cannot be the same as the initial password')
-            return self.get(request, errors=error)
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
