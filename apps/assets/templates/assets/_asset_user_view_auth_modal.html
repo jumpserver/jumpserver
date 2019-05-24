@@ -122,7 +122,7 @@ $(document).ready(function () {
         showAuth()
     };
     var error = function () {
-        $("#mfa_error").addClass("error").html("Code error");
+        $("#mfa_error").addClass("text-danger").html("Code error");
     };
     APIUpdateAttr({
         url: url,

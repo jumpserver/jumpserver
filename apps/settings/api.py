@@ -79,7 +79,7 @@ class LDAPTestingAPI(APIView):
         util = self.get_ldap_util(serializer)
 
         try:
-            users = util.get_search_user_items()
+            users = util.search_user_items()
         except Exception as e:
             return Response({"error": str(e)}, status=401)
 
@@ -95,7 +95,7 @@ class LDAPUserListApi(APIView):
     def get(self, request):
         util = LDAPUtil()
         try:
-            users = util.get_search_user_items()
+            users = util.search_user_items()
         except Exception as e:
             users = []
             logger.error(e, exc_info=True)
@@ -108,11 +108,11 @@ class LDAPUserSyncAPI(APIView):
     permission_classes = (IsOrgAdmin,)
 
     def post(self, request):
-        user_names = request.data.get('user_names', '')
+        username_list = request.data.get('username_list', [])
 
         util = LDAPUtil()
         try:
-            result = util.sync_users(username_set=user_names)
+            result = util.sync_users(username_list)
         except Exception as e:
             logger.error(e, exc_info=True)
             return Response({'error': str(e)}, status=401)

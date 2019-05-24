@@ -7,6 +7,8 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
+from users.utils import construct_user_email
+
 logger = _LDAPConfig.get_logger()
 
 
@@ -86,13 +88,18 @@ class LDAPUser(_LDAPUser):
         return user_dn
 
     def _populate_user_from_attributes(self):
-        super()._populate_user_from_attributes()
-        if not hasattr(self._user, 'email') or '@' not in self._user.email:
-            if '@' not in self._user.username:
-                email = '{}@{}'.format(self._user.username, settings.EMAIL_SUFFIX)
+        for field, attr in self.settings.USER_ATTR_MAP.items():
+            try:
+                value = self.attrs[attr][0]
+            except LookupError:
+                logger.warning("{} does not have a value for the attribute {}".format(self.dn, attr))
             else:
-                email = self._user.username
-            setattr(self._user, 'email', email)
+                if not hasattr(self._user, field):
+                    continue
+                if isinstance(getattr(self._user, field), bool):
+                    value = value.lower() in ['true', '1']
+                setattr(self._user, field, value)
 
-
-
+        email = getattr(self._user, 'email', '')
+        email = construct_user_email(email, self._user.username)
+        setattr(self._user, 'email', email)

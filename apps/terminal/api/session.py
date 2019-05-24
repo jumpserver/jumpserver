@@ -67,7 +67,6 @@ class CommandViewSet(viewsets.ViewSet):
 
     """
     command_store = get_command_storage()
-    multi_command_storage = get_multi_command_storage()
     serializer_class = SessionCommandSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
@@ -88,7 +87,8 @@ class CommandViewSet(viewsets.ViewSet):
             return Response({"msg": msg}, status=401)
 
     def list(self, request, *args, **kwargs):
-        queryset = self.multi_command_storage.filter()
+        multi_command_storage = get_multi_command_storage()
+        queryset = multi_command_storage.filter()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 

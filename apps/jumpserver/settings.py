@@ -357,6 +357,12 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = False
 EMAIL_SUBJECT_PREFIX = '[JMS] '
 
+#Email custom content
+EMAIL_CUSTOM_USER_CREATED_SUBJECT = ''
+EMAIL_CUSTOM_USER_CREATED_HONORIFIC = ''
+EMAIL_CUSTOM_USER_CREATED_BODY = ''
+EMAIL_CUSTOM_USER_CREATED_SIGNATURE = ''
+
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -371,6 +377,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FileUploadParser',
         'common.parsers.JMSCSVParser'
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -519,12 +527,7 @@ DEFAULT_TERMINAL_COMMAND_STORAGE = {
     },
 }
 
-TERMINAL_COMMAND_STORAGE = {
-    # 'ali-es': {
-    #     'TYPE': 'elasticsearch',
-    #     'HOSTS': ['http://elastic:changeme@localhost:9200'],
-    # },
-}
+TERMINAL_COMMAND_STORAGE = CONFIG.TERMINAL_COMMAND_STORAGE
 
 DEFAULT_TERMINAL_REPLAY_STORAGE = {
     "default": {

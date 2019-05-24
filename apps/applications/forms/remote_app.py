@@ -8,6 +8,7 @@ from orgs.mixins import OrgModelForm
 from assets.models import Asset, SystemUser
 
 from ..models import RemoteApp
+from .. import const
 
 
 __all__ = [
@@ -109,3 +110,23 @@ class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
             })
         }
 
+    def _clean_params(self):
+        app_type = self.data.get('type')
+        fields = const.REMOTE_APP_TYPE_MAP_FIELDS.get(app_type, [])
+        params = {}
+        for field in fields:
+            name = field['name']
+            value = self.cleaned_data[name]
+            params.update({name: value})
+        return params
+
+    def _save_params(self, instance):
+        params = self._clean_params()
+        instance.params = params
+        instance.save()
+        return instance
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        instance = self._save_params(instance)
+        return instance
