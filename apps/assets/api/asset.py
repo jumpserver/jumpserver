@@ -16,7 +16,7 @@ from django.urls import reverse_lazy
 from django.core.cache import cache
 from django.db.models import Q
 
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import IDInCacheFilterMixin, ApiMessageMixin
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
@@ -36,7 +36,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDInCacheFilterMixin, LabelFilter, BulkModelViewSet):
+class AssetViewSet(IDInCacheFilterMixin, LabelFilter, ApiMessageMixin, BulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -47,6 +47,7 @@ class AssetViewSet(IDInCacheFilterMixin, LabelFilter, BulkModelViewSet):
     serializer_class = serializers.AssetSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
+    success_message = _("%(hostname)s was %(action)s successfully")
 
     def set_assets_node(self, assets):
         if not isinstance(assets, list):

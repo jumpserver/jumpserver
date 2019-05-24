@@ -11,9 +11,8 @@ from django.conf import settings
 
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
-from users.models import UserGroup
-from assets.models import RemoteApp
 
+from ..hands import RemoteApp, UserGroup
 from ..models import RemoteAppPermission
 from ..forms import RemoteAppPermissionCreateUpdateForm
 

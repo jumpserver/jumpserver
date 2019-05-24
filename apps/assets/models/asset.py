@@ -12,11 +12,12 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
 from orgs.mixins import OrgModelMixin, OrgManager
 
-__all__ = ['Asset']
+__all__ = ['Asset', 'Protocol']
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +48,29 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
+class Protocol(models.Model):
+    PROTOCOL_SSH = 'ssh'
+    PROTOCOL_RDP = 'rdp'
+    PROTOCOL_TELNET = 'telnet'
+    PROTOCOL_VNC = 'vnc'
+    PROTOCOL_CHOICES = (
+        (PROTOCOL_SSH, 'ssh'),
+        (PROTOCOL_RDP, 'rdp'),
+        (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_VNC, 'vnc'),
+    )
+    PORT_VALIDATORS = [MaxValueValidator(65535), MinValueValidator(1)]
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=16, choices=PROTOCOL_CHOICES,
+                            default=PROTOCOL_SSH, verbose_name=_("Name"))
+    port = models.IntegerField(default=22, verbose_name=_("Port"),
+                               validators=PORT_VALIDATORS)
+
+    def __str__(self):
+        return "{}:{}".format(self.name, self.port)
+
+
 class Asset(OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
@@ -59,22 +83,15 @@ class Asset(OrgModelMixin):
         ('Other', 'Other'),
     )
 
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_TELNET = 'telnet'
-    PROTOCOL_VNC = 'vnc'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet (beta)'),
-        (PROTOCOL_VNC, 'vnc'),
-    )
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=128, default=Protocol.PROTOCOL_SSH,
+                                choices=Protocol.PROTOCOL_CHOICES,
+                                verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
+
+    protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocol"))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
@@ -84,7 +101,7 @@ class Asset(OrgModelMixin):
     admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
 
     # Some information
-    public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
+    public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     # Collect

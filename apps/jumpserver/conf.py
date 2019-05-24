@@ -274,7 +274,10 @@ class Config(dict):
             return v
         tp = type(default_value)
         try:
-            v = tp(v)
+            if tp in [list, dict]:
+                v = json.loads(v)
+            else:
+                v = tp(v)
         except Exception:
             pass
         return v

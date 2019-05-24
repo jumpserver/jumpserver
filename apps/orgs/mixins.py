@@ -9,8 +9,10 @@ from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from common.utils import get_logger
+from common.validators import ProjectUniqueValidator
 from .utils import (
     current_org, set_current_org, set_to_root_org, get_current_org_id
 )
@@ -214,3 +216,14 @@ class OrgResourceSerializerMixin(serializers.Serializer):
     (同时为serializer.is_valid()对Model的unique_together校验做准备)
     """
     org_id = serializers.HiddenField(default=get_current_org_id)
+
+    def get_validators(self):
+        _validators = super().get_validators()
+        validators = []
+
+        for v in _validators:
+            if isinstance(v, UniqueTogetherValidator) \
+                    and "org_id" in v.fields:
+                v = ProjectUniqueValidator(v.queryset, v.fields)
+            validators.append(v)
+        return validators
