@@ -54,11 +54,7 @@ class UserCreateUpdateForm(OrgModelForm):
             'phone', 'role', 'date_expired', 'comment', 'otp_level'
         ]
         widgets = {
-            'otp_level': forms.RadioSelect(
-                attrs={
-                    'class': 'form-inline'
-                }
-            ),
+            'otp_level': forms.RadioSelect(),
             'groups': forms.SelectMultiple(
                 attrs={
                     'class': 'select2',
