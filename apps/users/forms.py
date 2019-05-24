@@ -1,15 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 
 from django import forms
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
-
-from settings.models import Setting
 
 
 class UserCheckPasswordForm(forms.Form):
@@ -87,12 +84,6 @@ class UserCreateUpdateForm(OrgModelForm):
 
         field = self.fields['role']
         field.choices = set(roles)
-
-    @staticmethod
-    def get_user_initial_password():
-        if Setting.objects.filter(name='SECURITY_USER_INITIAL_PASSWORD'):
-            return True
-        return False
 
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']

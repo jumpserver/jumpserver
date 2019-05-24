@@ -348,7 +348,6 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 
-
 # Email config
 EMAIL_HOST = 'smtp.jumpserver.org'
 EMAIL_PORT = 25

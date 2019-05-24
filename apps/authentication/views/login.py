@@ -73,7 +73,6 @@ class UserLoginView(FormView):
         username = self.request.POST.get('username')
         if is_block_login(username, ip):
             return self.render_to_response(self.get_context_data(block_login=True))
-
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -148,15 +147,6 @@ class UserLoginView(FormView):
                 sender=self.__class__, username=username,
                 request=self.request, reason=reason
             )
-
-    def user_login_yes_or_no_reset_password(self, username):
-        user = User.objects.filter(username=username)
-        if user:
-            user = user[0]
-            password = self.request.POST.get('password')
-            if password == settings.SECURITY_USER_INITIAL_PASSWORD and not user.password:
-                return user.generate_reset_token()
-        return False
 
 
 class UserLoginOtpView(FormView):
