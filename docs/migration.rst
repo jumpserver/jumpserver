@@ -18,7 +18,7 @@
 .. code-block:: shell
 
     $ yum -y install wget gcc epel-release git
-    $ yum -y install mariadb mariadb-devel mariadb-server
+    $ yum -y install mariadb mariadb-devel mariadb-server mariadb-shared
     $ yum -y install redis
 
     $ systemctl enable redis

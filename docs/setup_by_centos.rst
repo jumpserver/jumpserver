@@ -112,7 +112,7 @@
 
 .. code-block:: shell
 
-    $ yum -y install mariadb mariadb-devel mariadb-server # centos7下安装的是mariadb
+    $ yum -y install mariadb mariadb-devel mariadb-server mariadb-shared # centos7下安装的是mariadb
     $ systemctl enable mariadb
     $ systemctl start mariadb
 

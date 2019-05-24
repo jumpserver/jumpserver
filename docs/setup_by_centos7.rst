@@ -52,7 +52,7 @@ CentOS 7 安装文档
     $ systemctl start redis
 
     # 安装 MySQL, 如果不使用 Mysql 可以跳过相关 Mysql 安装和配置, 支持sqlite3, mysql, postgres等
-    $ yum -y install mariadb mariadb-devel mariadb-server # centos7下叫mariadb, 用法与mysql一致
+    $ yum -y install mariadb mariadb-devel mariadb-server mariadb-shared # centos7下叫mariadb, 用法与mysql一致
     $ systemctl enable mariadb
     $ systemctl start mariadb
     # 创建数据库 Jumpserver 并授权

@@ -32,7 +32,7 @@
       && rpm --import https://mirrors.aliyun.com/docker-ce/linux/centos/gpg \
       && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
       && rpm --import https://nginx.org/keys/nginx_signing.key \
-      && yum -y install redis mariadb mariadb-devel mariadb-server nginx docker-ce \
+      && yum -y install redis mariadb mariadb-devel mariadb-server mariadb-shared nginx docker-ce \
       && systemctl enable redis mariadb nginx docker \
       && systemctl start redis mariadb \
       && yum -y install python36 python36-devel \
