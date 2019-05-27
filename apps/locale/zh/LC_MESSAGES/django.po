@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-24 19:17+0800\n"
+"POT-Creation-Date: 2019-05-27 15:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -3407,35 +3407,35 @@ msgid ""
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: settings/forms.py:185
+#: settings/forms.py:186
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: settings/forms.py:189
+#: settings/forms.py:190
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: settings/forms.py:191
+#: settings/forms.py:192
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/forms.py:197
+#: settings/forms.py:199
 msgid "Connection max idle time"
 msgstr "SSH最大空闲时间"
 
-#: settings/forms.py:199
+#: settings/forms.py:201
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
 msgstr "提示：（单位：分）如果超过该配置没有操作，连接会被断开（仅ssh）"
 
-#: settings/forms.py:205
+#: settings/forms.py:207
 msgid "Password expiration time"
 msgstr "密码过期时间"
 
-#: settings/forms.py:208
+#: settings/forms.py:209
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -3445,81 +3445,81 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/forms.py:217
+#: settings/forms.py:218
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: settings/forms.py:221
+#: settings/forms.py:222
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: settings/forms.py:223
+#: settings/forms.py:224
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: settings/forms.py:228
+#: settings/forms.py:229
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: settings/forms.py:229
+#: settings/forms.py:230
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: settings/forms.py:234
+#: settings/forms.py:235
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: settings/forms.py:235
+#: settings/forms.py:236
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: settings/forms.py:240
+#: settings/forms.py:241
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: settings/forms.py:241
+#: settings/forms.py:242
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 
-#: settings/forms.py:248
+#: settings/forms.py:249
 msgid "Create user email subject"
 msgstr "创建用户邮件的主题"
 
-#: settings/forms.py:249
+#: settings/forms.py:250
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/forms.py:253
+#: settings/forms.py:254
 msgid "Create user honorific"
 msgstr "创建用户邮件的敬语"
 
-#: settings/forms.py:254
+#: settings/forms.py:255
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
 
-#: settings/forms.py:259
+#: settings/forms.py:260
 msgid "Create user email content"
 msgstr "创建用户邮件的内容"
 
-#: settings/forms.py:260
+#: settings/forms.py:261
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
 
-#: settings/forms.py:263
+#: settings/forms.py:264
 msgid "Signature"
 msgstr "署名"
 
-#: settings/forms.py:264
+#: settings/forms.py:265
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "提示: 邮件的署名 (例如: jumpserver)"
 
