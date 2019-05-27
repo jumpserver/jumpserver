@@ -48,6 +48,12 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
+class AssetManager(OrgManager):
+    def get_queryset(self):
+        queryset = super().get_queryset().prefetch_related("nodes", "protocols")
+        return queryset
+
+
 class Protocol(models.Model):
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
@@ -127,7 +133,7 @@ class Asset(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = OrgManager.from_queryset(AssetQuerySet)()
+    objects = AssetManager.from_queryset(AssetQuerySet)()
     CONNECTIVITY_CACHE_KEY = '_JMS_ASSET_CONNECTIVITY_{}'
     UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
     CONNECTIVITY_CHOICES = (
@@ -148,18 +154,38 @@ class Asset(OrgModelMixin):
             return True, ''
         return False, warning
 
-    def support_ansible(self):
-        if self.platform in ("Windows", "Windows2016", "Other"):
-            return False
-        if self.protocol != 'ssh':
-            return False
-        return True
+    @property
+    def protocols_name(self):
+        names = []
+        for protocol in self.protocols.all():
+            names.append(protocol.name)
+        return names
+
+    def has_protocol(self, name):
+        return name in self.protocols_name
+
+    def get_protocol_by_name(self, name):
+        for i in self.protocols.all():
+            if i.name.lower() == name.lower():
+                return i
+        return None
+
+    @property
+    def protocol_ssh(self):
+        return self.get_protocol_by_name("ssh")
+
+    @property
+    def protocol_rdp(self):
+        return self.get_protocol_by_name("rdp")
 
     def is_unixlike(self):
-        if self.platform not in ("Windows", "Windows2016"):
+        if self.platform not in ("Windows", "Windows2016", "Other"):
             return True
         else:
             return False
+
+    def is_support_ansible(self):
+        return self.has_protocol('ssh') and self.platform not in ("Other",)
 
     def get_nodes(self):
         from .node import Node
@@ -188,6 +214,15 @@ class Asset(OrgModelMixin):
             else:
                 filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
         return Asset.objects.filter(filter_arg)
+
+    @property
+    def cpu_info(self):
+        info = ""
+        if self.cpu_model:
+            info += self.cpu_model
+        if self.cpu_count and self.cpu_cores:
+            info += "{}*{}".format(self.cpu_count, self.cpu_cores)
+        return info
 
     @property
     def hardware_info(self):
@@ -232,35 +267,6 @@ class Asset(OrgModelMixin):
         fake_node.is_node = False
         return fake_node
 
-    def to_json(self):
-        info = {
-            'id': self.id,
-            'hostname': self.hostname,
-            'ip': self.ip,
-            'port': self.port,
-        }
-        if self.domain and self.domain.gateway_set.all():
-            info["gateways"] = [d.id for d in self.domain.gateway_set.all()]
-        return info
-
-    def _to_secret_json(self):
-        """
-        Ansible use it create inventory
-        Todo: May be move to ops implements it
-        """
-        data = self.to_json()
-        if self.admin_user:
-            self.admin_user.load_specific_asset_auth(self)
-            admin_user = self.admin_user
-            data.update({
-                'username': admin_user.username,
-                'password': admin_user.password,
-                'private_key': admin_user.private_key_file,
-                'become': admin_user.become_info,
-                'groups': [node.value for node in self.nodes.all()],
-            })
-        return data
-
     def as_tree_node(self, parent_node):
         from common.tree import TreeNode
         icon_skin = 'file'
@@ -282,9 +288,11 @@ class Asset(OrgModelMixin):
                     'id': self.id,
                     'hostname': self.hostname,
                     'ip': self.ip,
-                    'port': self.port,
+                    'protocols': [
+                        {"name": p.name, "port": p.port}
+                        for p in self.protocols.all()
+                    ],
                     'platform': self.platform,
-                    'protocol': self.protocol,
                 }
             }
         }
@@ -308,10 +316,10 @@ class Asset(OrgModelMixin):
             asset = cls(ip='.'.join(ip),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
-                        port=22,
                         created_by='Fake')
             try:
                 asset.save()
+                asset.protocols.create(name="ssh", port=22)
                 if nodes and len(nodes) > 3:
                     _nodes = random.sample(nodes, 3)
                 else:

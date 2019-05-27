@@ -62,7 +62,7 @@
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        {% if asset.protocol == 'ssh' %}
+                                        {% if asset.is_support_ansible %}
                                             <tr class="no-borders-tr">
                                                 <td>{% trans 'Test connective' %}:</td>
                                                 <td>
@@ -118,7 +118,7 @@ function initAssetUserTable() {
                 var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-username="DEFAULT_USERNAME">{% trans "View auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
                 btn += view_btn;
-                {% if asset.protocol == 'ssh' %}
+                {% if asset.is_support_ansible %}
                     btn += test_btn;
                 {% endif %}
                 $(td).html(btn);

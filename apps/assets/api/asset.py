@@ -168,8 +168,8 @@ class AssetGatewayApi(generics.RetrieveAPIView):
         asset = get_object_or_404(Asset, pk=asset_id)
 
         if asset.domain and \
-                asset.domain.gateways.filter(protocol=asset.protocol).exists():
-            gateway = random.choice(asset.domain.gateways.filter(protocol=asset.protocol))
+                asset.domain.gateways.filter(protocol='ssh').exists():
+            gateway = random.choice(asset.domain.gateways.filter(protocol='ssh'))
             serializer = serializers.GatewayWithAuthSerializer(instance=gateway)
             return Response(serializer.data)
         else:

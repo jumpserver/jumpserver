@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
-from common.validators import ProjectUniqueValidator
 from ..models import Asset, Protocol
 from .system_user import AssetSystemUserSerializer
 
@@ -24,7 +23,8 @@ class ProtocolSerializer(serializers.ModelSerializer):
         fields = ["name", "port"]
 
 
-class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin, serializers.ModelSerializer):
+class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
+                      serializers.ModelSerializer):
     protocols = ProtocolSerializer(many=True)
 
     """

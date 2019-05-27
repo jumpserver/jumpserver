@@ -182,7 +182,7 @@ class AssetPermissionUtil:
         for perm in permissions:
             for asset in perm.assets.all().valid().prefetch_related('nodes'):
                 assets[asset].update(
-                    perm.system_users.filter(protocol=asset.protocol)
+                    perm.system_users.filter(protocol__in=asset.protocols_name)
                 )
         return assets
 
@@ -213,7 +213,7 @@ class AssetPermissionUtil:
             _assets = node.get_all_assets().valid().prefetch_related('nodes')
             for asset in _assets:
                 assets[asset].update(
-                    [s for s in system_users if s.protocol == asset.protocol]
+                    [s for s in system_users if asset.has_protocol(s.protocol)]
                 )
         self._assets = assets
         self._setattr_actions_to_system_user()
@@ -226,15 +226,12 @@ class AssetPermissionUtil:
             resource=resource
         )
 
-    @property
     def node_key(self):
         return self.get_cache_key('NODES_WITH_ASSETS')
 
-    @property
     def asset_key(self):
         return self.get_cache_key('ASSETS')
 
-    @property
     def system_key(self):
         return self.get_cache_key('SYSTEM_USER')
 
@@ -265,7 +262,8 @@ class AssetPermissionUtil:
         tree = GenerateTree()
         for asset, system_users in assets.items():
             tree.add_asset(asset, system_users)
-        return tree.get_nodes()
+        nodes = tree.get_nodes()
+        return nodes
 
     def get_nodes_with_assets_from_cache(self):
         cached = cache.get(self.node_key)
@@ -405,7 +403,7 @@ def parse_node_to_tree_node(node):
 
 
 def parse_asset_to_tree_node(node, asset, system_users):
-    system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
+    system_users_protocol_matched = [s for s in system_users if asset.has_protocol(s.protocol)]
     icon_skin = 'file'
     if asset.platform.lower() == 'windows':
         icon_skin = 'windows'
@@ -438,8 +436,8 @@ def parse_asset_to_tree_node(node, asset, system_users):
                 'id': asset.id,
                 'hostname': asset.hostname,
                 'ip': asset.ip,
-                'port': asset.port,
-                'protocol': asset.protocol,
+                'protocols': [{"name": p.name, "port": p.port}
+                              for p in asset.protocols.all()],
                 'platform': asset.platform,
                 'domain': None if not asset.domain else asset.domain.id,
                 'is_active': asset.is_active,

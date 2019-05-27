@@ -31,7 +31,7 @@ def check_asset_can_run_ansible(asset):
         msg = _("Asset has been disabled, skipped: {}").format(asset)
         logger.info(msg)
         return False
-    if not asset.support_ansible():
+    if not asset.is_support_ansible():
         msg = _("Asset may not be support ansible, skipped: {}").format(asset)
         logger.info(msg)
         return False
