@@ -227,7 +227,7 @@ class AssetPermissionUtil:
         for asset, system_users in assets.items():
             for system_user, attr_dict in system_users.items():
                 setattr(system_user, 'actions', attr_dict['actions'])
-            __assets[asset] = system_users.keys()
+            __assets[asset] = set(system_users.keys())
 
         self._assets = __assets
         return self._assets
@@ -259,7 +259,6 @@ class AssetPermissionUtil:
         return cached
 
     def get_assets(self):
-        return self.get_assets_without_cache()
         if self._is_not_using_cache():
             return self.get_assets_from_cache()
         elif self._is_refresh_cache():
