@@ -221,6 +221,3 @@ class DjangoSettingsAPI(APIView):
                     except (json.JSONDecodeError, TypeError):
                         data[k] = str(v)
         return Response(data)
-
-
-
