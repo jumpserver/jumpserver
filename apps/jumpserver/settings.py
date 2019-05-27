@@ -378,8 +378,8 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
+        'common.parsers.JMSCSVParser',
         'rest_framework.parsers.FileUploadParser',
-        'common.parsers.JMSCSVParser'
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         # 'rest_framework.authentication.BasicAuthentication',
