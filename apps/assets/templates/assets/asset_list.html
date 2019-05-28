@@ -628,7 +628,7 @@ $(document).ready(function(){
     var id_list = asset_table.selected;
     if (id_list.length === 0) {
         return false;
-     }
+    }
     var the_url = "{% url 'api-assets:asset-list' %}";
     var data = {
         'resources': id_list
