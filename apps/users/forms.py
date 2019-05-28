@@ -21,13 +21,7 @@ class UserCheckOtpCodeForm(forms.Form):
     otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
-class UserCreateUpdateForm(OrgModelForm):
-    EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
-    CUSTOM_PASSWORD = _('Set password')
-    PASSWORD_STRATEGY_CHOICES = (
-        (0, EMAIL_SET_PASSWORD),
-        (1, CUSTOM_PASSWORD)
-    )
+class UserCreateUpdateFormMixin(OrgModelForm):
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
         label=_('Password'), widget=forms.PasswordInput,
@@ -41,10 +35,6 @@ class UserCreateUpdateForm(OrgModelForm):
         label=_('ssh public key'), max_length=5000, required=False,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
         help_text=_('Paste user id_rsa.pub here.')
-    )
-    password_strategy = forms.ChoiceField(
-        choices=PASSWORD_STRATEGY_CHOICES, required=True, initial=0,
-        widget=forms.RadioSelect(), label=_('Password strategy')
     )
 
     class Meta:
@@ -65,7 +55,7 @@ class UserCreateUpdateForm(OrgModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
-        super(UserCreateUpdateForm, self).__init__(*args, **kwargs)
+        super(UserCreateUpdateFormMixin, self).__init__(*args, **kwargs)
 
         roles = []
         # Super admin user
@@ -113,6 +103,23 @@ class UserCreateUpdateForm(OrgModelForm):
             user.public_key = public_key
             user.save()
         return user
+
+
+class UserCreateForm(UserCreateUpdateFormMixin):
+    EMAIL_SET_PASSWORD = _('Reset link will be generated and sent to the user')
+    CUSTOM_PASSWORD = _('Set password')
+    PASSWORD_STRATEGY_CHOICES = (
+        (0, EMAIL_SET_PASSWORD),
+        (1, CUSTOM_PASSWORD)
+    )
+    password_strategy = forms.ChoiceField(
+        choices=PASSWORD_STRATEGY_CHOICES, required=True, initial=0,
+        widget=forms.RadioSelect(), label=_('Password strategy')
+    )
+
+
+class UserUpdateForm(UserCreateUpdateFormMixin):
+    pass
 
 
 class UserProfileForm(forms.ModelForm):
