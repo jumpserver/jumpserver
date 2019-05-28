@@ -75,7 +75,7 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
 class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = create_success_msg
@@ -108,7 +108,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
