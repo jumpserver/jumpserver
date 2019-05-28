@@ -221,3 +221,20 @@ FAQ
     >>> user = User.objects.get(username='admin')
     >>> user.public_key = '明文key'
     >>> user.save()
+
+11. 登录提示登录频繁
+
+.. code-block:: shell
+
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/utils
+    $ sh unblock_all_user.sh
+
+    # 如果不存在 unblock_all_user.sh 文件
+    $ source /opt/py3/bin/activate
+    $ cd /opt/jumpserver/apps
+    $ python manage.py shell
+    >>> from django.core.cache import cache
+    >>> cache.delete_pattern('_LOGIN_BLOCK_*')
+    >>> cache.delete_pattern('_LOGIN_LIMIT_*')
+    >>> exit()
