@@ -173,7 +173,7 @@ DATABASES = {
         'OPTIONS': DB_OPTIONS
     }
 }
-DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'ca.pem')
+DB_CA_PATH = os.path.join(PROJECT_DIR, 'data', 'certs', 'db_ca.pem')
 if CONFIG.DB_ENGINE.lower() == 'mysql':
     DB_OPTIONS['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
     if os.path.isfile(DB_CA_PATH):
@@ -426,6 +426,12 @@ AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'
 AUTH_LDAP_SEARCH_FILTER = '(cn=%(user)s)'
 AUTH_LDAP_START_TLS = False
 AUTH_LDAP_USER_ATTR_MAP = {"username": "cn", "name": "sn", "email": "mail"}
+AUTH_LDAP_GLOBAL_OPTIONS = {
+    ldap.OPT_X_TLS_REQUIRE_CERT: ldap.OPT_X_TLS_NEVER,
+}
+LDAP_CERT_FILE = os.path.join(PROJECT_DIR, "data", "certs", "ldap_ca.pem")
+if os.path.isfile(LDAP_CERT_FILE):
+    AUTH_LDAP_GLOBAL_OPTIONS[ldap.OPT_X_TLS_CACERTFILE] = LDAP_CERT_FILE
 # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
 # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
 # AUTH_LDAP_GROUP_SEARCH = LDAPSearch(

@@ -121,9 +121,9 @@ class LDAPSettingForm(BaseForm):
     )
     # AUTH_LDAP_GROUP_SEARCH_OU = CONFIG.AUTH_LDAP_GROUP_SEARCH_OU
     # AUTH_LDAP_GROUP_SEARCH_FILTER = CONFIG.AUTH_LDAP_GROUP_SEARCH_FILTER
-    AUTH_LDAP_START_TLS = forms.BooleanField(
-        label=_("Use SSL"), required=False
-    )
+    # AUTH_LDAP_START_TLS = forms.BooleanField(
+    #     label=_("Use SSL"), required=False
+    # )
     AUTH_LDAP = forms.BooleanField(label=_("Enable LDAP auth"), required=False)
 
 
