@@ -66,7 +66,7 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-
+var users_table = 0;
 function initTable() {
      var options = {
         ele: $('#user_list_table'),
@@ -122,23 +122,19 @@ function initTable() {
         ],
         op_html: $('#actions').html()
     };
-    var table = jumpserver.initServerSideDataTable(options);
-    return table
+    users_table = jumpserver.initServerSideDataTable(options);
+    return users_table
 }
 
 
 $(document).ready(function(){
-    var table = initTable();
+    initTable();
     var fields = $('#fm_user_bulk_update .form-group');
     $.each(fields, function (index, value) {
         console.log(value)
     });
     $('.btn_export').click(function () {
-        var rows = table.rows('.selected').data();
-        var users = [];
-        $.each(rows, function (index, obj) {
-            users.push(obj.id)
-        });
+        var users = users_table.selected;
         var data = {
             'resources': users
         };
@@ -171,11 +167,7 @@ $(document).ready(function(){
         });
     });
     $('#download_update_template').click(function () {
-        var rows = table.rows('.selected').data();
-        var users = [];
-        $.each(rows, function (index, obj) {
-            users.push(obj.id)
-        });
+        var users = users_table.selected;
         var data = {
             'resources': users
         };
@@ -209,11 +201,7 @@ $(document).ready(function(){
 
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#user_list_table').DataTable();
-    var id_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        id_list.push(this.data().id);
-    });
+    var id_list = users_table.selected;
     if (id_list.length === 0) {
         return false;
     }

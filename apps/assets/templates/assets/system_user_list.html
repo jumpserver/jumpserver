@@ -68,6 +68,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+var system_user_table = 0;
 function initTable() {
     var options = {
         ele: $('#system_user_list_table'),
@@ -125,7 +126,8 @@ function initTable() {
         ],
         op_html: $('#actions').html()
         };
-    jumpserver.initServerSideDataTable(options);
+    system_user_table = jumpserver.initServerSideDataTable(options);
+    return system_user_table
 }
 
 $(document).ready(function(){
@@ -198,12 +200,7 @@ $(document).ready(function(){
     }
 })
 .on('click', '.btn_export', function () {
-    var data_table = $('#system_user_list_table').DataTable();
-    var rows = data_table.rows('.selected').data();
-    var system_users = [];
-    $.each(rows, function (index, obj) {
-        system_users.push(obj.id)
-    });
+    var system_users = system_user_table.selected;
     var data = {
         'resources': system_users
     };
@@ -235,12 +232,7 @@ $(document).ready(function(){
     });
 })
 .on('click', '#download_update_template', function () {
-    var data_table = $('#system_user_list_table').DataTable();
-    var rows = data_table.rows('.selected').data();
-    var system_users = [];
-    $.each(rows, function (index, obj) {
-        system_users.push(obj.id)
-    });
+    var system_users = system_user_table.selected;
     var data = {
         'resources': system_users
     };

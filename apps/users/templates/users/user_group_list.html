@@ -46,7 +46,8 @@
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).ready(function() {
+var groups_table = 0;
+function initTable() {
     var options = {
         ele: $('#group_list_table'),
         buttons: [],
@@ -84,7 +85,11 @@ $(document).ready(function() {
         order: [],
         op_html: $('#actions').html()
     };
-    jumpserver.initServerSideDataTable(options);
+    groups_table = jumpserver.initServerSideDataTable(options);
+    return groups_table
+}
+$(document).ready(function() {
+    initTable()
 
 }).on('click', '.btn_delete_user_group', function(){
     var $this = $(this);
@@ -136,12 +141,7 @@ $(document).ready(function() {
             break;
     }
 }).on('click', '.btn_export', function(){
-    var data_table = $('#group_list_table').DataTable();
-    var rows = data_table.rows('.selected').data();
-    var groups = [];
-    $.each(rows, function (index, obj) {
-        groups.push(obj.id)
-    });
+    var groups = groups_table.selected;
     var data = {
         'resources': groups
     };
@@ -172,12 +172,7 @@ $(document).ready(function() {
         });
 })
 .on('click', '#download_update_template', function(){
-    var data_table = $('#group_list_table').DataTable();
-    var rows = data_table.rows('.selected').data();
-    var groups = [];
-    $.each(rows, function (index, obj) {
-        groups.push(obj.id)
-    });
+    var groups = groups_table.selected;
     var data = {
         'resources': groups
     };
