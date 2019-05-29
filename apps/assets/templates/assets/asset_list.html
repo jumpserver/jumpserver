@@ -67,14 +67,26 @@
            </div>
            <div class="mail-box-header">
                <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
-               <div class="html5buttons">
-                   <div class="dt-buttons btn-group">
-                       <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
-                           <span>{% trans "Import" %}</span>
-                       </a>
-                       <a class="btn btn-default btn_export" tabindex="0">
-                           <span>{% trans "Export" %}</span>
-                       </a>
+               <div class="" style="float: right">
+                   <div class=" btn-group">
+                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class=" btn_export" tabindex="0">
+                                <span>{% trans "Export" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                                <span>{% trans "Import" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                                <span>{% trans "Update" %}</span>
+                                </a>
+                            </li>
+                        </ul>
                    </div>
                </div>
                <div class="btn-group" style="float: right">
@@ -140,7 +152,7 @@
 {#        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>#}
     </ul>
 </div>
-
+{% include 'assets/_asset_update_modal.html' %}
 {% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
@@ -457,49 +469,78 @@ $(document).ready(function(){
     asset_table.search(val).draw();
  })
 .on('click', '.btn_export', function () {
-    var $data_table = $('#asset_list_table').DataTable();
-    var rows = $data_table.rows('.selected').data();
-
-    var assets = [];
-    $.each(rows, function (index, obj) {
-        assets.push(obj.id)
-    });
-    $.ajax({
-        url: "{% url "assets:asset-export" %}",
-        method: 'POST',
-        data: JSON.stringify({assets_id: assets, node_id: current_node_id}),
-        dataType: "json",
-        success: function (data, textStatus) {
-            window.open(data.redirect)
-        },
-        error: function () {
-            toastr.error('Export failed');
+    var assets = asset_table.selected;
+    var data = {
+        'resources': assets
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:asset-list' %}",
+        format: 'csv',
+        params: {
+            search: search,
+            node_id: current_node_id || ''
         }
-    })
+    };
+    APIExportData(props);
 })
-.on('click', '#btn_asset_import', function () {
-    var $form = $('#fm_asset_import');
-    var action = $form.attr("action");
+.on('click', '#btn_import_confirm', function () {
+    var file = document.getElementById('id_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var url = "{% url 'api-assets:asset-list' %}";
     if (current_node_id){
-        action = setUrlParam(action, 'node_id', current_node_id);
-        $form.attr("action", action)
+        url = setUrlParam(url, 'node_id', current_node_id);
     }
-    $form.find('.help-block').remove();
-    function success (data) {
-        if (data.valid === false) {
-            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
-        } else {
-            $('#id_created').html(data.created_info);
-            $('#id_created_detail').html(data.created.join(', '));
-            $('#id_updated').html(data.updated_info);
-            $('#id_updated_detail').html(data.updated.join(', '));
-            $('#id_failed').html(data.failed_info);
-            $('#id_failed_detail').html(data.failed.join(', '));
-            var $data_table = $('#asset_list_table').DataTable();
-            $data_table.ajax.reload();
+    var data_table = $('#asset_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "POST",
+        body: file,
+        data_table: data_table
+    });
+})
+.on('click', '#download_update_template', function () {
+    var assets = asset_table.selected;
+    var data = {
+        'resources': assets
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:asset-list' %}?format=csv&template=update",
+        format: 'csv',
+        params: {
+            search: search,
+            node_id: current_node_id || ''
         }
+    };
+    APIExportData(props);
+})
+.on('click', '#btn_update_confirm', function () {
+    var file = document.getElementById('update_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
     }
-    $form.ajaxSubmit({success: success});
+    var url = "{% url 'api-assets:asset-list' %}";
+    if (current_node_id){
+        url = setUrlParam(url, 'node_id', current_node_id);
+    }
+    var data_table = $('#asset_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "PUT",
+        body: file,
+        data_table: data_table
+    });
 })
 .on('click', '.btn-create-asset', function () {
     var url = "{% url 'assets:asset-create' %}";
@@ -584,15 +625,17 @@ $(document).ready(function(){
 })
 .on('click', '#btn_bulk_update', function () {
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#asset_list_table').DataTable();
-    var id_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        id_list.push(this.data().id);
-    });
+    var id_list = asset_table.selected;
     if (id_list.length === 0) {
         return false;
     }
     var the_url = "{% url 'api-assets:asset-list' %}";
+    var data = {
+        'resources': id_list
+    };
+    function refreshTag() {
+        $('#asset_list_table').DataTable().ajax.reload();
+    }
 
     function doDeactive() {
         var data = [];
@@ -601,7 +644,8 @@ $(document).ready(function(){
             data.push(obj);
         });
         function success() {
-            asset_table.ajax.reload()
+            setTimeout( function () {
+                window.location.reload();}, 500);
         }
         APIUpdateAttr({
             url: the_url,
@@ -617,7 +661,8 @@ $(document).ready(function(){
             data.push(obj);
         });
         function success() {
-            asset_table.ajax.reload()
+            setTimeout( function () {
+                window.location.reload();}, 300);
         }
         APIUpdateAttr({
             url: the_url,
@@ -636,68 +681,72 @@ $(document).ready(function(){
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "{% trans 'Confirm' %}",
             closeOnConfirm: false
-        }, function() {
-            var success = function() {
+        },function () {
+            function success(data) {
+                url = setUrlParam(the_url, 'spm', data.spm);
+                APIUpdateAttr({
+                    url:url,
+                    method:'DELETE',
+                    success:refreshTag,
+                    flash_message:false,
+                });
                 var msg = "{% trans 'Asset Deleted.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "success");
-                $('#asset_list_table').DataTable().ajax.reload();
-            };
-            var fail = function() {
+            }
+            function fail() {
                 var msg = "{% trans 'Asset Deleting failed.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "error");
-            };
-            var url_delete = the_url + '?id__in=' + JSON.stringify(id_list);
+            }
             APIUpdateAttr({
-                url: url_delete,
-                method: 'DELETE',
-                success: success,
-                error: fail
-            });
-            $data_table.ajax.reload();
-            jumpserver.checked = false;
-        });
+                url: "{% url 'api-common:resources-cache' %}",
+                method:'POST',
+                body:JSON.stringify(data),
+                success:success,
+                error:fail
+             })
+        })
     }
+
     function doUpdate() {
-        var data = {
-            'assets_id':id_list
-        };
-        function error(data) {
-            toastr.error(JSON.parse(data).error)
+        function fail(data) {
+            toastr.error(JSON.parse(data))
         }
         function success(data) {
-            location.href = data.url;
+            var url = "{% url 'assets:asset-bulk-update' %}";
+            location.href= setUrlParam(url, 'spm', data.spm);
          }
         APIUpdateAttr({
-            'url': "{% url 'api-assets:asset-bulk-update-select' %}",
-            'method': 'POST',
-            'body': JSON.stringify(data),
-            'flash_message': false,
-            'success': success,
-             'error': error,
+            url: "{% url 'api-common:resources-cache' %}",
+            method:'POST',
+            body:JSON.stringify(data),
+            flash_message:false,
+            success:success,
+            error:fail
         })
-    }
+     }
 
     function doRemove() {
-        var nodes = zTree.getSelectedNodes();
-        if (!current_node_id) {
-            return
-        }
+       var nodes = zTree.getSelectedNodes();
+       if (!current_node_id) {
+           return
+       }
 
-        var data = {
-            'assets': id_list
-        };
+       var data = {
+           'assets': id_list
+       };
 
-        var success = function () {
-            asset_table.ajax.reload()
-        };
+       var success = function () {
+           asset_table.ajax.reload()
+       };
 
-        APIUpdateAttr({
-            'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
-            'method': 'PUT',
-            'body': JSON.stringify(data),
-            'success': success
-        })
+       APIUpdateAttr({
+           'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
+           'method': 'PUT',
+           'body': JSON.stringify(data),
+           'success': success
+       })
     }
+
     switch(action) {
         case 'deactive':
             doDeactive();

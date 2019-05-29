@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.core.cache import cache
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
@@ -15,14 +16,29 @@ class AdminUserSerializer(serializers.ModelSerializer):
     """
     管理用户
     """
-    assets_amount = serializers.SerializerMethodField()
-    unreachable_amount = serializers.SerializerMethodField()
-    reachable_amount = serializers.SerializerMethodField()
+    password = serializers.CharField(
+        required=False, write_only=True, label=_('Password')
+    )
+    unreachable_amount = serializers.SerializerMethodField(label=_('Unreachable'))
+    assets_amount = serializers.SerializerMethodField(label=_('Asset'))
+    reachable_amount = serializers.SerializerMethodField(label=_('Reachable'))
 
     class Meta:
         list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
-        fields = '__all__'
+        fields = [
+            'id', 'org_id', 'name', 'username', 'assets_amount',
+            'reachable_amount', 'unreachable_amount', 'password', 'comment',
+            'date_created', 'date_updated', 'become', 'become_method',
+            'become_user', 'created_by',
+        ]
+
+        extra_kwargs = {
+            'date_created': {'label': _('Date created')},
+            'date_updated': {'label': _('Date updated')},
+            'become': {'read_only': True}, 'become_method': {'read_only': True},
+            'become_user': {'read_only': True}, 'created_by': {'read_only': True}
+        }
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

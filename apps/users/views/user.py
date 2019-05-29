@@ -31,7 +31,9 @@ from django.views.generic.detail import DetailView
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
-from common.const import create_success_msg, update_success_msg
+from common.const import (
+    create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
+)
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
 from common.permissions import AdminUserRequiredMixin
@@ -73,15 +75,20 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
 class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Create user')})
-        return context
+        check_rules = get_password_check_rules()
+        context = {
+            'app': _('Users'),
+            'action': _('Create user'),
+            'password_check_rules': check_rules,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -101,7 +108,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
@@ -156,15 +163,12 @@ class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
     id_list = None
 
     def get(self, request, *args, **kwargs):
-        users_id = self.request.GET.get('users_id', '')
-        self.id_list = [i for i in users_id.split(',')]
-
+        spm = request.GET.get('spm', '')
+        users_id = cache.get(KEY_CACHE_RESOURCES_ID.format(spm))
         if kwargs.get('form'):
             self.form = kwargs['form']
         elif users_id:
-            self.form = self.form_class(
-                initial={'users': self.id_list}
-            )
+            self.form = self.form_class(initial={'users': users_id})
         else:
             self.form = self.form_class()
         return super().get(request, *args, **kwargs)

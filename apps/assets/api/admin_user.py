@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
-from common.mixins import IDInFilterMixin
+from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
 from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
@@ -36,7 +36,7 @@ __all__ = [
 ]
 
 
-class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
+class AdminUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """

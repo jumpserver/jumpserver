@@ -1,8 +1,5 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% block table_search %}
-{% endblock %}
-
 {% block help_message %}
     <div class="alert alert-info help-message">
 {#    管理用户是资产（被控服务器）上的root，或拥有 NOPASSWD: ALL sudo权限的用户，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。#}
@@ -11,6 +8,30 @@
     {% trans 'Jumpserver users of the system using the user to `push system user`,  `get assets hardware information`, etc. '%}
     {% trans 'You can set any one for Windows or other hardware.' %}
     </div>
+{% endblock %}
+{% block table_search %}
+    <div class="" style="float: right">
+                   <div class=" btn-group">
+                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class=" btn_export" tabindex="0">
+                                <span>{% trans "Export" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                                <span>{% trans "Import" %}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                                <span>{% trans "Update" %}</span>
+                                </a>
+                            </li>
+                        </ul>
+                   </div>
+               </div>
 {% endblock %}
 
 {% block table_container %}
@@ -36,11 +57,14 @@
     <tbody>
     </tbody>
 </table>
+    {% include 'assets/_admin_user_import_modal.html' %}
+    {% include 'assets/_admin_user_update_modal.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).ready(function(){
+var admin_user_table = 0;
+function initTable() {
     var options = {
         ele: $('#admin_user_list_table'),
         columnDefs: [
@@ -93,7 +117,12 @@ $(document).ready(function(){
         columns: [{data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
                   {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment"}, {data: "id"}]
     };
-    jumpserver.initServerSideDataTable(options)
+    admin_user_table = jumpserver.initServerSideDataTable(options);
+    return admin_user_table
+}
+
+$(document).ready(function(){
+    initTable()
 })
 
 .on('click', '.btn_admin_user_delete', function () {
@@ -107,6 +136,70 @@ $(document).ready(function(){
         $data_table.ajax.reload();
     }, 3000);
 
-});
+})
+.on('click', '.btn_export', function(){
+    var admin_users = admin_user_table.selected;
+    var data = {
+        'resources': admin_users
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:admin-user-list' %}",
+        format: "csv",
+        params: {
+            search: search
+        }
+    };
+    APIExportData(props);
+}).on('click', '#btn_import_confirm',function () {
+        var url = "{% url 'api-assets:admin-user-list' %}";
+        var file = document.getElementById('id_file').files[0];
+        if(!file){
+            toastr.error("{% trans "Please select file" %}");
+            return
+        }
+        var data_table = $('#admin_user_list_table').DataTable();
+        APIImportData({
+            url: url,
+            method: "POST",
+            body: file,
+            data_table: data_table
+        });
+})
+.on('click', '#download_update_template', function () {
+    var admin_users = admin_user_table.selected;
+    var data = {
+        'resources': admin_users
+    };
+    var search = $("input[type='search']").val();
+    var props = {
+        method: "POST",
+        body: JSON.stringify(data),
+        success_url: "{% url 'api-assets:admin-user-list' %}?format=csv&template=update",
+        format: 'csv',
+        params: {
+            search: search
+        }
+    };
+    APIExportData(props);
+})
+.on('click', '#btn_update_confirm', function () {
+    var file = document.getElementById('update_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var url = "{% url 'api-assets:admin-user-list' %}";
+    var data_table = $('#admin_user_list_table').DataTable();
+
+    APIImportData({
+        url: url,
+        method: "PUT",
+        body: file,
+        data_table: data_table
+    });
+})
 </script>
 {% endblock %}

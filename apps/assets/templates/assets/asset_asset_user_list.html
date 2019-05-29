@@ -2,10 +2,6 @@
 {% load common_tags %}
 {% load static %}
 {% load i18n %}
-
-{% block custom_head_css_js %}
-{% endblock %}
-
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -87,6 +83,7 @@
         </div>
     </div>
     {% include 'assets/_asset_user_auth_modal.html' %}
+    {% include 'assets/_asset_user_view_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -117,14 +114,14 @@ function initAssetUserTable() {
                 $(td).html(cellData.slice(0, -6));
             }},
             {targets: 5, createdCell: function (td, cellData) {
-                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var btn = '<a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-username="DEFAULT_USERNAME">{% trans "View auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
+                btn += view_btn;
                 {% if asset.protocol == 'ssh' %}
-                    var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
-                    $(td).html(test_btn + update_auth_btn);
-                {% else %}
-                    $(td).html(update_auth_btn);
+                    btn += test_btn;
                 {% endif %}
-                {#var check_btn = ' <a class="btn btn-xs btn-info btn-check-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Check auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);#}
+                $(td).html(btn);
 
             }}
         ],
@@ -142,17 +139,6 @@ var username;
 $(document).ready(function () {
     initAssetUserTable();
 })
-{#.on('click', '.btn-check-asset-user-auth', function(){#}
-{#    var username = $(this).data('username');#}
-{#    var the_url = "{% url 'api-assets:asset-user-auth-info' %}" + '?asset_id={{ asset.id }}' + '&username=' + username;#}
-{#    $.ajax({#}
-{#        url: the_url,#}
-{#        method: 'GET',#}
-{#        success: function (data) {#}
-{#            alert("Password: " + data.password);#}
-{#        }#}
-{#    });#}
-{# })#}
 .on('click', '.btn-update-asset-user-auth', function() {
     username = $(this).data('username');
     var hostname = "{{ asset.hostname }}";
@@ -213,6 +199,12 @@ $(document).ready(function () {
         success: success,
         flash_message: false
     });
+})
+.on("click", ".btn-view-auth", function (evt) {
+    asset_id = "{{ asset.id }}" ;
+    host = "{{ asset.hostname }}";
+    username = $(this).data("username");
+    $("#asset_user_auth_view").modal();
 })
 </script>
 {% endblock %}

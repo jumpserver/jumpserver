@@ -715,9 +715,12 @@ String.prototype.format = function(args) {
     return result;
 };
 
-function setCookie(key, value) {
+function setCookie(key, value, time) {
     var expires = new Date();
-    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+    if (!time) {
+        time =  expires.getTime() + (24 * 60 * 60 * 1000);
+    }
+    expires.setTime(time);
     document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
 }
 
@@ -948,6 +951,89 @@ function rootNodeAddDom(ztree, callback) {
     refreshIconRef.bind('click', function () {
         ztree.destroy();
         callback()
+    })
+}
+
+function APIExportData(props) {
+    props = props || {};
+    $.ajax({
+        url: '/api/common/v1/resources/cache/',
+        type: props.method || "POST",
+        data: props.body,
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json",
+        success: function (data) {
+            var export_url = props.success_url;
+            var params = props.params || {};
+            params['format'] = props.format;
+            params['spm'] = data.spm;
+            for (var k in params){
+                export_url = setUrlParam(export_url, k, params[k])
+            }
+            window.open(export_url);
+        },
+        error: function () {
+            toastr.error(gettext('Export failed'));
+        }
+    })
+}
+
+function APIImportData(props){
+    props = props || {};
+    $.ajax({
+        url: props.url,
+        type: props.method || "POST",
+        processData: false,
+        data: props.body,
+        contentType: props.content_type || 'text/csv',
+        success: function (data) {
+            if(props.method === 'POST'){
+                $('#created_failed').html('');
+                $('#created_failed_detail').html('');
+                $('#success_created').html(gettext("Import Success"));
+                $('#success_created_detail').html("Count" + ": " + data.length);
+            }else{
+                $('#updated_failed').html('');
+                $('#updated_failed_detail').html('');
+                $('#success_updated').html(gettext("Update Success"));
+                $('#success_updated_detail').html("Count" + ": " + data.length);
+            }
+
+            props.data_table.ajax.reload()
+        },
+        error: function (error) {
+            var data = error.responseJSON;
+            if (data instanceof Array){
+                var html = '';
+                var li = '';
+                var err = '';
+                $.each(data, function (index, item){
+                    err = '';
+                    for (var prop in item) {
+                        err += prop + ": " + item[prop][0] + " "
+                    }
+                    if (err) {
+                        li = "<li>" + "Line " + (++index) + ". " + err + "</li>";
+                        html += li
+                    }
+                });
+                html = "<ul>" + html + "</ul>"
+            }
+            else {
+                html = error.responseText
+            }
+            if(props.method === 'POST'){
+                $('#success_created').html('');
+                $('#success_created_detail').html('');
+                $('#created_failed').html(gettext("Import failed"));
+                $('#created_failed_detail').html(html);
+            }else{
+                $('#success_updated').html('');
+                $('#success_updated_detail').html('');
+                $('#updated_failed').html(gettext("Update failed"));
+                $('#updated_failed_detail').html(html);
+            }
+        }
     })
 }
 

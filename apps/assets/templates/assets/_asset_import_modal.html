@@ -1,29 +1,6 @@
-{% extends '_modal.html' %}
+{% extends '_import_modal.html' %}
 {% load i18n %}
-{% block modal_id %}asset_import_modal{% endblock %}
-{% block modal_title%}{% trans "Import asset" %}{% endblock %}
-{% block modal_body %}
-<form method="post" action="{% url 'assets:asset-import' %}" id="fm_asset_import" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="form-group">
-        <label class="control-label" for="id_assets">{% trans "Template" %}</label>
-        <a href="{% url 'assets:asset-export' %}" style="display: block">{% trans 'Download' %}</a>
-    </div>
-    <div class="form-group">
-        <label class="control-label" for="id_users">{% trans "Asset csv file" %}</label>
-        <input id="id_assets" type="file" name="file" />
-        <span class="help-block red-fonts">
-            {% trans 'If set id, will use this id update asset existed' %}
-        </span>
-    </div>
-</form>
-<p>
-    <p class="text-success" id="id_created"></p>
-    <p id="id_created_detail"></p>
-    <p class="text-warning" id="id_updated"></p>
-    <p id="id_updated_detail"></p>
-    <p class="text-danger" id="id_failed"></p>
-    <p id="id_failed_detail"></p>
-</p>
-{% endblock %}
-{% block modal_confirm_id %}btn_asset_import{% endblock %}
+
+{% block modal_title%}{% trans "Import assets" %}{% endblock %}
+
+{% block import_modal_download_template_url %}{% url "api-assets:asset-list" %}{% endblock %}

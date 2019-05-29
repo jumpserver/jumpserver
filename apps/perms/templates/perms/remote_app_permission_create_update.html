@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{{ action }}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" class="form-horizontal" action="" >
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+                            {% csrf_token %}
+
+                            <h3>{% trans 'Basic' %}</h3>
+                            {% bootstrap_field form.name layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+
+                            <h3>{% trans 'User' %}</h3>
+                            {% bootstrap_field form.users layout="horizontal" %}
+                            {% bootstrap_field form.user_groups layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+
+                            <h3>{% trans 'RemoteApp' %}</h3>
+                            {% bootstrap_field form.remote_apps layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+
+                            <h3>{% trans 'Other' %}</h3>
+                            <div class="form-group">
+                                <label for="{{ form.is_active.id_for_label }}" class="col-sm-2 control-label">{% trans 'Active' %}</label>
+                                <div class="col-sm-8">
+                                    {{ form.is_active }}
+                                </div>
+                            </div>
+                            <div class="form-group {% if form.date_expired.errors or form.date_start.errors %} has-error {% endif %}" id="date_5">
+                                <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{% trans 'Validity period' %}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-daterange input-group" id="datepicker">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        {% if form.errors %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value }}">
+                                        {% else %}
+                                            <input type="text" class="input-sm form-control" id="date_start" name="date_start" value="{{ form.date_start.value|date:'Y-m-d H:i' }}">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" id="date_expired" name="date_expired" value="{{ form.date_expired.value|date:'Y-m-d H:i' }}">
+                                        {% endif %}
+                                    </div>
+                                    <span class="help-block ">{{ form.date_expired.errors }}</span>
+                                    <span class="help-block ">{{ form.date_start.errors }}</span>
+                                </div>
+                            </div>
+
+                            {% bootstrap_field form.comment layout="horizontal" %}
+
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script type="text/javascript" src='{% static "js/plugins/daterangepicker/moment.min.js" %}'></script>
+<script type="text/javascript" src='{% static "js/plugins/daterangepicker/daterangepicker.min.js" %}'></script>
+<link rel="stylesheet" type="text/css" href={% static "css/plugins/daterangepicker/daterangepicker.css" %} />
+
+<script>
+var dateOptions = {
+    singleDatePicker: true,
+    showDropdowns: true,
+    timePicker: true,
+    timePicker24Hour: true,
+    autoApply: true,
+    locale: {
+        format: 'YYYY-MM-DD HH:mm'
+    }
+};
+$(document).ready(function () {
+    $('.select2').select2({
+        closeOnSelect: false
+    });
+    $('#date_start').daterangepicker(dateOptions);
+    $('#date_expired').daterangepicker(dateOptions);
+})
+</script>
+{% endblock %}

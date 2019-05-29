@@ -20,6 +20,8 @@ api_v1 = [
    path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
    path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
    path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
+   path('common/v1/', include('common.urls.api_urls', namespace='api-common')),
+   path('applications/v1/', include('applications.urls.api_urls', namespace='api-applications')),
 ]
 
 api_v2 = [
@@ -37,6 +39,7 @@ app_view_patterns = [
     path('audits/', include('audits.urls.view_urls', namespace='audits')),
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
+    path('applications/', include('applications.urls.views_urls', namespace='applications')),
 ]
 
 

@@ -17,6 +17,9 @@
                             <li>
                                 <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
                             </li>
+                            <li>
+                                <a href="{% url 'settings:email-content-setting' %}"  class="text-center"><i class="fa fa-file-text"></i> {% trans 'Email content setting' %} </a>
+                            </li>
                             <li class="active">
                                 <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
                             </li>
@@ -107,13 +110,10 @@ $(document).ready(function () {
     });
 })
 .on("click","#btn_ldap_modal_confirm",function () {
-    var user_names=[];
-    $("tbody input[type='checkbox']:checked").each(function () {
-        user_names.push($(this).attr('id'));
-    });
+    var username_list = ldap_users_table.selected;
 
-    if (user_names.length === 0){
-        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}"
+    if (username_list.length === 0){
+        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}";
         toastr.error(msg);
         return
      }
@@ -129,7 +129,7 @@ $(document).ready(function () {
     }
     APIUpdateAttr({
         url: the_url,
-        body: JSON.stringify({'user_names':user_names}),
+        body: JSON.stringify({'username_list':username_list}),
         method: "POST",
         flash_message: false,
         success: success,

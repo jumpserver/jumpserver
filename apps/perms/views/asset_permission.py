@@ -10,10 +10,19 @@ from django.conf import settings
 
 from common.permissions import AdminUserRequiredMixin
 from orgs.utils import current_org
-from .hands import Node, Asset, SystemUser, User, UserGroup
-from .models import AssetPermission, Action
-from .forms import AssetPermissionForm
-from .const import PERMS_ACTION_NAME_ALL
+from perms.hands import Node, Asset, SystemUser, User, UserGroup
+from perms.models import AssetPermission, Action
+from perms.forms import AssetPermissionForm
+from perms.const import PERMS_ACTION_NAME_ALL
+
+
+__all__ = [
+    'AssetPermissionListView', 'AssetPermissionCreateView',
+    'AssetPermissionUpdateView', 'AssetPermissionDetailView',
+    'AssetPermissionDeleteView', 'AssetPermissionUserView',
+    'AssetPermissionAssetView',
+
+]
 
 
 class AssetPermissionListView(AdminUserRequiredMixin, TemplateView):
@@ -84,7 +93,7 @@ class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Update asset permission'),
+            'action': _('Asset permission detail'),
             'system_users_remain': SystemUser.objects.exclude(
                 granted_by_permissions=self.object
             ),
@@ -121,10 +130,10 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
             'app': _('Perms'),
             'action': _('Asset permission user list'),
             'users_remain': current_org.get_org_users().exclude(
-                asset_permissions=self.object
+                assetpermission=self.object
             ),
             'user_groups_remain': UserGroup.objects.exclude(
-                asset_permissions=self.object
+                assetpermission=self.object
             )
         }
         kwargs.update(context)

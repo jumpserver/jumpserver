@@ -3,11 +3,14 @@
 from django.db import models
 from django.http import JsonResponse
 from django.utils import timezone
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
+
+from .const import KEY_CACHE_RESOURCES_ID
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
@@ -63,6 +66,27 @@ class IDInFilterMixin(object):
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)
         return queryset
+
+
+class IDInCacheFilterMixin(object):
+
+    def filter_queryset(self, queryset):
+        queryset = super(IDInCacheFilterMixin, self).filter_queryset(queryset)
+        spm = self.request.query_params.get('spm')
+        cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
+        resources_id = cache.get(cache_key)
+        if resources_id and isinstance(resources_id, list):
+            queryset = queryset.filter(id__in=resources_id)
+        return queryset
+
+
+class IDExportFilterMixin(object):
+    def filter_queryset(self, queryset):
+        # 下载导入模版
+        if self.request.query_params.get('template') == 'import':
+            return []
+        else:
+            return super(IDExportFilterMixin, self).filter_queryset(queryset)
 
 
 class BulkSerializerMixin(object):
@@ -131,7 +155,11 @@ class BulkListSerializerMixin(object):
         for item in data:
             try:
                 # prepare child serializer to only handle one instance
-                self.child.instance = self.instance.get(id=item['id']) if self.instance else None
+                if 'id' in item.keys():
+                    self.child.instance = self.instance.get(id=item['id']) if self.instance else None
+                if 'pk' in item.keys():
+                    self.child.instance = self.instance.get(id=item['pk']) if self.instance else None
+
                 self.child.initial_data = item
                 # raw
                 validated = self.child.run_validation(item)

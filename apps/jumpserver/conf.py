@@ -194,7 +194,7 @@ class Config(dict):
             filename = os.path.join(self.root_path, filename)
         try:
             with open(filename, 'rt', encoding='utf8') as f:
-                obj = yaml.load(f)
+                obj = yaml.safe_load(f)
         except IOError as e:
             if silent and e.errno in (errno.ENOENT, errno.EISDIR):
                 return False
@@ -273,6 +273,19 @@ class Config(dict):
         if default_value is None:
             return v
         tp = type(default_value)
+        # 对bool特殊处理
+        if tp is bool and isinstance(v, str):
+            if v in ("true", "True", "1"):
+                return True
+            else:
+                return False
+        if tp in [list, dict] and isinstance(v, str):
+            try:
+                v = json.loads(v)
+                return v
+            except json.JSONDecodeError:
+                return v
+
         try:
             v = tp(v)
         except Exception:
@@ -289,14 +302,10 @@ class Config(dict):
         except KeyError:
             value = None
         if value is not None:
-            return self.convert_type(item, value)
+            return value
         # 其次从环境变量来
         value = os.environ.get(item, None)
         if value is not None:
-            if value.lower() == 'false':
-                value = False
-            elif value.lower() == 'true':
-                value = True
             return self.convert_type(item, value)
         return self.defaults.get(item)
 
@@ -343,6 +352,7 @@ defaults = {
     'TERMINAL_SESSION_KEEP_DURATION': 9999,
     'TERMINAL_HOST_KEY': '',
     'TERMINAL_TELNET_REGEX': '',
+    'TERMINAL_COMMAND_STORAGE': {},
     'SECURITY_MFA_AUTH': False,
     'SECURITY_LOGIN_LIMIT_COUNT': 7,
     'SECURITY_LOGIN_LIMIT_TIME': 30,
@@ -361,6 +371,7 @@ defaults = {
     'HTTP_LISTEN_PORT': 8080,
     'LOGIN_LOG_KEEP_DAYS': 90,
     'ASSETS_PERM_CACHE_TIME': 3600,
+
 }
 
 

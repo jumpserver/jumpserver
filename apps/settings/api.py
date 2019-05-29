@@ -5,7 +5,9 @@ import os
 import json
 import jms_storage
 
+from rest_framework import generics
 from rest_framework.views import Response, APIView
+from rest_framework.pagination import LimitOffsetPagination
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
@@ -79,7 +81,7 @@ class LDAPTestingAPI(APIView):
         util = self.get_ldap_util(serializer)
 
         try:
-            users = util.get_search_user_items()
+            users = util.search_user_items()
         except Exception as e:
             return Response({"error": str(e)}, status=401)
 
@@ -89,30 +91,66 @@ class LDAPTestingAPI(APIView):
             return Response({"error": "Have user but attr mapping error"}, status=401)
 
 
-class LDAPUserListApi(APIView):
+class LDAPUserListApi(generics.ListAPIView):
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
 
-    def get(self, request):
+    def get_queryset(self):
         util = LDAPUtil()
         try:
-            users = util.get_search_user_items()
+            users = util.search_user_items()
         except Exception as e:
             users = []
             logger.error(e, exc_info=True)
+        # 前端data_table会根据row.id对table.selected值进行操作
+        for user in users:
+            user['id'] = user['username']
+        return users
+
+    def filter_queryset(self, queryset):
+        search = self.request.query_params.get('search')
+        if not search:
+            return queryset
+        search = search.lower()
+        queryset = [
+            q for q in queryset
+            if
+            search in q['username'].lower()
+            or search in q['name'].lower()
+            or search in q['email'].lower()
+        ]
+        return queryset
+
+    def sort_queryset(self, queryset):
+        order_by = self.request.query_params.get('order')
+        if not order_by:
+            order_by = 'existing'
+        if order_by.startswith('-'):
+            order_by = order_by.lstrip('-')
+            reverse = True
         else:
-            users = sorted(users, key=lambda u: (u['existing'], u['username']))
-        return Response(users)
+            reverse = False
+        queryset = sorted(queryset, key=lambda x: x[order_by], reverse=reverse)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.sort_queryset(queryset)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(page)
+        return Response(queryset)
 
 
 class LDAPUserSyncAPI(APIView):
     permission_classes = (IsOrgAdmin,)
 
     def post(self, request):
-        user_names = request.data.get('user_names', '')
+        username_list = request.data.get('username_list', [])
 
         util = LDAPUtil()
         try:
-            result = util.sync_users(username_set=user_names)
+            result = util.sync_users(username_list)
         except Exception as e:
             logger.error(e, exc_info=True)
             return Response({'error': str(e)}, status=401)
@@ -221,6 +259,3 @@ class DjangoSettingsAPI(APIView):
                     except (json.JSONDecodeError, TypeError):
                         data[k] = str(v)
         return Response(data)
-
-
-

@@ -15,7 +15,7 @@ class TestAdHocRunner(unittest.TestCase):
         host_data = [
             {
                 "hostname": "testserver",
-                "ip": "192.168.244.168",
+                "ip": "192.168.244.185",
                 "port": 22,
                 "username": "root",
                 "password": "redhat",

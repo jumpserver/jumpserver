@@ -2,15 +2,83 @@
 {% load i18n %}
 {% load bootstrap3 %}
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
-{#{% block username %}#}
-{#    {% bootstrap_field form.username layout="horizontal" %}#}
-{#{% endblock %}#}
 {% block password %}
-    <div class="form-group">
-        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
-        <div class="col-sm-8 controls" style="margin-top: 8px;">
-            {% trans 'Reset link will be generated and sent to the user. ' %}
+    {% bootstrap_field form.password_strategy layout="horizontal" %}
+    <div class="form-group" id="custom_password">
+        {% bootstrap_field form.password layout="horizontal" %}
+    </div>
+    {#  密码popover  #}
+    <div id="container">
+        <div class="popover fade bottom in" role="tooltip" id="popover777" style=" display: none; width:260px;">
+            <div class="arrow" style="left: 50%;"></div>
+            <h3 class="popover-title" style="display: none;"></h3>
+            <h4>{% trans 'Your password must satisfy' %}</h4><div id="id_password_rules" style="color: #908a8a; margin-left:20px; font-size:15px;"></div>
+            <h4 style="margin-top: 10px;">{% trans 'Password strength' %}</h4><div id="id_progress"></div>
+            <div class="popover-content"></div>
         </div>
     </div>
+<script>
+function passwordCheck() {
+    if ($('#id_password').length != 1) {
+        return
+    }
+    var el = $('#id_password_rules'),
+        idPassword = $('#id_password'),
+        idPopover = $('#popover777'),
+        container = $('#container'),
+        progress = $('#id_progress'),
+        password_check_rules = {{ password_check_rules|safe }},
+        minLength = 6,
+        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) - 10 + 34,
+        left = 377,
+        i18n_fallback = {
+            "veryWeak": "{% trans 'Very weak' %}",
+            "weak": "{% trans 'Weak' %}",
+            "normal": "{% trans 'Normal' %}",
+            "medium": "{% trans 'Medium' %}",
+            "strong": "{% trans 'Strong' %}",
+            "veryStrong": "{% trans 'Very strong' %}"
+        };
+
+    $.each(password_check_rules, function (idx, rules) {
+        if(rules.key === 'id_security_password_min_length'){
+            minLength = rules.value
+        }
+    });
+
+    // 初始化popover
+    initPopover(container, progress, idPassword, el, password_check_rules, i18n_fallback);
+
+    // 监听事件
+    idPassword.on('focus', function () {
+        idPopover.css('top', top);
+        idPopover.css('left', left);
+        idPopover.css('display', 'block');
+    });
+    idPassword.on('blur', function () {
+        idPopover.css('display', 'none');
+    });
+    idPassword.on('keyup', function(){
+        var password = idPassword.val();
+        checkPasswordRules(password, minLength);
+    });
+}
+var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
+function passwordStrategyFieldsDisplay(){
+    var val = $('input:radio[name="password_strategy"]:checked').val();
+    if(val === '0'){
+        $('#custom_password').addClass('hidden')
+    }else {
+        $('#custom_password').removeClass('hidden')
+    }
+}
+$(document).ready(function () {
+    passwordCheck();
+    passwordStrategyFieldsDisplay()
+
+}).on('change', password_strategy_radio_input, function(){
+        passwordStrategyFieldsDisplay()
+   })
+</script>
 {% endblock %}
 

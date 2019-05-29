@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'perms:remote-app-permission-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:remote-app-permission-user-list' pk=object.id %}" class="text-center">
+                                    <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:remote-app-permission-remote-app-list' pk=object.id %}" class="text-center">
+                                    <i class="fa fa-th"></i> {% trans 'RemoteApp' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'perms:remote-app-permission-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Name' %}:</td>
+                                            <td><b>{{ object.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'User count' %}:</td>
+                                            <td><b>{{ object.users.count }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'User group count' %}:</td>
+                                            <td><b>{{ object.user_groups.count }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'RemoteApp count' %}:</td>
+                                            <td><b>{{ object.remote_apps.count }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date start' %}:</td>
+                                            <td><b>{{ object.date_start }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date expired' %}:</td>
+                                            <td><b>{{ object.date_expired }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}:</td>
+                                            <td><b>{{ object.created_by  }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ object.comment }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="50%">{% trans 'Active' %} :</td>
+                                            <td><span style="float: right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" {% if object.is_active %} checked {% endif %} class="onoffswitch-checkbox" id="is_active">
+                                                        <label class="onoffswitch-label" for="is_active">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).ready(function () {
+    $('.select2').select2()
+        .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.system_users_selected[data.id] = data.text;
+        })
+        .on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.system_users_selected[data.id]
+        })
+})
+.on('click', '.btn-delete', function () {
+    var $this = $(this);
+    var name = "{{ object.name }}";
+    var rid = "{{ object.id }}";
+    var the_url = '{% url "api-perms:remote-app-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    var redirect_url = "{% url 'perms:remote-app-permission-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+}).on('click', '#is_active', function () {
+    var the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
+    var checked = $(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body)
+    });
+})
+</script>
+{% endblock %}

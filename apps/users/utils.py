@@ -34,29 +34,24 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
-def send_user_created_mail(user):
-    subject = _('Create account successfully')
-    recipient_list = [user.email]
-    message = _("""
-    Hello %(name)s:
-    </br>
-    Your account has been created successfully
-    </br>
-    Username: %(username)s
-    </br>
-    <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
-    </br>
-    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-
-    </br>
-    ---
-
-    </br>
-    <a href="%(login_url)s">Login direct</a>
-
-    </br>
-    """) % {
-        'name': user.name,
+def construct_user_created_email_body(user):
+    default_body = _("""
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <p style="text-indent:2em;">
+            <span>
+                Username: %(username)s.
+            </span>
+            <span>
+                <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
+            </span>    
+            <span>
+                This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
+            </span> 
+            <span>
+                <a href="%(login_url)s">Login direct</a>
+            </span>
+        </p>
+        """) % {
         'username': user.username,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
@@ -64,6 +59,32 @@ def send_user_created_mail(user):
         'email': user.email,
         'login_url': reverse('authentication:login', external=True),
     }
+
+    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
+        custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
+    else:
+        custom_body = ''
+    body = custom_body + default_body
+    return body
+
+
+def send_user_created_mail(user):
+    recipient_list = [user.email]
+    subject = _('Create account successfully')
+    if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
+        subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
+
+    honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
+        honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
+
+    body = construct_user_created_email_body(user)
+
+    signature = '<p style="float:right">jumpserver</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
+        signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
+
+    message = honorific + body + signature
     if settings.DEBUG:
         try:
             print(message)
@@ -313,3 +334,13 @@ def is_need_unblock(key_block):
     if not cache.get(key_block):
         return False
     return True
+
+
+def construct_user_email(username, email):
+    if '@' not in email:
+        if '@' in username:
+            email = username
+        else:
+            email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
+    return email
+

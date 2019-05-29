@@ -1,0 +1,140 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+{% block modal_id %}asset_user_auth_view{% endblock %}
+{% block modal_title%}{% trans "Asset user auth" %}{% endblock %}
+{% block modal_body %}
+<style>
+    .inmodal .modal-body {
+        background: #fff;
+    }
+</style>
+<form class="form-horizontal" action="" style="padding-top: 20px">
+<div class="form-group mfa-field">
+    <label for="mfa" class="col-sm-2 control-label">{% trans 'MFA' %}</label>
+    <div class="col-sm-8">
+        <input type="text" id="mfa" class="form-control input-sm" name="mfa">
+        <span id="mfa_error" class="help-block">{% trans "Need otp auth for view auth" %}</span>
+    </div>
+    <div class="col-sm-2">
+        <a class="btn btn-primary btn-sm btn-mfa">{% trans "Confirm" %}</a>
+    </div>
+</div>
+<div hidden class="auth-field">
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Hostname' %}</label>
+        <div class="col-sm-8">
+            <p class="form-control-static" id="id_hostname_view"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Username' %}</label>
+        <div class="col-sm-8" >
+            <p class="form-control-static" id="id_username_view"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-8">
+            <input id="id_password_view" type="password" class="form-control" value="" readonly style="border: none;padding-left: 0;background-color: #fff;width: 100%">
+        </div>
+        <div class="col-sm-2" style="padding-left: 2px">
+            <a class="btn btn-white btn-sm btn-show-password"><i class="fa fa-eye"></i></a>
+            <a class="btn btn-white btn-sm btn-copy-password"><i class="fa fa-copy"></i></a>
+        </div>
+    </div>
+</div>
+</form>
+<script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
+<script>
+var showPassword = false;
+var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+var asset_id = "";
+var host = "";
+var username = "";
+
+function initClipboard() {
+    var clipboard = new Clipboard('.btn-copy-password', {
+        text: function (trigger) {
+            return $("#id_password_view").val()
+        }
+    });
+    clipboard.on("success", function (e) {
+        toastr.success("{% trans "Copy success" %}")
+    })
+}
+
+function showAuth() {
+    $(".mfa-field").hide();
+    $(".auth-field").show();
+
+    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + asset_id + "&username=" + username;
+    $("#id_username_view").html(username);
+    $("#id_hostname_view").html(host);
+    var success = function (data) {
+        var password = data.password;
+        $("#id_password_view").val(password);
+    };
+    var error = function() {
+        var msg = "{% trans 'Get auth info error' %}";
+        toastr.error(msg)
+    };
+    APIUpdateAttr({
+        url: url,
+        method: "GET",
+        success: success,
+        flash_message: false,
+        error: error
+    })
+}
+
+function showMFA() {
+    $(".mfa-field").show();
+    $(".auth-field").hide();
+}
+
+$(document).ready(function () {
+    initClipboard();
+}).on("click", ".btn-show-password", function () {
+    showPassword = !showPassword;
+    if (showPassword) {
+        $("#id_password_view").attr("type", "text")
+    } else {
+        $("#id_password_view").attr("type", "password")
+    }
+}).on("show.bs.modal", "#asset_user_auth_view", function () {
+    var now = new Date();
+    if (lastMFATime === "") {
+        lastMFATime = 0
+    }
+    var nowTime = now.getTime() / 1000;
+    if (nowTime - lastMFATime < 60*10 ) {
+        showAuth();
+    }
+}).on("click", ".btn-mfa", function () {
+    var url = "{% url 'api-auth:user-otp-verify' %}";
+    var data = {
+        code: $("#mfa").val()
+    };
+    var success = function () {
+        var now = new Date();
+        lastMFATime = now.getTime() / 1000;
+        showAuth()
+    };
+    var error = function () {
+        $("#mfa_error").addClass("text-danger").html("Code error");
+    };
+    APIUpdateAttr({
+        url: url,
+        method: "POST",
+        body: JSON.stringify(data),
+        success: success,
+        flash_message: false,
+        error: error
+    })
+})
+</script>
+{% endblock %}
+{% block modal_button %}
+  <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+{% endblock %}

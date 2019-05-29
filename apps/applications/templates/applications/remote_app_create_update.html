@@ -1,0 +1,123 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+    <form id="appForm" method="post" class="form-horizontal">
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        {% csrf_token %}
+        {% bootstrap_field form.name layout="horizontal" %}
+        {% bootstrap_field form.asset layout="horizontal" %}
+        {% bootstrap_field form.system_user layout="horizontal" %}
+        {% bootstrap_field form.type layout="horizontal" %}
+        {% bootstrap_field form.path layout="horizontal" %}
+
+        <div class="hr-line-dashed"></div>
+
+        {# chrome #}
+        <div class="chrome-fields">
+        {% bootstrap_field form.chrome_target layout="horizontal" %}
+        {% bootstrap_field form.chrome_username layout="horizontal" %}
+        {% bootstrap_field form.chrome_password layout="horizontal" %}
+        </div>
+
+        {# mysql workbench #}
+        <div class="mysql_workbench-fields">
+            {% bootstrap_field form.mysql_workbench_ip layout="horizontal" %}
+            {% bootstrap_field form.mysql_workbench_name layout="horizontal" %}
+            {% bootstrap_field form.mysql_workbench_username layout="horizontal" %}
+            {% bootstrap_field form.mysql_workbench_password layout="horizontal" %}
+        </div>
+
+        {# vmware #}
+        <div class="vmware_client-fields">
+        {% bootstrap_field form.vmware_target layout="horizontal" %}
+        {% bootstrap_field form.vmware_username layout="horizontal" %}
+        {% bootstrap_field form.vmware_password layout="horizontal" %}
+        </div>
+
+        {# custom #}
+        <div class="custom-fields">
+        {% bootstrap_field form.custom_cmdline layout="horizontal" %}
+        {% bootstrap_field form.custom_target layout="horizontal" %}
+        {% bootstrap_field form.custom_username layout="horizontal" %}
+        {% bootstrap_field form.custom_password layout="horizontal" %}
+        </div>
+
+        {% bootstrap_field form.comment layout="horizontal" %}
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+
+                <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script type="text/javascript">
+var app_type_id = '#' + '{{ form.type.id_for_label }}';
+var app_path_id = '#' + '{{ form.path.id_for_label }}';
+var all_type_fields = [
+    '.chrome-fields',
+    '.mysql_workbench-fields',
+    '.vmware_client-fields',
+    '.custom-fields'
+];
+var app_type_map_default_fields_value = {
+    'chrome': {
+        'app_path': 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+    },
+    'mysql_workbench': {
+        'app_path': 'C:\\Program Files\\MySQL\\MySQL Workbench 8.0 CE\\MySQLWorkbench.exe'
+    },
+    'vmware_client': {
+        'app_path': 'C:\\Program Files (x86)\\VMware\\Infrastructure\\Virtual Infrastructure Client\\Launcher\\VpxClient.exe'
+    },
+    'custom': {'app_path': ''}
+};
+function getAppType(){
+    return $(app_type_id+ " option:selected").val();
+}
+function initialDefaultValue(){
+    var app_type = getAppType();
+    var app_path = $(app_path_id).val();
+    if(app_path){
+        app_type_map_default_fields_value[app_type]['app_path'] = app_path
+    }
+}
+function setDefaultValue(){
+    // 设置类型相关字段的默认值
+    var app_type = getAppType();
+    var app_path = app_type_map_default_fields_value[app_type]['app_path'];
+    $(app_path_id).val(app_path)
+}
+function hiddenFields(){
+    var app_type = getAppType();
+    $.each(all_type_fields, function(index, value){
+        $(value).addClass('hidden')
+    });
+    $('.' + app_type + '-fields').removeClass('hidden');
+}
+$(document).ready(function () {
+    $('.select2').select2({
+        closeOnSelect: true
+    });
+    initialDefaultValue();
+    hiddenFields();
+    setDefaultValue();
+})
+.on('change', app_type_id, function(){
+    hiddenFields();
+    setDefaultValue();
+});
+</script>
+{% endblock %}

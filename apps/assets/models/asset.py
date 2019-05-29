@@ -71,7 +71,7 @@ class Asset(OrgModelMixin):
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
+    ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
     protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))

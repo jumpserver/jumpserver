@@ -12,10 +12,17 @@ from django.conf import settings
 
 from common.utils import get_logger
 from common.tree import TreeNode
-from .models import AssetPermission, Action
-from .hands import Node
+from perms.models import AssetPermission, Action
+from perms.hands import Node
 
 logger = get_logger(__file__)
+
+
+__all__ = [
+    'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
+    'parse_asset_to_tree_node', 'parse_node_to_tree_node',
+    'check_system_user_action',
+]
 
 
 class GenerateTree:
@@ -153,51 +160,53 @@ class AssetPermissionUtil:
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
+    @staticmethod
+    def _structured_system_user(system_users, actions):
+        """
+        结构化系统用户
+        :param system_users:
+        :param actions:
+        :return: {system_user1: {'actions': set(), }, }
+        """
+        _attr = {'actions': set(actions)}
+        _system_users = {system_user: _attr for system_user in system_users}
+        return _system_users
+
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
-        :return: {node1: set(system_user1,)}
+        :return: {asset1: {system_user1: {'actions': set()},}}
         """
-        nodes = defaultdict(set)
+        nodes = defaultdict(dict)
         permissions = self.permissions.prefetch_related('nodes', 'system_users')
         for perm in permissions:
+            actions = perm.actions.all()
             for node in perm.nodes.all():
-                nodes[node].update(perm.system_users.all())
+                system_users = perm.system_users.all()
+                system_users = self._structured_system_user(system_users, actions)
+                nodes[node].update(system_users)
         return nodes
 
     def get_assets_direct(self):
         """
+
         返回用户授权规则直接关联的资产
-        :return: {asset1: set(system_user1,)}
+        :return: {asset1: {system_user1: {'actions': set()},}}
         """
-        assets = defaultdict(set)
+        assets = defaultdict(dict)
         permissions = self.permissions.prefetch_related('assets', 'system_users')
         for perm in permissions:
+            actions = perm.actions.all()
             for asset in perm.assets.all().valid().prefetch_related('nodes'):
-                assets[asset].update(
-                    perm.system_users.filter(protocol=asset.protocol)
-                )
+                system_users = perm.system_users.filter(protocol=asset.protocol)
+                system_users = self._structured_system_user(system_users, actions)
+                assets[asset].update(system_users)
         return assets
 
-    def _setattr_actions_to_system_user(self):
-        """
-        动态给system_use设置属性actions
-        """
-        for asset, system_users in self._assets.items():
-            # 获取资产和资产的祖先节点的所有授权规则
-            perms = get_asset_permissions(asset, include_node=True)
-            # 过滤当前self.permission的授权规则
-            perms = perms.filter(id__in=[perm.id for perm in self.permissions])
-
-            for system_user in system_users:
-                actions = set()
-                _perms = perms.filter(system_users=system_user).\
-                    prefetch_related('actions')
-                for _perm in _perms:
-                    actions.update(_perm.actions.all())
-                setattr(system_user, 'actions', actions)
-
     def get_assets_without_cache(self):
+        """
+        :return: {asset1: set(system_user1,)}
+        """
         if self._assets:
             return self._assets
         assets = self.get_assets_direct()
@@ -205,11 +214,22 @@ class AssetPermissionUtil:
         for node, system_users in nodes.items():
             _assets = node.get_all_assets().valid().prefetch_related('nodes')
             for asset in _assets:
-                assets[asset].update(
-                    [s for s in system_users if s.protocol == asset.protocol]
-                )
-        self._assets = assets
-        self._setattr_actions_to_system_user()
+                for system_user, attr_dict in system_users.items():
+                    if system_user.protocol != asset.protocol:
+                        continue
+                    if system_user in assets[asset]:
+                        actions = assets[asset][system_user]['actions']
+                        attr_dict['actions'].update(actions)
+                        system_users.update({system_user: attr_dict})
+                assets[asset].update(system_users)
+
+        __assets = defaultdict(set)
+        for asset, system_users in assets.items():
+            for system_user, attr_dict in system_users.items():
+                setattr(system_user, 'actions', attr_dict['actions'])
+            __assets[asset] = set(system_users.keys())
+
+        self._assets = __assets
         return self._assets
 
     def get_cache_key(self, resource):
@@ -378,7 +398,7 @@ def sort_assets(assets, order_by='hostname', reverse=False):
 
 
 def parse_node_to_tree_node(node):
-    from . import serializers
+    from .. import serializers
     name = '{} ({})'.format(node.value, node.assets_amount)
     node_serializer = serializers.GrantedNodeSerializer(node)
     data = {
@@ -442,11 +462,6 @@ def parse_asset_to_tree_node(node, asset, system_users):
     }
     tree_node = TreeNode(**data)
     return tree_node
-
-
-#
-# actions
-#
 
 
 def check_system_user_action(system_user, action):

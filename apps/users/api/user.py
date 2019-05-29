@@ -15,7 +15,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser
 )
-from common.mixins import IDInFilterMixin
+from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from ..serializers import UserSerializer, UserPKUpdateSerializer, \
@@ -32,7 +32,7 @@ __all__ = [
 ]
 
 
-class UserViewSet(IDInFilterMixin, BulkModelViewSet):
+class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)
@@ -40,9 +40,15 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
 
+    def send_created_signal(self, users):
+        if not isinstance(users, list):
+            users = [users]
+        for user in users:
+            post_user_create.send(self.__class__, user=user)
+
     def perform_create(self, serializer):
-        user = serializer.save()
-        post_user_create.send(self.__class__, user=user)
+        users = serializer.save()
+        self.send_created_signal(users)
 
     def get_queryset(self):
         queryset = current_org.get_org_users()

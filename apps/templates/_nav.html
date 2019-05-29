@@ -27,12 +27,27 @@
         <li id="cmd-filter"><a href="{% url 'assets:cmd-filter-list' %}">{% trans 'Command filters' %}</a></li>
     </ul>
 </li>
+{% if LICENSE_VALID %}
+<li id="applications">
+    <a>
+        <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
+    </ul>
+</li>
+{% endif %}
 <li id="perms">
     <a href="#"><i class="fa fa-edit" style="width: 14px"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="asset-permission">
             <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
         </li>
+        {% if LICENSE_VALID %}
+        <li id="remote-app-permission">
+            <a href="{% url 'perms:remote-app-permission-list' %}">{% trans 'RemoteApp' %}</a>
+        </li>
+        {% endif %}
     </ul>
 </li>
 <li id="terminal">
