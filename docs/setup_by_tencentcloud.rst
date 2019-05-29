@@ -43,15 +43,15 @@
     $ echo -e "\033[31m 3. 下载组件 \033[0m" \
       && cd /opt \
       && if [ ! -d "/opt/jumpserver" ]; then git clone --depth=1 https://github.com/jumpserver/jumpserver.git; fi \
-      && if [ ! -f "/opt/luna.tar.gz" ]; then wget https://demo.jumpserver.org/download/luna/1.4.10/luna.tar.gz; tar xf luna.tar.gz; chown -R root:root luna; fi \
+      && if [ ! -f "/opt/luna.tar.gz" ]; then wget https://demo.jumpserver.org/download/luna/1.5.0/luna.tar.gz; tar xf luna.tar.gz; chown -R root:root luna; fi \
       && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
       && source /opt/py3/bin/activate \
       && pip install --upgrade pip setuptools -i http://mirrors.tencentyun.com/pypi/simple \
       && pip install -r /opt/jumpserver/requirements/requirements.txt -i http://mirrors.tencentyun.com/pypi/simple \
       && curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2.m.daocloud.io \
       && systemctl restart docker \
-      && docker pull jumpserver/jms_coco:1.4.10 \
-      && docker pull jumpserver/jms_guacamole:1.4.10 \
+      && docker pull jumpserver/jms_coco:1.5.0 \
+      && docker pull jumpserver/jms_guacamole:1.5.0 \
       && rm -rf /etc/nginx/conf.d/default.conf \
       && curl -o /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf
 
@@ -71,8 +71,8 @@
       && systemctl start nginx \
       && cd /opt/jumpserver \
       && ./jms start all -d \
-      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.4.10 \
-      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.4.10 \
+      && docker run --name jms_coco -d -p 2222:2222 -p 5000:5000 -e CORE_HOST=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_coco:1.5.0 \
+      && docker run --name jms_guacamole -d -p 8081:8081 -e JUMPSERVER_SERVER=http://$Server_IP:8080 -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_guacamole:1.5.0 \
       && echo -e "\033[31m 你的数据库密码是 $DB_PASSWORD \033[0m" \
       && echo -e "\033[31m 你的SECRET_KEY是 $SECRET_KEY \033[0m" \
       && echo -e "\033[31m 你的BOOTSTRAP_TOKEN是 $BOOTSTRAP_TOKEN \033[0m" \
