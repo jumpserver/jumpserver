@@ -31,11 +31,6 @@ Ubuntu 18.04 安装文档
     $ apt-get update && apt-get -y upgrade
     $ apt-get -y install wget gcc libffi-dev git
 
-    # 修改字符集, 否则可能报 input/output error的问题, 因为日志里打印了中文
-    $ apt-get -y install language-pack-zh-hans
-    $ export LC_ALL="zh_CN.utf8"
-    $ echo 'LANG="zh_CN.utf8"' > /etc/default/locale
-
 **1.2 安装 Redis, Jumpserver 使用 Redis 做 cache 和 celery broke**
 
 .. code-block:: shell
