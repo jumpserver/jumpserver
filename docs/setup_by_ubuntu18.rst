@@ -248,7 +248,7 @@ Ubuntu 18.04 安装文档
     $ wget https://github.com/jumpserver/luna/releases/download/1.5.0/luna.tar.gz
 
     # 如果网络有问题导致下载无法完成可以使用下面地址
-    $ wget https://demo.jumpserver.org/download/luna/1.5.0/luna.tar.gz
+    $ wget http://docs.jumpserver.org/download/luna/1.5.0/luna.tar.gz
 
     $ tar xf luna.tar.gz
     $ chown -R root:root luna
