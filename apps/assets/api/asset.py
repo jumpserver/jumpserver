@@ -51,7 +51,7 @@ class AssetViewSet(IDInCacheFilterMixin, LabelFilter, BulkModelViewSet):
     def set_assets_node(self, assets):
         if not isinstance(assets, list):
             assets = [assets]
-        node = Node.objects.get(value='Default')
+        node = Node.root()
         node_id = self.request.query_params.get('node_id')
         if node_id:
             node = get_object_or_none(Node, pk=node_id)
