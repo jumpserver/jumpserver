@@ -212,5 +212,7 @@ class OrgResourceSerializerMixin(serializers.Serializer):
     """
     通过API批量操作资源时, 自动给每个资源添加所需属性org_id的值为current_org_id
     (同时为serializer.is_valid()对Model的unique_together校验做准备)
+    由于HiddenField字段不可读，API获取资产信息时获取不到org_id，
+    但是coco需要资产的org_id字段，所以修改为CharField类型
     """
-    org_id = serializers.HiddenField(default=get_current_org_id)
+    org_id = serializers.CharField(default=get_current_org_id)
