@@ -469,14 +469,7 @@ $(document).ready(function(){
     asset_table.search(val).draw();
  })
 .on('click', '.btn_export', function () {
-    var $data_table = $('#asset_list_table').DataTable();
-    var rows = $data_table.rows('.selected').data();
-
-    var assets = [];
-    $.each(rows, function (index, obj) {
-        assets.push(obj.id)
-    });
-
+    var assets = asset_table.selected;
     var data = {
         'resources': assets
     };
@@ -513,14 +506,7 @@ $(document).ready(function(){
     });
 })
 .on('click', '#download_update_template', function () {
-    var $data_table = $('#asset_list_table').DataTable();
-    var rows = $data_table.rows('.selected').data();
-
-    var assets = [];
-    $.each(rows, function (index, obj) {
-        assets.push(obj.id)
-    });
-
+    var assets = asset_table.selected;
     var data = {
         'resources': assets
     };
@@ -639,11 +625,7 @@ $(document).ready(function(){
 })
 .on('click', '#btn_bulk_update', function () {
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#asset_list_table').DataTable();
-    var id_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        id_list.push(this.data().id);
-    });
+    var id_list = asset_table.selected;
     if (id_list.length === 0) {
         return false;
     }

@@ -61,7 +61,6 @@ class LDAPUtil:
         try:
             user = User.objects.get(username=username)
         except Exception as e:
-            logger.info(e)
             return None
         else:
             return user

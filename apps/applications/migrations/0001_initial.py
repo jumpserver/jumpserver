@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('org_id', models.CharField(blank=True, db_index=True, default='', max_length=36, verbose_name='Organization')),
                 ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('type', models.CharField(choices=[('Browser', (('chrome', 'Chrome'),)), ('Database tools', (('mysql_workbench', 'MySQL Workbench'),)), ('Virtualization tools', (('vmware_client', 'VMware Client'),)), ('custom', 'Custom')], default='chrome', max_length=128, verbose_name='App type')),
+                ('type', models.CharField(choices=[('Browser', (('chrome', 'Chrome'),)), ('Database tools', (('mysql_workbench', 'MySQL Workbench'),)), ('Virtualization tools', (('vmware_client', 'vSphere Client'),)), ('custom', 'Custom')], default='chrome', max_length=128, verbose_name='App type')),
                 ('path', models.CharField(max_length=128, verbose_name='App path')),
                 ('params', common.fields.model.EncryptJsonDictTextField(blank=True, default={}, max_length=4096, null=True, verbose_name='Parameters')),
                 ('created_by', models.CharField(blank=True, max_length=32, null=True, verbose_name='Created by')),

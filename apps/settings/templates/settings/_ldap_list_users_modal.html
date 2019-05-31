@@ -52,7 +52,7 @@
 var ldap_users_table = 0;
 function initLdapUsersTable() {
     if(ldap_users_table){
-        return
+        return ldap_users_table
     }
     var options = {
         ele: $('#ldap_list_users_table'),
@@ -73,10 +73,10 @@ function initLdapUsersTable() {
             {data: "username" },{data: "username" }, {data: "name" },
             {data:"email"}, {data:'existing'}
         ],
-        pageLength: 10
+        pageLength: 15
     };
 
-    ldap_users_table = jumpserver.initDataTable(options);
+    ldap_users_table = jumpserver.initServerSideDataTable(options);
     return ldap_users_table
 }
 
