@@ -53,7 +53,6 @@ class JMSCSVRender(BaseRenderer):
 
     def render(self, data, media_type=None, renderer_context=None):
         renderer_context = renderer_context or {}
-        encoding = renderer_context.get('encoding', 'utf-8')
         request = renderer_context['request']
         template = request.query_params.get('template', 'export')
         view = renderer_context['view']
@@ -74,7 +73,7 @@ class JMSCSVRender(BaseRenderer):
             table = self._gen_table(data, header, labels)
 
             csv_buffer = BytesIO()
-            csv_writer = unicodecsv.writer(csv_buffer, encoding=encoding)
+            csv_writer = unicodecsv.writer(csv_buffer, encoding='utf-8-sig')
             for row in table:
                 csv_writer.writerow(row)
 
