@@ -102,10 +102,10 @@ class RemoteAppPermissionUserView(AdminUserRequiredMixin,
             'app': _('Perms'),
             'action': _('RemoteApp permission user list'),
             'users_remain': current_org.get_org_users().exclude(
-                remoteapppermissions=self.object
+                remoteapppermission=self.object
             ),
             'user_groups_remain': UserGroup.objects.exclude(
-                remoteapppermissions=self.object
+                remoteapppermission=self.object
             )
         }
         kwargs.update(context)
