@@ -2,6 +2,7 @@
 #
 
 import unicodecsv
+import codecs
 from datetime import datetime
 
 from six import BytesIO
@@ -73,7 +74,8 @@ class JMSCSVRender(BaseRenderer):
             table = self._gen_table(data, header, labels)
 
             csv_buffer = BytesIO()
-            csv_writer = unicodecsv.writer(csv_buffer, encoding='utf-8-sig')
+            csv_buffer.write(codecs.BOM_UTF8)
+            csv_writer = unicodecsv.writer(csv_buffer, encoding='utf-8')
             for row in table:
                 csv_writer.writerow(row)
 

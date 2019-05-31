@@ -3,6 +3,7 @@
 
 import json
 import chardet
+import codecs
 import unicodecsv
 
 from rest_framework.parsers import BaseParser
@@ -82,6 +83,7 @@ class JMSCSVParser(BaseParser):
 
         try:
             stream_data = stream.read()
+            stream_data = stream_data.strip(codecs.BOM_UTF8)
             detect_result = chardet.detect(stream_data)
             encoding = detect_result.get("encoding", "utf-8")
             binary = self._universal_newlines(stream_data)
