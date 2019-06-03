@@ -167,6 +167,7 @@ class Session(OrgModelMixin):
 
     upload_to = 'replay'
     ACTIVE_CACHE_KEY_PREFIX = 'SESSION_ACTIVE_{}'
+    _DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = None
 
     def get_rel_replay_path(self, version=2):
         """
@@ -188,13 +189,29 @@ class Session(OrgModelMixin):
             local_path = rel_path
         return local_path
 
+    @property
+    def _date_start_first_has_replay_rdp_session(self):
+        if self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
+            instance = self.__class__.objects.filter(
+                protocol='rdp', has_replay=True).order_by('date_start').first()
+            if not instance:
+                return None
+            self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = instance.date_start
+
+        return self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION
+
     def can_replay(self):
         if self.has_replay:
             return True
-        version = settings.VERSION.split('.')
-        if [int(i) for i in version] > [1, 4, 8]:
-            return False
-        return True
+
+        # 判断对RDP Session添加上报has_replay状态机制之前的录像回放
+        if self._date_start_first_has_replay_rdp_session is None:
+            return True
+
+        if self.date_start < self._date_start_first_has_replay_rdp_session:
+            return True
+
+        return False
 
     def save_to_storage(self, f):
         local_path = self.get_local_path()
