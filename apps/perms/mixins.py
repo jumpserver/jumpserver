@@ -15,6 +15,7 @@ class AssetsFilterMixin(object):
     def filter_queryset(self, queryset):
         queryset = self.search_assets(queryset)
         queryset = self.sort_assets(queryset)
+        queryset = self.label_assets(queryset)
         return queryset
 
     def search_assets(self, queryset):
@@ -39,6 +40,28 @@ class AssetsFilterMixin(object):
 
         queryset = sort_assets(queryset, order_by=order_by, reverse=reverse)
         return queryset
+
+    def label_assets(self, queryset):
+        from assets.models import Label
+        query_keys = self.request.query_params.keys()
+        all_label_keys = Label.objects.values_list('name', flat=True)
+        valid_keys = set(all_label_keys) & set(query_keys)
+        labels_query = {}
+        for key in valid_keys:
+            labels_query[key] = self.request.query_params.get(key)
+
+        queryset = self.filter_labels_queryset(queryset, labels_query)
+        return queryset
+
+    def filter_labels_queryset(self, queryset, labels_query):
+        filter_queryset = []
+        if not labels_query:
+            return queryset
+        for item in queryset:
+            if item.labels.filter(name__in=labels_query.keys()) and \
+                    item.labels.filter(value__in=labels_query.values()):
+                filter_queryset.append(item)
+        return filter_queryset
 
 
 class RemoteAppFilterMixin(object):
