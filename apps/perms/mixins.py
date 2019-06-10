@@ -55,13 +55,14 @@ class AssetsFilterMixin(object):
         labels = set()
         for k, v in labels_query.items():
             label = Label.objects.filter(name=k, value=v).first()
-            if label:
-                labels.add(label)
+            if not label:
+                continue
+            labels.add(label)
 
         _queryset = []
         for asset in queryset:
-            _label = set(asset.labels.all()) & set(labels)
-            if _label and len(_label) == len(set(labels)):
+            _labels = set(asset.labels.all()) & set(labels)
+            if _labels and len(_labels) == len(set(labels)):
                 _queryset.append(asset)
         return _queryset
 
