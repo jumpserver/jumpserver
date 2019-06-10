@@ -236,6 +236,7 @@ class AdHoc(models.Model):
             logger.error(e, exc_info=True)
             return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
+            history.date_start = date_start
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start
             history.save()

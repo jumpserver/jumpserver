@@ -22,6 +22,14 @@ TEST_ADMIN_USER_CONN_TASKS = [
         }
     }
 ]
+TEST_WINDOWS_ADMIN_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
+        }
+    }
+]
 
 ASSET_ADMIN_CONN_CACHE_KEY = "ASSET_ADMIN_USER_CONN_{}"
 
@@ -34,7 +42,14 @@ TEST_SYSTEM_USER_CONN_TASKS = [
        }
    }
 ]
-
+TEST_WINDOWS_SYSTEM_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
+        }
+    }
+]
 
 ASSET_USER_CONN_CACHE_KEY = 'ASSET_USER_CONN_{}_{}'
 TEST_ASSET_USER_CONN_TASKS = [
@@ -42,6 +57,14 @@ TEST_ASSET_USER_CONN_TASKS = [
         "name": "ping",
         "action": {
             "module": "ping",
+        }
+    }
+]
+TEST_WINDOWS_ASSET_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
         }
     }
 ]

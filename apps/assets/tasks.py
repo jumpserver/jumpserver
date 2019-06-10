@@ -3,6 +3,7 @@ import json
 import re
 import os
 
+from collections import defaultdict
 from celery import shared_task
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
@@ -96,7 +97,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
         ___disk_total = '%s %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)
 
-        ___platform = info.get('ansible_system', 'Unknown')
+        # ___platform = info.get('ansible_system', 'Unknown')
         ___os = info.get('ansible_distribution', 'Unknown')
         ___os_version = info.get('ansible_distribution_version', 'Unknown')
         ___os_arch = info.get('ansible_architecture', 'Unknown')
@@ -163,25 +164,42 @@ def test_asset_connectivity_util(assets, task_name=None):
 
     if task_name is None:
         task_name = _("Test assets connectivity")
+
     hosts = clean_hosts(assets)
     if not hosts:
         return {}
-    tasks = const.TEST_ADMIN_USER_CONN_TASKS
-    created_by = assets[0].org_id
-    task, created = update_or_create_ansible_task(
-        task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS, run_as_admin=True, created_by=created_by,
+
+    results_summary = dict(
+        contacted=defaultdict(dict),
+        dark=defaultdict(dict),
+        success=True
     )
-    result = task.run()
-    summary = result[1]
-    for asset in assets:
-        if asset.hostname in summary.get('dark', {}):
-            asset.connectivity = asset.UNREACHABLE
-        elif asset.hostname in summary.get('contacted', []):
-            asset.connectivity = asset.REACHABLE
+    created_by = assets[0].org_id
+    for host in hosts:
+        if host.is_windows():
+            tasks = const.TEST_WINDOWS_ADMIN_USER_CONN_TASKS
         else:
-            asset.connectivity = asset.UNKNOWN
-    return summary
+            tasks = const.TEST_ADMIN_USER_CONN_TASKS
+
+        task, created = update_or_create_ansible_task(
+            task_name=task_name, hosts=[host], tasks=tasks, pattern='all',
+            options=const.TASK_OPTIONS, run_as_admin=True, created_by=created_by,
+        )
+        result = task.run()
+        summary = result[1]
+        if host.hostname in summary.get('dark', {}):
+            host.connectivity = host.UNREACHABLE
+        elif host.hostname in summary.get('contacted', []):
+            host.connectivity = host.REACHABLE
+        else:
+            host.connectivity = host.UNKNOWN
+
+        if not summary.get('success'):
+            results_summary['success'] = False
+        results_summary['contacted'].update(summary['contacted'])
+        results_summary['dark'].update(summary['dark'])
+
+    return results_summary
 
 
 @shared_task
@@ -243,9 +261,8 @@ def test_admin_user_connectivity_manual(admin_user):
 ##  System user connective ##
 
 @shared_task
-def set_system_user_connectivity_info(system_user, result):
-    summary = result[1]
-    system_user.connectivity = summary
+def set_system_user_connectivity_info(system_user, results_summary):
+    system_user.connectivity = results_summary
 
 
 @shared_task
@@ -258,18 +275,35 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     hosts = clean_hosts(assets)
     if not hosts:
         return {}
-    task, created = update_or_create_ansible_task(
-        task_name, hosts=hosts, tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS,
-        run_as=system_user.username, created_by=system_user.org_id,
+
+    results_summary = dict(
+        contacted=defaultdict(dict),
+        dark=defaultdict(dict),
+        success=True
     )
-    result = task.run()
-    set_system_user_connectivity_info(system_user, result)
-    return result
+    for host in hosts:
+        if host.is_windows():
+            tasks = const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
+        else:
+            tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+
+        task, created = update_or_create_ansible_task(
+            task_name, hosts=[host], tasks=tasks, pattern='all',
+            options=const.TASK_OPTIONS,
+            run_as=system_user.username, created_by=system_user.org_id,
+        )
+        result = task.run()
+        summary = result[1]
+        if not summary.get('success'):
+            results_summary['success'] = False
+        results_summary['contacted'].update(summary['contacted'])
+        results_summary['dark'].update(summary['dark'])
+
+    set_system_user_connectivity_info(system_user, results_summary)
+    return results_summary
 
 
 @shared_task
@@ -437,7 +471,11 @@ def test_asset_user_connectivity_util(asset_user, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
-    tasks = const.TEST_ASSET_USER_CONN_TASKS
+    if asset_user.asset.is_unixlike():
+        tasks = const.TEST_ASSET_USER_CONN_TASKS
+    else:
+        tasks = const.TEST_WINDOWS_ASSET_USER_CONN_TASKS
+
     if not check_asset_can_run_ansible(asset_user.asset):
         return
 

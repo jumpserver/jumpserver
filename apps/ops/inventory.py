@@ -21,7 +21,7 @@ class JMSBaseInventory(BaseInventory):
             'id': asset.id,
             'hostname': asset.hostname,
             'ip': asset.ip,
-            'port': asset.protocol_ssh.port,
+            'port': asset.ssh_port,
             'vars': dict(),
             'groups': [],
         }
@@ -31,6 +31,11 @@ class JMSBaseInventory(BaseInventory):
             info.update(asset.get_auth_info())
         for node in asset.nodes.all():
             info["groups"].append(node.value)
+        if asset.is_windows():
+            info["vars"].update({
+                "ansible_connection": "ssh",
+                "ansible_shell_type": "cmd",
+            })
         for label in asset.labels.all():
             info["vars"].update({
                 label.name: label.value
@@ -86,17 +91,14 @@ class JMSInventory(JMSBaseInventory):
         host_list = []
 
         for asset in assets:
-            info = self.convert_to_ansible(asset, run_as_admin=run_as_admin)
-            host_list.append(info)
-
-        if run_as:
-            for host in host_list:
+            host = self.convert_to_ansible(asset, run_as_admin=run_as_admin)
+            if run_as:
                 run_user_info = self.get_run_user_info(host)
                 host.update(run_user_info)
-
-        if become_info:
-            for host in host_list:
+            if become_info and asset.is_unixlike():
                 host.update(become_info)
+            host_list.append(host)
+
         super().__init__(host_list=host_list)
 
     def get_run_user_info(self, host):
@@ -133,12 +135,10 @@ class JMSCustomInventory(JMSBaseInventory):
         host_list = []
 
         for asset in assets:
-            info = self.convert_to_ansible(asset)
-            host_list.append(info)
-
-        for host in host_list:
+            host = self.convert_to_ansible(asset)
             run_user_info = self.get_run_user_info()
             host.update(run_user_info)
+            host_list.append(host)
 
         super().__init__(host_list=host_list)
 

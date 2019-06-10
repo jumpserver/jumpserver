@@ -178,6 +178,20 @@ class Asset(OrgModelMixin):
     def protocol_rdp(self):
         return self.get_protocol_by_name("rdp")
 
+    @property
+    def ssh_port(self):
+        if self.protocol_ssh:
+            port = self.protocol_ssh.port
+        else:
+            port = 22
+        return port
+
+    def is_windows(self):
+        if self.platform in ("Windows", "Windows2016"):
+            return True
+        else:
+            return False
+
     def is_unixlike(self):
         if self.platform not in ("Windows", "Windows2016", "Other"):
             return True
@@ -248,14 +262,18 @@ class Asset(OrgModelMixin):
         cache.set(key, value, 3600*2)
 
     def get_auth_info(self):
-        if self.admin_user:
-            self.admin_user.load_specific_asset_auth(self)
-            return {
-                'username': self.admin_user.username,
-                'password': self.admin_user.password,
-                'private_key': self.admin_user.private_key_file,
-                'become': self.admin_user.become_info,
-            }
+        if not self.admin_user:
+            return {}
+
+        self.admin_user.load_specific_asset_auth(self)
+        auth_info = {
+            'username': self.admin_user.username,
+            'password': self.admin_user.password,
+            'private_key': self.admin_user.private_key_file,
+        }
+        if self.is_unixlike():
+            auth_info.update({'become': self.admin_user.become_info})
+        return auth_info
 
     def as_node(self):
         from .node import Node
