@@ -52,18 +52,18 @@ class AssetsFilterMixin(object):
         if not labels_query:
             return queryset
 
-        labels = []
+        labels = set()
         for k, v in labels_query.items():
-            label = Label.objects.filter(name=k, value=v)
+            label = Label.objects.filter(name=k, value=v).first()
             if label:
-                labels.append(label.first())
+                labels.add(label)
 
-        queryset_end = []
+        _queryset = []
         for asset in queryset:
-            has_query_asset_label = set(asset.labels.all()) & set(labels)
-            if has_query_asset_label and len(has_query_asset_label) == len(set(labels)):
-                queryset_end.append(asset)
-        return queryset_end
+            _label = set(asset.labels.all()) & set(labels)
+            if _label and len(_label) == len(set(labels)):
+                _queryset.append(asset)
+        return _queryset
 
 
 class RemoteAppFilterMixin(object):
