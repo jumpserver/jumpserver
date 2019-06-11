@@ -37,9 +37,21 @@ class GenerateTree:
 
     def add_asset(self, asset, system_users):
         nodes = asset.nodes.all()
-        self.add_nodes(nodes)
+        in_nodes = False
         for node in nodes:
+            if node not in self.nodes:
+                continue
             self.nodes[node][asset].update(system_users)
+            in_nodes = True
+        if not in_nodes:
+            all_nodes = self.nodes.keys()
+            # 如果没有授权节点，就放到默认的根节点下
+            if not all_nodes:
+                root_node = Node.root()
+                self.add_node(root_node)
+            else:
+                root_node = max(all_nodes)
+            self.nodes[root_node][asset].update(system_users)
 
     def get_nodes(self):
         for node in self.nodes:
@@ -50,6 +62,7 @@ class GenerateTree:
             node.assets_amount = len(assets)
         return self.nodes
 
+    # 添加节点时，追溯到根节点
     def add_node(self, node):
         if node in self.nodes:
             return
@@ -62,9 +75,11 @@ class GenerateTree:
                 self.add_node(n)
                 break
 
+    # 添加树节点
     def add_nodes(self, nodes):
         for node in nodes:
             self.add_node(node)
+            self.add_nodes(node.get_all_children(with_self=False))
 
 
 def get_user_permissions(user, include_group=True):
@@ -123,6 +138,7 @@ class AssetPermissionUtil:
         self._assets = None
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.cache_policy = cache_policy
+        self.tree = GenerateTree()
 
     @classmethod
     def is_not_using_cache(cls, cache_policy):
@@ -181,6 +197,7 @@ class AssetPermissionUtil:
         permissions = self.permissions.prefetch_related('nodes', 'system_users')
         for perm in permissions:
             actions = perm.actions.all()
+            self.tree.add_nodes(perm.nodes.all())
             for node in perm.nodes.all():
                 system_users = perm.system_users.all()
                 system_users = self._structured_system_user(system_users, actions)
@@ -275,10 +292,9 @@ class AssetPermissionUtil:
         :return:
         """
         assets = self.get_assets_without_cache()
-        tree = GenerateTree()
         for asset, system_users in assets.items():
-            tree.add_asset(asset, system_users)
-        return tree.get_nodes()
+            self.tree.add_asset(asset, system_users)
+        return self.tree.get_nodes()
 
     def get_nodes_with_assets_from_cache(self):
         cached = cache.get(self.node_key)

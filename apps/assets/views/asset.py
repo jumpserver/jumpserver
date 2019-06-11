@@ -79,6 +79,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'action': _('My assets'),
+            'labels': Label.objects.all().order_by('name'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)

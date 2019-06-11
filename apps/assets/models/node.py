@@ -40,8 +40,10 @@ class Node(OrgModelMixin):
         return self.key == other.key
 
     def __gt__(self, other):
-        if self.is_root():
+        if self.is_root() and not other.is_root():
             return True
+        elif not self.is_root() and other.is_root():
+            return False
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]
         self_parent_key = self_key[:-1]
@@ -49,6 +51,10 @@ class Node(OrgModelMixin):
 
         if self_parent_key == other_parent_key:
             return self.name > other.name
+        if len(self_parent_key) < len(other_parent_key):
+            return True
+        elif len(self_parent_key) > len(other_parent_key):
+            return False
         return self_key > other_key
 
     def __lt__(self, other):
