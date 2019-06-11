@@ -44,7 +44,13 @@ class GenerateTree:
             self.nodes[node][asset].update(system_users)
             in_nodes = True
         if not in_nodes:
-            root_node = max(self.nodes.keys())
+            all_nodes = self.nodes.keys()
+            # 如果没有授权节点，就放到默认的根节点下
+            if not all_nodes:
+                root_node = Node.root()
+                self.add_node(root_node)
+            else:
+                root_node = max(all_nodes)
             self.nodes[root_node][asset].update(system_users)
 
     def get_nodes(self):
