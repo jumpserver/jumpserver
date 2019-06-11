@@ -169,35 +169,45 @@ def test_asset_connectivity_util(assets, task_name=None):
     if not hosts:
         return {}
 
-    results_summary = dict(
-        contacted=defaultdict(dict),
-        dark=defaultdict(dict),
-        success=True
-    )
-    created_by = assets[0].org_id
+    hosts_category = {
+        'linux': {
+             'hosts': [], 'tasks': const.TEST_ADMIN_USER_CONN_TASKS
+        },
+        'windows': {
+             'hosts': [], 'tasks': const.TEST_WINDOWS_ADMIN_USER_CONN_TASKS
+        }
+    }
     for host in hosts:
         if host.is_windows():
-            tasks = const.TEST_WINDOWS_ADMIN_USER_CONN_TASKS
+            hosts_category['windows']['hosts'].append(host)
         else:
-            tasks = const.TEST_ADMIN_USER_CONN_TASKS
+            hosts_category['linux']['hosts'].append(host)
 
+    results_summary = dict(
+        contacted=defaultdict(dict), dark=defaultdict(dict), success=True
+    )
+    created_by = assets[0].org_id
+    for key, value in hosts_category.items():
+        if not value['hosts']:
+            continue
         task, created = update_or_create_ansible_task(
-            task_name=task_name, hosts=[host], tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS, run_as_admin=True, created_by=created_by,
+            task_name=task_name, hosts=value['hosts'], tasks=value['tasks'],
+            pattern='all', options=const.TASK_OPTIONS, run_as_admin=True,
+            created_by=created_by,
         )
         result = task.run()
         summary = result[1]
-        if host.hostname in summary.get('dark', {}):
-            host.connectivity = host.UNREACHABLE
-        elif host.hostname in summary.get('contacted', []):
-            host.connectivity = host.REACHABLE
-        else:
-            host.connectivity = host.UNKNOWN
-
-        if not summary.get('success'):
-            results_summary['success'] = False
+        results_summary['success'] = summary['success']
         results_summary['contacted'].update(summary['contacted'])
         results_summary['dark'].update(summary['dark'])
+
+    for asset in assets:
+        if asset.hostname in results_summary.get('dark', {}):
+            asset.connectivity = asset.UNREACHABLE
+        elif asset.hostname in results_summary.get('contacted', []):
+            asset.connectivity = asset.REACHABLE
+        else:
+            asset.connectivity = asset.UNKNOWN
 
     return results_summary
 
@@ -275,34 +285,46 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     :return:
     """
     from ops.utils import update_or_create_ansible_task
+
     hosts = clean_hosts(assets)
     if not hosts:
         return {}
 
-    results_summary = dict(
-        contacted=defaultdict(dict),
-        dark=defaultdict(dict),
-        success=True
-    )
+    hosts_category = {
+        'linux': {
+            'hosts': [], 'tasks': const.TEST_SYSTEM_USER_CONN_TASKS
+        },
+        'windows': {
+            'hosts': [], 'tasks': const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
+        }
+    }
     for host in hosts:
         if host.is_windows():
-            tasks = const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
+            hosts_category['windows']['hosts'].append(host)
         else:
-            tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+            hosts_category['linux']['hosts'].append(host)
 
+    results_summary = dict(
+        contacted=defaultdict(dict), dark=defaultdict(dict), success=True
+    )
+
+    for key, value in hosts_category.items():
+        if not value['hosts']:
+            continue
         task, created = update_or_create_ansible_task(
-            task_name, hosts=[host], tasks=tasks, pattern='all',
-            options=const.TASK_OPTIONS,
-            run_as=system_user.username, created_by=system_user.org_id,
+            task_name=task_name, hosts=value['hosts'], tasks=value['tasks'],
+            pattern='all', options=const.TASK_OPTIONS,
+            run_as=system_user.username,
+            created_by=system_user.org_id,
         )
         result = task.run()
         summary = result[1]
-        if not summary.get('success'):
-            results_summary['success'] = False
+        results_summary['success'] = summary['success']
         results_summary['contacted'].update(summary['contacted'])
         results_summary['dark'].update(summary['dark'])
 
     set_system_user_connectivity_info(system_user, results_summary)
+
     return results_summary
 
 

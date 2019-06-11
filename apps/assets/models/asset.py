@@ -266,14 +266,12 @@ class Asset(OrgModelMixin):
             return {}
 
         self.admin_user.load_specific_asset_auth(self)
-        auth_info = {
+        info = {
             'username': self.admin_user.username,
             'password': self.admin_user.password,
             'private_key': self.admin_user.private_key_file,
         }
-        if self.is_unixlike():
-            auth_info.update({'become': self.admin_user.become_info})
-        return auth_info
+        return info
 
     def as_node(self):
         from .node import Node

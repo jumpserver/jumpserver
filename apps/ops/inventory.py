@@ -29,6 +29,8 @@ class JMSBaseInventory(BaseInventory):
             info["vars"].update(self.make_proxy_command(asset))
         if run_as_admin:
             info.update(asset.get_auth_info())
+        if asset.is_unixlike():
+            info["become"] = asset.admin_user.become_info
         for node in asset.nodes.all():
             info["groups"].append(node.value)
         if asset.is_windows():
