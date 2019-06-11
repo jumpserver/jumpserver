@@ -53,6 +53,8 @@ class Node(OrgModelMixin):
             return self.name > other.name
         if len(self_parent_key) < len(other_parent_key):
             return True
+        elif len(self_parent_key) > len(other_parent_key):
+            return False
         return self_key > other_key
 
     def __lt__(self, other):
