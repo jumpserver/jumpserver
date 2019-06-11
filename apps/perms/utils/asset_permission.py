@@ -79,6 +79,7 @@ class GenerateTree:
     def add_nodes(self, nodes):
         for node in nodes:
             self.add_node(node)
+            self.add_nodes(node.get_all_children(with_self=False))
 
 
 def get_user_permissions(user, include_group=True):
