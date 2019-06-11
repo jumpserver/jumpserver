@@ -16,11 +16,13 @@
         </li>
     </ul>
 </li>
+{% if SECURITY_COMMAND_EXECUTION %}
 <li id="ops">
     <a href="{% url 'ops:command-execution-start' %}">
         <i class="fa fa-terminal" style="width: 14px"></i> <span class="nav-label">{% trans 'Command execution' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
+{% endif %}
 <li id="users">
     <a href="{% url 'users:user-profile' %}">
         <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>

@@ -180,6 +180,11 @@ class SecuritySettingForm(BaseForm):
             'authentication (valid for all users, including administrators)'
         )
     )
+    # Execute commands for user
+    SECURITY_COMMAND_EXECUTION = forms.BooleanField(
+        required=False, label=_("Batch execute commands"),
+        help_text=_("Allow user batch execute commands")
+    )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
         min_value=3, max_value=99999,
