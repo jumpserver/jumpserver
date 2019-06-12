@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 16:59+0800\n"
+"POT-Creation-Date: 2019-06-12 17:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -595,7 +595,7 @@ msgstr "远程应用详情"
 msgid "My RemoteApp"
 msgstr "我的远程应用"
 
-#: assets/api/asset.py:126
+#: assets/api/asset.py:128
 msgid "Please select assets that need to be updated"
 msgstr "请选择需要更新的资产"
 
