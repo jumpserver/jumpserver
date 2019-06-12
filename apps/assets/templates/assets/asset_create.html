@@ -229,6 +229,9 @@ $(document).ready(function () {
             return v
         });
         data["protocols"] = protocols;
+        if (typeof data.labels === "string") {
+            data["labels"] = [data["labels"]];
+        }
         if (typeof data["nodes"] == "string") {
             data["nodes"] = [data["nodes"]]
         }
