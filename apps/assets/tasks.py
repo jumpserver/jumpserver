@@ -50,18 +50,14 @@ def clean_hosts(assets):
     return clean_assets
 
 
-def clean_hosts_related_system_user_protocol(system_user, assets):
-    if system_user.protocol_is_ssh:
-        hosts = [asset for asset in assets if asset .is_unixlike()]
-    elif system_user.protocol_is_rdp:
-        hosts = [asset for asset in assets if asset.is_windows()]
-    else:
-        msg = _("The system user {} protocol does "
-                "not support test connectivity".format(system_user.name))
-        logger.info(msg)
-        hosts = []
+def clean_hosts_by_protocol(system_user, assets):
+    hosts = [
+        asset for asset in assets
+        if asset.has_protocol(system_user.protocol)
+    ]
     if not hosts:
-        logger.info(_("No assets matched related system user, stop task"))
+        msg = _("No assets matched related system user protocol, stop task")
+        logger.info(msg)
     return hosts
 
 
@@ -186,23 +182,24 @@ def test_asset_connectivity_util(assets, task_name=None):
 
     hosts_category = {
         'linux': {
-             'hosts': [], 'tasks': const.TEST_ADMIN_USER_CONN_TASKS
+            'hosts': [],
+            'tasks': const.TEST_ADMIN_USER_CONN_TASKS
         },
         'windows': {
-             'hosts': [], 'tasks': const.TEST_WINDOWS_ADMIN_USER_CONN_TASKS
+            'hosts': [],
+            'tasks': const.TEST_WINDOWS_ADMIN_USER_CONN_TASKS
         }
     }
     for host in hosts:
-        if host.is_windows():
-            hosts_category['windows']['hosts'].append(host)
-        else:
-            hosts_category['linux']['hosts'].append(host)
+        hosts_list = hosts_category['windows']['hosts'] if host.is_windows() \
+            else hosts_category['linux']['hosts']
+        hosts_list.append(host)
 
     results_summary = dict(
         contacted=defaultdict(dict), dark=defaultdict(dict), success=True
     )
     created_by = assets[0].org_id
-    for key, value in hosts_category.items():
+    for _, value in hosts_category.items():
         if not value['hosts']:
             continue
         task, created = update_or_create_ansible_task(
@@ -212,7 +209,7 @@ def test_asset_connectivity_util(assets, task_name=None):
         )
         result = task.run()
         summary = result[1]
-        results_summary['success'] = summary['success']
+        results_summary['success'] &= summary['success']
         results_summary['contacted'].update(summary['contacted'])
         results_summary['dark'].update(summary['dark'])
 
@@ -299,8 +296,7 @@ def get_test_system_user_connectivity_tasks(system_user):
 
 
 @shared_task
-def set_system_user_connectivity_info(system_user, result):
-    summary = result[1]
+def set_system_user_connectivity_info(system_user, summary):
     system_user.connectivity = summary
 
 
@@ -319,21 +315,45 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     if not hosts:
         return {}
 
-    hosts = clean_hosts_related_system_user_protocol(system_user, hosts)
+    hosts = clean_hosts_by_protocol(system_user, hosts)
     if not hosts:
         return {}
 
-    tasks = get_test_system_user_connectivity_tasks(system_user)
+    hosts_category = {
+        'linux': {
+            'hosts': [],
+            'tasks': const.TEST_SYSTEM_USER_CONN_TASKS
+        },
+        'windows': {
+            'hosts': [],
+            'tasks': const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
+        }
+    }
+    for host in hosts:
+        hosts_list = hosts_category['windows']['hosts'] if host.is_windows() \
+            else hosts_category['linux']['hosts']
+        hosts_list.append(host)
 
-    task, created = update_or_create_ansible_task(
-        task_name=task_name, hosts=hosts, tasks=tasks,
-        pattern='all', options=const.TASK_OPTIONS,
-        run_as=system_user.username,
-        created_by=system_user.org_id,
+    results_summary = dict(
+        contacted=defaultdict(dict), dark=defaultdict(dict), success=True
     )
-    result = task.run()
-    set_system_user_connectivity_info(system_user, result)
-    return result
+    for _, value in hosts_category.items():
+        if not value['hosts']:
+            continue
+        task, created = update_or_create_ansible_task(
+            task_name=task_name, hosts=value['hosts'], tasks=value['tasks'],
+            pattern='all', options=const.TASK_OPTIONS,
+            run_as=system_user.username,
+            created_by=system_user.org_id,
+        )
+        result = task.run()
+        summary = result[1]
+        results_summary['success'] &= summary['success']
+        results_summary['contacted'].update(summary['contacted'])
+        results_summary['dark'].update(summary['dark'])
+
+    set_system_user_connectivity_info(system_user, results_summary)
+    return results_summary
 
 
 @shared_task
@@ -365,7 +385,7 @@ def test_system_user_connectivity_period():
 
 ####  Push system user tasks ####
 
-def get_push_ssh_system_user_tasks(system_user):
+def get_push_linux_system_user_tasks(system_user):
     tasks = []
     if system_user.password:
         tasks.append({
@@ -428,7 +448,7 @@ def get_push_ssh_system_user_tasks(system_user):
     return tasks
 
 
-def get_push_rdp_system_user_tasks(system_user):
+def get_push_windows_system_user_tasks(system_user):
     tasks = []
     if system_user.password:
         tasks.append({
@@ -446,14 +466,16 @@ def get_push_rdp_system_user_tasks(system_user):
     return tasks
 
 
-def get_push_system_user_tasks(system_user):
-    if system_user.protocol_is_ssh:
-        tasks = get_push_ssh_system_user_tasks(system_user)
-    elif system_user.protocol_is_rdp:
-        tasks = get_push_rdp_system_user_tasks(system_user)
+def get_push_system_user_tasks(host, system_user):
+    if host.is_unixlike():
+        tasks = get_push_linux_system_user_tasks(system_user)
+    elif host.is_windows():
+        tasks = get_push_windows_system_user_tasks(system_user)
     else:
-        msg = _("Get push system user task is empty: {}".
-                format(system_user.username))
+        msg = _(
+            "The asset {} system platform {} does not "
+            "support push system user".format(host.hostname, host.platform)
+        )
         logger.info(msg)
         tasks = []
     return tasks
@@ -478,13 +500,13 @@ def push_system_user_util(system_user, assets, task_name):
     if not hosts:
         return {}
 
-    hosts = clean_hosts_related_system_user_protocol(system_user, hosts)
+    hosts = clean_hosts_by_protocol(system_user, hosts)
     if not hosts:
         return {}
 
     for host in hosts:
         system_user.load_specific_asset_auth(host)
-        tasks = get_push_system_user_tasks(system_user)
+        tasks = get_push_system_user_tasks(host, system_user)
         if not tasks:
             continue
         task, created = update_or_create_ansible_task(
@@ -531,10 +553,10 @@ def test_admin_user_connectability_period():
 #### Test Asset user connectivity task ####
 
 def get_test_asset_user_connectivity_tasks(asset):
-    if asset.is_unixlike():
-        tasks = const.TEST_ASSET_USER_CONN_TASKS
-    else:
+    if asset.is_windows():
         tasks = const.TEST_WINDOWS_ASSET_USER_CONN_TASKS
+    else:
+        tasks = const.TEST_ASSET_USER_CONN_TASKS
     return tasks
 
 
@@ -557,7 +579,6 @@ def test_asset_user_connectivity_util(asset_user, task_name):
         return
 
     tasks = get_test_asset_user_connectivity_tasks(asset_user.asset)
-
     task, created = update_or_create_ansible_task(
         task_name, hosts=[asset_user.asset], tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
