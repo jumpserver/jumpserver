@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 16:50+0800\n"
+"POT-Creation-Date: 2019-06-12 17:06+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2017,13 +2017,11 @@ msgstr ""
 #: assets/templates/assets/system_user_list.html:12
 msgid ""
 "When system users are created, if you choose auto push Jumpserver to use "
-"ansible push system users into the asset, if the asset (Switch, Windows) "
-"does not support ansible, please manually fill in the account password. "
-"Automatic push for Windows is not currently supported."
+"ansible push system users into the asset, if the asset (Switch) does not "
+"support ansible, please manually fill in the account password."
 msgstr ""
 "系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到"
-"资产中，如果资产(交换机、windows)不支持ansible, 请手动填写账号密码。目前还不"
-"支持Windows的自动推送"
+"资产中，如果资产(交换机)不支持ansible, 请手动填写账号密码。"
 
 #: assets/templates/assets/system_user_list.html:43
 #: assets/views/system_user.py:45
@@ -5317,23 +5315,17 @@ msgstr "定时执行"
 
 #: xpack/plugins/change_auth_plan/forms.py:120
 msgid ""
-"Tips: Currently only unix-like assets are supported, while Windows assets "
-"are not"
-msgstr "提示：目前仅支持类Unix资产，暂不支持Windows资产"
-
-#: xpack/plugins/change_auth_plan/forms.py:122
-msgid ""
 "Tips: The username of the user on the asset to be modified. if the user "
 "exists, change the password; If the user does not exist, create the user."
 msgstr ""
 "提示：用户名为将要修改的资产上的用户的用户名。如果用户存在，则修改密码；如果"
 "用户不存在，则创建用户。"
 
-#: xpack/plugins/change_auth_plan/forms.py:126
+#: xpack/plugins/change_auth_plan/forms.py:124
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
-#: xpack/plugins/change_auth_plan/forms.py:127
+#: xpack/plugins/change_auth_plan/forms.py:125
 msgid ""
 "eg: Every Sunday 03:05 run <5 3 * * 0> <br> Tips: Using 5 digits linux "
 "crontab expressions <min hour day month week> (<a href='https://tool.lu/"
