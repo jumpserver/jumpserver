@@ -17,7 +17,7 @@ from ..hands import (
     AssetGrantedSerializer, UserGroup,  Node, NodeSerializer,
     RemoteAppSerializer,
 )
-from .. import serializers
+from .. import serializers, const
 
 
 __all__ = [
@@ -134,8 +134,11 @@ class UserGroupGrantedNodeAssetsApi(ListAPIView):
         node_id = self.kwargs.get('node_id')
 
         user_group = get_object_or_404(UserGroup, id=user_group_id)
-        node = get_object_or_404(Node, id=node_id)
         util = AssetPermissionUtil(user_group)
+        if str(node_id) == const.UNGROUPED_NODE_ID:
+            node = util.tree.ungrouped_node
+        else:
+            node = get_object_or_404(Node, id=node_id)
         nodes = util.get_nodes_with_assets()
         assets = nodes.get(node, [])
         for asset, system_users in assets.items():

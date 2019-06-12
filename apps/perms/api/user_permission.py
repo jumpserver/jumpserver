@@ -24,7 +24,7 @@ from ..hands import (
     User, Asset, Node, SystemUser, RemoteApp, AssetGrantedSerializer,
     NodeSerializer, RemoteAppSerializer,
 )
-from .. import serializers
+from .. import serializers, const
 from ..mixins import AssetsFilterMixin, RemoteAppFilterMixin
 from ..models import Action
 
@@ -300,9 +300,15 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, List
         user = self.get_object()
         node_id = self.kwargs.get('node_id')
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
-        node = get_object_or_404(Node, id=node_id)
-        nodes = util.get_nodes_with_assets()
-        assets = nodes.get(node, [])
+        if str(node_id) == const.UNGROUPED_NODE_ID:
+            node = util.tree.ungrouped_node
+        else:
+            node = get_object_or_404(Node, id=node_id)
+        if node == util.tree.root_node:
+            assets = util.get_assets()
+        else:
+            nodes = util.get_nodes_with_assets()
+            assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
 
