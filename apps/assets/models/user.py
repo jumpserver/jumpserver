@@ -161,6 +161,14 @@ class SystemUser(AssetUser):
         return assets
 
     @property
+    def protocol_is_ssh(self):
+        return self.protocol == self.PROTOCOL_SSH
+
+    @property
+    def protocol_is_rdp(self):
+        return self.protocol == self.PROTOCOL_RDP
+
+    @property
     def connectivity(self):
         cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
         value = cache.get(cache_key, None)
@@ -201,7 +209,7 @@ class SystemUser(AssetUser):
         return self.get_login_mode_display()
 
     def is_need_push(self):
-        if self.auto_push and self.protocol == self.PROTOCOL_SSH:
+        if self.auto_push and self.protocol in [self.PROTOCOL_SSH, self.PROTOCOL_RDP]:
             return True
         else:
             return False
