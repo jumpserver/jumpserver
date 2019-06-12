@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 14:35+0800\n"
+"POT-Creation-Date: 2019-06-12 16:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1252,80 +1252,72 @@ msgid "No assets matched, stop task"
 msgstr "没有匹配到资产，结束任务"
 
 #: assets/tasks.py:59
-msgid "The system user {} protocol does not support test connectivity"
-msgstr "系统用户 {} 协议不支持测试可连接性"
+msgid "No assets matched related system user protocol, stop task"
+msgstr "没有匹配到与系统用户协议相关的资产，结束任务"
 
-#: assets/tasks.py:64
-msgid "No assets matched related system user, stop task"
-msgstr "没有匹配到系统用户相关的资产，结束任务"
-
-#: assets/tasks.py:89
+#: assets/tasks.py:85
 msgid "Get asset info failed: {}"
 msgstr "获取资产信息失败：{}"
 
-#: assets/tasks.py:139
+#: assets/tasks.py:135
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:156
+#: assets/tasks.py:152
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:181
+#: assets/tasks.py:177
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:232
+#: assets/tasks.py:229
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:274
+#: assets/tasks.py:271
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:281
+#: assets/tasks.py:278
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:294
-msgid "Get test system user connectivity task is empty: {}"
-msgstr "获取测试系统用户可连接性任务为空: {}"
-
-#: assets/tasks.py:341
+#: assets/tasks.py:348
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:348
+#: assets/tasks.py:355
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:361
+#: assets/tasks.py:368
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:455
-msgid "Get push system user task is empty: {}"
-msgstr "获取推送系统用户任务为空: {}"
+#: assets/tasks.py:463
+msgid "The asset {} system platform {} does not support push system user"
+msgstr "资产 {} 系统平台 {} 不支持推送系统用户"
 
-#: assets/tasks.py:466
+#: assets/tasks.py:475
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh or "
 "rdp: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
 
-#: assets/tasks.py:473
+#: assets/tasks.py:482
 msgid "For security, do not push user {}"
 msgstr "为了安全，禁止推送用户 {}"
 
-#: assets/tasks.py:501 assets/tasks.py:515
+#: assets/tasks.py:510 assets/tasks.py:524
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:507
+#: assets/tasks.py:516
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:576
+#: assets/tasks.py:584
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 
@@ -2636,6 +2628,7 @@ msgid "discard time"
 msgstr ""
 
 #: common/mixins.py:210
+#, python-format
 msgid "%(name)s was %(action)s successfully"
 msgstr "%(name)s %(action)s成功"
 
@@ -2730,11 +2723,11 @@ msgstr "Become"
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models/adhoc.py:223
+#: ops/models/adhoc.py:224
 msgid "{} Start task: {}"
 msgstr "{} 任务开始: {}"
 
-#: ops/models/adhoc.py:226
+#: ops/models/adhoc.py:227
 msgid "{} Task finish"
 msgstr "{} 任务结束"
 

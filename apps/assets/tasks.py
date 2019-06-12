@@ -282,19 +282,6 @@ def test_admin_user_connectivity_manual(admin_user):
 
 ##  System user connective ##
 
-def get_test_system_user_connectivity_tasks(system_user):
-    if system_user.protocol_is_ssh:
-        tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    elif system_user.protocol_is_rdp:
-        tasks = const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
-    else:
-        msg = _("Get test system user connectivity task is empty: {}".
-                format(system_user.username))
-        logger.info(msg)
-        tasks = []
-    return tasks
-
-
 @shared_task
 def set_system_user_connectivity_info(system_user, summary):
     system_user.connectivity = summary
