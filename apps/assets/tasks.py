@@ -291,7 +291,7 @@ def get_test_system_user_connectivity_tasks(system_user):
     elif system_user.protocol_is_rdp:
         tasks = const.TEST_WINDOWS_SYSTEM_USER_CONN_TASKS
     else:
-        msg = _("Get test system user {} connectivity task is empty".
+        msg = _("Get test system user connectivity task is empty: {}".
                 format(system_user.username))
         logger.info(msg)
         tasks = []
@@ -452,7 +452,7 @@ def get_push_system_user_tasks(system_user):
     elif system_user.protocol_is_rdp:
         tasks = get_push_rdp_system_user_tasks(system_user)
     else:
-        msg = _("Get push system user {} task is empty".
+        msg = _("Get push system user task is empty: {}".
                 format(system_user.username))
         logger.info(msg)
         tasks = []
