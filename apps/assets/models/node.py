@@ -37,7 +37,7 @@ class Node(OrgModelMixin):
     def __eq__(self, other):
         if not other:
             return False
-        return self.key == other.key
+        return self.id == other.id
 
     def __gt__(self, other):
         if self.is_root() and not other.is_root():

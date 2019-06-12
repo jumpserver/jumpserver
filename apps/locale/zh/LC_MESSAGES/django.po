@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-11 11:39+0800\n"
+"POT-Creation-Date: 2019-06-12 16:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -110,7 +110,7 @@ msgstr "资产"
 #: applications/templates/applications/remote_app_detail.html:61
 #: applications/templates/applications/remote_app_list.html:23
 #: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:168
+#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:172
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72
 #: perms/forms/asset_permission.py:52 perms/models/asset_permission.py:39
@@ -271,7 +271,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:59
-#: assets/templates/assets/user_asset_list.html:171 ops/models/adhoc.py:43
+#: assets/templates/assets/user_asset_list.html:175 ops/models/adhoc.py:43
 #: orgs/models.py:17 perms/models/asset_permission.py:64
 #: perms/models/base.py:43
 #: perms/templates/perms/asset_permission_detail.html:102
@@ -563,8 +563,8 @@ msgstr "连接"
 #: assets/views/admin_user.py:29 assets/views/admin_user.py:47
 #: assets/views/admin_user.py:63 assets/views/admin_user.py:78
 #: assets/views/admin_user.py:102 assets/views/asset.py:53
-#: assets/views/asset.py:69 assets/views/asset.py:106 assets/views/asset.py:147
-#: assets/views/asset.py:164 assets/views/asset.py:188
+#: assets/views/asset.py:69 assets/views/asset.py:107 assets/views/asset.py:148
+#: assets/views/asset.py:165 assets/views/asset.py:189
 #: assets/views/cmd_filter.py:30 assets/views/cmd_filter.py:46
 #: assets/views/cmd_filter.py:62 assets/views/cmd_filter.py:78
 #: assets/views/cmd_filter.py:97 assets/views/cmd_filter.py:130
@@ -643,7 +643,7 @@ msgstr "标签"
 #: assets/forms/asset.py:37 assets/forms/asset.py:73 assets/models/asset.py:79
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:84
-#: assets/templates/assets/user_asset_list.html:169
+#: assets/templates/assets/user_asset_list.html:173
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 msgid "Domain"
 msgstr "网域"
@@ -807,7 +807,7 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/domain_gateway_list.html:68
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/user_asset_list.html:45
-#: assets/templates/assets/user_asset_list.html:163
+#: assets/templates/assets/user_asset_list.html:167
 #: audits/templates/audits/login_log_list.html:54
 #: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:133
 #: users/templates/users/user_granted_asset.html:45
@@ -824,7 +824,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:104
 #: assets/templates/assets/system_user_asset.html:50
 #: assets/templates/assets/user_asset_list.html:44
-#: assets/templates/assets/user_asset_list.html:162
+#: assets/templates/assets/user_asset_list.html:166
 #: perms/templates/perms/asset_permission_asset.html:54
 #: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:132
 #: users/templates/users/user_granted_asset.html:44
@@ -838,7 +838,7 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:70
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:53
-#: assets/templates/assets/user_asset_list.html:165
+#: assets/templates/assets/user_asset_list.html:169
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
@@ -848,20 +848,20 @@ msgstr "协议"
 #: assets/templates/assets/asset_detail.html:72
 #: assets/templates/assets/domain_gateway_list.html:69
 #: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/user_asset_list.html:164
+#: assets/templates/assets/user_asset_list.html:168
 #: settings/templates/settings/replay_storage_create.html:59
 msgid "Port"
 msgstr "端口"
 
 #: assets/models/asset.py:78 assets/templates/assets/asset_detail.html:108
-#: assets/templates/assets/user_asset_list.html:166
+#: assets/templates/assets/user_asset_list.html:170
 msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:81 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:54 assets/models/label.py:22
 #: assets/templates/assets/asset_detail.html:116
-#: assets/templates/assets/user_asset_list.html:170
+#: assets/templates/assets/user_asset_list.html:174
 msgid "Is active"
 msgstr "激活"
 
@@ -915,7 +915,7 @@ msgid "Disk info"
 msgstr "硬盘信息"
 
 #: assets/models/asset.py:103 assets/templates/assets/asset_detail.html:112
-#: assets/templates/assets/user_asset_list.html:167
+#: assets/templates/assets/user_asset_list.html:171
 msgid "OS"
 msgstr "操作系统"
 
@@ -1015,6 +1015,7 @@ msgid "Operator"
 msgstr "运营商"
 
 #: assets/models/cluster.py:36 assets/models/group.py:34
+#: perms/utils/asset_permission.py:63
 msgid "Default"
 msgstr "默认"
 
@@ -1160,7 +1161,7 @@ msgstr "分类"
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:133
+#: assets/models/node.py:139
 msgid "New node"
 msgstr "新节点"
 
@@ -1475,7 +1476,7 @@ msgstr "更新系统用户"
 
 #: assets/templates/assets/_user_asset_detail_modal.html:11
 #: assets/templates/assets/asset_asset_user_list.html:13
-#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:189
+#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:190
 msgid "Asset detail"
 msgstr "资产详情"
 
@@ -1695,7 +1696,7 @@ msgstr ""
 "左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，"
 "右侧是属于该节点下的资产"
 
-#: assets/templates/assets/asset_list.html:69 assets/views/asset.py:107
+#: assets/templates/assets/asset_list.html:69 assets/views/asset.py:108
 msgid "Create asset"
 msgstr "创建资产"
 
@@ -2042,19 +2043,19 @@ msgstr "管理用户详情"
 msgid "My assets"
 msgstr "我的资产"
 
-#: assets/views/asset.py:121
+#: assets/views/asset.py:122
 msgid "Bulk update asset success"
 msgstr "批量更新资产成功"
 
-#: assets/views/asset.py:148
+#: assets/views/asset.py:149
 msgid "Bulk update asset"
 msgstr "批量更新资产"
 
-#: assets/views/asset.py:165
+#: assets/views/asset.py:166
 msgid "Update asset"
 msgstr "更新资产"
 
-#: assets/views/asset.py:306
+#: assets/views/asset.py:307
 msgid "already exists"
 msgstr "已经存在"
 
@@ -2961,7 +2962,7 @@ msgstr "执行历史"
 msgid "Command execution list"
 msgstr "命令执行列表"
 
-#: ops/views/command.py:69 templates/_nav_user.html:21
+#: ops/views/command.py:69 templates/_nav_user.html:22
 msgid "Command execution"
 msgstr "命令执行"
 
@@ -3778,7 +3779,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:26 users/forms.py:138
+#: templates/_header_bar.html:89 templates/_nav_user.html:28 users/forms.py:138
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -3913,11 +3914,11 @@ msgstr "历史会话"
 msgid "Commands"
 msgstr "命令记录"
 
-#: templates/_nav.html:63 templates/_nav_user.html:31
+#: templates/_nav.html:63 templates/_nav_user.html:33
 msgid "Web terminal"
 msgstr "Web终端"
 
-#: templates/_nav.html:68 templates/_nav_user.html:36
+#: templates/_nav.html:68 templates/_nav_user.html:38
 msgid "File manager"
 msgstr "文件管理"
 
@@ -4331,11 +4332,11 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api/user.py:75 users/api/user.py:86 users/api/user.py:112
+#: users/api/user.py:78 users/api/user.py:89 users/api/user.py:115
 msgid "You do not have permission."
 msgstr "你没有权限"
 
-#: users/api/user.py:216
+#: users/api/user.py:219
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
