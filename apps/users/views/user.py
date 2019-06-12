@@ -75,15 +75,20 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
 class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Create user')})
-        return context
+        check_rules = get_password_check_rules()
+        context = {
+            'app': _('Users'),
+            'action': _('Create user'),
+            'password_check_rules': check_rules,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -103,7 +108,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.UserUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')

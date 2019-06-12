@@ -24,6 +24,7 @@ def on_transaction_commit(func):
 @receiver(post_save, sender=AssetPermission, dispatch_uid="my_unique_identifier")
 @on_transaction_commit
 def on_permission_created(sender, instance=None, created=False, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
     actions = instance.actions.all()
     if created and not actions:
         default_action = Action.get_action_all()
@@ -45,6 +46,7 @@ def on_permission_delete(sender, **kwargs):
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
 def on_permission_nodes_changed(sender, instance=None, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
     if isinstance(instance, AssetPermission) and kwargs['action'] == 'post_add':
         logger.debug("Asset permission nodes change signal received")
         nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
@@ -55,6 +57,7 @@ def on_permission_nodes_changed(sender, instance=None, **kwargs):
 
 @receiver(m2m_changed, sender=AssetPermission.assets.through)
 def on_permission_assets_changed(sender, instance=None, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
     if isinstance(instance, AssetPermission) and kwargs['action'] == 'post_add':
         logger.debug("Asset permission assets change signal received")
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
@@ -65,6 +68,7 @@ def on_permission_assets_changed(sender, instance=None, **kwargs):
 
 @receiver(m2m_changed, sender=AssetPermission.system_users.through)
 def on_permission_system_users_changed(sender, instance=None, **kwargs):
+    AssetPermissionUtil.expire_all_cache()
     if isinstance(instance, AssetPermission) and kwargs['action'] == 'post_add':
         logger.debug("Asset permission system_users change signal received")
         system_users = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])

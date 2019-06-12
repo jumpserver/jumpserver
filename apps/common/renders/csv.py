@@ -2,6 +2,8 @@
 #
 
 import unicodecsv
+import codecs
+from datetime import datetime
 
 from six import BytesIO
 from rest_framework.renderers import BaseRenderer
@@ -40,9 +42,18 @@ class JMSCSVRender(BaseRenderer):
             row = [item.get(key) for key in header]
             yield row
 
+    def set_response_disposition(self, serializer, context):
+        response = context.get('response')
+        if response and hasattr(serializer, 'Meta') and \
+                hasattr(serializer.Meta, "model"):
+            model_name = serializer.Meta.model.__name__.lower()
+            now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = "{}_{}.csv".format(model_name, now)
+            disposition = 'attachment; filename="{}"'.format(filename)
+            response['Content-Disposition'] = disposition
+
     def render(self, data, media_type=None, renderer_context=None):
         renderer_context = renderer_context or {}
-        encoding = renderer_context.get('encoding', 'utf-8')
         request = renderer_context['request']
         template = request.query_params.get('template', 'export')
         view = renderer_context['view']
@@ -52,6 +63,7 @@ class JMSCSVRender(BaseRenderer):
 
         try:
             serializer = view.get_serializer()
+            self.set_response_disposition(serializer, renderer_context)
         except Exception as e:
             logger.debug(e, exc_info=True)
             value = 'The resource not support export!'.encode('utf-8')
@@ -62,7 +74,8 @@ class JMSCSVRender(BaseRenderer):
             table = self._gen_table(data, header, labels)
 
             csv_buffer = BytesIO()
-            csv_writer = unicodecsv.writer(csv_buffer, encoding=encoding)
+            csv_buffer.write(codecs.BOM_UTF8)
+            csv_writer = unicodecsv.writer(csv_buffer, encoding='utf-8')
             for row in table:
                 csv_writer.writerow(row)
 

@@ -2,6 +2,8 @@
 #
 
 import json
+import chardet
+import codecs
 import unicodecsv
 
 from rest_framework.parsers import BaseParser
@@ -73,7 +75,6 @@ class JMSCSVParser(BaseParser):
 
     def parse(self, stream, media_type=None, parser_context=None):
         parser_context = parser_context or {}
-        encoding = parser_context.get('encoding', 'utf-8')
         try:
             serializer = parser_context["view"].get_serializer()
         except Exception as e:
@@ -82,6 +83,9 @@ class JMSCSVParser(BaseParser):
 
         try:
             stream_data = stream.read()
+            stream_data = stream_data.strip(codecs.BOM_UTF8)
+            detect_result = chardet.detect(stream_data)
+            encoding = detect_result.get("encoding", "utf-8")
             binary = self._universal_newlines(stream_data)
             rows = self._gen_rows(binary, charset=encoding)
 
@@ -97,5 +101,5 @@ class JMSCSVParser(BaseParser):
                 data.append(row_data)
             return data
         except Exception as e:
-            logger.debug(e, exc_info=True)
+            logger.error(e, exc_info=True)
             raise ParseError('CSV parse error!')

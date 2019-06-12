@@ -64,28 +64,60 @@
 
 {% block custom_foot_js %}
 <script type="text/javascript">
-var type_id = '#' + '{{ form.type.id_for_label }}';
+var app_type_id = '#' + '{{ form.type.id_for_label }}';
+var app_path_id = '#' + '{{ form.path.id_for_label }}';
 var all_type_fields = [
     '.chrome-fields',
     '.mysql_workbench-fields',
     '.vmware_client-fields',
     '.custom-fields'
 ];
-function appTypeChange(){
+var app_type_map_default_fields_value = {
+    'chrome': {
+        'app_path': 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+    },
+    'mysql_workbench': {
+        'app_path': 'C:\\Program Files\\MySQL\\MySQL Workbench 8.0 CE\\MySQLWorkbench.exe'
+    },
+    'vmware_client': {
+        'app_path': 'C:\\Program Files (x86)\\VMware\\Infrastructure\\Virtual Infrastructure Client\\Launcher\\VpxClient.exe'
+    },
+    'custom': {'app_path': ''}
+};
+function getAppType(){
+    return $(app_type_id+ " option:selected").val();
+}
+function initialDefaultValue(){
+    var app_type = getAppType();
+    var app_path = $(app_path_id).val();
+    if(app_path){
+        app_type_map_default_fields_value[app_type]['app_path'] = app_path
+    }
+}
+function setDefaultValue(){
+    // 设置类型相关字段的默认值
+    var app_type = getAppType();
+    var app_path = app_type_map_default_fields_value[app_type]['app_path'];
+    $(app_path_id).val(app_path)
+}
+function hiddenFields(){
+    var app_type = getAppType();
     $.each(all_type_fields, function(index, value){
         $(value).addClass('hidden')
     });
-    var type = $(type_id+ " option:selected").val();
-    $('.' + type + '-fields').removeClass('hidden');
+    $('.' + app_type + '-fields').removeClass('hidden');
 }
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: true
-     });
-    appTypeChange()
+    });
+    initialDefaultValue();
+    hiddenFields();
+    setDefaultValue();
 })
-.on('change', type_id, function(){
-    appTypeChange();
+.on('change', app_type_id, function(){
+    hiddenFields();
+    setDefaultValue();
 });
 </script>
 {% endblock %}

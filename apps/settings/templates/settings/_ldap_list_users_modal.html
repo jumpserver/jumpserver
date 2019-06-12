@@ -52,12 +52,15 @@
 var ldap_users_table = 0;
 function initLdapUsersTable() {
     if(ldap_users_table){
-        return
+        return ldap_users_table
     }
     var options = {
         ele: $('#ldap_list_users_table'),
         ajax_url: '{% url "api-settings:ldap-user-list" %}',
         columnDefs: [
+            {targets: 0, createdCell: function (td, cellData, rowData) {
+                $(td).html("<input type='checkbox' class='text-center ipt_check' id='ID_USERNAME'>".replace("ID_USERNAME", cellData))
+            }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 if(cellData){
                     $(td).html('<i class="fa fa-check text-navy"></i>')
@@ -70,10 +73,10 @@ function initLdapUsersTable() {
             {data: "username" },{data: "username" }, {data: "name" },
             {data:"email"}, {data:'existing'}
         ],
-        pageLength: 10
+        pageLength: 15
     };
 
-    ldap_users_table = jumpserver.initDataTable(options);
+    ldap_users_table = jumpserver.initServerSideDataTable(options);
     return ldap_users_table
 }
 

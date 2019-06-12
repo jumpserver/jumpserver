@@ -17,6 +17,9 @@
                             <li>
                                 <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
                             </li>
+                             <li>
+                                <a href="{% url 'settings:email-content-setting' %}"  class="text-center"><i class="fa fa-file-text"></i> {% trans 'Email content setting' %} </a>
+                            </li>
                             <li>
                                 <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
                             </li>
@@ -30,8 +33,8 @@
                     </div>
                     <div class="tab-content">
                         <div class="col-sm-12" style="padding-left:0">
-                                <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
-                                    <form action="" method="post" class="form-horizontal">
+                            <div class="ibox-content" style="border-width: 0;padding-top: 40px;">
+                                <form action="" method="post" class="form-horizontal">
                                     {% if form.non_field_errors %}
                                          <div class="alert alert-danger">
                                              {{ form.non_field_errors }}

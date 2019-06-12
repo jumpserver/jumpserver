@@ -48,6 +48,9 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 
     def perform_create(self, serializer):
         users = serializer.save()
+        for user in users:
+            if current_org and current_org.is_real():
+                user.orgs.add(current_org.id)
         self.send_created_signal(users)
 
     def get_queryset(self):

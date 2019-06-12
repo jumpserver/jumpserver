@@ -153,7 +153,11 @@ function initTree() {
 $(document).ready(function () {
     initTree();
     initTable();
-})
+}).on('click', '.labels li', function () {
+    var val = $(this).text();
+    $("#user_assets_table_filter input").val(val);
+    asset_table.search(val).draw();
+ })
 .on('click', '.asset_detail', function() {
     var data = asset_table.ajax.json();
     var asset_id = this.getAttribute("asset-id");
