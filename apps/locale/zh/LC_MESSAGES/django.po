@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 16:59+0800\n"
+"POT-Creation-Date: 2019-06-12 18:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -165,7 +165,7 @@ msgstr "系统用户"
 #: settings/templates/settings/terminal_setting.html:105 terminal/models.py:22
 #: terminal/models.py:258 terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
-#: users/models/user.py:61 users/templates/users/_select_user_modal.html:13
+#: users/models/user.py:63 users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_detail.html:63
 #: users/templates/users/user_group_detail.html:55
 #: users/templates/users/user_group_list.html:35
@@ -216,7 +216,7 @@ msgstr "参数"
 #: perms/models/asset_permission.py:62 perms/models/base.py:41
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
-#: users/models/user.py:102 users/serializers/v1.py:72
+#: users/models/user.py:104 users/serializers/v1.py:72
 #: users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:103
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
@@ -278,7 +278,7 @@ msgstr "创建日期"
 #: perms/templates/perms/remote_app_permission_detail.html:94
 #: settings/models.py:34 terminal/models.py:32
 #: terminal/templates/terminal/terminal_detail.html:63 users/models/group.py:15
-#: users/models/user.py:94 users/templates/users/user_detail.html:127
+#: users/models/user.py:96 users/templates/users/user_detail.html:127
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:37
 #: users/templates/users/user_profile.html:134
@@ -716,7 +716,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: perms/templates/perms/asset_permission_user.html:55
 #: perms/templates/perms/remote_app_permission_user.html:54
 #: settings/templates/settings/_ldap_list_users_modal.html:37 users/forms.py:13
-#: users/models/user.py:59 users/templates/users/_select_user_modal.html:14
+#: users/models/user.py:61 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:36
 #: users/templates/users/user_profile.html:47
@@ -755,7 +755,7 @@ msgid "Password"
 msgstr "密码"
 
 #: assets/forms/user.py:29 assets/serializers/asset_user.py:27
-#: users/models/user.py:88
+#: users/models/user.py:90
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -993,7 +993,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:80
+#: assets/models/cluster.py:22 users/models/user.py:82
 #: users/templates/users/user_detail.html:76
 msgid "Phone"
 msgstr "手机"
@@ -1020,7 +1020,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:479
+#: users/models/user.py:481
 msgid "System"
 msgstr "系统"
 
@@ -1138,8 +1138,8 @@ msgstr "默认资产组"
 #: terminal/models.py:154 terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:300
-#: users/models/user.py:36 users/models/user.py:467 users/serializers/v1.py:61
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:301
+#: users/models/user.py:37 users/models/user.py:469 users/serializers/v1.py:61
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:36 users/views/user.py:399
 #: xpack/plugins/orgs/forms.py:26
@@ -1216,8 +1216,8 @@ msgstr "连接"
 msgid "Org name"
 msgstr "组织名"
 
-#: assets/serializers/asset_user.py:23 users/forms.py:247
-#: users/models/user.py:91 users/templates/users/first_login.html:42
+#: assets/serializers/asset_user.py:23 users/forms.py:248
+#: users/models/user.py:93 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:46
 #: users/templates/users/user_profile.html:68
 #: users/templates/users/user_profile_update.html:43
@@ -1371,7 +1371,7 @@ msgstr "资产用户信息"
 
 #: assets/templates/assets/_asset_user_view_auth_modal.html:14
 #: audits/models.py:99 audits/templates/audits/login_log_list.html:56
-#: users/forms.py:159 users/models/user.py:83
+#: users/forms.py:160 users/models/user.py:85
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2988,8 +2988,8 @@ msgstr "下载文件"
 #: perms/templates/perms/asset_permission_list.html:75
 #: perms/templates/perms/asset_permission_list.html:122
 #: perms/templates/perms/remote_app_permission_list.html:16
-#: templates/_nav.html:14 users/forms.py:270 users/models/group.py:26
-#: users/models/user.py:67 users/templates/users/_select_user_modal.html:16
+#: templates/_nav.html:14 users/forms.py:271 users/models/group.py:26
+#: users/models/user.py:69 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:213
 #: users/templates/users/user_list.html:38
 #: xpack/plugins/orgs/templates/orgs/org_list.html:15
@@ -3018,7 +3018,7 @@ msgstr "资产授权"
 #: perms/models/asset_permission.py:61 perms/models/base.py:40
 #: perms/templates/perms/asset_permission_detail.html:90
 #: perms/templates/perms/remote_app_permission_detail.html:82
-#: users/models/user.py:99 users/templates/users/user_detail.html:107
+#: users/models/user.py:101 users/templates/users/user_detail.html:107
 #: users/templates/users/user_profile.html:116
 msgid "Date expired"
 msgstr "失效日期"
@@ -3546,7 +3546,7 @@ msgid "Please submit the LDAP configuration before import"
 msgstr "请先提交LDAP配置再进行导入"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:39
-#: users/models/user.py:63 users/templates/users/user_detail.html:71
+#: users/models/user.py:65 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
@@ -3779,7 +3779,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:28 users/forms.py:138
+#: templates/_header_bar.html:89 templates/_nav_user.html:28 users/forms.py:139
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -4340,7 +4340,7 @@ msgstr "你没有权限"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:32 users/models/user.py:71
+#: users/forms.py:32 users/models/user.py:73
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:37
@@ -4348,11 +4348,11 @@ msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:35 users/forms.py:217
+#: users/forms.py:35 users/forms.py:218
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:36 users/forms.py:218
+#: users/forms.py:36 users/forms.py:219
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
@@ -4364,23 +4364,23 @@ msgstr "复制用户公钥到这里"
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:85 users/forms.py:232
+#: users/forms.py:86 users/forms.py:233
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:89 users/forms.py:236 users/serializers/v1.py:47
+#: users/forms.py:90 users/forms.py:237 users/serializers/v1.py:47
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:109
+#: users/forms.py:110
 msgid "Reset link will be generated and sent to the user"
 msgstr "生成重置密码链接，通过邮件发送给用户"
 
-#: users/forms.py:110
+#: users/forms.py:111
 msgid "Set password"
 msgstr "设置密码"
 
-#: users/forms.py:117 xpack/plugins/change_auth_plan/models.py:83
+#: users/forms.py:118 xpack/plugins/change_auth_plan/models.py:83
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:51
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:69
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:57
@@ -4388,7 +4388,7 @@ msgstr "设置密码"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/forms.py:144
+#: users/forms.py:145
 msgid ""
 "Tip: when enabled, you will enter the MFA binding process the next time you "
 "log in. you can also directly bind in \"personal information -> quick "
@@ -4397,11 +4397,11 @@ msgstr ""
 "提示：启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修"
 "改->更改MFA设置）中直接绑定!"
 
-#: users/forms.py:154
+#: users/forms.py:155
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全."
 
-#: users/forms.py:164
+#: users/forms.py:165
 msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
@@ -4410,92 +4410,96 @@ msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
 "设置复杂密码，启用MFA认证）"
 
-#: users/forms.py:171 users/templates/users/first_login.html:48
+#: users/forms.py:172 users/templates/users/first_login.html:48
 #: users/templates/users/first_login.html:107
 #: users/templates/users/first_login.html:130
 msgid "Finish"
 msgstr "完成"
 
-#: users/forms.py:177
+#: users/forms.py:178
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:182
+#: users/forms.py:183
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:187
+#: users/forms.py:188
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:197
+#: users/forms.py:198
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:205
+#: users/forms.py:206
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:215
+#: users/forms.py:216
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms.py:219
+#: users/forms.py:220
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:253 users/forms.py:258 users/forms.py:304
+#: users/forms.py:254 users/forms.py:259 users/forms.py:305
 #: xpack/plugins/orgs/forms.py:30
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/models/user.py:35 users/models/user.py:475
+#: users/models/user.py:36 users/models/user.py:477
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:37
+#: users/models/user.py:38
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:40 users/templates/users/user_profile.html:92
+#: users/models/user.py:39
+msgid "Auditor"
+msgstr "审计员"
+
+#: users/models/user.py:42 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:159
 #: users/templates/users/user_profile.html:162
 msgid "Disable"
 msgstr "禁用"
 
-#: users/models/user.py:41 users/templates/users/user_profile.html:90
+#: users/models/user.py:43 users/templates/users/user_profile.html:90
 #: users/templates/users/user_profile.html:166
 msgid "Enable"
 msgstr "启用"
 
-#: users/models/user.py:42 users/templates/users/user_profile.html:88
+#: users/models/user.py:44 users/templates/users/user_profile.html:88
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:74
+#: users/models/user.py:76
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:77 users/templates/users/user_detail.html:82
+#: users/models/user.py:79 users/templates/users/user_detail.html:82
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:106 users/templates/users/user_detail.html:103
+#: users/models/user.py:108 users/templates/users/user_detail.html:103
 #: users/templates/users/user_list.html:39
 #: users/templates/users/user_profile.html:100
 msgid "Source"
 msgstr "用户来源"
 
-#: users/models/user.py:110
+#: users/models/user.py:112
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:136 users/templates/users/user_update.html:22
+#: users/models/user.py:138 users/templates/users/user_update.html:22
 #: users/views/login.py:47 users/views/login.py:108 users/views/user.py:431
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:478
+#: users/models/user.py:480
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 

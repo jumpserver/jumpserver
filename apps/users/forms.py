@@ -62,6 +62,7 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         if self.request.user.is_superuser:
             roles.append((User.ROLE_ADMIN, dict(User.ROLE_CHOICES).get(User.ROLE_ADMIN)))
             roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+            roles.append((User.ROLE_AUDITOR, dict(User.ROLE_CHOICES).get(User.ROLE_AUDITOR)))
 
         # Org admin user
         else:
