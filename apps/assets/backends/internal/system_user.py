@@ -2,6 +2,8 @@
 #
 
 import itertools
+import uuid
+from hashlib import md5
 
 from assets.models import Asset
 
@@ -39,6 +41,10 @@ class SystemUserBackend(BaseBackend):
         instances = []
         for system_user in system_users:
             instance = construct_authbook_object(system_user, asset)
+            instance.backend = 'SystemUser'
+            id_ = '{}_{}'.format(asset.id, system_user.id)
+            id_ = uuid.UUID(md5(id_.encode()).hexdigest())
+            instance.id = id_
             instances.append(instance)
         return instances
 

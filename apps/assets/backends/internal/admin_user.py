@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 #
 
-from assets.models import Asset
+import uuid
+from hashlib import md5
 
+from ...models import Asset
 from ..base import BaseBackend
 from .utils import construct_authbook_object
 
 
 class AdminUserBackend(BaseBackend):
-
     @classmethod
     def filter(cls, username=None, asset=None, **kwargs):
         instances = cls.construct_authbook_objects(username, asset)
@@ -30,6 +31,10 @@ class AdminUserBackend(BaseBackend):
             if username is not None and asset.admin_user.username != username:
                 continue
             instance = construct_authbook_object(asset.admin_user, asset)
+            instance.backend = "AdminUser"
+            id_ = '{}_{}'.format(asset.id, asset.admin_user.id)
+            id_ = uuid.UUID(md5(id_.encode()).hexdigest())
+            instance.id = id_
             instances.append(instance)
         return instances
 

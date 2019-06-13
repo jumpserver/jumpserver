@@ -1,58 +1,93 @@
 # -*- coding: utf-8 -*-
 #
 
+import time
 
 from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import filters
 
 from common.permissions import IsOrgAdminOrAppUser
 from common.utils import get_object_or_none, get_logger
-
 from ..backends.multi import AssetUserManager
-from ..models import Asset
+from ..models import Asset, Node
 from .. import serializers
 from ..tasks import test_asset_users_connectivity_manual
 
 
 __all__ = [
     'AssetUserViewSet', 'AssetUserAuthInfoApi', 'AssetUserTestConnectiveApi',
+    'AssetUserExportViewSet',
 ]
 
 
 logger = get_logger(__name__)
 
 
-class AssetUserViewSet(viewsets.GenericViewSet):
+class AssetUserFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        kwargs = {}
+        for field in view.filter_fields:
+            value = request.GET.get(field)
+            if not value:
+                continue
+            if field in ("node_id",):
+                continue
+            kwargs[field] = value
+        return queryset.filter(**kwargs)
+
+
+class AssetUserSearchBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        from ..backends.multi import AssetUserQuerySet
+        value = request.GET.get('search')
+        if not value:
+            return queryset
+        _queryset = AssetUserQuerySet([])
+        for field in view.search_fields:
+            if field in ("node_id",):
+                continue
+            _queryset |= queryset.filter(**{field: value})
+        return _queryset
+
+
+class AssetUserViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
     http_method_names = ['get', 'post']
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    filter_fields = ["id", "ip", "hostname", "username", "asset_id", "node_id"]
+    search_fields = filter_fields
+    filter_backends = (
+        filters.OrderingFilter, AssetUserFilterBackend, AssetUserSearchBackend
+    )
 
     def get_queryset(self):
+        # 尽可能先返回更少的数据
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
-        asset = get_object_or_none(Asset, pk=asset_id)
-        queryset = AssetUserManager.filter(username=username, asset=asset)
+        node_id = self.request.GET.get('node_id')
+        if asset_id:
+            asset = get_object_or_none(Asset, pk=asset_id)
+            queryset = AssetUserManager.filter(username=username, asset=asset)
+        elif node_id:
+            node = get_object_or_none(Node, id=node_id)
+            queryset = AssetUserManager.filter_by_node(node)
+        else:
+            queryset = AssetUserManager.all()
         return queryset
 
-    def filter_queryset(self, queryset):
-        queryset = sorted(
-            queryset,
-            key=lambda q: (q.asset.hostname, q.connectivity, q.username)
-        )
-        return queryset
+
+class AssetUserExportViewSet(AssetUserViewSet):
+    serializer_class = serializers.AssetUserExportSerializer
+    http_method_names = ['get']
+
+    def list(self, request, *args, **kwargs):
+        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
+        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
+            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
+        return super().list(request, *args, **kwargs)
 
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
@@ -60,6 +95,10 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def retrieve(self, request, *args, **kwargs):
+        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
+        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
+            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
+
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         status_code = status.HTTP_200_OK

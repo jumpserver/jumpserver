@@ -29,6 +29,7 @@ class AuthBook(AssetUser):
     version = models.IntegerField(default=1, verbose_name=_('Version'))
 
     objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
+    backend = "db"
 
     class Meta:
         verbose_name = _('AuthBook')
@@ -86,7 +87,15 @@ class AuthBook(AssetUser):
 
     @property
     def keyword(self):
-        return {'username': self.username, 'asset': self.asset}
+        return '{}_#_{}'.format(self.username, str(self.asset.id))
+
+    @property
+    def hostname(self):
+        return self.asset.hostname
+
+    @property
+    def ip(self):
+        return self.asset.ip
 
     def __str__(self):
         return '{}@{}'.format(self.username, self.asset)
