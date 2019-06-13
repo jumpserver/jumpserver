@@ -443,6 +443,7 @@ def get_push_windows_system_user_tasks(system_user):
             'action': {
                 'module': 'win_user',
                 'args': 'name={} password={} fullname={} '
+                        'groups="Users,Remote Desktop Users" groups_action=add '
                         'password_expired=no password_never_expires=yes '
                         'state=present update_password=always'
                         ''.format(system_user.username,
