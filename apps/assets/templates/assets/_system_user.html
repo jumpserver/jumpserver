@@ -95,41 +95,97 @@ var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
 var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
 var shell_id = '#' + '{{ form.shell.id_for_label }}';
 
-var need_change_field = [
-    auto_generate_key, private_key_id, auto_push_id, sudo_id, shell_id
-];
-var need_change_field_login_mode = [
-    auto_generate_key, private_key_id, auto_push_id, password_id
-];
-
-function protocolChange() {
+function autoLoginModeProtocol() {
+    // 协议+自动登录模式字段控制
+    $('#auth_title_id').removeClass('hidden');
     var protocol = $(protocol_id + " option:selected").text();
-    if (protocol === 'rdp' || protocol === 'vnc') {
-        $('.auth-fields').removeClass('hidden');
+    if (protocol === 'rdp') {
+        authFieldsDisplay();
+        $(auto_generate_key).closest('.form-group').removeClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden');
+        $(auto_push_id).closest('.form-group').removeClass('hidden');
         $('#command-filter-block').addClass('hidden');
-        $.each(need_change_field, function (index, value) {
-            $(value).closest('.form-group').addClass('hidden')
-        });
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else if (protocol === 'vnc') {
+        $('.auth-fields').removeClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $('#command-filter-block').addClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
     }
     else if (protocol === 'telnet (beta)') {
         $('.auth-fields').removeClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
         $('#command-filter-block').removeClass('hidden');
-        $.each(need_change_field, function (index, value) {
-            $(value).closest('.form-group').addClass('hidden')
-        });
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
     }
     else {
-        if($(login_mode_id).val() === 'manual'){
-            $(sudo_id).closest('.form-group').removeClass('hidden');
-            $(shell_id).closest('.form-group').removeClass('hidden');
-            return
-        }
         authFieldsDisplay();
+        $(auto_generate_key).closest('.form-group').removeClass('hidden');
+        $(private_key_id).closest('.form-group').removeClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden');
+        $(auto_push_id).closest('.form-group').removeClass('hidden');
         $('#command-filter-block').removeClass('hidden');
-        $.each(need_change_field, function (index, value) {
-            $(value).closest('.form-group').removeClass('hidden')
-        });
+        $(sudo_id).closest('.form-group').removeClass('hidden');
+        $(shell_id).closest('.form-group').removeClass('hidden');
     }
+}
+
+function manualLoginModeProtocol() {
+    // 协议+手动登录模式字段控制
+    $('#auth_title_id').addClass('hidden');
+    var protocol = $(protocol_id + " option:selected").text();
+    if (protocol === 'rdp') {
+        $('.auth-fields').addClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $('#command-filter-block').addClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else if (protocol === 'vnc') {
+        $('.auth-fields').addClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $('#command-filter-block').addClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else if (protocol === 'telnet (beta)') {
+        $('.auth-fields').addClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $('#command-filter-block').removeClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else {
+        $('.auth-fields').addClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $('#command-filter-block').removeClass('hidden');
+        $(sudo_id).closest('.form-group').removeClass('hidden');
+        $(shell_id).closest('.form-group').removeClass('hidden');
+    }
+
 }
 
 function authFieldsDisplay() {
@@ -139,34 +195,29 @@ function authFieldsDisplay() {
         $('.auth-fields').removeClass('hidden');
     }
 }
-function loginModeChange(){
-    if ($(login_mode_id).val() === 'manual'){
-        $('#auth_title_id').addClass('hidden');
-        $.each(need_change_field_login_mode, function(index, value){
-            $(value).closest('.form-group').addClass('hidden')
-        })
+function fieldDisplay(){
+    var login_mode = $(login_mode_id).val();
+    if (login_mode === 'manual'){
+        manualLoginModeProtocol();
     }
-    else if($(login_mode_id).val() === 'auto'){
-        $('#auth_title_id').removeClass('hidden');
-        $(password_id).closest('.form-group').removeClass('hidden')
-        protocolChange();
+    else if(login_mode === 'auto'){
+        autoLoginModeProtocol();
     }
 }
 
 $(document).ready(function () {
     $('.select2').select2();
     authFieldsDisplay();
-    protocolChange();
-    loginModeChange();
-})
-.on('change', protocol_id, function(){
-    protocolChange();
+    fieldDisplay();
 })
 .on('change', auto_generate_key, function(){
     authFieldsDisplay();
 })
 .on('change', login_mode_id, function(){
-    loginModeChange();
+    fieldDisplay();
+})
+.on('change', protocol_id, function(){
+    fieldDisplay();
 })
 
 </script>

@@ -69,12 +69,13 @@
                                             <td><b>{{ asset.public_ip|default:"" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Port' %}:</td>
-                                            <td><b>{{ asset.port }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Protocol' %}:</td>
-                                            <td><b>{{ asset.protocol }}</b></td>
+                                            <td>{% trans 'Protocol' %}</td>
+                                            <td>
+                                                {% for protocol in asset.protocols.all %}
+                                                    <b>{{ protocol.name }}:</b>
+                                                    {{ protocol.port }}
+                                                {% endfor %}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>
@@ -94,7 +95,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'CPU' %}:</td>
-                                            <td><b>{{ asset.cpu_model|default:"" }} {{ asset.cpu_count|default:"" }}*{{ asset.cpu_cores|default:"" }}</b></td>
+                                            <td><b>{{ asset.cpu_info }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Memory' %}:</td>
@@ -166,7 +167,7 @@
                                               </span>
                                           </td>
                                         </tr>
-                                        {% if asset.protocol == 'ssh' %}
+                                        {% if asset.is_support_ansible %}
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
                                             <td>

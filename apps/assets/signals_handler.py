@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.dispatch import receiver
 
 from common.utils import get_logger
+from common.decorator import on_transaction_commit
 from .models import Asset, SystemUser, Node, AuthBook
 from .tasks import (
     update_assets_hardware_info_util,
@@ -32,9 +33,12 @@ def set_asset_root_node(asset):
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
+@on_transaction_commit
 def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
     if created:
         logger.info("Asset `{}` create signal received".format(instance))
+
+        # 获取资产硬件信息
         update_asset_hardware_info_on_created(instance)
         test_asset_conn_on_created(instance)
 

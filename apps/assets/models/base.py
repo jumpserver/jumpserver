@@ -158,6 +158,10 @@ class AssetUser(OrgModelMixin):
                       private_key=private_key,
                       public_key=public_key)
 
+    def auto_gen_auth_password(self):
+        password = str(uuid.uuid4())
+        self.set_auth(password=password)
+
     def _to_secret_json(self):
         """Push system user use it"""
         return {

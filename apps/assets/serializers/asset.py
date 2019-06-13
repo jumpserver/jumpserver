@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgResourceSerializerMixin
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
-from ..models import Asset
+from ..models import Asset, Protocol
 from .system_user import AssetSystemUserSerializer
 
 __all__ = [
@@ -16,25 +17,33 @@ __all__ = [
 ]
 
 
-class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResourceSerializerMixin):
+class ProtocolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Protocol
+        fields = ["name", "port"]
+
+
+class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
+                      serializers.ModelSerializer):
+    protocols = ProtocolSerializer(many=True)
+
     """
     资产的数据结构
     """
     class Meta:
         model = Asset
         list_serializer_class = AdaptedBulkListSerializer
-        # validators = [] # 解决批量导入时unique_together字段校验失败
         fields = [
             'id', 'org_id', 'org_name', 'ip', 'hostname', 'protocol', 'port',
-            'platform', 'is_active', 'public_ip', 'domain', 'admin_user',
-            'nodes', 'labels', 'number', 'vendor', 'model', 'sn',
+            'protocols', 'platform', 'is_active', 'public_ip', 'domain',
+            'admin_user', 'nodes', 'labels', 'number', 'vendor', 'model', 'sn',
             'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
             'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
             'hostname_raw', 'comment', 'created_by', 'date_created',
             'hardware_info', 'connectivity'
         ]
         read_only_fields = (
-            'number', 'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
+            'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
             'cpu_cores', 'cpu_vcpus', 'memory', 'disk_total', 'disk_info',
             'os', 'os_version', 'os_arch', 'hostname_raw',
             'created_by', 'date_created',
@@ -43,7 +52,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResou
             'hardware_info': {'label': _('Hardware info')},
             'connectivity': {'label': _('Connectivity')},
             'org_name': {'label': _('Org name')}
-
         }
 
     @classmethod
@@ -53,18 +61,64 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer, OrgResou
             .select_related('admin_user')
         return queryset
 
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields.extend([
-            'hardware_info', 'connectivity', 'org_name'
-        ])
-        return fields
+    @staticmethod
+    def validate_protocols(attr):
+        protocols_name = [i.get("name", "ssh") for i in attr]
+        errors = [{} for i in protocols_name]
+        for i, name in enumerate(protocols_name):
+            if name in protocols_name[:i]:
+                errors[i] = {"name": _("Protocol duplicate: {}").format(name)}
+        if any(errors):
+            raise ValidationError(errors)
+        return attr
+
+    def create(self, validated_data):
+        protocols_data = validated_data.pop("protocols")
+
+        # 兼容老的api
+        protocol = validated_data.get("protocol")
+        port = validated_data.get("port")
+        if not protocols_data and protocol and port:
+            protocols_data = [{"name": protocol, "port": port}]
+
+        if not protocol and not port and protocols_data:
+            validated_data["protocol"] = protocols_data[0]["name"]
+            validated_data["port"] = protocols_data[0]["port"]
+
+        protocols_serializer = ProtocolSerializer(data=protocols_data, many=True)
+        protocols_serializer.is_valid(raise_exception=True)
+        protocols = protocols_serializer.save()
+        instance = super().create(validated_data)
+        instance.protocols.set(protocols)
+        return instance
+
+    def update(self, instance, validated_data):
+        protocols_data = validated_data.pop("protocols")
+
+        # 兼容老的api
+        protocol = validated_data.get("protocol")
+        port = validated_data.get("port")
+        if not protocols_data and protocol and port:
+            protocols_data = [{"name": protocol, "port": port}]
+
+        if not protocol and not port and protocols_data:
+            validated_data["protocol"] = protocols_data[0]["name"]
+            validated_data["port"] = protocols_data[0]["port"]
+
+        protocols_serializer = ProtocolSerializer(data=protocols_data, many=True)
+        protocols_serializer.is_valid(raise_exception=True)
+        protocols = protocols_serializer.save()
+
+        instance = super().update(instance, validated_data)
+        instance.protocols.all().delete()
+        instance.protocols.set(protocols)
+        return instance
 
 
 class AssetAsNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'port', 'platform', 'protocol']
+        fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
@@ -78,9 +132,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = (
-            "id", "hostname", "ip", "port", "system_users_granted",
+            "id", "hostname", "ip", "system_users_granted",
             "is_active", "system_users_join", "os", 'domain',
-            "platform", "comment", "protocol", "org_id", "org_name",
+            "platform", "comment", "protocols", "org_id", "org_name",
         )
 
     @staticmethod

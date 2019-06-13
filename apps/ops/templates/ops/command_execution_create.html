@@ -134,8 +134,11 @@ function getSelectedAssetsNode() {
     var assetsNodeId = [];
 	var assetsNode = [];
 	nodes.forEach(function (node) {
-	    if (node.meta.type === 'asset' && !node.isHidden && node.meta.asset.protocol === 'ssh') {
-	        if (assetsNodeId.indexOf(node.id) === -1) {
+	    if (node.meta.type === 'asset' && !node.isHidden) {
+	        var protocols = $.map(node.meta.asset.protocols, function (v) {
+                return v.name
+            });
+	        if (assetsNodeId.indexOf(node.id) === -1 && protocols.indexOf("ssh") > -1) {
 	            assetsNodeId.push(node.id);
                 assetsNode.push(node)
             }

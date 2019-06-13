@@ -118,7 +118,7 @@
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        <tr class="only-ssh">
+                                        <tr class="only-ssh-rdp">
                                             <td width="50%">{% trans 'Auto push' %}:</td>
                                             <td>
                                                 <span class="pull-right">
@@ -135,7 +135,7 @@
                                             </td>
                                         </tr>
                                         {% if system_user.auto_push %}
-                                        <tr class="only-ssh">
+                                        <tr class="only-ssh-rdp">
                                             <td width="50%">{% trans 'Push system user now' %}:</td>
                                             <td>
                                                 <span style="float: right">
@@ -144,7 +144,7 @@
                                             </td>
                                         </tr>
                                         {% endif %}
-                                        <tr class="only-ssh">
+                                        <tr>
                                             <td width="50%">{% trans 'Test assets connective' %}:</td>
                                             <td>
                                                 <span style="float: right">
@@ -219,8 +219,12 @@ function updateCommandFilters(command_filters) {
     });
 }
 $(document).ready(function () {
-    if($('#id_protocol_type').text() === 'rdp'){
-        $('.only-ssh').addClass('hidden')
+    var protocol = $('#id_protocol_type').text();
+    if(protocol !== 'ssh'){
+        $('.only-ssh').addClass("hidden")
+    }
+    if(["ssh", "rdp"].indexOf(protocol) === -1){
+        $('.only-ssh-rdp').addClass('hidden');
     }
     $(".panel-body .table tr:visible:first").addClass('no-borders-tr');
     $('.select2').select2()

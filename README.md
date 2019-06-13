@@ -93,7 +93,7 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="8">授权控制 Authorization</td>
+        <td class="features-first-td-background-style" rowspan="9">授权控制 Authorization</td>
         <td class="features-second-td-background-style" rowspan="3">资产授权管理
         </td>
         <td class="features-third-td-background-style">资产树
@@ -105,6 +105,12 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
     </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-third-td-background-style">节点内资产自动继承授权
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">RemoteApp(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">实现更细粒度的应用级授权
         </td>
     </tr>
     <tr class="subscription-level-tr-border">

@@ -165,11 +165,13 @@ function formSubmit(props) {
     /*
     {
       "form": $("form"),
+      "data": {},
       "url": "",
       "method": "POST",
       "redirect_to": "",
       "success": function(data, textStatue, jqXHR){},
-      "error": function(jqXHR, textStatus, errorThrown) {}
+      "error": function(jqXHR, textStatus, errorThrown) {},
+      "message": "",
     }
     */
     props = props || {};
@@ -183,6 +185,10 @@ function formSubmit(props) {
         dataType: props.data_type || "json"
     }).done(function (data, textState, jqXHR) {
         if (redirect_to) {
+            if (props.message) {
+                var messages="ed65330a45559c87345a0eb6ac7812d18d0d8976$[[\"__json_message\"\0540\05425\054\"asdfasdf \\u521b\\u5efa\\u6210\\u529f\"]]"
+                setCookie("messages", messages)
+            }
             location.href = redirect_to;
         } else if (typeof props.success === 'function') {
             return props.success(data, textState, jqXHR);
@@ -230,7 +236,15 @@ function formSubmit(props) {
                     var help_msg = v.join("<br/>") ;
                     helpBlockRef.html(help_msg);
                 } else {
-                    noneFieldErrorMsg += v + '<br/>';
+                    $.each(v, function (kk, vv) {
+                        if (typeof errors === "object") {
+                            $.each(vv, function (kkk, vvv) {
+                                noneFieldErrorMsg += " " + vvv + '<br/>';
+                            })
+                        } else{
+                            noneFieldErrorMsg += vv + '<br/>';
+                        }
+                    })
                 }
             });
             if (noneFieldErrorRef.length === 1 && noneFieldErrorMsg !== '') {
