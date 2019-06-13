@@ -9,11 +9,13 @@ from django.utils import timezone
 from django.db.models import Q
 from django.core.cache import cache
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
 from common.tree import TreeNode
-from perms.models import AssetPermission, Action
-from perms.hands import Node
+from .. import const
+from ..models import AssetPermission, Action
+from ..hands import Node
 
 logger = get_logger(__file__)
 
@@ -34,24 +36,43 @@ class GenerateTree:
         """
         self.__all_nodes = list(Node.objects.all())
         self.nodes = defaultdict(dict)
+        self.direct_nodes = []
+        self._root_node = None
+        self._ungroup_node = None
+
+    @property
+    def root_node(self):
+        if self._root_node:
+            return self._root_node
+        all_nodes = self.nodes.keys()
+        # 如果没有授权节点，就放到默认的根节点下
+        if not all_nodes:
+            root_node = Node.root()
+            self.add_node(root_node)
+        else:
+            root_node = max(all_nodes)
+        self._root_node = root_node
+        return root_node
+
+    @property
+    def ungrouped_node(self):
+        if self._ungroup_node:
+            return self._ungroup_node
+        node_id = const.UNGROUPED_NODE_ID
+        node_key = self.root_node.get_next_child_key()
+        node_value = _("Default")
+        node = Node(id=node_id, key=node_key, value=node_value)
+        self.add_node(node)
+        self._ungroup_node = node
+        return node
 
     def add_asset(self, asset, system_users):
         nodes = asset.nodes.all()
-        in_nodes = False
-        for node in nodes:
-            if node not in self.nodes:
-                continue
+        in_nodes = set(self.direct_nodes) & set(nodes)
+        for node in in_nodes:
             self.nodes[node][asset].update(system_users)
-            in_nodes = True
         if not in_nodes:
-            all_nodes = self.nodes.keys()
-            # 如果没有授权节点，就放到默认的根节点下
-            if not all_nodes:
-                root_node = Node.root()
-                self.add_node(root_node)
-            else:
-                root_node = max(all_nodes)
-            self.nodes[root_node][asset].update(system_users)
+            self.nodes[self.ungrouped_node][asset].update(system_users)
 
     def get_nodes(self):
         for node in self.nodes:
@@ -80,6 +101,8 @@ class GenerateTree:
         for node in nodes:
             self.add_node(node)
             self.add_nodes(node.get_all_children(with_self=False))
+            # 如果是直接授权的节点，则放到direct_nodes中
+            self.direct_nodes.append(node)
 
 
 def get_user_permissions(user, include_group=True):

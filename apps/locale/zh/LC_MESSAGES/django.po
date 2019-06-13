@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 17:06+0800\n"
+"POT-Creation-Date: 2019-06-13 18:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -598,7 +598,7 @@ msgstr "我的远程应用"
 msgid "%(hostname)s was %(action)s successfully"
 msgstr "%(hostname)s %(action)s成功"
 
-#: assets/api/asset.py:127
+#: assets/api/asset.py:129
 msgid "Please select assets that need to be updated"
 msgstr "请选择需要更新的资产"
 
@@ -1014,6 +1014,7 @@ msgid "Operator"
 msgstr "运营商"
 
 #: assets/models/cluster.py:36 assets/models/group.py:34
+#: perms/utils/asset_permission.py:63
 msgid "Default"
 msgstr "默认"
 
@@ -1295,29 +1296,29 @@ msgstr "测试系统用户可连接性: {} => {}"
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:463
+#: assets/tasks.py:469
 msgid "The asset {} system platform {} does not support push system user"
 msgstr "资产 {} 系统平台 {} 不支持推送系统用户"
 
-#: assets/tasks.py:475
+#: assets/tasks.py:481
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh or "
 "rdp: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
 
-#: assets/tasks.py:482
+#: assets/tasks.py:488
 msgid "For security, do not push user {}"
 msgstr "为了安全，禁止推送用户 {}"
 
-#: assets/tasks.py:510 assets/tasks.py:524
+#: assets/tasks.py:516 assets/tasks.py:530
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:516
+#: assets/tasks.py:522
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:584
+#: assets/tasks.py:590
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 
