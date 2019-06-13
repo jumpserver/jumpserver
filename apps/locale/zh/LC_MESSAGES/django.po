@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-13 18:14+0800\n"
+"POT-Creation-Date: 2019-06-13 18:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -110,7 +110,7 @@ msgstr "资产"
 #: applications/templates/applications/remote_app_detail.html:61
 #: applications/templates/applications/remote_app_list.html:23
 #: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/user.py:255 assets/templates/assets/user_asset_list.html:172
+#: assets/models/user.py:247 assets/templates/assets/user_asset_list.html:172
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72
 #: perms/forms/asset_permission.py:52 perms/models/asset_permission.py:39
@@ -1296,9 +1296,9 @@ msgstr "测试系统用户可连接性: {} => {}"
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:469
-msgid "The asset {} system platform {} does not support push system user"
-msgstr "资产 {} 系统平台 {} 不支持推送系统用户"
+#: assets/tasks.py:469 assets/tasks.py:555
+msgid "The asset {} system platform {} does not support run Ansible tasks"
+msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
 #: assets/tasks.py:481
 msgid ""
@@ -1318,7 +1318,7 @@ msgstr "推送系统用户到入资产: {}"
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:590
+#: assets/tasks.py:600
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 

@@ -467,7 +467,7 @@ def get_push_system_user_tasks(host, system_user):
     else:
         msg = _(
             "The asset {} system platform {} does not "
-            "support push system user".format(host.hostname, host.platform)
+            "support run Ansible tasks".format(host.hostname, host.platform)
         )
         logger.info(msg)
         tasks = []
@@ -546,10 +546,17 @@ def test_admin_user_connectability_period():
 #### Test Asset user connectivity task ####
 
 def get_test_asset_user_connectivity_tasks(asset):
-    if asset.is_windows():
+    if asset.is_unixlike():
+        tasks = const.TEST_ASSET_USER_CONN_TASKS
+    elif asset.is_windows():
         tasks = const.TEST_WINDOWS_ASSET_USER_CONN_TASKS
     else:
-        tasks = const.TEST_ASSET_USER_CONN_TASKS
+        msg = _(
+            "The asset {} system platform {} does not "
+            "support run Ansible tasks".format(asset.hostname, asset.platform)
+        )
+        logger.info(msg)
+        tasks = []
     return tasks
 
 
@@ -572,6 +579,9 @@ def test_asset_user_connectivity_util(asset_user, task_name):
         return
 
     tasks = get_test_asset_user_connectivity_tasks(asset_user.asset)
+    if not tasks:
+        return
+
     task, created = update_or_create_ansible_task(
         task_name, hosts=[asset_user.asset], tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils.translation import ugettext_lazy as _
-
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {

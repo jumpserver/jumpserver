@@ -161,14 +161,6 @@ class SystemUser(AssetUser):
         return assets
 
     @property
-    def protocol_is_ssh(self):
-        return self.protocol == self.PROTOCOL_SSH
-
-    @property
-    def protocol_is_rdp(self):
-        return self.protocol == self.PROTOCOL_RDP
-
-    @property
     def connectivity(self):
         cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
         value = cache.get(cache_key, None)
