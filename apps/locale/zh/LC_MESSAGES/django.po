@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-13 18:48+0800\n"
+"POT-Creation-Date: 2019-06-13 18:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1297,6 +1297,7 @@ msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
 #: assets/tasks.py:469 assets/tasks.py:555
+#: xpack/plugins/change_auth_plan/models.py:522
 msgid "The asset {} system platform {} does not support run Ansible tasks"
 msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
