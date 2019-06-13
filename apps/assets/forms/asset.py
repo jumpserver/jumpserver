@@ -6,21 +6,39 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from orgs.mixins import OrgModelForm
 
-from ..models import Asset, AdminUser
+from ..models import Asset, AdminUser, Protocol
 
 
 logger = get_logger(__file__)
-__all__ = ['AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm']
+__all__ = [
+    'AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm',
+    'ProtocolForm'
+]
+
+
+class ProtocolForm(forms.ModelForm):
+    class Meta:
+        model = Protocol
+        fields = ['name', 'port']
+        widgets = {
+            'name': forms.Select(attrs={
+                'class': 'form-control protocol-name'
+            }),
+            'port': forms.TextInput(attrs={
+                'class': 'form-control protocol-port'
+            }),
+        }
 
 
 class AssetCreateForm(OrgModelForm):
+    PROTOCOL_CHOICES = Protocol.PROTOCOL_CHOICES
+
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'public_ip', 'port',  'comment',
+            'hostname', 'ip', 'public_ip', 'protocols', 'comment',
             'nodes', 'is_active', 'admin_user', 'labels', 'platform',
-            'domain', 'protocol',
-
+            'domain',
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
@@ -32,7 +50,6 @@ class AssetCreateForm(OrgModelForm):
             'labels': forms.SelectMultiple(attrs={
                 'class': 'select2', 'data-placeholder': _('Label')
             }),
-            'port': forms.TextInput(),
             'domain': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Domain')
             }),
@@ -54,9 +71,9 @@ class AssetUpdateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'port', 'nodes',  'is_active', 'platform',
+            'hostname', 'ip', 'protocols', 'nodes',  'is_active', 'platform',
             'public_ip', 'number', 'comment', 'admin_user', 'labels',
-            'domain', 'protocol',
+            'domain',
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
@@ -68,7 +85,6 @@ class AssetUpdateForm(OrgModelForm):
             'labels': forms.SelectMultiple(attrs={
                 'class': 'select2', 'data-placeholder': _('Label')
             }),
-            'port': forms.TextInput(),
             'domain': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Domain')
             }),
@@ -101,8 +117,8 @@ class AssetBulkUpdateForm(OrgModelForm):
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port',  'admin_user', 'labels', 'platform',
-            'protocol', 'domain',
+            'assets', 'admin_user', 'labels', 'platform',
+            'domain',
         ]
         widgets = {
             'labels': forms.SelectMultiple(

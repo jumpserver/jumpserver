@@ -238,7 +238,7 @@ class AssetPermissionUtil:
         for perm in permissions:
             actions = perm.actions.all()
             for asset in perm.assets.all().valid().prefetch_related('nodes'):
-                system_users = perm.system_users.filter(protocol=asset.protocol)
+                system_users = perm.system_users.filter(protocol__in=asset.protocols_name)
                 system_users = self._structured_system_user(system_users, actions)
                 assets[asset].update(system_users)
         return assets
@@ -255,7 +255,7 @@ class AssetPermissionUtil:
             _assets = node.get_all_assets().valid().prefetch_related('nodes')
             for asset in _assets:
                 for system_user, attr_dict in system_users.items():
-                    if system_user.protocol != asset.protocol:
+                    if not asset.has_protocol(system_user.protocol):
                         continue
                     if system_user in assets[asset]:
                         actions = assets[asset][system_user]['actions']
@@ -279,15 +279,12 @@ class AssetPermissionUtil:
             resource=resource
         )
 
-    @property
     def node_key(self):
         return self.get_cache_key('NODES_WITH_ASSETS')
 
-    @property
     def asset_key(self):
         return self.get_cache_key('ASSETS')
 
-    @property
     def system_key(self):
         return self.get_cache_key('SYSTEM_USER')
 
@@ -457,7 +454,7 @@ def parse_node_to_tree_node(node):
 
 
 def parse_asset_to_tree_node(node, asset, system_users):
-    system_users_protocol_matched = [s for s in system_users if s.protocol == asset.protocol]
+    system_users_protocol_matched = [s for s in system_users if asset.has_protocol(s.protocol)]
     icon_skin = 'file'
     if asset.platform.lower() == 'windows':
         icon_skin = 'windows'
@@ -490,8 +487,8 @@ def parse_asset_to_tree_node(node, asset, system_users):
                 'id': asset.id,
                 'hostname': asset.hostname,
                 'ip': asset.ip,
-                'port': asset.port,
-                'protocol': asset.protocol,
+                'protocols': [{"name": p.name, "port": p.port}
+                              for p in asset.protocols.all()],
                 'platform': asset.platform,
                 'domain': None if not asset.domain else asset.domain.id,
                 'is_active': asset.is_active,

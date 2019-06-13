@@ -8,4 +8,3 @@ from .asset import *
 from .cmd_filter import *
 from .utils import *
 from .authbook import *
-from applications.models.remote_app import *
