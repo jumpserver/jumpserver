@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import AdminUserOrAuditsUserMixin
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
 from ..backends import get_multi_command_storage
@@ -20,8 +20,7 @@ __all__ = [
 ]
 
 
-
-class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
+class SessionListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
     model = Session
     template_name = 'terminal/session_list.html'
     context_object_name = 'session_list'
@@ -97,7 +96,7 @@ class SessionOfflineListView(SessionListView):
         return super().get_context_data(**kwargs)
 
 
-class SessionDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
+class SessionDetailView(SingleObjectMixin, AdminUserOrAuditsUserMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
     object = None

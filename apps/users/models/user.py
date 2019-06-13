@@ -246,6 +246,10 @@ class User(AbstractUser):
             return False
 
     @property
+    def is_audits(self):
+        return self.role == 'Auditor'
+
+    @property
     def is_app(self):
         return self.role == 'App'
 
