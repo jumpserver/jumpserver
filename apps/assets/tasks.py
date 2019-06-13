@@ -446,7 +446,7 @@ def get_push_windows_system_user_tasks(system_user):
                         'name={} '
                         'password={} '
                         'state=present '
-                        'update_password=always'
+                        'update_password=always '
                         'password_expired=no '
                         'password_never_expires=yes '
                         'groups="Users,Remote Desktop Users" '
