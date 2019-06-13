@@ -55,6 +55,13 @@ class IsOrgAdminOrAppUser(IsValidUser):
             and (current_org.can_admin_by(request.user) or request.user.is_app)
 
 
+class IsOrgAdminOrAppUserOrAudits(IsValidUser):
+    def has_permission(self, request, view):
+        return super(IsOrgAdminOrAppUserOrAudits, self).has_permission(request, view) \
+               and (current_org.can_admin_by(request.user)
+                    or request.user.is_app or request.user.is_audits)
+
+
 class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):
     def has_permission(self, request, view):
         if IsValidUser.has_permission(self, request, view) \
