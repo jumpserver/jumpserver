@@ -25,22 +25,22 @@
     </div>
 </form>
 <script>
-var hostname, username, asset_id = null;
+var authHostname, authUsername, authAssetId = null;
 
 $(document).ready(function () {
 
 }).on("show.bs.modal", "#asset_user_auth_update_modal", function () {
-    $('#id_hostname_p').html(hostname);
-    $('#id_username_p').html(username);
+    $('#id_hostname_p').html(authHostname);
+    $('#id_username_p').html(authUsername);
     $('#id_password_auth').parent().removeClass('has-error');
     $('#id_password_auth').val('');
 }).on('click', '#btn_asset_user_auth_update_modal_confirm', function(){
     var password = $('#id_password_auth').val();
     if (password){
         var data = {
-            'name': username,
-            'asset': asset_id,
-            'username': username,
+            'name': authUsername,
+            'asset': authAssetId,
+            'username': authUsername,
             'password': password
         };
         formSubmit({

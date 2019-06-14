@@ -12,8 +12,8 @@ from django.shortcuts import get_object_or_404
 from common.permissions import IsOrgAdminOrAppUser
 from common.utils import get_object_or_none, get_logger
 from common.mixins import IDInCacheFilterMixin
-from ..backends.multi import AssetUserManager
-from ..models import Asset, Node
+from ..backends import AssetUserManager
+from ..models import Asset, Node, SystemUser, AdminUser
 from .. import serializers
 from ..tasks import test_asset_users_connectivity_manual
 
@@ -34,21 +34,39 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
             value = request.GET.get(field)
             if not value:
                 continue
-            if field in ("node_id",):
+            if field in ("node_id", "system_user_id", "admin_user_id"):
                 continue
             kwargs[field] = value
         return queryset.filter(**kwargs)
 
 
+class AssetUserFilterFromBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        system_user_id = request.GET.get("system_user_id")
+        admin_user_id = request.GET.get("admin_user_id")
+        if not system_user_id and not admin_user_id:
+            return queryset
+
+        if system_user_id:
+            system_user = get_object_or_404(SystemUser, id=system_user_id)
+            assets = system_user.assets.all()
+            queryset = queryset.filter(asset__in=assets, username=system_user.username)
+
+        if admin_user_id:
+            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+            assets = admin_user.assets.all()
+            queryset = queryset.filter(asset__in=assets, username=admin_user.username)
+        return queryset
+
+
 class AssetUserSearchBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        from ..backends.multi import AssetUserQuerySet
         value = request.GET.get('search')
         if not value:
             return queryset
-        _queryset = AssetUserQuerySet([])
+        _queryset = AssetUserManager.none()
         for field in view.search_fields:
-            if field in ("node_id",):
+            if field in ("node_id", "system_user_id", "admin_user_id"):
                 continue
             _queryset |= queryset.filter(**{field: value})
         return _queryset
@@ -59,10 +77,14 @@ class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
     serializer_class = serializers.AssetUserSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
     http_method_names = ['get', 'post']
-    filter_fields = ["id", "ip", "hostname", "username", "asset_id", "node_id"]
+    filter_fields = [
+        "id", "ip", "hostname", "username", "asset_id", "node_id",
+        "system_user_id", "admin_user_id"
+    ]
     search_fields = filter_fields
     filter_backends = (
-        filters.OrderingFilter, AssetUserFilterBackend, AssetUserSearchBackend
+        filters.OrderingFilter, AssetUserFilterBackend, AssetUserSearchBackend,
+        AssetUserFilterFromBackend,
     )
 
     def get_queryset(self):
@@ -70,14 +92,22 @@ class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
         node_id = self.request.GET.get('node_id')
+        kwargs = {}
+        assets = []
+        if username:
+            kwargs['username'] = username
+
         if asset_id:
             asset = get_object_or_none(Asset, pk=asset_id)
-            queryset = AssetUserManager.filter(username=username, asset=asset)
+            kwargs['assets'] = [asset]
         elif node_id:
             node = get_object_or_404(Node, id=node_id)
-            queryset = AssetUserManager.filter_by_node(node)
-        else:
-            queryset = AssetUserManager.all()
+            assets = node.assets.all()
+
+        if assets:
+            kwargs['assets'] = assets
+        manger = AssetUserManager()
+        queryset = manger.filter(**kwargs)
         return queryset
 
 
@@ -113,7 +143,8 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         asset_id = self.request.GET.get('asset_id')
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
-            instance = AssetUserManager.get(username, asset)
+            manger = AssetUserManager()
+            instance = manger.get(username, [asset])
         except Exception as e:
             logger.error(e, exc_info=True)
             return None
@@ -130,7 +161,8 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
         asset = get_object_or_none(Asset, pk=asset_id)
-        asset_users = AssetUserManager.filter(username=username, asset=asset)
+        manager = AssetUserManager()
+        asset_users = manager.filter(username=username, assets=[asset])
         return asset_users
 
     def retrieve(self, request, *args, **kwargs):

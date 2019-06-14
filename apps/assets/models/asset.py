@@ -104,7 +104,7 @@ class Asset(OrgModelMixin):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
 
     # Some information
     public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
@@ -250,16 +250,11 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
-        if not self.is_unixlike():
-            return self.REACHABLE
-        key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        cached = cache.get(key, None)
-        return cached if cached is not None else self.UNKNOWN
+        return self.admin_user.get_connectivity_of(self)
 
     @connectivity.setter
     def connectivity(self, value):
-        key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        cache.set(key, value, 3600*2)
+        self.admin_user.set_connectivity_of(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:

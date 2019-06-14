@@ -40,9 +40,9 @@
 <script>
 var showPassword = false;
 var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
-var asset_id = "";
-var host = "";
-var username = "";
+var authAssetId = "";
+var authHostname = "";
+var authUsername = "";
 var mfaFor = "";
 
 function initClipboard() {
@@ -57,9 +57,9 @@ function initClipboard() {
 }
 
 function showAuth() {
-    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + asset_id + "&username=" + username;
-    $("#id_username_view").html(username);
-    $("#id_hostname_view").html(host);
+    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + authAssetId + "&username=" + authUsername;
+    $("#id_username_view").html(authUsername);
+    $("#id_hostname_view").html(authHostname);
     var success = function (data) {
         var password = data.password;
         $("#id_password_view").val(password);
