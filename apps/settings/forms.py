@@ -80,7 +80,14 @@ class EmailSettingForm(BaseForm):
     )
     EMAIL_HOST_PASSWORD = FormEncryptCharField(
         max_length=1024, label=_("SMTP password"), widget=forms.PasswordInput,
-        required=False, help_text=_("Some provider use token except password")
+        required=False,
+        help_text=_("Tips: Some provider use token except password")
+    )
+    EMAIL_FROM = forms.CharField(
+        max_length=128, label=_("Send user"), initial='', required=False,
+        help_text=_(
+            "Tips: Send mail account, default SMTP account as the send account"
+        )
     )
     EMAIL_USE_SSL = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False,

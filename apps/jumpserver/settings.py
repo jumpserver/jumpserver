@@ -353,6 +353,7 @@ EMAIL_HOST = 'smtp.jumpserver.org'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = 'noreply@jumpserver.org'
 EMAIL_HOST_PASSWORD = ''
+EMAIL_FROM = ''
 EMAIL_USE_SSL = False
 EMAIL_USE_TLS = False
 EMAIL_SUBJECT_PREFIX = '[JMS] '
