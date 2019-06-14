@@ -10,7 +10,7 @@ from django.urls import reverse_lazy, reverse
 from common.mixins import JSONResponseMixin
 from ..models import Terminal
 from ..forms import TerminalForm
-from common.permissions import SuperUserRequiredMixin
+from common.permissions import PermissionsMixin, IsSuperUser
 
 
 __all__ = [
@@ -20,10 +20,11 @@ __all__ = [
 ]
 
 
-class TerminalListView(SuperUserRequiredMixin, ListView):
+class TerminalListView(PermissionsMixin, ListView):
     model = Terminal
     template_name = 'terminal/terminal_list.html'
     form_class = TerminalForm
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = super(TerminalListView, self).get_context_data(**kwargs)
@@ -35,11 +36,12 @@ class TerminalListView(SuperUserRequiredMixin, ListView):
         return context
 
 
-class TerminalUpdateView(SuperUserRequiredMixin, UpdateView):
+class TerminalUpdateView(PermissionsMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
     template_name = 'terminal/terminal_update.html'
     success_url = reverse_lazy('terminal:terminal-list')
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
@@ -47,10 +49,11 @@ class TerminalUpdateView(SuperUserRequiredMixin, UpdateView):
         return context
 
 
-class TerminalDetailView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView):
+class TerminalDetailView(LoginRequiredMixin, PermissionsMixin, DetailView):
     model = Terminal
     template_name = 'terminal/terminal_detail.html'
     context_object_name = 'terminal'
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = super(TerminalDetailView, self).get_context_data(**kwargs)
@@ -61,16 +64,18 @@ class TerminalDetailView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView)
         return context
 
 
-class TerminalDeleteView(SuperUserRequiredMixin, DeleteView):
+class TerminalDeleteView(PermissionsMixin, DeleteView):
     model = Terminal
     template_name = 'delete_confirm.html'
     success_url = reverse_lazy('terminal:terminal-list')
+    permission_classes = [IsSuperUser]
 
 
-class TerminalAcceptView(SuperUserRequiredMixin, JSONResponseMixin, UpdateView):
+class TerminalAcceptView(PermissionsMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
     template_name = 'terminal/terminal_modal_accept.html'
+    permission_classes = [IsSuperUser]
 
     def form_valid(self, form):
         terminal = form.save()
@@ -92,12 +97,13 @@ class TerminalAcceptView(SuperUserRequiredMixin, JSONResponseMixin, UpdateView):
         return self.render_json_response(data)
 
 
-class TerminalConnectView(LoginRequiredMixin, SuperUserRequiredMixin, DetailView):
+class TerminalConnectView(LoginRequiredMixin, PermissionsMixin, DetailView):
     """
     Abandon
     """
     template_name = 'flash_message_standalone.html'
     model = Terminal
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         if self.object.type == 'Web':
