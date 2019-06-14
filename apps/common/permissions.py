@@ -114,29 +114,6 @@ class SuperUserRequiredMixin(UserPassesTestMixin):
             return True
 
 
-class AdminUserOrAuditsUserMixin(UserPassesTestMixin):
-    def test_func(self):
-        if not self.request.user.is_authenticated:
-            return False
-        elif not current_org.can_admin_by(self.request.user) and not self.request.user.is_auditor:
-            self.raise_exception = True
-            return False
-        return True
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-
-        if not current_org:
-            return redirect('orgs:switch-a-org')
-
-        if not current_org.can_admin_by(request.user) and not request.user.is_auditor:
-            if request.user.is_org_admin:
-                return redirect('orgs:switch-a-org')
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
-
-
 class WithBootstrapToken(permissions.BasePermission):
     def has_permission(self, request, view):
         authorization = request.META.get('HTTP_AUTHORIZATION', '')
@@ -144,3 +121,14 @@ class WithBootstrapToken(permissions.BasePermission):
             return False
         request_bootstrap_token = authorization.split()[-1]
         return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
+
+
+class PermissionsMixin(UserPassesTestMixin):
+    permission_classes = []
+
+    def test_func(self):
+        permission_classes = self.permission_classes
+        for permission_class in permission_classes:
+            if not permission_class().has_permission(self.request, self):
+                return False
+        return True

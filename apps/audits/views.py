@@ -19,7 +19,7 @@ from django.db.models import Q
 
 from audits.utils import get_excel_response, write_content_to_excel
 from common.mixins import DatetimeSearchMixin
-from common.permissions import AdminUserOrAuditsUserMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
@@ -42,12 +42,13 @@ def get_resource_type_list():
     return [model._meta.verbose_name for model in models]
 
 
-class FTPLogListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
+class FTPLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     model = FTPLog
     template_name = 'audits/ftp_log_list.html'
     paginate_by = settings.DISPLAY_PER_PAGE
     user = asset = system_user = filename = ''
     date_from = date_to = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
         self.queryset = super().get_queryset()
@@ -89,13 +90,14 @@ class FTPLogListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class OperateLogListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
+class OperateLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     model = OperateLog
     template_name = 'audits/operate_log_list.html'
     paginate_by = settings.DISPLAY_PER_PAGE
     user = action = resource_type = ''
     date_from = date_to = None
     actions_dict = dict(OperateLog.ACTION_CHOICES)
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
         self.queryset = super().get_queryset()
@@ -132,12 +134,13 @@ class OperateLogListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListVi
         return super().get_context_data(**kwargs)
 
 
-class PasswordChangeLogList(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
+class PasswordChangeLogList(PermissionsMixin, DatetimeSearchMixin, ListView):
     model = PasswordChangeLog
     template_name = 'audits/password_change_log_list.html'
     paginate_by = settings.DISPLAY_PER_PAGE
     user = ''
     date_from = date_to = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
         users = current_org.get_org_users()
@@ -168,12 +171,13 @@ class PasswordChangeLogList(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, Lis
         return super().get_context_data(**kwargs)
 
 
-class LoginLogListView(AdminUserOrAuditsUserMixin, DatetimeSearchMixin, ListView):
+class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     template_name = 'audits/login_log_list.html'
     model = UserLoginLog
     paginate_by = settings.DISPLAY_PER_PAGE
     user = keyword = ""
     date_to = date_from = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     @staticmethod
     def get_org_users():
