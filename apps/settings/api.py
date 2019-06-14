@@ -30,6 +30,7 @@ class MailTestingAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
+            email_from = serializer.validated_data["EMAIL_FROM"]
             email_host_user = serializer.validated_data["EMAIL_HOST_USER"]
             for k, v in serializer.validated_data.items():
                 if k.startswith('EMAIL'):
@@ -37,7 +38,8 @@ class MailTestingAPI(APIView):
             try:
                 subject = "Test"
                 message = "Test smtp setting"
-                send_mail(subject, message,  email_host_user, [email_host_user])
+                email_from = email_from or email_host_user
+                send_mail(subject, message,  email_from, [email_host_user])
             except Exception as e:
                 return Response({"error": str(e)}, status=401)
 
