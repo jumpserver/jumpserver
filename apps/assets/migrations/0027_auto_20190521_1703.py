@@ -15,4 +15,9 @@ class Migration(migrations.Migration):
             name='ip',
             field=models.CharField(db_index=True, max_length=128, verbose_name='IP'),
         ),
+        migrations.AlterField(
+            model_name='asset',
+            name='public_ip',
+            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Public IP'),
+        ),
     ]

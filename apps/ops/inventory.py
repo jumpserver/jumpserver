@@ -21,7 +21,7 @@ class JMSBaseInventory(BaseInventory):
             'id': asset.id,
             'hostname': asset.hostname,
             'ip': asset.ip,
-            'port': asset.port,
+            'port': asset.ssh_port,
             'vars': dict(),
             'groups': [],
         }
@@ -29,8 +29,15 @@ class JMSBaseInventory(BaseInventory):
             info["vars"].update(self.make_proxy_command(asset))
         if run_as_admin:
             info.update(asset.get_auth_info())
+            if asset.is_unixlike():
+                info["become"] = asset.admin_user.become_info
         for node in asset.nodes.all():
             info["groups"].append(node.value)
+        if asset.is_windows():
+            info["vars"].update({
+                "ansible_connection": "ssh",
+                "ansible_shell_type": "cmd",
+            })
         for label in asset.labels.all():
             info["vars"].update({
                 label.name: label.value
@@ -73,7 +80,7 @@ class JMSInventory(JMSBaseInventory):
     """
     def __init__(self, assets, run_as_admin=False, run_as=None, become_info=None):
         """
-        :param host_id_list: ["test1", ]
+        :param assets: assets
         :param run_as_admin: True 是否使用管理用户去执行, 每台服务器的管理用户可能不同
         :param run_as: 用户名(添加了统一的资产用户管理器之后AssetUserManager加上之后修改为username)
         :param become_info: 是否become成某个用户去执行
@@ -86,17 +93,14 @@ class JMSInventory(JMSBaseInventory):
         host_list = []
 
         for asset in assets:
-            info = self.convert_to_ansible(asset, run_as_admin=run_as_admin)
-            host_list.append(info)
-
-        if run_as:
-            for host in host_list:
+            host = self.convert_to_ansible(asset, run_as_admin=run_as_admin)
+            if run_as:
                 run_user_info = self.get_run_user_info(host)
                 host.update(run_user_info)
-
-        if become_info:
-            for host in host_list:
+            if become_info and asset.is_unixlike():
                 host.update(become_info)
+            host_list.append(host)
+
         super().__init__(host_list=host_list)
 
     def get_run_user_info(self, host):
@@ -133,12 +137,10 @@ class JMSCustomInventory(JMSBaseInventory):
         host_list = []
 
         for asset in assets:
-            info = self.convert_to_ansible(asset)
-            host_list.append(info)
-
-        for host in host_list:
+            host = self.convert_to_ansible(asset)
             run_user_info = self.get_run_user_info()
             host.update(run_user_info)
+            host_list.append(host)
 
         super().__init__(host_list=host_list)
 

@@ -154,7 +154,7 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         assets = util.get_assets()
         for k, v in assets.items():
-            system_users_granted = [s for s in v if s.protocol == k.protocol]
+            system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
             k.system_users_granted = system_users_granted
             queryset.append(k)
         return queryset
@@ -215,8 +215,7 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin,
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
-                system_users_granted = [s for s in v if
-                                        s.protocol == k.protocol]
+                system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
             queryset.append(node)
@@ -364,7 +363,7 @@ class UserGrantedNodeChildrenApi(UserPermissionCacheMixin, ListAPIView):
         for asset, system_users in nodes_granted[node].items():
             fake_node = asset.as_node()
             fake_node.assets_amount = 0
-            system_users = [s for s in system_users if s.protocol == asset.protocol]
+            system_users = [s for s in system_users if asset.has_protocol(s.protocol)]
             fake_node.asset.system_users_granted = system_users
             fake_node.key = node.key + ':0'
             fake_nodes.append(fake_node)
@@ -389,7 +388,7 @@ class UserGrantedNodeChildrenApi(UserPermissionCacheMixin, ListAPIView):
                     fake_node = asset.as_node()
                     fake_node.assets_amount = 0
                     system_users = [s for s in system_users if
-                                    s.protocol == asset.protocol]
+                                    asset.has_protocol(s.protocol)]
                     fake_node.asset.system_users_granted = system_users
                     fake_node.key = node.key + ':0'
                     matched_assets.append(fake_node)
