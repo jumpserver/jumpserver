@@ -27,7 +27,7 @@ from django.forms.formsets import formset_factory
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin ,IsOrgAdmin
 from common.const import (
     create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
 )
@@ -43,8 +43,9 @@ __all__ = [
 logger = get_logger(__file__)
 
 
-class AssetListView(AdminUserRequiredMixin, TemplateView):
+class AssetListView(PermissionsMixin, TemplateView):
     template_name = 'assets/asset_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         Node.root()
@@ -58,10 +59,11 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetUserListView(AdminUserRequiredMixin, DetailView):
+class AssetUserListView(PermissionsMixin, DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_asset_user_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -85,11 +87,12 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class AssetCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
     model = Asset
     form_class = forms.AssetCreateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
+    permission_classes = [IsOrgAdmin]
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
@@ -133,7 +136,7 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return create_success_msg % ({"name": cleaned_data["hostname"]})
 
 
-class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
+class AssetBulkUpdateView(PermissionsMixin, ListView):
     model = Asset
     form_class = forms.AssetBulkUpdateForm
     template_name = 'assets/asset_bulk_update.html'
@@ -141,6 +144,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     success_message = _("Bulk update asset success")
     id_list = None
     form = None
+    permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
@@ -173,11 +177,12 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class AssetUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
+class AssetUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
     model = Asset
     form_class = forms.AssetUpdateForm
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
+    permission_classes = [IsOrgAdmin]
 
     def get_protocol_formset(self):
         ProtocolFormset = formset_factory(forms.ProtocolForm, extra=0, min_num=1, max_num=5)
@@ -202,10 +207,11 @@ class AssetUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
         return update_success_msg % ({"name": cleaned_data["hostname"]})
 
 
-class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
+class AssetDeleteView(PermissionsMixin, DeleteView):
     model = Asset
     template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:asset-list')
+    permission_classes = [IsOrgAdmin]
 
 
 class AssetDetailView(LoginRequiredMixin, DetailView):
@@ -272,8 +278,9 @@ class AssetExportView(LoginRequiredMixin, View):
         return JsonResponse({'redirect': url})
 
 
-class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
+class BulkImportAssetView(PermissionsMixin, JSONResponseMixin, FormView):
     form_class = forms.FileForm
+    permission_classes = [IsOrgAdmin]
 
     def form_valid(self, form):
         node_id = self.request.GET.get("node_id")
