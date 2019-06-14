@@ -1,0 +1,66 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}asset_user_auth_update_modal{% endblock %}
+{% block modal_title%}{% trans "Update asset user auth" %}{% endblock %}
+{% block modal_body %}
+<form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13){ $('#btn_asset_user_auth_update_modal_confirm').trigger('click'); return false;}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Hostname" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_hostname_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Username" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_username_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Password" %}</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_password_auth" type="password" name="password" placeholder="{% trans 'Please input password' %}"/>
+        </div>
+    </div>
+</form>
+<script>
+var hostname, username, asset_id = null;
+
+$(document).ready(function () {
+
+}).on("show.bs.modal", "#asset_user_auth_update_modal", function () {
+    $('#id_hostname_p').html(hostname);
+    $('#id_username_p').html(username);
+    $('#id_password_auth').parent().removeClass('has-error');
+    $('#id_password_auth').val('');
+}).on('click', '#btn_asset_user_auth_update_modal_confirm', function(){
+    var password = $('#id_password_auth').val();
+    if (password){
+        var data = {
+            'name': username,
+            'asset': asset_id,
+            'username': username,
+            'password': password
+        };
+        formSubmit({
+            data: data,
+            url: "{% url 'api-assets:asset-user-list' %}",
+            method: 'POST',
+            success: function () {
+                toastr.success("{% trans 'Update successfully!' %}");
+                $("#asset_user_auth_update_modal").modal('hide');
+            },
+            error: function () {
+                toastr.error("{% trans 'Update failed!' %}");
+            }
+        });
+    }
+    else{
+        $('#id_password_auth').parent().addClass('has-error');
+    }
+})
+
+</script>
+{% endblock %}
+{% block modal_confirm_id %}btn_asset_user_auth_update_modal_confirm{% endblock %}

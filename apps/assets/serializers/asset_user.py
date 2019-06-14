@@ -46,11 +46,12 @@ class AssetUserSerializer(serializers.ModelSerializer):
         )
         fields = [
             "id", "hostname", "ip", "username", "password", "asset", "version",
-            "is_latest", "connectivity", "backend", "org_id",
+            "is_latest", "connectivity", "backend", "org_id", "name",
             "date_created", "date_updated", "private_key", "public_key",
         ]
         extra_kwargs = {
-            'username': {'required': True}
+            'username': {'required': True},
+            'name': {'write_only': True},
         }
 
     def create(self, validated_data):

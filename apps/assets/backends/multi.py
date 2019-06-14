@@ -20,6 +20,8 @@ class AssetUserQuerySet(list):
         return self
 
     def filter(self, **kwargs):
+        id_in = kwargs.pop('id__in', None)
+
         def filter_it(obj):
             wanted = []
             real = []
@@ -30,7 +32,11 @@ class AssetUserQuerySet(list):
                     value = str(value)
                 real.append(value)
             return wanted == real
-        return AssetUserQuerySet([i for i in self if filter_it(i)])
+
+        queryset = AssetUserQuerySet([i for i in self if filter_it(i)])
+        if id_in:
+            queryset = AssetUserQuerySet([i for i in queryset if str(i.id) in id_in])
+        return queryset
 
     def __or__(self, other):
         self.extend(other)

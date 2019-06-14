@@ -43,6 +43,7 @@ var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
 var asset_id = "";
 var host = "";
 var username = "";
+var mfaFor = "";
 
 function initClipboard() {
     var clipboard = new Clipboard('.btn-copy-password', {
@@ -92,11 +93,19 @@ $(document).ready(function () {
     }
     var nowTime = now.getTime() / 1000;
     if (nowTime - lastMFATime > 60*10 ) {
+        setTimeout(function () {
+            $("#asset_user_auth_view").modal("hide");
+        }, 100);
+        mfaFor = "viewAuth";
         $("#mfa_auth_confirm").modal("show");
     } else {
         showAuth();
     }
 }).on("success", '#mfa_auth_confirm', function () {
+    if (mfaFor !== "viewAuth") {
+        return
+    }
+    $("#asset_user_auth_view").modal("show");
     showAuth();
 })
 </script>

@@ -7,9 +7,11 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import filters
+from django.shortcuts import get_object_or_404
 
 from common.permissions import IsOrgAdminOrAppUser
 from common.utils import get_object_or_none, get_logger
+from common.mixins import IDInCacheFilterMixin
 from ..backends.multi import AssetUserManager
 from ..models import Asset, Node
 from .. import serializers
@@ -52,7 +54,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
         return _queryset
 
 
-class AssetUserViewSet(viewsets.ModelViewSet):
+class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
@@ -72,7 +74,7 @@ class AssetUserViewSet(viewsets.ModelViewSet):
             asset = get_object_or_none(Asset, pk=asset_id)
             queryset = AssetUserManager.filter(username=username, asset=asset)
         elif node_id:
-            node = get_object_or_none(Node, id=node_id)
+            node = get_object_or_404(Node, id=node_id)
             queryset = AssetUserManager.filter_by_node(node)
         else:
             queryset = AssetUserManager.all()

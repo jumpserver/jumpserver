@@ -79,7 +79,6 @@ class LogTailApi(generics.RetrieveAPIView):
 
 
 class ResourcesIDCacheApi(APIView):
-
     def post(self, request, *args, **kwargs):
         spm = str(uuid.uuid4())
         resources_id = request.data.get('resources')
