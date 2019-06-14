@@ -30,6 +30,7 @@
 var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
 var assetUserTable;
 var needPush = false;
+var prefer = null;
 
 function initAssetUserTable() {
     var options = {
@@ -38,9 +39,9 @@ function initAssetUserTable() {
         columnDefs: [
             {
                 targets: 5, createdCell: function (td, cellData) {
-                  if (cellData === 1) {
+                  if (cellData == 1) {
                       $(td).html('<i class="fa fa-circle text-navy"></i>')
-                  } else if (cellData === 0) {
+                  } else if (cellData == 0) {
                       $(td).html('<i class="fa fa-circle text-danger"></i>')
                   } else {
                       $(td).html('<i class="fa fa-circle text-warning"></i>')
@@ -109,6 +110,9 @@ $(document).ready(function(){
     authUsername = $(this).data("user") ;
     authAssetId = $(this).data("asset");
     var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id=" + authAssetId + "&username=" + authUsername;
+    if (prefer) {
+        the_url = setUrlParam(the_url, "prefer", prefer)
+    }
     var success = function (data) {
         var task_id = data.task;
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);

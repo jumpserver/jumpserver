@@ -48,7 +48,7 @@ class LogTailApi(generics.RetrieveAPIView):
         return line
 
     def read_from_file(self):
-        with open(self.log_path, 'r') as f:
+        with open(self.log_path, 'rt', encoding='utf8') as f:
             offset = cache.get(self.mark, 0)
             f.seek(offset)
             data = f.read(self.buff_size).replace('\n', '\r\n')

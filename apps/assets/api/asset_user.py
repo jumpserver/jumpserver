@@ -40,25 +40,6 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(**kwargs)
 
 
-class AssetUserFilterFromBackend(filters.BaseFilterBackend):
-    def filter_queryset(self, request, queryset, view):
-        system_user_id = request.GET.get("system_user_id")
-        admin_user_id = request.GET.get("admin_user_id")
-        if not system_user_id and not admin_user_id:
-            return queryset
-
-        if system_user_id:
-            system_user = get_object_or_404(SystemUser, id=system_user_id)
-            assets = system_user.assets.all()
-            queryset = queryset.filter(asset__in=assets, username=system_user.username)
-
-        if admin_user_id:
-            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-            assets = admin_user.assets.all()
-            queryset = queryset.filter(asset__in=assets, username=admin_user.username)
-        return queryset
-
-
 class AssetUserSearchBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         value = request.GET.get('search')
@@ -83,8 +64,8 @@ class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
     ]
     search_fields = filter_fields
     filter_backends = (
-        filters.OrderingFilter, AssetUserFilterBackend, AssetUserSearchBackend,
-        AssetUserFilterFromBackend,
+        filters.OrderingFilter,
+        AssetUserFilterBackend, AssetUserSearchBackend,
     )
 
     def get_queryset(self):
@@ -92,8 +73,24 @@ class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
         node_id = self.request.GET.get('node_id')
+        admin_user_id = self.request.GET.get("admin_user_id")
+        system_user_id = self.request.GET.get("system_user_id")
+
         kwargs = {}
         assets = []
+
+        manager = AssetUserManager()
+        if system_user_id:
+            system_user = get_object_or_404(SystemUser, id=system_user_id)
+            assets = system_user.assets.all()
+            username = system_user.username
+
+        if admin_user_id:
+            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+            assets = admin_user.assets.all()
+            username = admin_user.username
+            manager.prefer('admin_user')
+
         if username:
             kwargs['username'] = username
 
@@ -106,8 +103,8 @@ class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
 
         if assets:
             kwargs['assets'] = assets
-        manger = AssetUserManager()
-        queryset = manger.filter(**kwargs)
+
+        queryset = manager.filter(**kwargs)
         return queryset
 
 
@@ -160,8 +157,11 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
     def get_asset_users(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
+        prefer = self.request.GET.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         manager = AssetUserManager()
+        if prefer:
+            manager.prefer(prefer)
         asset_users = manager.filter(username=username, assets=[asset])
         return asset_users
 

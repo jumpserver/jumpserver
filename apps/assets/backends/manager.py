@@ -1,15 +1,28 @@
 # -*- coding: utf-8 -*-
 #
-from .base import AssetUserQuerySet, BaseBackend
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+
+from .base import AssetUserQuerySet
 from .db import AuthBookBackend
 from .system_user import SystemUserBackend
 from .admin_user import AdminUserBackend
 
 
-class AssetUserManager(BaseBackend):
+class NotSupportError(Exception):
+    pass
+
+
+class AssetUserManager:
     """
     资产用户管理器
     """
+    ObjectDoesNotExist = ObjectDoesNotExist
+    MultipleObjectsReturned = MultipleObjectsReturned
+    NotSupportError = NotSupportError
+    MSG_NOT_EXIST = '{} Object matching query does not exist'
+    MSG_MULTIPLE = '{} get() returned more than one object ' \
+                   '-- it returned {}!'
+
     backends = (
         ('db', AuthBookBackend),
         ('system_user', SystemUserBackend),
@@ -30,9 +43,10 @@ class AssetUserManager(BaseBackend):
         instances_map = {}
         instances = []
         for name, backend in self.backends:
-            instances_map[name] = backend.filter(
+            _instances = backend.filter(
                 username=username, assets=assets, latest=latest
             )
+            instances_map[name] = _instances
 
         # 如果不是获取最新版本，就不再merge
         if not latest:
@@ -50,6 +64,21 @@ class AssetUserManager(BaseBackend):
         ordering_instances = [instances_map.get(i) for i in ordering]
         instances = self._merge_instances(*ordering_instances)
         return AssetUserQuerySet(instances)
+
+    def get(self, username, asset):
+        instances = self.filter(username, assets=[asset])
+        if len(instances) == 1:
+            return instances[0]
+        elif len(instances) == 0:
+            self.raise_does_not_exist(self.__name__)
+        else:
+            self.raise_multiple_return(self.__name__, len(instances))
+
+    def raise_does_not_exist(self, name):
+        raise self.ObjectDoesNotExist(self.MSG_NOT_EXIST.format(name))
+
+    def raise_multiple_return(self, name, length):
+        raise self.MultipleObjectsReturned(self.MSG_MULTIPLE.format(name, length))
 
     @staticmethod
     def create(**kwargs):

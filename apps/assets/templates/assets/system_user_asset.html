@@ -44,19 +44,7 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-hover" id="system_user_list">
-                                        <thead>
-                                            <tr>
-                                                <th>{% trans 'Hostname' %}</th>
-                                                <th>{% trans 'IP' %}</th>
-                                                <th>{% trans 'Port' %}</th>
-                                                <th>{% trans 'Reachable' %}</th>
-                                                <th>{% trans 'Action' %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
+                                    {% include 'assets/_asset_user_list.html' %}
                                 </div>
                             </div>
                         </div>
@@ -132,50 +120,9 @@
             </div>
         </div>
     </div>
-    {% include 'assets/_asset_user_auth_update_modal.html' %}
-    {% include 'assets/_asset_user_auth_view_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function initAssetsTable() {
-    var connectivity = {{ system_user.connectivity | safe }};
-    var options = {
-		ele: $('#system_user_list'),
-		buttons: [],
-		order: [],
-		columnDefs: [
-			{targets: 0, createdCell: function (td, cellData, rowData) {
-			    cellData = htmlEscape(cellData);
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-			}},
-			{targets: 3, createdCell: function (td, cellData) {
-				if (connectivity.unreachable.indexOf(cellData) >= 0) {
-					$(td).html('<i class="fa fa-times text-danger"></i>')
-				 } else if (connectivity.reachable.indexOf(cellData) >= 0 ) {
-					$(td).html('<i class="fa fa-check text-navy"></i>')
-				 } else {
-                    $(td).html('')
-                }
-			}},
-            {targets: 4, createdCell: function (td, cellData, rowData) {
-                var push_btn = '';
-                {% if system_user.auto_push %}
-				push_btn = ' <a class="btn btn-xs btn-primary btn-push-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Push" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                {% endif %}
-                var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "View auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                {#var unbound_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-unbound" data-uid="{{ DEFAULT_PK }}">{% trans "Unbound" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
-                var update_auth_btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                $(td).html(update_auth_btn + view_btn + push_btn + test_btn);
-			}}
-		],
-		ajax_url: '{% url "api-assets:system-user-assets" pk=system_user.id %}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "hostname" }, {data: "id"}],
-		op_html: $('#actions').html()
-	};
-	jumpserver.initServerSideDataTable(options);
-}
 
 function updateSystemUserNode(nodes) {
     var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
@@ -217,7 +164,10 @@ $(document).ready(function () {
         var data = evt.params.data;
         delete jumpserver.nodes_selected[data.id];
     });
-	initAssetsTable();
+	assetUserListUrl = setUrlParam(assetUserListUrl, "system_user_id", "{{ system_user.id }}");
+    needPush = true;
+    initAssetUserTable();
+
 })
 .on('click', '.btn-push', function () {
     var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";

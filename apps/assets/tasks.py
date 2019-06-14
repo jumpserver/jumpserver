@@ -563,7 +563,13 @@ def get_test_asset_user_connectivity_tasks(asset):
 @shared_task
 def set_asset_user_connectivity_info(asset_user, result):
     summary = result[1]
-    asset_user.connectivity = summary
+    if summary.get('contacted'):
+        connectivity = 1
+    elif summary.get("dark"):
+        connectivity = 0
+    else:
+        connectivity = 3
+    asset_user.connectivity = connectivity
 
 
 @shared_task

@@ -30,6 +30,8 @@ class AuthBook(AssetUser):
 
     objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
     backend = "db"
+    # 用于system user和admin_user的动态设置
+    _connectivity = None
 
     class Meta:
         verbose_name = _('AuthBook')
@@ -41,7 +43,8 @@ class AuthBook(AssetUser):
 
     def _get_pre_obj(self):
         pre_obj = self.__class__.objects.filter(
-            username=self.username, asset=self.asset).latest_version().first()
+            username=self.username, asset=self.asset
+        ).latest_version().first()
         return pre_obj
 
     def _remove_pre_obj_latest(self):
@@ -68,22 +71,14 @@ class AuthBook(AssetUser):
 
     @property
     def connectivity(self):
+        if self._connectivity:
+            return self._connectivity
         value = cache.get(self._conn_cache_key, self.UNKNOWN)
         return value
 
     @connectivity.setter
     def connectivity(self, value):
-        _connectivity = self.UNKNOWN
-
-        for host in value.get('dark', {}).keys():
-            if host == self.asset.hostname:
-                _connectivity = self.UNREACHABLE
-
-        for host in value.get('contacted', []):
-            if host == self.asset.hostname:
-                _connectivity = self.REACHABLE
-
-        cache.set(self._conn_cache_key, _connectivity, 3600)
+        cache.set(self._conn_cache_key, value, 3600)
 
     @property
     def keyword(self):

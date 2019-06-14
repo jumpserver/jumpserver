@@ -200,7 +200,7 @@ class AssetUser(OrgModelMixin):
         ]
         id_ = self.generate_id_with_asset(asset)
         obj = AuthBook(id=id_, asset=asset, version=0, is_latest=True)
-        obj.connectivity = self.get_connectivity_of(asset)
+        obj._connectivity = self.get_connectivity_of(asset)
         for field in fields:
             value = getattr(self, field)
             setattr(obj, field, value)

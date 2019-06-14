@@ -13,11 +13,11 @@ class AssetUserBackend(BaseBackend):
 
     @classmethod
     def filter(cls, username=None, assets=None, **kwargs):
-        queryset = cls.model.objects.all().prefetch_related('assets')
+        queryset = cls.model.objects.all()
         if username:
             queryset = queryset.filter(username=username)
         if assets:
-            queryset = queryset.filter(assets__in=assets)
+            queryset = queryset.filter(assets__in=assets).distinct()
         queryset = cls.filter_queryset_more(queryset)
         instances = cls.construct_authbook_objects(queryset, assets)
         return instances
@@ -33,7 +33,3 @@ class AssetUserBackend(BaseBackend):
                 instance.backend = cls.backend
                 instances.append(instance)
         return instances
-
-    @classmethod
-    def create(cls, **kwargs):
-        raise cls.NotSupportError("Not support create")
