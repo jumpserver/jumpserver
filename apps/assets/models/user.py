@@ -201,7 +201,7 @@ class SystemUser(AssetUser):
         return self.get_login_mode_display()
 
     def is_need_push(self):
-        if self.auto_push and self.protocol == self.PROTOCOL_SSH:
+        if self.auto_push and self.protocol in [self.PROTOCOL_SSH, self.PROTOCOL_RDP]:
             return True
         else:
             return False

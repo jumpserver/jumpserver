@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib.messages.views import SuccessMessageMixin
+from django.forms.formsets import formset_factory
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
@@ -30,8 +31,6 @@ from common.permissions import AdminUserRequiredMixin
 from common.const import (
     create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
 )
-from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
-from orgs.utils import current_org
 from .. import forms
 from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
 
@@ -102,10 +101,30 @@ class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         form["nodes"].initial = node
         return form
 
+    def get_protocol_formset(self):
+        ProtocolFormset = formset_factory(forms.ProtocolForm, extra=0, min_num=1, max_num=5)
+        if self.request.method == "POST":
+            formset = ProtocolFormset(self.request.POST)
+        else:
+            formset = ProtocolFormset()
+        return formset
+
+    def form_valid(self, form):
+        formset = self.get_protocol_formset()
+        valid = formset.is_valid()
+        if not valid:
+            return self.form_invalid(form)
+        protocols = formset.save()
+        instance = super().form_valid(form)
+        instance.protocols.set(protocols)
+        return instance
+
     def get_context_data(self, **kwargs):
+        formset = self.get_protocol_formset()
         context = {
             'app': _('Assets'),
             'action': _('Create asset'),
+            'formset': formset,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -160,10 +179,21 @@ class AssetUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
 
+    def get_protocol_formset(self):
+        ProtocolFormset = formset_factory(forms.ProtocolForm, extra=0, min_num=1, max_num=5)
+        if self.request.method == "POST":
+            formset = ProtocolFormset(self.request.POST)
+        else:
+            initial_data = [{"name": p.name, "port": p.port} for p in self.object.protocols.all()]
+            formset = ProtocolFormset(initial=initial_data)
+        return formset
+
     def get_context_data(self, **kwargs):
+        formset = self.get_protocol_formset()
         context = {
             'app': _('Assets'),
             'action': _('Update asset'),
+            'formset': formset,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
