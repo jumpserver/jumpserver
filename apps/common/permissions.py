@@ -27,6 +27,12 @@ class IsAppUser(IsValidUser):
             and request.user.is_app
 
 
+class IsAuditor(IsValidUser):
+    def has_permission(self, request, view):
+        return super(IsAuditor, self).has_permission(request, view) \
+               and request.user.is_auditor
+
+
 class IsSuperUser(IsValidUser):
     def has_permission(self, request, view):
         return super(IsSuperUser, self).has_permission(request, view) \
@@ -53,13 +59,6 @@ class IsOrgAdminOrAppUser(IsValidUser):
     def has_permission(self, request, view):
         return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
             and (current_org.can_admin_by(request.user) or request.user.is_app)
-
-
-class IsOrgAdminOrAppUserOrAudits(IsValidUser):
-    def has_permission(self, request, view):
-        return super(IsOrgAdminOrAppUserOrAudits, self).has_permission(request, view) \
-               and (current_org.can_admin_by(request.user)
-                    or request.user.is_app or request.user.is_audits)
 
 
 class IsOrgAdminOrAppUserOrUserReadonly(IsOrgAdminOrAppUser):
@@ -119,7 +118,7 @@ class AdminUserOrAuditsUserMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
-        elif not current_org.can_admin_by(self.request.user) and not self.request.user.is_audits:
+        elif not current_org.can_admin_by(self.request.user) and not self.request.user.is_auditor:
             self.raise_exception = True
             return False
         return True
@@ -131,7 +130,7 @@ class AdminUserOrAuditsUserMixin(UserPassesTestMixin):
         if not current_org:
             return redirect('orgs:switch-a-org')
 
-        if not current_org.can_admin_by(request.user) and not request.user.is_audits:
+        if not current_org.can_admin_by(request.user) and not request.user.is_auditor:
             if request.user.is_org_admin:
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
