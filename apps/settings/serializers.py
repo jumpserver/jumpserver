@@ -6,6 +6,7 @@ class MailTestSerializer(serializers.Serializer):
     EMAIL_PORT = serializers.IntegerField(default=25)
     EMAIL_HOST_USER = serializers.CharField(max_length=1024)
     EMAIL_HOST_PASSWORD = serializers.CharField()
+    EMAIL_FROM = serializers.CharField(required=False, allow_blank=True)
     EMAIL_USE_SSL = serializers.BooleanField(default=False)
     EMAIL_USE_TLS = serializers.BooleanField(default=False)
 

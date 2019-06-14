@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-13 18:56+0800\n"
+"POT-Creation-Date: 2019-06-14 10:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -183,6 +183,7 @@ msgstr "系统用户"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:12
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:52
 #: xpack/plugins/orgs/templates/orgs/org_list.html:12
+#: xpack/plugins/vault/templates/vault/vault.html:90
 msgid "Name"
 msgstr "名称"
 
@@ -446,6 +447,7 @@ msgstr "详情"
 #: xpack/plugins/cloud/templates/cloud/account_list.html:39
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:25
 #: xpack/plugins/orgs/templates/orgs/org_list.html:87
+#: xpack/plugins/vault/templates/vault/vault.html:149
 msgid "Update"
 msgstr "更新"
 
@@ -486,6 +488,7 @@ msgstr "更新"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:55
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
 #: xpack/plugins/orgs/templates/orgs/org_list.html:89
+#: xpack/plugins/vault/templates/vault/vault.html:150
 msgid "Delete"
 msgstr "删除"
 
@@ -544,6 +547,7 @@ msgstr "创建远程应用"
 #: xpack/plugins/cloud/templates/cloud/account_list.html:16
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:18
 #: xpack/plugins/orgs/templates/orgs/org_list.html:23
+#: xpack/plugins/vault/templates/vault/vault.html:78
 msgid "Action"
 msgstr "动作"
 
@@ -727,6 +731,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:53
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:12
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:13
+#: xpack/plugins/vault/templates/vault/vault.html:74
 msgid "Username"
 msgstr "用户名"
 
@@ -742,7 +747,7 @@ msgstr "密码或密钥密码"
 #: authentication/forms.py:13
 #: authentication/templates/authentication/login.html:67
 #: authentication/templates/authentication/new_login.html:93
-#: settings/forms.py:103 users/forms.py:15 users/forms.py:27
+#: settings/forms.py:110 users/forms.py:15 users/forms.py:27
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_password_authentication.html:18
 #: users/templates/users/user_password_update.html:43
@@ -818,10 +823,11 @@ msgstr "端口"
 #: assets/templates/assets/user_asset_list.html:45
 #: assets/templates/assets/user_asset_list.html:167
 #: audits/templates/audits/login_log_list.html:54
-#: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:133
+#: perms/templates/perms/asset_permission_asset.html:55 settings/forms.py:140
 #: users/templates/users/user_granted_asset.html:45
 #: users/templates/users/user_group_granted_asset.html:45
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:51
+#: xpack/plugins/vault/templates/vault/vault.html:73
 msgid "IP"
 msgstr "IP"
 
@@ -835,10 +841,11 @@ msgstr "IP"
 #: assets/templates/assets/user_asset_list.html:44
 #: assets/templates/assets/user_asset_list.html:166
 #: perms/templates/perms/asset_permission_asset.html:54
-#: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:132
+#: perms/templates/perms/asset_permission_list.html:77 settings/forms.py:139
 #: users/templates/users/user_granted_asset.html:44
 #: users/templates/users/user_group_granted_asset.html:44
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:50
+#: xpack/plugins/vault/templates/vault/vault.html:72
 msgid "Hostname"
 msgstr "主机名"
 
@@ -967,6 +974,7 @@ msgstr "最新版本"
 #: assets/models/authbook.py:29 ops/templates/ops/adhoc_history.html:58
 #: ops/templates/ops/adhoc_history_detail.html:57
 #: ops/templates/ops/task_adhoc.html:58 ops/templates/ops/task_history.html:64
+#: xpack/plugins/vault/templates/vault/vault.html:75
 msgid "Version"
 msgstr "版本"
 
@@ -1208,6 +1216,7 @@ msgid "Hardware info"
 msgstr "硬件信息"
 
 #: assets/serializers/asset.py:53
+#: xpack/plugins/vault/templates/vault/vault.html:76
 msgid "Connectivity"
 msgstr "连接"
 
@@ -1592,6 +1601,7 @@ msgstr "Windows或其它硬件可以随意设置一个"
 #: audits/templates/audits/login_log_list.html:85
 #: users/templates/users/user_group_list.html:10
 #: users/templates/users/user_list.html:10
+#: xpack/plugins/vault/templates/vault/vault.html:55
 msgid "Export"
 msgstr "导出"
 
@@ -1602,6 +1612,7 @@ msgstr "导出"
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:15
 #: xpack/plugins/license/templates/license/license_detail.html:110
+#: xpack/plugins/vault/templates/vault/vault.html:60
 msgid "Import"
 msgstr "导入"
 
@@ -2321,6 +2332,7 @@ msgstr "日期"
 #: ops/templates/ops/task_adhoc.html:63
 #: terminal/templates/terminal/command_list.html:76
 #: terminal/templates/terminal/session_detail.html:50
+#: xpack/plugins/vault/templates/vault/vault.html:77
 msgid "Datetime"
 msgstr "日期"
 
@@ -2666,7 +2678,7 @@ msgstr "等待任务开始"
 msgid "Interval"
 msgstr "间隔"
 
-#: ops/models/adhoc.py:38 settings/forms.py:151
+#: ops/models/adhoc.py:38 settings/forms.py:158
 msgid "Units: seconds"
 msgstr "单位: 秒"
 
@@ -3003,7 +3015,7 @@ msgstr "命令执行"
 msgid "Organization"
 msgstr "组织管理"
 
-#: perms/const.py:18 settings/forms.py:136
+#: perms/const.py:18 settings/forms.py:143
 msgid "All"
 msgstr "全部"
 
@@ -3143,6 +3155,7 @@ msgstr "选择系统用户"
 
 #: perms/templates/perms/asset_permission_list.html:46
 #: perms/templates/perms/remote_app_permission_list.html:6
+#: xpack/plugins/vault/templates/vault/vault.html:46
 msgid "Create permission"
 msgstr "创建授权规则"
 
@@ -3262,29 +3275,29 @@ msgstr "远程应用授权远程应用列表"
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:52
+#: settings/api.py:54
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: settings/api.py:89
+#: settings/api.py:91
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:158
+#: settings/api.py:160
 msgid "succeed: {} failed: {} total: {}"
 msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:180 settings/api.py:216
+#: settings/api.py:182 settings/api.py:218
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:186 settings/api.py:222
+#: settings/api.py:188 settings/api.py:224
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:204 settings/api.py:242
+#: settings/api.py:206 settings/api.py:244
 #: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -3325,56 +3338,64 @@ msgstr "SMTP账号"
 msgid "SMTP password"
 msgstr "SMTP密码"
 
-#: settings/forms.py:83
-msgid "Some provider use token except password"
-msgstr "一些邮件提供商需要输入的是Token"
+#: settings/forms.py:84
+msgid "Tips: Some provider use token except password"
+msgstr "提示：一些邮件提供商需要输入的是Token"
 
-#: settings/forms.py:86
+#: settings/forms.py:87
+msgid "Send user"
+msgstr "发送账号"
+
+#: settings/forms.py:89
+msgid "Tips: Send mail account, default SMTP account as the send account"
+msgstr "提示：发送邮件账号，默认使用SMTP账号作为发送账号"
+
+#: settings/forms.py:93
 msgid "Use SSL"
 msgstr "使用SSL"
 
-#: settings/forms.py:87
+#: settings/forms.py:94
 msgid "If SMTP port is 465, may be select"
 msgstr "如果SMTP端口是465，通常需要启用SSL"
 
-#: settings/forms.py:90
+#: settings/forms.py:97
 msgid "Use TLS"
 msgstr "使用TLS"
 
-#: settings/forms.py:91
+#: settings/forms.py:98
 msgid "If SMTP port is 587, may be select"
 msgstr "如果SMTP端口是587，通常需要启用TLS"
 
-#: settings/forms.py:97
+#: settings/forms.py:104
 msgid "LDAP server"
 msgstr "LDAP地址"
 
-#: settings/forms.py:100
+#: settings/forms.py:107
 msgid "Bind DN"
 msgstr "绑定DN"
 
-#: settings/forms.py:107
+#: settings/forms.py:114
 msgid "User OU"
 msgstr "用户OU"
 
-#: settings/forms.py:108
+#: settings/forms.py:115
 msgid "Use | split User OUs"
 msgstr "使用|分隔各OU"
 
-#: settings/forms.py:112
+#: settings/forms.py:119
 msgid "User search filter"
 msgstr "用户过滤器"
 
-#: settings/forms.py:113
+#: settings/forms.py:120
 #, python-format
 msgid "Choice may be (cn|uid|sAMAccountName)=%(user)s)"
 msgstr "可能的选项是(cn或uid或sAMAccountName=%(user)s)"
 
-#: settings/forms.py:116
+#: settings/forms.py:123
 msgid "User attr map"
 msgstr "LDAP属性映射"
 
-#: settings/forms.py:118
+#: settings/forms.py:125
 msgid ""
 "User attr map present how to map LDAP user attr to jumpserver, username,name,"
 "email is jumpserver attr"
@@ -3382,39 +3403,39 @@ msgstr ""
 "用户属性映射代表怎样将LDAP中用户属性映射到jumpserver用户上，username, name,"
 "email 是jumpserver的属性"
 
-#: settings/forms.py:127
+#: settings/forms.py:134
 msgid "Enable LDAP auth"
 msgstr "启用LDAP认证"
 
-#: settings/forms.py:137
+#: settings/forms.py:144
 msgid "Auto"
 msgstr "自动"
 
-#: settings/forms.py:144
+#: settings/forms.py:151
 msgid "Password auth"
 msgstr "密码认证"
 
-#: settings/forms.py:147
+#: settings/forms.py:154
 msgid "Public key auth"
 msgstr "密钥认证"
 
-#: settings/forms.py:150
+#: settings/forms.py:157
 msgid "Heartbeat interval"
 msgstr "心跳间隔"
 
-#: settings/forms.py:154
+#: settings/forms.py:161
 msgid "List sort by"
 msgstr "资产列表排序"
 
-#: settings/forms.py:157
+#: settings/forms.py:164
 msgid "List page size"
 msgstr "资产分页每页数量"
 
-#: settings/forms.py:160
+#: settings/forms.py:167
 msgid "Session keep duration"
 msgstr "会话保留时长"
 
-#: settings/forms.py:161
+#: settings/forms.py:168
 msgid ""
 "Units: days, Session, record, command will be delete if more than duration, "
 "only in database"
@@ -3422,62 +3443,62 @@ msgstr ""
 "单位：天。 会话、录像、命令记录超过该时长将会被删除(仅影响数据库存储, oss等不"
 "受影响)"
 
-#: settings/forms.py:165
+#: settings/forms.py:172
 msgid "Telnet login regex"
 msgstr "Telnet 成功正则表达式"
 
-#: settings/forms.py:166
+#: settings/forms.py:173
 msgid "ex: Last\\s*login|success|成功"
 msgstr ""
 "登录telnet服务器成功后的提示正则表达式，如: Last\\s*login|success|成功 "
 
-#: settings/forms.py:177
+#: settings/forms.py:184
 msgid "MFA Secondary certification"
 msgstr "MFA 二次认证"
 
-#: settings/forms.py:179
+#: settings/forms.py:186
 msgid ""
 "After opening, the user login must use MFA secondary authentication (valid "
 "for all users, including administrators)"
 msgstr "开启后，用户登录必须使用MFA二次认证（对所有用户有效，包括管理员）"
 
-#: settings/forms.py:185
+#: settings/forms.py:192
 msgid "Batch execute commands"
 msgstr "批量命令"
 
-#: settings/forms.py:186
+#: settings/forms.py:193
 msgid "Allow user batch execute commands"
 msgstr "允许用户批量执行命令"
 
-#: settings/forms.py:191
+#: settings/forms.py:198
 msgid "Limit the number of login failures"
 msgstr "限制登录失败次数"
 
-#: settings/forms.py:195
+#: settings/forms.py:202
 msgid "No logon interval"
 msgstr "禁止登录时间间隔"
 
-#: settings/forms.py:197
+#: settings/forms.py:204
 msgid ""
 "Tip: (unit/minute) if the user has failed to log in for a limited number of "
 "times, no login is allowed during this time interval."
 msgstr ""
 "提示：（单位：分）当用户登录失败次数达到限制后，那么在此时间间隔内禁止登录"
 
-#: settings/forms.py:204
+#: settings/forms.py:211
 msgid "Connection max idle time"
 msgstr "SSH最大空闲时间"
 
-#: settings/forms.py:206
+#: settings/forms.py:213
 msgid ""
 "If idle time more than it, disconnect connection(only ssh now) Unit: minute"
 msgstr "提示：（单位：分）如果超过该配置没有操作，连接会被断开（仅ssh）"
 
-#: settings/forms.py:212
+#: settings/forms.py:219
 msgid "Password expiration time"
 msgstr "密码过期时间"
 
-#: settings/forms.py:214
+#: settings/forms.py:221
 msgid ""
 "Tip: (unit: day) If the user does not update the password during the time, "
 "the user password will expire failure;The password expiration reminder mail "
@@ -3487,81 +3508,81 @@ msgstr ""
 "提示：（单位：天）如果用户在此期间没有更新密码，用户密码将过期失效； 密码过期"
 "提醒邮件将在密码过期前5天内由系统（每天）自动发送给用户"
 
-#: settings/forms.py:223
+#: settings/forms.py:230
 msgid "Password minimum length"
 msgstr "密码最小长度 "
 
-#: settings/forms.py:227
+#: settings/forms.py:234
 msgid "Must contain capital letters"
 msgstr "必须包含大写字母"
 
-#: settings/forms.py:229
+#: settings/forms.py:236
 msgid ""
 "After opening, the user password changes and resets must contain uppercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含大写字母"
 
-#: settings/forms.py:234
+#: settings/forms.py:241
 msgid "Must contain lowercase letters"
 msgstr "必须包含小写字母"
 
-#: settings/forms.py:235
+#: settings/forms.py:242
 msgid ""
 "After opening, the user password changes and resets must contain lowercase "
 "letters"
 msgstr "开启后，用户密码修改、重置必须包含小写字母"
 
-#: settings/forms.py:240
+#: settings/forms.py:247
 msgid "Must contain numeric characters"
 msgstr "必须包含数字字符"
 
-#: settings/forms.py:241
+#: settings/forms.py:248
 msgid ""
 "After opening, the user password changes and resets must contain numeric "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含数字字符"
 
-#: settings/forms.py:246
+#: settings/forms.py:253
 msgid "Must contain special characters"
 msgstr "必须包含特殊字符"
 
-#: settings/forms.py:247
+#: settings/forms.py:254
 msgid ""
 "After opening, the user password changes and resets must contain special "
 "characters"
 msgstr "开启后，用户密码修改、重置必须包含特殊字符"
 
-#: settings/forms.py:254
+#: settings/forms.py:261
 msgid "Create user email subject"
 msgstr "创建用户邮件的主题"
 
-#: settings/forms.py:255
+#: settings/forms.py:262
 msgid ""
 "Tips: When creating a user, send the subject of the email (eg:Create account "
 "successfully)"
 msgstr "提示: 创建用户时，发送设置密码邮件的主题 (例如: 创建用户成功)"
 
-#: settings/forms.py:259
+#: settings/forms.py:266
 msgid "Create user honorific"
 msgstr "创建用户邮件的敬语"
 
-#: settings/forms.py:260
+#: settings/forms.py:267
 msgid "Tips: When creating a user, send the honorific of the email (eg:Hello)"
 msgstr "提示: 创建用户时，发送设置密码邮件的敬语 (例如: 您好)"
 
-#: settings/forms.py:265
+#: settings/forms.py:272
 msgid "Create user email content"
 msgstr "创建用户邮件的内容"
 
-#: settings/forms.py:266
+#: settings/forms.py:273
 msgid "Tips:When creating a user, send the content of the email"
 msgstr "提示: 创建用户时，发送设置密码邮件的内容"
 
-#: settings/forms.py:269
+#: settings/forms.py:276
 msgid "Signature"
 msgstr "署名"
 
-#: settings/forms.py:270
+#: settings/forms.py:277
 msgid "Tips: Email signature (eg:jumpserver)"
 msgstr "提示: 邮件的署名 (例如: jumpserver)"
 
@@ -5919,6 +5940,14 @@ msgstr "创建组织"
 #: xpack/plugins/orgs/views.py:57
 msgid "Update org"
 msgstr "更新组织"
+
+#: xpack/plugins/vault/meta.py:11 xpack/plugins/vault/views.py:16
+msgid "Vault"
+msgstr "密码匣子"
+
+#: xpack/plugins/vault/views.py:17
+msgid "vault list"
+msgstr "密码匣子"
 
 #~ msgid "User does not exist"
 #~ msgstr "用户不存在"
