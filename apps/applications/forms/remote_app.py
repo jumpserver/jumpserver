@@ -89,7 +89,7 @@ class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
         super().__init__(*args, **kwargs)
         field_asset = self.fields['asset']
         field_asset.queryset = field_asset.queryset.filter(
-            protocol=Protocol.PROTOCOL_RDP
+            protocols__name__in=[Protocol.PROTOCOL_RDP]
         )
         field_system_user = self.fields['system_user']
         field_system_user.queryset = field_system_user.queryset.filter(
