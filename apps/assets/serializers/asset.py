@@ -12,8 +12,8 @@ from ..models import Asset, Protocol
 from .system_user import AssetSystemUserSerializer
 
 __all__ = [
-    'AssetSerializer', 'AssetGrantedSerializer', 'MyAssetGrantedSerializer',
-    'AssetAsNodeSerializer', 'AssetSimpleSerializer',
+    'AssetSerializer', 'AssetGrantedSerializer', 'AssetSimpleSerializer',
+    'ProtocolSerializer',
 ]
 
 
@@ -115,16 +115,19 @@ class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
         return instance
 
 
-class AssetAsNodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
+# class AssetAsNodeSerializer(serializers.ModelSerializer):
+#     protocols = ProtocolSerializer(many=True)
+#
+#     class Meta:
+#         model = Asset
+#         fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
+    protocols = ProtocolSerializer(many=True)
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
     # nodes = NodeTMPSerializer(many=True, read_only=True)
@@ -132,9 +135,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = (
-            "id", "hostname", "ip", "system_users_granted",
+            "id", "hostname", "ip", "protocols", "system_users_granted",
             "is_active", "system_users_join", "os", 'domain',
-            "platform", "comment", "protocols", "org_id", "org_name",
+            "platform", "comment", "org_id", "org_name",
         )
 
     @staticmethod
@@ -143,21 +146,24 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         return ', '.join(system_users)
 
 
-class MyAssetGrantedSerializer(AssetGrantedSerializer):
-    """
-    普通用户获取授权的资产定义的数据结构
-    """
-
-    class Meta:
-        model = Asset
-        fields = (
-            "id", "hostname", "system_users_granted",
-            "is_active", "system_users_join", "org_name",
-            "os", "platform", "comment", "org_id", "protocol"
-        )
+# class MyAssetGrantedSerializer(AssetGrantedSerializer):
+#     """
+#     普通用户获取授权的资产定义的数据结构
+#     """
+#     protocols = ProtocolSerializer(many=True)
+#
+#     class Meta:
+#         model = Asset
+#         fields = (
+#             "id", "hostname", "system_users_granted",
+#             "is_active", "system_users_join", "org_name",
+#             "os", "platform", "comment", "org_id", "protocols"
+#         )
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
+    protocols = ProtocolSerializer(many=True)
+
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'port', 'ip', 'connectivity']
+        fields = ['id', 'hostname', 'ip', 'protocols', 'connectivity', 'port']

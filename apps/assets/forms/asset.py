@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from orgs.mixins import OrgModelForm
 
-from ..models import Asset, AdminUser, Protocol
+from ..models import Asset, Protocol
 
 
 logger = get_logger(__file__)

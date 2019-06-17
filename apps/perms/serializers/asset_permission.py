@@ -5,14 +5,13 @@ from rest_framework import serializers
 
 from common.fields import StringManyToManyField
 from perms.models import AssetPermission, Action
-from assets.models import Node, Asset, SystemUser
+from assets.models import Node
 from assets.serializers import AssetGrantedSerializer
 
 __all__ = [
     'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
-    'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
     'ActionSerializer', 'NodeGrantedSerializer',
 ]
 
@@ -122,19 +121,21 @@ class GrantedNodeSerializer(serializers.ModelSerializer):
         ]
 
 
-class GrantedAssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        fields = [
-            'id', 'hostname', 'ip', 'port', 'protocol', 'platform',
-            'domain', 'is_active', 'comment'
-        ]
+# class GrantedAssetSerializer(serializers.ModelSerializer):
+#     protocols = ProtocolSerializer(many=True)
+#
+#     class Meta:
+#         model = Asset
+#         fields = [
+#             'id', 'hostname', 'ip', 'protocols', 'port', 'protocol',
+#             'platform', 'domain', 'is_active', 'comment'
+#         ]
 
 
-class GrantedSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        fields = [
-            'id', 'name', 'username', 'protocol', 'priority',
-            'login_mode', 'comment'
-        ]
+# class GrantedSystemUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = SystemUser
+#         fields = [
+#             'id', 'name', 'username', 'protocol', 'priority',
+#             'login_mode', 'comment'
+#         ]
