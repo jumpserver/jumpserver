@@ -25,7 +25,9 @@ from ..hands import (
     NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers, const
-from ..mixins import AssetsFilterMixin, RemoteAppFilterMixin
+from ..mixins import (
+    AssetsFilterMixin, RemoteAppFilterMixin, ChangeOrgIfNeedMixin
+)
 from ..models import Action
 
 logger = get_logger(__name__)
@@ -459,7 +461,7 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
 # RemoteApp permission
 
-class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
+class UserGrantedRemoteAppsApi(ChangeOrgIfNeedMixin, RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
     pagination_class = LimitOffsetPagination
@@ -484,7 +486,7 @@ class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
+class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
@@ -519,7 +521,14 @@ class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
 class ValidateUserRemoteAppPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
+    def change_org_if_need(self):
+        if self.request.user.is_superuser or \
+                self.request.user.is_app or \
+                self.kwargs.get('pk') is None:
+            set_to_root_org()
+
     def get(self, request, *args, **kwargs):
+        self.change_org_if_need()
         user_id = request.query_params.get('user_id', '')
         remote_app_id = request.query_params.get('remote_app_id', '')
         user = get_object_or_404(User, id=user_id)
@@ -529,5 +538,4 @@ class ValidateUserRemoteAppPermissionApi(APIView):
         remote_apps = util.get_remote_apps()
         if remote_app not in remote_apps:
             return Response({'msg': False}, status=403)
-
         return Response({'msg': True}, status=200)
