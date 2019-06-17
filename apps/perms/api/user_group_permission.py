@@ -93,19 +93,12 @@ class UserGroupGrantedNodesWithAssetsAsTreeApi(ListAPIView):
     show_assets = True
     system_user_id = None
 
-    def change_org_if_need(self):
-        if self.request.user.is_superuser or \
-                self.request.user.is_app or \
-                self.kwargs.get('pk') is None:
-            set_to_root_org()
-
     def get(self, request, *args, **kwargs):
         self.show_assets = request.query_params.get('show_assets', '1') == '1'
         self.system_user_id = request.query_params.get('system_user')
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.change_org_if_need()
         user_group_id = self.kwargs.get('pk', '')
         queryset = []
         group = get_object_or_404(UserGroup, id=user_group_id)
