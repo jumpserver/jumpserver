@@ -58,6 +58,9 @@ function initClipboard() {
 
 function showAuth() {
     var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + authAssetId + "&username=" + authUsername;
+    if (prefer) {
+        url = setUrlParam(url, 'prefer', prefer)
+    }
     $("#id_username_view").html(authUsername);
     $("#id_hostname_view").html(authHostname);
     var success = function (data) {

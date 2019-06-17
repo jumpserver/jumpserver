@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import filters
+from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
 
 from common.permissions import IsOrgAdminOrAppUser
@@ -53,7 +54,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
         return _queryset
 
 
-class AssetUserViewSet(IDInCacheFilterMixin, viewsets.ModelViewSet):
+class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
@@ -138,10 +139,13 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     def get_object(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
+        prefer = self.request.GET.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
             manger = AssetUserManager()
-            instance = manger.get(username, [asset])
+            if prefer:
+                manger.prefer(prefer)
+            instance = manger.get(username, asset)
         except Exception as e:
             logger.error(e, exc_info=True)
             return None
@@ -153,22 +157,36 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     Test asset users connective
     """
+    permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_asset_users(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
-        prefer = self.request.GET.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         manager = AssetUserManager()
-        if prefer:
-            manager.prefer(prefer)
         asset_users = manager.filter(username=username, assets=[asset])
         return asset_users
 
     def retrieve(self, request, *args, **kwargs):
         asset_users = self.get_asset_users()
-        task = test_asset_users_connectivity_manual.delay(asset_users)
+        prefer = self.request.GET.get("prefer")
+        kwargs = {}
+        if prefer == "admin_user":
+            kwargs["run_as_admin"] = True
+        task = test_asset_users_connectivity_manual.delay(asset_users, **kwargs)
         return Response({"task": task.id})
 
 
+class AssetUserPushApi(generics.CreateAPIView):
+    """
+    Test asset users connective
+    """
+    serializer_class = serializers.AssetUserPushSerializer
+    permission_classes = (IsOrgAdminOrAppUser,)
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        asset = serializer.validated_data["asset"]
+        username = serializer.validated_data["username"]
+        pass

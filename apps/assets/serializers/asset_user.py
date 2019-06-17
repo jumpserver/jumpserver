@@ -6,10 +6,14 @@ from rest_framework import serializers
 
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
+from common.utils import validate_ssh_private_key
+from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
+
 
 __all__ = [
     'AssetUserSerializer', 'AssetUserAuthInfoSerializer',
-    'AssetUserExportSerializer',
+    'AssetUserExportSerializer', 'AssetUserPushSerializer',
 ]
 
 
@@ -19,7 +23,7 @@ class BasicAssetSerializer(serializers.ModelSerializer):
         fields = ['hostname', 'ip']
 
 
-class AssetUserSerializer(serializers.ModelSerializer):
+class AssetUserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
     connectivity = serializers.CharField(read_only=True, label=_("Connectivity"))
@@ -40,23 +44,30 @@ class AssetUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuthBook
+        list_serializer_class = AdaptedBulkListSerializer
         read_only_fields = (
             'date_created', 'date_updated', 'created_by',
             'is_latest', 'version', 'connectivity',
         )
         fields = [
             "id", "hostname", "ip", "username", "password", "asset", "version",
-            "is_latest", "connectivity", "backend", "org_id", "name",
+            "is_latest", "connectivity", "backend", "org_id",
             "date_created", "date_updated", "private_key", "public_key",
         ]
         extra_kwargs = {
             'username': {'required': True},
-            'name': {'write_only': True},
         }
+
+    def validate_private_key(self, key):
+        password = self.initial_data.get("password")
+        valid = validate_ssh_private_key(key, password)
+        if not valid:
+            raise serializers.ValidationError(_("private key invalid"))
+        return key
 
     def create(self, validated_data):
         kwargs = {
-            'name': validated_data.get('name'),
+            'name': validated_data.get('username'),
             'username': validated_data.get('username'),
             'asset': validated_data.get('asset'),
             'comment': validated_data.get('comment', ''),
@@ -72,15 +83,15 @@ class AssetUserSerializer(serializers.ModelSerializer):
 class AssetUserExportSerializer(AssetUserSerializer):
     password = serializers.CharField(
         max_length=256, allow_blank=True, allow_null=True,
-        required=False, help_text=_('Password')
+        required=False, label=_('Password')
     )
     public_key = serializers.CharField(
         max_length=4096, allow_blank=True, allow_null=True,
-        required=False, help_text=_('Public key')
+        required=False, label=_('Public key')
     )
     private_key = serializers.CharField(
         max_length=4096, allow_blank=True, allow_null=True,
-        required=False, help_text=_('Private key')
+        required=False, label=_('Private key')
     )
 
 
@@ -88,3 +99,14 @@ class AssetUserAuthInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthBook
         fields = ['password', 'private_key', 'public_key']
+
+
+class AssetUserPushSerializer(serializers.Serializer):
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.all(), label=_("Asset"))
+    username = serializers.CharField(max_length=1024)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
