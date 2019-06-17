@@ -108,8 +108,9 @@ class ChangeOrgIfNeedMixin(object):
 
     @staticmethod
     def change_org_if_need(request, kwargs):
-        if request.user.is_superuser or request.user.is_app or \
-                kwargs.get('pk') is None:
+        if request.user.is_authenticated and request.user.is_superuser \
+                or request.user.is_app \
+                or kwargs.get('pk') is None:
             set_to_root_org()
 
     def get(self, request, *args, **kwargs):

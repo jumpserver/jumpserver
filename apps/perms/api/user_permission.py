@@ -518,17 +518,11 @@ class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
         return super().get_permissions()
 
 
-class ValidateUserRemoteAppPermissionApi(APIView):
+class ValidateUserRemoteAppPermissionApi(ChangeOrgIfNeedMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
-    def change_org_if_need(self):
-        if self.request.user.is_superuser or \
-                self.request.user.is_app or \
-                self.kwargs.get('pk') is None:
-            set_to_root_org()
-
     def get(self, request, *args, **kwargs):
-        self.change_org_if_need()
+        self.change_org_if_need(request, kwargs)
         user_id = request.query_params.get('user_id', '')
         remote_app_id = request.query_params.get('remote_app_id', '')
         user = get_object_or_404(User, id=user_id)
