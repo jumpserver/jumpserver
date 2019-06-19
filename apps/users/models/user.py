@@ -30,11 +30,13 @@ class User(AbstractUser):
     ROLE_ADMIN = 'Admin'
     ROLE_USER = 'User'
     ROLE_APP = 'App'
+    ROLE_AUDITOR = 'Auditor'
 
     ROLE_CHOICES = (
         (ROLE_ADMIN, _('Administrator')),
         (ROLE_USER, _('User')),
-        (ROLE_APP, _('Application'))
+        (ROLE_APP, _('Application')),
+        (ROLE_AUDITOR, _("Auditor"))
     )
     OTP_LEVEL_CHOICES = (
         (0, _('Disable')),
@@ -242,6 +244,10 @@ class User(AbstractUser):
             return True
         else:
             return False
+
+    @property
+    def is_auditor(self):
+        return self.role == 'Auditor'
 
     @property
     def is_app(self):

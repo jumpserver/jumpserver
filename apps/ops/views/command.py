@@ -5,7 +5,9 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.generic import ListView, TemplateView
 
-from common.permissions import AdminUserRequiredMixin, LoginRequiredMixin
+from common.permissions import (
+    LoginRequiredMixin, PermissionsMixin, IsOrgAdmin, IsAuditor
+)
 from common.mixins import DatetimeSearchMixin
 from ..models import CommandExecution
 from ..forms import CommandExecutionForm
@@ -16,13 +18,14 @@ __all__ = [
 ]
 
 
-class CommandExecutionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
+class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     template_name = 'ops/command_execution_list.html'
     model = CommandExecution
     paginate_by = settings.DISPLAY_PER_PAGE
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     keyword = ''
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def _get_queryset(self):
         self.keyword = self.request.GET.get('keyword', '')

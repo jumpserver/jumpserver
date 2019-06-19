@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, reverse
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin
 from common.const import create_success_msg, update_success_msg
 from ..models import CommandFilter, CommandFilterRule, SystemUser
 from ..forms import CommandFilterForm, CommandFilterRuleForm
@@ -22,8 +22,9 @@ __all__ = (
 )
 
 
-class CommandFilterListView(AdminUserRequiredMixin, TemplateView):
+class CommandFilterListView(PermissionsMixin, TemplateView):
     template_name = 'assets/cmd_filter_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -34,12 +35,13 @@ class CommandFilterListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterCreateView(AdminUserRequiredMixin, CreateView):
+class CommandFilterCreateView(PermissionsMixin, CreateView):
     model = CommandFilter
     template_name = 'assets/cmd_filter_create_update.html'
     form_class = CommandFilterForm
     success_url = reverse_lazy('assets:cmd-filter-list')
     success_message = create_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -50,12 +52,13 @@ class CommandFilterCreateView(AdminUserRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterUpdateView(AdminUserRequiredMixin, UpdateView):
+class CommandFilterUpdateView(PermissionsMixin, UpdateView):
     model = CommandFilter
     template_name = 'assets/cmd_filter_create_update.html'
     form_class = CommandFilterForm
     success_url = reverse_lazy('assets:cmd-filter-list')
     success_message = update_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -66,9 +69,10 @@ class CommandFilterUpdateView(AdminUserRequiredMixin, UpdateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterDetailView(AdminUserRequiredMixin, DetailView):
+class CommandFilterDetailView(PermissionsMixin, DetailView):
     model = CommandFilter
     template_name = 'assets/cmd_filter_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         system_users_remain = SystemUser.objects\
@@ -83,10 +87,11 @@ class CommandFilterDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterRuleListView(AdminUserRequiredMixin, SingleObjectMixin, TemplateView):
+class CommandFilterRuleListView(PermissionsMixin, SingleObjectMixin, TemplateView):
     template_name = 'assets/cmd_filter_rule_list.html'
     model = CommandFilter
     object = None
+    permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=self.model.objects.all())
@@ -102,12 +107,13 @@ class CommandFilterRuleListView(AdminUserRequiredMixin, SingleObjectMixin, Templ
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterRuleCreateView(AdminUserRequiredMixin, CreateView):
+class CommandFilterRuleCreateView(PermissionsMixin, CreateView):
     template_name = 'assets/cmd_filter_rule_create_update.html'
     model = CommandFilterRule
     form_class = CommandFilterRuleForm
     success_message = create_success_msg
     cmd_filter = None
+    permission_classes = [IsOrgAdmin]
 
     def get_success_url(self):
         return reverse('assets:cmd-filter-rule-list', kwargs={
@@ -135,12 +141,13 @@ class CommandFilterRuleCreateView(AdminUserRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandFilterRuleUpdateView(AdminUserRequiredMixin, UpdateView):
+class CommandFilterRuleUpdateView(PermissionsMixin, UpdateView):
     template_name = 'assets/cmd_filter_rule_create_update.html'
     model = CommandFilterRule
     form_class = CommandFilterRuleForm
     success_message = create_success_msg
     cmd_filter = None
+    permission_classes = [IsOrgAdmin]
 
     def get_success_url(self):
         return reverse('assets:cmd-filter-rule-list', kwargs={

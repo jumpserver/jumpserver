@@ -9,7 +9,7 @@ from django.template import loader
 import time
 
 from common.mixins import DatetimeSearchMixin
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
 from ..models import Command
 from .. import utils
 from ..backends import get_multi_command_storage
@@ -18,13 +18,14 @@ __all__ = ['CommandListView', 'CommandExportView']
 common_storage = get_multi_command_storage()
 
 
-class CommandListView(DatetimeSearchMixin, AdminUserRequiredMixin, ListView):
+class CommandListView(DatetimeSearchMixin, PermissionsMixin, ListView):
     model = Command
     template_name = "terminal/command_list.html"
     context_object_name = 'command_list'
     paginate_by = settings.DISPLAY_PER_PAGE
     command = user = asset = system_user = ""
     date_from = date_to = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
         self.command = self.request.GET.get('command', '')
@@ -63,10 +64,11 @@ class CommandListView(DatetimeSearchMixin, AdminUserRequiredMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class CommandExportView(DatetimeSearchMixin, AdminUserRequiredMixin, View):
+class CommandExportView(DatetimeSearchMixin, PermissionsMixin, View):
     model = Command
     command = user = asset = system_user = action = ''
     date_from = date_to = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
