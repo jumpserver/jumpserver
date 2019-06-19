@@ -85,23 +85,21 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             system_user = get_object_or_404(SystemUser, id=system_user_id)
             assets = system_user.assets.all()
             username = system_user.username
-
-        if admin_user_id:
+        elif admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
             assets = admin_user.assets.all()
             username = admin_user.username
             manager.prefer('admin_user')
 
-        if username:
-            kwargs['username'] = username
-
         if asset_id:
             asset = get_object_or_none(Asset, pk=asset_id)
-            kwargs['assets'] = [asset]
+            assets = [asset]
         elif node_id:
             node = get_object_or_404(Node, id=node_id)
             assets = node.assets.all()
 
+        if username:
+            kwargs['username'] = username
         if assets:
             kwargs['assets'] = assets
 
