@@ -211,11 +211,17 @@ class ApiMessageMixin:
     _action_map = {"create": _("create"), "update": _("update")}
 
     def get_success_message(self, cleaned_data):
-        data = {k: v for k, v in cleaned_data.items()}
-        action = getattr(self, "action", "create")
-        data["action"] = self._action_map.get(action)
-        message = self.success_message % data
-        return message
+        data_list = []
+        if not isinstance(cleaned_data, list):
+            data_list.append(cleaned_data)
+        else:
+            data_list = cleaned_data
+        for raw_data in data_list:
+            data = {k: v for k, v in raw_data.items()}
+            action = getattr(self, "action", "create")
+            data["action"] = self._action_map.get(action)
+            message = self.success_message % data
+            return message
 
     def dispatch(self, request, *args, **kwargs):
         resp = super().dispatch(request, *args, **kwargs)
