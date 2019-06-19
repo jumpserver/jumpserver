@@ -22,7 +22,7 @@ class RemoteAppPermissionSerializer(BulkOrgResourceModelSerializer):
         fields = [
             'id', 'name', 'users', 'user_groups', 'remote_apps', 'comment',
             'is_active', 'date_start', 'date_expired', 'is_valid',
-            'created_by', 'date_created', 'org_id'
+            'created_by', 'date_created',
         ]
         read_only_fields = ['created_by', 'date_created']
 

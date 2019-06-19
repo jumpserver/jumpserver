@@ -52,7 +52,7 @@ class AssetUserSerializer(BulkOrgResourceModelSerializer):
         )
         fields = [
             "id", "hostname", "ip", "username", "password", "asset", "version",
-            "is_latest", "connectivity", "backend", "org_id",
+            "is_latest", "connectivity", "backend",
             "date_created", "date_updated", "private_key", "public_key",
         ]
         extra_kwargs = {
