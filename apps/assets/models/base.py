@@ -30,8 +30,8 @@ class AssetUser(OrgModelMixin):
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)

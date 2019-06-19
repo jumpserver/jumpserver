@@ -35,11 +35,10 @@
     </div>
 </div>
 </form>
-{% include 'authentication/_mfa_confirm_modal.html' %}
 <script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
 <script>
 var showPassword = false;
-var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+
 var authAssetId = "";
 var authHostname = "";
 var authUsername = "";
@@ -90,25 +89,6 @@ $(document).ready(function () {
         $("#id_password_view").attr("type", "password")
     }
 }).on("show.bs.modal", "#asset_user_auth_view", function () {
-    var now = new Date();
-    if (lastMFATime === "") {
-        lastMFATime = 0
-    }
-    var nowTime = now.getTime() / 1000;
-    if (nowTime - lastMFATime > 60*10 ) {
-        setTimeout(function () {
-            $("#asset_user_auth_view").modal("hide");
-        }, 100);
-        mfaFor = "viewAuth";
-        $("#mfa_auth_confirm").modal("show");
-    } else {
-        showAuth();
-    }
-}).on("success", '#mfa_auth_confirm', function () {
-    if (mfaFor !== "viewAuth") {
-        return
-    }
-    $("#asset_user_auth_view").modal("show");
     showAuth();
 })
 </script>

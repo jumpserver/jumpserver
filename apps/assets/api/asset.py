@@ -40,8 +40,8 @@ class AssetViewSet(IDInCacheFilterMixin, LabelFilter, ApiMessageMixin, BulkModel
     """
     API endpoint that allows Asset to be viewed or edited.
     """
-    filter_fields = ("hostname", "ip")
-    search_fields = filter_fields
+    filter_fields = ("hostname", "ip", "systemuser__id", "admin_user__id")
+    search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer

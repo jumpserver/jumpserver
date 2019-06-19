@@ -74,7 +74,7 @@ class Protocol(models.Model):
                                validators=PORT_VALIDATORS)
 
     def __str__(self):
-        return "{}:{}".format(self.name, self.port)
+        return "{}/{}".format(self.name, self.port)
 
 
 class Asset(OrgModelMixin):

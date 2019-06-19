@@ -201,49 +201,47 @@ $(document).ready(function () {
     }
     $(this).parent().parent().find(".protocol-port").val(port);
 })
-</script>
-{% block form_submit %}
-    <script>
-    $(document).ready(function () {
-    })
-    .on("submit", "form", function (evt) {
-        evt.preventDefault();
-        var the_url = '{% url 'api-assets:asset-list' %}';
-        var redirect_to = '{% url "assets:asset-list" %}';
-        var form = $("form");
-        var protocols = {};
-        var data = form.serializeObject();
-        $.each(data, function (k, v) {
-            if (k.startsWith("form")){
-                delete data[k];
-                var _k = k.split("-");
-                var formName = _k.slice(0, 2).join("-");
-                var key = _k[_k.length-1];
-                if (!protocols[formName]) {
-                    protocols[formName] = {}
-                }
-                protocols[formName][key] = v
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    {% block formUrl %}
+    var the_url = '{% url 'api-assets:asset-list' %}';
+    var redirect_to = '{% url "assets:asset-list" %}';
+    var method = "POST";
+    {% endblock %}
+    var form = $("form");
+    var protocols = {};
+    var data = form.serializeObject();
+    $.each(data, function (k, v) {
+        if (k.startsWith("form")){
+            delete data[k];
+            var _k = k.split("-");
+            var formName = _k.slice(0, 2).join("-");
+            var key = _k[_k.length-1];
+            if (!protocols[formName]) {
+                protocols[formName] = {}
             }
-        });
-        protocols = $.map(protocols, function ( v) {
-            return v
-        });
-        data["protocols"] = protocols;
-        if (typeof data.labels === "string") {
-            data["labels"] = [data["labels"]];
+            protocols[formName][key] = v
         }
-        if (typeof data["nodes"] == "string") {
-            data["nodes"] = [data["nodes"]]
-        }
-        var props = {
-            url: the_url,
-            data: data,
-            method: "POST",
-            form: form,
-            redirect_to: redirect_to
-        };
-        formSubmit(props);
-     })
-    </script>
-{% endblock %}
+    });
+
+    protocols = $.map(protocols, function (v) {
+        return v.name + '/' + v.port
+    });
+    data["protocols"] = protocols;
+    if (typeof data.labels === "string") {
+        data["labels"] = [data["labels"]];
+    }
+    if (typeof data["nodes"] == "string") {
+        data["nodes"] = [data["nodes"]]
+    }
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+ })
+</script>
 {% endblock %}

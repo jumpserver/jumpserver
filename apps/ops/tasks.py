@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import subprocess
+import datetime
 
 from django.conf import settings
 from celery import shared_task, subtask
@@ -105,10 +106,10 @@ def hello(name, callback=None):
 
 
 @shared_task
-@after_app_shutdown_clean_periodic
-@register_as_period_task(interval=30)
+# @after_app_shutdown_clean_periodic
+# @register_as_period_task(interval=30)
 def hello123():
-    print("Hello world")
+    print("{} Hello world".format(datetime.datetime.now().strftime("%H:%M:%S")))
 
 
 @shared_task

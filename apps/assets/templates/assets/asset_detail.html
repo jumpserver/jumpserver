@@ -72,8 +72,7 @@
                                             <td>{% trans 'Protocol' %}</td>
                                             <td>
                                                 {% for protocol in asset.protocols.all %}
-                                                    <b>{{ protocol.name }}:</b>
-                                                    {{ protocol.port }}
+                                                    <b>{{ protocol }}</b>
                                                 {% endfor %}
                                             </td>
                                         </tr>

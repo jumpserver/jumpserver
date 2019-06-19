@@ -216,7 +216,10 @@ class ApiMessageMixin:
         data = {k: v for k, v in cleaned_data.items()}
         action = getattr(self, "action", "create")
         data["action"] = self._action_map.get(action)
-        message = self.success_message % data
+        try:
+            message = self.success_message % data
+        except:
+            message = ''
         return message
 
     def dispatch(self, request, *args, **kwargs):

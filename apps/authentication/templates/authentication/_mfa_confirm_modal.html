@@ -22,32 +22,6 @@
 </div>
 </form>
 <script>
-var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
-
-function showAuth() {
-    $(".mfa-field").hide();
-    $(".auth-field").show();
-
-    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + asset_id + "&username=" + username;
-    $("#id_username_view").html(username);
-    $("#id_hostname_view").html(host);
-    var success = function (data) {
-        var password = data.password;
-        $("#id_password_view").val(password);
-    };
-    var error = function() {
-        var msg = "{% trans 'Get auth info error' %}";
-        toastr.error(msg)
-    };
-    APIUpdateAttr({
-        url: url,
-        method: "GET",
-        success: success,
-        flash_message: false,
-        error: error
-    })
-}
-
 var codeError = "{% trans 'Code error' %}";
 
 $(document).ready(function () {

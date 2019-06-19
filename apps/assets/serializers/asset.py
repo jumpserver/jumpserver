@@ -22,8 +22,25 @@ class ProtocolSerializer(serializers.ModelSerializer):
         fields = ["name", "port"]
 
 
+class ProtocolsRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        return str(value)
+
+    def to_internal_value(self, data):
+        if '/' not in data:
+            raise ValidationError("protocol not contain /: {}".format(data))
+        v = data.split("/")
+        if len(v) != 2:
+            raise ValidationError("protocol format should be name/port: {}".format(data))
+        name, port = v
+        cleaned_data = {"name": name, "port": port}
+        return cleaned_data
+
+
 class AssetSerializer(BulkOrgResourceModelSerializer):
-    protocols = ProtocolSerializer(many=True)
+    protocols = ProtocolsRelatedField(
+        many=True, queryset=Protocol.objects.all(), label=_("Protocols")
+    )
 
     """
     资产的数据结构
@@ -47,6 +64,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created',
         )
         extra_kwargs = {
+            'protocol': {'write_only': True},
+            'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
             'connectivity': {'label': _('Connectivity')},
             'org_name': {'label': _('Org name')}
@@ -61,6 +80,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def validate_protocols(attr):
+        protocols_serializer = ProtocolSerializer(data=attr, many=True)
+        protocols_serializer.is_valid(raise_exception=True)
         protocols_name = [i.get("name", "ssh") for i in attr]
         errors = [{} for i in protocols_name]
         for i, name in enumerate(protocols_name):
@@ -71,7 +92,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return attr
 
     def create(self, validated_data):
-        protocols_data = validated_data.pop("protocols")
+        protocols_data = validated_data.pop("protocols", [])
 
         # 兼容老的api
         protocol = validated_data.get("protocol")
@@ -91,7 +112,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        protocols_data = validated_data.pop("protocols", None)
+        protocols_data = validated_data.pop("protocols", [])
 
         # 兼容老的api
         protocol = validated_data.get("protocol")

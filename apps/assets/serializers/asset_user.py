@@ -7,7 +7,6 @@ from rest_framework import serializers
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
 from common.utils import validate_ssh_private_key
-from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins import BulkOrgResourceModelSerializer
 

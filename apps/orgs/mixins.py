@@ -219,7 +219,8 @@ class OrgResourceSerializerMixin(serializers.Serializer):
     由于HiddenField字段不可读，API获取资产信息时获取不到org_id，
     但是coco需要资产的org_id字段，所以修改为CharField类型
     """
-    org_id = serializers.ReadOnlyField(default=get_current_org_id)
+    org_id = serializers.ReadOnlyField(default=get_current_org_id, label=_("Organization"))
+    org_name = serializers.ReadOnlyField(label=_("Org name"))
 
     def get_validators(self):
         _validators = super().get_validators()

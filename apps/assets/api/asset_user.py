@@ -96,7 +96,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             assets = [asset]
         elif node_id:
             node = get_object_or_404(Node, id=node_id)
-            assets = node.assets.all()
+            assets = node.get_all_assets()
 
         if username:
             kwargs['username'] = username

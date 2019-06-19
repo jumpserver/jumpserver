@@ -25,12 +25,14 @@
 </table>
 {% include 'assets/_asset_user_auth_update_modal.html' %}
 {% include 'assets/_asset_user_auth_view_modal.html' %}
+{% include 'authentication/_mfa_confirm_modal.html' %}
 
 <script>
 var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
 var assetUserTable;
 var needPush = false;
 var prefer = null;
+var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
 
 function initAssetUserTable() {
     var options = {
@@ -98,7 +100,20 @@ $(document).ready(function(){
     authAssetId = $(this).data("asset") ;
     authHostname = $(this).data("hostname");
     authUsername = $(this).data('user');
-    $("#asset_user_auth_view").modal('show');
+    var now = new Date();
+    var nowTime = now.getTime() / 1000;
+    if (nowTime - lastMFATime > 60*10 ) {
+        mfaFor = "viewAuth";
+        $("#mfa_auth_confirm").modal("show");
+    } else {
+        $("#asset_user_auth_view").modal('show');
+    }
+})
+.on("success", '#mfa_auth_confirm', function () {
+    if (mfaFor !== "viewAuth") {
+        return
+    }
+    $("#asset_user_auth_view").modal("show");
 })
 .on('click', '.btn-update-auth', function() {
     authUsername = $(this).data("user") ;
@@ -125,5 +140,6 @@ $(document).ready(function(){
         flash_message: false
     });
 })
+
 
 </script>
