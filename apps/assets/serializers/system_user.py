@@ -3,12 +3,13 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 
-from ..models import SystemUser, Asset
+from ..models import SystemUser
 from .base import AuthSerializer
 
 
-class SystemUserSerializer(serializers.ModelSerializer):
+class SystemUserSerializer(BulkOrgResourceModelSerializer):
     """
     系统用户
     """

@@ -4,6 +4,7 @@
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
+from orgs.mixins import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 from assets.models import Node
 from assets.serializers import AssetGrantedSerializer
@@ -22,13 +23,13 @@ class ActionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
+class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = AssetPermission
         exclude = ('created_by', 'date_created')
 
 
-class AssetPermissionListSerializer(serializers.ModelSerializer):
+class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
     users = StringManyToManyField(many=True, read_only=True)
     user_groups = StringManyToManyField(many=True, read_only=True)
     assets = StringManyToManyField(many=True, read_only=True)

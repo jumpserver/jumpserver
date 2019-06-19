@@ -4,8 +4,8 @@
 
 from rest_framework import serializers
 
-from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 
 from .. import const
 from ..models import RemoteApp
@@ -66,7 +66,7 @@ class RemoteAppParamsDictField(serializers.DictField):
         return value
 
 
-class RemoteAppSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class RemoteAppSerializer(BulkOrgResourceModelSerializer):
     params = RemoteAppParamsDictField()
 
     class Meta:
