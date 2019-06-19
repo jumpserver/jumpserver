@@ -211,6 +211,8 @@ class ApiMessageMixin:
     _action_map = {"create": _("create"), "update": _("update")}
 
     def get_success_message(self, cleaned_data):
+        if not isinstance(cleaned_data, dict):
+            return ''
         data = {k: v for k, v in cleaned_data.items()}
         action = getattr(self, "action", "create")
         data["action"] = self._action_map.get(action)
