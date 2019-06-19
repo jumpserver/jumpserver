@@ -6,7 +6,7 @@ from django.conf import settings
 from django.views.generic import ListView, TemplateView
 
 from common.permissions import (
-    LoginRequiredMixin, PermissionsMixin, IsOrgAdmin, IsAuditor
+    PermissionsMixin, IsOrgAdmin, IsAuditor, IsValidUser
 )
 from common.mixins import DatetimeSearchMixin
 from ..models import CommandExecution
@@ -54,9 +54,10 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class CommandExecutionStartView(LoginRequiredMixin, TemplateView):
+class CommandExecutionStartView(PermissionsMixin, TemplateView):
     template_name = 'ops/command_execution_create.html'
     form_class = CommandExecutionForm
+    permission_classes = [IsValidUser]
 
     def get_user_system_users(self):
         from perms.utils import AssetPermissionUtil

@@ -32,6 +32,7 @@ class AdminUser(AssetUser):
     become_user = models.CharField(default='root', max_length=64)
     _become_pass = models.CharField(default='', max_length=128)
     CONNECTIVE_CACHE_KEY = '_JMS_ADMIN_USER_CONNECTIVE_{}'
+    _prefer = "admin_user"
 
     def __str__(self):
         return self.name
@@ -61,7 +62,7 @@ class AdminUser(AssetUser):
         return info
 
     def get_related_assets(self):
-        assets = self.asset_set.all()
+        assets = self.assets.all()
         return assets
 
     @property
@@ -174,17 +175,20 @@ class SystemUser(AssetUser):
         data = self.connectivity
         unreachable = data['unreachable']
         reachable = data['reachable']
+        assets = {asset.hostname: asset for asset in self.assets.all()}
 
         for host in value.get('dark', {}).keys():
             if host not in unreachable:
                 unreachable.append(host)
             if host in reachable:
                 reachable.remove(host)
+            self.set_connectivity_of(assets.get(host), self.UNREACHABLE)
         for host in value.get('contacted'):
             if host not in reachable:
                 reachable.append(host)
             if host in unreachable:
                 unreachable.remove(host)
+            self.set_connectivity_of(assets.get(host), self.REACHABLE)
         cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
         cache.set(cache_key, data, 3600)
 

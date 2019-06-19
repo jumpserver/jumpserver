@@ -1,0 +1,129 @@
+{% load i18n %}
+<style>
+.btn-group>.btn+.dropdown-toggle {
+    padding-right: 4px;
+    padding-left: 4px;
+}
+</style>
+<table class="table table-striped table-bordered table-hover" id="asset_user_list_table" style="width: 100%">
+  <thead>
+  <tr>
+      <th class="text-center">
+        <input type="checkbox" id="check_all" class="ipt_check_all" >
+      </th>
+      <th class="text-center">{% trans 'Hostname' %}</th>
+      <th class="text-center">{% trans 'IP' %}</th>
+      <th class="text-center">{% trans 'Username' %}</th>
+      <th class="text-center">{% trans 'Version' %}</th>
+      <th class="text-center">{% trans 'Connectivity'%}</th>
+      <th class="text-center">{% trans 'Datetime' %}</th>
+      <th class="text-center">{% trans 'Action' %}</th>
+   </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+{% include 'assets/_asset_user_auth_update_modal.html' %}
+{% include 'assets/_asset_user_auth_view_modal.html' %}
+
+<script>
+var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
+var assetUserTable;
+var needPush = false;
+var prefer = null;
+
+function initAssetUserTable() {
+    var options = {
+        ele: $('#asset_user_list_table'),
+        toggle: true,
+        columnDefs: [
+            {
+                targets: 5, createdCell: function (td, cellData) {
+                  if (cellData == 1) {
+                      $(td).html('<i class="fa fa-circle text-navy"></i>')
+                  } else if (cellData == 0) {
+                      $(td).html('<i class="fa fa-circle text-danger"></i>')
+                  } else {
+                      $(td).html('<i class="fa fa-circle text-warning"></i>')
+                  }
+                }
+            },
+            {
+                targets: 6, createdCell: function (td, cellData) {
+                    var date = new Date(cellData);
+                    $(td).html(date.toLocaleString());
+                },
+            },
+            {
+                targets: 7, createdCell: function (td, cellData, rowData) {
+                    var view_btn = '<button class="btn btn-xs btn-primary m-l-xs btn-view-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans "View" %}</button>'
+                    var update_btn = '<li><a class="btn-update-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Update' %}</a></li>';
+                    var test_btn = '<li><a class="btn-test-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Test' %}</a></li>';
+                    var push_btn = '<li><a class="btn-push-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Push' %}</a></li>';
+                    if (needPush) {
+                        test_btn += push_btn;
+                    }
+                    var actions = '<div class="btn-group">' + view_btn +
+                        '             <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle">' +
+                        '               <span class="caret"></span>' +
+                        '             </button>' +
+                        '                  <ul class="dropdown-menu">' +
+                                           update_btn + test_btn +
+                        '                  </ul>' +
+                        '           </div>';
+                        actions = actions.replaceAll("username123", rowData.username)
+                                         .replaceAll("hostname123", rowData.hostname)
+                                         .replaceAll("asset123", rowData.asset);
+				    $(td).html(actions);
+                },
+                width: '70px'
+            }
+        ],
+        ajax_url: assetUserListUrl,
+        columns: [
+            {data: "id"}, {data: "hostname"}, {data: "ip"},
+            {data: "username", orderable: false}, {data: "version", orderable: false},
+            {data: "connectivity", orderable: false},
+            {data: "date_created", orderable: false},
+            {data: "asset", orderable: false}
+        ],
+        op_html: $('#actions').html()
+    };
+    table = jumpserver.initServerSideDataTable(options);
+    return table
+}
+$(document).ready(function(){
+})
+.on('click', '.btn-view-auth', function () {
+    authAssetId = $(this).data("asset") ;
+    authHostname = $(this).data("hostname");
+    authUsername = $(this).data('user');
+    $("#asset_user_auth_view").modal('show');
+})
+.on('click', '.btn-update-auth', function() {
+    authUsername = $(this).data("user") ;
+    authHostname = $(this).data("hostname");
+    authAssetId = $(this).data("asset");
+    $("#asset_user_auth_update_modal").modal('show');
+})
+.on("click", '.btn-test-auth', function () {
+    authUsername = $(this).data("user") ;
+    authAssetId = $(this).data("asset");
+    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id=" + authAssetId + "&username=" + authUsername;
+    if (prefer) {
+        the_url = setUrlParam(the_url, "prefer", prefer)
+    }
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+
+</script>

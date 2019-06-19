@@ -10,7 +10,6 @@ import chardet
 from io import StringIO
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
@@ -36,7 +35,7 @@ from common.const import (
 )
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
-from common.permissions import PermissionsMixin, IsOrgAdmin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from orgs.utils import current_org
 from .. import forms
 from ..models import User, UserGroup
@@ -379,8 +378,9 @@ class UserGrantedAssetView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserProfileView(LoginRequiredMixin, TemplateView):
+class UserProfileView(PermissionsMixin, TemplateView):
     template_name = 'users/user_profile.html'
+    permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
         mfa_setting = settings.SECURITY_MFA_AUTH
@@ -392,9 +392,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+class UserProfileUpdateView(PermissionsMixin, UpdateView):
     template_name = 'users/user_profile_update.html'
     model = User
+    permission_classes = [IsValidUser]
     form_class = forms.UserProfileForm
     success_url = reverse_lazy('users:user-profile')
 
@@ -410,7 +411,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
         return super().get_context_data(**kwargs)
 
 
-class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
+class UserPasswordUpdateView(PermissionsMixin, UpdateView):
     template_name = 'users/user_password_update.html'
     model = User
     form_class = forms.UserPasswordForm
@@ -451,10 +452,11 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
+class UserPublicKeyUpdateView(PermissionsMixin, UpdateView):
     template_name = 'users/user_pubkey_update.html'
     model = User
     form_class = forms.UserPublicKeyForm
+    permission_classes = [IsValidUser]
     success_url = reverse_lazy('users:user-profile')
 
     def get_object(self, queryset=None):
@@ -469,7 +471,8 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
         return super().get_context_data(**kwargs)
 
 
-class UserPublicKeyGenerateView(LoginRequiredMixin, View):
+class UserPublicKeyGenerateView(PermissionsMixin, View):
+    permission_classes = [IsValidUser]
 
     def get(self, request, *args, **kwargs):
         private, public = ssh_key_gen(username=request.user.username, hostname='jumpserver')

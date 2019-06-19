@@ -14,12 +14,11 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 from django.utils.translation import ugettext as _
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from audits.utils import get_excel_response, write_content_to_excel
 from common.mixins import DatetimeSearchMixin
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor, IsValidUser
 
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
@@ -253,7 +252,8 @@ class CommandExecutionListView(UserCommandExecutionListView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class LoginLogExportView(LoginRequiredMixin, View):
+class LoginLogExportView(PermissionsMixin, View):
+    permission_classes = [IsValidUser]
 
     def get(self, request):
         fields = [

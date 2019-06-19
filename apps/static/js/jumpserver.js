@@ -646,6 +646,8 @@ jumpserver.initServerSideDataTable = function (options) {
             $.each(rows, function (id, row) {
                 table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
+                    console.log(table)
+                    console.log(table.selected);
                     table.selected.push(row.id)
                 }
             })
@@ -927,8 +929,11 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
 }
 
 // 解决input框中的资产和弹出表格中资产的显示不一致
-function initSelectedAssets2Table(){
-    var inputAssets = $('#id_assets').val();
+function initSelectedAssets2Table(id){
+    if (!id) {
+        id = "#id_assets"
+    }
+    var inputAssets = $(id).val();
     var selectedAssets = asset_table2.selected.concat();
 
     // input assets无，table assets选中，则取消勾选(再次click)

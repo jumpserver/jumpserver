@@ -99,7 +99,7 @@ class AdminUserAssetsView(PermissionsMixin, SingleObjectMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.object.asset_set.all()
+        self.queryset = self.object.assets.all()
         return self.queryset
 
     def get_context_data(self, **kwargs):

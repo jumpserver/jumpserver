@@ -104,14 +104,15 @@ class JMSInventory(JMSBaseInventory):
         super().__init__(host_list=host_list)
 
     def get_run_user_info(self, host):
-        from assets.backends.multi import AssetUserManager
+        from assets.backends import AssetUserManager
 
         if not self.run_as:
             return {}
 
         try:
             asset = self.assets.get(id=host.get('id'))
-            run_user = AssetUserManager.get(self.run_as, asset)
+            manager = AssetUserManager()
+            run_user = manager.get(self.run_as, asset)
         except Exception as e:
             logger.error(e, exc_info=True)
             return {}

@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 
-from assets.models import AuthBook
-
-from ..base import BaseBackend
+from ..models import AuthBook
+from .base import BaseBackend
 
 
 class AuthBookBackend(BaseBackend):
-
     @classmethod
-    def filter(cls, username=None, asset=None, latest=True):
+    def filter(cls, username=None, assets=None, latest=True):
         queryset = AuthBook.objects.all()
         if username is not None:
             queryset = queryset.filter(username=username)
-        if asset:
-            queryset = queryset.filter(asset=asset)
+        if assets:
+            queryset = queryset.filter(asset__in=assets)
         if latest:
             queryset = queryset.latest_version()
         return queryset

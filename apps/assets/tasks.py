@@ -563,11 +563,17 @@ def get_test_asset_user_connectivity_tasks(asset):
 @shared_task
 def set_asset_user_connectivity_info(asset_user, result):
     summary = result[1]
-    asset_user.connectivity = summary
+    if summary.get('contacted'):
+        connectivity = 1
+    elif summary.get("dark"):
+        connectivity = 0
+    else:
+        connectivity = 3
+    asset_user.connectivity = connectivity
 
 
 @shared_task
-def test_asset_user_connectivity_util(asset_user, task_name):
+def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
     """
     :param asset_user: <AuthBook>对象
     :param task_name:
@@ -582,23 +588,29 @@ def test_asset_user_connectivity_util(asset_user, task_name):
     if not tasks:
         return
 
-    task, created = update_or_create_ansible_task(
-        task_name, hosts=[asset_user.asset], tasks=tasks, pattern='all',
-        options=const.TASK_OPTIONS,
-        run_as=asset_user.username, created_by=asset_user.org_id
-    )
+    args = (task_name,)
+    kwargs = {
+        'hosts': [asset_user.asset], 'tasks': tasks,
+        'pattern': 'all', 'options': const.TASK_OPTIONS,
+        'created_by': asset_user.org_id,
+    }
+    if run_as_admin:
+        kwargs["run_as_admin"] = True
+    else:
+        kwargs["run_as"] = asset_user.username
+    task, created = update_or_create_ansible_task(*args, **kwargs)
     result = task.run()
     set_asset_user_connectivity_info(asset_user, result)
 
 
 @shared_task
-def test_asset_users_connectivity_manual(asset_users):
+def test_asset_users_connectivity_manual(asset_users, run_as_admin=False):
     """
     :param asset_users: <AuthBook>对象
     """
     for asset_user in asset_users:
         task_name = _("Test asset user connectivity: {}").format(asset_user)
-        test_asset_user_connectivity_util(asset_user, task_name)
+        test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=run_as_admin)
 
 
 # @shared_task

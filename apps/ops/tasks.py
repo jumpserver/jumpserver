@@ -105,6 +105,13 @@ def hello(name, callback=None):
 
 
 @shared_task
+@after_app_shutdown_clean_periodic
+@register_as_period_task(interval=30)
+def hello123():
+    print("Hello world")
+
+
+@shared_task
 def hello_callback(result):
     print(result)
     print("Hello callback")

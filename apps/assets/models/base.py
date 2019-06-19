@@ -6,6 +6,7 @@ from hashlib import md5
 
 import sshpubkeys
 from django.db import models
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -39,6 +40,8 @@ class AssetUser(OrgModelMixin):
         (REACHABLE, _('Reachable')),
         (UNKNOWN, _("Unknown")),
     )
+    CONNECTIVITY_CACHE_KEY = "CONNECTIVITY_{}"
+    _prefer = "system_user"
 
     @property
     def password(self):
@@ -124,10 +127,21 @@ class AssetUser(OrgModelMixin):
     def get_auth(self, asset=None):
         pass
 
+    def get_connectivity_of(self, asset):
+        i = self.generate_id_with_asset(asset)
+        key = self.CONNECTIVITY_CACHE_KEY.format(i)
+        return cache.get(key)
+
+    def set_connectivity_of(self, asset, c):
+        i = self.generate_id_with_asset(asset)
+        key = self.CONNECTIVITY_CACHE_KEY.format(i)
+        cache.set(key, c, 3600)
+
     def load_specific_asset_auth(self, asset):
-        from ..backends.multi import AssetUserManager
+        from ..backends import AssetUserManager
         try:
-            other = AssetUserManager.get(username=self.username, asset=asset)
+            manager = AssetUserManager().prefer(self._prefer)
+            other = manager.get(username=self.username, asset=asset)
         except Exception as e:
             logger.error(e, exc_info=True)
         else:
@@ -171,6 +185,26 @@ class AssetUser(OrgModelMixin):
             'public_key': self.public_key,
             'private_key': self.private_key_file,
         }
+
+    def generate_id_with_asset(self, asset):
+        id_ = '{}_{}'.format(asset.id, self.id)
+        id_ = uuid.UUID(md5(id_.encode()).hexdigest())
+        return id_
+
+    def construct_to_authbook(self, asset):
+        from . import AuthBook
+        fields = [
+            'name', 'username', 'comment', 'org_id',
+            '_password', '_private_key', '_public_key',
+            'date_created', 'date_updated', 'created_by'
+        ]
+        id_ = self.generate_id_with_asset(asset)
+        obj = AuthBook(id=id_, asset=asset, version=0, is_latest=True)
+        obj._connectivity = self.get_connectivity_of(asset)
+        for field in fields:
+            value = getattr(self, field)
+            setattr(obj, field, value)
+        return obj
 
     class Meta:
         abstract = True

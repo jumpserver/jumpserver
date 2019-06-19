@@ -10,9 +10,9 @@
 
 {% block form_submit %}
 <script>
-    $(document).ready(function () {
-    })
-    .on("submit", "form", function (evt) {
+$(document).ready(function () {
+})
+.on("submit", "form", function (evt) {
     evt.preventDefault();
     var the_url = '{% url 'api-assets:asset-detail' pk=object.id %}';
     var redirect_to = '{% url "assets:asset-list" %}';
@@ -35,6 +35,9 @@
         return v
     });
     data["protocols"] = protocols;
+    if (typeof data.labels === "string") {
+            data["labels"] = [data["labels"]];
+    }
     if (typeof data["nodes"] == "string") {
         data["nodes"] = [data["nodes"]]
     }
@@ -46,6 +49,6 @@
         redirect_to: redirect_to
     };
     formSubmit(props);
- });
+});
 </script>
 {% endblock %}

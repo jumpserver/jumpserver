@@ -49,7 +49,7 @@ class TerminalUpdateView(PermissionsMixin, UpdateView):
         return context
 
 
-class TerminalDetailView(LoginRequiredMixin, PermissionsMixin, DetailView):
+class TerminalDetailView(PermissionsMixin, DetailView):
     model = Terminal
     template_name = 'terminal/terminal_detail.html'
     context_object_name = 'terminal'
@@ -97,7 +97,7 @@ class TerminalAcceptView(PermissionsMixin, JSONResponseMixin, UpdateView):
         return self.render_json_response(data)
 
 
-class TerminalConnectView(LoginRequiredMixin, PermissionsMixin, DetailView):
+class TerminalConnectView(PermissionsMixin, DetailView):
     """
     Abandon
     """
@@ -127,11 +127,11 @@ class TerminalConnectView(LoginRequiredMixin, PermissionsMixin, DetailView):
         return super(TerminalConnectView, self).get_context_data(**kwargs)
 
 
-class WebTerminalView(LoginRequiredMixin, View):
+class WebTerminalView(View):
     def get(self, request, *args, **kwargs):
         return redirect('/luna/?' + request.GET.urlencode())
 
 
-class WebSFTPView(LoginRequiredMixin, View):
+class WebSFTPView(View):
     def get(self, request, *args, **kwargs):
         return redirect('/coco/elfinder/sftp/?' + request.GET.urlencode())

@@ -27,7 +27,7 @@ from django.forms.formsets import formset_factory
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
-from common.permissions import PermissionsMixin ,IsOrgAdmin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from common.const import (
     create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
 )
@@ -74,8 +74,9 @@ class AssetUserListView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserAssetListView(LoginRequiredMixin, TemplateView):
+class UserAssetListView(PermissionsMixin, TemplateView):
     template_name = 'assets/user_asset_list.html'
+    permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -214,10 +215,11 @@ class AssetDeleteView(PermissionsMixin, DeleteView):
     permission_classes = [IsOrgAdmin]
 
 
-class AssetDetailView(LoginRequiredMixin, DetailView):
+class AssetDetailView(PermissionsMixin, DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
+    permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
         nodes_remain = Node.objects.exclude(assets=self.object)
@@ -231,7 +233,9 @@ class AssetDetailView(LoginRequiredMixin, DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportView(LoginRequiredMixin, View):
+class AssetExportView(PermissionsMixin, View):
+    permission_classes = [IsValidUser]
+
     def get(self, request):
         spm = request.GET.get('spm', '')
         assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else []

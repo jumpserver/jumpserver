@@ -1,9 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
-from django.core.cache import cache
 from django.shortcuts import render
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import RedirectView
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
@@ -15,6 +13,7 @@ from django.urls import reverse_lazy
 from formtools.wizard.views import SessionWizardView
 
 from common.utils import get_object_or_none
+from common.permissions import PermissionsMixin, IsValidUser
 from ..models import User
 from ..utils import (
     send_reset_password_mail, get_password_check_rules, check_password_rules
@@ -120,8 +119,9 @@ class UserResetPasswordView(TemplateView):
         return HttpResponseRedirect(reverse('users:reset-password-success'))
 
 
-class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
+class UserFirstLoginView(PermissionsMixin, SessionWizardView):
     template_name = 'users/first_login.html'
+    permission_classes = [IsValidUser]
     form_list = [
         forms.UserProfileForm,
         forms.UserPublicKeyForm,

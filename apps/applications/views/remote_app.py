@@ -6,11 +6,10 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
 
-from common.permissions import PermissionsMixin, IsOrgAdmin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from common.const import create_success_msg, update_success_msg
 
 from ..models import RemoteApp
@@ -92,8 +91,9 @@ class RemoteAppDetailView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserRemoteAppListView(LoginRequiredMixin, TemplateView):
+class UserRemoteAppListView(PermissionsMixin, TemplateView):
     template_name = 'applications/user_remote_app_list.html'
+    permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
         context = {
