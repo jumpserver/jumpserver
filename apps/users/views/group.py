@@ -9,7 +9,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 from common.utils import get_logger
 from common.const import create_success_msg, update_success_msg
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
 from ..models import User, UserGroup
 from .. import forms
@@ -19,8 +19,9 @@ __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
 logger = get_logger(__name__)
 
 
-class UserGroupListView(AdminUserRequiredMixin, TemplateView):
+class UserGroupListView(PermissionsMixin, TemplateView):
     template_name = 'users/user_group_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -31,12 +32,13 @@ class UserGroupListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class UserGroupCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
     success_message = create_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -47,12 +49,13 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         return super().get_context_data(**kwargs)
 
 
-class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
+class UserGroupUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
     success_message = update_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -64,10 +67,11 @@ class UserGroupUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateVie
         return super().get_context_data(**kwargs)
 
 
-class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
+class UserGroupDetailView(PermissionsMixin, DetailView):
     model = UserGroup
     context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         users = current_org.get_org_users().exclude(id__in=self.object.users.all())
@@ -80,11 +84,12 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
+class UserGroupGrantedAssetView(PermissionsMixin, DetailView):
     model = UserGroup
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'
     object = None
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {

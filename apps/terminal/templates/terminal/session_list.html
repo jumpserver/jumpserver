@@ -103,7 +103,7 @@
                 {% if session.is_finished %}
                 <a {% if not session.can_replay %} disabled="" {% endif %} onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
                 {% else %}
-                    {% if session.protocol == 'ssh' %}
+                    {% if session.protocol == 'ssh' and request.user.is_org_admin%}
                         <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
                     {% else %}
                         <a class="btn btn-xs btn-danger btn-term" disabled value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
@@ -115,6 +115,7 @@
 {% endblock %}
 
 {% block content_bottom_left %}
+    {% if  request.user.is_org_admin %}
     <div id="actions" {% if type != "online" %} style="display: none" {% endif %}>
         <div class="input-group">
             <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
@@ -128,6 +129,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 {% endblock %}
 
 {% block custom_foot_js %}

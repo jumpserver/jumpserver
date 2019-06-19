@@ -15,7 +15,7 @@ import jms_storage
 
 
 from common.utils import is_uuid
-from common.permissions import IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdminOrAppUser, IsAuditor
 from ..hands import SystemUser
 from ..models import Terminal, Session
 from .. import serializers
@@ -30,7 +30,7 @@ class SessionViewSet(BulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -68,7 +68,7 @@ class CommandViewSet(viewsets.ViewSet):
     """
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
 
     def get_queryset(self):
         self.command_store.filter(**dict(self.request.query_params))

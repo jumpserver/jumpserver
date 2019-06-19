@@ -10,7 +10,7 @@ from django.views.generic.detail import DetailView
 from common.const import create_success_msg, update_success_msg
 from ..forms import SystemUserForm
 from ..models import SystemUser, Node, CommandFilter
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin
 
 
 __all__ = [
@@ -20,8 +20,9 @@ __all__ = [
 ]
 
 
-class SystemUserListView(AdminUserRequiredMixin, TemplateView):
+class SystemUserListView(PermissionsMixin, TemplateView):
     template_name = 'assets/system_user_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -32,12 +33,13 @@ class SystemUserListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class SystemUserCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
     model = SystemUser
     form_class = SystemUserForm
     template_name = 'assets/system_user_create.html'
     success_url = reverse_lazy('assets:system-user-list')
     success_message = create_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -48,12 +50,13 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         return super().get_context_data(**kwargs)
 
 
-class SystemUserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
+class SystemUserUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
     model = SystemUser
     form_class = SystemUserForm
     template_name = 'assets/system_user_update.html'
     success_url = reverse_lazy('assets:system-user-list')
     success_message = update_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -64,10 +67,11 @@ class SystemUserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateVi
         return super().get_context_data(**kwargs)
 
 
-class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
+class SystemUserDetailView(PermissionsMixin, DetailView):
     template_name = 'assets/system_user_detail.html'
     context_object_name = 'system_user'
     model = SystemUser
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -79,16 +83,18 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
+class SystemUserDeleteView(PermissionsMixin, DeleteView):
     model = SystemUser
     template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:system-user-list')
+    permission_classes = [IsOrgAdmin]
 
 
-class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
+class SystemUserAssetView(PermissionsMixin, DetailView):
     model = SystemUser
     template_name = 'assets/system_user_asset.html'
     context_object_name = 'system_user'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         nodes_remain = sorted(Node.objects.exclude(systemuser=self.object), reverse=True)

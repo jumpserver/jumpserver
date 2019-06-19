@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
 from ..backends import get_multi_command_storage
@@ -20,14 +20,14 @@ __all__ = [
 ]
 
 
-
-class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
+class SessionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     model = Session
     template_name = 'terminal/session_list.html'
     context_object_name = 'session_list'
     paginate_by = settings.DISPLAY_PER_PAGE
     user = asset = system_user = ''
     date_from = date_to = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
         self.queryset = super().get_queryset()
@@ -97,10 +97,11 @@ class SessionOfflineListView(SessionListView):
         return super().get_context_data(**kwargs)
 
 
-class SessionDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
+class SessionDetailView(SingleObjectMixin, PermissionsMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
     object = None
+    permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=self.model.objects.all())

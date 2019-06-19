@@ -24,16 +24,6 @@ from .models import User
 logger = logging.getLogger('jumpserver')
 
 
-class AdminUserRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        if not self.request.user.is_authenticated:
-            return False
-        elif not self.request.user.is_superuser:
-            self.raise_exception = True
-            return False
-        return True
-
-
 def construct_user_created_email_body(user):
     default_body = _("""
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">

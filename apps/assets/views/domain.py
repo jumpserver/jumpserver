@@ -7,7 +7,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy, reverse
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin ,IsOrgAdmin
 from common.const import create_success_msg, update_success_msg
 from common.utils import get_object_or_none
 from ..models import Domain, Gateway
@@ -21,8 +21,9 @@ __all__ = (
 )
 
 
-class DomainListView(AdminUserRequiredMixin, TemplateView):
+class DomainListView(PermissionsMixin, TemplateView):
     template_name = 'assets/domain_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -33,12 +34,13 @@ class DomainListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class DomainCreateView(AdminUserRequiredMixin, CreateView):
+class DomainCreateView(PermissionsMixin, CreateView):
     model = Domain
     template_name = 'assets/domain_create_update.html'
     form_class = DomainForm
     success_url = reverse_lazy('assets:domain-list')
     success_message = create_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -49,12 +51,13 @@ class DomainCreateView(AdminUserRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class DomainUpdateView(AdminUserRequiredMixin, UpdateView):
+class DomainUpdateView(PermissionsMixin, UpdateView):
     model = Domain
     template_name = 'assets/domain_create_update.html'
     form_class = DomainForm
     success_url = reverse_lazy('assets:domain-list')
     success_message = update_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -65,9 +68,10 @@ class DomainUpdateView(AdminUserRequiredMixin, UpdateView):
         return super().get_context_data(**kwargs)
 
 
-class DomainDetailView(AdminUserRequiredMixin, DetailView):
+class DomainDetailView(PermissionsMixin, DetailView):
     model = Domain
     template_name = 'assets/domain_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -78,16 +82,18 @@ class DomainDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class DomainDeleteView(AdminUserRequiredMixin, DeleteView):
+class DomainDeleteView(PermissionsMixin, DeleteView):
     model = Domain
     template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:domain-list')
+    permission_classes = [IsOrgAdmin]
 
 
-class DomainGatewayListView(AdminUserRequiredMixin, SingleObjectMixin, TemplateView):
+class DomainGatewayListView(PermissionsMixin, SingleObjectMixin, TemplateView):
     template_name = 'assets/domain_gateway_list.html'
     model = Domain
     object = None
+    permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=self.model.objects.all())
@@ -103,11 +109,12 @@ class DomainGatewayListView(AdminUserRequiredMixin, SingleObjectMixin, TemplateV
         return super().get_context_data(**kwargs)
 
 
-class DomainGatewayCreateView(AdminUserRequiredMixin, CreateView):
+class DomainGatewayCreateView(PermissionsMixin, CreateView):
     model = Gateway
     template_name = 'assets/gateway_create_update.html'
     form_class = GatewayForm
     success_message = create_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_success_url(self):
         domain = self.object.domain
@@ -130,11 +137,12 @@ class DomainGatewayCreateView(AdminUserRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class DomainGatewayUpdateView(AdminUserRequiredMixin, UpdateView):
+class DomainGatewayUpdateView(PermissionsMixin, UpdateView):
     model = Gateway
     template_name = 'assets/gateway_create_update.html'
     form_class = GatewayForm
     success_message = update_success_msg
+    permission_classes = [IsOrgAdmin]
 
     def get_success_url(self):
         domain = self.object.domain

@@ -96,7 +96,7 @@ class Organization(models.Model):
         admin_orgs = []
         if user.is_anonymous:
             return admin_orgs
-        elif user.is_superuser:
+        elif user.is_superuser or user.is_auditor:
             admin_orgs = list(cls.objects.all())
             admin_orgs.append(cls.default())
         elif user.is_org_admin:
