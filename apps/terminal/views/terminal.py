@@ -2,7 +2,6 @@
 #
 from django.views.generic import ListView, UpdateView, DeleteView, \
     DetailView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse

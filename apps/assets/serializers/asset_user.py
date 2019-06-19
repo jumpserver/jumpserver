@@ -9,6 +9,7 @@ from ..backends import AssetUserManager
 from common.utils import validate_ssh_private_key
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 
 
 __all__ = [
@@ -23,7 +24,7 @@ class BasicAssetSerializer(serializers.ModelSerializer):
         fields = ['hostname', 'ip']
 
 
-class AssetUserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class AssetUserSerializer(BulkOrgResourceModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
     connectivity = serializers.CharField(read_only=True, label=_("Connectivity"))
@@ -51,7 +52,7 @@ class AssetUserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         )
         fields = [
             "id", "hostname", "ip", "username", "password", "asset", "version",
-            "is_latest", "connectivity", "backend", "org_id",
+            "is_latest", "connectivity", "backend",
             "date_created", "date_updated", "private_key", "public_key",
         ]
         extra_kwargs = {

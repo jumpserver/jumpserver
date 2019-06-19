@@ -20,7 +20,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms.formsets import formset_factory

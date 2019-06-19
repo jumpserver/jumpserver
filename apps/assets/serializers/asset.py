@@ -5,8 +5,7 @@ from rest_framework.validators import ValidationError
 
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgResourceSerializerMixin
-from common.mixins import BulkSerializerMixin
+from orgs.mixins import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Protocol
 from .system_user import AssetSystemUserSerializer
@@ -23,8 +22,7 @@ class ProtocolSerializer(serializers.ModelSerializer):
         fields = ["name", "port"]
 
 
-class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
-                      serializers.ModelSerializer):
+class AssetSerializer(BulkOrgResourceModelSerializer):
     protocols = ProtocolSerializer(many=True)
 
     """
@@ -34,7 +32,7 @@ class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
         model = Asset
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'org_id', 'org_name', 'ip', 'hostname', 'protocol', 'port',
+            'id', 'ip', 'hostname', 'protocol', 'port',
             'protocols', 'platform', 'is_active', 'public_ip', 'domain',
             'admin_user', 'nodes', 'labels', 'number', 'vendor', 'model', 'sn',
             'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
@@ -93,7 +91,7 @@ class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
         return instance
 
     def update(self, instance, validated_data):
-        protocols_data = validated_data.pop("protocols")
+        protocols_data = validated_data.pop("protocols", None)
 
         # 兼容老的api
         protocol = validated_data.get("protocol")
@@ -104,14 +102,16 @@ class AssetSerializer(BulkSerializerMixin, OrgResourceSerializerMixin,
         if not protocol and not port and protocols_data:
             validated_data["protocol"] = protocols_data[0]["name"]
             validated_data["port"] = protocols_data[0]["port"]
-
-        protocols_serializer = ProtocolSerializer(data=protocols_data, many=True)
-        protocols_serializer.is_valid(raise_exception=True)
-        protocols = protocols_serializer.save()
+        protocols = None
+        if protocols_data:
+            protocols_serializer = ProtocolSerializer(data=protocols_data, many=True)
+            protocols_serializer.is_valid(raise_exception=True)
+            protocols = protocols_serializer.save()
 
         instance = super().update(instance, validated_data)
-        instance.protocols.all().delete()
-        instance.protocols.set(protocols)
+        if protocols:
+            instance.protocols.all().delete()
+            instance.protocols.set(protocols)
         return instance
 
 

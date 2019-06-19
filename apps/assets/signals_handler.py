@@ -65,6 +65,7 @@ def on_system_user_update(sender, instance=None, created=True, **kwargs):
 @receiver(m2m_changed, sender=SystemUser.nodes.through)
 def on_system_user_nodes_change(sender, instance=None, **kwargs):
     if instance and kwargs["action"] == "post_add":
+        logger.info("System user `{}` nodes update signal received".format(instance))
         assets = set()
         nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
         for node in nodes:

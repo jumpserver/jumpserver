@@ -3,11 +3,12 @@
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 
 from ..models import Label
 
 
-class LabelSerializer(serializers.ModelSerializer):
+class LabelSerializer(BulkOrgResourceModelSerializer):
     asset_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,7 +26,7 @@ class LabelSerializer(serializers.ModelSerializer):
         return fields
 
 
-class LabelDistinctSerializer(serializers.ModelSerializer):
+class LabelDistinctSerializer(BulkOrgResourceModelSerializer):
     value = serializers.SerializerMethodField()
 
     class Meta:
