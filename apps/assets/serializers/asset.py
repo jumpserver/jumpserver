@@ -27,6 +27,10 @@ class ProtocolsRelatedField(serializers.RelatedField):
         return str(value)
 
     def to_internal_value(self, data):
+        print(data)
+        print(type(data))
+        if isinstance(data, dict):
+            return data
         if '/' not in data:
             raise ValidationError("protocol not contain /: {}".format(data))
         v = data.split("/")

@@ -199,7 +199,7 @@ def test_asset_connectivity_util(assets, task_name=None):
         contacted=defaultdict(dict), dark=defaultdict(dict), success=True
     )
     created_by = assets[0].org_id
-    for _, value in hosts_category.items():
+    for k, value in hosts_category.items():
         if not value['hosts']:
             continue
         task, created = update_or_create_ansible_task(
@@ -324,7 +324,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     results_summary = dict(
         contacted=defaultdict(dict), dark=defaultdict(dict), success=True
     )
-    for _, value in hosts_category.items():
+    for k, value in hosts_category.items():
         if not value['hosts']:
             continue
         task, created = update_or_create_ansible_task(
