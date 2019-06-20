@@ -5401,8 +5401,6 @@ msgid "Password rules"
 msgstr "密码规则"
 
 #: xpack/plugins/change_auth_plan/models.py:213
-#, fuzzy
-#| msgid "For security, do not change root user's password"
 msgid "For security, do not change {} user's password"
 msgstr "为了安全，禁止更改 {} 用户的密码"
 
