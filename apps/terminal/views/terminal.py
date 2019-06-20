@@ -28,7 +28,7 @@ class TerminalListView(PermissionsMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(TerminalListView, self).get_context_data(**kwargs)
         context.update({
-            'app': _('Terminal'),
+            'app': _('Sessions'),
             'action': _('Terminal list'),
             'form': self.form_class()
         })
@@ -44,7 +44,7 @@ class TerminalUpdateView(PermissionsMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Terminal'), 'action': _('Update terminal')})
+        context.update({'app': _('Sessions'), 'action': _('Update terminal')})
         return context
 
 
@@ -57,7 +57,7 @@ class TerminalDetailView(PermissionsMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(TerminalDetailView, self).get_context_data(**kwargs)
         context.update({
-            'app': _('Terminal'),
+            'app': _('Sessions'),
             'action': _('Terminal detail')
         })
         return context

@@ -48,7 +48,7 @@ class CommandListView(DatetimeSearchMixin, PermissionsMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Terminal'),
+            'app': _('Sessions'),
             'action': _('Command list'),
             'user_list': utils.get_session_user_list(),
             'asset_list': utils.get_session_asset_list(),
