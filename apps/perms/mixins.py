@@ -1,7 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-
 from orgs.utils import set_to_root_org
 
 __all__ = [
@@ -116,4 +115,3 @@ class ChangeOrgIfNeedMixin(object):
     def get(self, request, *args, **kwargs):
         self.change_org_if_need(request, kwargs)
         return super().get(request, *args, **kwargs)
-
