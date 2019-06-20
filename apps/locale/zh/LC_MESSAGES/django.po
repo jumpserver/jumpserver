@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-20 11:41+0800\n"
+"POT-Creation-Date: 2019-06-20 17:55+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -305,7 +305,7 @@ msgstr "备注"
 #: perms/templates/perms/remote_app_permission_list.html:17
 #: perms/templates/perms/remote_app_permission_remote_app.html:26
 #: perms/templates/perms/remote_app_permission_user.html:26
-#: templates/_nav.html:36 templates/_nav.html:48 templates/_nav_user.html:14
+#: templates/_nav.html:36 templates/_nav.html:48 templates/_nav_user.html:16
 msgid "RemoteApp"
 msgstr "远程应用"
 
@@ -558,28 +558,9 @@ msgstr "连接"
 
 #: applications/views/remote_app.py:31 applications/views/remote_app.py:47
 #: applications/views/remote_app.py:69 applications/views/remote_app.py:87
-#: assets/models/user.py:135
-#: assets/templates/assets/_asset_group_bulk_update_modal.html:11
-#: assets/templates/assets/system_user_asset.html:22
-#: assets/templates/assets/system_user_detail.html:22
-#: assets/views/admin_user.py:30 assets/views/admin_user.py:49
-#: assets/views/admin_user.py:66 assets/views/admin_user.py:82
-#: assets/views/admin_user.py:107 assets/views/asset.py:52
-#: assets/views/asset.py:69 assets/views/asset.py:128 assets/views/asset.py:171
-#: assets/views/asset.py:199 assets/views/asset.py:226
-#: assets/views/cmd_filter.py:31 assets/views/cmd_filter.py:48
-#: assets/views/cmd_filter.py:65 assets/views/cmd_filter.py:82
-#: assets/views/cmd_filter.py:102 assets/views/cmd_filter.py:136
-#: assets/views/cmd_filter.py:170 assets/views/domain.py:30
-#: assets/views/domain.py:47 assets/views/domain.py:64
-#: assets/views/domain.py:78 assets/views/domain.py:104
-#: assets/views/domain.py:133 assets/views/domain.py:153
-#: assets/views/label.py:27 assets/views/label.py:45 assets/views/label.py:72
-#: assets/views/system_user.py:29 assets/views/system_user.py:46
-#: assets/views/system_user.py:63 assets/views/system_user.py:78
-#: templates/_nav.html:19 xpack/plugins/change_auth_plan/models.py:68
-msgid "Assets"
-msgstr "资产管理"
+#: templates/_nav.html:33
+msgid "Applications"
+msgstr "应用管理"
 
 #: applications/views/remote_app.py:32
 msgid "RemoteApp list"
@@ -1182,6 +1163,29 @@ msgstr "自动登录"
 msgid "Manually login"
 msgstr "手动登录"
 
+#: assets/models/user.py:135
+#: assets/templates/assets/_asset_group_bulk_update_modal.html:11
+#: assets/templates/assets/system_user_asset.html:22
+#: assets/templates/assets/system_user_detail.html:22
+#: assets/views/admin_user.py:30 assets/views/admin_user.py:49
+#: assets/views/admin_user.py:66 assets/views/admin_user.py:82
+#: assets/views/admin_user.py:107 assets/views/asset.py:52
+#: assets/views/asset.py:69 assets/views/asset.py:128 assets/views/asset.py:171
+#: assets/views/asset.py:199 assets/views/asset.py:226
+#: assets/views/cmd_filter.py:31 assets/views/cmd_filter.py:48
+#: assets/views/cmd_filter.py:65 assets/views/cmd_filter.py:82
+#: assets/views/cmd_filter.py:102 assets/views/cmd_filter.py:136
+#: assets/views/cmd_filter.py:170 assets/views/domain.py:30
+#: assets/views/domain.py:47 assets/views/domain.py:64
+#: assets/views/domain.py:78 assets/views/domain.py:104
+#: assets/views/domain.py:133 assets/views/domain.py:153
+#: assets/views/label.py:27 assets/views/label.py:45 assets/views/label.py:72
+#: assets/views/system_user.py:29 assets/views/system_user.py:46
+#: assets/views/system_user.py:63 assets/views/system_user.py:78
+#: templates/_nav.html:19 xpack/plugins/change_auth_plan/models.py:68
+msgid "Assets"
+msgstr "资产管理"
+
 #: assets/models/user.py:138 assets/templates/assets/_system_user.html:59
 #: assets/templates/assets/system_user_detail.html:122
 #: assets/templates/assets/system_user_update.html:10
@@ -1438,7 +1442,7 @@ msgstr "日期"
 
 #: assets/templates/assets/_asset_user_list.html:61
 msgid "View"
-msgstr "查看认证"
+msgstr "查看"
 
 #: assets/templates/assets/_asset_user_list.html:63
 #: assets/templates/assets/admin_user_assets.html:61
@@ -2317,8 +2321,8 @@ msgid "Date"
 msgstr "日期"
 
 #: audits/views.py:85 audits/views.py:129 audits/views.py:166
-#: audits/views.py:211 audits/views.py:243 templates/_nav.html:87
-#: templates/_nav_audits.html:22
+#: audits/views.py:211 audits/views.py:243 ops/views/command.py:47
+#: templates/_nav.html:87 templates/_nav_audits.html:22
 msgid "Audits"
 msgstr "日志审计"
 
@@ -2984,7 +2988,7 @@ msgstr "更新任务内容: {}"
 
 #: ops/views/adhoc.py:45 ops/views/adhoc.py:71 ops/views/adhoc.py:85
 #: ops/views/adhoc.py:99 ops/views/adhoc.py:113 ops/views/adhoc.py:127
-#: ops/views/adhoc.py:141 ops/views/command.py:47 ops/views/command.py:72
+#: ops/views/adhoc.py:141 ops/views/command.py:72
 msgid "Ops"
 msgstr "作业中心"
 
@@ -3000,7 +3004,7 @@ msgstr "执行历史"
 msgid "Command execution list"
 msgstr "命令执行列表"
 
-#: ops/views/command.py:73 templates/_nav_user.html:22
+#: ops/views/command.py:73 templates/_nav_user.html:26
 msgid "Command execution"
 msgstr "命令执行"
 
@@ -3825,7 +3829,7 @@ msgstr "文档"
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:28 users/forms.py:139
+#: templates/_header_bar.html:89 templates/_nav_user.html:32 users/forms.py:139
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -3941,11 +3945,11 @@ msgstr "用户列表"
 msgid "Command filters"
 msgstr "命令过滤"
 
-#: templates/_nav.html:33
-msgid "Applications"
-msgstr "应用管理"
-
 #: templates/_nav.html:55 templates/_nav_audits.html:11
+#: terminal/views/command.py:51 terminal/views/session.py:74
+#: terminal/views/session.py:92 terminal/views/session.py:116
+#: terminal/views/terminal.py:31 terminal/views/terminal.py:47
+#: terminal/views/terminal.py:60
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -3954,6 +3958,7 @@ msgid "Session online"
 msgstr "在线会话"
 
 #: templates/_nav.html:59 templates/_nav_audits.html:15
+#: terminal/views/session.py:93
 msgid "Session offline"
 msgstr "历史会话"
 
@@ -3961,18 +3966,15 @@ msgstr "历史会话"
 msgid "Commands"
 msgstr "命令记录"
 
-#: templates/_nav.html:63 templates/_nav_user.html:33
+#: templates/_nav.html:63 templates/_nav_user.html:37
 msgid "Web terminal"
 msgstr "Web终端"
 
-#: templates/_nav.html:68 templates/_nav_user.html:38
+#: templates/_nav.html:68 templates/_nav_user.html:42
 msgid "File manager"
 msgstr "文件管理"
 
-#: templates/_nav.html:72 terminal/views/command.py:51
-#: terminal/views/session.py:74 terminal/views/session.py:92
-#: terminal/views/session.py:116 terminal/views/terminal.py:31
-#: terminal/views/terminal.py:47 terminal/views/terminal.py:60
+#: templates/_nav.html:72
 msgid "Terminal"
 msgstr "终端管理"
 
@@ -3996,7 +3998,7 @@ msgstr "账户列表"
 msgid "Sync instance"
 msgstr "同步实例"
 
-#: templates/_nav_user.html:9
+#: templates/_nav_user.html:11
 msgid "My Applications"
 msgstr "我的应用"
 
@@ -4353,10 +4355,6 @@ msgstr "信息"
 #: terminal/views/session.py:75
 msgid "Session online list"
 msgstr "在线会话"
-
-#: terminal/views/session.py:93
-msgid "Session offline list"
-msgstr "离线会话"
 
 #: terminal/views/terminal.py:32
 msgid "Terminal list"
@@ -5770,7 +5768,7 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/templates/interface/interface.html:15
-#: xpack/plugins/interface/views.py:25
+#: xpack/plugins/interface/views.py:24 xpack/plugins/interface/views.py:25
 msgid "Interface setting"
 msgstr "界面设置"
 
@@ -5792,10 +5790,6 @@ msgstr "恢复默认成功！"
 #: xpack/plugins/interface/templates/interface/interface.html:114
 msgid "Restore default failed."
 msgstr "恢复默认失败！"
-
-#: xpack/plugins/interface/views.py:24
-msgid "Interface"
-msgstr "界面"
 
 #: xpack/plugins/interface/views.py:51
 msgid "It is already in the default setting state!"
@@ -5900,7 +5894,9 @@ msgstr "无效的许可证"
 msgid "Admin"
 msgstr "管理员"
 
-#: xpack/plugins/orgs/meta.py:8
+#: xpack/plugins/orgs/meta.py:8 xpack/plugins/orgs/views.py:26
+#: xpack/plugins/orgs/views.py:43 xpack/plugins/orgs/views.py:60
+#: xpack/plugins/orgs/views.py:77
 msgid "Organizations"
 msgstr "组织管理"
 
@@ -5917,18 +5913,9 @@ msgstr "添加管理员"
 msgid "Create organization "
 msgstr "创建组织"
 
-#: xpack/plugins/orgs/views.py:26
-msgid "Org"
-msgstr "组织"
-
 #: xpack/plugins/orgs/views.py:27
 msgid "Org list"
 msgstr "组织列表"
-
-#: xpack/plugins/orgs/views.py:43 xpack/plugins/orgs/views.py:60
-#: xpack/plugins/orgs/views.py:77
-msgid "Orgs"
-msgstr "组织"
 
 #: xpack/plugins/orgs/views.py:44
 msgid "Create org"
@@ -5954,15 +5941,6 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:38
 msgid "vault create"
 msgstr "创建"
-
-#~ msgid "Update failed!"
-#~ msgstr "更新失败"
-
-#~ msgid "Update auth"
-#~ msgstr "更新认证"
-
-#~ msgid "Password version"
-#~ msgstr "密码版本"
 
 #~ msgid "User does not exist"
 #~ msgstr "用户不存在"

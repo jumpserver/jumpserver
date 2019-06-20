@@ -71,7 +71,7 @@ class SessionOnlineListView(SessionListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Terminal'),
+            'app': _('Sessions'),
             'action': _('Session online list'),
             'type': 'online',
             'now': timezone.now(),
@@ -89,8 +89,8 @@ class SessionOfflineListView(SessionListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Terminal'),
-            'action': _('Session offline list'),
+            'app': _('Sessions'),
+            'action': _('Session offline'),
             'now': timezone.now(),
         }
         kwargs.update(context)
@@ -113,7 +113,7 @@ class SessionDetailView(SingleObjectMixin, PermissionsMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Terminal'),
+            'app': _('Sessions'),
             'action': _('Session detail'),
         }
         kwargs.update(context)
