@@ -27,8 +27,6 @@ class ProtocolsRelatedField(serializers.RelatedField):
         return str(value)
 
     def to_internal_value(self, data):
-        print(data)
-        print(type(data))
         if isinstance(data, dict):
             return data
         if '/' not in data:
@@ -152,7 +150,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
-    protocols = ProtocolSerializer(many=True)
+    protocols = ProtocolsRelatedField(
+        many=True, queryset=Protocol.objects.all(), label=_("Protocols")
+    )
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
     # nodes = NodeTMPSerializer(many=True, read_only=True)
@@ -160,9 +160,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = (
-            "id", "hostname", "ip", "protocols", "system_users_granted",
-            "is_active", "system_users_join", "os", 'domain',
-            "platform", "comment", "org_id", "org_name",
+            "id", "hostname", "ip", "protocol", "port", "protocols",
+            "system_users_granted", "is_active", "system_users_join", "os",
+            'domain', "platform", "comment", "org_id", "org_name",
         )
 
     @staticmethod
@@ -187,8 +187,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
-    protocols = ProtocolSerializer(many=True)
 
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'protocols', 'connectivity', 'port']
+        fields = ['id', 'hostname', 'ip', 'connectivity', 'port']
