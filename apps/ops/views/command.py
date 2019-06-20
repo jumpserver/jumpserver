@@ -44,7 +44,7 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Audits'),
+            'app': _('Ops'),
             'action': _('Command execution list'),
             'date_from': self.date_from,
             'date_to': self.date_to,
