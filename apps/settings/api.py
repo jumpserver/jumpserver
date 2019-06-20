@@ -39,7 +39,7 @@ class MailTestingAPI(APIView):
                 subject = "Test"
                 message = "Test smtp setting"
                 email_from = email_from or email_host_user
-                send_mail(subject, message,  email_from, [email_host_user])
+                send_mail(subject, message,  email_from, [email_from])
             except Exception as e:
                 return Response({"error": str(e)}, status=401)
 

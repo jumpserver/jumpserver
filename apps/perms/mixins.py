@@ -3,8 +3,6 @@
 
 from orgs.utils import set_to_root_org
 
-from orgs.utils import set_to_root_org
-
 __all__ = [
     'AssetsFilterMixin', 'RemoteAppFilterMixin', 'ChangeOrgIfNeedMixin',
 ]
