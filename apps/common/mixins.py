@@ -224,7 +224,7 @@ class ApiMessageMixin:
 
     def dispatch(self, request, *args, **kwargs):
         resp = super().dispatch(request, *args, **kwargs)
-        if request.method.lower() in ("get", "delete"):
+        if request.method.lower() in ("get", "delete", "patch"):
             return resp
         if resp.status_code >= 400:
             return resp
