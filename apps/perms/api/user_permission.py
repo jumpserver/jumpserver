@@ -26,7 +26,7 @@ from ..hands import (
 )
 from .. import serializers, const
 from ..mixins import (
-    AssetsFilterMixin, RemoteAppFilterMixin, ChangeOrgIfNeedMixin
+    AssetsFilterMixin, RemoteAppFilterMixin
 )
 from ..models import Action
 
@@ -47,14 +47,6 @@ class UserPermissionCacheMixin:
     RESP_CACHE_KEY = '_PERMISSION_RESPONSE_CACHE_{}'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     _object = None
-
-    @staticmethod
-    def change_org_if_need(request, kwargs):
-        if request.user.is_authenticated and \
-                request.user.is_superuser or \
-                request.user.is_app or \
-                kwargs.get('pk') is None:
-            set_to_root_org()
 
     def get_object(self):
         return None
@@ -115,7 +107,6 @@ class UserPermissionCacheMixin:
         cache.set(key, response.data, self.CACHE_TIME)
 
     def get(self, request, *args, **kwargs):
-        self.change_org_if_need(request, kwargs)
         self.cache_policy = request.GET.get('cache_policy', '0')
 
         obj = self._get_object()
@@ -461,7 +452,7 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
 # RemoteApp permission
 
-class UserGrantedRemoteAppsApi(ChangeOrgIfNeedMixin, RemoteAppFilterMixin, ListAPIView):
+class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
     pagination_class = LimitOffsetPagination
@@ -486,7 +477,7 @@ class UserGrantedRemoteAppsApi(ChangeOrgIfNeedMixin, RemoteAppFilterMixin, ListA
         return super().get_permissions()
 
 
-class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
+class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
@@ -518,11 +509,10 @@ class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
         return super().get_permissions()
 
 
-class ValidateUserRemoteAppPermissionApi(ChangeOrgIfNeedMixin, APIView):
+class ValidateUserRemoteAppPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):
-        self.change_org_if_need(request, kwargs)
         user_id = request.query_params.get('user_id', '')
         remote_app_id = request.query_params.get('remote_app_id', '')
         user = get_object_or_404(User, id=user_id)
