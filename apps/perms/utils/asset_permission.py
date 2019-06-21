@@ -11,6 +11,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from orgs.utils import set_to_root_org
 from common.utils import get_logger
 from common.tree import TreeNode
 from .. import const
@@ -162,6 +163,11 @@ class AssetPermissionUtil:
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.cache_policy = cache_policy
         self.tree = GenerateTree()
+        self.change_org_if_need()
+
+    @staticmethod
+    def change_org_if_need():
+        set_to_root_org()
 
     @classmethod
     def is_not_using_cache(cls, cache_policy):

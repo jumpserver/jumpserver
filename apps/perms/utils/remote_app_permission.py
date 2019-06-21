@@ -4,6 +4,7 @@
 from django.db.models import Q
 
 from common.tree import TreeNode
+from orgs.utils import set_to_root_org
 
 from ..models import RemoteAppPermission
 
@@ -38,6 +39,11 @@ class RemoteAppPermissionUtil:
 
     def __init__(self, obj):
         self.object = obj
+        self.change_org_if_need()
+
+    @staticmethod
+    def change_org_if_need():
+        set_to_root_org()
 
     @property
     def permissions(self):
