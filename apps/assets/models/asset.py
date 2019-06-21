@@ -256,6 +256,8 @@ class Asset(OrgModelMixin):
 
     @connectivity.setter
     def connectivity(self, value):
+        if not self.admin_user:
+            return
         self.admin_user.set_connectivity_of(self, value)
 
     def get_auth_info(self):
