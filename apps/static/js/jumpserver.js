@@ -1015,7 +1015,7 @@ function APIImportData(props){
                 $('#updated_failed').html('');
                 $('#updated_failed_detail').html('');
                 $('#success_updated').html(gettext("Update Success"));
-                $('#success_updated_detail').html("Count" + ": " + data.length);
+                $('#success_updated_detail').html(gettext("Count") + ": " + data.length);
             }
 
             props.data_table.ajax.reload()

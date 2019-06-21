@@ -28,7 +28,7 @@ class RemoteAppListView(PermissionsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('RemoteApp list'),
         }
         kwargs.update(context)
@@ -44,7 +44,7 @@ class RemoteAppCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('Create RemoteApp'),
         }
         kwargs.update(context)
@@ -66,7 +66,7 @@ class RemoteAppUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('Update RemoteApp'),
         }
         kwargs.update(context)
@@ -84,7 +84,7 @@ class RemoteAppDetailView(PermissionsMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('RemoteApp detail'),
         }
         kwargs.update(context)

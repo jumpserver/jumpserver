@@ -229,6 +229,8 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
+        if not self.admin_user:
+            return self.UNKNOWN
         return self.admin_user.get_connectivity_of(self)
 
     @connectivity.setter

@@ -248,7 +248,7 @@ class CommandExecutionListView(UserCommandExecutionListView):
             'keyword': self.keyword,
             'user_id': self.user_id,
         })
-        return super().get_context_data(**context)
+        return context
 
 
 @method_decorator(csrf_exempt, name='dispatch')
