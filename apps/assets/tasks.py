@@ -209,9 +209,13 @@ def test_asset_connectivity_util(assets, task_name=None):
         )
         result = task.run()
         summary = result[1]
-        results_summary['success'] &= summary['success']
-        results_summary['contacted'].update(summary['contacted'])
-        results_summary['dark'].update(summary['dark'])
+        success = summary.get('success', False)
+        contacted = summary.get('contacted', {})
+        dark = summary.get('dark', {})
+
+        results_summary['success'] &= success
+        results_summary['contacted'].update(contacted)
+        results_summary['dark'].update(dark)
 
     for asset in assets:
         if asset.hostname in results_summary.get('dark', {}):
@@ -330,14 +334,17 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
         task, created = update_or_create_ansible_task(
             task_name=task_name, hosts=value['hosts'], tasks=value['tasks'],
             pattern='all', options=const.TASK_OPTIONS,
-            run_as=system_user.username,
-            created_by=system_user.org_id,
+            run_as=system_user.username, created_by=system_user.org_id,
         )
         result = task.run()
         summary = result[1]
-        results_summary['success'] &= summary['success']
-        results_summary['contacted'].update(summary['contacted'])
-        results_summary['dark'].update(summary['dark'])
+        success = summary.get('success', False)
+        contacted = summary.get('contacted', {})
+        dark = summary.get('dark', {})
+
+        results_summary['success'] &= success
+        results_summary['contacted'].update(contacted)
+        results_summary['dark'].update(dark)
 
     set_system_user_connectivity_info(system_user, results_summary)
     return results_summary
