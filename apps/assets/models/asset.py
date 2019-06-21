@@ -134,13 +134,6 @@ class Asset(OrgModelMixin):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     objects = AssetManager.from_queryset(AssetQuerySet)()
-    CONNECTIVITY_CACHE_KEY = '_JMS_ASSET_CONNECTIVITY_{}'
-    UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
-    CONNECTIVITY_CHOICES = (
-        (UNREACHABLE, _("Unreachable")),
-        (REACHABLE, _('Reachable')),
-        (UNKNOWN, _("Unknown")),
-    )
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -214,20 +207,6 @@ class Asset(OrgModelMixin):
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
-
-    @classmethod
-    def get_queryset_by_fullname_list(cls, fullname_list):
-        org_fullname_map = defaultdict(list)
-        for fullname in fullname_list:
-            hostname, org = cls.split_fullname(fullname)
-            org_fullname_map[org].append(hostname)
-        filter_arg = Q()
-        for org, hosts in org_fullname_map.items():
-            if org.is_real():
-                filter_arg |= Q(hostname__in=hosts, org_id=org.id)
-            else:
-                filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
-        return Asset.objects.filter(filter_arg)
 
     @property
     def cpu_info(self):
