@@ -47,9 +47,8 @@ class SessionViewSet(BulkModelViewSet):
         sid = serializer.validated_data["system_user"]
         # guacamole提交的是id
         if is_uuid(sid):
-            _system_user = SystemUser.get_system_user_by_id_or_cached(sid)
-            if _system_user:
-                serializer.validated_data["system_user"] = _system_user.name
+            _system_user = get_object_or_404(SystemUser, id=sid)
+            serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
 
 

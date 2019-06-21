@@ -293,3 +293,11 @@ class LocalProxy(object):
     __rdivmod__ = lambda x, o: x._get_current_object().__rdivmod__(o)
     __copy__ = lambda x: copy.copy(x._get_current_object())
     __deepcopy__ = lambda x, memo: copy.deepcopy(x._get_current_object(), memo)
+
+
+def random_string(length):
+    import string
+    import random
+    charset = string.ascii_letters + string.digits
+    s = [random.choice(charset) for i in range(length)]
+    return ''.join(s)

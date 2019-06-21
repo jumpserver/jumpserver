@@ -14,8 +14,11 @@ from common.utils import (
     get_signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
 )
 from common.validators import alphanumeric
+from common import fields
 from orgs.mixins import OrgModelMixin
 from .utils import private_key_validator
+from ..utils import Connectivity
+from .. import const
 
 signer = get_signer()
 
@@ -26,7 +29,7 @@ class AssetUser(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
-    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    _password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -34,13 +37,8 @@ class AssetUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
-    UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
-    CONNECTIVITY_CHOICES = (
-        (UNREACHABLE, _("Unreachable")),
-        (REACHABLE, _('Reachable')),
-        (UNKNOWN, _("Unknown")),
-    )
-    CONNECTIVITY_CACHE_KEY = "CONNECTIVITY_{}"
+    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_ASSET_CONNECTIVITY_{}"
+
     _prefer = "system_user"
 
     @property
@@ -109,6 +107,10 @@ class AssetUser(OrgModelMixin):
                 pass
         return None
 
+    def get_related_assets(self):
+        assets = self.assets.all()
+        return assets
+
     def set_auth(self, password=None, private_key=None, public_key=None):
         update_fields = []
         if password:
@@ -124,17 +126,52 @@ class AssetUser(OrgModelMixin):
         if update_fields:
             self.save(update_fields=update_fields)
 
-    def get_auth(self, asset=None):
-        pass
+    def set_connectivity(self, summary):
+        unreachable = summary.get('dark', {}).keys()
+        reachable = summary.get('contacted', {}).keys()
 
-    def get_connectivity_of(self, asset):
-        i = self.generate_id_with_asset(asset)
-        key = self.CONNECTIVITY_CACHE_KEY.format(i)
-        return cache.get(key)
+        for asset in self.get_related_assets():
+            if asset.hostname in unreachable:
+                self.set_asset_connectivity(asset, Connectivity.unreachable())
+            elif asset.hostname in reachable:
+                self.set_asset_connectivity(asset, Connectivity.reachable())
+            else:
+                self.set_asset_connectivity(asset, Connectivity.unknown())
 
-    def set_connectivity_of(self, asset, c):
+    @property
+    def connectivity(self):
+        assets = self.get_related_assets()
+        data = {
+            'unreachable': [],
+            'reachable': [],
+            'unknown': [],
+        }
+        for asset in assets:
+            connectivity = self.get_asset_connectivity(asset)
+            if connectivity.is_reachable():
+                data["reachable"].append(asset.hostname)
+            elif connectivity.is_unreachable():
+                data["unreachable"].append(asset.hostname)
+            else:
+                data["unknown"].append(asset.hostname)
+        return data
+
+    @property
+    def connectivity_amount(self):
+        return {k: len(v) for k, v in self.connectivity.items()}
+
+    @property
+    def assets_amount(self):
+        return self.get_related_assets().count()
+
+    def get_asset_connectivity(self, asset):
         i = self.generate_id_with_asset(asset)
-        key = self.CONNECTIVITY_CACHE_KEY.format(i)
+        key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
+        return cache.get(key, const.CONN_UNKNOWN)
+
+    def set_asset_connectivity(self, asset, c):
+        i = self.generate_id_with_asset(asset)
+        key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
         cache.set(key, c, 3600)
 
     def load_specific_asset_auth(self, asset):
@@ -168,9 +205,10 @@ class AssetUser(OrgModelMixin):
         private_key, public_key = ssh_key_gen(
             username=self.username
         )
-        self.set_auth(password=password,
-                      private_key=private_key,
-                      public_key=public_key)
+        self.set_auth(
+            password=password, private_key=private_key,
+            public_key=public_key
+        )
 
     def auto_gen_auth_password(self):
         password = str(uuid.uuid4())
@@ -187,24 +225,18 @@ class AssetUser(OrgModelMixin):
         }
 
     def generate_id_with_asset(self, asset):
-        id_ = '{}_{}'.format(asset.id, self.id)
-        id_ = uuid.UUID(md5(id_.encode()).hexdigest())
-        return id_
+        i = '{}_{}'.format(asset.id, self.id)
+        i = uuid.UUID(md5(i.encode()).hexdigest())
+        return i
 
     def construct_to_authbook(self, asset):
-        from . import AuthBook
-        fields = [
-            'name', 'username', 'comment', 'org_id',
-            '_password', '_private_key', '_public_key',
-            'date_created', 'date_updated', 'created_by'
-        ]
-        id_ = self.generate_id_with_asset(asset)
-        obj = AuthBook(id=id_, asset=asset, version=0, is_latest=True)
-        obj._connectivity = self.get_connectivity_of(asset)
-        for field in fields:
-            value = getattr(self, field)
-            setattr(obj, field, value)
-        return obj
+        i = self.generate_id_with_asset(asset)
+        self.id = i
+        self.asset = asset
+        self.version = 0
+        self.is_latest = True
+        return self
 
     class Meta:
         abstract = True
+

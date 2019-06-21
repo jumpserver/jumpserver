@@ -4,13 +4,11 @@
 
 import logging
 
-from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import get_signer
-from ..const import SYSTEM_USER_CONN_CACHE_KEY
 from .base import AssetUser
 
 
@@ -31,7 +29,7 @@ class AdminUser(AssetUser):
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
     _become_pass = models.CharField(default='', max_length=128)
-    CONNECTIVE_CACHE_KEY = '_JMS_ADMIN_USER_CONNECTIVE_{}'
+    CONNECTIVITY_CACHE_KEY = '_ADMIN_USER_CONNECTIVE_{}'
     _prefer = "admin_user"
 
     def __str__(self):
@@ -60,31 +58,6 @@ class AdminUser(AssetUser):
         else:
             info = None
         return info
-
-    def get_related_assets(self):
-        assets = self.assets.all()
-        return assets
-
-    @property
-    def assets_amount(self):
-        return self.get_related_assets().count()
-
-    @property
-    def connectivity(self):
-        from .asset import Asset
-        assets = self.get_related_assets().values_list('id', 'hostname', flat=True)
-        data = {
-            'unreachable': [],
-            'reachable': [],
-        }
-        for asset_id, hostname in assets:
-            key = Asset.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-            value = cache.get(key, Asset.UNKNOWN)
-            if value == Asset.REACHABLE:
-                data['reachable'].append(hostname)
-            elif value == Asset.UNREACHABLE:
-                data['unreachable'].append(hostname)
-        return data
 
     class Meta:
         ordering = ['name']
@@ -141,9 +114,6 @@ class SystemUser(AssetUser):
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
     cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
 
-    SYSTEM_USER_CACHE_KEY = "__SYSTEM_USER_CACHED_{}"
-    CONNECTIVE_CACHE_KEY = '_JMS_SYSTEM_USER_CONNECTIVE_{}'
-
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
@@ -157,49 +127,6 @@ class SystemUser(AssetUser):
             'auto_push': self.auto_push,
         }
 
-    def get_related_assets(self):
-        assets = set(self.assets.all())
-        return assets
-
-    @property
-    def connectivity(self):
-        cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
-        value = cache.get(cache_key, None)
-        if not value or 'unreachable' not in value:
-            return {'unreachable': [], 'reachable': []}
-        else:
-            return value
-
-    @connectivity.setter
-    def connectivity(self, value):
-        data = self.connectivity
-        unreachable = data['unreachable']
-        reachable = data['reachable']
-        assets = {asset.hostname: asset for asset in self.assets.all()}
-
-        for host in value.get('dark', {}).keys():
-            if host not in unreachable:
-                unreachable.append(host)
-            if host in reachable:
-                reachable.remove(host)
-            self.set_connectivity_of(assets.get(host), self.UNREACHABLE)
-        for host in value.get('contacted'):
-            if host not in reachable:
-                reachable.append(host)
-            if host in unreachable:
-                unreachable.remove(host)
-            self.set_connectivity_of(assets.get(host), self.REACHABLE)
-        cache_key = self.CONNECTIVE_CACHE_KEY.format(str(self.id))
-        cache.set(cache_key, data, 3600)
-
-    @property
-    def assets_unreachable(self):
-        return self.connectivity.get('unreachable')
-
-    @property
-    def assets_reachable(self):
-        return self.connectivity.get('reachable')
-
     @property
     def login_mode_display(self):
         return self.get_login_mode_display()
@@ -209,12 +136,6 @@ class SystemUser(AssetUser):
             return True
         else:
             return False
-
-    def set_cache(self):
-        cache.set(self.SYSTEM_USER_CACHE_KEY.format(self.id), self, 3600)
-
-    def expire_cache(self):
-        cache.delete(self.SYSTEM_USER_CACHE_KEY.format(self.id))
 
     @property
     def cmd_filter_rules(self):
@@ -232,18 +153,6 @@ class SystemUser(AssetUser):
             elif action == rule.ACTION_DENY:
                 return False, matched_cmd
         return True, None
-
-    @classmethod
-    def get_system_user_by_id_or_cached(cls, sid):
-        cached = cache.get(cls.SYSTEM_USER_CACHE_KEY.format(sid))
-        if cached:
-            return cached
-        try:
-            system_user = cls.objects.get(id=sid)
-            system_user.set_cache()
-            return system_user
-        except cls.DoesNotExist:
-            return None
 
     class Meta:
         ordering = ['name']

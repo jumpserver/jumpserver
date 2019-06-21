@@ -6,16 +6,14 @@ import uuid
 import logging
 import random
 from functools import reduce
-from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
 from orgs.mixins import OrgModelMixin, OrgManager
+from ..utils import Connectivity
 
 __all__ = ['Asset', 'Protocol']
 logger = logging.getLogger(__name__)
@@ -230,12 +228,12 @@ class Asset(OrgModelMixin):
     @property
     def connectivity(self):
         if not self.admin_user:
-            return self.UNKNOWN
-        return self.admin_user.get_connectivity_of(self)
+            return Connectivity.unknown()
+        return self.admin_user.get_asset_connectivity(self)
 
     @connectivity.setter
     def connectivity(self, value):
-        self.admin_user.set_connectivity_of(self, value)
+        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:
