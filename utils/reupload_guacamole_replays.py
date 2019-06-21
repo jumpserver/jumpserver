@@ -51,6 +51,7 @@ def upload_to_local(session):
     target_path = os.path.join(target_dir, target_filename)
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)
+    print("Move {} => {}".format(source_path, target_path))
     shutil.copy(source_path, target_path)
     shutil.copystat(source_path, target_path)
     os.unlink(source_path)
