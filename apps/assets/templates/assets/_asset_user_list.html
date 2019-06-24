@@ -33,6 +33,7 @@ var assetUserTable;
 var needPush = false;
 var prefer = null;
 var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+var testDatetime = "{% trans 'Test datetime: ' %}";
 
 function initAssetUserTable() {
     var options = {
@@ -41,13 +42,19 @@ function initAssetUserTable() {
         columnDefs: [
             {
                 targets: 5, createdCell: function (td, cellData) {
-                  if (cellData == 1) {
-                      $(td).html('<i class="fa fa-circle text-navy"></i>')
-                  } else if (cellData == 0) {
-                      $(td).html('<i class="fa fa-circle text-danger"></i>')
+                  var innerHtml = "";
+                  if (cellData.status == 1) {
+                      innerHtml = '<i class="fa fa-circle text-navy"></i>'
+                  } else if (cellData.status == 0) {
+                      innerHtml = '<i class="fa fa-circle text-danger"></i>'
                   } else {
-                      $(td).html('<i class="fa fa-circle text-warning"></i>')
+                      innerHtml = '<i class="fa fa-circle text-warning"></i>'
                   }
+                  var date = new Date(cellData.datetime);
+                  var dateManual = date.toLocaleString();
+                  var dataContent = testDatetime + dateManual;
+                  innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
+                  $(td).html(innerHtml);
                 }
             },
             {
@@ -102,7 +109,7 @@ $(document).ready(function(){
     authUsername = $(this).data('user');
     var now = new Date();
     var nowTime = now.getTime() / 1000;
-    if (nowTime - lastMFATime > 60*10 ) {
+    if ( !lastMFATime || nowTime - lastMFATime > 60*10 ) {
         mfaFor = "viewAuth";
         $("#mfa_auth_confirm").modal("show");
     } else {

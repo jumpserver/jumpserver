@@ -11,27 +11,27 @@
 {% endblock %}
 {% block table_search %}
     <div class="" style="float: right">
-                   <div class=" btn-group">
-                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class=" btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                                <span>{% trans "Update" %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                   </div>
-               </div>
+       <div class=" btn-group">
+            <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class=" btn_export" tabindex="0">
+                    <span>{% trans "Export" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                    <span>{% trans "Import" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                    <span>{% trans "Update" %}</span>
+                    </a>
+                </li>
+            </ul>
+       </div>
+   </div>
 {% endblock %}
 
 {% block table_container %}
@@ -81,7 +81,7 @@ function initTable() {
                 } else {
                     innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data +'">' + innerHtml + '</span>');
+                $(td).html(innerHtml)
             }},
             {targets: 5, createdCell: function (td, cellData) {
                 var data = cellData['unreachable'];
@@ -127,7 +127,7 @@ function initTable() {
 }
 
 $(document).ready(function(){
-    initTable()
+    initTable();
 })
 
 .on('click', '.btn_admin_user_delete', function () {

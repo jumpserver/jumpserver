@@ -163,6 +163,7 @@ var zTree, rMenu, asset_table, show = 0;
 var update_node_action = "";
 var current_node_id = null;
 var current_node = null;
+var testDatetime = "{% trans 'Test datetime: ' %}";
 function initTable() {
     var options = {
         ele: $('#asset_list_table'),
@@ -176,16 +177,21 @@ function initTable() {
             {targets: 3, createdCell: function (td, cellData, rowData) {
                 $(td).html(rowData.hardware_info)
             }},
-            {targets: 4, createdCell: function (td, cellData) {
-                if (cellData === 1){
-                    $(td).html('<i class="fa fa-circle text-navy"></i>')
-                } else if (cellData === 0) {
-                    $(td).html('<i class="fa fa-circle text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-circle text-warning"></i>')
-                }
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                  var innerHtml = "";
+                  if (cellData.status == 1) {
+                      innerHtml = '<i class="fa fa-circle text-navy"></i>'
+                  } else if (cellData.status == 0) {
+                      innerHtml = '<i class="fa fa-circle text-danger"></i>'
+                  } else {
+                      innerHtml = '<i class="fa fa-circle text-warning"></i>'
+                  }
+                  var date = new Date(cellData.datetime);
+                  var dateManual = date.toLocaleString();
+                  var dataContent = testDatetime + dateManual;
+                  innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
+                  $(td).html(innerHtml);
             }},
-
             {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);

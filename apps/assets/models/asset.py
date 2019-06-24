@@ -229,11 +229,15 @@ class Asset(OrgModelMixin):
     def connectivity(self):
         if not self.admin_user:
             return Connectivity.unknown()
-        return self.admin_user.get_asset_connectivity(self)
+        instance = self.admin_user.get_asset_user(self)
+        return instance.connectivity
 
     @connectivity.setter
     def connectivity(self, value):
-        self.admin_user.set_asset_connectivity(self, value)
+        if not self.admin_user:
+            return
+        instance = self.admin_user.get_asset_user(self)
+        instance.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:

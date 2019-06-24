@@ -208,8 +208,7 @@ def test_asset_connectivity_util(assets, task_name=None):
             pattern='all', options=const.TASK_OPTIONS, run_as_admin=True,
             created_by=created_by,
         )
-        result = task.run()
-        summary = result.get("summary", {})
+        raw, summary = task.run()
         success = summary.get('success', False)
         contacted = summary.get('contacted', {})
         dark = summary.get('dark', {})
@@ -332,8 +331,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
             pattern='all', options=const.TASK_OPTIONS,
             run_as=system_user.username, created_by=system_user.org_id,
         )
-        result = task.run()
-        summary = result[1]
+        raw, summary = task.run()
         success = summary.get('success', False)
         contacted = summary.get('contacted', {})
         dark = summary.get('dark', {})
@@ -564,18 +562,6 @@ def get_test_asset_user_connectivity_tasks(asset):
 
 
 @shared_task
-def set_asset_user_connectivity_info(asset_user, result):
-    summary = result[1]
-    if summary.get('contacted'):
-        connectivity = 1
-    elif summary.get("dark"):
-        connectivity = 0
-    else:
-        connectivity = 3
-    asset_user.connectivity = connectivity
-
-
-@shared_task
 def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
     """
     :param asset_user: <AuthBook>对象
@@ -603,8 +589,8 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
     else:
         kwargs["run_as"] = asset_user.username
     task, created = update_or_create_ansible_task(*args, **kwargs)
-    result = task.run()
-    asset_user.set_connectivity(result.get("summary", {}))
+    raw, summary = task.run()
+    asset_user.set_connectivity(summary)
 
 
 @shared_task

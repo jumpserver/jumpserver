@@ -11,7 +11,7 @@ class OrgMiddleware:
 
     @staticmethod
     def set_permed_org_if_need(request):
-        if request.content_type != "text/plain":
+        if request.path.startswith('/api'):
             return
         if not (request.user.is_authenticated and request.user.is_org_admin):
             return

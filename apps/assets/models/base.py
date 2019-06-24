@@ -169,27 +169,27 @@ class AssetUser(OrgModelMixin):
     def set_asset_connectivity(self, asset, c):
         i = self.generate_id_with_asset(asset)
         key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
-        Connectivity.set(key, c, 3600)
+        Connectivity.set(key, c)
 
-    def load_specific_asset_auth(self, asset):
+    def get_asset_user(self, asset):
         from ..backends import AssetUserManager
         try:
             manager = AssetUserManager().prefer(self._prefer)
             other = manager.get(username=self.username, asset=asset)
+            return other
         except Exception as e:
             logger.error(e, exc_info=True)
-        else:
-            self._merge_auth(other)
+            return None
+
+    def load_specific_asset_auth(self, asset):
+        instance = self.get_asset_user(asset)
+        if instance:
+            self._merge_auth(instance)
 
     def _merge_auth(self, other):
-        if not other:
-            return
-        if other.password:
-            self.password = other.password
-        if other.public_key:
-            self.public_key = other.public_key
-        if other.private_key:
-            self.private_key = other.private_key
+        self.password = other.password
+        self.public_key = other.public_key
+        self.private_key = other.private_key
 
     def clear_auth(self):
         self._password = ''

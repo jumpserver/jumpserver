@@ -45,24 +45,24 @@ class Connectivity:
         (UNKNOWN, _("Unknown")),
     )
 
-    value = UNKNOWN
+    status = UNKNOWN
     datetime = timezone.now()
 
-    def __init__(self, value, datetime):
-        self.value = value
+    def __init__(self, status, datetime):
+        self.status = status
         self.datetime = datetime
 
     def display(self):
-        return dict(self.__class__.CONNECTIVITY_CHOICES).get(self.value)
+        return dict(self.__class__.CONNECTIVITY_CHOICES).get(self.status)
 
     def is_reachable(self):
-        return self.value == self.REACHABLE
+        return self.status == self.REACHABLE
 
     def is_unreachable(self):
-        return self.value == self.UNREACHABLE
+        return self.status == self.UNREACHABLE
 
     def is_unknown(self):
-        return self.value == self.UNKNOWN
+        return self.status == self.UNKNOWN
 
     @classmethod
     def unreachable(cls):
@@ -96,4 +96,7 @@ class Connectivity:
         cls.set(key, cls.reachable(), ttl)
 
     def __eq__(self, other):
-        return self.value == other.value
+        return self.status == other.status
+
+    def __str__(self):
+        return self.display()

@@ -9,6 +9,7 @@ from orgs.mixins import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Protocol
 from .system_user import AssetSystemUserSerializer
+from .base import ConnectivitySerializer
 
 __all__ = [
     'AssetSerializer', 'AssetGrantedSerializer', 'AssetSimpleSerializer',
@@ -43,6 +44,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     protocols = ProtocolsRelatedField(
         many=True, queryset=Protocol.objects.all(), label=_("Protocols")
     )
+    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     """
     资产的数据结构
@@ -69,7 +71,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
-            'connectivity': {'label': _('Connectivity')},
             'org_name': {'label': _('Org name')}
         }
 

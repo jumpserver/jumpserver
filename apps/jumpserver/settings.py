@@ -111,6 +111,7 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
 ]
 
+
 ROOT_URLCONF = 'jumpserver.urls'
 
 TEMPLATES = [

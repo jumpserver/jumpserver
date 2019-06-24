@@ -78,7 +78,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         system_user_id = self.request.GET.get("system_user_id")
 
         kwargs = {}
-        assets = []
+        assets = None
 
         manager = AssetUserManager()
         if system_user_id:
@@ -92,7 +92,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             manager.prefer('admin_user')
 
         if asset_id:
-            asset = get_object_or_none(Asset, pk=asset_id)
+            asset = get_object_or_404(Asset, id=asset_id)
             assets = [asset]
         elif node_id:
             node = get_object_or_404(Node, id=node_id)
@@ -100,7 +100,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 
         if username:
             kwargs['username'] = username
-        if assets:
+        if assets is not None:
             kwargs['assets'] = assets
 
         queryset = manager.filter(**kwargs)

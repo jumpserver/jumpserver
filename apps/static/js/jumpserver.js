@@ -500,8 +500,10 @@ jumpserver.initDataTable = function (options) {
         $('[data-toggle="popover"]').popover({
             html: true,
             placement: 'bottom',
-            // trigger: 'hover',
+            trigger: 'click',
             container: 'body'
+        }).on('click', function (e) {
+            $('[data-toggle="popover"]').not(this).popover('hide');
         });
     });
     $('.ipt_check_all').on('click', function() {
@@ -670,6 +672,14 @@ jumpserver.initServerSideDataTable = function (options) {
     }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
+        $('[data-toggle="popover"]').popover({
+            html: true,
+            placement: 'bottom',
+            trigger: 'click',
+            container: 'body'
+        }).on('click', function (e) {
+            $('[data-toggle="popover"]').not(this).popover('hide');
+        });
         var table_data = [];
         $.each(table.rows().data(), function (id, row) {
             if (row.id) {

@@ -15,3 +15,6 @@ def on_db_connection_ready(sender, **kwargs):
 
 class CommonConfig(AppConfig):
     name = 'common'
+
+    def ready(self):
+        from . import signals_handlers

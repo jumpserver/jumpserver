@@ -3,6 +3,7 @@
 
 from werkzeug.local import Local
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import redirect, get_object_or_404
 from django.forms import ModelForm
@@ -20,7 +21,7 @@ from .utils import (
 from .models import Organization
 
 logger = get_logger(__file__)
-tl = Local()
+local = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
@@ -28,16 +29,13 @@ __all__ = [
     'OrgMembershipModelViewSetMixin', 'OrgResourceSerializerMixin',
     'BulkOrgResourceSerializerMixin', 'BulkOrgResourceModelSerializer',
 ]
+debug = settings.DEBUG
 
 
 class OrgManager(models.Manager):
-
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
         kwargs = {}
-        # if not hasattr(tl, 'times'):
-        #     tl.times = 0
-        # logger.debug("[{}]>>>>>>>>>> Get query set".format(tl.times))
         if not current_org:
             kwargs['id'] = None
         elif current_org.is_real():
@@ -45,7 +43,6 @@ class OrgManager(models.Manager):
         elif current_org.is_default():
             queryset = queryset.filter(org_id="")
         queryset = queryset.filter(**kwargs)
-        # tl.times += 1
         return queryset
 
     def filter_by_fullname(self, fullname, field=None):

@@ -80,27 +80,29 @@ function initTable() {
             }},
             {targets: 6, createdCell: function (td, cellData) {
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-navy'>" + cellData + "</span>";
+                var data = cellData['reachable'];
+                if (data !== 0) {
+                    innerHtml = "<span class='text-navy'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData +'">' + innerHtml + '</span>');
+                $(td).html(innerHtml)
             }},
             {targets: 7, createdCell: function (td, cellData) {
+                var data = cellData['unreachable'];
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-danger'>" + cellData + "</span>";
+                if (data !== 0) {
+                    innerHtml = "<span class='text-danger'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
                 var val = 0;
                 var innerHtml = "";
                 var total = rowData.assets_amount;
-                var reachable = rowData.reachable_amount;
+                var reachable = cellData.reachable;
                 if (total !== 0) {
                     val = reachable/total * 100;
                 }
@@ -112,7 +114,6 @@ function initTable() {
                     innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-
             }},
             {targets: 10, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
@@ -122,10 +123,10 @@ function initTable() {
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
             {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "login_mode_display"}, {data: "assets_amount" },
-            {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }
+            {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "comment" }, {data: "id" }
         ],
         op_html: $('#actions').html()
-        };
+    };
     system_user_table = jumpserver.initServerSideDataTable(options);
     return system_user_table
 }

@@ -33,6 +33,9 @@ class AssetUserManager:
     _using = None
 
     def filter(self, username=None, assets=None, latest=True):
+        if assets is not None and not assets:
+            return AssetUserQuerySet([])
+
         if self._using:
             backend = dict(self.backends).get(self._using)
             if not backend:

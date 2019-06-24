@@ -92,7 +92,7 @@ class SystemUserDeleteView(PermissionsMixin, DeleteView):
 
 class SystemUserAssetView(PermissionsMixin, DetailView):
     model = SystemUser
-    template_name = 'assets/system_user_asset.html'
+    template_name = 'assets/system_user_assets.html'
     context_object_name = 'system_user'
     permission_classes = [IsOrgAdmin]
 

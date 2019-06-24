@@ -25,7 +25,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-9" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span style="float: left">{% trans 'Assets of ' %} <b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
@@ -48,7 +48,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-3" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -169,40 +169,6 @@ $(document).ready(function () {
     initAssetUserTable();
 
 })
-.on('click', '.btn-push', function () {
-    var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
-    var error = function (data) {
-        alert(data)
-    };
-    var success = function (data) {
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600,left=400,top=400')
-    };
-    APIUpdateAttr({
-        url: the_url,
-        error: error,
-        method: 'GET',
-        success: success
-    });
-})
-.on('click', '.btn-test-connective', function () {
-    var the_url = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
-    var error = function (data) {
-        alert(data)
-    };
-    var success = function (data) {
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600,left=400,top=400')
-    };
-    APIUpdateAttr({
-        url: the_url,
-        error: error,
-        method: 'GET',
-        success: success
-    });
-})
 .on('click', '.btn-remove-from-node', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
@@ -230,6 +196,23 @@ $(document).ready(function () {
     });
     updateSystemUserNode(nodes);
 })
+.on('click', '.btn-push', function () {
+    var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success: success
+    });
+})
 .on('click', '.btn-push-auth', function () {
     var $this = $(this);
     var asset_id = $this.data('asset');
@@ -249,6 +232,23 @@ $(document).ready(function () {
         success: success,
         error: error
     })
+})
+.on('click', '.btn-test-connective', function () {
+    var the_url = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    var success = function (data) {
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600,left=400,top=400')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success: success
+    });
 })
 
 
