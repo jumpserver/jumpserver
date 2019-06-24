@@ -16,8 +16,8 @@ from ops.celery.decorator import (
 )
 
 from .models import SystemUser, AdminUser
+from .models.utils import Connectivity
 from . import const
-from .utils import Connectivity
 
 
 FORKS = 10

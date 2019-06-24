@@ -5,7 +5,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgManager
-from ..utils import Connectivity
 from .base import AssetUser
 
 __all__ = ['AuthBook']
@@ -72,8 +71,6 @@ class AuthBook(AssetUser):
 
     @property
     def connectivity(self):
-        if self._connectivity:
-            return self._connectivity
         return self.get_asset_connectivity(self.asset)
 
     @property

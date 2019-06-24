@@ -6,7 +6,6 @@ from hashlib import md5
 
 import sshpubkeys
 from django.db import models
-from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -16,9 +15,7 @@ from common.utils import (
 from common.validators import alphanumeric
 from common import fields
 from orgs.mixins import OrgModelMixin
-from .utils import private_key_validator
-from ..utils import Connectivity
-from .. import const
+from .utils import private_key_validator, Connectivity
 
 signer = get_signer()
 
@@ -167,12 +164,12 @@ class AssetUser(OrgModelMixin):
     def get_asset_connectivity(self, asset):
         i = self.generate_id_with_asset(asset)
         key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
-        return cache.get(key, const.CONN_UNKNOWN)
+        return Connectivity.get(key)
 
     def set_asset_connectivity(self, asset, c):
         i = self.generate_id_with_asset(asset)
         key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
-        cache.set(key, c, 3600)
+        Connectivity.set(key, c, 3600)
 
     def load_specific_asset_auth(self, asset):
         from ..backends import AssetUserManager
@@ -225,17 +222,24 @@ class AssetUser(OrgModelMixin):
         }
 
     def generate_id_with_asset(self, asset):
-        i = '{}_{}'.format(asset.id, self.id)
-        i = uuid.UUID(md5(i.encode()).hexdigest())
-        return i
+        user_id = str(self.id).split('-')[:3]
+        asset_id = str(asset.id).split('-')[3:]
+        ids = user_id + asset_id
+        return '-'.join(ids)
 
     def construct_to_authbook(self, asset):
+        from . import AuthBook
+        fields = [
+            'name', 'username', 'comment', 'org_id',
+            '_password', '_private_key', '_public_key',
+            'date_created', 'date_updated', 'created_by'
+        ]
         i = self.generate_id_with_asset(asset)
-        self.id = i
-        self.asset = asset
-        self.version = 0
-        self.is_latest = True
-        return self
+        obj = AuthBook(id=i, asset=asset, version=0, is_latest=True)
+        for field in fields:
+            value = getattr(self, field)
+            setattr(obj, field, value)
+        return obj
 
     class Meta:
         abstract = True

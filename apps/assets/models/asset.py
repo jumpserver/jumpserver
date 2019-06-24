@@ -12,8 +12,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
+from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
-from ..utils import Connectivity
 
 __all__ = ['Asset', 'Protocol']
 logger = logging.getLogger(__name__)

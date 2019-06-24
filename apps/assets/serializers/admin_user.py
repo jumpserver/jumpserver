@@ -23,23 +23,18 @@ class AdminUserSerializer(BulkOrgResourceModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = [
-            'id', 'name', 'username', 'assets_amount',
-            'reachable_amount', 'unreachable_amount', 'password', 'comment',
-            'date_created', 'date_updated', 'become', 'become_method',
-            'become_user', 'created_by',
+            'id', 'name', 'username', 'password', 'comment',
+            'connectivity_amount', 'assets_amount',
+            'date_created', 'date_updated', 'created_by',
         ]
 
         extra_kwargs = {
-            'date_created': {'label': _('Date created')},
-            'date_updated': {'label': _('Date updated')},
-            'become': {'read_only': True}, 'become_method': {'read_only': True},
-            'become_user': {'read_only': True}, 'created_by': {'read_only': True},
-            'assets_amount': {'label', _('Asset')}
+            'date_created': {'read_only': True},
+            'date_updated': {'read_only': True},
+            'created_by': {'read_only': True},
+            'assets_amount': {'label': _('Asset')},
+            'connectivity_amount': {'label': _('Connectivity')},
         }
-
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        return [f for f in fields if not f.startswith('_')]
 
 
 class AdminUserAuthSerializer(AuthSerializer):
