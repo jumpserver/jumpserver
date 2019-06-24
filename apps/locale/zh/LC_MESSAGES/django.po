@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-24 20:17+0800\n"
+"POT-Creation-Date: 2019-06-24 21:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -411,7 +411,7 @@ msgstr "详情"
 
 #: applications/templates/applications/remote_app_detail.html:21
 #: applications/templates/applications/remote_app_list.html:56
-#: assets/templates/assets/_asset_user_list.html:69
+#: assets/templates/assets/_asset_user_list.html:70
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:29
 #: assets/templates/assets/admin_user_list.html:114
@@ -1435,11 +1435,11 @@ msgstr "日期"
 msgid "Test datetime: "
 msgstr "测试日期: "
 
-#: assets/templates/assets/_asset_user_list.html:68
+#: assets/templates/assets/_asset_user_list.html:69
 msgid "View"
 msgstr "查看"
 
-#: assets/templates/assets/_asset_user_list.html:70
+#: assets/templates/assets/_asset_user_list.html:71
 #: assets/templates/assets/admin_user_assets.html:61
 #: assets/templates/assets/asset_asset_user_list.html:57
 #: assets/templates/assets/asset_detail.html:182
@@ -1448,7 +1448,7 @@ msgstr "查看"
 msgid "Test"
 msgstr "测试"
 
-#: assets/templates/assets/_asset_user_list.html:71
+#: assets/templates/assets/_asset_user_list.html:72
 #: assets/templates/assets/system_user_assets.html:72
 #: assets/templates/assets/system_user_detail.html:142
 msgid "Push"
@@ -1632,7 +1632,7 @@ msgstr "比例"
 #: users/templates/users/user_group_list.html:194
 #: users/templates/users/user_list.html:158
 #: users/templates/users/user_list.html:190
-#: xpack/plugins/vault/templates/vault/vault.html:223
+#: xpack/plugins/vault/templates/vault/vault.html:224
 msgid "Please select file"
 msgstr "选择文件"
 

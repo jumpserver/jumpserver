@@ -26,9 +26,9 @@ class AssetUser(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
-    _password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
-    _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
+    public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
@@ -37,28 +37,6 @@ class AssetUser(OrgModelMixin):
     CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_ASSET_CONNECTIVITY_{}"
 
     _prefer = "system_user"
-
-    @property
-    def password(self):
-        if self._password:
-            return signer.unsign(self._password)
-        else:
-            return None
-
-    @password.setter
-    def password(self, password_raw):
-        # raise AttributeError("Using set_auth do that")
-        self._password = signer.sign(password_raw)
-
-    @property
-    def private_key(self):
-        if self._private_key:
-            return signer.unsign(self._private_key)
-
-    @private_key.setter
-    def private_key(self, private_key_raw):
-        # raise AttributeError("Using set_auth do that")
-        self._private_key = signer.sign(private_key_raw)
 
     @property
     def private_key_obj(self):
@@ -81,19 +59,6 @@ class AssetUser(OrgModelMixin):
             self.private_key_obj.write_private_key_file(key_path)
             os.chmod(key_path, 0o400)
         return key_path
-
-    @property
-    def public_key(self):
-        key = signer.unsign(self._public_key)
-        if key:
-            return key
-        else:
-            return None
-
-    @public_key.setter
-    def public_key(self, public_key_raw):
-        # raise AttributeError("Using set_auth do that")
-        self._public_key = signer.sign(public_key_raw)
 
     @property
     def public_key_obj(self):
@@ -192,9 +157,9 @@ class AssetUser(OrgModelMixin):
         self.private_key = other.private_key
 
     def clear_auth(self):
-        self._password = ''
-        self._private_key = ''
-        self._public_key = ''
+        self.password = ''
+        self.private_key = ''
+        self.public_key = ''
         self.save()
 
     def auto_gen_auth(self):
@@ -231,7 +196,7 @@ class AssetUser(OrgModelMixin):
         from . import AuthBook
         fields = [
             'name', 'username', 'comment', 'org_id',
-            '_password', '_private_key', '_public_key',
+            'password', 'private_key', 'public_key',
             'date_created', 'date_updated', 'created_by'
         ]
         i = self.generate_id_with_asset(asset)
