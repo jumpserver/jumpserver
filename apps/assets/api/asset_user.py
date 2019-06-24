@@ -10,7 +10,7 @@ from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
 
-from common.permissions import IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
 from common.mixins import IDInCacheFilterMixin
 from ..backends import AssetUserManager
@@ -57,7 +57,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
 class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
-    permission_classes = (IsOrgAdminOrAppUser, )
+    permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
     filter_fields = [
         "id", "ip", "hostname", "username", "asset_id", "node_id",
@@ -111,22 +111,16 @@ class AssetUserExportViewSet(AssetUserViewSet):
     serializer_class = serializers.AssetUserExportSerializer
     http_method_names = ['get']
 
-    def list(self, request, *args, **kwargs):
-        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
-        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
-            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
-        return super().list(request, *args, **kwargs)
+    def get_permissions(self):
+        self.permission_classes.append(NeedMFAVerify)
+        return super().get_permissions()
 
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
 
     def retrieve(self, request, *args, **kwargs):
-        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
-        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
-            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
-
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         status_code = status.HTTP_200_OK

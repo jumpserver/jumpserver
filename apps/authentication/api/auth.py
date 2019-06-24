@@ -194,7 +194,7 @@ class UserOtpVerifyApi(CreateAPIView):
         code = serializer.validated_data["code"]
 
         if request.user.check_otp(code):
-            request.session["OTP_LAST_VERIFY_TIME"] = int(time.time())
+            request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:
             return Response({"error": "Code not valid"}, status=400)

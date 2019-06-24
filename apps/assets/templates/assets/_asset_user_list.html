@@ -32,8 +32,9 @@ var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
 var assetUserTable;
 var needPush = false;
 var prefer = null;
-var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+var lastMFATime = "{{ request.session.MFA_VERIFY_TIME }}";
 var testDatetime = "{% trans 'Test datetime: ' %}";
+var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 
 function initAssetUserTable() {
     var options = {
@@ -109,7 +110,7 @@ $(document).ready(function(){
     authUsername = $(this).data('user');
     var now = new Date();
     var nowTime = now.getTime() / 1000;
-    if ( !lastMFATime || nowTime - lastMFATime > 60*10 ) {
+    if ( !lastMFATime || nowTime - lastMFATime > mfaVerifyTTL ) {
         mfaFor = "viewAuth";
         $("#mfa_auth_confirm").modal("show");
     } else {

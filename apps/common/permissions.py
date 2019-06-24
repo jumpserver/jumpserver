@@ -132,3 +132,11 @@ class PermissionsMixin(UserPassesTestMixin):
             if not permission_class().has_permission(self.request, self):
                 return False
         return True
+
+
+class NeedMFAVerify(permissions.BasePermission):
+    def has_permission(self, request, view):
+        mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
+        if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+            return True
+        return False
