@@ -88,13 +88,13 @@ class User(AbstractUser):
     otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
     # Todo: Auto generate key, let user download
     private_key = fields.EncryptTextField(
-        max_length=5000, blank=True, verbose_name=_('Private key')
+        blank=True, null=True, verbose_name=_('Private key')
     )
     public_key = fields.EncryptTextField(
-        max_length=5000, blank=True, verbose_name=_('Public key')
+        blank=True, null=True, verbose_name=_('Public key')
     )
     comment = models.TextField(
-        max_length=200, blank=True, verbose_name=_('Comment')
+        blank=True, null=True, verbose_name=_('Comment')
     )
     is_first_login = models.BooleanField(default=True)
     date_expired = models.DateTimeField(
@@ -276,7 +276,6 @@ class User(AbstractUser):
             self.role = 'Admin'
             self.is_active = True
         super().save(*args, **kwargs)
-        self.expire_user_cache()
 
     @property
     def private_token(self):
@@ -425,25 +424,7 @@ class User(AbstractUser):
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
-        self.expire_user_cache()
         return super(User, self).delete()
-
-    def expire_user_cache(self):
-        key = self.user_cache_key_prefix.format(self.id)
-        cache.delete(key)
-
-    @classmethod
-    def get_user_or_from_cache(cls, uid):
-        key = cls.user_cache_key_prefix.format(uid)
-        user = cache.get(key)
-        if user:
-            return user
-        try:
-            user = cls.objects.get(id=uid)
-            cache.set(key, user, 3600)
-        except cls.DoesNotExist:
-            user = None
-        return user
 
     class Meta:
         ordering = ['username']
