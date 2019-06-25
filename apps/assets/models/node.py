@@ -206,7 +206,7 @@ class Node(OrgModelMixin):
         return self.get_all_assets().valid()
 
     def is_default_node(self):
-        return self.is_root() and self.key == '0'
+        return self.is_root() and self.key == '1'
 
     def is_root(self):
         if self.key.isdigit():

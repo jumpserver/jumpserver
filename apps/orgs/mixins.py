@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 
-from werkzeug.local import Local
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import redirect, get_object_or_404
 from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -16,12 +13,12 @@ from common.utils import get_logger
 from common.validators import ProjectUniqueValidator
 from common.mixins import BulkSerializerMixin
 from .utils import (
-    current_org, set_current_org, set_to_root_org, get_current_org_id
+    set_current_org, set_to_root_org, get_current_org, current_org,
+    get_current_org_id_for_serializer,
 )
 from .models import Organization
 
 logger = get_logger(__file__)
-local = Local()
 
 __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
@@ -29,43 +26,28 @@ __all__ = [
     'OrgMembershipModelViewSetMixin', 'OrgResourceSerializerMixin',
     'BulkOrgResourceSerializerMixin', 'BulkOrgResourceModelSerializer',
 ]
-debug = settings.DEBUG
 
 
 class OrgManager(models.Manager):
+
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
         kwargs = {}
-        if not current_org:
+        _current_org = get_current_org()
+
+        if _current_org is None:
             kwargs['id'] = None
-        elif current_org.is_real():
-            kwargs['org_id'] = current_org.id
-        elif current_org.is_default():
+        elif _current_org.is_real():
+            kwargs['org_id'] = _current_org.id
+        elif _current_org.is_default():
             queryset = queryset.filter(org_id="")
+
         queryset = queryset.filter(**kwargs)
         return queryset
 
-    def filter_by_fullname(self, fullname, field=None):
-        ori_org = current_org
-        value, org = self.model.split_fullname(fullname)
-        set_current_org(org)
-        if not field:
-            if hasattr(self.model, 'name'):
-                field = 'name'
-            elif hasattr(self.model, 'hostname'):
-                field = 'hostname'
-        queryset = self.get_queryset().filter(**{field: value})
-        set_current_org(ori_org)
-        return queryset
-
-    def get_object_by_fullname(self, fullname, field=None):
-        queryset = self.filter_by_fullname(fullname, field=field)
-        if len(queryset) == 1:
-            return queryset[0]
-        return None
-
     def all(self):
-        if not current_org:
+        _current_org = get_current_org()
+        if _current_org is None:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
             return self
         else:
@@ -73,34 +55,22 @@ class OrgManager(models.Manager):
 
     def set_current_org(self, org):
         if isinstance(org, str):
-            org = Organization.objects.get(name=org)
+            org = Organization.get_instance(org)
         set_current_org(org)
         return self
 
 
 class OrgModelMixin(models.Model):
-    org_id = models.CharField(max_length=36, blank=True, default='', verbose_name=_("Organization"), db_index=True)
+    org_id = models.CharField(max_length=36, blank=True, default='',
+                              verbose_name=_("Organization"), db_index=True)
     objects = OrgManager()
 
     sep = '@'
 
     def save(self, *args, **kwargs):
-        if current_org and current_org.is_real():
+        if current_org is not None and current_org.is_real():
             self.org_id = current_org.id
         return super().save(*args, **kwargs)
-
-    @classmethod
-    def split_fullname(cls, fullname, sep=None):
-        if not sep:
-            sep = cls.sep
-        index = fullname.rfind(sep)
-        if index == -1:
-            value = fullname
-            org = Organization.default()
-        else:
-            value = fullname[:index]
-            org = Organization.get_instance(fullname[index + 1:])
-        return value, org
 
     @property
     def org(self):
@@ -126,41 +96,19 @@ class OrgModelMixin(models.Model):
         else:
             return name
 
-    def validate_unique(self, exclude=None):
-        """
-        Check unique constraints on the model and raise ValidationError if any
-        failed.
-        """
-        self.org_id = current_org.id if current_org.is_real() else ''
-        if exclude and 'org_id' in exclude:
-            exclude.remove('org_id')
-        unique_checks, date_checks = self._get_unique_checks(exclude=exclude)
-
-        errors = self._perform_unique_checks(unique_checks)
-        date_errors = self._perform_date_checks(date_checks)
-
-        for k, v in date_errors.items():
-            errors.setdefault(k, []).extend(v)
-
-        if errors:
-            raise ValidationError(errors)
-
     class Meta:
         abstract = True
 
 
 class OrgViewGenericMixin:
     def dispatch(self, request, *args, **kwargs):
-        if not current_org:
+        if current_org is None:
             return redirect('orgs:switch-a-org')
 
         if not current_org.can_admin_by(request.user):
-            print("{} cannot admin {}".format(request.user, current_org))
             if request.user.is_org_admin:
                 return redirect('orgs:switch-a-org')
             return HttpResponseForbidden()
-        else:
-            print(current_org.can_admin_by(request.user))
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -216,7 +164,7 @@ class OrgResourceSerializerMixin(serializers.Serializer):
     由于HiddenField字段不可读，API获取资产信息时获取不到org_id，
     但是coco需要资产的org_id字段，所以修改为CharField类型
     """
-    org_id = serializers.ReadOnlyField(default=get_current_org_id, label=_("Organization"))
+    org_id = serializers.ReadOnlyField(default=get_current_org_id_for_serializer, label=_("Organization"))
     org_name = serializers.ReadOnlyField(label=_("Org name"))
 
     def get_validators(self):
@@ -236,7 +184,7 @@ class OrgResourceSerializerMixin(serializers.Serializer):
         return fields
 
 
-class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerMixin):
+class BulkOrgResourceSerializerMixin(OrgResourceSerializerMixin, BulkSerializerMixin):
     pass
 
 
