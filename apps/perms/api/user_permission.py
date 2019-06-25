@@ -14,7 +14,6 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
-from orgs.utils import set_to_root_org
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
     check_system_user_action, RemoteAppPermissionUtil,
@@ -513,6 +512,7 @@ class ValidateUserRemoteAppPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):
+        self.change_org_if_need(request, kwargs)
         user_id = request.query_params.get('user_id', '')
         remote_app_id = request.query_params.get('remote_app_id', '')
         user = get_object_or_404(User, id=user_id)
