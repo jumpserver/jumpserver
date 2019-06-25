@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from common.utils import get_signer, date_expired_default, get_logger
+from common import fields
 
 
 __all__ = ['User']
@@ -84,12 +85,12 @@ class User(AbstractUser):
     otp_level = models.SmallIntegerField(
         default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('MFA')
     )
-    _otp_secret_key = models.CharField(max_length=128, blank=True, null=True)
+    otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
     # Todo: Auto generate key, let user download
-    _private_key = models.CharField(
+    private_key = fields.EncryptTextField(
         max_length=5000, blank=True, verbose_name=_('Private key')
     )
-    _public_key = models.CharField(
+    public_key = fields.EncryptTextField(
         max_length=5000, blank=True, verbose_name=_('Public key')
     )
     comment = models.TextField(
@@ -141,14 +142,6 @@ class User(AbstractUser):
     def can_update_password(self):
         return self.is_local
 
-    @property
-    def otp_secret_key(self):
-        return signer.unsign(self._otp_secret_key)
-
-    @otp_secret_key.setter
-    def otp_secret_key(self, item):
-        self._otp_secret_key = signer.sign(item)
-
     def check_otp(self, code):
         from ..utils import check_otp_code
         return check_otp_code(self.otp_secret_key, code)
@@ -161,13 +154,13 @@ class User(AbstractUser):
             Check if the user's ssh public key is valid.
             This function is used in base.html.
         """
-        if self._public_key:
+        if self.public_key:
             return True
         return False
 
     @property
     def groups_display(self):
-        return ' '.join(self.groups.all().values_list('name', flat=True))
+        return ' '.join([group.name for group in self.groups.all()])
 
     @property
     def role_display(self):
@@ -189,22 +182,6 @@ class User(AbstractUser):
         if self.is_active and not self.is_expired:
             return True
         return False
-
-    @property
-    def private_key(self):
-        return signer.unsign(self._private_key)
-
-    @private_key.setter
-    def private_key(self, private_key_raw):
-        self._private_key = signer.sign(private_key_raw)
-
-    @property
-    def public_key(self):
-        return signer.unsign(self._public_key)
-
-    @public_key.setter
-    def public_key(self, public_key_raw):
-        self._public_key = signer.sign(public_key_raw)
 
     @property
     def public_key_obj(self):
@@ -364,7 +341,7 @@ class User(AbstractUser):
 
     def generate_reset_token(self):
         letter = string.ascii_letters + string.digits
-        token =''.join([random.choice(letter) for _ in range(50)])
+        token = ''.join([random.choice(letter) for _ in range(50)])
         self.set_cache(token)
         return token
 

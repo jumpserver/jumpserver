@@ -76,14 +76,14 @@ class AssetUser(OrgModelMixin):
     def set_auth(self, password=None, private_key=None, public_key=None):
         update_fields = []
         if password:
-            self._password = signer.sign(password)
-            update_fields.append('_password')
+            self.password = password
+            update_fields.append('password')
         if private_key:
-            self._private_key = signer.sign(private_key)
-            update_fields.append('_private_key')
+            self.private_key = private_key
+            update_fields.append('private_key')
         if public_key:
-            self._public_key = signer.sign(public_key)
-            update_fields.append('_public_key')
+            self.public_key = public_key
+            update_fields.append('public_key')
 
         if update_fields:
             self.save(update_fields=update_fields)
