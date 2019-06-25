@@ -40,9 +40,8 @@ class AssetUser(OrgModelMixin):
 
     @property
     def private_key_obj(self):
-        if self._private_key:
-            key_str = signer.unsign(self._private_key)
-            return ssh_key_string_to_obj(key_str, password=self.password)
+        if self.private_key:
+            return ssh_key_string_to_obj(self.private_key, password=self.password)
         else:
             return None
 
@@ -52,8 +51,7 @@ class AssetUser(OrgModelMixin):
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
-        key_str = signer.unsign(self._private_key)
-        key_name = '.' + md5(key_str.encode('utf-8')).hexdigest()
+        key_name = '.' + md5(self.private_key.encode('utf-8')).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
             self.private_key_obj.write_private_key_file(key_path)

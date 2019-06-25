@@ -15,20 +15,20 @@ class AdminUserSerializer(BulkOrgResourceModelSerializer):
     """
     管理用户
     """
-    password = serializers.CharField(
-        required=False, write_only=True, label=_('Password')
-    )
 
     class Meta:
         list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = [
-            'id', 'name', 'username', 'password', 'comment',
-            'connectivity_amount', 'assets_amount',
+            'id', 'name', 'username', 'password', 'private_key', 'public_key',
+            'comment', 'connectivity_amount', 'assets_amount',
             'date_created', 'date_updated', 'created_by',
         ]
 
         extra_kwargs = {
+            'password': {"write_only": True},
+            'private_key': {"write_only": True},
+            'public_key': {"write_only": True},
             'date_created': {'read_only': True},
             'date_updated': {'read_only': True},
             'created_by': {'read_only': True},

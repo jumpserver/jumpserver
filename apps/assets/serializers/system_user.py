@@ -12,20 +12,20 @@ class SystemUserSerializer(BulkOrgResourceModelSerializer):
     """
     系统用户
     """
-    password = serializers.CharField(
-        required=False, write_only=True, label=_('Password')
-    )
 
     class Meta:
         model = SystemUser
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'username', 'login_mode', 'login_mode_display',
-            'priority', 'protocol', 'auto_push', 'password',
-            'cmd_filters', 'sudo', 'shell', 'comment', 'nodes', 'assets',
-            'assets_amount', 'connectivity_amount'
+            'id', 'name', 'username', 'password', 'public_key', 'private_key',
+            'login_mode', 'login_mode_display', 'priority', 'protocol',
+            'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment', 'nodes',
+            'assets', 'assets_amount', 'connectivity_amount'
         ]
         extra_kwargs = {
+            'password': {"write_only": True},
+            'public_key': {"write_only": True},
+            'private_key': {"write_only": True},
             'assets_amount': {'label': _('Asset')},
             'connectivity_amount': {'label': _('Connectivity')},
             'login_mode_display': {'label': _('Login mode display')},

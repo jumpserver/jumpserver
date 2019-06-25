@@ -48,9 +48,10 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 
     def perform_create(self, serializer):
         users = serializer.save()
-        for user in users:
-            if current_org and current_org.is_real():
-                user.orgs.add(current_org.id)
+        if isinstance(users, User):
+            users = [users]
+        if current_org and current_org.is_real():
+            current_org.users.add(*users)
         self.send_created_signal(users)
 
     def get_queryset(self):
@@ -174,6 +175,7 @@ class UserResetPKApi(generics.UpdateAPIView):
         send_reset_ssh_key_mail(user)
 
 
+# 废弃
 class UserUpdatePKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserPKUpdateSerializer
@@ -181,7 +183,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         user = self.get_object()
-        user.public_key = serializer.validated_data['_public_key']
+        user.public_key = serializer.validated_data['public_key']
         user.save()
 
 

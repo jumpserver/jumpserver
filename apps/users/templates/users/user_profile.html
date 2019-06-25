@@ -217,33 +217,9 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).on('click', '#btn_update_pk', function() {
-    var $this = $(this);
-    var pk = $('#txt_pk').val();
-    var the_url = '{% url "api-users:user-public-key-update" pk=user.id %}';
-    var body = {'_public_key': pk};
-    var success = function() {
-        $('#txt_pk').val('');
-        var msg = "{% trans 'Successfully updated the SSH public key.' %}";
-        swal("{% trans 'User SSH public key update' %}", msg, "success");
-    };
-    var fail = function() {
-        var msg = "{% trans 'Failed to update SSH public key.' %}";
-        swal({
-            title: "{% trans 'User SSH public key update' %}",
-            text: msg,
-            type: "error",
-            showCancelButton: false,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "{% trans 'Confirm' %}",
-            closeOnConfirm: true
-            }, function () {
-              $('#txt_pk').focus();
-            }
-        );
-    };
-    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
-}).on('click', '.btn-reset-pubkey', function () {
+$(document).ready(function () {
+})
+.on('click', '.btn-reset-pubkey', function () {
     var the_url = '{% url "users:user-pubkey-generate" %}';
     window.open(the_url, "_blank")
 })

@@ -3,12 +3,13 @@
 import re
 from collections import defaultdict
 from django.conf import settings
-
+from django.dispatch import receiver
 from django.core.signals import request_finished
 from django.db import connection
 
 
 from .utils import get_logger
+from .local import thread_local
 
 logger = get_logger(__file__)
 pattern = re.compile(r'FROM `(\w+)`')
@@ -48,6 +49,11 @@ def on_request_finished_logging_db_query(sender, **kwargs):
         logger.debug("Query {:3} times using {:.2f}s {}".format(
             counter.counter, counter.time, name)
         )
+
+
+@receiver(request_finished)
+def on_request_finished_release_local(sender, **kwargs):
+    thread_local.__release_local__()
 
 
 if settings.DEBUG:
