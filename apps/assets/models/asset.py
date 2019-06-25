@@ -12,11 +12,12 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
 from orgs.mixins import OrgModelMixin, OrgManager
 
-__all__ = ['Asset']
+__all__ = ['Asset', 'Protocol']
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +48,35 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
+class AssetManager(OrgManager):
+    def get_queryset(self):
+        queryset = super().get_queryset().prefetch_related("nodes", "protocols")
+        return queryset
+
+
+class Protocol(models.Model):
+    PROTOCOL_SSH = 'ssh'
+    PROTOCOL_RDP = 'rdp'
+    PROTOCOL_TELNET = 'telnet'
+    PROTOCOL_VNC = 'vnc'
+    PROTOCOL_CHOICES = (
+        (PROTOCOL_SSH, 'ssh'),
+        (PROTOCOL_RDP, 'rdp'),
+        (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_VNC, 'vnc'),
+    )
+    PORT_VALIDATORS = [MaxValueValidator(65535), MinValueValidator(1)]
+
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    name = models.CharField(max_length=16, choices=PROTOCOL_CHOICES,
+                            default=PROTOCOL_SSH, verbose_name=_("Name"))
+    port = models.IntegerField(default=22, verbose_name=_("Port"),
+                               validators=PORT_VALIDATORS)
+
+    def __str__(self):
+        return "{}/{}".format(self.name, self.port)
+
+
 class Asset(OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
@@ -59,32 +89,25 @@ class Asset(OrgModelMixin):
         ('Other', 'Other'),
     )
 
-    PROTOCOL_SSH = 'ssh'
-    PROTOCOL_RDP = 'rdp'
-    PROTOCOL_TELNET = 'telnet'
-    PROTOCOL_VNC = 'vnc'
-    PROTOCOL_CHOICES = (
-        (PROTOCOL_SSH, 'ssh'),
-        (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet (beta)'),
-        (PROTOCOL_VNC, 'vnc'),
-    )
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=PROTOCOL_SSH, choices=PROTOCOL_CHOICES, verbose_name=_('Protocol'))
+    protocol = models.CharField(max_length=128, default=Protocol.PROTOCOL_SSH,
+                                choices=Protocol.PROTOCOL_CHOICES,
+                                verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
+
+    protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocol"))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
 
     # Auth
-    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.PROTECT, null=True, verbose_name=_("Admin user"), related_name='assets')
 
     # Some information
-    public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
+    public_ip = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Public IP'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
 
     # Collect
@@ -110,7 +133,7 @@ class Asset(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = OrgManager.from_queryset(AssetQuerySet)()
+    objects = AssetManager.from_queryset(AssetQuerySet)()
     CONNECTIVITY_CACHE_KEY = '_JMS_ASSET_CONNECTIVITY_{}'
     UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
     CONNECTIVITY_CHOICES = (
@@ -131,18 +154,52 @@ class Asset(OrgModelMixin):
             return True, ''
         return False, warning
 
-    def support_ansible(self):
-        if self.platform in ("Windows", "Windows2016", "Other"):
-            return False
-        if self.protocol != 'ssh':
-            return False
-        return True
+    @property
+    def protocols_name(self):
+        names = []
+        for protocol in self.protocols.all():
+            names.append(protocol.name)
+        return names
 
-    def is_unixlike(self):
-        if self.platform not in ("Windows", "Windows2016"):
+    def has_protocol(self, name):
+        return name in self.protocols_name
+
+    def get_protocol_by_name(self, name):
+        for i in self.protocols.all():
+            if i.name.lower() == name.lower():
+                return i
+        return None
+
+    @property
+    def protocol_ssh(self):
+        return self.get_protocol_by_name("ssh")
+
+    @property
+    def protocol_rdp(self):
+        return self.get_protocol_by_name("rdp")
+
+    @property
+    def ssh_port(self):
+        if self.protocol_ssh:
+            port = self.protocol_ssh.port
+        else:
+            port = 22
+        return port
+
+    def is_windows(self):
+        if self.platform in ("Windows", "Windows2016"):
             return True
         else:
             return False
+
+    def is_unixlike(self):
+        if self.platform not in ("Windows", "Windows2016", "Other"):
+            return True
+        else:
+            return False
+
+    def is_support_ansible(self):
+        return self.has_protocol('ssh') and self.platform not in ("Other",)
 
     def get_nodes(self):
         from .node import Node
@@ -173,6 +230,15 @@ class Asset(OrgModelMixin):
         return Asset.objects.filter(filter_arg)
 
     @property
+    def cpu_info(self):
+        info = ""
+        if self.cpu_model:
+            info += self.cpu_model
+        if self.cpu_count and self.cpu_cores:
+            info += "{}*{}".format(self.cpu_count, self.cpu_cores)
+        return info
+
+    @property
     def hardware_info(self):
         if self.cpu_count:
             return '{} Core {} {}'.format(
@@ -184,26 +250,27 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
-        if not self.is_unixlike():
-            return self.REACHABLE
-        key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        cached = cache.get(key, None)
-        return cached if cached is not None else self.UNKNOWN
+        if not self.admin_user:
+            return self.UNKNOWN
+        return self.admin_user.get_connectivity_of(self)
 
     @connectivity.setter
     def connectivity(self, value):
-        key = self.CONNECTIVITY_CACHE_KEY.format(str(self.id))
-        cache.set(key, value, 3600*2)
+        if not self.admin_user:
+            return
+        self.admin_user.set_connectivity_of(self, value)
 
     def get_auth_info(self):
-        if self.admin_user:
-            self.admin_user.load_specific_asset_auth(self)
-            return {
-                'username': self.admin_user.username,
-                'password': self.admin_user.password,
-                'private_key': self.admin_user.private_key_file,
-                'become': self.admin_user.become_info,
-            }
+        if not self.admin_user:
+            return {}
+
+        self.admin_user.load_specific_asset_auth(self)
+        info = {
+            'username': self.admin_user.username,
+            'password': self.admin_user.password,
+            'private_key': self.admin_user.private_key_file,
+        }
+        return info
 
     def as_node(self):
         from .node import Node
@@ -214,35 +281,6 @@ class Asset(OrgModelMixin):
         fake_node.asset = self
         fake_node.is_node = False
         return fake_node
-
-    def to_json(self):
-        info = {
-            'id': self.id,
-            'hostname': self.hostname,
-            'ip': self.ip,
-            'port': self.port,
-        }
-        if self.domain and self.domain.gateway_set.all():
-            info["gateways"] = [d.id for d in self.domain.gateway_set.all()]
-        return info
-
-    def _to_secret_json(self):
-        """
-        Ansible use it create inventory
-        Todo: May be move to ops implements it
-        """
-        data = self.to_json()
-        if self.admin_user:
-            self.admin_user.load_specific_asset_auth(self)
-            admin_user = self.admin_user
-            data.update({
-                'username': admin_user.username,
-                'password': admin_user.password,
-                'private_key': admin_user.private_key_file,
-                'become': admin_user.become_info,
-                'groups': [node.value for node in self.nodes.all()],
-            })
-        return data
 
     def as_tree_node(self, parent_node):
         from common.tree import TreeNode
@@ -265,9 +303,11 @@ class Asset(OrgModelMixin):
                     'id': self.id,
                     'hostname': self.hostname,
                     'ip': self.ip,
-                    'port': self.port,
+                    'protocols': [
+                        {"name": p.name, "port": p.port}
+                        for p in self.protocols.all()
+                    ],
                     'platform': self.platform,
-                    'protocol': self.protocol,
                 }
             }
         }
@@ -291,10 +331,10 @@ class Asset(OrgModelMixin):
             asset = cls(ip='.'.join(ip),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
-                        port=22,
                         created_by='Fake')
             try:
                 asset.save()
+                asset.protocols.create(name="ssh", port=22)
                 if nodes and len(nodes) > 3:
                     _nodes = random.sample(nodes, 3)
                 else:

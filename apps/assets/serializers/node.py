@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
+from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import Asset, Node
 
 
@@ -10,7 +11,7 @@ __all__ = [
 ]
 
 
-class NodeSerializer(serializers.ModelSerializer):
+class NodeSerializer(BulkOrgResourceModelSerializer):
     assets_amount = serializers.IntegerField(read_only=True)
 
     class Meta:

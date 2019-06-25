@@ -4,6 +4,8 @@
         <i class="fa fa-files-o" style="width: 14px"></i><span class="nav-label">{% trans 'My assets' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
+
+{% if LICENSE_VALID %}
 <li id="applications">
     <a>
         <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'My Applications' %}</span><span class="fa arrow"></span>
@@ -16,6 +18,8 @@
         </li>
     </ul>
 </li>
+{% endif %}
+
 {% if SECURITY_COMMAND_EXECUTION %}
 <li id="ops">
     <a href="{% url 'ops:command-execution-start' %}">

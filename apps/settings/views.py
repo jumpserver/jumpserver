@@ -3,15 +3,16 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
-from common.permissions import SuperUserRequiredMixin
+from common.permissions import PermissionsMixin, IsSuperUser
 from common import utils
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm, EmailContentSettingForm
 
 
-class BasicSettingView(SuperUserRequiredMixin, TemplateView):
+class BasicSettingView(PermissionsMixin, TemplateView):
     form_class = BasicSettingForm
     template_name = "settings/basic_setting.html"
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -35,9 +36,10 @@ class BasicSettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class EmailSettingView(SuperUserRequiredMixin, TemplateView):
+class EmailSettingView(PermissionsMixin, TemplateView):
     form_class = EmailSettingForm
     template_name = "settings/email_setting.html"
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -61,9 +63,10 @@ class EmailSettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
+class LDAPSettingView(PermissionsMixin, TemplateView):
     form_class = LDAPSettingForm
     template_name = "settings/ldap_setting.html"
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -87,9 +90,10 @@ class LDAPSettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
+class TerminalSettingView(PermissionsMixin, TemplateView):
     form_class = TerminalSettingForm
     template_name = "settings/terminal_setting.html"
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         command_storage = utils.get_command_storage_setting()
@@ -118,8 +122,9 @@ class TerminalSettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class ReplayStorageCreateView(SuperUserRequiredMixin, TemplateView):
+class ReplayStorageCreateView(PermissionsMixin, TemplateView):
     template_name = 'settings/replay_storage_create.html'
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -130,8 +135,9 @@ class ReplayStorageCreateView(SuperUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandStorageCreateView(SuperUserRequiredMixin, TemplateView):
+class CommandStorageCreateView(PermissionsMixin, TemplateView):
     template_name = 'settings/command_storage_create.html'
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -142,9 +148,10 @@ class CommandStorageCreateView(SuperUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
+class SecuritySettingView(PermissionsMixin, TemplateView):
     form_class = SecuritySettingForm
     template_name = "settings/security_setting.html"
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -168,9 +175,10 @@ class SecuritySettingView(SuperUserRequiredMixin, TemplateView):
             return render(request, self.template_name, context)
 
 
-class EmailContentSettingView(SuperUserRequiredMixin, TemplateView):
+class EmailContentSettingView(PermissionsMixin, TemplateView):
     template_name = "settings/email_content_setting.html"
     form_class = EmailContentSettingForm
+    permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
         context = {

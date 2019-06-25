@@ -4,15 +4,15 @@
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
+from orgs.mixins import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
-from assets.models import Node, Asset, SystemUser
+from assets.models import Node
 from assets.serializers import AssetGrantedSerializer
 
 __all__ = [
     'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
-    'GrantedAssetSerializer', 'GrantedSystemUserSerializer',
     'ActionSerializer', 'NodeGrantedSerializer',
 ]
 
@@ -23,13 +23,13 @@ class ActionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AssetPermissionCreateUpdateSerializer(serializers.ModelSerializer):
+class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = AssetPermission
         exclude = ('created_by', 'date_created')
 
 
-class AssetPermissionListSerializer(serializers.ModelSerializer):
+class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
     users = StringManyToManyField(many=True, read_only=True)
     user_groups = StringManyToManyField(many=True, read_only=True)
     assets = StringManyToManyField(many=True, read_only=True)
@@ -122,19 +122,21 @@ class GrantedNodeSerializer(serializers.ModelSerializer):
         ]
 
 
-class GrantedAssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        fields = [
-            'id', 'hostname', 'ip', 'port', 'protocol', 'platform',
-            'domain', 'is_active', 'comment'
-        ]
+# class GrantedAssetSerializer(serializers.ModelSerializer):
+#     protocols = ProtocolSerializer(many=True)
+#
+#     class Meta:
+#         model = Asset
+#         fields = [
+#             'id', 'hostname', 'ip', 'protocols', 'port', 'protocol',
+#             'platform', 'domain', 'is_active', 'comment'
+#         ]
 
 
-class GrantedSystemUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemUser
-        fields = [
-            'id', 'name', 'username', 'protocol', 'priority',
-            'login_mode', 'comment'
-        ]
+# class GrantedSystemUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = SystemUser
+#         fields = [
+#             'id', 'name', 'username', 'protocol', 'priority',
+#             'login_mode', 'comment'
+#         ]

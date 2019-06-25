@@ -8,7 +8,7 @@ from django.views.generic.edit import DeleteView, SingleObjectMixin
 from django.urls import reverse_lazy
 from django.conf import settings
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
 from perms.hands import Node, Asset, SystemUser, User, UserGroup
 from perms.models import AssetPermission, Action
@@ -25,8 +25,9 @@ __all__ = [
 ]
 
 
-class AssetPermissionListView(AdminUserRequiredMixin, TemplateView):
+class AssetPermissionListView(PermissionsMixin, TemplateView):
     template_name = 'perms/asset_permission_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -37,11 +38,12 @@ class AssetPermissionListView(AdminUserRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
+class AssetPermissionCreateView(PermissionsMixin, CreateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
+    permission_classes = [IsOrgAdmin]
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
@@ -69,11 +71,12 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
+class AssetPermissionUpdateView(PermissionsMixin, UpdateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy("perms:asset-permission-list")
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -84,11 +87,12 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
+class AssetPermissionDetailView(PermissionsMixin, DetailView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_detail.html'
     success_url = reverse_lazy("perms:asset-permission-list")
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -102,19 +106,21 @@ class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionDeleteView(AdminUserRequiredMixin, DeleteView):
+class AssetPermissionDeleteView(PermissionsMixin, DeleteView):
     model = AssetPermission
     template_name = 'delete_confirm.html'
     success_url = reverse_lazy('perms:asset-permission-list')
+    permission_classes = [IsOrgAdmin]
 
 
-class AssetPermissionUserView(AdminUserRequiredMixin,
+class AssetPermissionUserView(PermissionsMixin,
                               SingleObjectMixin,
                               ListView):
     template_name = 'perms/asset_permission_user.html'
     context_object_name = 'asset_permission'
     paginate_by = settings.DISPLAY_PER_PAGE
     object = None
+    permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetPermission.objects.all())
@@ -140,13 +146,14 @@ class AssetPermissionUserView(AdminUserRequiredMixin,
         return super().get_context_data(**kwargs)
 
 
-class AssetPermissionAssetView(AdminUserRequiredMixin,
+class AssetPermissionAssetView(PermissionsMixin,
                                SingleObjectMixin,
                                ListView):
     template_name = 'perms/asset_permission_asset.html'
     context_object_name = 'asset_permission'
     paginate_by = settings.DISPLAY_PER_PAGE
     object = None
+    permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset = AssetPermission.objects.all())

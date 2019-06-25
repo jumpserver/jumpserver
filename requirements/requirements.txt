@@ -28,7 +28,6 @@ djangorestframework==3.9.4
 djangorestframework-bulk==0.2.1
 docutils==0.14
 ecdsa==0.13
-elasticsearch==6.1.1
 enum-compat==0.0.2
 ephem==3.7.6.0
 eventlet==0.24.1

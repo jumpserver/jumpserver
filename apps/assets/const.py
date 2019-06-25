@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.utils.translation import ugettext_lazy as _
-
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {
@@ -22,6 +20,14 @@ TEST_ADMIN_USER_CONN_TASKS = [
         }
     }
 ]
+TEST_WINDOWS_ADMIN_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
+        }
+    }
+]
 
 ASSET_ADMIN_CONN_CACHE_KEY = "ASSET_ADMIN_USER_CONN_{}"
 
@@ -34,14 +40,29 @@ TEST_SYSTEM_USER_CONN_TASKS = [
        }
    }
 ]
+TEST_WINDOWS_SYSTEM_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
+        }
+    }
+]
 
-
-ASSET_USER_CONN_CACHE_KEY = 'ASSET_USER_CONN_{}_{}'
+ASSET_USER_CONN_CACHE_KEY = 'ASSET_USER_CONN_{}'
 TEST_ASSET_USER_CONN_TASKS = [
     {
         "name": "ping",
         "action": {
             "module": "ping",
+        }
+    }
+]
+TEST_WINDOWS_ASSET_USER_CONN_TASKS = [
+    {
+        "name": "ping",
+        "action": {
+            "module": "win_ping",
         }
     }
 ]

@@ -16,12 +16,24 @@
     <h3>{% trans 'Basic' %}</h3>
     {% bootstrap_field form.hostname layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
-    {% bootstrap_field form.protocol layout="horizontal" %}
-    {% bootstrap_field form.port layout="horizontal" %}
     {% bootstrap_field form.platform layout="horizontal" %}
     {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.domain layout="horizontal" %}
+    <div class="hr-line-dashed"></div>
 
+    <h3>{% trans 'Protocols' %}</h3>
+    <div class="protocols">
+        {% for fm in formset.forms %}
+        <div class="form-group">
+            <div class="col-md-2 col-md-offset-2" style="text-align: right">{{ fm.name }}</div>
+            <div class="col-md-6">{{ fm.port }}</div>
+            <div class="col-md-1" style="padding: 6px 0">
+                <a class="btn btn-danger btn-xs btn-protocol btn-del"><span class="fa fa-minus"></span> </a>
+                <a class="btn btn-primary btn-xs btn-protocol btn-add" style="display: none"><span class="fa fa-plus"></span></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Auth' %}</h3>
     {% bootstrap_field form.admin_user layout="horizontal" %}
@@ -55,6 +67,8 @@
             {% endif %}
         </div>
     </div>
+    {% block extra %}
+    {% endblock %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
@@ -73,10 +87,24 @@
 
 {% block custom_foot_js %}
 <script>
+var instanceId = "{{ object.id }}";
+var protocolLen = 0;
 function format(item) {
    var group = item.element.parentElement.label;
    return group + ':' + item.text;
 }
+
+function protocolBtnShow() {
+    $(".btn-protocol.btn-add").hide();
+    $(".btn-protocol.btn-add:last").show();
+    var btnDel = $(".btn-protocol.btn-del");
+    if (btnDel.length === 1) {
+        btnDel.addClass("disabled")
+    } else {
+        btnDel.removeClass("disabled")
+    }
+}
+
 
 $(document).ready(function () {
     $('.select2').select2({
@@ -89,20 +117,131 @@ $(document).ready(function () {
     $('#id_nodes.select2').select2({
         closeOnSelect: false
     });
-    $("#id_protocol").change(function (){
-        var protocol = $("#id_protocol option:selected").text();
-        var port = 22;
-        if(protocol === 'rdp'){
-            port = 3389;
-        }
-        else if(protocol === 'telnet (beta)'){
-            port = 23;
-        }
-        else if(protocol === 'vnc'){
-            port = 5901;
-        }
-        $("#id_port").val(port);
-    });
+    protocolBtnShow()
 })
+.on("change", "#id_platform", function () {
+    if (instanceId !== "") {
+        return
+    }
+    var platform = $(this).val();
+    var protocolRef = $(".protocols").find("select").first()
+    var protocol = protocolRef.val();
+
+    var protocolShould = "";
+    if (platform.startsWith("Windows")){
+        protocolShould = "rdp"
+    } else {
+        protocolShould = "ssh"
+    }
+    if (protocol !== protocolShould) {
+        protocolRef.val(protocolShould);
+        protocolRef.trigger("change")
+    }
+
+})
+.on("click", ".btn-protocol.btn-del", function () {
+    $(this).parent().parent().remove();
+    protocolBtnShow()
+})
+.on("click", ".btn-protocol.btn-add", function () {
+    var protocol = "";
+    var protocolsRef = $(".protocols");
+    var firstProtocolForm = protocolsRef.children().first();
+    var newProtocolForm = firstProtocolForm.clone();
+    var protocolChoices = $.map($(firstProtocolForm.find('select option')), function (option) {
+        return option.value
+    });
+    var protocolsSet = $.map(protocolsRef.find('select option:selected'), function(option) {
+        return option.value
+    });
+    for (var i=0;i<protocolChoices.length;i++) {
+        var p = protocolChoices[i];
+        if (protocolsSet.indexOf(p) === -1) {
+            protocol = p;
+            break
+        }
+    }
+    if (protocol === "") {
+        return
+    }
+    if (protocolLen === 0) {
+        protocolLen = protocolsRef.length;
+    }
+    var selectName = "form-" + protocolLen + "-name";
+    var selectId = "id_" + selectName;
+    var portName = "form-" + protocolLen + "-port";
+    var portId = "id_" + portName;
+    newProtocolForm.find("select").prop("name", selectName).prop("id", selectId);
+    newProtocolForm.find("input").prop("name", portName).prop("id", portId);
+    newProtocolForm.find("option[value='" + protocol + "']").attr("selected", true);
+    protocolsRef.append(newProtocolForm);
+    protocolLen += 1;
+    $("#" + selectId).trigger("change");
+    protocolBtnShow()
+})
+.on("change", ".protocol-name", function () {
+    var name = $(this).val();
+    var port = 22;
+    switch (name) {
+        case "ssh":
+            port = 22;
+            break;
+        case "rdp":
+            port = 3389;
+            break;
+        case "telnet":
+            port = 23;
+            break;
+        case "vnc":
+            port = 5901;
+            break;
+        default:
+            port = 22;
+            break
+    }
+    $(this).parent().parent().find(".protocol-port").val(port);
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    {% block formUrl %}
+    var the_url = '{% url 'api-assets:asset-list' %}';
+    var redirect_to = '{% url "assets:asset-list" %}';
+    var method = "POST";
+    {% endblock %}
+    var form = $("form");
+    var protocols = {};
+    var data = form.serializeObject();
+    $.each(data, function (k, v) {
+        if (k.startsWith("form")){
+            delete data[k];
+            var _k = k.split("-");
+            var formName = _k.slice(0, 2).join("-");
+            var key = _k[_k.length-1];
+            if (!protocols[formName]) {
+                protocols[formName] = {}
+            }
+            protocols[formName][key] = v
+        }
+    });
+
+    protocols = $.map(protocols, function (v) {
+        return v.name + '/' + v.port
+    });
+    data["protocols"] = protocols;
+    if (typeof data.labels === "string") {
+        data["labels"] = [data["labels"]];
+    }
+    if (typeof data["nodes"] == "string") {
+        data["nodes"] = [data["nodes"]]
+    }
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+ })
 </script>
 {% endblock %}

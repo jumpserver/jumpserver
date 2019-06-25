@@ -1,95 +1,15 @@
-{% extends '_base_create_update.html' %}
-{% load static %}
+{% extends 'assets/asset_create.html' %}
 {% load bootstrap3 %}
 {% load i18n %}
-{% load asset_tags %}
-{% load common_tags %}
 
-{% block custom_head_css_js_create %}
-    <link href="{% static "css/plugins/inputTags.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/inputTags.jquery.min.js" %}"></script>
-{% endblock %}
-
-{% block form %}
-    <form action="" method="post" class="form-horizontal">
-    {% if form.non_field_errors %}
-         <div class="alert alert-danger">
-             {{ form.non_field_errors }}
-         </div>
-    {% endif %}
-    {% csrf_token %}
-    <h3>{% trans 'Basic' %}</h3>
-    {% bootstrap_field form.hostname layout="horizontal" %}
-    {% bootstrap_field form.ip layout="horizontal" %}
-    {% bootstrap_field form.protocol layout="horizontal" %}
-    {% bootstrap_field form.port layout="horizontal" %}
-    {% bootstrap_field form.platform layout="horizontal" %}
-    {% bootstrap_field form.public_ip layout="horizontal" %}
-    {% bootstrap_field form.domain layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Auth' %}</h3>
-    {% bootstrap_field form.admin_user layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Node' %}</h3>
-    {% bootstrap_field form.nodes layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Labels' %}</h3>
-    <div class="form-group">
-        <label for="{{ form.labels.id_for_label }}" class="col-md-2 control-label">{% trans 'Label' %}</label>
-        <div class="col-md-9">
-            <select name="labels" class="select2 labels" data-placeholder="{% trans 'Label'  %}" style="width: 100%" multiple="" tabindex="4" id="{{ form.labels.id_for_label }}">
-                {% for name, labels in form.labels.field.queryset|group_labels %}
-                <optgroup label="{{ name }}">
-                    {% for label in labels %}
-                        {% if label in form.labels.initial %}
-                            <option value="{{ label.id }}" selected>{{ label.value }}</option>
-                        {% else %}
-                            <option value="{{ label.id }}">{{ label.value }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </optgroup>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-
+{% block extra %}
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
     {% bootstrap_field form.number layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Other' %}</h3>
-    {% bootstrap_field form.comment layout="horizontal" %}
-    {% bootstrap_field form.is_active layout="horizontal" %}
-
-    <div class="hr-line-dashed"></div>
-    <div class="form-group">
-        <div class="col-sm-4 col-sm-offset-2">
-            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
-        </div>
-    </div>
-
-</form>
 {% endblock %}
 
-{% block custom_foot_js %}
-    <script>
-    function format(item) {
-        var group = item.element.parentElement.label;
-        return group + ':' + item.text;
-    }
-    $(document).ready(function () {
-        $('.select2').select2({
-            allowClear: true
-        });
-        $(".labels").select2({
-            allowClear: true,
-            templateSelection: format
-        });
-    })
-    </script>
+{% block formUrl %}
+    var the_url = '{% url 'api-assets:asset-detail' pk=object.id %}';
+    var redirect_to = '{% url "assets:asset-list" %}';
+    var method = 'PUT';
 {% endblock %}

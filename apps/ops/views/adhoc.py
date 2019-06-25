@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views.generic import ListView, DetailView
 
 from common.mixins import DatetimeSearchMixin
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
 from ..models import Task, AdHoc, AdHocRunHistory
 
@@ -17,13 +17,14 @@ __all__ = [
 ]
 
 
-class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
+class TaskListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
     keyword = ''
+    permission_classes = [IsOrgAdmin]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -51,9 +52,10 @@ class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class TaskDetailView(AdminUserRequiredMixin, DetailView):
+class TaskDetailView(PermissionsMixin, DetailView):
     model = Task
     template_name = 'ops/task_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -73,9 +75,10 @@ class TaskDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskAdhocView(AdminUserRequiredMixin, DetailView):
+class TaskAdhocView(PermissionsMixin, DetailView):
     model = Task
     template_name = 'ops/task_adhoc.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -86,9 +89,10 @@ class TaskAdhocView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskHistoryView(AdminUserRequiredMixin, DetailView):
+class TaskHistoryView(PermissionsMixin, DetailView):
     model = Task
     template_name = 'ops/task_history.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -99,9 +103,10 @@ class TaskHistoryView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocDetailView(AdminUserRequiredMixin, DetailView):
+class AdHocDetailView(PermissionsMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -112,9 +117,10 @@ class AdHocDetailView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryView(AdminUserRequiredMixin, DetailView):
+class AdHocHistoryView(PermissionsMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_history.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
@@ -125,9 +131,10 @@ class AdHocHistoryView(AdminUserRequiredMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
+class AdHocHistoryDetailView(PermissionsMixin, DetailView):
     model = AdHocRunHistory
     template_name = 'ops/adhoc_history_detail.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {

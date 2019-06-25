@@ -165,11 +165,13 @@ function formSubmit(props) {
     /*
     {
       "form": $("form"),
+      "data": {},
       "url": "",
       "method": "POST",
       "redirect_to": "",
       "success": function(data, textStatue, jqXHR){},
-      "error": function(jqXHR, textStatus, errorThrown) {}
+      "error": function(jqXHR, textStatus, errorThrown) {},
+      "message": "",
     }
     */
     props = props || {};
@@ -183,6 +185,10 @@ function formSubmit(props) {
         dataType: props.data_type || "json"
     }).done(function (data, textState, jqXHR) {
         if (redirect_to) {
+            if (props.message) {
+                var messages="ed65330a45559c87345a0eb6ac7812d18d0d8976$[[\"__json_message\"\0540\05425\054\"asdfasdf \\u521b\\u5efa\\u6210\\u529f\"]]"
+                setCookie("messages", messages)
+            }
             location.href = redirect_to;
         } else if (typeof props.success === 'function') {
             return props.success(data, textState, jqXHR);
@@ -230,7 +236,15 @@ function formSubmit(props) {
                     var help_msg = v.join("<br/>") ;
                     helpBlockRef.html(help_msg);
                 } else {
-                    noneFieldErrorMsg += v + '<br/>';
+                    $.each(v, function (kk, vv) {
+                        if (typeof errors === "object") {
+                            $.each(vv, function (kkk, vvv) {
+                                noneFieldErrorMsg += " " + vvv + '<br/>';
+                            })
+                        } else{
+                            noneFieldErrorMsg += vv + '<br/>';
+                        }
+                    })
                 }
             });
             if (noneFieldErrorRef.length === 1 && noneFieldErrorMsg !== '') {
@@ -632,6 +646,8 @@ jumpserver.initServerSideDataTable = function (options) {
             $.each(rows, function (id, row) {
                 table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
+                    console.log(table)
+                    console.log(table.selected);
                     table.selected.push(row.id)
                 }
             })
@@ -913,8 +929,11 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
 }
 
 // 解决input框中的资产和弹出表格中资产的显示不一致
-function initSelectedAssets2Table(){
-    var inputAssets = $('#id_assets').val();
+function initSelectedAssets2Table(id){
+    if (!id) {
+        id = "#id_assets"
+    }
+    var inputAssets = $(id).val();
     var selectedAssets = asset_table2.selected.concat();
 
     // input assets无，table assets选中，则取消勾选(再次click)
@@ -996,7 +1015,7 @@ function APIImportData(props){
                 $('#updated_failed').html('');
                 $('#updated_failed_detail').html('');
                 $('#success_updated').html(gettext("Update Success"));
-                $('#success_updated_detail').html("Count" + ": " + data.length);
+                $('#success_updated_detail').html(gettext("Count") + ": " + data.length);
             }
 
             props.data_table.ajax.reload()

@@ -9,8 +9,11 @@ from django.forms import ModelForm
 from django.http.response import HttpResponseForbidden
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from common.utils import get_logger
+from common.validators import ProjectUniqueValidator
+from common.mixins import BulkSerializerMixin
 from .utils import (
     current_org, set_current_org, set_to_root_org, get_current_org_id
 )
@@ -23,6 +26,7 @@ __all__ = [
     'OrgManager', 'OrgViewGenericMixin', 'OrgModelMixin', 'OrgModelForm',
     'RootOrgViewMixin', 'OrgMembershipSerializerMixin',
     'OrgMembershipModelViewSetMixin', 'OrgResourceSerializerMixin',
+    'BulkOrgResourceSerializerMixin', 'BulkOrgResourceModelSerializer',
 ]
 
 
@@ -215,4 +219,29 @@ class OrgResourceSerializerMixin(serializers.Serializer):
     由于HiddenField字段不可读，API获取资产信息时获取不到org_id，
     但是coco需要资产的org_id字段，所以修改为CharField类型
     """
-    org_id = serializers.CharField(default=get_current_org_id)
+    org_id = serializers.ReadOnlyField(default=get_current_org_id, label=_("Organization"))
+    org_name = serializers.ReadOnlyField(label=_("Org name"))
+
+    def get_validators(self):
+        _validators = super().get_validators()
+        validators = []
+
+        for v in _validators:
+            if isinstance(v, UniqueTogetherValidator) \
+                    and "org_id" in v.fields:
+                v = ProjectUniqueValidator(v.queryset, v.fields)
+            validators.append(v)
+        return validators
+
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields.extend(["org_id", "org_name"])
+        return fields
+
+
+class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerMixin):
+    pass
+
+
+class BulkOrgResourceModelSerializer(BulkOrgResourceSerializerMixin, serializers.ModelSerializer):
+    pass

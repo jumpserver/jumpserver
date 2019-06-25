@@ -3,11 +3,12 @@
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 
 from ..models import Domain, Gateway
 
 
-class DomainSerializer(serializers.ModelSerializer):
+class DomainSerializer(BulkOrgResourceModelSerializer):
     asset_count = serializers.SerializerMethodField()
     gateway_count = serializers.SerializerMethodField()
 
@@ -25,7 +26,7 @@ class DomainSerializer(serializers.ModelSerializer):
         return obj.gateway_set.all().count()
 
 
-class GatewaySerializer(serializers.ModelSerializer):
+class GatewaySerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
         list_serializer_class = AdaptedBulkListSerializer
@@ -45,7 +46,7 @@ class GatewayWithAuthSerializer(GatewaySerializer):
         return fields
 
 
-class DomainWithGatewaySerializer(serializers.ModelSerializer):
+class DomainWithGatewaySerializer(BulkOrgResourceModelSerializer):
     gateways = GatewayWithAuthSerializer(many=True, read_only=True)
 
     class Meta:

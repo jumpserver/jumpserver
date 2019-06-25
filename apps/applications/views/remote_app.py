@@ -6,11 +6,10 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
 
-from common.permissions import AdminUserRequiredMixin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from common.const import create_success_msg, update_success_msg
 
 from ..models import RemoteApp
@@ -23,27 +22,29 @@ __all__ = [
 ]
 
 
-class RemoteAppListView(AdminUserRequiredMixin, TemplateView):
+class RemoteAppListView(PermissionsMixin, TemplateView):
     template_name = 'applications/remote_app_list.html'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('RemoteApp list'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
-class RemoteAppCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class RemoteAppCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
     template_name = 'applications/remote_app_create_update.html'
     model = RemoteApp
     form_class = forms.RemoteAppCreateUpdateForm
     success_url = reverse_lazy('applications:remote-app-list')
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('Create RemoteApp'),
         }
         kwargs.update(context)
@@ -53,18 +54,19 @@ class RemoteAppCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         return create_success_msg % ({'name': cleaned_data['name']})
 
 
-class RemoteAppUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
+class RemoteAppUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
     template_name = 'applications/remote_app_create_update.html'
     model = RemoteApp
     form_class = forms.RemoteAppCreateUpdateForm
     success_url = reverse_lazy('applications:remote-app-list')
+    permission_classes = [IsOrgAdmin]
 
     def get_initial(self):
         return {k: v for k, v in self.object.params.items()}
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('Update RemoteApp'),
         }
         kwargs.update(context)
@@ -74,22 +76,24 @@ class RemoteAppUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateVie
         return update_success_msg % ({'name': cleaned_data['name']})
 
 
-class RemoteAppDetailView(AdminUserRequiredMixin, DetailView):
+class RemoteAppDetailView(PermissionsMixin, DetailView):
     template_name = 'applications/remote_app_detail.html'
     model = RemoteApp
     context_object_name = 'remote_app'
+    permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
+            'app': _('Applications'),
             'action': _('RemoteApp detail'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
-class UserRemoteAppListView(LoginRequiredMixin, TemplateView):
+class UserRemoteAppListView(PermissionsMixin, TemplateView):
     template_name = 'applications/user_remote_app_list.html'
+    permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
         context = {

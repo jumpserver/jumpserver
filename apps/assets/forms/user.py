@@ -100,16 +100,18 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         private_key, public_key = super().gen_keys()
 
         if login_mode == SystemUser.LOGIN_MANUAL or \
-                protocol in [SystemUser.PROTOCOL_RDP,
-                             SystemUser.PROTOCOL_TELNET,
+                protocol in [SystemUser.PROTOCOL_TELNET,
                              SystemUser.PROTOCOL_VNC]:
             system_user.auto_push = 0
-            auto_generate_key = False
             system_user.save()
+            auto_generate_key = False
 
         if auto_generate_key:
             logger.info('Auto generate key and set system user auth')
-            system_user.auto_gen_auth()
+            if protocol == SystemUser.PROTOCOL_SSH:
+                system_user.auto_gen_auth()
+            elif protocol == SystemUser.PROTOCOL_RDP:
+                system_user.auto_gen_auth_password()
         else:
             system_user.set_auth(password=password, private_key=private_key,
                                  public_key=public_key)
