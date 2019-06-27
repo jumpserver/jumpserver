@@ -39,6 +39,9 @@ class SessionViewSet(BulkModelViewSet):
             terminal = get_object_or_404(Terminal, id=terminal_id)
             queryset = queryset.filter(terminal=terminal)
             return queryset
+        # 解决guacamole更新session时并发导致幽灵会话的问题
+        if self.request.method in ('PATCH', ):
+            queryset = queryset.select_for_update()
         return queryset
 
     def perform_create(self, serializer):
