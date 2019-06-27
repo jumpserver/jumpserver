@@ -147,7 +147,23 @@ class PrivateTokenAuthentication(authentication.TokenAuthentication):
 
 
 class SessionAuthentication(authentication.SessionAuthentication):
-    def enforce_csrf(self, request):
-        reason = CSRFCheck().process_view(request, None, (), {})
-        if reason:
-            raise exceptions.AuthenticationFailed(reason)
+    def authenticate(self, request):
+        """
+        Returns a `User` if the request session currently has a logged in user.
+        Otherwise returns `None`.
+        """
+
+        # Get the session-based user from the underlying HttpRequest object
+        user = getattr(request._request, 'user', None)
+
+        # Unauthenticated, CSRF validation not required
+        if not user or not user.is_active:
+            return None
+
+        try:
+            self.enforce_csrf(request)
+        except exceptions.AuthenticationFailed:
+            return None
+
+        # CSRF passed with authenticated user
+        return user, None

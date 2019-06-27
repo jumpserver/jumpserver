@@ -1,0 +1,87 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}asset_user_auth_update_modal{% endblock %}
+{% block modal_title%}{% trans "Update asset user auth" %}{% endblock %}
+{% block modal_body %}
+<form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13){ $('#btn_asset_user_auth_update_modal_confirm').trigger('click'); return false;}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Hostname" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_hostname_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Username" %}</label>
+        <div class="col-sm-10">
+            <p class="form-control-static" id="id_username_p"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Password" %}</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_password_auth" type="password" name="password" placeholder="{% trans 'Please input password' %}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans "Private key" %}</label>
+        <div class="col-sm-10">
+            <div class="row bootstrap3-multi-input">
+                <div class="col-xs-12">
+                    <input id="id_private_key" type="file" name="private_key"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+var authHostname, authUsername, authAssetId = null;
+
+$(document).ready(function () {
+
+}).on("show.bs.modal", "#asset_user_auth_update_modal", function () {
+    $('#id_hostname_p').html(authHostname);
+    $('#id_username_p').html(authUsername);
+    $('#id_password_auth').parent().removeClass('has-error');
+    $('#id_password_auth').val('');
+}).on('click', '#btn_asset_user_auth_update_modal_confirm', function(){
+    var password = $('#id_password_auth').val();
+    var privateKey = $('#id_private_key').prop('files');
+    var hasPrivateKey = privateKey.length > 0;
+    if (!password && !hasPrivateKey) {
+        $('#id_password_auth').parent().addClass('has-error');
+        return
+    }
+    var data = {
+        'asset': authAssetId,
+        'username': authUsername
+    };
+    if (password) {
+        data["password"] = password
+    }
+    var props = {
+        data: data,
+        url: "{% url 'api-assets:asset-user-list' %}",
+        form: $("form"),
+        method: 'POST',
+        success: function () {
+            toastr.success("{% trans 'Update successfully!' %}");
+            $("#asset_user_auth_update_modal").modal('hide');
+        }
+    };
+    if (hasPrivateKey) {
+        var reader = new FileReader();//新建一个FileReader
+        reader.readAsText(privateKey[0], "UTF-8");//读取文件
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            data["private_key"] = evt.target.result;
+            formSubmit(props);
+        }
+    }
+    if (!hasPrivateKey) {
+        formSubmit(props);
+    }
+})
+
+</script>
+{% endblock %}
+{% block modal_confirm_id %}btn_asset_user_auth_update_modal_confirm{% endblock %}

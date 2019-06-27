@@ -3,12 +3,12 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
-
-from ..models import SystemUser, Asset
+from orgs.mixins import BulkOrgResourceModelSerializer
+from ..models import SystemUser
 from .base import AuthSerializer
 
 
-class SystemUserSerializer(serializers.ModelSerializer):
+class SystemUserSerializer(BulkOrgResourceModelSerializer):
     """
     系统用户
     """
@@ -31,7 +31,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
         model = SystemUser
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'org_id', 'name', 'username', 'login_mode',
+            'id', 'name', 'username', 'login_mode', 'login_mode_display',
             'login_mode_display', 'priority', 'protocol', 'auto_push',
             'password', 'assets_amount', 'reachable_amount', 'reachable_assets',
             'unreachable_amount', 'unreachable_assets', 'cmd_filters', 'sudo',
@@ -39,16 +39,8 @@ class SystemUserSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'login_mode_display': {'label': _('Login mode display')},
-            'created_by': {'read_only': True}, 'nodes': {'read_only': True},
-            'assets': {'read_only': True}
+            'created_by': {'read_only': True},
         }
-
-    def get_field_names(self, declared_fields, info):
-        fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
-        fields.extend([
-            'login_mode_display',
-        ])
-        return fields
 
     @staticmethod
     def get_unreachable_assets(obj):

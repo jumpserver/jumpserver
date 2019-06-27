@@ -76,6 +76,7 @@ function initTable2() {
 function onNodeSelected2(event, treeNode) {
     var url = asset_table2.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.meta.node.id);
+    url = setUrlParam(url, "show_current_asset", "");
     asset_table2.ajax.url(url);
     asset_table2.ajax.reload();
 }

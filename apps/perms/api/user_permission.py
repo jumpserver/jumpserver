@@ -14,7 +14,6 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
-from orgs.utils import set_to_root_org
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
     check_system_user_action, RemoteAppPermissionUtil,
@@ -26,7 +25,7 @@ from ..hands import (
 )
 from .. import serializers, const
 from ..mixins import (
-    AssetsFilterMixin, RemoteAppFilterMixin, ChangeOrgIfNeedMixin
+    AssetsFilterMixin, RemoteAppFilterMixin
 )
 from ..models import Action
 
@@ -47,14 +46,6 @@ class UserPermissionCacheMixin:
     RESP_CACHE_KEY = '_PERMISSION_RESPONSE_CACHE_{}'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     _object = None
-
-    @staticmethod
-    def change_org_if_need(request, kwargs):
-        if request.user.is_authenticated and \
-                request.user.is_superuser or \
-                request.user.is_app or \
-                kwargs.get('pk') is None:
-            set_to_root_org()
 
     def get_object(self):
         return None
@@ -115,7 +106,6 @@ class UserPermissionCacheMixin:
         cache.set(key, response.data, self.CACHE_TIME)
 
     def get(self, request, *args, **kwargs):
-        self.change_org_if_need(request, kwargs)
         self.cache_policy = request.GET.get('cache_policy', '0')
 
         obj = self._get_object()
@@ -156,7 +146,7 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         assets = util.get_assets()
         for k, v in assets.items():
-            system_users_granted = [s for s in v if s.protocol == k.protocol]
+            system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
             k.system_users_granted = system_users_granted
             queryset.append(k)
         return queryset
@@ -217,8 +207,7 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin,
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
-                system_users_granted = [s for s in v if
-                                        s.protocol == k.protocol]
+                system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
                 k.system_users_granted = system_users_granted
             node.assets_granted = assets
             queryset.append(node)
@@ -366,7 +355,7 @@ class UserGrantedNodeChildrenApi(UserPermissionCacheMixin, ListAPIView):
         for asset, system_users in nodes_granted[node].items():
             fake_node = asset.as_node()
             fake_node.assets_amount = 0
-            system_users = [s for s in system_users if s.protocol == asset.protocol]
+            system_users = [s for s in system_users if asset.has_protocol(s.protocol)]
             fake_node.asset.system_users_granted = system_users
             fake_node.key = node.key + ':0'
             fake_nodes.append(fake_node)
@@ -391,7 +380,7 @@ class UserGrantedNodeChildrenApi(UserPermissionCacheMixin, ListAPIView):
                     fake_node = asset.as_node()
                     fake_node.assets_amount = 0
                     system_users = [s for s in system_users if
-                                    s.protocol == asset.protocol]
+                                    asset.has_protocol(s.protocol)]
                     fake_node.asset.system_users_granted = system_users
                     fake_node.key = node.key + ':0'
                     matched_assets.append(fake_node)
@@ -462,7 +451,7 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
 # RemoteApp permission
 
-class UserGrantedRemoteAppsApi(ChangeOrgIfNeedMixin, RemoteAppFilterMixin, ListAPIView):
+class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
     pagination_class = LimitOffsetPagination
@@ -487,7 +476,7 @@ class UserGrantedRemoteAppsApi(ChangeOrgIfNeedMixin, RemoteAppFilterMixin, ListA
         return super().get_permissions()
 
 
-class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
+class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
@@ -519,7 +508,7 @@ class UserGrantedRemoteAppsAsTreeApi(ChangeOrgIfNeedMixin, ListAPIView):
         return super().get_permissions()
 
 
-class ValidateUserRemoteAppPermissionApi(ChangeOrgIfNeedMixin, APIView):
+class ValidateUserRemoteAppPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):
@@ -533,5 +522,4 @@ class ValidateUserRemoteAppPermissionApi(ChangeOrgIfNeedMixin, APIView):
         remote_apps = util.get_remote_apps()
         if remote_app not in remote_apps:
             return Response({'msg': False}, status=403)
-
         return Response({'msg': True}, status=200)

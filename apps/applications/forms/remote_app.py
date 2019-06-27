@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django import forms
 
 from orgs.mixins import OrgModelForm
-from assets.models import Asset, SystemUser
+from assets.models import SystemUser, Protocol
 
 from ..models import RemoteApp
 from .. import const
@@ -89,7 +89,7 @@ class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
         super().__init__(*args, **kwargs)
         field_asset = self.fields['asset']
         field_asset.queryset = field_asset.queryset.filter(
-            protocol=Asset.PROTOCOL_RDP
+            protocols__name=Protocol.PROTOCOL_RDP
         )
         field_system_user = self.fields['system_user']
         field_system_user.queryset = field_system_user.queryset.filter(

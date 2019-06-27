@@ -1,0 +1,54 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+{% block modal_id %}mfa_auth_confirm{% endblock %}
+{% block modal_title%}{% trans "MFA confirm" %}{% endblock %}
+{% block modal_body %}
+<style>
+    .inmodal .modal-body {
+        background: #fff;
+    }
+</style>
+<form class="form-horizontal" action="" style="padding-top: 20px">
+<div class="form-group mfa-field">
+    <label for="mfa" class="col-sm-2 control-label">{% trans 'MFA' %}</label>
+    <div class="col-sm-8">
+        <input type="text" id="mfa" class="form-control input-sm" name="mfa">
+        <span id="mfa_error" class="help-block">{% trans "Need otp auth for view auth" %}</span>
+    </div>
+    <div class="col-sm-2">
+        <a class="btn btn-primary btn-sm btn-mfa">{% trans "Confirm" %}</a>
+    </div>
+</div>
+</form>
+<script>
+var codeError = "{% trans 'Code error' %}";
+
+$(document).ready(function () {
+}).on("click", ".btn-mfa", function () {
+    var url = "{% url 'api-auth:user-otp-verify' %}";
+    var data = {
+        code: $("#mfa").val()
+    };
+    var success = function () {
+        var now = new Date();
+        lastMFATime = now.getTime() / 1000;
+        $("#mfa_auth_confirm").modal("hide").trigger("success");
+    };
+    var error = function () {
+        $("#mfa_error").addClass("text-danger").html(codeError);
+    };
+    APIUpdateAttr({
+        url: url,
+        method: "POST",
+        body: JSON.stringify(data),
+        success: success,
+        flash_message: false,
+        error: error
+    })
+})
+</script>
+{% endblock %}
+{% block modal_button %}
+  <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+{% endblock %}

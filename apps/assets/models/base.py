@@ -6,6 +6,7 @@ from hashlib import md5
 
 import sshpubkeys
 from django.db import models
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -29,8 +30,8 @@ class AssetUser(OrgModelMixin):
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
     UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
@@ -39,6 +40,8 @@ class AssetUser(OrgModelMixin):
         (REACHABLE, _('Reachable')),
         (UNKNOWN, _("Unknown")),
     )
+    CONNECTIVITY_CACHE_KEY = "CONNECTIVITY_{}"
+    _prefer = "system_user"
 
     @property
     def password(self):
@@ -124,10 +127,21 @@ class AssetUser(OrgModelMixin):
     def get_auth(self, asset=None):
         pass
 
+    def get_connectivity_of(self, asset):
+        i = self.generate_id_with_asset(asset)
+        key = self.CONNECTIVITY_CACHE_KEY.format(i)
+        return cache.get(key)
+
+    def set_connectivity_of(self, asset, c):
+        i = self.generate_id_with_asset(asset)
+        key = self.CONNECTIVITY_CACHE_KEY.format(i)
+        cache.set(key, c, 3600)
+
     def load_specific_asset_auth(self, asset):
-        from ..backends.multi import AssetUserManager
+        from ..backends import AssetUserManager
         try:
-            other = AssetUserManager.get(username=self.username, asset=asset)
+            manager = AssetUserManager().prefer(self._prefer)
+            other = manager.get(username=self.username, asset=asset)
         except Exception as e:
             logger.error(e, exc_info=True)
         else:
@@ -158,6 +172,10 @@ class AssetUser(OrgModelMixin):
                       private_key=private_key,
                       public_key=public_key)
 
+    def auto_gen_auth_password(self):
+        password = str(uuid.uuid4())
+        self.set_auth(password=password)
+
     def _to_secret_json(self):
         """Push system user use it"""
         return {
@@ -167,6 +185,26 @@ class AssetUser(OrgModelMixin):
             'public_key': self.public_key,
             'private_key': self.private_key_file,
         }
+
+    def generate_id_with_asset(self, asset):
+        id_ = '{}_{}'.format(asset.id, self.id)
+        id_ = uuid.UUID(md5(id_.encode()).hexdigest())
+        return id_
+
+    def construct_to_authbook(self, asset):
+        from . import AuthBook
+        fields = [
+            'name', 'username', 'comment', 'org_id',
+            '_password', '_private_key', '_public_key',
+            'date_created', 'date_updated', 'created_by'
+        ]
+        id_ = self.generate_id_with_asset(asset)
+        obj = AuthBook(id=id_, asset=asset, version=0, is_latest=True)
+        obj._connectivity = self.get_connectivity_of(asset)
+        for field in fields:
+            value = getattr(self, field)
+            setattr(obj, field, value)
+        return obj
 
     class Meta:
         abstract = True

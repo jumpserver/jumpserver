@@ -7,6 +7,7 @@ from rest_framework import serializers
 from common.utils import get_signer, validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 
 signer = get_signer()
@@ -56,7 +57,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
         fields = ['id', 'groups']
 
 
-class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class UserGroupSerializer(BulkOrgResourceModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
         required=False, many=True, queryset=User.objects.all(), label=_('User')
     )

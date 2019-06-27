@@ -23,7 +23,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-8" style="padding-left: 0;">
+                        <div class="col-sm-9" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span style="float: left">{% trans 'Asset list of ' %} <b>{{ admin_user.name }}</b></span>
@@ -42,23 +42,11 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-striped table-bordered table-hover" id="asset_list_table">
-                                        <thead>
-                                            <tr>
-                                                <th>{% trans 'Hostname' %}</th>
-                                                <th>{% trans 'IP' %}</th>
-                                                <th>{% trans 'Port' %}</th>
-                                                <th>{% trans 'Reachable' %}</th>
-                                                <th>{% trans 'Action' %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
+                                    {% include 'assets/_asset_user_list.html' %}
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-3" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -84,64 +72,14 @@
             </div>
         </div>
     </div>
-   {% include 'assets/_asset_user_auth_modal.html' %}
-   {% include 'assets/_asset_user_view_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
 
-function initTable() {
-    var reachable = {{ admin_user.REACHABLE }};
-    var unreachable = {{ admin_user.UNREACHABLE }};
-    var options = {
-		ele: $('#asset_list_table'),
-		buttons: [],
-		order: [],
-		columnDefs: [
-			{targets: 0, createdCell: function (td, cellData, rowData) {
-			    cellData = htmlEscape(cellData);
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-			}},
-			{targets: 3, createdCell: function (td, cellData) {
-				if (cellData === unreachable) {
-					$(td).html('<i class="fa fa-times text-danger"></i>')
-				} else if (cellData === reachable) {
-					$(td).html('<i class="fa fa-check text-navy"></i>')
-				} else {
-                    $(td).html('')
-                }
-			}},
-            {targets: 4, createdCell: function (td, cellData, rowData) {
-                var btn = ' <a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "Update auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-aid="{{ DEFAULT_PK }}" data-hostname="hostname777">{% trans "View auth" %}</a>'.replace("{{ DEFAULT_PK }}", cellData).replace("hostname777", rowData.hostname);
-                var test_btn = ' <a class="btn btn-xs btn-info btn-test-asset" data-uid="{{ DEFAULT_PK }}" >{% trans "Test" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                btn += view_btn;
-                btn += test_btn;
-                $(td).html(btn);
-			}}
-        ],
-
-		ajax_url: '{% url "api-assets:admin-user-assets" pk=admin_user.id %}',
-		columns: [
-		    {data: "hostname" }, {data: "ip" },
-            {data: "port" },  {data: "connectivity" }, {data: "id"}],
-		op_html: $('#actions').html()
-	};
-	jumpserver.initServerSideDataTable(options);
-}
-
-function initAssetUserAuthModalForm(hostname, username){
-    $('#id_hostname_p').html(hostname);
-    $('#id_username_p').html(username);
-    $('#id_password').parent().removeClass('has-error');
-    $('#id_password').val('');
-}
-
-var assetId ;
-
 $(document).ready(function () {
-	initTable();
+	assetUserListUrl = setUrlParam(assetUserListUrl, "admin_user_id", "{{ admin_user.id }}");
+    prefer = "admin_user";
+    initAssetUserTable();
 })
 .on('click', '.btn-test-asset', function () {
     var asset_id = $(this).data('uid');
@@ -173,37 +111,10 @@ $(document).ready(function () {
     });
 })
 .on('click', '.btn-update-asset-user-auth', function() {
-    assetId = $(this).data('aid');
-    var hostname = $(this).data('hostname');
-    var username = '{{ admin_user.username }}';
-    initAssetUserAuthModalForm(hostname, username);
-    $("#asset_user_auth_modal").modal();
-})
-.on('click', '#btn_asset_user_auth_modal_confirm', function(){
-    var password = $('#id_password').val();
-    if (password){
-        var data = {
-            'name': "{{ admin_user.username }}",
-            'asset': assetId,
-            'username': "{{ admin_user.username }}",
-            'password': password
-        };
-        formSubmit({
-            data: data,
-            url: "{% url 'api-assets:asset-user-list' %}",
-            method: 'POST',
-            success: function () {
-                toastr.success("{% trans 'Update successfully!' %}");
-            },
-            error: function () {
-                toastr.error("{% trans 'Update failed!' %}");
-            }
-        });
-        $("#asset_user_auth_modal").modal('hide');
-    }
-    else{
-        $('#id_password').parent().addClass('has-error');
-    }
+    asset_id = $(this).data('aid');
+    hostname = $(this).data('hostname');
+    username = '{{ admin_user.username }}';
+    $("#asset_user_auth_update_modal").modal();
 })
 .on("click", ".btn-view-auth", function (evt) {
     asset_id = $(this).data("aid") ;

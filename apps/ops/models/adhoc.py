@@ -220,6 +220,7 @@ class AdHoc(models.Model):
         time_start = time.time()
         try:
             date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            history.date_start = date_start
             print(_("{} Start task: {}").format(date_start, self.task.name))
             raw, summary = self._run_only()
             date_end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

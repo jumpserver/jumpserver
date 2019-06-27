@@ -454,3 +454,15 @@ div.dataTables_wrapper div.dataTables_filter {
 #tree-refresh .fa-refresh {
     font: normal normal normal 14px/1 FontAwesome !important;
 }
+
+.select2-selection__rendered span.select2-selection, .select2-container .select2-selection--single, .select2-selection__arrow {
+    height: 34px !important;
+}
+
+.select2-selection {
+    border-radius: 0 !important;
+}
+
+span.select2-selection__placeholder {
+    line-height: 34px !important;
+}

@@ -3,6 +3,8 @@
 
 from rest_framework import serializers
 
+from common.serializers import AdaptedBulkListSerializer
+from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import RemoteAppPermission
 
 
@@ -13,13 +15,14 @@ __all__ = [
 ]
 
 
-class RemoteAppPermissionSerializer(serializers.ModelSerializer):
+class RemoteAppPermissionSerializer(BulkOrgResourceModelSerializer):
     class Meta:
         model = RemoteAppPermission
+        list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'users', 'user_groups', 'remote_apps', 'comment',
             'is_active', 'date_start', 'date_expired', 'is_valid',
-            'created_by', 'date_created', 'org_id'
+            'created_by', 'date_created',
         ]
         read_only_fields = ['created_by', 'date_created']
 

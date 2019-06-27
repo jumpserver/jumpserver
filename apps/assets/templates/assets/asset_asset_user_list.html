@@ -37,20 +37,7 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-hover" id="asset_user_list">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                                            <th class="text-center">{% trans 'Username' %}</th>
-                                            <th class="text-center">{% trans 'Password version' %}</th>
-                                            <th class="text-center">{% trans 'Reachable' %}</th>
-                                            <th class="text-center">{% trans 'Date updated' %}</th>
-                                            <th class="text-center">{% trans 'Action' %}</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
+                                    {% include 'assets/_asset_user_list.html' %}
                                 </div>
                             </div>
                         </div>
@@ -62,7 +49,7 @@
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        {% if asset.protocol == 'ssh' %}
+                                        {% if asset.is_support_ansible %}
                                             <tr class="no-borders-tr">
                                                 <td>{% trans 'Test connective' %}:</td>
                                                 <td>
@@ -82,110 +69,14 @@
             </div>
         </div>
     </div>
-    {% include 'assets/_asset_user_auth_modal.html' %}
-    {% include 'assets/_asset_user_view_auth_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function initAssetUserAuthModalForm(hostname){
-    $('#id_hostname_p').html(hostname);
-    $('#id_username_p').html(username);
-    $('#id_password').parent().removeClass('has-error');
-    $('#id_password').val('');
-}
-function initAssetUserTable() {
-    var reachable = {{ asset.admin_user.REACHABLE }};
-    var unreachable = {{ asset.admin_user.UNREACHABLE }};
-    var options = {
-        ele: $('#asset_user_list'),
-        buttons: [],
-        order: [],
-        columnDefs: [
-            {targets: 3, createdCell: function (td, cellData) {
-                if (cellData === unreachable) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else if (cellData === reachable) {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
-                } else {
-                    $(td).html('')
-                }
-            }},
-            {targets: 4, createdCell: function (td, cellData) {
-                $(td).html(cellData.slice(0, -6));
-            }},
-            {targets: 5, createdCell: function (td, cellData) {
-                var btn = '<a class="btn btn-xs btn-primary btn-update-asset-user-auth" data-username="DEFAULT_USERNAME">{% trans "Update auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
-                var view_btn = ' <a class="btn btn-xs btn-primary btn-view-auth" data-username="DEFAULT_USERNAME">{% trans "View auth" %}</a>'.replace("DEFAULT_USERNAME", cellData);
-                var test_btn = ' <a class="btn btn-xs btn-info btn-test-connective" data-username="DEFAULT_USERNAME">{% trans "Test" %}</a>'.replace("DEFAULT_USERNAME", cellData);
-                btn += view_btn;
-                {% if asset.protocol == 'ssh' %}
-                    btn += test_btn;
-                {% endif %}
-                $(td).html(btn);
-
-            }}
-        ],
-        ajax_url: '{% url "api-assets:asset-user-list" %}' + '?asset_id={{ asset.id }}',
-        columns: [
-            {data: function (){return ''}}, {data: "username" },
-            {data: "version"}, {data: "connectivity"}, {data: "date_updated"},
-            {data: "username", orderable: false}
-        ],
-        op_html: $('#actions').html()
-    };
-    jumpserver.initDataTable(options);
-}
-var username;
 $(document).ready(function () {
-    initAssetUserTable();
+    assetUserListUrl = setUrlParam(assetUserListUrl, "asset_id", "{{ asset.id }}");
+    initAssetUserTable()
 })
-.on('click', '.btn-update-asset-user-auth', function() {
-    username = $(this).data('username');
-    var hostname = "{{ asset.hostname }}";
-    initAssetUserAuthModalForm(hostname, username);
-    $("#asset_user_auth_modal").modal();
-})
-.on('click', '#btn_asset_user_auth_modal_confirm', function(){
-    var password = $('#id_password').val();
-    if (password){
-        var data = {
-            'name': username,
-            'asset': "{{ asset.id }}",
-            'username': username,
-            'password': password
-        };
-        formSubmit({
-            data: data,
-            url: "{% url 'api-assets:asset-user-list' %}",
-            method: 'POST',
-            success: function () {
-                toastr.success("{% trans 'Update successfully!' %}");
-            },
-            error: function () {
-                toastr.error("{% trans 'Update failed!' %}");
-            }
-        });
-        $("#asset_user_auth_modal").modal('hide');
-    }
-    else{
-        $('#id_password').parent().addClass('has-error');
-    }
-})
-.on('click', '.btn-test-connective', function () {
-    var username = $(this).data('username');
-    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}" + "&username=" + username;
-    var success = function (data) {
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600,left=400,top=400')
-    };
-    APIUpdateAttr({
-        url: the_url,
-        method: 'GET',
-        success: success,
-        flash_message: false
-    });
-})
+
 .on('click', '#btn-bulk-test-connective', function () {
     var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}";
     var success = function (data) {
@@ -199,12 +90,6 @@ $(document).ready(function () {
         success: success,
         flash_message: false
     });
-})
-.on("click", ".btn-view-auth", function (evt) {
-    asset_id = "{{ asset.id }}" ;
-    host = "{{ asset.hostname }}";
-    username = $(this).data("username");
-    $("#asset_user_auth_view").modal();
 })
 </script>
 {% endblock %}

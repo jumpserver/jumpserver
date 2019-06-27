@@ -8,11 +8,12 @@ from common.serializers import AdaptedBulkListSerializer
 
 from ..models import Node, AdminUser
 from ..const import ADMIN_USER_CONN_CACHE_KEY
+from orgs.mixins import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializer
 
 
-class AdminUserSerializer(serializers.ModelSerializer):
+class AdminUserSerializer(BulkOrgResourceModelSerializer):
     """
     管理用户
     """
@@ -27,7 +28,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = [
-            'id', 'org_id', 'name', 'username', 'assets_amount',
+            'id', 'name', 'username', 'assets_amount',
             'reachable_amount', 'unreachable_amount', 'password', 'comment',
             'date_created', 'date_updated', 'become', 'become_method',
             'become_user', 'created_by',

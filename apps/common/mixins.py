@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
@@ -203,3 +204,31 @@ class DatetimeSearchMixin:
     def get(self, request, *args, **kwargs):
         self.get_date_range()
         return super().get(request, *args, **kwargs)
+
+
+class ApiMessageMixin:
+    success_message = _("%(name)s was %(action)s successfully")
+    _action_map = {"create": _("create"), "update": _("update")}
+
+    def get_success_message(self, cleaned_data):
+        if not isinstance(cleaned_data, dict):
+            return ''
+        data = {k: v for k, v in cleaned_data.items()}
+        action = getattr(self, "action", "create")
+        data["action"] = self._action_map.get(action)
+        try:
+            message = self.success_message % data
+        except:
+            message = ''
+        return message
+
+    def dispatch(self, request, *args, **kwargs):
+        resp = super().dispatch(request, *args, **kwargs)
+        if request.method.lower() in ("get", "delete", "patch"):
+            return resp
+        if resp.status_code >= 400:
+            return resp
+        message = self.get_success_message(resp.data)
+        if message:
+            messages.success(request, message)
+        return resp
