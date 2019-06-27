@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
-from .views import IndexView, LunaView, I18NView
+from .views import IndexView, LunaView, I18NView, HealthCheckView
 from .swagger import get_swagger_view
 
 api_v1 = [
@@ -63,6 +63,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('', include(api_v2_patterns)),
     path('', include(api_v1_patterns)),
+    path('api/health/', HealthCheckView.as_view(), name="health"),
     path('luna/', LunaView.as_view(), name='luna-view'),
     path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),

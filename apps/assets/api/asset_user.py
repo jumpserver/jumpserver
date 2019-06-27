@@ -148,6 +148,7 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
     Test asset users connective
     """
     permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.TaskIDSerializer
 
     def get_asset_users(self):
         username = self.request.GET.get('username')

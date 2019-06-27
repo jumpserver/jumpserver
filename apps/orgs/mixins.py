@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+import traceback
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import redirect, get_object_or_404
@@ -33,8 +33,8 @@ class OrgManager(models.Manager):
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
         kwargs = {}
-        _current_org = get_current_org()
 
+        _current_org = get_current_org()
         if _current_org is None:
             kwargs['id'] = None
         elif _current_org.is_real():
@@ -42,12 +42,17 @@ class OrgManager(models.Manager):
         elif _current_org.is_default():
             queryset = queryset.filter(org_id="")
 
+        # lines = traceback.format_stack()
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        # for line in lines[-10:-5]:
+        #     print(line)
+        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
         queryset = queryset.filter(**kwargs)
         return queryset
 
     def all(self):
-        _current_org = get_current_org()
-        if _current_org is None:
+        if not current_org:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
             return self
         else:

@@ -46,12 +46,6 @@ class AssetQuerySet(models.QuerySet):
         return self.active()
 
 
-class AssetManager(OrgManager):
-    def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related("nodes", "protocols")
-        return queryset
-
-
 class Protocol(models.Model):
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
@@ -131,7 +125,7 @@ class Asset(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = AssetManager.from_queryset(AssetQuerySet)()
+    objects = OrgManager.from_queryset(AssetQuerySet)()
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -300,15 +294,20 @@ class Asset(OrgModelMixin):
     @classmethod
     def generate_fake(cls, count=100):
         from random import seed, choice
-        import forgery_py
         from django.db import IntegrityError
         from .node import Node
+        from orgs.utils import get_current_org
+        from orgs.models import Organization
+        org = get_current_org()
+        if not org or not org.is_real():
+            Organization.default().change_to()
+
         nodes = list(Node.objects.all())
         seed()
         for i in range(count):
             ip = [str(i) for i in random.sample(range(255), 4)]
             asset = cls(ip='.'.join(ip),
-                        hostname=forgery_py.internet.user_name(True),
+                        hostname='.'.join(ip),
                         admin_user=choice(AdminUser.objects.all()),
                         created_by='Fake')
             try:

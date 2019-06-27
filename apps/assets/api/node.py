@@ -26,6 +26,7 @@ from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
 from .. import serializers
+from ..utils import NodeUtil
 
 
 logger = get_logger(__file__)
@@ -79,12 +80,10 @@ class NodeListAsTreeApi(generics.ListAPIView):
     serializer_class = TreeNodeSerializer
 
     def get_queryset(self):
-        queryset = [node.as_tree_node() for node in Node.objects.all()]
-        return queryset
-
-    def filter_queryset(self, queryset):
-        if self.request.query_params.get('refresh', '0') == '1':
-            queryset = self.refresh_nodes(queryset)
+        queryset = Node.objects.all()
+        util = NodeUtil()
+        nodes = util.get_nodes_by_queryset(queryset)
+        queryset = [node.as_tree_node() for node in nodes]
         return queryset
 
     @staticmethod
@@ -114,15 +113,11 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
 
     def get_queryset(self):
         node_key = self.request.query_params.get('key')
-        if node_key:
-            self.node = Node.objects.get(key=node_key)
-            queryset = self.node.get_children(with_self=False)
-        else:
-            self.is_root = True
-            self.node = Node.root()
-            queryset = list(self.node.get_children(with_self=True))
-            nodes_invalid = Node.objects.exclude(key__startswith=self.node.key)
-            queryset.extend(list(nodes_invalid))
+        util = NodeUtil()
+        if not node_key:
+            node_key = Node.root().key
+        self.node = util.get_node_by_key(node_key)
+        queryset = self.node.get_children(with_self=True)
         queryset = [node.as_tree_node() for node in queryset]
         queryset = sorted(queryset)
         return queryset

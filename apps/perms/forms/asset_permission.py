@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from perms.models import AssetPermission
-from assets.models import Asset
+from assets.models import Asset, Node
 
 __all__ = [
     'AssetPermissionForm',

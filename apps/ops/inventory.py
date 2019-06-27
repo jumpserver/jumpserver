@@ -2,7 +2,6 @@
 #
 
 from .ansible.inventory import BaseInventory
-from assets.utils import get_assets_by_id_list, get_system_user_by_id
 
 from common.utils import get_logger
 

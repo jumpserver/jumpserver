@@ -258,7 +258,9 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
             util.filter_permissions(
                 system_users=self.system_user_id
             )
+        print("111111111111")
         nodes = util.get_nodes_with_assets()
+        print("22222222222222")
         for node, assets in nodes.items():
             data = parse_node_to_tree_node(node)
             queryset.append(data)

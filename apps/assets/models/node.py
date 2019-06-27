@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+import re
 
 from django.db import models, transaction
 from django.db.models import Q
@@ -15,54 +16,185 @@ from orgs.models import Organization
 __all__ = ['Node']
 
 
-class Node(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
-    value = models.CharField(max_length=128, verbose_name=_("Value"))
-    child_mark = models.IntegerField(default=0)
-    date_create = models.DateTimeField(auto_now_add=True)
-
+class FamilyMixin:
+    _parents = None
+    _children = None
+    _all_children = None
     is_node = True
-    _assets_amount = None
-    _full_value_cache_key = '_NODE_VALUE_{}'
-    _assets_amount_cache_key = '_NODE_ASSETS_AMOUNT_{}'
-
-    class Meta:
-        verbose_name = _("Node")
-        ordering = ['key']
-
-    def __str__(self):
-        return self.full_value
-
-    def __eq__(self, other):
-        if not other:
-            return False
-        return self.id == other.id
-
-    def __gt__(self, other):
-        if self.is_root() and not other.is_root():
-            return True
-        elif not self.is_root() and other.is_root():
-            return False
-        self_key = [int(k) for k in self.key.split(':')]
-        other_key = [int(k) for k in other.key.split(':')]
-        self_parent_key = self_key[:-1]
-        other_parent_key = other_key[:-1]
-
-        if self_parent_key == other_parent_key:
-            return self.name > other.name
-        if len(self_parent_key) < len(other_parent_key):
-            return True
-        elif len(self_parent_key) > len(other_parent_key):
-            return False
-        return self_key > other_key
-
-    def __lt__(self, other):
-        return not self.__gt__(other)
 
     @property
-    def name(self):
-        return self.value
+    def children(self):
+        if self._children:
+            return self._children
+        pattern = r'^{0}:[0-9]+$'.format(self.key)
+        return Node.objects.filter(key__regex=pattern)
+
+    @children.setter
+    def children(self, value):
+        self._children = value
+
+    @property
+    def all_children(self):
+        if self._all_children:
+            return self._all_children
+        pattern = r'^{0}:'.format(self.key)
+        return Node.objects.filter(
+            key__regex=pattern
+        )
+
+    def get_children(self, with_self=False):
+        children = list(self.children)
+        if with_self:
+            children.append(self)
+        return children
+
+    def get_all_children(self, with_self=False):
+        children = self.all_children
+        if with_self:
+            children = list(children)
+            children.append(self)
+        return children
+
+    @property
+    def parents(self):
+        if self._parents:
+            return self._parents
+        ancestor_keys = self.get_ancestor_keys()
+        ancestor = Node.objects.filter(
+            key__in=ancestor_keys
+        ).order_by('key')
+        return ancestor
+
+    @parents.setter
+    def parents(self, value):
+        self._parents = value
+
+    def get_ancestor(self, with_self=False):
+        parents = self.parents
+        if with_self:
+            parents = list(parents)
+            parents.append(self)
+        return parents
+
+    @property
+    def parent(self):
+        if self._parents:
+            return self._parents[0]
+        if self.is_root():
+            return self
+        try:
+            parent = Node.objects.get(key=self.parent_key)
+            return parent
+        except Node.DoesNotExist:
+            return Node.root()
+
+    @parent.setter
+    def parent(self, parent):
+        if not self.is_node:
+            self.key = parent.key + ':fake'
+            return
+        children = self.get_all_children()
+        old_key = self.key
+        with transaction.atomic():
+            self.key = parent.get_next_child_key()
+            for child in children:
+                child.key = child.key.replace(old_key, self.key, 1)
+                child.save()
+            self.save()
+
+    def get_sibling(self, with_self=False):
+        key = ':'.join(self.key.split(':')[:-1])
+        pattern = r'^{}:[0-9]+$'.format(key)
+        sibling = Node.objects.filter(
+            key__regex=pattern.format(self.key)
+        )
+        if not with_self:
+            sibling = sibling.exclude(key=self.key)
+        return sibling
+
+    def get_family(self):
+        ancestor = self.get_ancestor()
+        children = self.get_all_children()
+        return [*tuple(ancestor), self, *tuple(children)]
+
+    def get_ancestor_keys(self, with_self=False):
+        parent_keys = []
+        key_list = self.key.split(":")
+        if not with_self:
+            key_list.pop()
+        for i in range(len(key_list)):
+            parent_keys.append(":".join(key_list))
+            key_list.pop()
+        return parent_keys
+
+    def is_children(self, other):
+        pattern = re.compile(r'^{0}:[0-9]+$'.format(self.key))
+        return pattern.match(other.key)
+
+    def is_parent(self, other):
+        pattern = re.compile(r'^{0}:[0-9]+$'.format(other.key))
+        return pattern.match(self.key)
+
+    @property
+    def parent_key(self):
+        parent_key = ":".join(self.key.split(":")[:-1])
+        return parent_key
+
+    @property
+    def parents_keys(self, with_self=False):
+        keys = []
+        key_list = self.key.split(":")
+        if not with_self:
+            key_list.pop()
+        for i in range(len(key_list)):
+            keys.append(':'.join(key_list))
+            key_list.pop()
+        return keys
+
+
+class FullValueMixin:
+    _full_value_cache_key = '_NODE_VALUE_{}'
+    _full_value = ''
+    key = ''
+
+    @property
+    def full_value(self):
+        if self._full_value:
+            return self._full_value
+        key = self._full_value_cache_key.format(self.key)
+        cached = cache.get(key)
+        if cached:
+            return cached
+        if self.is_root():
+            return self.value
+        parent_full_value = self.parent.full_value
+        value = parent_full_value + ' / ' + self.value
+        self.full_value = value
+        return value
+
+    @full_value.setter
+    def full_value(self, value):
+        self._full_value = value
+        key = self._full_value_cache_key.format(self.key)
+        cache.set(key, value, 3600*24)
+
+    def expire_full_value(self):
+        key = self._full_value_cache_key.format(self.key)
+        cache.delete_pattern(key+'*')
+
+    @classmethod
+    def expire_nodes_full_value(cls, nodes=None):
+        key = cls._full_value_cache_key.format('*')
+        cache.delete_pattern(key+'*')
+        from ..utils import NodeUtil
+        util = NodeUtil()
+        util.set_full_value()
+
+
+class AssetsAmountMixin:
+    _assets_amount_cache_key = '_NODE_ASSETS_AMOUNT_{}'
+    _assets_amount = None
+    key = ''
 
     @property
     def assets_amount(self):
@@ -77,53 +209,77 @@ class Node(OrgModelMixin):
         if cached is not None:
             return cached
         assets_amount = self.get_all_assets().count()
-        cache.set(cache_key, assets_amount, 3600)
+        self.assets_amount = assets_amount
         return assets_amount
 
     @assets_amount.setter
     def assets_amount(self, value):
         self._assets_amount = value
+        cache_key = self._assets_amount_cache_key.format(self.key)
+        cache.set(cache_key, value, 3600 * 24)
 
     def expire_assets_amount(self):
         ancestor_keys = self.get_ancestor_keys(with_self=True)
-        cache_keys = [self._assets_amount_cache_key.format(k) for k in ancestor_keys]
+        cache_keys = [self._assets_amount_cache_key.format(k) for k in
+                      ancestor_keys]
         cache.delete_many(cache_keys)
 
     @classmethod
     def expire_nodes_assets_amount(cls, nodes=None):
-        if nodes:
-            for node in nodes:
-                node.expire_assets_amount()
-            return
+        from ..utils import NodeUtil
         key = cls._assets_amount_cache_key.format('*')
         cache.delete_pattern(key)
+        util = NodeUtil(with_assets_amount=True)
+        util.set_assets_amount()
+
+
+class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
+    value = models.CharField(max_length=128, verbose_name=_("Value"))
+    child_mark = models.IntegerField(default=0)
+    date_create = models.DateTimeField(auto_now_add=True)
+
+    is_node = True
+    _parents = None
+
+    class Meta:
+        verbose_name = _("Node")
+        ordering = ['key']
+
+    def __str__(self):
+        return self.full_value
+
+    def __eq__(self, other):
+        if not other:
+            return False
+        return self.id == other.id
+
+    def __gt__(self, other):
+        # if self.is_root() and not other.is_root():
+        #     return False
+        # elif not self.is_root() and other.is_root():
+        #     return True
+        self_key = [int(k) for k in self.key.split(':')]
+        other_key = [int(k) for k in other.key.split(':')]
+        self_parent_key = self_key[:-1]
+        other_parent_key = other_key[:-1]
+
+        if self_parent_key and other_parent_key and \
+                self_parent_key == other_parent_key:
+            return self.value > other.value
+        # if len(self_parent_key) < len(other_parent_key):
+        #     return True
+        # elif len(self_parent_key) > len(other_parent_key):
+        #     return False
+        return self_key > other_key
+
+    def __lt__(self, other):
+        return not self.__gt__(other)
 
     @property
-    def full_value(self):
-        key = self._full_value_cache_key.format(self.key)
-        cached = cache.get(key)
-        if cached:
-            return cached
-        if self.is_root():
-            return self.value
-        parent_full_value = self.parent.full_value
-        value = parent_full_value + ' / ' + self.value
-        key = self._full_value_cache_key.format(self.key)
-        cache.set(key, value, 3600)
-        return value
-
-    def expire_full_value(self):
-        key = self._full_value_cache_key.format(self.key)
-        cache.delete_pattern(key+'*')
-
-    @classmethod
-    def expire_nodes_full_value(cls, nodes=None):
-        if nodes:
-            for node in nodes:
-                node.expire_full_value()
-            return
-        key = cls._full_value_cache_key.format('*')
-        cache.delete_pattern(key+'*')
+    def name(self):
+        return self.value
 
     @property
     def level(self):
@@ -151,33 +307,6 @@ class Node(OrgModelMixin):
             child_key = self.get_next_child_key()
             child = self.__class__.objects.create(id=_id, key=child_key, value=value)
             return child
-
-    def get_children(self, with_self=False):
-        pattern = r'^{0}$|^{0}:[0-9]+$' if with_self else r'^{0}:[0-9]+$'
-        return self.__class__.objects.filter(
-            key__regex=pattern.format(self.key)
-        )
-
-    def get_all_children(self, with_self=False):
-        pattern = r'^{0}$|^{0}:' if with_self else r'^{0}:'
-        return self.__class__.objects.filter(
-            key__regex=pattern.format(self.key)
-        )
-
-    def get_sibling(self, with_self=False):
-        key = ':'.join(self.key.split(':')[:-1])
-        pattern = r'^{}:[0-9]+$'.format(key)
-        sibling = self.__class__.objects.filter(
-            key__regex=pattern.format(self.key)
-        )
-        if not with_self:
-            sibling = sibling.exclude(key=self.key)
-        return sibling
-
-    def get_family(self):
-        ancestor = self.get_ancestor()
-        children = self.get_all_children()
-        return [*tuple(ancestor), self, *tuple(children)]
 
     def get_assets(self):
         from .asset import Asset
@@ -213,52 +342,6 @@ class Node(OrgModelMixin):
             return True
         else:
             return False
-
-    @property
-    def parent_key(self):
-        parent_key = ":".join(self.key.split(":")[:-1])
-        return parent_key
-
-    @property
-    def parent(self):
-        if self.is_root():
-            return self
-        try:
-            parent = self.__class__.objects.get(key=self.parent_key)
-            return parent
-        except Node.DoesNotExist:
-            return self.__class__.root()
-
-    @parent.setter
-    def parent(self, parent):
-        if not self.is_node:
-            self.key = parent.key + ':fake'
-            return
-        children = self.get_all_children()
-        old_key = self.key
-        with transaction.atomic():
-            self.key = parent.get_next_child_key()
-            for child in children:
-                child.key = child.key.replace(old_key, self.key, 1)
-                child.save()
-            self.save()
-
-    def get_ancestor_keys(self, with_self=False):
-        parent_keys = []
-        key_list = self.key.split(":")
-        if not with_self:
-            key_list.pop()
-        for i in range(len(key_list)):
-            parent_keys.append(":".join(key_list))
-            key_list.pop()
-        return parent_keys
-
-    def get_ancestor(self, with_self=False):
-        ancestor_keys = self.get_ancestor_keys(with_self=with_self)
-        ancestor = self.__class__.objects.filter(
-            key__in=ancestor_keys
-        ).order_by('key')
-        return ancestor
 
     @classmethod
     def create_root_node(cls):
@@ -311,8 +394,18 @@ class Node(OrgModelMixin):
         return tree_node
 
     @classmethod
+    def get_queryset(cls):
+        from ..utils import NodeUtil
+        util = NodeUtil()
+        return util.nodes
+
+    @classmethod
     def generate_fake(cls, count=100):
         import random
+        org = get_current_org()
+        if not org or not org.is_real():
+            Organization.default().change_to()
+
         for i in range(count):
             node = random.choice(cls.objects.all())
             node.create_child('Node {}'.format(i))

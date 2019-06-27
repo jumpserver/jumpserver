@@ -4,6 +4,7 @@ import uuid
 from collections import defaultdict
 import json
 from hashlib import md5
+import time
 
 from django.utils import timezone
 from django.db.models import Q
@@ -17,6 +18,7 @@ from common.tree import TreeNode
 from .. import const
 from ..models import AssetPermission, Action
 from ..hands import Node
+from assets.utils import NodeUtil
 
 logger = get_logger(__file__)
 
@@ -35,9 +37,8 @@ class GenerateTree:
             "asset_instance": set("system_user")
         }
         """
-        self.__all_nodes = list(Node.objects.all())
+        self.node_util = NodeUtil()
         self.nodes = defaultdict(dict)
-        self.direct_nodes = []
         self._root_node = None
         self._ungroup_node = None
 
@@ -48,10 +49,8 @@ class GenerateTree:
         all_nodes = self.nodes.keys()
         # 如果没有授权节点，就放到默认的根节点下
         if not all_nodes:
-            root_node = Node.root()
-            self.add_node(root_node)
-        else:
-            root_node = max(all_nodes)
+            return None
+        root_node = min(all_nodes)
         self._root_node = root_node
         return root_node
 
@@ -60,7 +59,10 @@ class GenerateTree:
         if self._ungroup_node:
             return self._ungroup_node
         node_id = const.UNGROUPED_NODE_ID
-        node_key = self.root_node.get_next_child_key()
+        if self.root_node:
+            node_key = self.root_node.get_next_child_key()
+        else:
+            node_key = '0:0'
         node_value = _("Default")
         node = Node(id=node_id, key=node_key, value=node_value)
         self.add_node(node)
@@ -69,11 +71,11 @@ class GenerateTree:
 
     def add_asset(self, asset, system_users):
         nodes = asset.nodes.all()
-        in_nodes = set(self.direct_nodes) & set(nodes)
-        for node in in_nodes:
-            self.nodes[node][asset].update(system_users)
-        if not in_nodes:
-            self.nodes[self.ungrouped_node][asset].update(system_users)
+        for node in nodes:
+            if node in self.nodes:
+                self.nodes[node][asset].update(system_users)
+            else:
+                self.nodes[self.ungrouped_node][asset].update(system_users)
 
     def get_nodes(self):
         for node in self.nodes:
@@ -84,26 +86,14 @@ class GenerateTree:
             node.assets_amount = len(assets)
         return self.nodes
 
-    # 添加节点时，追溯到根节点
     def add_node(self, node):
-        if node in self.nodes:
-            return
-        else:
-            self.nodes[node] = defaultdict(set)
-        if node.is_root():
-            return
-        for n in self.__all_nodes:
-            if n.key == node.parent_key:
-                self.add_node(n)
-                break
+        self.nodes[node] = defaultdict(set)
 
     # 添加树节点
     def add_nodes(self, nodes):
-        for node in nodes:
+        need_nodes = self.node_util.get_family(nodes, with_children=True)
+        for node in need_nodes:
             self.add_node(node)
-            self.add_nodes(node.get_all_children(with_self=False))
-            # 如果是直接授权的节点，则放到direct_nodes中
-            self.direct_nodes.append(node)
 
 
 def get_user_permissions(user, include_group=True):
@@ -140,34 +130,27 @@ def get_system_user_permissions(system_user):
     )
 
 
-class AssetPermissionUtil:
-    get_permissions_map = {
-        "User": get_user_permissions,
-        "UserGroup": get_user_group_permissions,
-        "Asset": get_asset_permissions,
-        "Node": get_node_permissions,
-        "SystemUser": get_system_user_permissions,
-    }
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        logger.debug("Start call: {}".format(func.__name__))
+        now = time.time()
+        result = func(*args, **kwargs)
+        using = time.time() - now
+        logger.debug("Call {} end, using: {:.2}".format(func.__name__, using))
+        return result
+    return wrapper
 
+
+class AssetGranted:
+    def __init__(self):
+        self.system_users = {}
+
+
+class AssetPermissionCacheMixin:
     CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
     CACHE_META_KEY_PREFIX = '_ASSET_PERM_META_KEY_'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
-
-    def __init__(self, obj, cache_policy='0'):
-        self.object = obj
-        self.obj_id = str(obj.id)
-        self._permissions = None
-        self._permissions_id = None  # 标记_permission的唯一值
-        self._assets = None
-        self._filter_id = 'None'  # 当通过filter更改 permission是标记
-        self.cache_policy = cache_policy
-        self.tree = GenerateTree()
-        self.change_org_if_need()
-
-    @staticmethod
-    def change_org_if_need():
-        set_to_root_org()
 
     @classmethod
     def is_not_using_cache(cls, cache_policy):
@@ -190,94 +173,7 @@ class AssetPermissionUtil:
     def _is_refresh_cache(self):
         return self.is_refresh_cache(self.cache_policy)
 
-    @property
-    def permissions(self):
-        if self._permissions:
-            return self._permissions
-        object_cls = self.object.__class__.__name__
-        func = self.get_permissions_map[object_cls]
-        permissions = func(self.object)
-        self._permissions = permissions
-        return permissions
-
-    def filter_permissions(self, **filters):
-        filters_json = json.dumps(filters, sort_keys=True)
-        self._permissions = self.permissions.filter(**filters)
-        self._filter_id = md5(filters_json.encode()).hexdigest()
-
-    @staticmethod
-    def _structured_system_user(system_users, actions):
-        """
-        结构化系统用户
-        :param system_users:
-        :param actions:
-        :return: {system_user1: {'actions': set(), }, }
-        """
-        _attr = {'actions': set(actions)}
-        _system_users = {system_user: _attr for system_user in system_users}
-        return _system_users
-
-    def get_nodes_direct(self):
-        """
-        返回用户/组授权规则直接关联的节点
-        :return: {asset1: {system_user1: {'actions': set()},}}
-        """
-        nodes = defaultdict(dict)
-        permissions = self.permissions.prefetch_related('nodes', 'system_users')
-        for perm in permissions:
-            actions = perm.actions.all()
-            self.tree.add_nodes(perm.nodes.all())
-            for node in perm.nodes.all():
-                system_users = perm.system_users.all()
-                system_users = self._structured_system_user(system_users, actions)
-                nodes[node].update(system_users)
-        return nodes
-
-    def get_assets_direct(self):
-        """
-
-        返回用户授权规则直接关联的资产
-        :return: {asset1: {system_user1: {'actions': set()},}}
-        """
-        assets = defaultdict(dict)
-        permissions = self.permissions.prefetch_related('assets', 'system_users')
-        for perm in permissions:
-            actions = perm.actions.all()
-            for asset in perm.assets.all().valid().prefetch_related('nodes'):
-                system_users = perm.system_users.filter(protocol__in=asset.protocols_name)
-                system_users = self._structured_system_user(system_users, actions)
-                assets[asset].update(system_users)
-        return assets
-
-    def get_assets_without_cache(self):
-        """
-        :return: {asset1: set(system_user1,)}
-        """
-        if self._assets:
-            return self._assets
-        assets = self.get_assets_direct()
-        nodes = self.get_nodes_direct()
-        for node, system_users in nodes.items():
-            _assets = node.get_all_assets().valid().prefetch_related('nodes')
-            for asset in _assets:
-                for system_user, attr_dict in system_users.items():
-                    if not asset.has_protocol(system_user.protocol):
-                        continue
-                    if system_user in assets[asset]:
-                        actions = assets[asset][system_user]['actions']
-                        attr_dict['actions'].update(actions)
-                        system_users.update({system_user: attr_dict})
-                assets[asset].update(system_users)
-
-        __assets = defaultdict(set)
-        for asset, system_users in assets.items():
-            for system_user, attr_dict in system_users.items():
-                setattr(system_user, 'actions', attr_dict['actions'])
-            __assets[asset] = set(system_users.keys())
-
-        self._assets = __assets
-        return self._assets
-
+    @timeit
     def get_cache_key(self, resource):
         cache_key = self.CACHE_KEY_PREFIX + '{obj_id}_{filter_id}_{resource}'
         return cache_key.format(
@@ -301,27 +197,6 @@ class AssetPermissionUtil:
             cached = cache.get(self.asset_key)
         return cached
 
-    def get_assets(self):
-        if self._is_not_using_cache():
-            return self.get_assets_from_cache()
-        elif self._is_refresh_cache():
-            self.expire_cache()
-            return self.get_assets_from_cache()
-        else:
-            self.expire_cache()
-            return self.get_assets_without_cache()
-
-    def get_nodes_with_assets_without_cache(self):
-        """
-        返回节点并且包含资产
-        {"node": {"assets": set("system_user")}}
-        :return:
-        """
-        assets = self.get_assets_without_cache()
-        for asset, system_users in assets.items():
-            self.tree.add_asset(asset, system_users)
-        return self.tree.get_nodes()
-
     def get_nodes_with_assets_from_cache(self):
         cached = cache.get(self.node_key)
         if not cached:
@@ -337,13 +212,6 @@ class AssetPermissionUtil:
             return self.get_nodes_with_assets_from_cache()
         else:
             return self.get_nodes_with_assets_without_cache()
-
-    def get_system_user_without_cache(self):
-        system_users = set()
-        permissions = self.permissions.prefetch_related('system_users')
-        for perm in permissions:
-            system_users.update(perm.system_users.all())
-        return system_users
 
     def get_system_user_from_cache(self):
         cached = cache.get(self.system_key)
@@ -416,6 +284,152 @@ class AssetPermissionUtil:
     def expire_all_cache(cls):
         key = cls.CACHE_KEY_PREFIX + '*'
         cache.delete_pattern(key)
+
+
+class AssetPermissionUtil(AssetPermissionCacheMixin):
+    get_permissions_map = {
+        "User": get_user_permissions,
+        "UserGroup": get_user_group_permissions,
+        "Asset": get_asset_permissions,
+        "Node": get_node_permissions,
+        "SystemUser": get_system_user_permissions,
+    }
+
+    def __init__(self, obj, cache_policy='0'):
+        self.object = obj
+        self.obj_id = str(obj.id)
+        self._permissions = None
+        self._permissions_id = None  # 标记_permission的唯一值
+        self._assets = None
+        self._filter_id = 'None'  # 当通过filter更改 permission是标记
+        self.cache_policy = cache_policy
+        self.tree = GenerateTree()
+        self.change_org_if_need()
+        self.nodes = None
+
+    @staticmethod
+    def change_org_if_need():
+        set_to_root_org()
+
+    @property
+    def permissions(self):
+        if self._permissions:
+            return self._permissions
+        object_cls = self.object.__class__.__name__
+        func = self.get_permissions_map[object_cls]
+        permissions = func(self.object)
+        self._permissions = permissions
+        return permissions
+
+    @timeit
+    def filter_permissions(self, **filters):
+        filters_json = json.dumps(filters, sort_keys=True)
+        self._permissions = self.permissions.filter(**filters)
+        self._filter_id = md5(filters_json.encode()).hexdigest()
+
+    @staticmethod
+    @timeit
+    def _structured_system_user(system_users, actions):
+        """
+        结构化系统用户
+        :param system_users:
+        :param actions:
+        :return: {system_user1: {'actions': set(), }, }
+        """
+        _attr = {'actions': set(actions)}
+        _system_users = {system_user: _attr for system_user in system_users}
+        return _system_users
+
+    @timeit
+    def get_nodes_direct(self):
+        """
+        返回用户/组授权规则直接关联的节点
+        :return: {asset1: {system_user1: {'actions': set()},}}
+        """
+        nodes = defaultdict(dict)
+        permissions = self.permissions.prefetch_related('nodes', 'system_users', 'actions')
+        for perm in permissions:
+            actions = perm.actions.all()
+            for node in perm.nodes.all():
+                system_users = perm.system_users.all()
+                system_users = self._structured_system_user(system_users, actions)
+                nodes[node].update(system_users)
+        self.tree.add_nodes(nodes.keys())
+        # 替换成优化过的node
+        nodes = {self.tree.node_util.get_node_by_key(k.key): v for k, v in nodes.items()}
+        return nodes
+
+    @timeit
+    def get_assets_direct(self):
+        """
+        返回用户授权规则直接关联的资产
+        :return: {asset1: {system_user1: {'actions': set()},}}
+        """
+        assets = defaultdict(dict)
+        permissions = self.permissions.prefetch_related('assets', 'system_users')
+        for perm in permissions:
+            actions = perm.actions.all()
+            for asset in perm.assets.all().valid().prefetch_related('nodes'):
+                system_users = perm.system_users.filter(protocol__in=asset.protocols_name)
+                system_users = self._structured_system_user(system_users, actions)
+                assets[asset].update(system_users)
+        return assets
+
+    @timeit
+    def get_assets_without_cache(self):
+        """
+        :return: {asset1: set(system_user1,)}
+        """
+        if self._assets:
+            return self._assets
+        assets = self.get_assets_direct()
+        nodes = self.get_nodes_direct()
+        # for node, system_users in nodes.items():
+        #     print(9999, node)
+        #     _assets = node.get_all_valid_assets()
+        #     print(".......... end .......")
+        #     for asset in _assets:
+        #         print(">>asset")
+        #         for system_user, attr_dict in system_users.items():
+        #             print(">>>system user")
+        #             if not asset.has_protocol(system_user.protocol):
+        #                 continue
+        #             if system_user in assets[asset]:
+        #                 actions = assets[asset][system_user]['actions']
+        #                 attr_dict['actions'].update(actions)
+        #                 system_users.update({system_user: attr_dict})
+        #             print("<<<system user")
+        #         print("<<<asset")
+        #         assets[asset].update(system_users)
+        # print(">>>>>>")
+        #
+        __assets = defaultdict(set)
+        for asset, system_users in assets.items():
+            for system_user, attr_dict in system_users.items():
+                setattr(system_user, 'actions', attr_dict['actions'])
+            __assets[asset] = set(system_users.keys())
+
+        self._assets = __assets
+        return self._assets
+
+    @timeit
+    def get_nodes_with_assets_without_cache(self):
+        """
+        返回节点并且包含资产
+        {"node": {"assets": set("system_user")}}
+        :return:
+        """
+        assets = self.get_assets_without_cache()
+        for asset, system_users in assets.items():
+            self.tree.add_asset(asset, system_users)
+        return self.tree.get_nodes()
+
+    def get_system_user_without_cache(self):
+        system_users = set()
+        permissions = self.permissions.prefetch_related('system_users')
+        for perm in permissions:
+            system_users.update(perm.system_users.all())
+        return system_users
 
 
 def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):

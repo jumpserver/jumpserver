@@ -242,22 +242,3 @@ class CommandStorageDeleteAPI(APIView):
         storage_name = str(request.data.get('name'))
         Setting.delete_storage('TERMINAL_COMMAND_STORAGE', storage_name)
         return Response({"msg": _('Delete succeed')}, status=200)
-
-
-class DjangoSettingsAPI(APIView):
-    def get(self, request):
-        if not settings.DEBUG:
-            return Response("Not in debug mode")
-
-        data = {}
-        for i in [settings, getattr(settings, '_wrapped')]:
-            if not i:
-                continue
-            for k, v in i.__dict__.items():
-                if k and k.isupper():
-                    try:
-                        json.dumps(v)
-                        data[k] = v
-                    except (json.JSONDecodeError, TypeError):
-                        data[k] = str(v)
-        return Response(data)
