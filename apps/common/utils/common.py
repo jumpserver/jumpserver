@@ -130,16 +130,13 @@ def get_short_uuid_str():
 
 
 def is_uuid(seq):
-    if isinstance(seq, str):
-        if UUID_PATTERN.match(seq):
-            return True
-        else:
-            return False
-    else:
-        for s in seq:
-            if not is_uuid(s):
-                return False
+    if isinstance(seq, uuid.UUID):
         return True
+    elif isinstance(seq, str) and UUID_PATTERN.match(seq):
+        return True
+    elif isinstance(seq, (list, tuple)):
+        all([is_uuid(x) for x in seq])
+    return False
 
 
 def get_request_ip(request):

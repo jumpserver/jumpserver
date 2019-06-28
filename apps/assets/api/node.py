@@ -112,12 +112,16 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
     is_root = False
 
     def get_queryset(self):
+        self.check_need_refresh_nodes()
         node_key = self.request.query_params.get('key')
         util = NodeUtil()
+        # 是否包含自己
+        with_self = False
         if not node_key:
             node_key = Node.root().key
+            with_self = True
         self.node = util.get_node_by_key(node_key)
-        queryset = self.node.get_children(with_self=True)
+        queryset = self.node.get_children(with_self=with_self)
         queryset = [node.as_tree_node() for node in queryset]
         queryset = sorted(queryset)
         return queryset
@@ -133,14 +137,11 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         queryset = self.filter_assets(queryset)
-        queryset = self.filter_refresh_nodes(queryset)
         return queryset
 
-    def filter_refresh_nodes(self, queryset):
+    def check_need_refresh_nodes(self):
         if self.request.query_params.get('refresh', '0') == '1':
-            Node.expire_nodes_assets_amount()
-            Node.expire_nodes_full_value()
-        return queryset
+            Node.refresh_nodes()
 
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):

@@ -20,14 +20,8 @@ from .. import serializers
 __all__ = [
     'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
     'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi', 'ActionViewSet',
+    'AssetPermissionAddAssetApi',
 ]
-
-
-class ActionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Action.objects.all()
-    serializer_class = serializers.ActionSerializer
-    permission_classes = (IsOrgAdmin,)
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):

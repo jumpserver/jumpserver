@@ -277,7 +277,7 @@ function APIUpdateAttr(props) {
     }).done(function(data, textStatue, jqXHR) {
         if (flash_message) {
             var msg = "";
-            if (user_fail_message) {
+            if (user_success_message) {
                 msg = user_success_message;
             } else {
                 msg = default_success_message;
@@ -635,7 +635,7 @@ jumpserver.initServerSideDataTable = function (options) {
         columns: options.columns || [],
         select: options.select || select,
         language: jumpserver.language,
-        lengthMenu: [[15, 25, 50, 9999], [15, 25, 50, 'All']]
+        lengthMenu: options.lengthMenu || [[15, 25, 50, 9999], [15, 25, 50, 'All']]
     });
     table.selected = [];
     table.selected_rows = [];
@@ -1071,4 +1071,28 @@ function htmlEscape ( d ) {
     return typeof d === 'string' ?
         d.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') :
         d;
+}
+
+function objectAttrsIsList(obj, attrs) {
+    attrs.forEach(function (attr) {
+        if (obj[attr] && !(obj[attr] instanceof Array)){
+            obj[attr] = [obj[attr]]
+        }
+    })
+}
+
+function objectAttrsIsDatetime(obj, attrs) {
+    attrs.forEach(function (attr) {
+        obj[attr] = new Date(obj[attr]).toISOString();
+    })
+}
+
+function objectAttrsIsBool(obj, attrs) {
+    attrs.forEach(function (attr) {
+        if (!obj[attr]) {
+            obj[attr] = false
+        } else if (['on', '1'].includes(obj[attr])) {
+            obj[attr] = true
+        }
+    })
 }

@@ -5,6 +5,7 @@ from collections import defaultdict
 import json
 from hashlib import md5
 import time
+import itertools
 
 from django.utils import timezone
 from django.db.models import Q
@@ -102,11 +103,11 @@ def get_user_permissions(user, include_group=True):
         arg = Q(users=user) | Q(user_groups__in=groups)
     else:
         arg = Q(users=user)
-    return AssetPermission.objects.all().valid().filter(arg)
+    return AssetPermission.objects.valid().filter(arg)
 
 
 def get_user_group_permissions(user_group):
-    return AssetPermission.objects.all().valid().filter(
+    return AssetPermission.objects.valid().filter(
         user_groups=user_group
     )
 
@@ -117,15 +118,15 @@ def get_asset_permissions(asset, include_node=True):
         arg = Q(assets=asset) | Q(nodes__in=nodes)
     else:
         arg = Q(assets=asset)
-    return AssetPermission.objects.all().valid().filter(arg)
+    return AssetPermission.objects.valid().filter(arg)
 
 
 def get_node_permissions(node):
-    return AssetPermission.objects.all().valid().filter(nodes=node)
+    return AssetPermission.objects.valid().filter(nodes=node)
 
 
 def get_system_user_permissions(system_user):
-    return AssetPermission.objects.valid().all().filter(
+    return AssetPermission.objects.valid().filter(
         system_users=system_user
     )
 
@@ -139,11 +140,6 @@ def timeit(func):
         logger.debug("Call {} end, using: {:.2}".format(func.__name__, using))
         return result
     return wrapper
-
-
-class AssetGranted:
-    def __init__(self):
-        self.system_users = {}
 
 
 class AssetPermissionCacheMixin:
@@ -286,6 +282,38 @@ class AssetPermissionCacheMixin:
         cache.delete_pattern(key)
 
 
+class FlatPermissionQueryset:
+    def __init__(self):
+        self.queryset = defaultdict(list)
+
+    def add(self, permission):
+        self.queryset[permission.id].append(permission)
+
+    def add_many(self, assets_or_nodes, system_users, actions):
+        if any([assets_or_nodes, system_users, actions]):
+            return
+
+        iterable = itertools.product(assets_or_nodes, system_users, actions)
+        for source, sysuser, action in iterable:
+            permission = FlatPermission(source, sysuser, action)
+            self.add(permission)
+
+    def clean(self):
+        pass
+
+
+class FlatPermission:
+    def __init__(self, asset_or_node, system_user, action):
+        self.id = asset_or_node.id
+        self.source = asset_or_node
+        self.system_user = system_user
+        self.action = action
+
+    def __eq__(self, other):
+        pass
+
+
+
 class AssetPermissionUtil(AssetPermissionCacheMixin):
     get_permissions_map = {
         "User": get_user_permissions,
@@ -344,19 +372,15 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
-        :return: {asset1: {system_user1: {'actions': set()},}}
+        :return: {node1: {system_user1: {'actions': set()},}}
         """
-        nodes = defaultdict(dict)
-        permissions = self.permissions.prefetch_related('nodes', 'system_users', 'actions')
+        nodes = FlatPermissionQueryset()
+        permissions = self.permissions
         for perm in permissions:
             actions = perm.actions.all()
-            for node in perm.nodes.all():
-                system_users = perm.system_users.all()
-                system_users = self._structured_system_user(system_users, actions)
-                nodes[node].update(system_users)
-        self.tree.add_nodes(nodes.keys())
-        # 替换成优化过的node
-        nodes = {self.tree.node_util.get_node_by_key(k.key): v for k, v in nodes.items()}
+            system_users = perm.system_users.all()
+            _nodes = perm.nodes.all()
+            nodes.add_many(_nodes, system_users, actions)
         return nodes
 
     @timeit
@@ -385,24 +409,18 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         assets = self.get_assets_direct()
         nodes = self.get_nodes_direct()
         # for node, system_users in nodes.items():
-        #     print(9999, node)
-        #     _assets = node.get_all_valid_assets()
-        #     print(".......... end .......")
+        #     print(">>>>> Node<<<<<<<<<<<<: ", node.value)
+        #     _assets = list(node.get_all_valid_assets())
         #     for asset in _assets:
-        #         print(">>asset")
         #         for system_user, attr_dict in system_users.items():
-        #             print(">>>system user")
         #             if not asset.has_protocol(system_user.protocol):
         #                 continue
         #             if system_user in assets[asset]:
         #                 actions = assets[asset][system_user]['actions']
         #                 attr_dict['actions'].update(actions)
         #                 system_users.update({system_user: attr_dict})
-        #             print("<<<system user")
-        #         print("<<<asset")
         #         assets[asset].update(system_users)
-        # print(">>>>>>")
-        #
+
         __assets = defaultdict(set)
         for asset, system_users in assets.items():
             for system_user, attr_dict in system_users.items():
@@ -507,8 +525,7 @@ def parse_asset_to_tree_node(node, asset, system_users):
                 'id': asset.id,
                 'hostname': asset.hostname,
                 'ip': asset.ip,
-                'protocols': [{"name": p.name, "port": p.port}
-                              for p in asset.protocols.all()],
+                'protocols': [str(p) for p in asset.protocols.all()],
                 'platform': asset.platform,
                 'domain': None if not asset.domain else asset.domain.id,
                 'is_active': asset.is_active,

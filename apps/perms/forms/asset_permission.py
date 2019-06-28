@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import absolute_import, unicode_literals
+from functools import reduce
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,17 +19,22 @@ class AssetPermissionForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
-        if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
-        assets_field = self.fields.get('assets')
+        users_field.queryset = current_org.get_org_users()
 
         # 前端渲染优化, 防止过多资产
         if not self.data:
             instance = kwargs.get('instance')
+            assets_field = self.fields['assets']
             if instance:
                 assets_field.queryset = instance.assets.all()
             else:
                 assets_field.queryset = Asset.objects.none()
+            nodes_field = self.fields['nodes']
+            nodes_field._queryset = Node.get_queryset()
+
+    def clean_action(self):
+        actions = self.cleaned_data.get("action")
+        return reduce(lambda x, y: x | y, actions)
 
     class Meta:
         model = AssetPermission
@@ -51,16 +57,14 @@ class AssetPermissionForm(OrgModelForm):
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
-            'actions': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Action')}
-            )
+            'action': forms.CheckboxSelectMultiple()
         }
         labels = {
             'nodes': _("Node"),
         }
         help_texts = {
-            'actions': _('Tips: The RDP protocol does not support separate '
-                         'controls for uploading or downloading files')
+            'action': _('Tips: The RDP protocol does not support separate '
+                        'controls for uploading or downloading files')
         }
 
     def clean_user_groups(self):

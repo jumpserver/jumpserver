@@ -11,7 +11,7 @@ from .base import BasePermission
 
 
 __all__ = [
-    'Action', 'AssetPermission', 'NodePermission',
+    'Action', 'AssetPermission', 'NodePermission', 'ActionFlag'
 ]
 
 
@@ -33,11 +33,28 @@ class Action(models.Model):
         return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
 
 
+class ActionFlag:
+    CONNECT = 0b00000001
+    UPLOAD = 0b00000010
+    DOWNLOAD = 0b00000100
+    UPDOWNLOAD = CONNECT | DOWNLOAD
+    ALL = 0b11111111
+
+    CHOICES = (
+        (ALL, _('All')),
+        (CONNECT, _('Connect')),
+        (UPLOAD, _('Upload file')),
+        (UPDOWNLOAD, _("Upload download")),
+        (DOWNLOAD, _('Download file')),
+    )
+
+
 class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
-    actions = models.ManyToManyField('Action', related_name='permissions', blank=True, verbose_name=_('Action'))
+    # actions = models.ManyToManyField(Action, related_name='permissions', blank=True, verbose_name=_('Action'))
+    action = models.IntegerField(choices=ActionFlag.CHOICES, default=ActionFlag.ALL, verbose_name=_("Action"))
 
     class Meta:
         unique_together = [('org_id', 'name')]

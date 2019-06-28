@@ -25,13 +25,6 @@ def on_transaction_commit(func):
 @on_transaction_commit
 def on_permission_created(sender, instance=None, created=False, **kwargs):
     AssetPermissionUtil.expire_all_cache()
-    actions = instance.actions.all()
-    if created and not actions:
-        default_action = Action.get_action_all()
-        instance.actions.add(default_action)
-        logger.debug(
-            "Set default action to perms: {}".format(default_action, instance)
-        )
 
 
 @receiver(post_save, sender=AssetPermission)

@@ -4,7 +4,8 @@ import traceback
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import redirect, get_object_or_404
-from django.forms import ModelForm
+from django import forms
+from django.core.exceptions import ValidationError
 from django.http.response import HttpResponseForbidden
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -101,6 +102,26 @@ class OrgModelMixin(models.Model):
         else:
             return name
 
+    def validate_unique(self, exclude=None):
+        """
+        Check unique constraints on the model and raise ValidationError if any
+        failed.
+        Form 提交时会使用这个检验
+        """
+        self.org_id = current_org.id if current_org.is_real() else ''
+        if exclude and 'org_id' in exclude:
+            exclude.remove('org_id')
+        unique_checks, date_checks = self._get_unique_checks(exclude=exclude)
+
+        errors = self._perform_unique_checks(unique_checks)
+        date_errors = self._perform_date_checks(date_checks)
+
+        for k, v in date_errors.items():
+            errors.setdefault(k, []).extend(v)
+
+        if errors:
+            raise ValidationError(errors)
+
     class Meta:
         abstract = True
 
@@ -123,11 +144,9 @@ class RootOrgViewMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrgModelForm(ModelForm):
+class OrgModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # if 'initial' not in kwargs:
-        #     return
         for name, field in self.fields.items():
             if not hasattr(field, 'queryset'):
                 continue

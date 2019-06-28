@@ -13,14 +13,8 @@ __all__ = [
     'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
-    'ActionSerializer', 'NodeGrantedSerializer',
+    'NodeGrantedSerializer',
 ]
-
-
-class ActionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Action
-        fields = '__all__'
 
 
 class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
@@ -35,7 +29,7 @@ class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
-    actions = StringManyToManyField(many=True, read_only=True)
+    action = serializers.IntegerField(read_only=True)
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 

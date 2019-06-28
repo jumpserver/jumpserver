@@ -58,8 +58,6 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
             form['assets'].initial = assets
-        form['actions'].initial = Action.objects.get(name=PERMS_ACTION_NAME_ALL)
-
         return form
 
     def get_context_data(self, **kwargs):

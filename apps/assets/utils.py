@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
+import time
 from django.db.models import Prefetch
 
 from common.utils import get_object_or_none, get_logger
@@ -56,9 +57,11 @@ class NodeUtil:
     def get_all_nodes(self):
         all_nodes = Node.objects.all()
         if self.with_assets_amount:
+            now = time.time()
             all_nodes = all_nodes.prefetch_related(
                 Prefetch('assets', queryset=Asset.objects.all().only('id'))
             )
+            all_nodes = list(all_nodes)
             for node in all_nodes:
                 node._assets = set(node.assets.all())
         all_nodes = sorted(all_nodes, key=self.sorted_by)

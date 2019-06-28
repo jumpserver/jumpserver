@@ -186,9 +186,6 @@ class FullValueMixin:
     def expire_nodes_full_value(cls, nodes=None):
         key = cls._full_value_cache_key.format('*')
         cache.delete_pattern(key+'*')
-        from ..utils import NodeUtil
-        util = NodeUtil()
-        util.set_full_value()
 
 
 class AssetsAmountMixin:
@@ -216,7 +213,7 @@ class AssetsAmountMixin:
     def assets_amount(self, value):
         self._assets_amount = value
         cache_key = self._assets_amount_cache_key.format(self.key)
-        cache.set(cache_key, value, 3600 * 24)
+        cache.set(cache_key, value)
 
     def expire_assets_amount(self):
         ancestor_keys = self.get_ancestor_keys(with_self=True)
@@ -226,11 +223,15 @@ class AssetsAmountMixin:
 
     @classmethod
     def expire_nodes_assets_amount(cls, nodes=None):
-        from ..utils import NodeUtil
         key = cls._assets_amount_cache_key.format('*')
         cache.delete_pattern(key)
+
+    @classmethod
+    def refresh_nodes(cls):
+        from ..utils import NodeUtil
         util = NodeUtil(with_assets_amount=True)
         util.set_assets_amount()
+        util.set_full_value()
 
 
 class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
@@ -375,9 +376,7 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
 
     def as_tree_node(self):
         from common.tree import TreeNode
-        from ..serializers import NodeSerializer
         name = '{} ({})'.format(self.value, self.assets_amount)
-        node_serializer = NodeSerializer(instance=self)
         data = {
             'id': self.key,
             'name': name,
@@ -386,7 +385,12 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
             'isParent': True,
             'open': self.is_root(),
             'meta': {
-                'node': node_serializer.data,
+                'node': {
+                    "id": self.id,
+                    "name": self.name,
+                    "value": self.value,
+                    "key": self.key,
+                },
                 'type': 'node'
             }
         }

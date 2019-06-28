@@ -7,7 +7,6 @@ from .. import api
 app_name = 'perms'
 
 router = routers.DefaultRouter()
-router.register('actions', api.ActionViewSet, 'action')
 router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remote-app-permission')
 
