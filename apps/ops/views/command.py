@@ -57,7 +57,6 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 class CommandExecutionStartView(PermissionsMixin, TemplateView):
     template_name = 'ops/command_execution_create.html'
     form_class = CommandExecutionForm
-    permission_classes = [IsValidUser]
 
     def get_permissions(self):
         if settings.SECURITY_COMMAND_EXECUTION:
