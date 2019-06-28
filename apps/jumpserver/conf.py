@@ -344,7 +344,7 @@ defaults = {
     'SESSION_COOKIE_AGE': 3600 * 24,
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
-    'OTP_VALID_WINDOW': 0,
+    'OTP_VALID_WINDOW': 2,
     'OTP_ISSUER_NAME': 'Jumpserver',
     'EMAIL_SUFFIX': 'jumpserver.org',
     'TERMINAL_PASSWORD_AUTH': True,
