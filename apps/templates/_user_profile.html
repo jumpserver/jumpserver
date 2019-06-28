@@ -19,7 +19,7 @@
                 </span>
                 <span class="fa fa-sort-desc pull-right"></span>
             </a>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" style="min-width: 220px">
                 {% for org in ADMIN_ORGS %}
                     <li>
                         <a class="org-dropdown" href="{% url 'orgs:org-switch' pk=org.id %}" data-id="{{ org.id }}">
