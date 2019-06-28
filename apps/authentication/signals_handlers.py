@@ -18,6 +18,8 @@ from .signals import post_auth_success, post_auth_failed
 def on_user_logged_out(sender, request, user, **kwargs):
     if not settings.AUTH_OPENID:
         return
+    if not settings.AUTH_OPENID_SHARE_SESSION:
+        return
     query = QueryDict('', mutable=True)
     query.update({
         'redirect_uri': settings.BASE_SITE_URL

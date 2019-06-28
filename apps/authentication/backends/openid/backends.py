@@ -64,10 +64,7 @@ class OpenIDAuthorizationCodeBackend(BaseOpenIDAuthorizationBackend):
 class OpenIDAuthorizationPasswordBackend(BaseOpenIDAuthorizationBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         logger.info('Authentication OpenID password backend')
-        if not settings.AUTH_OPENID:
-            logger.info('Authenticate failed: AUTH_OPENID is False')
-            return None
-        elif not username:
+        if not username:
             logger.info('Authenticate failed: Not username')
             return None
         try:

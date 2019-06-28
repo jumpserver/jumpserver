@@ -23,6 +23,9 @@ class OpenIDAuthenticationMiddleware(MiddlewareMixin):
         # Don't need openid auth if AUTH_OPENID is False
         if not settings.AUTH_OPENID:
             return
+        # Don't need openid auth if no shared session enabled
+        if not settings.AUTH_OPENID_SHARE_SESSION:
+            return
         # Don't need check single logout if user not authenticated
         if not request.user.is_authenticated:
             return

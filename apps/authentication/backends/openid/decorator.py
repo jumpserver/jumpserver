@@ -50,7 +50,7 @@ def no_ssl_verification():
 
 def ssl_verification(func):
     def wrapper(*args, **kwargs):
-        if settings.AUTH_OPENID_NEED_SSL_VERIFICATION:
+        if not settings.AUTH_OPENID_IGNORE_SSL_VERIFICATION:
             return func(*args, **kwargs)
         with no_ssl_verification():
             return func(*args, **kwargs)
