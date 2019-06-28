@@ -59,6 +59,13 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
     form_class = CommandExecutionForm
     permission_classes = [IsValidUser]
 
+    def get_permissions(self):
+        if settings.SECURITY_COMMAND_EXECUTION:
+            permission_classes = [IsValidUser]
+        else:
+            permission_classes = [IsOrgAdmin]
+        return permission_classes
+
     def get_user_system_users(self):
         from perms.utils import AssetPermissionUtil
         user = self.request.user
