@@ -1,4 +1,5 @@
 import uuid
+from functools import reduce
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -37,16 +38,40 @@ class ActionFlag:
     CONNECT = 0b00000001
     UPLOAD = 0b00000010
     DOWNLOAD = 0b00000100
-    UPDOWNLOAD = CONNECT | DOWNLOAD
+    UPDOWNLOAD = UPLOAD | DOWNLOAD
+    CONNECT_UPLOADOWN = CONNECT | UPDOWNLOAD
     ALL = 0b11111111
+    NAME_MAP = {
+        "connect": CONNECT,
+        "upload": UPLOAD,
+        "download": DOWNLOAD,
+        "updownload": UPDOWNLOAD,
+        "all": ALL,
+    }
 
     CHOICES = (
         (ALL, _('All')),
         (CONNECT, _('Connect')),
-        (UPLOAD, _('Upload file')),
         (UPDOWNLOAD, _("Upload download")),
+        (UPLOAD, _('Upload file')),
         (DOWNLOAD, _('Download file')),
     )
+
+    @classmethod
+    def value_to_choices(cls, value):
+        value = int(value)
+        if value == cls.ALL:
+            return [cls.ALL]
+        elif value == cls.UPDOWNLOAD:
+            return [cls.UPDOWNLOAD]
+        elif value == cls.CONNECT_UPLOADOWN:
+            return [cls.CONNECT, cls.UPDOWNLOAD]
+        else:
+            return [i for i in dict(cls.CHOICES) if i == i & int(value)]
+
+    @classmethod
+    def choices_to_value(cls, value):
+        return reduce(lambda x, y: int(x) | int(y), value)
 
 
 class AssetPermission(BasePermission):
@@ -60,13 +85,9 @@ class AssetPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
 
-    def get_all_assets(self):
-        assets = set(self.assets.all())
-        for node in self.nodes.all():
-            _assets = node.get_all_assets()
-            set_or_append_attr_bulk(_assets, 'inherit', node.value)
-            assets.update(set(_assets))
-        return assets
+    @classmethod
+    def get_queryset_with_prefetch(cls):
+        return cls.objects.all().valid().prefetch_related('nodes', 'assets', 'system_users')
 
 
 class NodePermission(OrgModelMixin):

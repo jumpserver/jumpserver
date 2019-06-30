@@ -64,6 +64,7 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
         context = {
             'app': _('Perms'),
             'action': _('Create asset permission'),
+            'api_action': "create",
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -79,7 +80,8 @@ class AssetPermissionUpdateView(PermissionsMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Update asset permission')
+            'action': _('Update asset permission'),
+            'api_action': "update",
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

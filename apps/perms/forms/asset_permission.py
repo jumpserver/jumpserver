@@ -7,15 +7,36 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
-from perms.models import AssetPermission
 from assets.models import Asset, Node
+from ..models import AssetPermission, ActionFlag
 
 __all__ = [
     'AssetPermissionForm',
 ]
 
 
+class ActionField(forms.MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = ActionFlag.CHOICES
+        kwargs['initial'] = ActionFlag.ALL
+        kwargs['label'] = _("Action")
+        kwargs['widget'] = forms.CheckboxSelectMultiple()
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        return ActionFlag.choices_to_value(value)
+
+    def prepare_value(self, value):
+        if value is None:
+            return value
+        value = ActionFlag.value_to_choices(value)
+        return value
+
+
 class AssetPermissionForm(OrgModelForm):
+    action = ActionField()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
@@ -31,10 +52,6 @@ class AssetPermissionForm(OrgModelForm):
                 assets_field.queryset = Asset.objects.none()
             nodes_field = self.fields['nodes']
             nodes_field._queryset = Node.get_queryset()
-
-    def clean_action(self):
-        actions = self.cleaned_data.get("action")
-        return reduce(lambda x, y: x | y, actions)
 
     class Meta:
         model = AssetPermission

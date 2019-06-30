@@ -110,6 +110,7 @@ var dateOptions = {
         format: 'YYYY-MM-DD HH:mm'
     }
 };
+var api_action =  "{{ api_action }}";
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
@@ -147,21 +148,17 @@ $(document).ready(function () {
 .on("submit", "form", function (evt) {
     evt.preventDefault();
     var the_url = '{% url 'api-perms:asset-permission-list' %}';
-    var redirect_to = '{% url "perms:asset-permission-list" %}';
     var method = "POST";
+    {% if api_action == "update" %}
+        the_url = '{% url 'api-perms:asset-permission-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    var redirect_to = '{% url "perms:asset-permission-list" %}';
     var form = $("form");
     var data = form.serializeObject();
-    console.log(data)
-    var actions = data.action;
-    var action = 0;
-    for (i=0;i<actions.length;i++) {
-        console.log(actions[i])
-        action |= actions[i];
-    }
-    data.action = action;
-    objectAttrsIsList(data, ['users', 'user_groups', 'system_users', 'nodes', 'assets']);
+    objectAttrsIsList(data, ['users', 'user_groups', 'system_users', 'nodes', 'assets', 'actions']);
     objectAttrsIsDatetime(data, ['date_start', 'date_expired']);
-    objectAttrsIsBool(data, ['is_active'])
+    objectAttrsIsBool(data, ['is_active']);
     console.log(data)
     var props = {
         url: the_url,

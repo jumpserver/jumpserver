@@ -103,11 +103,11 @@ def get_user_permissions(user, include_group=True):
         arg = Q(users=user) | Q(user_groups__in=groups)
     else:
         arg = Q(users=user)
-    return AssetPermission.objects.valid().filter(arg)
+    return AssetPermission.get_queryset_with_prefetch().filter(arg)
 
 
 def get_user_group_permissions(user_group):
-    return AssetPermission.objects.valid().filter(
+    return AssetPermission.get_queryset_with_prefetch().filter(
         user_groups=user_group
     )
 
@@ -282,36 +282,55 @@ class AssetPermissionCacheMixin:
         cache.delete_pattern(key)
 
 
-class FlatPermissionQueryset:
-    def __init__(self):
-        self.queryset = defaultdict(list)
-
-    def add(self, permission):
-        self.queryset[permission.id].append(permission)
-
-    def add_many(self, assets_or_nodes, system_users, actions):
-        if any([assets_or_nodes, system_users, actions]):
+class FlatPermissionQueryset(set):
+    def add_many(self, assets_or_nodes, system_users, action, rtp="asset"):
+        print("Add many: {}-{}-{}".format(len(assets_or_nodes), len(system_users), action))
+        if not any([assets_or_nodes, system_users, action]):
             return
 
-        iterable = itertools.product(assets_or_nodes, system_users, actions)
+        iterable = itertools.product(assets_or_nodes, system_users, [action])
         for source, sysuser, action in iterable:
-            permission = FlatPermission(source, sysuser, action)
+            permission = FlatPermission(source, sysuser, action, rtp=rtp)
+            print("ADDDDDDDDDDDDDDDd")
             self.add(permission)
 
-    def clean(self):
-        pass
+    def group_by_resource(self):
+        resources = defaultdict(lambda: defaultdict(int))
+        for i in self:
+            resources[i.resource][i.system_user] |= i.action
+        return resources
 
 
 class FlatPermission:
-    def __init__(self, asset_or_node, system_user, action):
-        self.id = asset_or_node.id
-        self.source = asset_or_node
+    def __init__(self, assets_or_node, system_user, action, rtp="asset"):
+        self.id = "{}_{}_{}".format(assets_or_node.id, system_user.id, action)
+        self.resource = assets_or_node
+        self.resource_type = rtp
         self.system_user = system_user
         self.action = action
 
     def __eq__(self, other):
-        pass
+        if self.id == other.id:
+            return True
+        # 资产不同
+        if self.resource_type == "asset" and self.id != other.id:
+            return False
+        # 不是子节点
+        elif self.resource_type == "node" and not other.resource.key.startswith(self.resource.key):
+            return False
+        # 系统用户优先级大于后者，则相同
+        if self.system_user.priority > self.system_user.priority:
+            return True
+        # 如果系统用户不同，则不同
+        elif self.system_user != other.system_user:
+            return False
+        # 如果action为与后的结果则相同
+        if self.action == self.action | other.action:
+            return True
+        return False
 
+    def __hash__(self):
+        return hash(self.id)
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
@@ -355,33 +374,20 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
-    @staticmethod
-    @timeit
-    def _structured_system_user(system_users, actions):
-        """
-        结构化系统用户
-        :param system_users:
-        :param actions:
-        :return: {system_user1: {'actions': set(), }, }
-        """
-        _attr = {'actions': set(actions)}
-        _system_users = {system_user: _attr for system_user in system_users}
-        return _system_users
-
     @timeit
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
         :return: {node1: {system_user1: {'actions': set()},}}
         """
-        nodes = FlatPermissionQueryset()
-        permissions = self.permissions
-        for perm in permissions:
-            actions = perm.actions.all()
+        queryset = FlatPermissionQueryset()
+        for perm in self.permissions:
+            actions = perm.action
             system_users = perm.system_users.all()
-            _nodes = perm.nodes.all()
-            nodes.add_many(_nodes, system_users, actions)
-        return nodes
+            nodes = perm.nodes.all()
+            queryset.add_many(nodes, system_users, actions, rtp="nodes")
+        print(queryset)
+        return queryset.group_by_resource()
 
     @timeit
     def get_assets_direct(self):
@@ -389,15 +395,14 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         返回用户授权规则直接关联的资产
         :return: {asset1: {system_user1: {'actions': set()},}}
         """
-        assets = defaultdict(dict)
-        permissions = self.permissions.prefetch_related('assets', 'system_users')
-        for perm in permissions:
-            actions = perm.actions.all()
-            for asset in perm.assets.all().valid().prefetch_related('nodes'):
-                system_users = perm.system_users.filter(protocol__in=asset.protocols_name)
-                system_users = self._structured_system_user(system_users, actions)
-                assets[asset].update(system_users)
-        return assets
+        queryset = FlatPermissionQueryset()
+        for perm in self.permissions:
+            action = perm.action
+            assets = perm.assets.all()
+            system_users = perm.system_users.all()
+            queryset.add_many(assets, system_users, action, rtp="assets")
+        print(queryset)
+        return queryset.group_by_resource()
 
     @timeit
     def get_assets_without_cache(self):
@@ -408,27 +413,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
             return self._assets
         assets = self.get_assets_direct()
         nodes = self.get_nodes_direct()
-        # for node, system_users in nodes.items():
-        #     print(">>>>> Node<<<<<<<<<<<<: ", node.value)
-        #     _assets = list(node.get_all_valid_assets())
-        #     for asset in _assets:
-        #         for system_user, attr_dict in system_users.items():
-        #             if not asset.has_protocol(system_user.protocol):
-        #                 continue
-        #             if system_user in assets[asset]:
-        #                 actions = assets[asset][system_user]['actions']
-        #                 attr_dict['actions'].update(actions)
-        #                 system_users.update({system_user: attr_dict})
-        #         assets[asset].update(system_users)
-
-        __assets = defaultdict(set)
-        for asset, system_users in assets.items():
-            for system_user, attr_dict in system_users.items():
-                setattr(system_user, 'actions', attr_dict['actions'])
-            __assets[asset] = set(system_users.keys())
-
-        self._assets = __assets
-        return self._assets
+        print("++++++++++++++++++++++")
+        print(assets)
+        print("---------------------")
+        print(nodes)
 
     @timeit
     def get_nodes_with_assets_without_cache(self):

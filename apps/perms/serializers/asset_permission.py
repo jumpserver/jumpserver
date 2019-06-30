@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 
+from functools import reduce
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
 from orgs.mixins import BulkOrgResourceModelSerializer
-from perms.models import AssetPermission, Action
+from perms.models import AssetPermission, Action, ActionFlag
 from assets.models import Node
 from assets.serializers import AssetGrantedSerializer
 
@@ -17,7 +18,28 @@ __all__ = [
 ]
 
 
+class ActionField(serializers.MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = ActionFlag.CHOICES
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, value):
+        return ActionFlag.value_to_choices(value)
+
+    def to_internal_value(self, data):
+        return ActionFlag.choices_to_value(data)
+
+
+class ActionDisplayField(ActionField):
+    def to_representation(self, value):
+        values = super().to_representation(value)
+        choices = dict(ActionFlag.CHOICES)
+        return [choices.get(i) for i in values]
+
+
 class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
+    action = ActionField()
+
     class Meta:
         model = AssetPermission
         exclude = ('created_by', 'date_created')
@@ -29,7 +51,7 @@ class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
-    action = serializers.IntegerField(read_only=True)
+    action = ActionDisplayField()
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 
