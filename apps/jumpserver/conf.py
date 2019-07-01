@@ -346,7 +346,7 @@ defaults = {
     'AUTH_OPENID': False,
     'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
     'AUTH_OPENID_SHARE_SESSION': False,
-    'OTP_VALID_WINDOW': 0,
+    'OTP_VALID_WINDOW': 2,
     'OTP_ISSUER_NAME': 'Jumpserver',
     'EMAIL_SUFFIX': 'jumpserver.org',
     'TERMINAL_PASSWORD_AUTH': True,
