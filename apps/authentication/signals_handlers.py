@@ -18,19 +18,17 @@ from .signals import post_auth_success, post_auth_failed
 def on_user_logged_out(sender, request, user, **kwargs):
     if not settings.AUTH_OPENID:
         return
-
+    if not settings.AUTH_OPENID_SHARE_SESSION:
+        return
     query = QueryDict('', mutable=True)
     query.update({
         'redirect_uri': settings.BASE_SITE_URL
     })
-
     client = new_client()
     openid_logout_url = "%s?%s" % (
-        client.openid_connect_client.get_url(
-            name='end_session_endpoint'),
+        client.get_url_end_session_endpoint(),
         query.urlencode()
     )
-
     request.COOKIES['next'] = openid_logout_url
 
 
