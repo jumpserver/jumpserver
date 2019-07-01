@@ -95,7 +95,7 @@ class CommandViewSet(viewsets.ViewSet):
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
     session = None
 
     def create(self, request, *args, **kwargs):
