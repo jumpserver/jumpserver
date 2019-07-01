@@ -58,7 +58,11 @@ class UserPermissionCacheMixin:
         return None
 
     def get_request_md5(self):
-        full_path = self.request.get_full_path()
+        path = self.request.path
+        query = {k: v for k, v in self.request.GET.items()}
+        query.pop("_", None)
+        query = "&".join(["{}={}".format(k, v) for k, v in query.items()])
+        full_path = "{}?{}".format(path, query)
         return md5(full_path.encode()).hexdigest()
 
     def get_meta_cache_id(self):
@@ -83,9 +87,7 @@ class UserPermissionCacheMixin:
             return None
         # 从响应缓冲里获取响应
         key = self.get_response_key()
-        print("response key: {}".format(key))
         data = cache.get(key)
-        print(data)
         if not data:
             logger.debug("Not get response from cache: {}".format(key))
             return None
@@ -94,7 +96,6 @@ class UserPermissionCacheMixin:
         return response
 
     def expire_response_cache(self):
-        print("Expire cache")
         obj_id = self.get_object_id()
         expire_cache_id = '{}_{}'.format(obj_id, '*')
         key = self.RESP_CACHE_KEY.format(expire_cache_id)
@@ -109,7 +110,6 @@ class UserPermissionCacheMixin:
         key = self.get_response_key()
         cache.set(key, response.data, self.CACHE_TIME)
         logger.debug("Set response to cache: {}".format(key))
-        print(self.CACHE_TIME)
 
     def get(self, request, *args, **kwargs):
         self.cache_policy = request.GET.get('cache_policy', '0')
@@ -256,7 +256,6 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
         return user
 
     def get_queryset(self):
-        print("Call get queryset")
         queryset = []
         self.show_assets = self.request.query_params.get('show_assets', '1') == '1'
         self.system_user_id = self.request.query_params.get('system_user')
