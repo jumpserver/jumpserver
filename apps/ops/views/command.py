@@ -62,7 +62,7 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
     def get_permissions(self):
         if not settings.SECURITY_COMMAND_EXECUTION:
             return [IsOrgAdmin]
-        return super().permission_classes()
+        return super().get_permissions()
 
     def get_user_system_users(self):
         from perms.utils import AssetPermissionUtil
