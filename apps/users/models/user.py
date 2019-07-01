@@ -250,6 +250,16 @@ class User(AbstractUser):
         return self.role == 'Auditor'
 
     @property
+    def is_common_user(self):
+        if self.is_org_admin:
+            return False
+        if self.is_auditor:
+            return False
+        if self.is_app:
+            return False
+        return True
+
+    @property
     def is_app(self):
         return self.role == 'App'
 

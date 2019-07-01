@@ -126,8 +126,11 @@ class WithBootstrapToken(permissions.BasePermission):
 class PermissionsMixin(UserPassesTestMixin):
     permission_classes = []
 
+    def get_permissions(self):
+        return self.permission_classes
+
     def test_func(self):
-        permission_classes = self.permission_classes
+        permission_classes = self.get_permissions()
         for permission_class in permission_classes:
             if not permission_class().has_permission(self.request, self):
                 return False
