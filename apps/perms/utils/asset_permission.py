@@ -373,6 +373,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         "Node": get_node_permissions,
         "SystemUser": get_system_user_permissions,
     }
+    assets_prefetch = ('id', 'hostname', 'ip', "platform", "domain_id",
+                       "comment", "is_active", "os", "org_id")
 
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
@@ -432,7 +434,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         assets = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets = perm.assets.all().prefetch_related('nodes', 'protocols')
+            _assets = perm.assets.all().prefetch_related(*self.assets_prefetch)
             system_users = perm.system_users.all()
             iterable = itertools.product(_assets, system_users, actions)
             for asset, system_user, action in iterable:
@@ -456,10 +458,11 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         print("Get node assets start")
         if pattern:
             assets = Asset.objects.filter(nodes__key__regex=pattern)\
-                .prefetch_related('nodes', "protocols").only('id', 'hostname', 'ip').distinct()
+                .prefetch_related('nodes', "protocols")\
+                .only(*self.assets_prefetch)\
+                .distinct()
         else:
             assets = []
-        assets = list(assets)
         print("Get node assets end, using: {}".format(time.time() - now))
         self.tree.add_assets_without_system_users(assets)
         assets = self.tree.get_assets()

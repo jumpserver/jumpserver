@@ -161,7 +161,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = (
-            "id", "hostname", "ip", "protocol", "port", "protocols",
+            "id", "hostname", "ip", "protocols",
             "system_users_granted", "is_active", "system_users_join", "os",
             'domain', "platform", "comment", "org_id", "org_name",
         )

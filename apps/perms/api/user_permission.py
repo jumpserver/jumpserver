@@ -207,8 +207,7 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin,
         for node, _assets in nodes.items():
             assets = _assets.keys()
             for k, v in _assets.items():
-                system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
-                k.system_users_granted = system_users_granted
+                k.system_users_granted = v
             node.assets_granted = assets
             queryset.append(node)
         return queryset
@@ -298,6 +297,7 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, List
         user = self.get_object()
         node_id = self.kwargs.get('node_id')
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
+        nodes = util.get_nodes_with_assets()
         if str(node_id) == const.UNGROUPED_NODE_ID:
             node = util.tree.ungrouped_node
         else:
@@ -305,7 +305,6 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, List
         if node == util.tree.root_node:
             assets = util.get_assets()
         else:
-            nodes = util.get_nodes_with_assets()
             assets = nodes.get(node, [])
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users

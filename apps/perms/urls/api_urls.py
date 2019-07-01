@@ -13,6 +13,8 @@ router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remot
 asset_permission_urlpatterns = [
     # 查询某个用户授权的资产和资产组
     path('user/<uuid:pk>/assets/',
+         api.UserGrantedAssetsApi.as_view()),
+    path('users/<uuid:pk>/assets/',
          api.UserGrantedAssetsApi.as_view(), name='user-assets'),
     path('user/assets/', api.UserGrantedAssetsApi.as_view(),
          name='my-assets'),
