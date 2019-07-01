@@ -101,7 +101,7 @@ class GenerateTree:
             return self._ungroup_node
         node_id = const.UNGROUPED_NODE_ID
         if self.root_node:
-            node_key = self.root_node.get_next_child_key()
+            node_key = "{}:{}".format(self.root_node.key, self.root_node.child_mark)
         else:
             node_key = '0:0'
         node_value = _("Default")
