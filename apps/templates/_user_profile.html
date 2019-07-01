@@ -11,7 +11,7 @@
     </div>
     {% if ADMIN_ORGS and request.COOKIES.IN_ADMIN_PAGE != 'No' %}
         {% if ADMIN_ORGS|length > 1 or not CURRENT_ORG.is_default %}
-        <div style="height: 55px;">
+        <div>
             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="display: block; background-color: transparent; color: #8095a8; padding: 14px 20px 14px 25px">
                 <i class="fa fa-bookmark" style="width: 14px; "></i>
                 <span class="nav-label" style="padding-left: 7px">
@@ -19,15 +19,13 @@
                 </span>
                 <span class="fa fa-sort-desc pull-right"></span>
             </a>
-            <ul class="dropdown-menu" style="width: 219px;">
+            <ul class="dropdown-menu" style="min-width: 220px">
                 {% for org in ADMIN_ORGS %}
                     <li>
-                        <a class="org-dropdown"
-                           href="{% url 'orgs:org-switch' pk=org.id %}"
-                           data-id="{{ org.id }}">
+                        <a class="org-dropdown" href="{% url 'orgs:org-switch' pk=org.id %}" data-id="{{ org.id }}">
                             {{ org.name }}
                             {% if org.id == CURRENT_ORG.id %}
-                                <span class="fa fa-circle pull-right" style="padding-top: 5px; color: #1ab394"></span>
+                                <span class="fa fa-circle" style="padding-top: 5px; color: #1ab394"></span>
                             {% endif %}
                         </a>
                     </li>
