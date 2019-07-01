@@ -57,13 +57,12 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 class CommandExecutionStartView(PermissionsMixin, TemplateView):
     template_name = 'ops/command_execution_create.html'
     form_class = CommandExecutionForm
+    permission_classes = [IsValidUser]
 
     def get_permissions(self):
-        if settings.SECURITY_COMMAND_EXECUTION:
-            permission_classes = [IsValidUser]
-        else:
-            permission_classes = [IsOrgAdmin]
-        return permission_classes
+        if not settings.SECURITY_COMMAND_EXECUTION:
+            return [IsOrgAdmin]
+        return super().permission_classes()
 
     def get_user_system_users(self):
         from perms.utils import AssetPermissionUtil

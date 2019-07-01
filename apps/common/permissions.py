@@ -127,7 +127,7 @@ class PermissionsMixin(UserPassesTestMixin):
     permission_classes = []
 
     def get_permissions(self):
-        return [permission for permission in self.permission_classes]
+        return self.permission_classes
 
     def test_func(self):
         permission_classes = self.get_permissions()
