@@ -155,7 +155,9 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
-        return self.queryset.all()
+        return self.queryset.all().prefetch_related(
+            "nodes", "assets", "users", "user_groups", "system_users"
+        )
 
 
 class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):

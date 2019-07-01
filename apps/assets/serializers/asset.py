@@ -138,30 +138,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         return instance
 
 
-# class AssetAsNodeSerializer(serializers.ModelSerializer):
-#     protocols = ProtocolSerializer(many=True)
-#
-#     class Meta:
-#         model = Asset
-#         fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
-
-
-
-# class MyAssetGrantedSerializer(AssetGrantedSerializer):
-#     """
-#     普通用户获取授权的资产定义的数据结构
-#     """
-#     protocols = ProtocolSerializer(many=True)
-#
-#     class Meta:
-#         model = Asset
-#         fields = (
-#             "id", "hostname", "system_users_granted",
-#             "is_active", "system_users_join", "org_name",
-#             "os", "platform", "comment", "org_id", "protocols"
-#         )
-
-
 class AssetSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
