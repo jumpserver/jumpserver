@@ -8,14 +8,12 @@ from rest_framework.generics import (
 
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
-from orgs.utils import set_to_root_org
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
     RemoteAppPermissionUtil,
 )
 from ..hands import (
-    AssetGrantedSerializer, UserGroup,  Node, NodeSerializer,
-    RemoteAppSerializer,
+    UserGroup,  Node, NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers, const
 
@@ -30,7 +28,7 @@ __all__ = [
 
 class UserGroupGrantedAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = AssetGrantedSerializer
+    serializer_class = serializers.AssetGrantedSerializer
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')
@@ -120,7 +118,7 @@ class UserGroupGrantedNodesWithAssetsAsTreeApi(ListAPIView):
 
 class UserGroupGrantedNodeAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = AssetGrantedSerializer
+    serializer_class = serializers.AssetGrantedSerializer
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')

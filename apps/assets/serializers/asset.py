@@ -8,12 +8,11 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Protocol
-from .system_user import AssetSystemUserSerializer
 from .base import ConnectivitySerializer
 
 __all__ = [
-    'AssetSerializer', 'AssetGrantedSerializer', 'AssetSimpleSerializer',
-    'ProtocolSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer',
+    'ProtocolSerializer', 'ProtocolsRelatedField',
 ]
 
 
@@ -146,30 +145,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 #         model = Asset
 #         fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
 
-
-class AssetGrantedSerializer(serializers.ModelSerializer):
-    """
-    被授权资产的数据结构
-    """
-    protocols = ProtocolsRelatedField(
-        many=True, queryset=Protocol.objects.all(), label=_("Protocols")
-    )
-    system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
-    system_users_join = serializers.SerializerMethodField()
-    # nodes = NodeTMPSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Asset
-        fields = (
-            "id", "hostname", "ip", "protocols",
-            "system_users_granted", "is_active", "system_users_join", "os",
-            'domain', "platform", "comment", "org_id", "org_name",
-        )
-
-    @staticmethod
-    def get_system_users_join(obj):
-        system_users = [s.username for s in obj.system_users_granted]
-        return ', '.join(system_users)
 
 
 # class MyAssetGrantedSerializer(AssetGrantedSerializer):

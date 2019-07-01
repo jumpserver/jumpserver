@@ -20,7 +20,7 @@ from ..utils import (
     construct_remote_apps_tree_root, parse_remote_app_to_tree_node,
 )
 from ..hands import (
-    User, Asset, Node, SystemUser, RemoteApp, AssetGrantedSerializer,
+    User, Asset, Node, SystemUser, RemoteApp,
     NodeSerializer, RemoteAppSerializer,
 )
 from .. import serializers, const
@@ -129,7 +129,7 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
     用户授权的所有资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = AssetGrantedSerializer
+    serializer_class = serializers.AssetGrantedSerializer
     pagination_class = LimitOffsetPagination
 
     def get_object(self):
@@ -146,7 +146,10 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         assets = util.get_assets()
         for k, v in assets.items():
-            system_users_granted = [s for s in v if k.has_protocol(s.protocol)]
+            system_users_granted = []
+            for system_user, actions in v.items():
+                system_user.actions = actions
+                system_users_granted.append(system_user)
             k.system_users_granted = system_users_granted
             queryset.append(k)
         return queryset
@@ -281,7 +284,7 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, List
     查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = AssetGrantedSerializer
+    serializer_class = serializers.AssetGrantedSerializer
     pagination_class = LimitOffsetPagination
 
     def get_object(self):
