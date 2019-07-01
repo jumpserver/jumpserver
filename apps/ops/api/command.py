@@ -20,7 +20,7 @@ class CommandExecutionViewSet(viewsets.ModelViewSet):
         )
 
     def check_permissions(self, request):
-        if not settings.SECURITY_COMMAND_EXECUTION and request.user.is_ordinary_users:
+        if not settings.SECURITY_COMMAND_EXECUTION and request.user.is_common_users:
             return self.permission_denied(request, "Command execution disabled")
         return super().check_permissions(request)
 
