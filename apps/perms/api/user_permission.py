@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import time
+import traceback
 from hashlib import md5
 from django.core.cache import cache
 from django.conf import settings
@@ -16,16 +17,12 @@ from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from ..utils import (
     AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
-    check_system_user_action, RemoteAppPermissionUtil,
-    construct_remote_apps_tree_root, parse_remote_app_to_tree_node,
+    check_system_user_action,
 )
-from ..hands import (
-    User, Asset, Node, SystemUser, RemoteApp,
-    NodeSerializer, RemoteAppSerializer,
-)
+from ..hands import User, Asset, Node, SystemUser, NodeSerializer
 from .. import serializers, const
 from ..mixins import (
-    AssetsFilterMixin, RemoteAppFilterMixin
+    AssetsFilterMixin,
 )
 from ..models import Action
 
@@ -36,8 +33,6 @@ __all__ = [
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodeChildrenApi',
     'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
-    'UserGrantedRemoteAppsApi', 'ValidateUserRemoteAppPermissionApi',
-    'UserGrantedRemoteAppsAsTreeApi',
 ]
 
 
@@ -77,46 +72,61 @@ class UserPermissionCacheMixin:
         request_md5 = self.get_request_md5()
         meta_cache_id = self.get_meta_cache_id()
         resp_cache_id = '{}_{}_{}'.format(obj_id, request_md5, meta_cache_id)
+        resp_cache_id = md5(resp_cache_id.encode()).hexdigest()
         return resp_cache_id
 
     def get_response_from_cache(self):
-        resp_cache_id = self.get_response_cache_id()
         # 没有数据缓冲
         meta_cache_id = self.get_meta_cache_id()
         if not meta_cache_id:
+            logger.debug("Not get meta id: {}".format(meta_cache_id))
             return None
         # 从响应缓冲里获取响应
-        key = self.RESP_CACHE_KEY.format(resp_cache_id)
+        key = self.get_response_key()
+        print("response key: {}".format(key))
         data = cache.get(key)
+        print(data)
         if not data:
+            logger.debug("Not get response from cache: {}".format(key))
             return None
         logger.debug("Get user permission from cache: {}".format(self.get_object()))
         response = Response(data)
         return response
 
     def expire_response_cache(self):
+        print("Expire cache")
         obj_id = self.get_object_id()
         expire_cache_id = '{}_{}'.format(obj_id, '*')
         key = self.RESP_CACHE_KEY.format(expire_cache_id)
         cache.delete_pattern(key)
 
-    def set_response_to_cache(self, response):
+    def get_response_key(self):
         resp_cache_id = self.get_response_cache_id()
         key = self.RESP_CACHE_KEY.format(resp_cache_id)
+        return key
+
+    def set_response_to_cache(self, response):
+        key = self.get_response_key()
         cache.set(key, response.data, self.CACHE_TIME)
+        logger.debug("Set response to cache: {}".format(key))
+        print(self.CACHE_TIME)
 
     def get(self, request, *args, **kwargs):
         self.cache_policy = request.GET.get('cache_policy', '0')
 
         obj = self._get_object()
         if obj is None:
+            logger.debug("Not get response from cache: obj is none")
             return super().get(request, *args, **kwargs)
 
         if AssetPermissionUtil.is_not_using_cache(self.cache_policy):
+            logger.debug("Not get resp from cache: {}".format(self.cache_policy))
             return super().get(request, *args, **kwargs)
         elif AssetPermissionUtil.is_refresh_cache(self.cache_policy):
+            logger.debug("Not get resp from cache: {}".format(self.cache_policy))
             self.expire_response_cache()
 
+        logger.debug("Try get response from cache")
         resp = self.get_response_from_cache()
         if not resp:
             resp = super().get(request, *args, **kwargs)
@@ -245,11 +255,8 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
             user = get_object_or_404(User, id=user_id)
         return user
 
-    def list(self, request, *args, **kwargs):
-        resp = super().list(request, *args, **kwargs)
-        return resp
-
     def get_queryset(self):
+        print("Call get queryset")
         queryset = []
         self.show_assets = self.request.query_params.get('show_assets', '1') == '1'
         self.system_user_id = self.request.query_params.get('system_user')
@@ -259,22 +266,14 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
             util.filter_permissions(
                 system_users=self.system_user_id
             )
-        print("111111111111")
         nodes = util.get_nodes_with_assets()
-        print("22222222222222")
         for node, assets in nodes.items():
-            now = time.time()
-            print("Parse to node")
             data = parse_node_to_tree_node(node)
-            print("parse to node end, using: {0:.2f}".format(time.time() - now))
             queryset.append(data)
             if not self.show_assets:
                 continue
             for asset, system_users in assets.items():
-                now1 = time.time()
-                print("parse to asset")
                 data = parse_asset_to_tree_node(node, asset, system_users)
-                print("parse to asset end, using: {0:.2f}".format(time.time()-now1))
                 queryset.append(data)
         return queryset
 
@@ -458,77 +457,3 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
         return Response({'actions': actions}, status=200)
 
 
-# RemoteApp permission
-
-class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = RemoteAppSerializer
-    pagination_class = LimitOffsetPagination
-
-    def get_object(self):
-        user_id = self.kwargs.get('pk', '')
-        if user_id:
-            user = get_object_or_404(User, id=user_id)
-        else:
-            user = self.request.user
-        return user
-
-    def get_queryset(self):
-        util = RemoteAppPermissionUtil(self.get_object())
-        queryset = util.get_remote_apps()
-        queryset = list(queryset)
-        return queryset
-
-    def get_permissions(self):
-        if self.kwargs.get('pk') is None:
-            self.permission_classes = (IsValidUser,)
-        return super().get_permissions()
-
-
-class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
-    serializer_class = TreeNodeSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
-
-    def get_object(self):
-        user_id = self.kwargs.get('pk', '')
-        if not user_id:
-            user = self.request.user
-        else:
-            user = get_object_or_404(User, id=user_id)
-        return user
-
-    def get_queryset(self):
-        queryset = []
-        tree_root = construct_remote_apps_tree_root()
-        queryset.append(tree_root)
-
-        util = RemoteAppPermissionUtil(self.get_object())
-        remote_apps = util.get_remote_apps()
-        for remote_app in remote_apps:
-            node = parse_remote_app_to_tree_node(tree_root, remote_app)
-            queryset.append(node)
-
-        queryset = sorted(queryset)
-        return queryset
-
-    def get_permissions(self):
-        if self.kwargs.get('pk') is None:
-            self.permission_classes = (IsValidUser,)
-        return super().get_permissions()
-
-
-class ValidateUserRemoteAppPermissionApi(APIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-
-    def get(self, request, *args, **kwargs):
-        self.change_org_if_need(request, kwargs)
-        user_id = request.query_params.get('user_id', '')
-        remote_app_id = request.query_params.get('remote_app_id', '')
-        user = get_object_or_404(User, id=user_id)
-        remote_app = get_object_or_404(RemoteApp, id=remote_app_id)
-
-        util = RemoteAppPermissionUtil(user)
-        remote_apps = util.get_remote_apps()
-        if remote_app not in remote_apps:
-            return Response({'msg': False}, status=403)
-        return Response({'msg': True}, status=200)

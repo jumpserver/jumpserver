@@ -110,17 +110,17 @@ class GenerateTree:
         self._ungroup_node = node
         return node
 
-    @timeit
+    #@timeit
     def add_assets_without_system_users(self, assets):
         for asset in assets:
             self.add_asset(asset, {})
 
-    @timeit
+    #@timeit
     def add_assets(self, assets):
         for asset, system_users in assets.items():
             self.add_asset(asset, system_users)
 
-    @timeit
+    #@timeit
     def add_asset(self, asset, system_users=None):
         nodes = asset.nodes.all()
         nodes = self.node_util.get_nodes_by_queryset(nodes)
@@ -159,7 +159,7 @@ class GenerateTree:
         self.nodes[node]["system_users"] = system_users
 
     # 添加树节点
-    @timeit
+    #@timeit
     def add_nodes(self, nodes):
         _nodes = nodes.keys()
         family = self.node_util.get_family(_nodes, with_children=True)
@@ -169,7 +169,7 @@ class GenerateTree:
     def get_assets(self):
         return dict(self.assets)
 
-    @timeit
+    #@timeit
     def get_nodes_with_assets(self):
         if self._nodes_with_assets:
             return self._nodes_with_assets
@@ -220,6 +220,7 @@ class AssetPermissionCacheMixin:
     CACHE_META_KEY_PREFIX = '_ASSET_PERM_META_KEY_'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
+    cache_policy = '1'
 
     @classmethod
     def is_not_using_cache(cls, cache_policy):
@@ -242,7 +243,7 @@ class AssetPermissionCacheMixin:
     def _is_refresh_cache(self):
         return self.is_refresh_cache(self.cache_policy)
 
-    @timeit
+    #@timeit
     def get_cache_key(self, resource):
         cache_key = self.CACHE_KEY_PREFIX + '{obj_id}_{filter_id}_{resource}'
         return cache_key.format(
@@ -250,18 +251,23 @@ class AssetPermissionCacheMixin:
             resource=resource
         )
 
+    @property
     def node_key(self):
         return self.get_cache_key('NODES_WITH_ASSETS')
 
+    @property
     def asset_key(self):
-        return self.get_cache_key('ASSETS')
+        key = self.get_cache_key('ASSETS')
+        return key
 
+    @property
     def system_key(self):
         return self.get_cache_key('SYSTEM_USER')
 
     def get_assets_from_cache(self):
         cached = cache.get(self.asset_key)
         if not cached:
+            print("Refresh cache")
             self.update_cache()
             cached = cache.get(self.asset_key)
         return cached
@@ -290,7 +296,7 @@ class AssetPermissionCacheMixin:
         return cached
 
     def get_assets(self):
-        if self._is_not_using_cache():
+        if self._is_using_cache():
             return self.get_assets_from_cache()
         elif self._is_refresh_cache():
             self.expire_cache()
@@ -318,7 +324,10 @@ class AssetPermissionCacheMixin:
     @property
     def cache_meta(self):
         key = self.get_meta_cache_key()
-        return cache.get(key) or {}
+        meta = cache.get(key) or {}
+        # print("Meta key: {}".format(key))
+        # print("Meta id: {}".format(meta["id"]))
+        return meta
 
     def set_meta_to_cache(self):
         key = self.get_meta_cache_key()
@@ -327,6 +336,8 @@ class AssetPermissionCacheMixin:
             'datetime': timezone.now(),
             'object': str(self.object)
         }
+        # print("Set meta key: {}".format(key))
+        # print("set meta to cache: {}".format(meta["id"]))
         cache.set(key, meta, self.CACHE_TIME)
 
     def expire_cache_meta(self):
@@ -403,13 +414,13 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self._permissions = permissions
         return permissions
 
-    @timeit
+    #@timeit
     def filter_permissions(self, **filters):
         filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
-    @timeit
+    #@timeit
     def get_nodes_direct(self):
         """
         返回用户/组授权规则直接关联的节点
@@ -425,7 +436,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self.tree.add_nodes(nodes)
         return nodes
 
-    @timeit
+    #@timeit
     def get_assets_direct(self):
         """
         返回用户授权规则直接关联的资产
@@ -442,7 +453,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self.tree.add_assets(assets)
         return assets
 
-    @timeit
+    #@timeit
     def get_assets_without_cache(self):
         """
         :return: {asset1: set(system_user1,)}
@@ -469,7 +480,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self._assets = assets
         return assets
 
-    @timeit
+    #@timeit
     def get_nodes_with_assets_without_cache(self):
         """
         返回节点并且包含资产
