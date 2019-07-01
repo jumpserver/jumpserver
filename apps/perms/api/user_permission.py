@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+import time
 from hashlib import md5
 from django.core.cache import cache
 from django.conf import settings
@@ -261,14 +261,19 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
         nodes = util.get_nodes_with_assets()
         print("22222222222222")
         for node, assets in nodes.items():
+            now = time.time()
+            print("Parse to node")
             data = parse_node_to_tree_node(node)
+            print("parse to node end, using: {0:.2f}".format(time.time() - now))
             queryset.append(data)
             if not self.show_assets:
                 continue
             for asset, system_users in assets.items():
+                now1 = time.time()
+                print("parse to asset")
                 data = parse_asset_to_tree_node(node, asset, system_users)
+                print("parse to asset end, using: {0:.2f}".format(time.time()-now1))
                 queryset.append(data)
-        queryset = sorted(queryset)
         return queryset
 
 

@@ -54,17 +54,19 @@ class NodeUtil:
     def sorted_by(node):
         return [int(i) for i in node.key.split(':')]
 
-    def get_all_nodes(self):
+    def get_queryset(self):
         all_nodes = Node.objects.all()
         if self.with_assets_amount:
-            now = time.time()
             all_nodes = all_nodes.prefetch_related(
                 Prefetch('assets', queryset=Asset.objects.all().only('id'))
             )
             all_nodes = list(all_nodes)
             for node in all_nodes:
                 node._assets = set(node.assets.all())
-        all_nodes = sorted(all_nodes, key=self.sorted_by)
+        return all_nodes
+
+    def get_all_nodes(self):
+        all_nodes = sorted(self.get_queryset(), key=self.sorted_by)
 
         guarder = Node(key='', value='Guarder')
         guarder._assets = []
@@ -119,11 +121,11 @@ class NodeUtil:
     def get_nodes_by_queryset(self, queryset):
         nodes = []
         for n in queryset:
-            node = self._nodes.get(n.key)
+            node = self.get_node_by_key(n.key)
             if not node:
                 continue
-            nodes.append(nodes)
-        return [self]
+            nodes.append(node)
+        return nodes
 
     def get_node_by_key(self, key):
         return self._nodes.get(key)
@@ -156,10 +158,16 @@ class NodeUtil:
             tree_nodes.add(node)
             if with_children:
                 tree_nodes.update(node._children)
-        for n in tree_nodes:
-            delattr(n, '_children')
-            delattr(n, '_parents')
         return list(tree_nodes)
+
+    def get_nodes_parents(self, nodes, with_self=True):
+        parents = set()
+        for n in nodes:
+            node = self.get_node_by_key(n.key)
+            parents.update(set(node._parents))
+            if with_self:
+                parents.add(node)
+        return parents
 
 
 def test_node_tree():

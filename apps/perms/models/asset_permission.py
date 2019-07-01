@@ -39,39 +39,46 @@ class ActionFlag:
     UPLOAD = 0b00000010
     DOWNLOAD = 0b00000100
     UPDOWNLOAD = UPLOAD | DOWNLOAD
-    CONNECT_UPLOADOWN = CONNECT | UPDOWNLOAD
     ALL = 0b11111111
-    NAME_MAP = {
-        "connect": CONNECT,
-        "upload": UPLOAD,
-        "download": DOWNLOAD,
-        "updownload": UPDOWNLOAD,
-        "all": ALL,
-    }
 
-    CHOICES = (
+    DB_CHOICES = (
         (ALL, _('All')),
         (CONNECT, _('Connect')),
-        (UPDOWNLOAD, _("Upload download")),
         (UPLOAD, _('Upload file')),
         (DOWNLOAD, _('Download file')),
+        (UPDOWNLOAD, _("Upload download")),
     )
+
+    NAME_MAP = {
+        ALL: "all",
+        CONNECT: "connect",
+        UPLOAD: "upload_file",
+        DOWNLOAD: "download_file",
+        UPDOWNLOAD: "updownload",
+    }
+
+    NAME_MAP_REVERSE = dict({v: k for k, v in NAME_MAP.items()})
+    CHOICES = []
+    for i, j in DB_CHOICES:
+        CHOICES.append((NAME_MAP[i], j))
 
     @classmethod
     def value_to_choices(cls, value):
         value = int(value)
-        if value == cls.ALL:
-            return [cls.ALL]
-        elif value == cls.UPDOWNLOAD:
-            return [cls.UPDOWNLOAD]
-        elif value == cls.CONNECT_UPLOADOWN:
-            return [cls.CONNECT, cls.UPDOWNLOAD]
-        else:
-            return [i for i in dict(cls.CHOICES) if i == i & int(value)]
+        choices = [cls.NAME_MAP[i] for i, j in cls.DB_CHOICES if value & i == i]
+        return choices
 
     @classmethod
     def choices_to_value(cls, value):
-        return reduce(lambda x, y: int(x) | int(y), value)
+        def to_choices(x, y):
+            x = cls.NAME_MAP_REVERSE.get(x, 0)
+            y = cls.NAME_MAP_REVERSE.get(y, 0)
+            return x | y
+        return reduce(to_choices, value)
+
+    @classmethod
+    def choices(cls):
+        return [(cls.NAME_MAP[i], j) for i, j in cls.DB_CHOICES]
 
 
 class AssetPermission(BasePermission):
@@ -79,7 +86,7 @@ class AssetPermission(BasePermission):
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
     # actions = models.ManyToManyField(Action, related_name='permissions', blank=True, verbose_name=_('Action'))
-    action = models.IntegerField(choices=ActionFlag.CHOICES, default=ActionFlag.ALL, verbose_name=_("Action"))
+    actions = models.IntegerField(choices=ActionFlag.DB_CHOICES, default=ActionFlag.ALL, verbose_name=_("Actions"))
 
     class Meta:
         unique_together = [('org_id', 'name')]

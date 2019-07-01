@@ -50,18 +50,13 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
     """
     查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少
     """
-    actions = serializers.SerializerMethodField()
 
     class Meta:
         model = SystemUser
         fields = (
             'id', 'name', 'username', 'priority',
-            'protocol',  'comment', 'login_mode', 'actions',
+            'protocol',  'comment', 'login_mode',
         )
-
-    @staticmethod
-    def get_actions(obj):
-        return [action.name for action in obj.actions]
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):

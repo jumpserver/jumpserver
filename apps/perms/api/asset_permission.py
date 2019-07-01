@@ -35,7 +35,8 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_serializer_class(self):
-        if self.action in ("list", 'retrieve'):
+        if self.action in ("list", 'retrieve') and \
+                self.request.query_params.get("display"):
             return serializers.AssetPermissionListSerializer
         return self.serializer_class
 

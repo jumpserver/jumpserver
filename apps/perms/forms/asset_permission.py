@@ -74,13 +74,13 @@ class AssetPermissionForm(OrgModelForm):
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
-            'action': forms.CheckboxSelectMultiple()
+            'actions': forms.CheckboxSelectMultiple()
         }
         labels = {
             'nodes': _("Node"),
         }
         help_texts = {
-            'action': _('Tips: The RDP protocol does not support separate '
+            'actions': _('Tips: The RDP protocol does not support separate '
                         'controls for uploading or downloading files')
         }
 

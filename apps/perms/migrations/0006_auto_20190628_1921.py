@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assetpermission',
             name='action',
-            field=models.IntegerField(choices=[(255, 'All'), (1, 'Connect'), (2, 'Upload file'), (5, 'Upload download'), (4, 'Download file')], default=255, verbose_name='Action'),
+            field=models.IntegerField(choices=[(255, 'All'), (1, 'Connect'), (2, 'Upload file'), (4, 'Download file'), (6, 'Upload download')], default=255, verbose_name='Actions'),
         ),
         migrations.RunPython(migrate_old_actions),
     ]

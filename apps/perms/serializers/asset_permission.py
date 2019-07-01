@@ -38,7 +38,7 @@ class ActionDisplayField(ActionField):
 
 
 class AssetPermissionCreateUpdateSerializer(BulkOrgResourceModelSerializer):
-    action = ActionField()
+    actions = ActionField()
 
     class Meta:
         model = AssetPermission
@@ -51,7 +51,7 @@ class AssetPermissionListSerializer(BulkOrgResourceModelSerializer):
     assets = StringManyToManyField(many=True, read_only=True)
     nodes = StringManyToManyField(many=True, read_only=True)
     system_users = StringManyToManyField(many=True, read_only=True)
-    action = ActionDisplayField()
+    actions = ActionDisplayField()
     is_valid = serializers.BooleanField()
     is_expired = serializers.BooleanField()
 

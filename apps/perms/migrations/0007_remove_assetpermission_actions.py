@@ -14,4 +14,9 @@ class Migration(migrations.Migration):
             model_name='assetpermission',
             name='actions',
         ),
+        migrations.RenameField(
+            model_name='assetpermission',
+            old_name='action',
+            new_name='actions',
+        ),
     ]
