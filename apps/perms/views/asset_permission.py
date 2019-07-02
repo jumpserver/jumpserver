@@ -10,10 +10,9 @@ from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
-from perms.hands import Node, Asset, SystemUser, User, UserGroup
-from perms.models import AssetPermission, Action
+from perms.hands import Node, Asset, SystemUser, UserGroup
+from perms.models import AssetPermission
 from perms.forms import AssetPermissionForm
-from perms.const import PERMS_ACTION_NAME_ALL
 
 
 __all__ = [

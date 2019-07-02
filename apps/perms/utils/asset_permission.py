@@ -17,7 +17,7 @@ from orgs.utils import set_to_root_org
 from common.utils import get_logger
 from common.tree import TreeNode
 from .. import const
-from ..models import AssetPermission, Action, ActionFlag
+from ..models import AssetPermission, Action
 from ..hands import Node, Asset
 from assets.utils import NodeUtil
 
@@ -569,7 +569,7 @@ def parse_asset_to_tree_node(node, asset, system_users):
             'protocol': system_user.protocol,
             'priority': system_user.priority,
             'login_mode': system_user.login_mode,
-            'actions': [ActionFlag.value_to_choices(action)],
+            'actions': [Action.value_to_choices(action)],
         })
     data = {
         'id': str(asset.id),

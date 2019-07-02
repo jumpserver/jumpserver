@@ -21,7 +21,7 @@ from ..utils import (
 from ..hands import User, Asset, Node, SystemUser, NodeSerializer
 from .. import serializers, const
 from ..mixins import AssetsFilterMixin
-from ..models import ActionFlag
+from ..models import Action
 
 logger = get_logger(__name__)
 
@@ -423,7 +423,7 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
             return Response({'msg': False}, status=403)
 
         action = granted_system_users[su]
-        choices = ActionFlag.value_to_choices(action)
+        choices = Action.value_to_choices(action)
         if action_name not in choices:
             return Response({'msg': False}, status=403)
 

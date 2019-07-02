@@ -6,21 +6,22 @@ from functools import reduce
 
 def migrate_old_actions(apps, schema_editor):
     from orgs.utils import set_to_root_org
-    from ..models import ActionFlag
     set_to_root_org()
     perm_model = apps.get_model('perms', 'AssetPermission')
     db_alias = schema_editor.connection.alias
     perms = perm_model.objects.using(db_alias).all()
     actions_map = {
-        "all": ActionFlag.ALL,
-        "connect": ActionFlag.CONNECT,
-        "upload_file": ActionFlag.UPLOAD,
-        "download_file": ActionFlag.DOWNLOAD,
+        "all": 0b11111111,
+        "connect": 0b00000001,
+        "upload_file": 0b00000010,
+        "download_file": 0b00000100,
     }
 
     for perm in perms:
         actions = perm.actions.all()
-        new_actions = [actions_map.get(action.name, ActionFlag.ALL) for action in actions]
+        if not actions:
+            continue
+        new_actions = [actions_map.get(action.name, 0b11111111) for action in actions]
         new_action = reduce(lambda x, y: x | y, new_actions)
         perm.action = new_action
         perm.save()

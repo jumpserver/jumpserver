@@ -77,6 +77,7 @@ def monkey_patch_settings(sender, **kwargs):
 @receiver(django_ready)
 def auto_generate_terminal_host_key(sender, **kwargs):
     try:
+        print("Auto gen host key")
         if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
             return
         private_key, public_key = ssh_key_gen()
