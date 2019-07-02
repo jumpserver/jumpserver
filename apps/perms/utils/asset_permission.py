@@ -180,6 +180,9 @@ class GenerateTree:
         self._nodes_with_assets = nodes
         return dict(nodes)
 
+    def get_nodes(self):
+        return self.nodes.keys()
+
 
 def get_user_permissions(user, include_group=True):
     if include_group:
@@ -435,6 +438,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
                 nodes[node][system_user] |= action
         self.tree.add_nodes(nodes)
         return nodes
+
+    def get_nodes(self):
+        self.get_assets_direct()
+        return self.tree.get_nodes()
 
     #@timeit
     def get_assets_direct(self):

@@ -27,7 +27,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
         extra_kwargs = {
-            'password': {'write_only': True},
+            'password': {'write_only': True, 'required': False},
             'public_key': {'write_only': True},
             'groups_display': {'label': _('Groups name')},
             'source_display': {'label': _('Source name')},

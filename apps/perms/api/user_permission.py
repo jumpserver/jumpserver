@@ -8,7 +8,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView
+    ListAPIView, get_object_or_404, RetrieveAPIView
 )
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -172,7 +172,7 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
 
 class UserGrantedNodesApi(UserPermissionCacheMixin, ListAPIView):
     """
-    查询用户授权的所有节点的API, 如果是超级用户或者是 app，切换到root org
+    查询用户授权的所有节点的API
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeSerializer
@@ -188,8 +188,8 @@ class UserGrantedNodesApi(UserPermissionCacheMixin, ListAPIView):
     def get_queryset(self):
         user = self.get_object()
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
-        nodes = util.get_nodes_with_assets()
-        return nodes.keys()
+        nodes = util.get_nodes()
+        return nodes
 
     def get_permissions(self):
         if self.kwargs.get('pk') is None:
