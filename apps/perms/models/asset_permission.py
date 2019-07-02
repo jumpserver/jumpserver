@@ -4,7 +4,7 @@ from functools import reduce
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import date_expired_default
+from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin
 
 from .base import BasePermission
@@ -78,6 +78,14 @@ class AssetPermission(BasePermission):
     @classmethod
     def get_queryset_with_prefetch(cls):
         return cls.objects.all().valid().prefetch_related('nodes', 'assets', 'system_users')
+
+    def get_all_assets(self):
+        assets = set(self.assets.all())
+        for node in self.nodes.all():
+            _assets = node.get_all_assets()
+            set_or_append_attr_bulk(_assets, 'inherit', node.value)
+            assets.update(set(_assets))
+        return assets
 
 
 class NodePermission(OrgModelMixin):

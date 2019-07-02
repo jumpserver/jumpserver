@@ -155,7 +155,7 @@ class AssetPermissionAssetView(PermissionsMixin,
     permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset = AssetPermission.objects.all())
+        self.object = self.get_object(queryset=AssetPermission.objects.all())
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
