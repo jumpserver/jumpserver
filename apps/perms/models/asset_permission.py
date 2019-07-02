@@ -4,7 +4,7 @@ from functools import reduce
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import date_expired_default
+from common.utils import date_expired_default, set_or_append_attr_bulk
 from orgs.mixins import OrgModelMixin
 
 from .base import BasePermission
