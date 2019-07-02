@@ -11,6 +11,7 @@ from .asset_permission import ActionField
 __all__ = [
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'ActionsSerializer',
 ]
 
 
@@ -111,3 +112,7 @@ class GrantedNodeSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'key', 'value',
         ]
+
+
+class ActionsSerializer(serializers.Serializer):
+    actions = ActionField(read_only=True)

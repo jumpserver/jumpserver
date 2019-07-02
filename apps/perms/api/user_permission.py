@@ -8,7 +8,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
-    ListAPIView, get_object_or_404,
+    ListAPIView, get_object_or_404, GenericAPIView, RetrieveAPIView
 )
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -433,13 +433,14 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
         return Response({'msg': True}, status=200)
 
 
-class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
+class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
+    serializers_class = serializers.ActionsSerializer
 
-    def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id', '')
-        asset_id = request.query_params.get('asset_id', '')
-        system_id = request.query_params.get('system_user_id', '')
+    def get_object(self):
+        user_id = self.request.query_params.get('user_id', '')
+        asset_id = self.request.query_params.get('asset_id', '')
+        system_id = self.request.query_params.get('system_user_id', '')
 
         user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)
@@ -447,12 +448,8 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, APIView):
 
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         granted_assets = util.get_assets()
-        granted_system_users = granted_assets.get(asset, [])
-        _su = next((s for s in granted_system_users if s.id == su.id), None)
-        if not _su:
-            return Response({'actions': []}, status=403)
+        granted_system_users = granted_assets.get(asset, {})
 
-        actions = [action.name for action in getattr(_su, 'actions', [])]
-        return Response({'actions': actions}, status=200)
-
-
+        if su not in granted_system_users:
+            return {"actions": 0}
+        return granted_system_users[su]
