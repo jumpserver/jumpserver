@@ -55,6 +55,8 @@ class Action:
             x = cls.NAME_MAP_REVERSE.get(x, 0)
             y = cls.NAME_MAP_REVERSE.get(y, 0)
             return x | y
+        if not value:
+            return None
         return reduce(to_choices, value)
 
     @classmethod

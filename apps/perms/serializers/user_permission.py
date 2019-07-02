@@ -6,7 +6,7 @@ from rest_framework import serializers
 from assets.models import Node, SystemUser
 from assets.serializers import AssetSerializer
 
-from .asset_permission import ActionField
+from .asset_permission import ActionsField
 
 __all__ = [
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
@@ -19,7 +19,7 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
     """
     查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少
     """
-    actions = ActionField(read_only=True)
+    actions = ActionsField(read_only=True)
 
     class Meta:
         model = SystemUser
@@ -115,4 +115,4 @@ class GrantedNodeSerializer(serializers.ModelSerializer):
 
 
 class ActionsSerializer(serializers.Serializer):
-    actions = ActionField(read_only=True)
+    actions = ActionsField(read_only=True)
