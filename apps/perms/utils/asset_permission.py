@@ -27,7 +27,6 @@ logger = get_logger(__file__)
 __all__ = [
     'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
     'parse_asset_to_tree_node', 'parse_node_to_tree_node',
-    'check_system_user_action',
 ]
 
 
@@ -597,16 +596,3 @@ def parse_asset_to_tree_node(node, asset, system_users):
     }
     tree_node = TreeNode(**data)
     return tree_node
-
-
-def check_system_user_action(system_user, action):
-    """
-    :param system_user: SystemUser object (包含动态属性: actions)
-    :param action: Action object
-    :return: bool
-    """
-
-    check_actions = [Action.get_action_all(), action]
-    granted_actions = getattr(system_user, 'actions', [])
-    actions = list(set(granted_actions).intersection(set(check_actions)))
-    return bool(actions)
