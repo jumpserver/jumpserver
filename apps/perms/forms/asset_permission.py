@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from assets.models import Asset, Node
-from ..models import AssetPermission, ActionFlag
+from ..models import AssetPermission, Action
 
 __all__ = [
     'AssetPermissionForm',
@@ -16,20 +16,20 @@ __all__ = [
 
 class ActionField(forms.MultipleChoiceField):
     def __init__(self, *args, **kwargs):
-        kwargs['choices'] = ActionFlag.CHOICES
-        kwargs['initial'] = ActionFlag.ALL
+        kwargs['choices'] = Action.CHOICES
+        kwargs['initial'] = Action.ALL
         kwargs['label'] = _("Action")
         kwargs['widget'] = forms.CheckboxSelectMultiple()
         super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         value = super().to_python(value)
-        return ActionFlag.choices_to_value(value)
+        return Action.choices_to_value(value)
 
     def prepare_value(self, value):
         if value is None:
             return value
-        value = ActionFlag.value_to_choices(value)
+        value = Action.value_to_choices(value)
         return value
 
 

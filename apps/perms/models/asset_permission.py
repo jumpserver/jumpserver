@@ -4,37 +4,18 @@ from functools import reduce
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import date_expired_default, set_or_append_attr_bulk
+from common.utils import date_expired_default
 from orgs.mixins import OrgModelMixin
 
-from ..const import PERMS_ACTION_NAME_CHOICES, PERMS_ACTION_NAME_ALL
 from .base import BasePermission
 
 
 __all__ = [
-    'Action', 'AssetPermission', 'NodePermission', 'ActionFlag'
+    'AssetPermission', 'NodePermission', 'Action',
 ]
 
 
-class Action(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(
-        max_length=128, unique=True, choices=PERMS_ACTION_NAME_CHOICES,
-        verbose_name=_('Name')
-    )
-
-    class Meta:
-        verbose_name = _('Action')
-
-    def __str__(self):
-        return self.get_name_display()
-
-    @classmethod
-    def get_action_all(cls):
-        return cls.objects.get(name=PERMS_ACTION_NAME_ALL)
-
-
-class ActionFlag:
+class Action:
     CONNECT = 0b00000001
     UPLOAD = 0b00000010
     DOWNLOAD = 0b00000100
@@ -86,7 +67,7 @@ class AssetPermission(BasePermission):
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
     # actions = models.ManyToManyField(Action, related_name='permissions', blank=True, verbose_name=_('Action'))
-    actions = models.IntegerField(choices=ActionFlag.DB_CHOICES, default=ActionFlag.ALL, verbose_name=_("Actions"))
+    actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
 
     class Meta:
         unique_together = [('org_id', 'name')]

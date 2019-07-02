@@ -6,7 +6,7 @@ from django.db import transaction
 
 from common.utils import get_logger
 from .utils import AssetPermissionUtil
-from .models import AssetPermission, Action
+from .models import AssetPermission
 
 
 logger = get_logger(__file__)

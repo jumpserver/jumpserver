@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from common.fields import StringManyToManyField
 from orgs.mixins import BulkOrgResourceModelSerializer
-from perms.models import AssetPermission, ActionFlag
+from perms.models import AssetPermission, Action
 
 __all__ = [
     'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
@@ -16,20 +16,20 @@ __all__ = [
 
 class ActionField(serializers.MultipleChoiceField):
     def __init__(self, *args, **kwargs):
-        kwargs['choices'] = ActionFlag.CHOICES
+        kwargs['choices'] = Action.CHOICES
         super().__init__(*args, **kwargs)
 
     def to_representation(self, value):
-        return ActionFlag.value_to_choices(value)
+        return Action.value_to_choices(value)
 
     def to_internal_value(self, data):
-        return ActionFlag.choices_to_value(data)
+        return Action.choices_to_value(data)
 
 
 class ActionDisplayField(ActionField):
     def to_representation(self, value):
         values = super().to_representation(value)
-        choices = dict(ActionFlag.CHOICES)
+        choices = dict(Action.CHOICES)
         return [choices.get(i) for i in values]
 
 

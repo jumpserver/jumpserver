@@ -10,7 +10,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
-from ..models import AssetPermission, Action
+from ..models import AssetPermission
 from ..hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
