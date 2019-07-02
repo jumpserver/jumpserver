@@ -39,6 +39,14 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by': {'read_only': True}, 'source': {'read_only': True}
         }
 
+    def validate_role(self, value):
+        request = self.context.get('request')
+        if not request.user.is_superuser and value != User.ROLE_USER:
+            role_display = dict(User.ROLE_CHOICES)[User.ROLE_USER]
+            msg = _("Role limit to {}".format(role_display))
+            raise serializers.ValidationError(msg)
+        return value
+
     @staticmethod
     def validate_password(value):
         from ..utils import check_password_rules

@@ -224,6 +224,8 @@ class AssetPermissionCacheMixin:
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
     cache_policy = '1'
+    obj_id = ''
+    _filter_id = None
 
     @classmethod
     def is_not_using_cache(cls, cache_policy):
@@ -270,7 +272,6 @@ class AssetPermissionCacheMixin:
     def get_assets_from_cache(self):
         cached = cache.get(self.asset_key)
         if not cached:
-            print("Refresh cache")
             self.update_cache()
             cached = cache.get(self.asset_key)
         return cached
@@ -320,7 +321,7 @@ class AssetPermissionCacheMixin:
     def get_meta_cache_key(self):
         cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_{filter_id}'
         key = cache_key.format(
-            obj_id=str(self.object.id), filter_id=self._filter_id
+            obj_id=self.obj_id, filter_id=self._filter_id
         )
         return key
 
@@ -345,7 +346,7 @@ class AssetPermissionCacheMixin:
 
     def expire_cache_meta(self):
         cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_*'
-        key = cache_key.format(obj_id=str(self.object.id))
+        key = cache_key.format(obj_id=self.obj_id)
         cache.delete_pattern(key)
 
     def update_cache(self):
@@ -377,6 +378,15 @@ class AssetPermissionCacheMixin:
     def expire_all_cache(cls):
         key = cls.CACHE_KEY_PREFIX + '*'
         cache.delete_pattern(key)
+
+    def get_assets_without_cache(self):
+        raise NotImplementedError()
+
+    def get_nodes_with_assets_without_cache(self):
+        raise NotImplementedError()
+
+    def get_system_user_without_cache(self):
+        raise NotImplementedError()
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
@@ -472,8 +482,6 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         for node in nodes:
             pattern.add(r'^{0}$|^{0}:'.format(node.key))
         pattern = '|'.join(list(pattern))
-        now = time.time()
-        print("Get node assets start")
         if pattern:
             assets = Asset.objects.filter(nodes__key__regex=pattern)\
                 .prefetch_related('nodes', "protocols")\
@@ -481,7 +489,6 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
                 .distinct()
         else:
             assets = []
-        print("Get node assets end, using: {}".format(time.time() - now))
         self.tree.add_assets_without_system_users(assets)
         assets = self.tree.get_assets()
         self._assets = assets

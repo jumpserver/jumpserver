@@ -21,9 +21,7 @@ from ..utils import (
 )
 from ..hands import User, Asset, Node, SystemUser, NodeSerializer
 from .. import serializers, const
-from ..mixins import (
-    AssetsFilterMixin,
-)
+from ..mixins import AssetsFilterMixin
 from ..models import Action
 
 logger = get_logger(__name__)
@@ -155,13 +153,13 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
         user = self.get_object()
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         assets = util.get_assets()
-        for k, v in assets.items():
+        for asset, system_users in assets.items():
             system_users_granted = []
-            for system_user, actions in v.items():
+            for system_user, actions in system_users.items():
                 system_user.actions = actions
                 system_users_granted.append(system_user)
-            k.system_users_granted = system_users_granted
-            queryset.append(k)
+            asset.system_users_granted = system_users_granted
+            queryset.append(system_users_granted)
         return queryset
 
     def get_permissions(self):

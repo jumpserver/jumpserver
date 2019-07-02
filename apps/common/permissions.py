@@ -140,3 +140,14 @@ class NeedMFAVerify(permissions.BasePermission):
         if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
             return True
         return False
+
+
+class CanUpdateSuperUser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['GET', 'OPTIONS']:
+            return True
+        if request.user.is_superuser:
+            return True
+        if hasattr(obj, 'is_superuser') and obj.is_superuser:
+            return False
+        return True
