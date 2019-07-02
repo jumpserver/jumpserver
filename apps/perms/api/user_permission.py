@@ -158,7 +158,7 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
                 system_user.actions = actions
                 system_users_granted.append(system_user)
             asset.system_users_granted = system_users_granted
-            queryset.append(system_users_granted)
+            queryset.append(asset)
         return queryset
 
     def get_permissions(self):
