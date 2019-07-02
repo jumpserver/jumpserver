@@ -9,7 +9,7 @@ from .const import USERS_CACHE_KEY, ASSETS_CACHE_KEY, SYSTEM_USER_CACHE_KEY
 
 
 def get_session_asset_list():
-    return Asset.objects.values_list('hostname', flat=True)
+    return Asset.objects.values_list()
 
 
 def get_session_user_list():

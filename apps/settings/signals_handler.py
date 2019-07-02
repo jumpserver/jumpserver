@@ -24,6 +24,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 
 @receiver(django_ready, dispatch_uid="my_unique_identifier")
 def monkey_patch_settings(sender, **kwargs):
+    logger.debug("Monkey patch settings")
     cache_key_prefix = '_SETTING_'
     custom_need_cache_settings = [
         'AUTHENTICATION_BACKENDS', 'TERMINAL_HOST_KEY',
@@ -77,7 +78,6 @@ def monkey_patch_settings(sender, **kwargs):
 @receiver(django_ready)
 def auto_generate_terminal_host_key(sender, **kwargs):
     try:
-        print("Auto gen host key")
         if Setting.objects.filter(name='TERMINAL_HOST_KEY').exists():
             return
         private_key, public_key = ssh_key_gen()

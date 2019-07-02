@@ -41,3 +41,8 @@ def on_org_user_changed(sender, instance=None, **kwargs):
                 for user_group in user_groups:
                     user_group.users.remove(user)
         set_current_org(old_org)
+
+
+@receiver(m2m_changed, sender=Organization.admins.through)
+def on_org_admin_change(sender, **kwargs):
+    Organization._user_admin_orgs = None

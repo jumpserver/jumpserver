@@ -648,8 +648,6 @@ jumpserver.initServerSideDataTable = function (options) {
             $.each(rows, function (id, row) {
                 table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
-                    console.log(table)
-                    console.log(table.selected);
                     table.selected.push(row.id)
                 }
             })
@@ -1095,4 +1093,9 @@ function objectAttrsIsBool(obj, attrs) {
             obj[attr] = true
         }
     })
+}
+
+function formatDateAsCN(d) {
+    var date = new Date(d);
+    return date.toISOString().replace("T", " ").replace(/\..*/, "");
 }

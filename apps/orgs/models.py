@@ -21,6 +21,7 @@ class Organization(models.Model):
     ROOT_NAME = 'ROOT'
     DEFAULT_ID = 'DEFAULT'
     DEFAULT_NAME = 'DEFAULT'
+    _user_admin_orgs = None
 
     class Meta:
         verbose_name = _("Organization")
@@ -92,6 +93,8 @@ class Organization(models.Model):
 
     @classmethod
     def get_user_admin_orgs(cls, user):
+        if cls._user_admin_orgs and user.id in cls._user_admin_orgs:
+            return cls._user_admin_orgs[user.id]
         admin_orgs = []
         if user.is_anonymous:
             return admin_orgs
@@ -100,6 +103,11 @@ class Organization(models.Model):
             admin_orgs.append(cls.default())
         elif user.is_org_admin:
             admin_orgs = user.admin_orgs.all()
+
+        if cls._user_admin_orgs is None:
+            cls._user_admin_orgs = {user.id: admin_orgs}
+        else:
+            cls._user_admin_orgs[user.id] = admin_orgs
         return admin_orgs
 
     @classmethod

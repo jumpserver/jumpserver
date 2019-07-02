@@ -55,7 +55,7 @@ class SessionViewSet(BulkModelViewSet):
         return super().perform_create(serializer)
 
 
-class CommandViewSet(viewsets.ViewSet):
+class CommandViewSet(viewsets.ModelViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
@@ -70,10 +70,14 @@ class CommandViewSet(viewsets.ViewSet):
     """
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
+    filter_fields = ("asset", "system_user", "user", "input")
 
     def get_queryset(self):
-        self.command_store.filter(**dict(self.request.query_params))
+        multi_command_storage = get_multi_command_storage()
+        queryset = multi_command_storage.filter()
+        return queryset
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
@@ -87,12 +91,6 @@ class CommandViewSet(viewsets.ViewSet):
             msg = "Command not valid: {}".format(serializer.errors)
             logger.error(msg)
             return Response({"msg": msg}, status=401)
-
-    def list(self, request, *args, **kwargs):
-        multi_command_storage = get_multi_command_storage()
-        queryset = multi_command_storage.filter()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
 
 
 class SessionReplayViewSet(viewsets.ViewSet):

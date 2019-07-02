@@ -180,7 +180,7 @@ class GenerateTree:
         return dict(nodes)
 
     def get_nodes(self):
-        return self.nodes.keys()
+        return list(self.nodes.keys())
 
 
 def get_user_permissions(user, include_group=True):
@@ -256,8 +256,12 @@ class AssetPermissionCacheMixin:
         )
 
     @property
-    def node_key(self):
+    def node_asset_key(self):
         return self.get_cache_key('NODES_WITH_ASSETS')
+
+    @property
+    def node_key(self):
+        return self.get_cache_key('NODES')
 
     @property
     def asset_key(self):
@@ -268,54 +272,47 @@ class AssetPermissionCacheMixin:
     def system_key(self):
         return self.get_cache_key('SYSTEM_USER')
 
-    def get_assets_from_cache(self):
-        cached = cache.get(self.asset_key)
+    def get_resource_from_cache(self, resource):
+        key_map = {
+            "assets": self.asset_key,
+            "nodes": self.node_key,
+            "nodes_with_assets": self.node_asset_key,
+            "system_users": self.system_key
+        }
+        key = key_map.get(resource)
+        if not key:
+            raise ValueError("Not a valid resource: {}".format(resource))
+        cached = cache.get(key)
         if not cached:
             self.update_cache()
-            cached = cache.get(self.asset_key)
+            cached = cache.get(key)
         return cached
 
-    def get_nodes_with_assets_from_cache(self):
-        cached = cache.get(self.node_key)
-        if not cached:
-            self.update_cache()
-            cached = cache.get(self.node_key)
-        return cached
+    def get_resource(self, resource):
+        if self._is_using_cache():
+            return self.get_resource_from_cache(resource)
+        elif self._is_refresh_cache():
+            self.expire_cache()
+            data = self.get_resource_from_cache(resource)
+            return data
+        else:
+            return self.get_resource_without_cache(resource)
+
+    def get_resource_without_cache(self, resource):
+        attr = 'get_{}_without_cache'.format(resource)
+        return getattr(self, attr)()
 
     def get_nodes_with_assets(self):
-        if self._is_using_cache():
-            return self.get_nodes_with_assets_from_cache()
-        elif self._is_refresh_cache():
-            self.expire_cache()
-            return self.get_nodes_with_assets_from_cache()
-        else:
-            return self.get_nodes_with_assets_without_cache()
-
-    def get_system_user_from_cache(self):
-        cached = cache.get(self.system_key)
-        if not cached:
-            self.update_cache()
-            cached = cache.get(self.system_key)
-        return cached
+        return self.get_resource("nodes_with_assets")
 
     def get_assets(self):
-        if self._is_using_cache():
-            return self.get_assets_from_cache()
-        elif self._is_refresh_cache():
-            self.expire_cache()
-            return self.get_assets_from_cache()
-        else:
-            self.expire_cache()
-            return self.get_assets_without_cache()
+        return self.get_resource("assets")
+
+    def get_nodes(self):
+        return self.get_resource("nodes")
 
     def get_system_users(self):
-        if self._is_using_cache():
-            return self.get_system_user_from_cache()
-        elif self._is_refresh_cache():
-            self.expire_cache()
-            return self.get_system_user_from_cache()
-        else:
-            return self.get_system_user_without_cache()
+        return self.get_resource("system_users")
 
     def get_meta_cache_key(self):
         cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_{filter_id}'
@@ -332,6 +329,17 @@ class AssetPermissionCacheMixin:
         # print("Meta id: {}".format(meta["id"]))
         return meta
 
+    def update_cache(self):
+        assets = self.get_resource_without_cache("assets")
+        nodes_with_assets = self.get_resource_without_cache("nodes_with_assets")
+        system_users = self.get_resource_without_cache("system_users")
+        nodes = self.get_resource_without_cache("nodes")
+        cache.set(self.asset_key, assets, self.CACHE_TIME)
+        cache.set(self.node_asset_key, nodes_with_assets, self.CACHE_TIME)
+        cache.set(self.system_key, system_users, self.CACHE_TIME)
+        cache.set(self.node_key, nodes, self.CACHE_TIME)
+        self.set_meta_to_cache()
+
     def set_meta_to_cache(self):
         key = self.get_meta_cache_key()
         meta = {
@@ -347,15 +355,6 @@ class AssetPermissionCacheMixin:
         cache_key = self.CACHE_META_KEY_PREFIX + '{obj_id}_*'
         key = cache_key.format(obj_id=self.obj_id)
         cache.delete_pattern(key)
-
-    def update_cache(self):
-        assets = self.get_assets_without_cache()
-        nodes = self.get_nodes_with_assets_without_cache()
-        system_users = self.get_system_user_without_cache()
-        cache.set(self.asset_key, assets, self.CACHE_TIME)
-        cache.set(self.node_key, nodes, self.CACHE_TIME)
-        cache.set(self.system_key, system_users, self.CACHE_TIME)
-        self.set_meta_to_cache()
 
     def expire_cache(self):
         """
@@ -378,15 +377,6 @@ class AssetPermissionCacheMixin:
         key = cls.CACHE_KEY_PREFIX + '*'
         cache.delete_pattern(key)
 
-    def get_assets_without_cache(self):
-        raise NotImplementedError()
-
-    def get_nodes_with_assets_without_cache(self):
-        raise NotImplementedError()
-
-    def get_system_user_without_cache(self):
-        raise NotImplementedError()
-
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
     get_permissions_map = {
@@ -396,8 +386,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         "Node": get_node_permissions,
         "SystemUser": get_system_user_permissions,
     }
-    assets_prefetch = ('id', 'hostname', 'ip', "platform", "domain_id",
-                       "comment", "is_active", "os", "org_id")
+    assets_only = (
+        'id', 'hostname', 'ip', "platform", "domain_id",
+        'comment', 'is_active', 'os', 'org_id'
+    )
 
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
@@ -411,6 +403,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self.change_org_if_need()
         self.nodes = None
         self._nodes = None
+        self._assets_direct = None
+        self._nodes_direct = None
 
     @staticmethod
     def change_org_if_need():
@@ -438,6 +432,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         返回用户/组授权规则直接关联的节点
         :return: {node1: {system_user1: {'actions': set()},}}
         """
+        if self._nodes_direct:
+            return self._nodes_direct
         nodes = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
@@ -446,9 +442,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
             for node, system_user, action in itertools.product(_nodes, system_users, actions):
                 nodes[node][system_user] |= action
         self.tree.add_nodes(nodes)
+        self._nodes_direct = nodes
         return nodes
 
-    def get_nodes(self):
+    def get_nodes_without_cache(self):
         self.get_assets_direct()
         return self.tree.get_nodes()
 
@@ -458,15 +455,18 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         返回用户授权规则直接关联的资产
         :return: {asset1: {system_user1: 1,}}
         """
+        if self._assets_direct:
+            return self._assets_direct
         assets = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets = perm.assets.all().prefetch_related(*self.assets_prefetch)
+            _assets = perm.assets.all().only(*self.assets_only)
             system_users = perm.system_users.all()
             iterable = itertools.product(_assets, system_users, actions)
             for asset, system_user, action in iterable:
                 assets[asset][system_user] |= action
         self.tree.add_assets(assets)
+        self._assets_direct = assets
         return assets
 
     #@timeit
@@ -476,6 +476,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         """
         if self._assets:
             return self._assets
+        self.get_assets_direct()
         nodes = self.get_nodes_direct()
         pattern = set()
         for node in nodes:
@@ -484,7 +485,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         if pattern:
             assets = Asset.objects.filter(nodes__key__regex=pattern)\
                 .prefetch_related('nodes', "protocols")\
-                .only(*self.assets_prefetch)\
+                .only(*self.assets_only)\
                 .distinct()
         else:
             assets = []
@@ -501,9 +502,11 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         :return:
         """
         self.get_assets_without_cache()
-        return self.tree.get_nodes_with_assets()
+        nodes_assets = self.tree.get_nodes_with_assets()
+        print(nodes_assets.keys())
+        return nodes_assets
 
-    def get_system_user_without_cache(self):
+    def get_system_users_without_cache(self):
         system_users = set()
         permissions = self.permissions.prefetch_related('system_users')
         for perm in permissions:

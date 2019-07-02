@@ -60,8 +60,8 @@ function initAssetUserTable() {
             },
             {
                 targets: 6, createdCell: function (td, cellData) {
-                    var date = new Date(cellData);
-                    $(td).html(date.toLocaleString());
+                    var data = formatDateAsCN(cellData);
+                    $(td).html(data);
                 },
             },
             {
