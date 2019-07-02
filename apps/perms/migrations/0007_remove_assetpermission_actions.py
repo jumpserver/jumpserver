@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
             old_name='action',
             new_name='actions',
         ),
-        migrations.DeleteModel(name='Action'),
+        migrations.DeleteModel('action'),
     ]
