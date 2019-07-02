@@ -96,6 +96,14 @@ class AssetPermission(BasePermission):
     def get_queryset_with_prefetch(cls):
         return cls.objects.all().valid().prefetch_related('nodes', 'assets', 'system_users')
 
+    def get_all_assets(self):
+        assets = set(self.assets.all())
+        for node in self.nodes.all():
+            _assets = node.get_all_assets()
+            set_or_append_attr_bulk(_assets, 'inherit', node.value)
+            assets.update(set(_assets))
+        return assets
+
 
 class NodePermission(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
