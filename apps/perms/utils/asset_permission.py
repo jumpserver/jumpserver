@@ -176,6 +176,10 @@ class GenerateTree:
         for node, values in self.nodes.items():
             node._assets_amount = values["assets_amount"]
             nodes[node] = {asset: self.assets.get(asset, {}) for asset in values["assets"]}
+        # 如果返回空节点，页面构造授权资产树报错
+        if not nodes:
+            node = Node(value='Empty')
+            nodes[node] = {}
         self._nodes_with_assets = nodes
         return dict(nodes)
 
