@@ -133,19 +133,6 @@ class UserUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def form_valid(self, form):
-        password = form.cleaned_data.get('password')
-        if not password:
-            return super().form_valid(form)
-
-        is_ok = check_password_rules(password)
-        if not is_ok:
-            form.add_error(
-                "password", _("* Your password does not meet the requirements")
-            )
-            return self.form_invalid(form)
-        return super().form_valid(form)
-
     def get_form_kwargs(self):
         kwargs = super(UserUpdateView, self).get_form_kwargs()
         data = {'request': self.request}
