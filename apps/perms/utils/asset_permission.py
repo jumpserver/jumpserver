@@ -109,6 +109,13 @@ class GenerateTree:
         self._ungroup_node = node
         return node
 
+    @property
+    def empty_node(self):
+        node_id = const.EMPTY_NODE_ID
+        value = _('Empty')
+        node = Node(id=node_id, value=value)
+        return node
+
     #@timeit
     def add_assets_without_system_users(self, assets):
         for asset in assets:
@@ -176,6 +183,9 @@ class GenerateTree:
         for node, values in self.nodes.items():
             node._assets_amount = values["assets_amount"]
             nodes[node] = {asset: self.assets.get(asset, {}) for asset in values["assets"]}
+        # 如果返回空节点，页面构造授权资产树报错
+        if not nodes:
+            nodes[self.empty_node] = {}
         self._nodes_with_assets = nodes
         return dict(nodes)
 

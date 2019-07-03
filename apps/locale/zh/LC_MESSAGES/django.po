@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-02 14:47+0800\n"
+"POT-Creation-Date: 2019-07-03 15:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -86,13 +86,13 @@ msgstr "运行参数"
 #: assets/templates/assets/system_user_list.html:55 audits/models.py:19
 #: audits/templates/audits/ftp_log_list.html:41
 #: audits/templates/audits/ftp_log_list.html:71
-#: perms/forms/asset_permission.py:68 perms/models/asset_permission.py:85
+#: perms/forms/asset_permission.py:68 perms/models/asset_permission.py:68
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:48
 #: perms/templates/perms/asset_permission_list.html:117
 #: terminal/backends/command/models.py:13 terminal/models.py:155
-#: terminal/templates/terminal/command_list.html:40
-#: terminal/templates/terminal/command_list.html:73
+#: terminal/templates/terminal/command_list.html:33
+#: terminal/templates/terminal/command_list.html:59
 #: terminal/templates/terminal/session_list.html:41
 #: terminal/templates/terminal/session_list.html:72
 #: xpack/plugins/change_auth_plan/forms.py:114
@@ -115,15 +115,15 @@ msgstr "资产"
 #: assets/models/user.py:160 assets/templates/assets/user_asset_list.html:172
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:49
 #: audits/templates/audits/ftp_log_list.html:72
-#: perms/forms/asset_permission.py:74 perms/models/asset_permission.py:87
-#: perms/models/asset_permission.py:104
+#: perms/forms/asset_permission.py:74 perms/models/asset_permission.py:70
+#: perms/models/asset_permission.py:95
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:50
 #: perms/templates/perms/asset_permission_list.html:71
 #: perms/templates/perms/asset_permission_list.html:123 templates/_nav.html:25
 #: terminal/backends/command/models.py:14 terminal/models.py:156
-#: terminal/templates/terminal/command_list.html:48
-#: terminal/templates/terminal/command_list.html:74
+#: terminal/templates/terminal/command_list.html:34
+#: terminal/templates/terminal/command_list.html:60
 #: terminal/templates/terminal/session_list.html:49
 #: terminal/templates/terminal/session_list.html:73
 #: xpack/plugins/orgs/templates/orgs/org_list.html:19
@@ -149,8 +149,7 @@ msgstr "系统用户"
 #: assets/templates/assets/system_user_detail.html:58
 #: assets/templates/assets/system_user_list.html:51 ops/models/adhoc.py:37
 #: ops/templates/ops/task_detail.html:60 ops/templates/ops/task_list.html:27
-#: orgs/models.py:11 perms/models/asset_permission.py:23
-#: perms/models/base.py:35
+#: orgs/models.py:11 perms/models/base.py:35
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:45
 #: perms/templates/perms/asset_permission_list.html:64
@@ -215,7 +214,7 @@ msgstr "参数"
 #: assets/templates/assets/domain_detail.html:72
 #: assets/templates/assets/system_user_detail.html:100
 #: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:14
-#: perms/models/asset_permission.py:107 perms/models/base.py:41
+#: perms/models/asset_permission.py:98 perms/models/base.py:41
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
 #: users/models/user.py:105 users/serializers/v1.py:107
@@ -238,7 +237,7 @@ msgstr "创建者"
 #: assets/templates/assets/domain_detail.html:68
 #: assets/templates/assets/system_user_detail.html:96
 #: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:64
-#: orgs/models.py:15 perms/models/asset_permission.py:108
+#: orgs/models.py:15 perms/models/asset_permission.py:99
 #: perms/models/base.py:42
 #: perms/templates/perms/asset_permission_detail.html:94
 #: perms/templates/perms/remote_app_permission_detail.html:86
@@ -274,7 +273,7 @@ msgstr "创建日期"
 #: assets/templates/assets/system_user_detail.html:104
 #: assets/templates/assets/system_user_list.html:59
 #: assets/templates/assets/user_asset_list.html:175 ops/models/adhoc.py:43
-#: orgs/models.py:16 perms/models/asset_permission.py:109
+#: orgs/models.py:16 perms/models/asset_permission.py:100
 #: perms/models/base.py:43
 #: perms/templates/perms/asset_permission_detail.html:102
 #: perms/templates/perms/remote_app_permission_detail.html:94
@@ -367,7 +366,7 @@ msgstr "重置"
 #: settings/templates/settings/replay_storage_create.html:153
 #: settings/templates/settings/security_setting.html:74
 #: settings/templates/settings/terminal_setting.html:73
-#: terminal/templates/terminal/command_list.html:103
+#: terminal/templates/terminal/command_list.html:50
 #: terminal/templates/terminal/session_list.html:127
 #: terminal/templates/terminal/terminal_update.html:46
 #: users/templates/users/_user.html:51
@@ -527,7 +526,7 @@ msgstr "创建远程应用"
 #: audits/templates/audits/operate_log_list.html:67
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:34
-#: perms/forms/asset_permission.py:21 perms/models/asset_permission.py:27
+#: perms/forms/asset_permission.py:21
 #: perms/templates/perms/asset_permission_create_update.html:50
 #: perms/templates/perms/asset_permission_list.html:52
 #: perms/templates/perms/asset_permission_list.html:126
@@ -548,8 +547,8 @@ msgid "Action"
 msgstr "动作"
 
 #: applications/templates/applications/user_remote_app_list.html:57
-#: assets/templates/assets/user_asset_list.html:100 perms/const.py:19
-#: perms/models/asset_permission.py:46
+#: assets/templates/assets/user_asset_list.html:100
+#: perms/models/asset_permission.py:27
 msgid "Connect"
 msgstr "连接"
 
@@ -619,7 +618,7 @@ msgstr "未知"
 #: assets/templates/assets/asset_detail.html:194
 #: assets/templates/assets/asset_detail.html:202
 #: assets/templates/assets/system_user_assets.html:83
-#: perms/models/asset_permission.py:86
+#: perms/models/asset_permission.py:69
 #: xpack/plugins/change_auth_plan/models.py:72
 msgid "Nodes"
 msgstr "节点"
@@ -654,7 +653,7 @@ msgstr "网域"
 #: assets/forms/asset.py:134 assets/models/node.py:248
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:71 perms/forms/asset_permission.py:79
-#: perms/models/asset_permission.py:102
+#: perms/models/asset_permission.py:93
 #: perms/templates/perms/asset_permission_list.html:49
 #: perms/templates/perms/asset_permission_list.html:70
 #: perms/templates/perms/asset_permission_list.html:120
@@ -1036,8 +1035,8 @@ msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:39 ops/models/command.py:21
 #: ops/templates/ops/command_execution_list.html:61 terminal/models.py:161
-#: terminal/templates/terminal/command_list.html:55
-#: terminal/templates/terminal/command_list.html:71
+#: terminal/templates/terminal/command_list.html:31
+#: terminal/templates/terminal/command_list.html:61
 #: terminal/templates/terminal/session_detail.html:48
 #: terminal/templates/terminal/session_list.html:77
 msgid "Command"
@@ -1122,7 +1121,7 @@ msgstr "默认资产组"
 #: perms/templates/perms/remote_app_permission_list.html:15
 #: templates/index.html:87 terminal/backends/command/models.py:12
 #: terminal/models.py:154 terminal/templates/terminal/command_list.html:32
-#: terminal/templates/terminal/command_list.html:72
+#: terminal/templates/terminal/command_list.html:58
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:301
 #: users/models/user.py:38 users/models/user.py:431 users/serializers/v1.py:96
@@ -1427,7 +1426,7 @@ msgstr "关闭"
 #: audits/templates/audits/operate_log_list.html:71
 #: audits/templates/audits/password_change_log_list.html:53
 #: ops/templates/ops/task_adhoc.html:63
-#: terminal/templates/terminal/command_list.html:76
+#: terminal/templates/terminal/command_list.html:36
 #: terminal/templates/terminal/session_detail.html:50
 msgid "Datetime"
 msgstr "日期"
@@ -1661,7 +1660,7 @@ msgstr "比例"
 #: users/templates/users/user_group_list.html:194
 #: users/templates/users/user_list.html:158
 #: users/templates/users/user_list.html:190
-#: xpack/plugins/vault/templates/vault/vault.html:224
+#: xpack/plugins/vault/templates/vault/vault.html:223
 msgid "Please select file"
 msgstr "选择文件"
 
@@ -1710,7 +1709,7 @@ msgstr "创建日期"
 
 #: assets/templates/assets/asset_detail.html:154
 #: assets/templates/assets/user_asset_list.html:46
-#: perms/models/asset_permission.py:105 perms/models/base.py:38
+#: perms/models/asset_permission.py:96 perms/models/base.py:38
 #: perms/templates/perms/asset_permission_create_update.html:55
 #: perms/templates/perms/asset_permission_detail.html:120
 #: perms/templates/perms/remote_app_permission_create_update.html:54
@@ -2274,7 +2273,6 @@ msgstr "选择用户"
 #: ops/templates/ops/command_execution_list.html:48
 #: ops/templates/ops/task_list.html:13 ops/templates/ops/task_list.html:18
 #: templates/_base_list.html:41 templates/_header_bar.html:8
-#: terminal/templates/terminal/command_list.html:60
 #: terminal/templates/terminal/session_list.html:61
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:48
@@ -2612,26 +2610,26 @@ msgstr ""
 msgid "Encrypt field using Secret Key"
 msgstr ""
 
-#: common/mixins.py:36
-msgid "is discard"
-msgstr ""
-
-#: common/mixins.py:37
-msgid "discard time"
-msgstr ""
-
-#: common/mixins.py:210
+#: common/mixins/api.py:60
 #, python-format
 msgid "%(name)s was %(action)s successfully"
 msgstr "%(name)s %(action)s成功"
 
-#: common/mixins.py:211
+#: common/mixins/api.py:61
 msgid "create"
 msgstr "创建"
 
-#: common/mixins.py:211
+#: common/mixins/api.py:61
 msgid "update"
 msgstr "更新"
+
+#: common/mixins/models.py:31
+msgid "is discard"
+msgstr ""
+
+#: common/mixins/models.py:32
+msgid "discard time"
+msgstr ""
 
 #: common/validators.py:11
 msgid "Special char not allowed"
@@ -2992,24 +2990,12 @@ msgstr "命令执行列表"
 msgid "Command execution"
 msgstr "命令执行"
 
-#: orgs/mixins.py:71 orgs/mixins.py:191 orgs/models.py:26
+#: orgs/mixins.py:71 orgs/mixins.py:191 orgs/models.py:27
 msgid "Organization"
 msgstr "组织"
 
-#: perms/const.py:18 perms/models/asset_permission.py:45 settings/forms.py:143
-msgid "All"
-msgstr "全部"
-
-#: perms/const.py:20 perms/models/asset_permission.py:47
-msgid "Upload file"
-msgstr "上传文件"
-
-#: perms/const.py:21 perms/models/asset_permission.py:48
-msgid "Download file"
-msgstr "下载文件"
-
 #: perms/forms/asset_permission.py:65 perms/forms/remote_app_permission.py:34
-#: perms/models/asset_permission.py:103 perms/models/base.py:37
+#: perms/models/asset_permission.py:94 perms/models/base.py:37
 #: perms/templates/perms/asset_permission_list.html:47
 #: perms/templates/perms/asset_permission_list.html:67
 #: perms/templates/perms/asset_permission_list.html:114
@@ -3036,20 +3022,32 @@ msgstr "用户和用户组至少选一个"
 msgid "Asset or group at least one required"
 msgstr "资产和节点至少选一个"
 
-#: perms/models/asset_permission.py:49
+#: perms/models/asset_permission.py:26 settings/forms.py:143
+msgid "All"
+msgstr "全部"
+
+#: perms/models/asset_permission.py:28
+msgid "Upload file"
+msgstr "上传文件"
+
+#: perms/models/asset_permission.py:29
+msgid "Download file"
+msgstr "下载文件"
+
+#: perms/models/asset_permission.py:30
 msgid "Upload download"
 msgstr "上传下载"
 
-#: perms/models/asset_permission.py:89
+#: perms/models/asset_permission.py:72
 msgid "Actions"
 msgstr "动作"
 
-#: perms/models/asset_permission.py:93 perms/models/asset_permission.py:115
+#: perms/models/asset_permission.py:76 perms/models/asset_permission.py:106
 #: templates/_nav.html:44
 msgid "Asset permission"
 msgstr "资产授权"
 
-#: perms/models/asset_permission.py:106 perms/models/base.py:40
+#: perms/models/asset_permission.py:97 perms/models/base.py:40
 #: perms/templates/perms/asset_permission_detail.html:90
 #: perms/templates/perms/remote_app_permission_detail.html:82
 #: users/models/user.py:102 users/templates/users/user_detail.html:107
@@ -3198,9 +3196,13 @@ msgstr "添加用户"
 msgid "Add user group to this permission"
 msgstr "添加用户组"
 
-#: perms/views/asset_permission.py:34 perms/views/asset_permission.py:65
-#: perms/views/asset_permission.py:82 perms/views/asset_permission.py:99
-#: perms/views/asset_permission.py:136 perms/views/asset_permission.py:169
+#: perms/utils/asset_permission.py:115
+msgid "Empty"
+msgstr "空"
+
+#: perms/views/asset_permission.py:33 perms/views/asset_permission.py:64
+#: perms/views/asset_permission.py:81 perms/views/asset_permission.py:98
+#: perms/views/asset_permission.py:135 perms/views/asset_permission.py:168
 #: perms/views/remote_app_permission.py:33
 #: perms/views/remote_app_permission.py:49
 #: perms/views/remote_app_permission.py:65
@@ -3211,27 +3213,27 @@ msgstr "添加用户组"
 msgid "Perms"
 msgstr "权限管理"
 
-#: perms/views/asset_permission.py:35
+#: perms/views/asset_permission.py:34
 msgid "Asset permission list"
 msgstr "资产授权列表"
 
-#: perms/views/asset_permission.py:66
+#: perms/views/asset_permission.py:65
 msgid "Create asset permission"
 msgstr "创建权限规则"
 
-#: perms/views/asset_permission.py:83
+#: perms/views/asset_permission.py:82
 msgid "Update asset permission"
 msgstr "更新资产授权"
 
-#: perms/views/asset_permission.py:100
+#: perms/views/asset_permission.py:99
 msgid "Asset permission detail"
 msgstr "资产授权详情"
 
-#: perms/views/asset_permission.py:137
+#: perms/views/asset_permission.py:136
 msgid "Asset permission user list"
 msgstr "资产授权用户列表"
 
-#: perms/views/asset_permission.py:170
+#: perms/views/asset_permission.py:169
 msgid "Asset permission asset list"
 msgstr "资产授权资产列表"
 
@@ -3938,7 +3940,7 @@ msgid "Command filters"
 msgstr "命令过滤"
 
 #: templates/_nav.html:55 templates/_nav_audits.html:11
-#: terminal/views/command.py:51 terminal/views/session.py:74
+#: terminal/views/command.py:38 terminal/views/session.py:74
 #: terminal/views/session.py:92 terminal/views/session.py:116
 #: terminal/views/terminal.py:31 terminal/views/terminal.py:47
 #: terminal/views/terminal.py:60
@@ -4178,7 +4180,7 @@ msgid "Input"
 msgstr "输入"
 
 #: terminal/backends/command/models.py:17
-#: terminal/templates/terminal/command_list.html:75
+#: terminal/templates/terminal/command_list.html:35
 #: terminal/templates/terminal/terminal_list.html:33
 msgid "Session"
 msgstr "会话"
@@ -4244,13 +4246,13 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: terminal/templates/terminal/command_list.html:88
-msgid "Goto"
-msgstr "转到"
-
-#: terminal/templates/terminal/command_list.html:99
+#: terminal/templates/terminal/command_list.html:46
 msgid "Export command"
 msgstr "导出命令"
+
+#: terminal/templates/terminal/command_list.html:172
+msgid "Goto"
+msgstr "转到"
 
 #: terminal/templates/terminal/session_detail.html:17
 #: terminal/views/session.py:117
@@ -4258,7 +4260,7 @@ msgid "Session detail"
 msgstr "会话详情"
 
 #: terminal/templates/terminal/session_detail.html:28
-#: terminal/views/command.py:52
+#: terminal/views/command.py:39
 msgid "Command list"
 msgstr "命令记录列表"
 
@@ -5756,7 +5758,7 @@ msgid "Interface settings"
 msgstr "界面设置"
 
 #: xpack/plugins/interface/templates/interface/interface.html:15
-#: xpack/plugins/interface/views.py:25
+#: xpack/plugins/interface/views.py:24 xpack/plugins/interface/views.py:25
 msgid "Interface setting"
 msgstr "界面设置"
 
@@ -5778,10 +5780,6 @@ msgstr "恢复默认成功！"
 #: xpack/plugins/interface/templates/interface/interface.html:114
 msgid "Restore default failed."
 msgstr "恢复默认失败！"
-
-#: xpack/plugins/interface/views.py:24
-msgid "Interface"
-msgstr "界面"
 
 #: xpack/plugins/interface/views.py:51
 msgid "It is already in the default setting state!"
@@ -5886,7 +5884,9 @@ msgstr "无效的许可证"
 msgid "Admin"
 msgstr "管理员"
 
-#: xpack/plugins/orgs/meta.py:8
+#: xpack/plugins/orgs/meta.py:8 xpack/plugins/orgs/views.py:26
+#: xpack/plugins/orgs/views.py:43 xpack/plugins/orgs/views.py:60
+#: xpack/plugins/orgs/views.py:77
 msgid "Organizations"
 msgstr "组织管理"
 
@@ -5903,18 +5903,9 @@ msgstr "添加管理员"
 msgid "Create organization "
 msgstr "创建组织"
 
-#: xpack/plugins/orgs/views.py:26
-msgid "Org"
-msgstr ""
-
 #: xpack/plugins/orgs/views.py:27
 msgid "Org list"
 msgstr "组织列表"
-
-#: xpack/plugins/orgs/views.py:43 xpack/plugins/orgs/views.py:60
-#: xpack/plugins/orgs/views.py:77
-msgid "Orgs"
-msgstr ""
 
 #: xpack/plugins/orgs/views.py:44
 msgid "Create org"
@@ -5924,8 +5915,8 @@ msgstr "创建组织"
 msgid "Update org"
 msgstr "更新组织"
 
-#: xpack/plugins/vault/meta.py:11 xpack/plugins/vault/views.py:23
-#: xpack/plugins/vault/views.py:38
+#: xpack/plugins/vault/meta.py:11 xpack/plugins/vault/views.py:22
+#: xpack/plugins/vault/views.py:37
 msgid "Vault"
 msgstr "密码匣子"
 
@@ -5933,13 +5924,16 @@ msgstr "密码匣子"
 msgid "Import vault"
 msgstr "导入密码"
 
-#: xpack/plugins/vault/views.py:24
+#: xpack/plugins/vault/views.py:23
 msgid "vault list"
 msgstr "密码匣子"
 
-#: xpack/plugins/vault/views.py:39
+#: xpack/plugins/vault/views.py:38
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "Interface"
+#~ msgstr "界面"
 
 #~ msgid "already exists"
 #~ msgstr "已经存在"
