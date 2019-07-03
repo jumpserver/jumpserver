@@ -1,44 +1,34 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.views.generic import ListView, View
-from django.conf import settings
+from django.views.generic import View, TemplateView
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse
 from django.template import loader
+from django.utils import timezone
 import time
 
 from common.mixins import DatetimeSearchMixin
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
 from ..models import Command
-from .. import utils
 from ..backends import get_multi_command_storage
 
 __all__ = ['CommandListView', 'CommandExportView']
 common_storage = get_multi_command_storage()
 
 
-class CommandListView(DatetimeSearchMixin, PermissionsMixin, ListView):
-    model = Command
+class CommandListView(DatetimeSearchMixin, PermissionsMixin, TemplateView):
     template_name = "terminal/command_list.html"
-    context_object_name = 'command_list'
-    paginate_by = settings.DISPLAY_PER_PAGE
-    date_from = date_to = None
     permission_classes = [IsOrgAdmin | IsAuditor]
-
-    def get_queryset(self):
-        filter_kwargs = dict()
-        filter_kwargs['date_from'] = self.date_from
-        filter_kwargs['date_to'] = self.date_to
-        queryset = common_storage.filter(**filter_kwargs)
-        return queryset
+    default_days_ago = 5
 
     def get_context_data(self, **kwargs):
+        now = timezone.now()
         context = {
             'app': _('Sessions'),
             'action': _('Command list'),
-            'date_from': self.date_from,
-            'date_to': self.date_to,
+            'date_from': now - timezone.timedelta(days=self.default_days_ago),
+            'date_to': now,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

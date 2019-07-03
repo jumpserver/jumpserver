@@ -567,7 +567,8 @@ jumpserver.initServerSideDataTable = function (options) {
       };
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
-        dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        // dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        dom: options.dom || '<"#uc.pull-left"><"pull-right"<"inline"l><"#fb.inline"><"inline"f><"#fa.inline">>tr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         order: options.order || [],
         buttons: [],
         columnDefs: columnDefs,
@@ -668,8 +669,6 @@ jumpserver.initServerSideDataTable = function (options) {
             })
         }
     }).on('draw', function(){
-        $('#op').html(options.op_html || '');
-        $('#uc').html(options.uc_html || '');
         $('[data-toggle="popover"]').popover({
             html: true,
             placement: 'bottom',
@@ -691,6 +690,11 @@ jumpserver.initServerSideDataTable = function (options) {
                 table.rows(index).select()
             }
         });
+    }).on("init", function () {
+        $('#op').html(options.op_html || '');
+        $('#uc').html(options.uc_html || '');
+        $('#fb').html(options.fb_html || '');
+        $('#fa').html(options.fa_html || '');
     });
     var table_id = table.settings()[0].sTableId;
     $('#' + table_id + ' .ipt_check_all').on('click', function() {

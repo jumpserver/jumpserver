@@ -3,10 +3,7 @@
 {% load static %}
 {% load common_tags %}
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <style>
         .toggle {
             cursor: pointer;
@@ -23,6 +20,7 @@
 
 {% block table_search %}
 {% endblock %}
+
 {% block table_container %}
     <table class="table table-striped table-bordered table-hover" id="command_table" data-page="false" >
         <thead>
@@ -53,35 +51,60 @@
         </div>
     </div>
 
+    <div class="hide" id="daterange">
+        <div class="form-group p-l-5" id="date" style="padding-left: 5px">
+        <div class="input-daterange input-group p-l-5" id="datepicker">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input type="text" class="input-sm form-control" style="width: 100px;" id="date_from" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+            <span class="input-group-addon">to</span>
+            <input type="text" class="input-sm form-control" style="width: 100px;" id="date_to" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+        </div>
+        </div>
+    </div>
 
     <ul class="dropdown-menu search-help">
         <li><a class="search-item" data-value="user">{% trans 'User' %}</a></li>
         <li><a class="search-item" data-value="asset">{% trans 'Asset' %}</a></li>
         <li><a class="search-item" data-value="system_user">{% trans 'System user' %}</a></li>
-        <li><a class="search-item" data-value="command">{% trans 'Command' %}</a></li>
+        <li><a class="search-item" data-value="input">{% trans 'Command' %}</a></li>
     </ul>
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
-<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
-<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}" charset="UTF-8"></script>
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.zh-CN.min.js' %}" charset="UTF-8"></script>
 <script>
 
+var table;
 $(document).ready(function () {
-    $('.footable').footable();
-    $('.select2').select2({
-        dropdownAutoWidth : true,
-        width: 'auto'
+    table = initTable().on("init", function () {
+        var dateFromRef = $("#date_from");
+        var dateToRef = $("#date_to");
+        let options = {
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            language: navigator.language || "en",
+        };
+        dateFromRef.datepicker(options).on("changeDate", function () {
+            let date = new Date($(this).val() + ' 0:0:0');
+            let url = table.ajax.url();
+            url = setUrlParam(url, "date_from", date.getTime()/1000);
+            table.ajax.url(url);
+            table.ajax.reload();
+            console.log("On change")
+        });
+        dateToRef.datepicker(options).on("changeDate", function () {
+            let date = new Date($(this).val() + ' 23:59:59');
+            let url = table.ajax.url();
+            url = setUrlParam(url, "date_to", date.getTime()/1000);
+            table.ajax.url(url);
+            table.ajax.reload();
+        });
     });
-    $('#date .input-daterange').datepicker({
-        format: "yyyy-mm-dd",
-        todayBtn: "linked",
-        keyboardNavigation: false,
-        forceParse: false,
-        calendarWeeks: true,
-        autoclose: true
-    });
-    initTable();
 })
 .on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
@@ -100,13 +123,11 @@ $(document).ready(function () {
     var offset1 = $('#command_table_filter input').offset();
     var x = offset1.left;
     var y = offset1.top;
-    console.log(x, y)
     var offset = $(".search-help").parent().offset();
     x -= offset.left;
     y -= offset.top;
     x += 18;
     y += 80;
-    console.log(x, y)
     $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
     $('.dropdown-menu.search-help').show();
 })
@@ -149,7 +170,9 @@ $(document).ready(function () {
     }
 }).on('click', 'body', function (e) {
     $('.dropdown-menu.search-help').hide()
-})
+}).on('change', '#date_start', function () {
+    console.log("date change")
+});
 
 
 
@@ -186,7 +209,8 @@ function initTable() {
             {data: "session"}, {data: "timestamp", width: "160px"},
         ],
         select: {},
-        op_html: $('#actions').html()
+        op_html: $('#actions').html(),
+        fb_html: $("#daterange").html(),
     };
     table = jumpserver.initServerSideDataTable(options);
     return table

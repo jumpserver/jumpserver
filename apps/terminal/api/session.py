@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -39,10 +40,14 @@ class SessionViewSet(BulkModelViewSet):
             terminal = get_object_or_404(Terminal, id=terminal_id)
             queryset = queryset.filter(terminal=terminal)
             return queryset
-        # 解决guacamole更新session时并发导致幽灵会话的问题
-        if self.request.method in ('PATCH', ):
-            queryset = queryset.select_for_update()
         return queryset
+
+    def get_object(self):
+        # 解决guacamole更新session时并发导致幽灵会话的问题
+        obj = super().get_object()
+        if self.request.method in ('PATCH', ):
+            obj = obj.select_for_update()
+        return obj
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
@@ -71,13 +76,32 @@ class CommandViewSet(viewsets.ModelViewSet):
     command_store = get_command_storage()
     serializer_class = SessionCommandSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
-    filter_fields = ("asset", "system_user", "user", "input")
+    permission_classes = [IsOrgAdminOrAppUser | IsAuditor]
+    filter_fields = [
+        "asset", "system_user", "user", "input", "session",
+    ]
+    default_days_ago = 5
 
     def get_queryset(self):
+        date_from, date_to = self.get_date_range()
         multi_command_storage = get_multi_command_storage()
-        queryset = multi_command_storage.filter()
+        queryset = multi_command_storage.filter(date_from=date_from, date_to=date_to)
         return queryset
+
+    def get_filter_fields(self):
+        fields = self.filter_fields
+        fields.extend(["date_from", "date_to"])
+        return fields
+
+    def get_date_range(self):
+        now = timezone.now()
+        days_ago = now - timezone.timedelta(days=self.default_days_ago)
+        default_start_st = days_ago.timestamp()
+        default_end_st = now.timestamp()
+        query_params = self.request.query_params
+        date_from_st = query_params.get("date_from") or default_start_st
+        date_to_st = query_params.get("date_to") or default_end_st
+        return int(date_from_st), int(date_to_st)
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
