@@ -92,21 +92,21 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         return public_key
 
     def clean_password(self):
-        password = self.cleaned_data['password']
-        password_strategy = self.data.get('password_strategy', None)
-        if not password_strategy:
+        msg = _('* Your password does not meet the requirements')
+        password_strategy = self.data.get('password_strategy')
+        password = self.data.get('password')
+        if password_strategy == '0':
+            return
+        elif password_strategy == '1':
+            if not check_password_rules(password):
+                raise forms.ValidationError(msg)
+            return password
+        elif password_strategy is None:
             if not password:
                 return
             if not check_password_rules(password):
-                msg = _('* Your password does not meet the requirements')
                 raise forms.ValidationError(msg)
-
-        if str(password_strategy) == '0':
-            return
-        if not password or not check_password_rules(password):
-            msg = _('* Your password does not meet the requirements')
-            raise forms.ValidationError(msg)
-        return password
+            return password
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
