@@ -38,21 +38,11 @@ class SessionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
         filter_kwargs = dict()
         filter_kwargs['date_start__gt'] = self.date_from
         filter_kwargs['date_start__lt'] = self.date_to
-        if self.user:
-            filter_kwargs['user'] = self.user
-        if self.asset:
-            filter_kwargs['asset'] = self.asset
-        if self.system_user:
-            filter_kwargs['system_user'] = self.system_user
-        if filter_kwargs:
-            self.queryset = self.queryset.filter(**filter_kwargs)
         return self.queryset
 
     def get_context_data(self, **kwargs):
         context = {
-            'user_list': utils.get_session_user_list(),
-            'asset_list': utils.get_session_asset_list(),
-            'system_user_list': utils.get_session_system_user_list(),
+            'asset_list': utils.get_session_asset_list()[:10],
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user': self.user,

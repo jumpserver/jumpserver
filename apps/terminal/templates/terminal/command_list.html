@@ -80,7 +80,7 @@ $(document).ready(function () {
     table = initTable().on("init", function () {
         var dateFromRef = $("#date_from");
         var dateToRef = $("#date_to");
-        let options = {
+        var options = {
             format: "yyyy-mm-dd",
             todayBtn: "linked",
             keyboardNavigation: false,
@@ -90,16 +90,15 @@ $(document).ready(function () {
             language: navigator.language || "en",
         };
         dateFromRef.datepicker(options).on("changeDate", function () {
-            let date = new Date($(this).val() + ' 0:0:0');
-            let url = table.ajax.url();
+            var date = new Date($(this).val() + ' 0:0:0');
+            var url = table.ajax.url();
             url = setUrlParam(url, "date_from", date.getTime()/1000);
             table.ajax.url(url);
             table.ajax.reload();
-            console.log("On change")
         });
         dateToRef.datepicker(options).on("changeDate", function () {
-            let date = new Date($(this).val() + ' 23:59:59');
-            let url = table.ajax.url();
+            var date = new Date($(this).val() + ' 23:59:59');
+            var url = table.ajax.url();
             url = setUrlParam(url, "date_to", date.getTime()/1000);
             table.ajax.url(url);
             table.ajax.reload();
@@ -107,15 +106,11 @@ $(document).ready(function () {
     });
 })
 .on('click', '#btn_bulk_update', function(){
-    var action = $('#slct_bulk_update').val();
-    var param_action = '&action=' + action;
-    var local_params = window.location.search;
-    if(!local_params){
-        param_action = '?action=' + action;
-    }
-    var params = local_params + param_action;
-    var pathname = window.location.pathname + 'export/';
-    var url = pathname + params;
+    // var action = $('#slct_bulk_update').val();
+    var params = getUrlParams(table.ajax.url());
+
+    var exportPath = "{% url 'api-terminal:command-export' %}";
+    var url = exportPath + "?" + params;
     window.open(url);
 }).on("click", '#command_table_filter input', function (e) {
     e.preventDefault();
@@ -182,8 +177,13 @@ function format(d) {
     return output
 }
 
+var commandListUrl = '{% url "api-terminal:command-list" %}';
+var dateFrom = "{{ date_from.timestamp }}";
+var dateTo = "{{ date_to.timestamp }}";
 
 function initTable() {
+    commandListUrl = setUrlParam(commandListUrl, "date_from", dateFrom);
+    commandListUrl = setUrlParam(commandListUrl, "date_to", dateTo);
     var options = {
         ele: $('#command_table'),
         columnDefs: [
@@ -202,7 +202,7 @@ function initTable() {
             }},
         ],
         toggle: true,
-        ajax_url: '{% url "api-terminal:command-list" %}',
+        ajax_url: commandListUrl,
         columns: [
             {data: "id"}, {data: "input", orderable: false}, {data: "user", orderable: false},
             {data: "asset"}, {data: "system_user"},

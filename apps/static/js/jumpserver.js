@@ -467,14 +467,15 @@ jumpserver.initDataTable = function (options) {
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var select = {
-            style: 'multi',
-            selector: 'td:first-child'
-      };
+      style: 'multi',
+      selector: 'td:first-child'
+  };
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         order: options.order || [],
         // select: options.select || 'multi',
+        searchDelay: 800,
         buttons: [],
         columnDefs: columnDefs,
         ajax: {
@@ -574,6 +575,7 @@ jumpserver.initServerSideDataTable = function (options) {
         columnDefs: columnDefs,
         serverSide: true,
         processing: true,
+        searchDelay: 800,
         ajax: {
             url: options.ajax_url ,
             error: function(jqXHR, textStatus, errorThrown) {
@@ -1102,4 +1104,13 @@ function objectAttrsIsBool(obj, attrs) {
 function formatDateAsCN(d) {
     var date = new Date(d);
     return date.toISOString().replace("T", " ").replace(/\..*/, "");
+}
+
+function getUrlParams(url) {
+    url = url.split("?");
+    let params = "";
+    if (url.length === 2){
+        params = url[1];
+    }
+    return params
 }

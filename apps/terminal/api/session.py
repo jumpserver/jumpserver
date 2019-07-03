@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-import logging
 import os
 
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
 from django.conf import settings
-from django.utils import timezone
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -15,16 +13,15 @@ from rest_framework_bulk import BulkModelViewSet
 import jms_storage
 
 
-from common.utils import is_uuid
+from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsAuditor
 from ..hands import SystemUser
-from ..models import Terminal, Session
+from ..models import Session
 from .. import serializers
-from ..backends import get_command_storage, get_multi_command_storage, \
-    SessionCommandSerializer
 
-__all__ = ['SessionViewSet', 'SessionReplayViewSet', 'CommandViewSet']
-logger = logging.getLogger(__file__)
+
+__all__ = ['SessionViewSet', 'SessionReplayViewSet',]
+logger = get_logger(__name__)
 
 
 class SessionViewSet(BulkModelViewSet):
@@ -32,15 +29,7 @@ class SessionViewSet(BulkModelViewSet):
     serializer_class = serializers.SessionSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        terminal_id = self.kwargs.get("terminal", None)
-        if terminal_id:
-            terminal = get_object_or_404(Terminal, id=terminal_id)
-            queryset = queryset.filter(terminal=terminal)
-            return queryset
-        return queryset
+    filter_fields = ["user", "asset", "system_user", "terminal"]
 
     def get_object(self):
         # 解决guacamole更新session时并发导致幽灵会话的问题
@@ -58,63 +47,6 @@ class SessionViewSet(BulkModelViewSet):
             _system_user = get_object_or_404(SystemUser, id=sid)
             serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
-
-
-class CommandViewSet(viewsets.ModelViewSet):
-    """接受app发送来的command log, 格式如下
-    {
-        "user": "admin",
-        "asset": "localhost",
-        "system_user": "web",
-        "session": "xxxxxx",
-        "input": "whoami",
-        "output": "d2hvbWFp",  # base64.b64encode(s)
-        "timestamp": 1485238673.0
-    }
-
-    """
-    command_store = get_command_storage()
-    serializer_class = SessionCommandSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = [IsOrgAdminOrAppUser | IsAuditor]
-    filter_fields = [
-        "asset", "system_user", "user", "input", "session",
-    ]
-    default_days_ago = 5
-
-    def get_queryset(self):
-        date_from, date_to = self.get_date_range()
-        multi_command_storage = get_multi_command_storage()
-        queryset = multi_command_storage.filter(date_from=date_from, date_to=date_to)
-        return queryset
-
-    def get_filter_fields(self):
-        fields = self.filter_fields
-        fields.extend(["date_from", "date_to"])
-        return fields
-
-    def get_date_range(self):
-        now = timezone.now()
-        days_ago = now - timezone.timedelta(days=self.default_days_ago)
-        default_start_st = days_ago.timestamp()
-        default_end_st = now.timestamp()
-        query_params = self.request.query_params
-        date_from_st = query_params.get("date_from") or default_start_st
-        date_to_st = query_params.get("date_to") or default_end_st
-        return int(date_from_st), int(date_to_st)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, many=True)
-        if serializer.is_valid():
-            ok = self.command_store.bulk_save(serializer.validated_data)
-            if ok:
-                return Response("ok", status=201)
-            else:
-                return Response("Save error", status=500)
-        else:
-            msg = "Command not valid: {}".format(serializer.errors)
-            logger.error(msg)
-            return Response({"msg": msg}, status=401)
 
 
 class SessionReplayViewSet(viewsets.ViewSet):
