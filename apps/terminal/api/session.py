@@ -9,12 +9,13 @@ from django.conf import settings
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework.generics import GenericAPIView
 import jms_storage
-
 
 from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsAuditor
+from common.filters import DatetimeRangeFilter
+from orgs.mixins import OrgBulkModelViewSet
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
@@ -24,12 +25,17 @@ __all__ = ['SessionViewSet', 'SessionReplayViewSet',]
 logger = get_logger(__name__)
 
 
-class SessionViewSet(BulkModelViewSet):
+class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
-    filter_fields = ["user", "asset", "system_user", "terminal"]
+    filter_fields = [
+        "user", "asset", "system_user", "terminal", "is_finished",
+    ]
+    date_range_filter_fields = [
+        ('date_start', ('date_from', 'date_to'))
+    ]
 
     def get_object(self):
         # 解决guacamole更新session时并发导致幽灵会话的问题
@@ -37,6 +43,12 @@ class SessionViewSet(BulkModelViewSet):
         if self.request.method in ('PATCH', ):
             obj = obj.select_for_update()
         return obj
+
+    @property
+    def filter_backends(self):
+        backends = list(GenericAPIView.filter_backends)
+        backends.append(DatetimeRangeFilter)
+        return backends
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):

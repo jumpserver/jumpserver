@@ -1108,9 +1108,44 @@ function formatDateAsCN(d) {
 
 function getUrlParams(url) {
     url = url.split("?");
-    let params = "";
+    var params = "";
     if (url.length === 2){
         params = url[1];
     }
     return params
+}
+
+function getTimeUnits(u) {
+    var units = {
+        "d": "天",
+        "h": "时",
+        "m": "分",
+        "s": "秒",
+    };
+    if (navigator.language || "zh-CN") {
+        return units[u]
+    }
+    return u
+}
+
+function timeOffset(a, b) {
+    var start = new Date(a);
+    var end = new Date(b);
+    var offset = (end - start)/1000;
+
+    var days = offset / 3600 / 24;
+    var hours = offset / 3600;
+    var minutes = offset / 60;
+    var seconds = offset;
+
+    if (days > 1) {
+        return days.toFixed(1) + " " + getTimeUnits("d");
+    } else if (hours > 1) {
+        return hours.toFixed(1) + " " + getTimeUnits("h");
+    } else if (minutes > 1) {
+        return minutes.toFixed(1) + " " + getTimeUnits("m")
+    } else if (seconds > 1) {
+        return seconds.toFixed(1) + " " + getTimeUnits("s")
+    }
+    return ""
 }

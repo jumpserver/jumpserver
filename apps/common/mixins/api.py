@@ -38,8 +38,10 @@ class IDInFilterMixin(object):
 class IDInCacheFilterMixin(object):
 
     def filter_queryset(self, queryset):
-        queryset = super(IDInCacheFilterMixin, self).filter_queryset(queryset)
+        queryset = super().filter_queryset(queryset)
         spm = self.request.query_params.get('spm')
+        if not spm:
+            return queryset
         cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
         resources_id = cache.get(cache_key)
         if resources_id and isinstance(resources_id, list):

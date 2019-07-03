@@ -27,13 +27,14 @@ class BulkSerializerMixin(object):
             if all((isinstance(self.root, BulkListSerializer),
                     id_attr,
                     request_method in ('PUT', 'PATCH'))):
-                id_field = self.fields[id_attr]
+                id_field = self.fields.get("id") or self.fields.get('pk')
                 if data.get("id"):
                     id_value = id_field.to_internal_value(data.get("id"))
                 else:
                     id_value = id_field.to_internal_value(data.get("pk"))
+                print(">>>>>>>>>>>>>>>>>>>")
+                print(id_attr)
                 ret[id_attr] = id_value
-
         return ret
 
 

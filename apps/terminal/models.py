@@ -241,6 +241,10 @@ class Session(OrgModelMixin):
         command_store = get_multi_command_storage()
         return command_store.count(session=str(self.id))
 
+    @property
+    def login_from_display(self):
+        return self.get_login_from_display()
+
     class Meta:
         db_table = "terminal_session"
         ordering = ["-date_start"]
