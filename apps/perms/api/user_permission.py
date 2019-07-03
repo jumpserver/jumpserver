@@ -299,12 +299,14 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, List
         nodes = util.get_nodes_with_assets()
         if str(node_id) == const.UNGROUPED_NODE_ID:
             node = util.tree.ungrouped_node
+        elif str(node_id) == const.EMPTY_NODE_ID:
+            node = util.tree.empty_node
         else:
             node = get_object_or_404(Node, id=node_id)
         if node == util.tree.root_node:
             assets = util.get_assets()
         else:
-            assets = nodes.get(node, [])
+            assets = nodes.get(node, {})
         for asset, system_users in assets.items():
             asset.system_users_granted = system_users
 
