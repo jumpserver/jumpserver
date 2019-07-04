@@ -106,8 +106,6 @@ class AdminUserAssetsView(PermissionsMixin, SingleObjectMixin, ListView):
         context = {
             'app': _('Assets'),
             'action': _('Admin user detail'),
-            "total_amount": len(self.queryset),
-            'unreachable_amount': len([asset for asset in self.queryset if asset.connectivity is False])
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

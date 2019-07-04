@@ -608,7 +608,10 @@ jumpserver.initServerSideDataTable = function (options) {
                     search_list.map(function (val, index) {
                        var kv = val.split(":");
                        if (kv.length === 2) {
-                           search_attr[kv[0]] = kv[1]
+                           var value = kv[1];
+                           value = value.replace("+", " ");
+                           console.log(value);
+                           search_attr[kv[0]] = value
                        } else {
                            search_raw.push(kv)
                        }

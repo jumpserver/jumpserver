@@ -32,8 +32,6 @@ class BulkSerializerMixin(object):
                     id_value = id_field.to_internal_value(data.get("id"))
                 else:
                     id_value = id_field.to_internal_value(data.get("pk"))
-                print(">>>>>>>>>>>>>>>>>>>")
-                print(id_attr)
                 ret[id_attr] = id_value
         return ret
 

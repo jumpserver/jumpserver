@@ -513,7 +513,6 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         """
         self.get_assets_without_cache()
         nodes_assets = self.tree.get_nodes_with_assets()
-        print(nodes_assets.keys())
         return nodes_assets
 
     def get_system_users_without_cache(self):
