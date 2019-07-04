@@ -26,14 +26,22 @@ class CommandQueryMixin:
     pagination_class = LimitOffsetPagination
     permission_classes = [IsOrgAdminOrAppUser | IsAuditor]
     filter_fields = [
-        "asset", "system_user", "user", "input", "session",
+        "asset", "system_user", "user", "session",
     ]
     default_days_ago = 5
 
     def get_queryset(self):
         date_from, date_to = self.get_date_range()
+        q = self.request.query_params
         multi_command_storage = get_multi_command_storage()
-        queryset = multi_command_storage.filter(date_from=date_from, date_to=date_to)
+        queryset = multi_command_storage.filter(
+            date_from=date_from, date_to=date_to, input=q.get("input"),
+            user=q.get("user"), asset=q.get("asset"),
+            system_user=q.get("system_user")
+        )
+        return queryset
+
+    def filter_queryset(self, queryset):
         return queryset
 
     def get_filter_fields(self):
