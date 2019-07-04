@@ -96,8 +96,8 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         # 创建-不设置密码
         if password_strategy == '0':
             return
-        # 更新-密码为空
         password = self.data.get('password')
+        # 更新-密码为空
         if password_strategy is None and not password:
             return
         if not check_password_rules(password):
