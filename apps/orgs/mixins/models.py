@@ -32,10 +32,10 @@ class OrgManager(models.Manager):
             kwargs['org_id'] = _current_org.id
         elif _current_org.is_default():
             queryset = queryset.filter(org_id="")
-
+        #
         # lines = traceback.format_stack()
         # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        # for line in lines[-10:-5]:
+        # for line in lines[-10:-1]:
         #     print(line)
         # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 

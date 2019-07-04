@@ -10,7 +10,7 @@
         {% csrf_token %}
         <div class="form-group">
             <label class="control-label">{% trans "Download the imported template or use the exported CSV file format" %}</label>
-            <a href="{% block import_modal_download_template_url %}{% endblock %}?format=csv&template=import" style="display: block">{% trans 'Download the import template' %}</a>
+            <a href="{% block import_modal_download_template_url %}{% endblock %}?format=csv&template=import&limit=1" style="display: block">{% trans 'Download the import template' %}</a>
         </div>
 
         <div class="form-group">

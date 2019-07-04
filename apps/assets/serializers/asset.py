@@ -2,12 +2,12 @@
 #
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
-
+from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
-from ..models import Asset, Protocol
+from ..models import Asset, Protocol, Node, Label
 from .base import ConnectivitySerializer
 
 __all__ = [
@@ -58,7 +58,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
             'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
             'hostname_raw', 'comment', 'created_by', 'date_created',
-            'hardware_info', 'connectivity'
+            'hardware_info', 'connectivity',
         ]
         read_only_fields = (
             'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
@@ -76,8 +76,11 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('labels', 'nodes', 'protocols')\
-            .select_related('admin_user', 'domain')
+        queryset = queryset.prefetch_related(
+            Prefetch('nodes', queryset=Node.objects.all().only('id')),
+            Prefetch('labels', queryset=Label.objects.all().only('id')),
+            'protocols'
+        ).select_related('admin_user', 'domain')
         return queryset
 
     @staticmethod

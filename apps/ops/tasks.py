@@ -47,7 +47,7 @@ def run_command_execution(cid, **kwargs):
         try:
             execution.run()
         except SoftTimeLimitExceeded:
-            print("HLLL")
+            logger.error("Run time out")
     else:
         logger.error("Not found the execution id: {}".format(cid))
 

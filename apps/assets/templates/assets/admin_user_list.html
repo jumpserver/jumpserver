@@ -75,7 +75,7 @@ function initTable() {
             }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = "";
-                var data = cellData['reachable'];
+                var data = cellData.reachable;
                 if (data !== 0) {
                     innerHtml = "<span class='text-navy'>" + data + "</span>";
                 } else {

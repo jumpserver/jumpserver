@@ -149,9 +149,10 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
     def get_asset_users(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
+        prefer = self.request.GET.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         manager = AssetUserManager()
-        asset_users = manager.filter(username=username, assets=[asset])
+        asset_users = manager.filter(username=username, assets=[asset], prefer=prefer)
         return asset_users
 
     def retrieve(self, request, *args, **kwargs):

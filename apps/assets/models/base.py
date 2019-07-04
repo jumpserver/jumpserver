@@ -35,8 +35,8 @@ class AssetUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
-    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_{}_ASSET_CONNECTIVITY"
-    CONNECTIVITY_AMOUNT_CACHE_KEY = "ASSET_USER_{}_CONNECTIVITY_AMOUNT"
+    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_{}_{}_ASSET_CONNECTIVITY"
+    CONNECTIVITY_AMOUNT_CACHE_KEY = "ASSET_USER_{}_{}_CONNECTIVITY_AMOUNT"
     ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
     ASSET_USER_CACHE_TIME = 3600 * 24
 
@@ -99,21 +99,24 @@ class AssetUser(OrgModelMixin):
         unreachable = summary.get('dark', {}).keys()
         reachable = summary.get('contacted', {}).keys()
 
-        for asset in self.get_related_assets():
+        assets = self.get_related_assets()
+        if not isinstance(assets, list):
+            assets = assets.only('id', 'hostname', 'admin_user__id')
+        for asset in assets:
             if asset.hostname in unreachable:
                 self.set_asset_connectivity(asset, Connectivity.unreachable())
             elif asset.hostname in reachable:
                 self.set_asset_connectivity(asset, Connectivity.reachable())
             else:
                 self.set_asset_connectivity(asset, Connectivity.unknown())
-        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
+        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, self.part_id)
         cache.delete(cache_key)
 
     @property
     def connectivity(self):
-        assets = self.get_related_assets()\
-            .select_related('admin_user')\
-            .only('id', 'hostname', 'admin_user')
+        assets = self.get_related_assets()
+        if not isinstance(assets, list):
+            assets = assets.only('id', 'hostname', 'admin_user__id')
         data = {
             'unreachable': [],
             'reachable': [],
@@ -131,11 +134,11 @@ class AssetUser(OrgModelMixin):
 
     @property
     def connectivity_amount(self):
-        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
+        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, self.part_id)
         amount = cache.get(cache_key)
         if not amount:
-            connectivity = {k: len(v) for k, v in self.connectivity.items()}
-            cache.set(cache_key, connectivity, self.ASSET_USER_CACHE_TIME)
+            amount = {k: len(v) for k, v in self.connectivity.items()}
+            cache.set(cache_key, amount, self.ASSET_USER_CACHE_TIME)
         return amount
 
     @property
@@ -152,17 +155,18 @@ class AssetUser(OrgModelMixin):
         cache.delete(cache_key)
 
     def get_asset_connectivity(self, asset):
-        i = self.generate_id_with_asset(asset)
-        key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
+        key = self.get_asset_connectivity_key(asset)
         return Connectivity.get(key)
 
+    def get_asset_connectivity_key(self, asset):
+        return self.CONNECTIVITY_ASSET_CACHE_KEY.format(self.username, asset.id)
+
     def set_asset_connectivity(self, asset, c):
-        i = self.generate_id_with_asset(asset)
-        key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
+        key = self.get_asset_connectivity_key(asset)
         Connectivity.set(key, c)
         # 当为某个系统用户或管理用户设置的的时候，失效掉他们的连接数量
-        amount_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
-        cache.delete(amount_key)
+        amount_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, '*')
+        cache.delete_pattern(amount_key)
 
     def get_asset_user(self, asset):
         from ..backends import AssetUserManager

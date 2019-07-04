@@ -576,6 +576,7 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
 
     tasks = get_test_asset_user_connectivity_tasks(asset_user.asset)
     if not tasks:
+        logger.debug("No tasks ")
         return
 
     args = (task_name,)

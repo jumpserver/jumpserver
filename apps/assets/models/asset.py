@@ -126,6 +126,7 @@ class Asset(OrgModelMixin):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     objects = OrgManager.from_queryset(AssetQuerySet)()
+    _connectivity = None
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -221,17 +222,18 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
+        if self._connectivity:
+            return self._connectivity
         if not self.admin_user:
             return Connectivity.unknown()
-        instance = self.admin_user.get_asset_user(self)
-        return instance.connectivity
+        connectivity = self.admin_user.get_asset_connectivity(self)
+        return connectivity
 
     @connectivity.setter
     def connectivity(self, value):
         if not self.admin_user:
             return
-        instance = self.admin_user.get_asset_user(self)
-        instance.set_asset_connectivity(self, value)
+        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:
