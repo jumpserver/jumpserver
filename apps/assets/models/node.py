@@ -9,11 +9,16 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from orgs.mixins import OrgModelMixin
+from orgs.mixins import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org
 from orgs.models import Organization
 
 __all__ = ['Node']
+
+
+class NodeQuerySet(models.QuerySet):
+    def delete(self):
+        raise PermissionError("Bulk delete node deny")
 
 
 class FamilyMixin:
@@ -242,6 +247,7 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
     child_mark = models.IntegerField(default=0)
     date_create = models.DateTimeField(auto_now_add=True)
 
+    objects = OrgManager.from_queryset(NodeQuerySet)()
     is_node = True
     _parents = None
 
@@ -391,12 +397,18 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
                     "name": self.name,
                     "value": self.value,
                     "key": self.key,
+                    "assets_amount": self.assets_amount,
                 },
                 'type': 'node'
             }
         }
         tree_node = TreeNode(**data)
         return tree_node
+
+    def delete(self, using=None, keep_parents=False):
+        if self.children or self.assets.get_assets():
+            return
+        return super().delete(using=using, keep_parents=keep_parents)
 
     @classmethod
     def get_queryset(cls):
