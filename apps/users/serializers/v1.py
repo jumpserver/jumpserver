@@ -6,9 +6,18 @@ from rest_framework import serializers
 
 from common.utils import get_signer, validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
+from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
+
+
+__all__ = [
+    'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
+    'UserGroupSerializer', 'UserGroupListSerializer',
+    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer'
+]
+
 
 signer = get_signer()
 
@@ -106,6 +115,10 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
+
+
+class UserGroupListSerializer(UserGroupSerializer):
+    users = StringManyToManyField(many=True, read_only=True)
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):
