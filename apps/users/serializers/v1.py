@@ -100,7 +100,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         model = UserGroup
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'org_id', 'name',  'users', 'comment', 'date_created',
+            'id', 'name',  'users', 'comment', 'date_created',
             'created_by',
         ]
         extra_kwargs = {
