@@ -78,10 +78,13 @@ class AdminUserDetailView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
+        from ..utils import NodeUtil
+        nodes = Node.objects.all()
+        util = NodeUtil()
         context = {
             'app': _('Assets'),
             'action': _('Admin user detail'),
-            'nodes': Node.objects.all()
+            'nodes': util.get_nodes_by_queryset(queryset=nodes),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
