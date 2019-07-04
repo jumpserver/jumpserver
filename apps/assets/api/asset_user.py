@@ -108,10 +108,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 class AssetUserExportViewSet(AssetUserViewSet):
     serializer_class = serializers.AssetUserExportSerializer
     http_method_names = ['get']
-
-    def get_permissions(self):
-        self.permission_classes.append(NeedMFAVerify)
-        return super().get_permissions()
+    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
 
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
