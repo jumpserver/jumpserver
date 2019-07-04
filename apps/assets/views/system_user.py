@@ -74,10 +74,11 @@ class SystemUserDetailView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
+        cmd_filters_remain = CommandFilter.objects.exclude(system_users=self.object)
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
-            'cmd_filters_remain': CommandFilter.objects.exclude(system_users=self.object)
+            'cmd_filters_remain': cmd_filters_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
