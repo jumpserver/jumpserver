@@ -111,6 +111,7 @@ MIDDLEWARE = [
     'orgs.middleware.OrgMiddleware',
 ]
 
+
 ROOT_URLCONF = 'jumpserver.urls'
 
 TEMPLATES = [
@@ -398,7 +399,7 @@ REST_FRAMEWORK = {
     'ORDERING_PARAM': "order",
     'SEARCH_PARAM': "search",
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
-    'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
+    'DATETIME_INPUT_FORMATS': ['iso-8601', '%Y-%m-%d %H:%M:%S %z'],
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'PAGE_SIZE': 15
 }
@@ -566,6 +567,7 @@ SECURITY_PASSWORD_RULES = [
     'SECURITY_PASSWORD_NUMBER',
     'SECURITY_PASSWORD_SPECIAL_CHAR'
 ]
+SECURITY_MFA_VERIFY_TTL = CONFIG.SECURITY_MFA_VERIFY_TTL
 
 TERMINAL_PASSWORD_AUTH = CONFIG.TERMINAL_PASSWORD_AUTH
 TERMINAL_PUBLIC_KEY_AUTH = CONFIG.TERMINAL_PUBLIC_KEY_AUTH

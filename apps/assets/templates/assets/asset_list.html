@@ -49,15 +49,7 @@
 <div class="wrapper wrapper-content">
    <div class="row">
        <div class="col-lg-3" id="split-left" style="padding-left: 3px">
-           <div class="ibox float-e-margins">
-               <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
-                   <div class="file-manager ">
-                       <div id="assetTree" class="ztree">
-                       </div>
-                       <div class="clearfix"></div>
-                   </div>
-               </div>
-           </div>
+           {% include 'assets/_node_tree.html' %}
        </div>
        <div class="col-lg-9 animated fadeInRight" id="split-right">
            <div class="tree-toggle">
@@ -132,26 +124,7 @@
    </div>
 </div>
 
-<div id="rMenu">
-    <ul class="dropdown-menu">
-        <li class="divider"></li>
-        <li id="m_create" tabindex="-1" onclick="addTreeNode();"><a><i class="fa fa-plus-square-o"></i> {% trans 'Add node' %}</a></li>
-        <li id="m_del" tabindex="-1" onclick="editTreeNode();"><a><i class="fa fa-pencil-square-o"></i> {% trans 'Rename node' %}</a></li>
-        <li id="m_del" tabindex="-1" onclick="removeTreeNode();"><a><i class="fa fa-minus-square"></i> {% trans 'Delete node' %}</a></li>
-        <li class="divider"></li>
-        <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-copy"></i> {% trans 'Add assets to node' %}</a></li>
-        <li id="menu_asset_move" class="btn-move-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-cut"></i> {% trans 'Move assets to node' %}</a></li>
-        <li class="divider"></li>
-        <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
-        <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
-        <li class="divider"></li>
-        <li id="menu_refresh_assets_amount" class="btn-refresh-assets-amount" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh all node assets amount' %}</a></li>
-        <li class="divider"></li>
-        <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
-        <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
-{#        <li id="fresh_tree" class="btn-refresh-tree" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh' %}</a></li>#}
-    </ul>
-</div>
+{% include 'assets/_node_tree.html' %}
 {% include 'assets/_asset_update_modal.html' %}
 {% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
@@ -159,10 +132,11 @@
 
 {% block custom_foot_js %}
 <script>
-var zTree, rMenu, asset_table, show = 0;
+var asset_table, show = 0;
 var update_node_action = "";
 var current_node_id = null;
-var current_node = null;
+var testDatetime = "{% trans 'Test datetime: ' %}";
+
 function initTable() {
     var options = {
         ele: $('#asset_list_table'),
@@ -176,16 +150,21 @@ function initTable() {
             {targets: 3, createdCell: function (td, cellData, rowData) {
                 $(td).html(rowData.hardware_info)
             }},
-            {targets: 4, createdCell: function (td, cellData) {
-                if (cellData === 1){
-                    $(td).html('<i class="fa fa-circle text-navy"></i>')
-                } else if (cellData === 0) {
-                    $(td).html('<i class="fa fa-circle text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-circle text-warning"></i>')
-                }
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                  var innerHtml = "";
+                  if (cellData.status == 1) {
+                      innerHtml = '<i class="fa fa-circle text-navy"></i>'
+                  } else if (cellData.status == 0) {
+                      innerHtml = '<i class="fa fa-circle text-danger"></i>'
+                  } else {
+                      innerHtml = '<i class="fa fa-circle text-warning"></i>'
+                  }
+                  var date = new Date(cellData.datetime);
+                  var dateManual = date.toLocaleString();
+                  var dataContent = testDatetime + dateManual;
+                  innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
+                  $(td).html(innerHtml);
             }},
-
             {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
@@ -203,239 +182,24 @@ function initTable() {
     asset_table = jumpserver.initServerSideDataTable(options);
     return asset_table
 }
-
-function addTreeNode() {
-	hideRMenu();
-	var parentNode = zTree.getSelectedNodes()[0];
-	if (!parentNode){
-	    return
-    }
-    var url = "{% url 'api-assets:node-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", parentNode.meta.node.id);
-    $.post(url,  {}, function (data, status){
-        if (status === "success") {
-            var newNode = {
-                id: data["key"],
-                name: data["value"],
-                pId: parentNode.id,
-                meta: {
-                    "node": data
-                }
-            };
-            newNode.checked = zTree.getSelectedNodes()[0].checked;
-            zTree.addNodes(parentNode, 0, newNode);
-            var node = zTree.getNodeByParam('id', newNode.id, parentNode);
-            zTree.editName(node);
-        } else {
-            alert("{% trans 'Create node failed' %}")
-        }
-    });
-}
-
-function removeTreeNode() {
-	hideRMenu();
-	var current_node = zTree.getSelectedNodes()[0];
-	if (!current_node){
-	    return
-    }
-	if (current_node.children && current_node.children.length > 0) {
-		toastr.error("{% trans 'Have child node, cancel' %}");
-	 } else if (current_node.meta.node.assets_amount !== 0) {
-        toastr.error("{% trans 'Have assets, cancel' %}");
-    } else {
-        var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-		$.ajax({
-            url: url,
-            method: "DELETE",
-            success: function () {
-                zTree.removeNode(current_node);
-            }
-        });
-	}
-}
-
-function editTreeNode() {
-    hideRMenu();
-    var current_node = zTree.getSelectedNodes()[0];
-    if (!current_node){
-        return
-    }
-    if (current_node) {
-        current_node.name = current_node.meta.node.value;
-    }
-    zTree.editName(current_node);
-}
-
-function OnRightClick(event, treeId, treeNode) {
-    if (!treeNode && event.target.tagName.toLowerCase() !== "button" && $(event.target).parents("a").length === 0) {
-		zTree.cancelSelectedNode();
-		showRMenu("root", event.clientX, event.clientY);
-	} else if (treeNode && !treeNode.noR) {
-		zTree.selectNode(treeNode);
-		showRMenu("node", event.clientX, event.clientY);
-	}
-}
-
-function showRMenu(type, x, y) {
-	$("#rMenu ul").show();
-    x -= 220;
-    x += document.body.scrollLeft;
-    y += document.body.scrollTop+document.documentElement.scrollTop;
-    rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});
-
-	$("body").bind("mousedown", onBodyMouseDown);
-}
-
-function beforeClick(treeId, treeNode, clickFlag) {
-    return true;
-}
-
-function hideRMenu() {
-	if (rMenu) rMenu.css({"visibility": "hidden"});
-	$("body").unbind("mousedown", onBodyMouseDown);
-}
-
-function onBodyMouseDown(event){
-	if (!(event.target.id === "rMenu" || $(event.target).parents("#rMenu").length>0)) {
-		rMenu.css({"visibility" : "hidden"});
-	}
-}
-
-
-function onRename(event, treeId, treeNode, isCancel){
-    var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-    var data = {"value": treeNode.name};
-    if (isCancel){
-        return
-    }
-    APIUpdateAttr({
-        url: url,
-        body: JSON.stringify(data),
-        method: "PATCH",
-        success_message: "{% trans 'Rename success' %}",
-        fail_message: "{% trans 'Rename failed, do not change the root node name' %}",
-        success: function () {
-            treeNode.name = treeNode.name + ' (' + treeNode.meta.node.assets_amount + ')'
-            zTree.updateNode(treeNode);
-            console.log("Success: " + treeNode.name)
-        }
-    })
-}
-
-function onSelected(event, treeNode) {
-    current_node = treeNode;
-    current_node_id = treeNode.meta.node.id;
-    zTree.expandNode(current_node, true);
-    var url = asset_table.ajax.url();
-    url = setUrlParam(url, "node_id", current_node_id);
-    url = setUrlParam(url, "show_current_asset", getCookie('show_current_asset'));
-    setCookie('node_selected', treeNode.node_id);
-    asset_table.ajax.url(url);
-    asset_table.ajax.reload();
-}
-
-function selectQueryNode() {
-    // TODO: 是否应该添加
-    // 暂时忽略之前选中的内容
-    return
-    var query_node_id = $.getUrlParam("node");
-    var cookie_node_id = getCookie('node_selected');
-    var node;
-    var node_id;
-
-    if (query_node_id !== null) {
-        node_id = query_node_id
-    } else if (cookie_node_id !== null) {
-        node_id = cookie_node_id;
-    }
-
-    node = zTree.getNodesByParam("node_id", node_id, null);
-    if (node){
-        zTree.selectNode(node[0]);
-    }
-}
-
-function beforeDrag() {
-    return true
-}
-
-function beforeDrop(treeId, treeNodes, targetNode, moveType) {
-    var treeNodesNames = [];
-    $.each(treeNodes, function (index, value) {
-        treeNodesNames.push(value.name);
-    });
-
-    var msg = "你想移动节点: `" + treeNodesNames.join(",") + "` 到 `" + targetNode.name + "` 下吗?";
-    return confirm(msg);
-}
-
-function onDrag(event, treeId, treeNodes) {
-}
-
-function onDrop(event, treeId, treeNodes, targetNode, moveType) {
-    var treeNodesIds = [];
-    $.each(treeNodes, function (index, value) {
-        treeNodesIds.push(value.meta.node.id);
-    });
-
-    var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.meta.node.id);
-    var body = {nodes: treeNodesIds};
-    APIUpdateAttr({
-        url: the_url,
-        method: "PUT",
-        body: JSON.stringify(body)
-    })
-}
-
 function initTree() {
-    if (zTree) {
-        return
-    }
-    var url = '{% url 'api-assets:node-children-tree' %}?assets=0&all=';
-    var showCurrentAsset = getCookie('show_current_asset');
-    if (!showCurrentAsset) {
-        url += '1'
-    }
-    var setting = {
-        view: {
-            dblClickExpand: false,
-            showLine: true
-        },
-        data: {
-            simpleData: {
-                enable: true
-            }
-        },
-        async: {
-			enable: true,
-			url: url,
-			autoParam: ["id=key", "name=n", "level=lv"],
-            type: 'get'
-		},
-        edit: {
-            enable: true,
-			showRemoveBtn: false,
-			showRenameBtn: false,
-            drag: {
-                isCopy: true,
-                isMove: true
-            }
-        },
-        callback: {
-            onRightClick: OnRightClick,
-            beforeClick: beforeClick,
-            onRename: onRename,
-            onSelected: onSelected,
-            beforeDrag: beforeDrag,
-            onDrag: onDrag,
-            beforeDrop: beforeDrop,
-            onDrop: onDrop
-        }
-    };
-
-    var zNodes = [];
-    zTree = $.fn.zTree.init($("#assetTree"), setting, zNodes);
-    rMenu = $("#rMenu");
+    initNodeTree({
+        onSelected: onNodeSelected,
+        showMenu: true,
+        otherMenu: `
+            <li class="divider"></li>
+            <li id="menu_asset_add" class="btn-add-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-copy"></i> {% trans 'Add assets to node' %}</a></li>
+            <li id="menu_asset_move" class="btn-move-asset" data-toggle="modal" data-target="#asset_list_modal" tabindex="0"><a><i class="fa fa-cut"></i> {% trans 'Move assets to node' %}</a></li>
+            <li class="divider"></li>
+            <li id="menu_refresh_hardware_info" class="btn-refresh-hardware" tabindex="-1"><a><i class="fa fa-refresh"></i> {% trans 'Refresh node hardware info' %}</a></li>
+            <li id="menu_test_connective" class="btn-test-connective" tabindex="-1"><a><i class="fa fa-chain"></i> {% trans 'Test node connective' %}</a></li>
+            <li class="divider"></li>
+            <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
+            <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
+        `
+    })
 }
+
 
 function toggle() {
     if (show === 0) {
@@ -450,6 +214,18 @@ function toggle() {
         $("#split-left").show(500);
         show = 0;
     }
+}
+
+function onNodeSelected(event, treeNode) {
+    current_node = treeNode;
+    current_node_id = treeNode.meta.node.id;
+    zTree.expandNode(current_node, true);
+    var url = asset_table.ajax.url();
+    url = setUrlParam(url, "node_id", current_node_id);
+    url = setUrlParam(url, "show_current_asset", getCookie('show_current_asset'));
+    setCookie('node_selected', treeNode.node_id);
+    asset_table.ajax.url(url);
+    asset_table.ajax.reload();
 }
 
 $(document).ready(function(){
@@ -549,69 +325,7 @@ $(document).ready(function(){
     }
     window.open(url, '_self');
 })
-.on('click', '.btn-refresh-hardware', function () {
-    var url = "{% url 'api-assets:node-refresh-hardware-info' pk=DEFAULT_PK %}";
-    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
-    function success(data) {
-        rMenu.css({"visibility" : "hidden"});
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
-    }
-    APIUpdateAttr({
-        url: the_url,
-        method: "GET",
-        success: success,
-        flash_message: false
-    });
 
-})
-.on('click', '.btn-test-connective', function () {
-    var url = "{% url 'api-assets:node-test-connective' pk=DEFAULT_PK %}";
-    if (!current_node_id) {
-        return null;
-    }
-    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
-    function success(data) {
-        rMenu.css({"visibility" : "hidden"});
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
-    }
-    APIUpdateAttr({
-        url: the_url,
-        method: "GET",
-        success: success,
-        flash_message: false
-    });
-})
-.on('click', '.btn-show-current-asset', function(){
-    hideRMenu();
-    $(this).css('display', 'none');
-    $('#show_all_asset').css('display', 'inline-block');
-    setCookie('show_current_asset', '1');
-    location.reload();
-})
-.on('click', '.btn-show-all-asset', function(){
-    hideRMenu();
-    $(this).css('display', 'none');
-    $('#show_current_asset').css('display', 'inline-block');
-    setCookie('show_current_asset', '');
-    location.reload();
-})
-.on('click', '.btn-test-connective', function () {
-    hideRMenu();
-
-})
-.on('click', '#menu_refresh_assets_amount', function () {
-    hideRMenu();
-    var url = "{% url 'api-assets:refresh-assets-amount' %}";
-    APIUpdateAttr({
-        'url': url,
-        'method': 'GET'
-    });
-    window.location.reload();
-})
 .on('click', '.btn_asset_delete', function () {
     var $this = $(this);
     var $data_table = $("#asset_list_table").DataTable();

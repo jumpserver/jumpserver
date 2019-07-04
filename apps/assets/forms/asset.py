@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from orgs.mixins import OrgModelForm
 
-from ..models import Asset, Protocol
+from ..models import Asset, Protocol, Node
 
 
 logger = get_logger(__file__)
@@ -32,6 +32,12 @@ class ProtocolForm(forms.ModelForm):
 
 class AssetCreateForm(OrgModelForm):
     PROTOCOL_CHOICES = Protocol.PROTOCOL_CHOICES
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.data:
+            nodes_field = self.fields['nodes']
+            nodes_field._queryset = Node.get_queryset()
 
     class Meta:
         model = Asset

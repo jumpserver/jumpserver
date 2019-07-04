@@ -304,7 +304,7 @@ table.dataTable tbody td.selected td i.text-navy {
 
 div.dataTables_wrapper div.dataTables_filter,
 .dataTables_length {
-    float: right !important;
+    // float: right !important;
 }
 
 div.dataTables_wrapper div.dataTables_filter {
@@ -465,4 +465,12 @@ div.dataTables_wrapper div.dataTables_filter {
 
 span.select2-selection__placeholder {
     line-height: 34px !important;
+}
+
+.p-l-5 {
+    padding-left: 5px;
+}
+
+.p-r-5 {
+    padding-right: 5px;
 }

@@ -6,9 +6,18 @@ from rest_framework import serializers
 
 from common.utils import get_signer, validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
+from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
+
+
+__all__ = [
+    'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
+    'UserGroupSerializer', 'UserGroupListSerializer',
+    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer'
+]
+
 
 signer = get_signer()
 
@@ -19,13 +28,16 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         model = User
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'username', 'email', 'groups', 'groups_display',
+            'id', 'name', 'username', 'password', 'email', 'public_key',
+            'groups',  'groups_display',
             'role', 'role_display',  'wechat', 'phone', 'otp_level',
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
         extra_kwargs = {
+            'password': {'write_only': True, 'required': False},
+            'public_key': {'write_only': True},
             'groups_display': {'label': _('Groups name')},
             'source_display': {'label': _('Source name')},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
@@ -36,14 +48,45 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'created_by': {'read_only': True}, 'source': {'read_only': True}
         }
 
+    def validate_role(self, value):
+        request = self.context.get('request')
+        if not request.user.is_superuser and value != User.ROLE_USER:
+            role_display = dict(User.ROLE_CHOICES)[User.ROLE_USER]
+            msg = _("Role limit to {}".format(role_display))
+            raise serializers.ValidationError(msg)
+        return value
+
+    @staticmethod
+    def validate_password(value):
+        from ..utils import check_password_rules
+        if not check_password_rules(value):
+            msg = _('Password does not match security rules')
+            raise serializers.ValidationError(msg)
+        return value
+
+    @staticmethod
+    def change_password_to_raw(validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            validated_data['password_raw'] = password
+        return validated_data
+
+    def create(self, validated_data):
+        validated_data = self.change_password_to_raw(validated_data)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data = self.change_password_to_raw(validated_data)
+        return super().update(instance, validated_data)
+
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', '_public_key']
+        fields = ['id', 'public_key']
 
     @staticmethod
-    def validate__public_key(value):
+    def validate_public_key(value):
         if not validate_ssh_public_key(value):
             raise serializers.ValidationError(_('Not a valid ssh public key'))
         return value
@@ -66,12 +109,16 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         model = UserGroup
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'org_id', 'name',  'users', 'comment', 'date_created',
+            'id', 'name',  'users', 'comment', 'date_created',
             'created_by',
         ]
         extra_kwargs = {
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
+
+
+class UserGroupListSerializer(UserGroupSerializer):
+    users = StringManyToManyField(many=True, read_only=True)
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):

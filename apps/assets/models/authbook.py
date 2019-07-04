@@ -3,12 +3,9 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
 
 from orgs.mixins import OrgManager
-
 from .base import AssetUser
-from ..const import ASSET_USER_CONN_CACHE_KEY
 
 __all__ = ['AuthBook']
 
@@ -32,6 +29,7 @@ class AuthBook(AssetUser):
     backend = "db"
     # 用于system user和admin_user的动态设置
     _connectivity = None
+    CONN_CACHE_KEY = "ASSET_USER_CONN_{}"
 
     class Meta:
         verbose_name = _('AuthBook')
@@ -65,20 +63,15 @@ class AuthBook(AssetUser):
         self._set_version()
         self._set_latest()
 
-    @property
-    def _conn_cache_key(self):
-        return ASSET_USER_CONN_CACHE_KEY.format(self.id)
+    def get_related_assets(self):
+        return [self.asset]
+
+    def generate_id_with_asset(self, asset):
+        return self.id
 
     @property
     def connectivity(self):
-        if self._connectivity:
-            return self._connectivity
-        value = cache.get(self._conn_cache_key, self.UNKNOWN)
-        return value
-
-    @connectivity.setter
-    def connectivity(self, value):
-        cache.set(self._conn_cache_key, value, 3600)
+        return self.get_asset_connectivity(self.asset)
 
     @property
     def keyword(self):

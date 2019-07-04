@@ -10,7 +10,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
-from ..models import AssetPermission, Action
+from ..models import AssetPermission
 from ..hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
@@ -20,14 +20,8 @@ from .. import serializers
 __all__ = [
     'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
     'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi', 'ActionViewSet',
+    'AssetPermissionAddAssetApi',
 ]
-
-
-class ActionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Action.objects.all()
-    serializer_class = serializers.ActionSerializer
-    permission_classes = (IsOrgAdmin,)
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
@@ -41,7 +35,8 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOrgAdmin,)
 
     def get_serializer_class(self):
-        if self.action in ("list", 'retrieve'):
+        if self.action in ("list", 'retrieve') and \
+                self.request.query_params.get("display"):
             return serializers.AssetPermissionListSerializer
         return self.serializer_class
 
@@ -160,7 +155,9 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_queryset(self):
-        return self.queryset.all()
+        return self.queryset.all().prefetch_related(
+            "nodes", "assets", "users", "user_groups", "system_users"
+        )
 
 
 class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):

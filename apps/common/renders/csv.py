@@ -57,9 +57,14 @@ class JMSCSVRender(BaseRenderer):
         request = renderer_context['request']
         template = request.query_params.get('template', 'export')
         view = renderer_context['view']
-        data = json.loads(json.dumps(data, cls=encoders.JSONEncoder))
+
+        if isinstance(data, dict) and data.get("count"):
+            data = data["results"]
+
         if template == 'import':
             data = [data[0]] if data else data
+
+        data = json.loads(json.dumps(data, cls=encoders.JSONEncoder))
 
         try:
             serializer = view.get_serializer()

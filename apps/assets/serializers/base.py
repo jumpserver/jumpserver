@@ -24,3 +24,8 @@ class AuthSerializer(serializers.ModelSerializer):
             self.instance.set_auth(password=password, private_key=private_key,
                                    public_key=public_key)
         return self.instance
+
+
+class ConnectivitySerializer(serializers.Serializer):
+    status = serializers.IntegerField()
+    datetime = serializers.DateTimeField()

@@ -1,5 +1,6 @@
 import datetime
 import re
+import time
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.utils.encoding import iri_to_uri
@@ -222,3 +224,10 @@ def redirect_format_api(request, *args, **kwargs):
         return HttpResponseTemporaryRedirect(_path)
     else:
         return Response({"msg": "Redirect url failed: {}".format(_path)}, status=404)
+
+
+class HealthCheckView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        return Response({"status": 1, "time": int(time.time())})

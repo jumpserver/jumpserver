@@ -2,27 +2,27 @@
 {% load i18n static %}
 {% block table_search %}
     <div class="" style="float: right">
-                   <div class=" btn-group">
-                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class=" btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                                <span>{% trans "Update" %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                   </div>
-               </div>
+       <div class=" btn-group">
+            <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class=" btn_export" tabindex="0">
+                    <span>{% trans "Export" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                    <span>{% trans "Import" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                    <span>{% trans "Update" %}</span>
+                    </a>
+                </li>
+            </ul>
+       </div>
+   </div>
 {% endblock %}
 {% block table_container %}
 <div class="pull-left m-r-5"><a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary ">{% trans "Create user group" %}</a></div>
@@ -79,7 +79,7 @@ function initTable() {
                 }
             }}
         ],
-        ajax_url: '{% url "api-users:user-group-list" %}',
+        ajax_url: '{% url "api-users:user-group-list" %}?display=1',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "users"},
                   {data: "comment"}, {data: "id" }],
         order: [],

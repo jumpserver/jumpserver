@@ -2,6 +2,7 @@
 #
 from rest_framework import serializers
 
+from orgs.mixins import BulkOrgResourceModelSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Terminal, Status, Session, Task
@@ -24,13 +25,18 @@ class TerminalSerializer(serializers.ModelSerializer):
         return Session.objects.filter(terminal=obj, is_finished=False).count()
 
 
-class SessionSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class SessionSerializer(BulkOrgResourceModelSerializer):
     command_amount = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Session
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
+        fields = [
+            "id", "user", "asset", "system_user", "login_from",
+            "login_from_display", "remote_addr", "is_finished",
+            "has_replay", "can_replay", "protocol", "date_start", "date_end",
+            "terminal", "command_amount",
+        ]
 
 
 class StatusSerializer(serializers.ModelSerializer):

@@ -10,10 +10,9 @@ from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
-from perms.hands import Node, Asset, SystemUser, User, UserGroup
-from perms.models import AssetPermission, Action
+from perms.hands import Node, Asset, SystemUser, UserGroup
+from perms.models import AssetPermission
 from perms.forms import AssetPermissionForm
-from perms.const import PERMS_ACTION_NAME_ALL
 
 
 __all__ = [
@@ -58,14 +57,13 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
             form['assets'].initial = assets
-        form['actions'].initial = Action.objects.get(name=PERMS_ACTION_NAME_ALL)
-
         return form
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
             'action': _('Create asset permission'),
+            'api_action': "create",
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -81,7 +79,8 @@ class AssetPermissionUpdateView(PermissionsMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Update asset permission')
+            'action': _('Update asset permission'),
+            'api_action': "update",
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -156,7 +155,7 @@ class AssetPermissionAssetView(PermissionsMixin,
     permission_classes = [IsOrgAdmin]
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset = AssetPermission.objects.all())
+        self.object = self.get_object(queryset=AssetPermission.objects.all())
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):

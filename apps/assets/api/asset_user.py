@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import time
-
 from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 from rest_framework.pagination import LimitOffsetPagination
@@ -10,7 +8,7 @@ from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
 
-from common.permissions import IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
 from common.mixins import IDInCacheFilterMixin
 from ..backends import AssetUserManager
@@ -57,7 +55,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
 class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
-    permission_classes = (IsOrgAdminOrAppUser, )
+    permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
     filter_fields = [
         "id", "ip", "hostname", "username", "asset_id", "node_id",
@@ -78,7 +76,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         system_user_id = self.request.GET.get("system_user_id")
 
         kwargs = {}
-        assets = []
+        assets = None
 
         manager = AssetUserManager()
         if system_user_id:
@@ -92,7 +90,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             manager.prefer('admin_user')
 
         if asset_id:
-            asset = get_object_or_none(Asset, pk=asset_id)
+            asset = get_object_or_404(Asset, id=asset_id)
             assets = [asset]
         elif node_id:
             node = get_object_or_404(Node, id=node_id)
@@ -100,7 +98,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 
         if username:
             kwargs['username'] = username
-        if assets:
+        if assets is not None:
             kwargs['assets'] = assets
 
         queryset = manager.filter(**kwargs)
@@ -110,23 +108,14 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
 class AssetUserExportViewSet(AssetUserViewSet):
     serializer_class = serializers.AssetUserExportSerializer
     http_method_names = ['get']
-
-    def list(self, request, *args, **kwargs):
-        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
-        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
-            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
-        return super().list(request, *args, **kwargs)
+    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
 
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
 
     def retrieve(self, request, *args, **kwargs):
-        otp_last_verify = request.session.get("OTP_LAST_VERIFY_TIME")
-        if not otp_last_verify or time.time() - int(otp_last_verify) > 600:
-            return Response({"error": "Need MFA confirm mfa auth"}, status=403)
-
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         status_code = status.HTTP_200_OK
@@ -135,15 +124,14 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         return Response(serializer.data, status=status_code)
 
     def get_object(self):
-        username = self.request.GET.get('username')
-        asset_id = self.request.GET.get('asset_id')
-        prefer = self.request.GET.get("prefer")
+        query_params = self.request.query_params
+        username = query_params.get('username')
+        asset_id = query_params.get('asset_id')
+        prefer = query_params.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
             manger = AssetUserManager()
-            if prefer:
-                manger.prefer(prefer)
-            instance = manger.get(username, asset)
+            instance = manger.get(username, asset, prefer=prefer)
         except Exception as e:
             logger.error(e, exc_info=True)
             return None
@@ -156,13 +144,15 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
     Test asset users connective
     """
     permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.TaskIDSerializer
 
     def get_asset_users(self):
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
+        prefer = self.request.GET.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         manager = AssetUserManager()
-        asset_users = manager.filter(username=username, assets=[asset])
+        asset_users = manager.filter(username=username, assets=[asset], prefer=prefer)
         return asset_users
 
     def retrieve(self, request, *args, **kwargs):

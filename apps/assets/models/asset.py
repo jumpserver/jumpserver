@@ -6,15 +6,13 @@ import uuid
 import logging
 import random
 from functools import reduce
-from collections import defaultdict
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
+from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
 
 __all__ = ['Asset', 'Protocol']
@@ -46,12 +44,6 @@ class AssetQuerySet(models.QuerySet):
 
     def valid(self):
         return self.active()
-
-
-class AssetManager(OrgManager):
-    def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related("nodes", "protocols")
-        return queryset
 
 
 class Protocol(models.Model):
@@ -133,14 +125,8 @@ class Asset(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = AssetManager.from_queryset(AssetQuerySet)()
-    CONNECTIVITY_CACHE_KEY = '_JMS_ASSET_CONNECTIVITY_{}'
-    UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
-    CONNECTIVITY_CHOICES = (
-        (UNREACHABLE, _("Unreachable")),
-        (REACHABLE, _('Reachable')),
-        (UNKNOWN, _("Unknown")),
-    )
+    objects = OrgManager.from_queryset(AssetQuerySet)()
+    _connectivity = None
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -215,20 +201,6 @@ class Asset(OrgModelMixin):
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
-    @classmethod
-    def get_queryset_by_fullname_list(cls, fullname_list):
-        org_fullname_map = defaultdict(list)
-        for fullname in fullname_list:
-            hostname, org = cls.split_fullname(fullname)
-            org_fullname_map[org].append(hostname)
-        filter_arg = Q()
-        for org, hosts in org_fullname_map.items():
-            if org.is_real():
-                filter_arg |= Q(hostname__in=hosts, org_id=org.id)
-            else:
-                filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
-        return Asset.objects.filter(filter_arg)
-
     @property
     def cpu_info(self):
         info = ""
@@ -250,15 +222,18 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
+        if self._connectivity:
+            return self._connectivity
         if not self.admin_user:
-            return self.UNKNOWN
-        return self.admin_user.get_connectivity_of(self)
+            return Connectivity.unknown()
+        connectivity = self.admin_user.get_asset_connectivity(self)
+        return connectivity
 
     @connectivity.setter
     def connectivity(self, value):
         if not self.admin_user:
             return
-        self.admin_user.set_connectivity_of(self, value)
+        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:
@@ -321,15 +296,20 @@ class Asset(OrgModelMixin):
     @classmethod
     def generate_fake(cls, count=100):
         from random import seed, choice
-        import forgery_py
         from django.db import IntegrityError
         from .node import Node
+        from orgs.utils import get_current_org
+        from orgs.models import Organization
+        org = get_current_org()
+        if not org or not org.is_real():
+            Organization.default().change_to()
+
         nodes = list(Node.objects.all())
         seed()
         for i in range(count):
             ip = [str(i) for i in random.sample(range(255), 4)]
             asset = cls(ip='.'.join(ip),
-                        hostname=forgery_py.internet.user_name(True),
+                        hostname='.'.join(ip),
                         admin_user=choice(AdminUser.objects.all()),
                         created_by='Fake')
             try:

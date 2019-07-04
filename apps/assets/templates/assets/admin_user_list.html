@@ -11,27 +11,27 @@
 {% endblock %}
 {% block table_search %}
     <div class="" style="float: right">
-                   <div class=" btn-group">
-                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class=" btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                                <span>{% trans "Update" %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                   </div>
-               </div>
+       <div class=" btn-group">
+            <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class=" btn_export" tabindex="0">
+                    <span>{% trans "Export" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                    <span>{% trans "Import" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                    <span>{% trans "Update" %}</span>
+                    </a>
+                </li>
+            </ul>
+       </div>
+   </div>
 {% endblock %}
 
 {% block table_container %}
@@ -75,27 +75,29 @@ function initTable() {
             }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-navy'>" + cellData + "</span>";
+                var data = cellData.reachable;
+                if (data !== 0) {
+                    innerHtml = "<span class='text-navy'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData +'">' + innerHtml + '</span>');
+                $(td).html(innerHtml)
             }},
             {targets: 5, createdCell: function (td, cellData) {
+                var data = cellData.unreachable;
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-danger'>" + cellData + "</span>";
+                if (data !== 0) {
+                    innerHtml = "<span class='text-danger'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');
             }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var val = 0;
                 var innerHtml = "";
                 var total = rowData.assets_amount;
-                var reachable = rowData.reachable_amount;
+                var reachable = cellData.reachable;
                 if (total !== 0) {
                     val = reachable/total * 100;
                 }
@@ -114,15 +116,18 @@ function initTable() {
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
-                  {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment"}, {data: "id"}]
+        columns: [
+            {data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
+            {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"},
+            {data: "comment"}, {data: "id"}
+        ]
     };
     admin_user_table = jumpserver.initServerSideDataTable(options);
     return admin_user_table
 }
 
 $(document).ready(function(){
-    initTable()
+    initTable();
 })
 
 .on('click', '.btn_admin_user_delete', function () {

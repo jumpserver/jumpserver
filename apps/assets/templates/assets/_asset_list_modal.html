@@ -67,6 +67,7 @@ function initTable2() {
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" }
         ],
+        lengthMenu: [[10, 25, 50], [10, 25, 50]],
         pageLength: 10
     };
     asset_table2 = jumpserver.initServerSideDataTable(options);

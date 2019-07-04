@@ -2,17 +2,17 @@
 #
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
-
+from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
-from ..models import Asset, Protocol
-from .system_user import AssetSystemUserSerializer
+from ..models import Asset, Protocol, Node, Label
+from .base import ConnectivitySerializer
 
 __all__ = [
-    'AssetSerializer', 'AssetGrantedSerializer', 'AssetSimpleSerializer',
-    'ProtocolSerializer',
+    'AssetSerializer', 'AssetSimpleSerializer',
+    'ProtocolSerializer', 'ProtocolsRelatedField',
 ]
 
 
@@ -43,6 +43,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     protocols = ProtocolsRelatedField(
         many=True, queryset=Protocol.objects.all(), label=_("Protocols")
     )
+    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     """
     资产的数据结构
@@ -57,7 +58,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
             'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
             'hostname_raw', 'comment', 'created_by', 'date_created',
-            'hardware_info', 'connectivity'
+            'hardware_info', 'connectivity',
         ]
         read_only_fields = (
             'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
@@ -69,15 +70,17 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'protocol': {'write_only': True},
             'port': {'write_only': True},
             'hardware_info': {'label': _('Hardware info')},
-            'connectivity': {'label': _('Connectivity')},
             'org_name': {'label': _('Org name')}
         }
 
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('labels', 'nodes')\
-            .select_related('admin_user')
+        queryset = queryset.prefetch_related(
+            Prefetch('nodes', queryset=Node.objects.all().only('id')),
+            Prefetch('labels', queryset=Label.objects.all().only('id')),
+            'protocols'
+        ).select_related('admin_user', 'domain')
         return queryset
 
     @staticmethod
@@ -136,54 +139,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             instance.protocols.all().delete()
             instance.protocols.set(protocols)
         return instance
-
-
-# class AssetAsNodeSerializer(serializers.ModelSerializer):
-#     protocols = ProtocolSerializer(many=True)
-#
-#     class Meta:
-#         model = Asset
-#         fields = ['id', 'hostname', 'ip', 'platform', 'protocols']
-
-
-class AssetGrantedSerializer(serializers.ModelSerializer):
-    """
-    被授权资产的数据结构
-    """
-    protocols = ProtocolsRelatedField(
-        many=True, queryset=Protocol.objects.all(), label=_("Protocols")
-    )
-    system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
-    system_users_join = serializers.SerializerMethodField()
-    # nodes = NodeTMPSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Asset
-        fields = (
-            "id", "hostname", "ip", "protocol", "port", "protocols",
-            "system_users_granted", "is_active", "system_users_join", "os",
-            'domain', "platform", "comment", "org_id", "org_name",
-        )
-
-    @staticmethod
-    def get_system_users_join(obj):
-        system_users = [s.username for s in obj.system_users_granted]
-        return ', '.join(system_users)
-
-
-# class MyAssetGrantedSerializer(AssetGrantedSerializer):
-#     """
-#     普通用户获取授权的资产定义的数据结构
-#     """
-#     protocols = ProtocolSerializer(many=True)
-#
-#     class Meta:
-#         model = Asset
-#         fields = (
-#             "id", "hostname", "system_users_granted",
-#             "is_active", "system_users_join", "org_name",
-#             "os", "platform", "comment", "org_id", "protocols"
-#         )
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

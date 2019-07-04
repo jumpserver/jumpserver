@@ -29,9 +29,7 @@ urlpatterns = [
 
     # User view
     path('user/', views.UserListView.as_view(), name='user-list'),
-    path('user/export/', views.UserExportView.as_view(), name='user-export'),
     path('first-login/', views.UserFirstLoginView.as_view(), name='user-first-login'),
-    path('user/import/', views.UserBulkImportView.as_view(), name='user-import'),
     path('user/create/', views.UserCreateView.as_view(), name='user-create'),
     path('user/<uuid:pk>/update/', views.UserUpdateView.as_view(), name='user-update'),
     path('user/update/', views.UserBulkUpdateView.as_view(), name='user-bulk-update'),

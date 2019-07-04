@@ -27,11 +27,6 @@ def test_asset_conn_on_created(asset):
     test_asset_connectivity_util.delay([asset])
 
 
-def set_asset_root_node(asset):
-    logger.debug("Set asset default node: {}".format(Node.root()))
-    asset.nodes.add(Node.root())
-
-
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
 @on_transaction_commit
 def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):

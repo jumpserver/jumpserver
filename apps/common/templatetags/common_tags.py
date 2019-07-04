@@ -112,7 +112,6 @@ def to_dict(data):
 
 @register.filter
 def sort(data):
-    print(data)
     return sorted(data)
 
 

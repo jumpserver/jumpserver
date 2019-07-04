@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
 #
-from functools import partial
-from werkzeug.local import Local
+from werkzeug.local import LocalProxy
 
-from common.utils import LocalProxy
+from common.local import thread_local
 from .models import Organization
-
-
-_thread_locals = Local()
 
 
 def get_org_from_request(request):
     oid = request.session.get("oid")
     if not oid:
         oid = request.META.get("HTTP_X_JMS_ORG")
+    if not oid:
+        oid = Organization.DEFAULT_ID
     org = Organization.get_instance(oid)
     return org
 
 
 def set_current_org(org):
-    setattr(_thread_locals, 'current_org', org)
+    setattr(thread_local, 'current_org_id', org.id)
 
 
 def set_to_default_org():
@@ -31,17 +29,27 @@ def set_to_root_org():
 
 
 def _find(attr):
-    return getattr(_thread_locals, attr, None)
+    return getattr(thread_local, attr, None)
 
 
 def get_current_org():
-    return _find('current_org')
+    org_id = get_current_org_id()
+    if org_id is None:
+        return None
+    org = Organization.get_instance(org_id)
+    return org
 
 
 def get_current_org_id():
-    org = get_current_org()
-    org_id = str(org.id) if org.is_real() else ''
+    org_id = _find('current_org_id')
     return org_id
 
 
-current_org = LocalProxy(partial(_find, 'current_org'))
+def get_current_org_id_for_serializer():
+    org_id = get_current_org_id()
+    if org_id == Organization.DEFAULT_ID:
+        org_id = ''
+    return org_id
+
+
+current_org = LocalProxy(get_current_org)

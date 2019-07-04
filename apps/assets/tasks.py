@@ -15,7 +15,8 @@ from ops.celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic
 )
 
-from .models import SystemUser, AdminUser, Asset
+from .models import SystemUser, AdminUser
+from .models.utils import Connectivity
 from . import const
 
 
@@ -207,8 +208,7 @@ def test_asset_connectivity_util(assets, task_name=None):
             pattern='all', options=const.TASK_OPTIONS, run_as_admin=True,
             created_by=created_by,
         )
-        result = task.run()
-        summary = result[1]
+        raw, summary = task.run()
         success = summary.get('success', False)
         contacted = summary.get('contacted', {})
         dark = summary.get('dark', {})
@@ -218,13 +218,12 @@ def test_asset_connectivity_util(assets, task_name=None):
         results_summary['dark'].update(dark)
 
     for asset in assets:
-        if asset.hostname in results_summary.get('dark', {}):
-            asset.connectivity = asset.UNREACHABLE
-        elif asset.hostname in results_summary.get('contacted', []):
-            asset.connectivity = asset.REACHABLE
+        if asset.hostname in results_summary.get('dark', {}).keys():
+            asset.connectivity = Connectivity.unreachable()
+        elif asset.hostname in results_summary.get('contacted', {}).keys():
+            asset.connectivity = Connectivity.reachable()
         else:
-            asset.connectivity = asset.UNKNOWN
-
+            asset.connectivity = Connectivity.unknown()
     return results_summary
 
 
@@ -286,10 +285,6 @@ def test_admin_user_connectivity_manual(admin_user):
 
 ##  System user connective ##
 
-@shared_task
-def set_system_user_connectivity_info(system_user, summary):
-    system_user.connectivity = summary
-
 
 @shared_task
 def test_system_user_connectivity_util(system_user, assets, task_name):
@@ -336,8 +331,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
             pattern='all', options=const.TASK_OPTIONS,
             run_as=system_user.username, created_by=system_user.org_id,
         )
-        result = task.run()
-        summary = result[1]
+        raw, summary = task.run()
         success = summary.get('success', False)
         contacted = summary.get('contacted', {})
         dark = summary.get('dark', {})
@@ -346,7 +340,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
         results_summary['contacted'].update(contacted)
         results_summary['dark'].update(dark)
 
-    set_system_user_connectivity_info(system_user, results_summary)
+    system_user.set_connectivity(results_summary)
     return results_summary
 
 
@@ -568,22 +562,11 @@ def get_test_asset_user_connectivity_tasks(asset):
 
 
 @shared_task
-def set_asset_user_connectivity_info(asset_user, result):
-    summary = result[1]
-    if summary.get('contacted'):
-        connectivity = 1
-    elif summary.get("dark"):
-        connectivity = 0
-    else:
-        connectivity = 3
-    asset_user.connectivity = connectivity
-
-
-@shared_task
 def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
     """
     :param asset_user: <AuthBook>对象
     :param task_name:
+    :param run_as_admin:
     :return:
     """
     from ops.utils import update_or_create_ansible_task
@@ -593,6 +576,7 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
 
     tasks = get_test_asset_user_connectivity_tasks(asset_user.asset)
     if not tasks:
+        logger.debug("No tasks ")
         return
 
     args = (task_name,)
@@ -606,8 +590,8 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
     else:
         kwargs["run_as"] = asset_user.username
     task, created = update_or_create_ansible_task(*args, **kwargs)
-    result = task.run()
-    set_asset_user_connectivity_info(asset_user, result)
+    raw, summary = task.run()
+    asset_user.set_connectivity(summary)
 
 
 @shared_task
