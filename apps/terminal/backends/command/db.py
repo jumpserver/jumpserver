@@ -80,7 +80,7 @@ class CommandStore(CommandBase):
             filter_kwargs['timestamp__lte'] = int(date_to)
 
         if user:
-            filter_kwargs["user"] = user
+            filter_kwargs["user__startswith"] = user
         if asset:
             filter_kwargs['asset'] = asset
         if system_user:

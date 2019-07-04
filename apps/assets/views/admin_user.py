@@ -81,7 +81,7 @@ class AdminUserDetailView(PermissionsMixin, DetailView):
         context = {
             'app': _('Assets'),
             'action': _('Admin user detail'),
-            'nodes': Node.objects.all()
+            'nodes': Node.get_queryset(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -402,7 +402,7 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
     def get_queryset(cls):
         from ..utils import NodeUtil
         util = NodeUtil()
-        return util.nodes
+        return sorted(util.nodes)
 
     @classmethod
     def generate_fake(cls, count=100):
