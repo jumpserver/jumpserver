@@ -73,7 +73,6 @@ class UserPermissionCacheMixin:
         request_md5 = self.get_request_md5()
         meta_cache_id = self.get_meta_cache_id()
         resp_cache_id = '{}_{}_{}'.format(obj_id, request_md5, meta_cache_id)
-        resp_cache_id = md5(resp_cache_id.encode()).hexdigest()
         return resp_cache_id
 
     def get_response_from_cache(self):
