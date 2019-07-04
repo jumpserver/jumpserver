@@ -79,7 +79,7 @@ function initTable() {
                 }
             }}
         ],
-        ajax_url: '{% url "api-users:user-group-list" %}',
+        ajax_url: '{% url "api-users:user-group-list" %}?display=1',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "users"},
                   {data: "comment"}, {data: "id" }],
         order: [],

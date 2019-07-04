@@ -38,12 +38,12 @@ class SessionViewSet(OrgBulkModelViewSet):
         ('date_start', ('date_from', 'date_to'))
     ]
 
-    def get_object(self):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
         # 解决guacamole更新session时并发导致幽灵会话的问题
-        obj = super().get_object()
-        if self.request.method in ('PATCH', ):
-            obj = obj.select_for_update()
-        return obj
+        if self.request.method in ('PATCH',):
+            queryset = queryset.select_for_update()
+        return queryset
 
     @property
     def filter_backends(self):
