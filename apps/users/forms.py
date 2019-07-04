@@ -7,6 +7,7 @@ from common.utils import validate_ssh_public_key
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
+from .utils import check_password_rules
 
 
 class UserCheckPasswordForm(forms.Form):
@@ -89,6 +90,20 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         if not validate_ssh_public_key(public_key):
             raise forms.ValidationError(_('Not a valid ssh public key'))
         return public_key
+
+    def clean_password(self):
+        password_strategy = self.data.get('password_strategy')
+        # 创建-不设置密码
+        if password_strategy == '0':
+            return
+        password = self.data.get('password')
+        # 更新-密码为空
+        if password_strategy is None and not password:
+            return
+        if not check_password_rules(password):
+            msg = _('* Your password does not meet the requirements')
+            raise forms.ValidationError(msg)
+        return password
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
