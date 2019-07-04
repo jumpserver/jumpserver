@@ -71,7 +71,7 @@
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}" charset="UTF-8"></script>
-<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.zh-CN.min.js' %}" charset="UTF-8"></script>
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.zh-CN.min.js' %}" ></script>
 <script>
 
 var table;
@@ -136,8 +136,8 @@ $(document).ready(function () {
     $('.dropdown-menu.search-help').hide();
     keyword.focus()
 })
-.on("click", "document", function () {
-    $('.dropdown-menu.search-help').hide();
+.on('click', 'body', function (e) {
+    $('.dropdown-menu.search-help').hide()
 })
 .on('click', '.toggle', function (e) {
     e.preventDefault();
@@ -162,12 +162,7 @@ $(document).ready(function () {
             detailRows.push(tr.attr('id'));
         }
     }
-}).on('click', 'body', function (e) {
-    $('.dropdown-menu.search-help').hide()
-}).on('change', '#date_start', function () {
-    console.log("date change")
-});
-
+})
 
 
 function format(d) {

@@ -20,7 +20,7 @@ class SystemUserSerializer(BulkOrgResourceModelSerializer):
             'id', 'name', 'username', 'password', 'public_key', 'private_key',
             'login_mode', 'login_mode_display', 'priority', 'protocol',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment', 'nodes',
-            'assets', 'assets_amount', 'connectivity_amount'
+            'assets_amount', 'connectivity_amount'
         ]
         extra_kwargs = {
             'password': {"write_only": True},
@@ -31,6 +31,12 @@ class SystemUserSerializer(BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
         }
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset.prefetch_related('cmd_filters', 'nodes')
+        return queryset
 
 
 class SystemUserAuthSerializer(AuthSerializer):
@@ -44,8 +50,6 @@ class SystemUserAuthSerializer(AuthSerializer):
             "id", "name", "username", "protocol",
             "login_mode", "password", "private_key",
         ]
-
-
 
 
 

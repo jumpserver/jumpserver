@@ -8,11 +8,12 @@ from django.core.signals import request_finished
 from django.db import connection
 
 
-from .utils import get_logger
+from common.utils import get_logger
 from .local import thread_local
 
-logger = get_logger(__file__)
 pattern = re.compile(r'FROM `(\w+)`')
+# logger = logging.getLogger('jmsdb')
+logger = get_logger(__name__)
 
 
 class Counter:

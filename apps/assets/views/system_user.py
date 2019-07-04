@@ -97,7 +97,10 @@ class SystemUserAssetView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
-        nodes_remain = sorted(Node.objects.exclude(systemuser=self.object), reverse=True)
+        from ..utils import NodeUtil
+        nodes_remain = Node.objects.exclude(systemuser=self.object)
+        util = NodeUtil()
+        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('assets'),
             'action': _('System user asset'),

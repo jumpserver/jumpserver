@@ -27,7 +27,11 @@ class OrgModelViewSet(IDInCacheFilterMixin, ModelViewSet):
 
 class OrgBulkModelViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     def get_queryset(self):
-        return super().get_queryset().all()
+        queryset = super().get_queryset().all()
+        if hasattr(self, 'serializer_class') and \
+                hasattr(self.serializer_class, 'setup_eager_loading'):
+            queryset = self.serializer_class.setup_eager_loading(queryset)
+        return queryset
 
 
 class OrgMembershipModelViewSetMixin:

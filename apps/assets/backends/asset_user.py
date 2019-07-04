@@ -14,6 +14,11 @@ class AssetUserBackend(BaseBackend):
     @classmethod
     def filter(cls, username=None, assets=None, **kwargs):
         queryset = cls.model.objects.all()
+        prefer_id = kwargs.get('prefer_id')
+        if prefer_id:
+            queryset = queryset.filter(id=prefer_id)
+            instances = cls.construct_authbook_objects(queryset, assets)
+            return instances
         if username:
             queryset = queryset.filter(username=username)
         if assets:

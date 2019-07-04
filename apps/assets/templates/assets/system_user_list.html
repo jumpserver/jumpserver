@@ -80,7 +80,7 @@ function initTable() {
             }},
             {targets: 6, createdCell: function (td, cellData) {
                 var innerHtml = "";
-                var data = cellData['reachable'];
+                var data = cellData.reachable;
                 if (data !== 0) {
                     innerHtml = "<span class='text-navy'>" + data + "</span>";
                 } else {
@@ -89,7 +89,7 @@ function initTable() {
                 $(td).html(innerHtml)
             }},
             {targets: 7, createdCell: function (td, cellData) {
-                var data = cellData['unreachable'];
+                var data = cellData.unreachable;
                 var innerHtml = "";
                 if (data !== 0) {
                     innerHtml = "<span class='text-danger'>" + data + "</span>";
@@ -103,7 +103,7 @@ function initTable() {
                 var innerHtml = "";
                 var total = rowData.assets_amount;
                 var reachable = cellData.reachable;
-                if (total !== 0) {
+                if (total && total !== 0) {
                     val = reachable/total * 100;
                 }
 
@@ -119,7 +119,8 @@ function initTable() {
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
-            }}],
+            }},
+        ],
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
             {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "login_mode_display"}, {data: "assets_amount" },

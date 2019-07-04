@@ -5,6 +5,7 @@ import uuid
 from hashlib import md5
 
 import sshpubkeys
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -34,7 +35,10 @@ class AssetUser(OrgModelMixin):
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     created_by = models.CharField(max_length=128, null=True, verbose_name=_('Created by'))
 
-    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_ASSET_CONNECTIVITY_{}"
+    CONNECTIVITY_ASSET_CACHE_KEY = "ASSET_USER_{}_ASSET_CONNECTIVITY"
+    CONNECTIVITY_AMOUNT_CACHE_KEY = "ASSET_USER_{}_CONNECTIVITY_AMOUNT"
+    ASSETS_AMOUNT_CACHE_KEY = "ASSET_USER_{}_ASSETS_AMOUNT"
+    ASSET_USER_CACHE_TIME = 3600 * 24
 
     _prefer = "system_user"
 
@@ -67,6 +71,11 @@ class AssetUser(OrgModelMixin):
                 pass
         return None
 
+    @property
+    def part_id(self):
+        i = '-'.join(str(self.id).split('-')[:3])
+        return i
+
     def get_related_assets(self):
         assets = self.assets.all()
         return assets
@@ -97,10 +106,14 @@ class AssetUser(OrgModelMixin):
                 self.set_asset_connectivity(asset, Connectivity.reachable())
             else:
                 self.set_asset_connectivity(asset, Connectivity.unknown())
+        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
+        cache.delete(cache_key)
 
     @property
     def connectivity(self):
-        assets = self.get_related_assets()
+        assets = self.get_related_assets()\
+            .select_related('admin_user')\
+            .only('id', 'hostname', 'admin_user')
         data = {
             'unreachable': [],
             'reachable': [],
@@ -118,11 +131,25 @@ class AssetUser(OrgModelMixin):
 
     @property
     def connectivity_amount(self):
-        return {k: len(v) for k, v in self.connectivity.items()}
+        cache_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
+        amount = cache.get(cache_key)
+        if not amount:
+            connectivity = {k: len(v) for k, v in self.connectivity.items()}
+            cache.set(cache_key, connectivity, self.ASSET_USER_CACHE_TIME)
+        return amount
 
     @property
     def assets_amount(self):
-        return self.get_related_assets().count()
+        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
+        cached = cache.get(cache_key)
+        if not cached:
+            cached = self.get_related_assets().count()
+            cache.set(cache_key, cached, self.ASSET_USER_CACHE_TIME)
+        return cached
+
+    def expire_assets_amount(self):
+        cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
+        cache.delete(cache_key)
 
     def get_asset_connectivity(self, asset):
         i = self.generate_id_with_asset(asset)
@@ -133,12 +160,15 @@ class AssetUser(OrgModelMixin):
         i = self.generate_id_with_asset(asset)
         key = self.CONNECTIVITY_ASSET_CACHE_KEY.format(i)
         Connectivity.set(key, c)
+        # 当为某个系统用户或管理用户设置的的时候，失效掉他们的连接数量
+        amount_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.part_id)
+        cache.delete(amount_key)
 
     def get_asset_user(self, asset):
         from ..backends import AssetUserManager
         try:
             manager = AssetUserManager().prefer(self._prefer)
-            other = manager.get(username=self.username, asset=asset)
+            other = manager.get(username=self.username, asset=asset, prefer_id=self.id)
             return other
         except Exception as e:
             logger.error(e, exc_info=True)
@@ -150,9 +180,12 @@ class AssetUser(OrgModelMixin):
             self._merge_auth(instance)
 
     def _merge_auth(self, other):
-        self.password = other.password
-        self.public_key = other.public_key
-        self.private_key = other.private_key
+        if other.password:
+            self.password = other.password
+        if other.public_key:
+            self.public_key = other.public_key
+        if other.private_key:
+            self.private_key = other.private_key
 
     def clear_auth(self):
         self.password = ''
@@ -185,7 +218,7 @@ class AssetUser(OrgModelMixin):
         }
 
     def generate_id_with_asset(self, asset):
-        user_id = str(self.id).split('-')[:3]
+        user_id = [self.part_id]
         asset_id = str(asset.id).split('-')[3:]
         ids = user_id + asset_id
         return '-'.join(ids)

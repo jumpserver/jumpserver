@@ -22,6 +22,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from common.mixins import IDInCacheFilterMixin
+from orgs.mixins import OrgBulkModelViewSet
 from ..models import SystemUser, Asset
 from .. import serializers
 from ..tasks import push_system_user_to_assets_manual, \
@@ -39,7 +40,7 @@ __all__ = [
 ]
 
 
-class SystemUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class SystemUserViewSet(OrgBulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """

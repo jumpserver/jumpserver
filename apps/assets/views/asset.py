@@ -220,6 +220,11 @@ class AssetDetailView(PermissionsMixin, DetailView):
     template_name = 'assets/asset_detail.html'
     permission_classes = [IsValidUser]
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related(
+            "nodes", "labels", "protocols"
+        ).select_related('admin_user', 'domain')
+
     def get_context_data(self, **kwargs):
         nodes_remain = Node.objects.exclude(assets=self.object)
         context = {

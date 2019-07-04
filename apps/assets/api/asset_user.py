@@ -127,15 +127,14 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         return Response(serializer.data, status=status_code)
 
     def get_object(self):
-        username = self.request.GET.get('username')
-        asset_id = self.request.GET.get('asset_id')
-        prefer = self.request.GET.get("prefer")
+        query_params = self.request.query_params
+        username = query_params.get('username')
+        asset_id = query_params.get('asset_id')
+        prefer = query_params.get("prefer")
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
             manger = AssetUserManager()
-            if prefer:
-                manger.prefer(prefer)
-            instance = manger.get(username, asset)
+            instance = manger.get(username, asset, prefer=prefer)
         except Exception as e:
             logger.error(e, exc_info=True)
             return None

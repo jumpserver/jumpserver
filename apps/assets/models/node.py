@@ -192,6 +192,7 @@ class AssetsAmountMixin:
     _assets_amount_cache_key = '_NODE_ASSETS_AMOUNT_{}'
     _assets_amount = None
     key = ''
+    cache_time = 3600 * 24 * 7
 
     @property
     def assets_amount(self):
@@ -213,7 +214,7 @@ class AssetsAmountMixin:
     def assets_amount(self, value):
         self._assets_amount = value
         cache_key = self._assets_amount_cache_key.format(self.key)
-        cache.set(cache_key, value)
+        cache.set(cache_key, value, self.cache_time)
 
     def expire_assets_amount(self):
         ancestor_keys = self.get_ancestor_keys(with_self=True)

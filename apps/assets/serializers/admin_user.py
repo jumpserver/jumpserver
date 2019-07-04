@@ -17,7 +17,7 @@ class AdminUserSerializer(BulkOrgResourceModelSerializer):
     """
 
     class Meta:
-        # list_serializer_class = AdaptedBulkListSerializer
+        list_serializer_class = AdaptedBulkListSerializer
         model = AdminUser
         fields = [
             'id', 'name', 'username', 'password', 'private_key', 'public_key',

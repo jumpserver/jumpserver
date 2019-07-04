@@ -76,8 +76,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('labels', 'nodes')\
-            .select_related('admin_user')
+        queryset = queryset.prefetch_related('labels', 'nodes', 'protocols')\
+            .select_related('admin_user', 'domain')
         return queryset
 
     @staticmethod
