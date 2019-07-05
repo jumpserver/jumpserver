@@ -6,16 +6,16 @@ import uuid
 import logging
 import random
 from functools import reduce
+from collections import OrderedDict
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
 from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
 
-__all__ = ['Asset', 'Protocol']
+__all__ = ['Asset']
 logger = logging.getLogger(__name__)
 
 
@@ -45,8 +45,12 @@ class AssetQuerySet(models.QuerySet):
     def valid(self):
         return self.active()
 
+    def has_protocol(self, name):
+        return self.filter(protocols__contains=name)
 
-class Protocol(models.Model):
+
+class ProtocolsMixin:
+    protocols = ''
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
@@ -57,19 +61,42 @@ class Protocol(models.Model):
         (PROTOCOL_TELNET, 'telnet (beta)'),
         (PROTOCOL_VNC, 'vnc'),
     )
-    PORT_VALIDATORS = [MaxValueValidator(65535), MinValueValidator(1)]
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=16, choices=PROTOCOL_CHOICES,
-                            default=PROTOCOL_SSH, verbose_name=_("Name"))
-    port = models.IntegerField(default=22, verbose_name=_("Port"),
-                               validators=PORT_VALIDATORS)
+    @property
+    def protocols_as_list(self):
+        if not self.protocols:
+            return []
+        return self.protocols.split(' ')
 
-    def __str__(self):
-        return "{}/{}".format(self.name, self.port)
+    @property
+    def protocols_as_dict(self):
+        d = OrderedDict()
+        protocols = self.protocols_as_list
+        for i in protocols:
+            if '/' not in i:
+                continue
+            name, port = i.split('/')[:2]
+            if not all([name, port]):
+                continue
+            d[name] = int(port)
+        return d
+
+    @property
+    def protocols_as_json(self):
+        return [
+            {"name": name, "port": port}
+            for name, port in self.protocols_as_dict.items()
+        ]
+
+    def has_protocol(self, name):
+        return name in self.protocols_as_dict
+
+    @property
+    def ssh_port(self):
+        return self.protocols_as_dict.get("ssh", 22)
 
 
-class Asset(OrgModelMixin):
+class Asset(ProtocolsMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -84,12 +111,12 @@ class Asset(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=Protocol.PROTOCOL_SSH,
-                                choices=Protocol.PROTOCOL_CHOICES,
+    protocol = models.CharField(max_length=128, default=ProtocolsMixin.PROTOCOL_SSH,
+                                choices=ProtocolsMixin.PROTOCOL_CHOICES,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
 
-    protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocol"))
+    protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
@@ -136,41 +163,9 @@ class Asset(OrgModelMixin):
         warning = ''
         if not self.is_active:
             warning += ' inactive'
-        else:
-            return True, ''
-        return False, warning
-
-    @property
-    def protocols_name(self):
-        names = []
-        for protocol in self.protocols.all():
-            names.append(protocol.name)
-        return names
-
-    def has_protocol(self, name):
-        return name in self.protocols_name
-
-    def get_protocol_by_name(self, name):
-        for i in self.protocols.all():
-            if i.name.lower() == name.lower():
-                return i
-        return None
-
-    @property
-    def protocol_ssh(self):
-        return self.get_protocol_by_name("ssh")
-
-    @property
-    def protocol_rdp(self):
-        return self.get_protocol_by_name("rdp")
-
-    @property
-    def ssh_port(self):
-        if self.protocol_ssh:
-            port = self.protocol_ssh.port
-        else:
-            port = 22
-        return port
+        if warning:
+            return False, warning
+        return True, warning
 
     def is_windows(self):
         if self.platform in ("Windows", "Windows2016"):
@@ -278,10 +273,7 @@ class Asset(OrgModelMixin):
                     'id': self.id,
                     'hostname': self.hostname,
                     'ip': self.ip,
-                    'protocols': [
-                        {"name": p.name, "port": p.port}
-                        for p in self.protocols.all()
-                    ],
+                    'protocols': self.protocols_as_list,
                     'platform': self.platform,
                 }
             }
@@ -314,7 +306,7 @@ class Asset(OrgModelMixin):
                         created_by='Fake')
             try:
                 asset.save()
-                asset.protocols.create(name="ssh", port=22)
+                asset.protocols = 'ssh/22'
                 if nodes and len(nodes) > 3:
                     _nodes = random.sample(nodes, 3)
                 else:

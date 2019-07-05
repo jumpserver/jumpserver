@@ -37,7 +37,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(LabelFilter, ApiMessageMixin, OrgBulkModelViewSet):
+class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """

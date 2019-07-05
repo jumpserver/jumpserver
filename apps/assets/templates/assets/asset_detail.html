@@ -70,11 +70,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Protocol' %}</td>
-                                            <td>
-                                                {% for protocol in asset.protocols.all %}
-                                                    <b>{{ protocol }}</b>
-                                                {% endfor %}
-                                            </td>
+                                            <td>{{ asset.protocols }}</td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>

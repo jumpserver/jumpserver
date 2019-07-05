@@ -1,37 +1,25 @@
 # coding:utf-8
 from __future__ import absolute_import, unicode_literals
 
-import csv
-import json
-import uuid
-import codecs
-import chardet
-from io import StringIO
-
-from django.db import transaction
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import TemplateView, ListView, View
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import FormMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.core.cache import cache
-from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.forms.formsets import formset_factory
 
-from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from common.const import (
     create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
 )
 from .. import forms
-from ..models import Asset, AdminUser, SystemUser, Label, Node, Domain
+from ..models import Asset, SystemUser, Label, Node
 
 
 __all__ = [
@@ -87,7 +75,7 @@ class UserAssetListView(PermissionsMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
+class AssetCreateView(PermissionsMixin, FormMixin, TemplateView):
     model = Asset
     form_class = forms.AssetCreateForm
     template_name = 'assets/asset_create.html'
@@ -112,16 +100,6 @@ class AssetCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
             formset = ProtocolFormset()
         return formset
 
-    def form_valid(self, form):
-        formset = self.get_protocol_formset()
-        valid = formset.is_valid()
-        if not valid:
-            return self.form_invalid(form)
-        protocols = formset.save()
-        instance = super().form_valid(form)
-        instance.protocols.set(protocols)
-        return instance
-
     def get_context_data(self, **kwargs):
         formset = self.get_protocol_formset()
         context = {
@@ -132,8 +110,32 @@ class AssetCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        return create_success_msg % ({"name": cleaned_data["hostname"]})
+
+class AssetUpdateView(PermissionsMixin, UpdateView):
+    model = Asset
+    form_class = forms.AssetUpdateForm
+    template_name = 'assets/asset_update.html'
+    success_url = reverse_lazy('assets:asset-list')
+    permission_classes = [IsOrgAdmin]
+
+    def get_protocol_formset(self):
+        ProtocolFormset = formset_factory(forms.ProtocolForm, extra=0, min_num=1, max_num=5)
+        if self.request.method == "POST":
+            formset = ProtocolFormset(self.request.POST)
+        else:
+            initial_data = self.object.protocols_as_json
+            formset = ProtocolFormset(initial=initial_data)
+        return formset
+
+    def get_context_data(self, **kwargs):
+        formset = self.get_protocol_formset()
+        context = {
+            'app': _('Assets'),
+            'action': _('Update asset'),
+            'formset': formset,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class AssetBulkUpdateView(PermissionsMixin, ListView):
@@ -177,36 +179,6 @@ class AssetBulkUpdateView(PermissionsMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class AssetUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
-    model = Asset
-    form_class = forms.AssetUpdateForm
-    template_name = 'assets/asset_update.html'
-    success_url = reverse_lazy('assets:asset-list')
-    permission_classes = [IsOrgAdmin]
-
-    def get_protocol_formset(self):
-        ProtocolFormset = formset_factory(forms.ProtocolForm, extra=0, min_num=1, max_num=5)
-        if self.request.method == "POST":
-            formset = ProtocolFormset(self.request.POST)
-        else:
-            initial_data = [{"name": p.name, "port": p.port} for p in self.object.protocols.all()]
-            formset = ProtocolFormset(initial=initial_data)
-        return formset
-
-    def get_context_data(self, **kwargs):
-        formset = self.get_protocol_formset()
-        context = {
-            'app': _('Assets'),
-            'action': _('Update asset'),
-            'formset': formset,
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
-
-    def get_success_message(self, cleaned_data):
-        return update_success_msg % ({"name": cleaned_data["hostname"]})
-
-
 class AssetDeleteView(PermissionsMixin, DeleteView):
     model = Asset
     template_name = 'delete_confirm.html'
@@ -222,7 +194,7 @@ class AssetDetailView(PermissionsMixin, DetailView):
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related(
-            "nodes", "labels", "protocols"
+            "nodes", "labels",
         ).select_related('admin_user', 'domain')
 
     def get_context_data(self, **kwargs):
