@@ -1082,7 +1082,10 @@ function htmlEscape ( d ) {
 
 function objectAttrsIsList(obj, attrs) {
     attrs.forEach(function (attr) {
-        if (obj[attr] && !(obj[attr] instanceof Array)){
+        if (!obj[attr]){
+            obj[attr] = []
+        }
+        else if (obj[attr] && !(obj[attr] instanceof Array)){
             obj[attr] = [obj[attr]]
         }
     })
