@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='asset',
             name='protocols',
-            field=CharField(blank=True, max_length=128, null=True, verbose_name='Protocols'),
+            field=CharField(blank=True, default='ssh/22', max_length=128, verbose_name='Protocols'),
         ),
         migrations.RunPython(migrate_assets_protocol),
         migrations.DeleteModel(name='Protocol'),

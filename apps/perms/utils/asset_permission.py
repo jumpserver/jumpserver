@@ -492,21 +492,14 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         for node in nodes:
             pattern.add(r'^{0}$|^{0}:'.format(node.key))
         pattern = '|'.join(list(pattern))
-        print(self.object.username)
-        print(pattern)
-        print("Start get nodes assets")
-        clock1 = time.clock()
         if pattern:
             assets = Asset.objects.filter(nodes__key__regex=pattern) \
+                .prefetch_related('nodes')\
                 .only(*self.assets_only)\
                 .distinct()
-            # .prefetch_related('nodes')\
         else:
             assets = []
         assets = list(assets)
-        print("get nodes assets using: {}".format(time.clock() - clock1))
-        print(len(assets))
-        return []
         self.tree.add_assets_without_system_users(assets)
         assets = self.tree.get_assets()
         self._assets = assets

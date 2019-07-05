@@ -116,7 +116,7 @@ class Asset(ProtocolsMixin, OrgModelMixin):
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
 
-    protocols = models.CharField(max_length=128, null=True, blank=True, verbose_name=_("Protocols"))
+    protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
