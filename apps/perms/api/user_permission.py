@@ -130,13 +130,47 @@ class UserPermissionCacheMixin:
         return resp
 
 
-class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIView):
+class UserGrantedAssetsApi(UserPermissionCacheMixin, ListAPIView):
     """
     用户授权的所有资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     pagination_class = LimitOffsetPagination
+
+    def get_serializer(self, queryset, many=True):
+        assets_ids = []
+        system_users_ids = set()
+        for asset in queryset:
+            assets_ids.append(asset["id"])
+            system_users_ids.update(set(asset["system_users"]))
+        assets = Asset.objects.filter(id__in=assets_ids).only(
+            *self.serializer_class.only_fields
+        )
+        assets_map = {asset.id: asset for asset in assets}
+        system_users = SystemUser.objects.filter(id__in=system_users_ids).only(
+            *self.serializer_class.system_user_only_field
+        )
+        system_users_map = {s.id: s for s in system_users}
+        data = []
+        for _asset in queryset:
+            id = _asset["id"]
+            asset = assets_map.get(id)
+            if not asset:
+                continue
+
+            _system_users = _asset["system_users"]
+            system_users_granted = []
+            for sid, action in _system_users.items():
+                system_user = system_users_map.get(sid)
+                if not system_user:
+                    continue
+                system_user.actions = action
+                system_users_granted.append(system_user)
+            asset.system_users_granted = system_users_granted
+            data.append(asset)
+        print(data[0])
+        return super().get_serializer(data, many=True)
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
@@ -147,17 +181,9 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, AssetsFilterMixin, ListAPIV
         return user
 
     def get_queryset(self):
-        queryset = []
         user = self.get_object()
         util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
-        assets = util.get_assets()
-        for asset, system_users in assets.items():
-            system_users_granted = []
-            for system_user, actions in system_users.items():
-                system_user.actions = actions
-                system_users_granted.append(system_user)
-            asset.system_users_granted = system_users_granted
-            queryset.append(asset)
+        queryset = util.get_assets()
         return queryset
 
     def get_permissions(self):

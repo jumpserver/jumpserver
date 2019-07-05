@@ -6,7 +6,8 @@ import uuid
 import logging
 import random
 from functools import reduce
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from django.core.cache import cache
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -96,7 +97,76 @@ class ProtocolsMixin:
         return self.protocols_as_dict.get("ssh", 22)
 
 
-class Asset(ProtocolsMixin, OrgModelMixin):
+class NodesRelationMixin:
+    NODES_CACHE_KEY = 'ASSET_NODES_{}'
+    ALL_ASSET_NODES_CACHE_KEY = 'ALL_ASSETS_NODES'
+    CACHE_TIME = 3600 * 24 * 7
+    id = ""
+    _all_nodes_keys = None
+
+    @classmethod
+    def get_all_nodes_keys(cls):
+        if cls._all_nodes_keys:
+            return cls._all_nodes_keys
+        from .node import Node
+        cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        assets = Asset.objects.all().only('id').prefetch_related(
+            models.Prefetch('nodes', queryset=Node.objects.all().only('key'))
+        )
+        assets_nodes_keys = {}
+        for asset in assets:
+            assets_nodes_keys[asset.id] = [n.key for n in asset.nodes.all()]
+        cache.set(cache_key, assets_nodes_keys, cls.CACHE_TIME)
+        cls._all_nodes_keys = assets_nodes_keys
+        return assets_nodes_keys
+
+    @classmethod
+    def get_asset_nodes_keys_by_id(cls, i):
+        from .node import Node
+        cache_key = cls.NODES_CACHE_KEY.format(i)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        assets = cls.objects.filter(id=i).only("id").prefetch_related(
+            models.Prefetch('nodes', queryset=Node.objects.all().only('key'))
+        )
+        if not assets:
+            return []
+        return assets[0].get_nodes_keys()
+
+    def get_nodes_keys(self):
+        cache_key = self.NODES_CACHE_KEY.format(self.id)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+
+        nodes = self.get_nodes()
+        if not isinstance(nodes, list):
+            keys = nodes.values_list("key")
+        else:
+            keys = [n.key for n in nodes]
+        cache.set(cache_key, keys, 0)
+        return keys
+
+    def get_nodes(self):
+        from .node import Node
+        nodes = self.nodes.all() or [Node.root()]
+        return nodes
+
+    def get_all_nodes(self, flat=False):
+        nodes = []
+        for node in self.get_nodes():
+            _nodes = node.get_ancestor(with_self=True)
+            nodes.append(_nodes)
+        if flat:
+            nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
+        return nodes
+
+
+class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -181,20 +251,6 @@ class Asset(ProtocolsMixin, OrgModelMixin):
 
     def is_support_ansible(self):
         return self.has_protocol('ssh') and self.platform not in ("Other",)
-
-    def get_nodes(self):
-        from .node import Node
-        nodes = self.nodes.all() or [Node.root()]
-        return nodes
-
-    def get_all_nodes(self, flat=False):
-        nodes = []
-        for node in self.get_nodes():
-            _nodes = node.get_ancestor(with_self=True)
-            nodes.append(_nodes)
-        if flat:
-            nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
-        return nodes
 
     @property
     def cpu_info(self):

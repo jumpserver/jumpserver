@@ -74,7 +74,7 @@ class Tree:
             raise ValueError("Parent must not be node parent")
         node.pId = parent.id
         parent.isParent = True
-        self.nodes[node.id] = node
+        self.nodes[node.key] = node
 
     def get_nodes(self):
         return sorted(self.nodes.values())

@@ -160,13 +160,38 @@ class NodeUtil:
                 tree_nodes.update(node._children)
         return list(tree_nodes)
 
+    def get_family_keys_by_keys(self, _nodes_keys, with_children=False):
+        tree_nodes = set()
+        for key in _nodes_keys:
+            node = self.get_node_by_key(key)
+            if not node:
+                continue
+            tree_nodes.update([n.key for n in node._parents])
+            tree_nodes.add(node.key)
+            if with_children:
+                tree_nodes.update(set([n.key for n in node._children]))
+        return list(tree_nodes)
+
     def get_nodes_parents(self, nodes, with_self=True):
         parents = set()
         for n in nodes:
             node = self.get_node_by_key(n.key)
+            if not node:
+                continue
             parents.update(set(node._parents))
             if with_self:
                 parents.add(node)
+        return parents
+
+    def get_nodes_parents_keys_by_keys(self, asset_nodes_keys, with_self=True):
+        parents = set()
+        for key in asset_nodes_keys:
+            node = self.get_node_by_key(key)
+            if not node:
+                continue
+            parents.update(set([n.key for n in node._parents]))
+            if with_self:
+                parents.add(node.key)
         return parents
 
 

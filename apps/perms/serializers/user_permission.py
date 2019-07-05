@@ -11,7 +11,7 @@ from .asset_permission import ActionsField
 __all__ = [
     'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
-    'ActionsSerializer',
+    'ActionsSerializer', 'AssetSystemUserSerializer',
 ]
 
 
@@ -23,10 +23,11 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SystemUser
-        fields = (
-            'id', 'name', 'username', 'priority', "actions",
+        only_fields = (
+            'id', 'name', 'username', 'priority',
             'protocol', 'login_mode',
         )
+        fields = list(only_fields) + ["actions"]
 
 
 class AssetGrantedSerializer(AssetSerializer):
@@ -36,17 +37,20 @@ class AssetGrantedSerializer(AssetSerializer):
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
 
+    only_fields = (
+        "id", "hostname", "ip", "protocols", "is_active", "os", 'domain',
+        "platform", "comment", "org_id",
+    )
+    system_user_only_field = AssetSystemUserSerializer.Meta.only_fields
+
     @staticmethod
     def get_system_users_join(obj):
         system_users = [s.username for s in obj.system_users_granted]
         return ', '.join(system_users)
 
     def get_field_names(self, declared_fields, info):
-        fields = (
-            "id", "hostname", "ip", "protocols",
-            "system_users_granted", "is_active", "system_users_join", "os",
-            'domain', "platform", "comment", "org_id", "org_name",
-        )
+        fields = [i for i in self.only_fields]
+        fields.extend(['org_name', 'system_users_granted', 'system_users_join'])
         return fields
 
 
