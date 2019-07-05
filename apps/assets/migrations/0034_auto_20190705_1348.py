@@ -35,4 +35,5 @@ class Migration(migrations.Migration):
             field=CharField(blank=True, max_length=128, null=True, verbose_name='Protocols'),
         ),
         migrations.RunPython(migrate_assets_protocol),
+        migrations.DeleteModel(name='Protocol'),
     ]
