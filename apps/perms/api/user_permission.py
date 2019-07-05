@@ -270,6 +270,7 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserPermissionCacheMixin, ListAPIView)
             for asset, system_users in assets.items():
                 data = parse_asset_to_tree_node(node, asset, system_users)
                 queryset.append(data)
+        queryset = sorted(queryset)
         return queryset
 
 
