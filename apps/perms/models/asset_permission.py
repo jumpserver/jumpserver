@@ -16,7 +16,7 @@ __all__ = [
 
 
 class Action:
-    NULL = 0
+    NONE = 0
     CONNECT = 0b00000001
     UPLOAD = 0b00000010
     DOWNLOAD = 0b00000100
@@ -53,13 +53,13 @@ class Action:
     @classmethod
     def choices_to_value(cls, value):
         if not value:
-            return cls.NULL
+            return cls.NONE
         if len(value) == 1:
-            return cls.NAME_MAP_REVERSE.get(value[0], cls.NULL)
+            return cls.NAME_MAP_REVERSE.get(value[0], cls.NONE)
 
         def to_choices(x, y):
-            x = cls.NAME_MAP_REVERSE.get(x, cls.NULL)
-            y = cls.NAME_MAP_REVERSE.get(y, cls.NULL)
+            x = cls.NAME_MAP_REVERSE.get(x, cls.NONE)
+            y = cls.NAME_MAP_REVERSE.get(y, cls.NONE)
             return x | y
         return reduce(to_choices, value)
 
