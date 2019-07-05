@@ -69,7 +69,11 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         check current user has permission to handle instance
         (update, destroy, bulk_update, bulk destroy)
         """
-        return not self.request.user.is_superuser and instance.is_superuser
+        if not self.request.user.is_superuser and instance.is_superuser:
+            return True
+        if self.request.user == instance:
+            return True
+        return False
 
     def _bulk_deny_permission(self, instances):
         deny_instances = [i for i in instances if self._deny_permission(i)]
