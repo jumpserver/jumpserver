@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django import forms
 
 from orgs.mixins import OrgModelForm
-from assets.models import SystemUser, Protocol
+from assets.models import SystemUser
 
 from ..models import RemoteApp
 from .. import const
@@ -88,9 +88,7 @@ class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
         # 过滤RDP资产和系统用户
         super().__init__(*args, **kwargs)
         field_asset = self.fields['asset']
-        field_asset.queryset = field_asset.queryset.filter(
-            protocols__name=Protocol.PROTOCOL_RDP
-        )
+        field_asset.queryset = field_asset.queryset.has_protocol('rdp')
         field_system_user = self.fields['system_user']
         field_system_user.queryset = field_system_user.queryset.filter(
             protocol=SystemUser.PROTOCOL_RDP

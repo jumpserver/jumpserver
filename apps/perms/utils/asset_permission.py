@@ -126,7 +126,7 @@ class GenerateTree:
         for asset, system_users in assets.items():
             self.add_asset(asset, system_users)
 
-    #@timeit
+    # #@timeit
     def add_asset(self, asset, system_users=None):
         nodes = asset.nodes.all()
         nodes = self.node_util.get_nodes_by_queryset(nodes)
@@ -492,13 +492,21 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         for node in nodes:
             pattern.add(r'^{0}$|^{0}:'.format(node.key))
         pattern = '|'.join(list(pattern))
+        print(self.object.username)
+        print(pattern)
+        print("Start get nodes assets")
+        clock1 = time.clock()
         if pattern:
-            assets = Asset.objects.filter(nodes__key__regex=pattern)\
-                .prefetch_related('nodes', "protocols")\
+            assets = Asset.objects.filter(nodes__key__regex=pattern) \
                 .only(*self.assets_only)\
                 .distinct()
+            # .prefetch_related('nodes')\
         else:
             assets = []
+        assets = list(assets)
+        print("get nodes assets using: {}".format(time.clock() - clock1))
+        print(len(assets))
+        return []
         self.tree.add_assets_without_system_users(assets)
         assets = self.tree.get_assets()
         self._assets = assets
@@ -598,7 +606,7 @@ def parse_asset_to_tree_node(node, asset, system_users):
                 'id': asset.id,
                 'hostname': asset.hostname,
                 'ip': asset.ip,
-                'protocols': [str(p) for p in asset.protocols.all()],
+                'protocols': asset.protocols_as_list,
                 'platform': asset.platform,
                 'domain': None if not asset.domain else asset.domain.id,
                 'is_active': asset.is_active,

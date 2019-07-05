@@ -3,14 +3,6 @@
 from django.db import migrations
 
 
-def migrate_assets_protocol(apps, schema_editor):
-    asset_model = apps.get_model("assets", "Asset")
-    db_alias = schema_editor.connection.alias
-    assets = asset_model.objects.using(db_alias).all()
-    for asset in assets:
-        asset.protocols.create(name=asset.protocol, port=asset.port)
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -18,5 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_assets_protocol),
     ]
