@@ -159,7 +159,6 @@ $(document).ready(function () {
     objectAttrsIsList(data, ['users', 'user_groups', 'system_users', 'nodes', 'assets', 'actions']);
     objectAttrsIsDatetime(data, ['date_start', 'date_expired']);
     objectAttrsIsBool(data, ['is_active']);
-    console.log(data)
     var props = {
         url: the_url,
         data: data,

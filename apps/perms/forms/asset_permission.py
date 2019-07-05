@@ -34,7 +34,7 @@ class ActionField(forms.MultipleChoiceField):
 
 
 class AssetPermissionForm(OrgModelForm):
-    action = ActionField()
+    actions = ActionField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -73,7 +73,6 @@ class AssetPermissionForm(OrgModelForm):
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
-            'actions': forms.CheckboxSelectMultiple()
         }
         labels = {
             'nodes': _("Node"),
