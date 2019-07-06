@@ -15,7 +15,7 @@ from .user import AdminUser, SystemUser
 from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
 
-__all__ = ['Asset']
+__all__ = ['Asset', 'ProtocolsMixin']
 logger = logging.getLogger(__name__)
 
 

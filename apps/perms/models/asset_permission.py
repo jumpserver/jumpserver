@@ -16,6 +16,7 @@ __all__ = [
 
 
 class Action:
+    NONE = 0
     CONNECT = 0b00000001
     UPLOAD = 0b00000010
     DOWNLOAD = 0b00000100
@@ -51,13 +52,20 @@ class Action:
 
     @classmethod
     def choices_to_value(cls, value):
+        if not isinstance(value, list):
+            return cls.NONE
+        db_value = [
+            cls.NAME_MAP_REVERSE[v] for v in value
+            if v in cls.NAME_MAP_REVERSE.keys()
+        ]
+        if not db_value:
+            return cls.NONE
+
         def to_choices(x, y):
-            x = cls.NAME_MAP_REVERSE.get(x, 0)
-            y = cls.NAME_MAP_REVERSE.get(y, 0)
             return x | y
-        if not value:
-            return None
-        return reduce(to_choices, value)
+
+        result = reduce(to_choices, db_value)
+        return result
 
     @classmethod
     def choices(cls):
