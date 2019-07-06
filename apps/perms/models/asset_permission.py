@@ -52,16 +52,20 @@ class Action:
 
     @classmethod
     def choices_to_value(cls, value):
-        if not value:
+        if not isinstance(value, list):
             return cls.NONE
-        if len(value) == 1:
-            return cls.NAME_MAP_REVERSE.get(value[0], cls.NONE)
+        db_value = [
+            cls.NAME_MAP_REVERSE[v] for v in value
+            if v in cls.NAME_MAP_REVERSE.keys()
+        ]
+        if not db_value:
+            return cls.NONE
 
         def to_choices(x, y):
-            x = cls.NAME_MAP_REVERSE.get(x, cls.NONE)
-            y = cls.NAME_MAP_REVERSE.get(y, cls.NONE)
             return x | y
-        return reduce(to_choices, value)
+
+        result = reduce(to_choices, db_value)
+        return result
 
     @classmethod
     def choices(cls):
