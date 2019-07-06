@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import logging
 import os
 
 from django.shortcuts import get_object_or_404
@@ -10,36 +9,47 @@ from django.conf import settings
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
+from rest_framework.generics import GenericAPIView
 import jms_storage
 
-
-from common.utils import is_uuid
+from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsAuditor
+from common.filters import DatetimeRangeFilter
+from orgs.mixins import OrgBulkModelViewSet
 from ..hands import SystemUser
-from ..models import Terminal, Session
+from ..models import Session
 from .. import serializers
-from ..backends import get_command_storage, get_multi_command_storage, \
-    SessionCommandSerializer
-
-__all__ = ['SessionViewSet', 'SessionReplayViewSet', 'CommandViewSet']
-logger = logging.getLogger(__file__)
 
 
-class SessionViewSet(BulkModelViewSet):
+__all__ = ['SessionViewSet', 'SessionReplayViewSet',]
+logger = get_logger(__name__)
+
+
+class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
+    filter_fields = [
+        "user", "asset", "system_user", "remote_addr",
+        "protocol", "terminal", "is_finished",
+    ]
+    date_range_filter_fields = [
+        ('date_start', ('date_from', 'date_to'))
+    ]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        terminal_id = self.kwargs.get("terminal", None)
-        if terminal_id:
-            terminal = get_object_or_404(Terminal, id=terminal_id)
-            queryset = queryset.filter(terminal=terminal)
-            return queryset
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        # 解决guacamole更新session时并发导致幽灵会话的问题
+        if self.request.method in ('PATCH',):
+            queryset = queryset.select_for_update()
         return queryset
+
+    @property
+    def filter_backends(self):
+        backends = list(GenericAPIView.filter_backends)
+        backends.append(DatetimeRangeFilter)
+        return backends
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
@@ -47,55 +57,14 @@ class SessionViewSet(BulkModelViewSet):
         sid = serializer.validated_data["system_user"]
         # guacamole提交的是id
         if is_uuid(sid):
-            _system_user = SystemUser.get_system_user_by_id_or_cached(sid)
-            if _system_user:
-                serializer.validated_data["system_user"] = _system_user.name
+            _system_user = get_object_or_404(SystemUser, id=sid)
+            serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
-
-
-class CommandViewSet(viewsets.ViewSet):
-    """接受app发送来的command log, 格式如下
-    {
-        "user": "admin",
-        "asset": "localhost",
-        "system_user": "web",
-        "session": "xxxxxx",
-        "input": "whoami",
-        "output": "d2hvbWFp",  # base64.b64encode(s)
-        "timestamp": 1485238673.0
-    }
-
-    """
-    command_store = get_command_storage()
-    serializer_class = SessionCommandSerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
-
-    def get_queryset(self):
-        self.command_store.filter(**dict(self.request.query_params))
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, many=True)
-        if serializer.is_valid():
-            ok = self.command_store.bulk_save(serializer.validated_data)
-            if ok:
-                return Response("ok", status=201)
-            else:
-                return Response("Save error", status=500)
-        else:
-            msg = "Command not valid: {}".format(serializer.errors)
-            logger.error(msg)
-            return Response({"msg": msg}, status=401)
-
-    def list(self, request, *args, **kwargs):
-        multi_command_storage = get_multi_command_storage()
-        queryset = multi_command_storage.filter()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
 
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
     session = None
 
     def create(self, request, *args, **kwargs):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+from django.utils.translation import ugettext_lazy as _
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {
@@ -11,7 +11,6 @@ UPDATE_ASSETS_HARDWARE_TASKS = [
    }
 ]
 
-ADMIN_USER_CONN_CACHE_KEY = "ADMIN_USER_CONN_{}"
 TEST_ADMIN_USER_CONN_TASKS = [
     {
         "name": "ping",
@@ -49,7 +48,6 @@ TEST_WINDOWS_SYSTEM_USER_CONN_TASKS = [
     }
 ]
 
-ASSET_USER_CONN_CACHE_KEY = 'ASSET_USER_CONN_{}'
 TEST_ASSET_USER_CONN_TASKS = [
     {
         "name": "ping",
@@ -74,5 +72,10 @@ TASK_OPTIONS = {
 }
 
 CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX = '_KEY_ASSET_BULK_UPDATE_ID_{}'
-
+CONN_UNREACHABLE, CONN_REACHABLE, CONN_UNKNOWN = range(0, 3)
+CONNECTIVITY_CHOICES = (
+    (CONN_UNREACHABLE, _("Unreachable")),
+    (CONN_REACHABLE, _('Reachable')),
+    (CONN_UNKNOWN, _("Unknown")),
+)
 

@@ -1,24 +1,16 @@
 # -*- coding: utf-8 -*-
 #
-
 from functools import partial
-
-from common.utils import LocalProxy
-
-try:
-    from threading import local
-except ImportError:
-    from django.utils._threading_local import local
-
-_thread_locals = local()
+from werkzeug.local import LocalProxy
+from common.local import thread_local
 
 
 def set_current_request(request):
-    setattr(_thread_locals, 'current_request', request)
+    setattr(thread_local, 'current_request', request)
 
 
 def _find(attr):
-    return getattr(_thread_locals, attr, None)
+    return getattr(thread_local, attr, None)
 
 
 def get_current_request():

@@ -24,12 +24,13 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
 
 @receiver(django_ready, dispatch_uid="my_unique_identifier")
 def monkey_patch_settings(sender, **kwargs):
+    logger.debug("Monkey patch settings")
     cache_key_prefix = '_SETTING_'
     custom_need_cache_settings = [
-        'AUTHENTICATION_BACKENDS'
+        'AUTHENTICATION_BACKENDS', 'TERMINAL_HOST_KEY',
     ]
     custom_no_cache_settings = [
-        'BASE_DIR', 'VERSION', 'AUTH_OPENID'
+        'BASE_DIR', 'VERSION', 'AUTH_OPENID',
     ]
     django_settings = dir(global_settings)
     uncached_settings = [i for i in django_settings if i.isupper()]

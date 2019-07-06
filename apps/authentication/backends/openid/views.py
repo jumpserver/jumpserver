@@ -24,7 +24,6 @@ __all__ = ['OpenIDLoginView', 'OpenIDLoginCompleteView']
 
 
 class OpenIDLoginView(RedirectView):
-
     def get_redirect_url(self, *args, **kwargs):
         redirect_uri = settings.BASE_SITE_URL + str(settings.LOGIN_COMPLETE_URL)
         nonce = Nonce(
@@ -32,42 +31,36 @@ class OpenIDLoginView(RedirectView):
             next_path=self.request.GET.get('next')
         )
         cache.set(str(nonce.state), nonce, 24*3600)
+
         self.request.session['openid_state'] = str(nonce.state)
-        authorization_url = client.openid_connect_client.\
-            authorization_url(
-                redirect_uri=nonce.redirect_uri, scope='code',
-                state=str(nonce.state)
-            )
+        authorization_url = client.get_authorization_url(
+            redirect_uri=nonce.redirect_uri,
+            scope='code',
+            state=str(nonce.state)
+        )
         return authorization_url
 
 
 class OpenIDLoginCompleteView(RedirectView):
-
     def get(self, request, *args, **kwargs):
         if 'error' in request.GET:
             return HttpResponseServerError(self.request.GET['error'])
-
         if 'code' not in self.request.GET and 'state' not in self.request.GET:
-            return HttpResponseBadRequest()
-
+            return HttpResponseBadRequest(content='Code or State is empty')
         if self.request.GET['state'] != self.request.session['openid_state']:
-            return HttpResponseBadRequest()
-
+            return HttpResponseBadRequest(content='State invalid')
         nonce = cache.get(self.request.GET['state'])
-
         if not nonce:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest(content='State failure')
 
         user = authenticate(
             request=self.request,
             code=self.request.GET['code'],
             redirect_uri=nonce.redirect_uri
         )
-
         cache.delete(str(nonce.state))
-
         if not user:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest(content='Authenticate user failed')
 
         login(self.request, user)
         post_openid_login_success.send(

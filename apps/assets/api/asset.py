@@ -20,6 +20,7 @@ from common.mixins import IDInCacheFilterMixin, ApiMessageMixin
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from orgs.mixins import OrgBulkModelViewSet
 from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
 from .. import serializers
@@ -36,7 +37,7 @@ __all__ = [
 ]
 
 
-class AssetViewSet(IDInCacheFilterMixin, LabelFilter, ApiMessageMixin, BulkModelViewSet):
+class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
     """
     API endpoint that allows Asset to be viewed or edited.
     """
@@ -98,11 +99,6 @@ class AssetViewSet(IDInCacheFilterMixin, LabelFilter, ApiMessageMixin, BulkModel
         queryset = super().filter_queryset(queryset)
         queryset = self.filter_node(queryset)
         queryset = self.filter_admin_user_id(queryset)
-        return queryset
-
-    def get_queryset(self):
-        queryset = super().get_queryset().distinct()
-        queryset = self.get_serializer_class().setup_eager_loading(queryset)
         return queryset
 
 

@@ -110,6 +110,7 @@ var dateOptions = {
         format: 'YYYY-MM-DD HH:mm'
     }
 };
+var api_action =  "{{ api_action }}";
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
@@ -143,6 +144,29 @@ $(document).ready(function () {
 
     $('#id_assets').val(assets).trigger('change');
     $("#asset_list_modal").modal('hide');
-});
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-perms:asset-permission-list' %}';
+    var method = "POST";
+    {% if api_action == "update" %}
+        the_url = '{% url 'api-perms:asset-permission-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    var redirect_to = '{% url "perms:asset-permission-list" %}';
+    var form = $("form");
+    var data = form.serializeObject();
+    objectAttrsIsList(data, ['users', 'user_groups', 'system_users', 'nodes', 'assets', 'actions']);
+    objectAttrsIsDatetime(data, ['date_start', 'date_expired']);
+    objectAttrsIsBool(data, ['is_active']);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+ })
 </script>
 {% endblock %}

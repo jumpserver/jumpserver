@@ -126,9 +126,33 @@ class WithBootstrapToken(permissions.BasePermission):
 class PermissionsMixin(UserPassesTestMixin):
     permission_classes = []
 
+    def get_permissions(self):
+        return self.permission_classes
+
     def test_func(self):
-        permission_classes = self.permission_classes
+        permission_classes = self.get_permissions()
         for permission_class in permission_classes:
             if not permission_class().has_permission(self.request, self):
                 return False
+        return True
+
+
+class NeedMFAVerify(permissions.BasePermission):
+    def has_permission(self, request, view):
+        mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
+        if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+            return True
+        return False
+
+
+class CanUpdateSuperUser(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['GET', 'OPTIONS']:
+            return True
+        if str(request.user.id) == str(obj.id):
+            return False
+        if request.user.is_superuser:
+            return True
+        if hasattr(obj, 'is_superuser') and obj.is_superuser:
+            return False
         return True

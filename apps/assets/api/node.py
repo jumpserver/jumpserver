@@ -26,6 +26,7 @@ from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
 from .. import serializers
+from ..utils import NodeUtil
 
 
 logger = get_logger(__file__)
@@ -79,12 +80,10 @@ class NodeListAsTreeApi(generics.ListAPIView):
     serializer_class = TreeNodeSerializer
 
     def get_queryset(self):
-        queryset = [node.as_tree_node() for node in Node.objects.all()]
-        return queryset
-
-    def filter_queryset(self, queryset):
-        if self.request.query_params.get('refresh', '0') == '1':
-            queryset = self.refresh_nodes(queryset)
+        queryset = Node.objects.all()
+        util = NodeUtil()
+        nodes = util.get_nodes_by_queryset(queryset)
+        queryset = [node.as_tree_node() for node in nodes]
         return queryset
 
     @staticmethod
@@ -113,16 +112,16 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
     is_root = False
 
     def get_queryset(self):
+        self.check_need_refresh_nodes()
         node_key = self.request.query_params.get('key')
-        if node_key:
-            self.node = Node.objects.get(key=node_key)
-            queryset = self.node.get_children(with_self=False)
-        else:
-            self.is_root = True
-            self.node = Node.root()
-            queryset = list(self.node.get_children(with_self=True))
-            nodes_invalid = Node.objects.exclude(key__startswith=self.node.key)
-            queryset.extend(list(nodes_invalid))
+        util = NodeUtil()
+        # 是否包含自己
+        with_self = False
+        if not node_key:
+            node_key = Node.root().key
+            with_self = True
+        self.node = util.get_node_by_key(node_key)
+        queryset = self.node.get_children(with_self=with_self)
         queryset = [node.as_tree_node() for node in queryset]
         queryset = sorted(queryset)
         return queryset
@@ -131,21 +130,20 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not include_assets:
             return queryset
-        assets = self.node.get_assets()
+        assets = self.node.get_assets().only(
+            "id", "hostname", "ip", 'platform', "os", "org_id",
+        )
         for asset in assets:
             queryset.append(asset.as_tree_node(self.node))
         return queryset
 
     def filter_queryset(self, queryset):
         queryset = self.filter_assets(queryset)
-        queryset = self.filter_refresh_nodes(queryset)
         return queryset
 
-    def filter_refresh_nodes(self, queryset):
+    def check_need_refresh_nodes(self):
         if self.request.query_params.get('refresh', '0') == '1':
-            Node.expire_nodes_assets_amount()
-            Node.expire_nodes_full_value()
-        return queryset
+            Node.refresh_nodes()
 
 
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):

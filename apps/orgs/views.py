@@ -13,7 +13,8 @@ class SwitchOrgView(DetailView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         self.object = Organization.get_instance(pk)
-        request.session['oid'] = self.object.id.__str__()
+        oid = str(self.object.id)
+        request.session['oid'] = oid
         host = request.get_host()
         referer = request.META.get('HTTP_REFERER')
         if referer.find(host) != -1:

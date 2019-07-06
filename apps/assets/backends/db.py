@@ -7,7 +7,7 @@ from .base import BaseBackend
 
 class AuthBookBackend(BaseBackend):
     @classmethod
-    def filter(cls, username=None, assets=None, latest=True):
+    def filter(cls, username=None, assets=None, latest=True, **kwargs):
         queryset = AuthBook.objects.all()
         if username is not None:
             queryset = queryset.filter(username=username)

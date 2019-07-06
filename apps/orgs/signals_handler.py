@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .models import Organization
-from .hands import set_current_org, current_org, Node
+from .hands import set_current_org, current_org, Node, get_current_org
 from perms.models import AssetPermission
 from users.models import UserGroup
 
@@ -14,7 +14,7 @@ from users.models import UserGroup
 @receiver(post_save, sender=Organization)
 def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
     if instance:
-        old_org = current_org
+        old_org = get_current_org()
         set_current_org(instance)
         node_root = Node.root()
         if node_root.value != instance.name:
@@ -41,3 +41,8 @@ def on_org_user_changed(sender, instance=None, **kwargs):
                 for user_group in user_groups:
                     user_group.users.remove(user)
         set_current_org(old_org)
+
+
+@receiver(m2m_changed, sender=Organization.admins.through)
+def on_org_admin_change(sender, **kwargs):
+    Organization._user_admin_orgs = None

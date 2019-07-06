@@ -6,32 +6,32 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import get_logger
 from orgs.mixins import OrgModelForm
 
-from ..models import Asset, Protocol
+from ..models import Asset, Node
 
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm',
-    'ProtocolForm'
+    'AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm', 'ProtocolForm',
 ]
 
 
-class ProtocolForm(forms.ModelForm):
-    class Meta:
-        model = Protocol
-        fields = ['name', 'port']
-        widgets = {
-            'name': forms.Select(attrs={
-                'class': 'form-control protocol-name'
-            }),
-            'port': forms.TextInput(attrs={
-                'class': 'form-control protocol-port'
-            }),
-        }
+class ProtocolForm(forms.Form):
+    name = forms.ChoiceField(
+        choices=Asset.PROTOCOL_CHOICES, label=_("Name"), initial='ssh',
+        widget=forms.Select(attrs={'class': 'form-control protocol-name'})
+    )
+    port = forms.IntegerField(
+        max_value=65534, min_value=1, label=_("Port"), initial=22,
+        widget=forms.TextInput(attrs={'class': 'form-control protocol-port'})
+    )
 
 
 class AssetCreateForm(OrgModelForm):
-    PROTOCOL_CHOICES = Protocol.PROTOCOL_CHOICES
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.data:
+            nodes_field = self.fields['nodes']
+            nodes_field._queryset = Node.get_queryset()
 
     class Meta:
         model = Asset

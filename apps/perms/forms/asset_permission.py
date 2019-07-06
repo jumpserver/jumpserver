@@ -6,29 +6,51 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins import OrgModelForm
 from orgs.utils import current_org
-from perms.models import AssetPermission
-from assets.models import Asset
+from assets.models import Asset, Node
+from ..models import AssetPermission, Action
 
 __all__ = [
     'AssetPermissionForm',
 ]
 
 
+class ActionField(forms.MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = Action.CHOICES
+        kwargs['initial'] = Action.ALL
+        kwargs['label'] = _("Action")
+        kwargs['widget'] = forms.CheckboxSelectMultiple()
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        return Action.choices_to_value(value)
+
+    def prepare_value(self, value):
+        if value is None:
+            return value
+        value = Action.value_to_choices(value)
+        return value
+
+
 class AssetPermissionForm(OrgModelForm):
+    actions = ActionField()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
-        if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
-        assets_field = self.fields.get('assets')
+        users_field.queryset = current_org.get_org_users()
 
         # 前端渲染优化, 防止过多资产
         if not self.data:
             instance = kwargs.get('instance')
+            assets_field = self.fields['assets']
             if instance:
                 assets_field.queryset = instance.assets.all()
             else:
                 assets_field.queryset = Asset.objects.none()
+            nodes_field = self.fields['nodes']
+            nodes_field._queryset = Node.get_queryset()
 
     class Meta:
         model = AssetPermission
@@ -51,16 +73,13 @@ class AssetPermissionForm(OrgModelForm):
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             ),
-            'actions': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('Action')}
-            )
         }
         labels = {
             'nodes': _("Node"),
         }
         help_texts = {
             'actions': _('Tips: The RDP protocol does not support separate '
-                         'controls for uploading or downloading files')
+                        'controls for uploading or downloading files')
         }
 
     def clean_user_groups(self):

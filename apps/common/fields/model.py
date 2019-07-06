@@ -124,9 +124,26 @@ class EncryptTextField(EncryptMixin, models.TextField):
 
 
 class EncryptCharField(EncryptMixin, models.CharField):
+    @staticmethod
+    def change_max_length(kwargs):
+        kwargs.setdefault('max_length', 1024)
+        max_length = kwargs.get('max_length')
+        if max_length < 129:
+            max_length = 128
+        max_length = max_length * 2
+        kwargs['max_length'] = max_length
+
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 2048
+        self.change_max_length(kwargs)
         super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        max_length = kwargs.pop('max_length')
+        if max_length > 255:
+            max_length = max_length // 2
+        kwargs['max_length'] = max_length
+        return name, path, args, kwargs
 
 
 class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):

@@ -7,11 +7,13 @@ from abc import abstractmethod
 class BaseBackend:
     @classmethod
     @abstractmethod
-    def filter(cls, username=None, assets=None, latest=True):
+    def filter(cls, username=None, assets=None, latest=True, prefer=None, prefer_id=None):
         """
         :param username: 用户名
         :param assets: <Asset>对象
         :param latest: 是否是最新记录
+        :param prefer: 优先使用
+        :param prefer_id: 使用id
         :return: 元素为<AuthBook>的可迭代对象(<list> or <QuerySet>)
         """
         pass

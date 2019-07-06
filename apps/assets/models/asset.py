@@ -6,18 +6,16 @@ import uuid
 import logging
 import random
 from functools import reduce
-from collections import defaultdict
+from collections import OrderedDict
 
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-from django.core.cache import cache
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 from .user import AdminUser, SystemUser
+from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
 
-__all__ = ['Asset', 'Protocol']
+__all__ = ['Asset', 'ProtocolsMixin']
 logger = logging.getLogger(__name__)
 
 
@@ -47,14 +45,12 @@ class AssetQuerySet(models.QuerySet):
     def valid(self):
         return self.active()
 
-
-class AssetManager(OrgManager):
-    def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related("nodes", "protocols")
-        return queryset
+    def has_protocol(self, name):
+        return self.filter(protocols__contains=name)
 
 
-class Protocol(models.Model):
+class ProtocolsMixin:
+    protocols = ''
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
@@ -65,19 +61,42 @@ class Protocol(models.Model):
         (PROTOCOL_TELNET, 'telnet (beta)'),
         (PROTOCOL_VNC, 'vnc'),
     )
-    PORT_VALIDATORS = [MaxValueValidator(65535), MinValueValidator(1)]
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=16, choices=PROTOCOL_CHOICES,
-                            default=PROTOCOL_SSH, verbose_name=_("Name"))
-    port = models.IntegerField(default=22, verbose_name=_("Port"),
-                               validators=PORT_VALIDATORS)
+    @property
+    def protocols_as_list(self):
+        if not self.protocols:
+            return []
+        return self.protocols.split(' ')
 
-    def __str__(self):
-        return "{}/{}".format(self.name, self.port)
+    @property
+    def protocols_as_dict(self):
+        d = OrderedDict()
+        protocols = self.protocols_as_list
+        for i in protocols:
+            if '/' not in i:
+                continue
+            name, port = i.split('/')[:2]
+            if not all([name, port]):
+                continue
+            d[name] = int(port)
+        return d
+
+    @property
+    def protocols_as_json(self):
+        return [
+            {"name": name, "port": port}
+            for name, port in self.protocols_as_dict.items()
+        ]
+
+    def has_protocol(self, name):
+        return name in self.protocols_as_dict
+
+    @property
+    def ssh_port(self):
+        return self.protocols_as_dict.get("ssh", 22)
 
 
-class Asset(OrgModelMixin):
+class Asset(ProtocolsMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
         ('Linux', 'Linux'),
@@ -92,12 +111,12 @@ class Asset(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.CharField(max_length=128, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, verbose_name=_('Hostname'))
-    protocol = models.CharField(max_length=128, default=Protocol.PROTOCOL_SSH,
-                                choices=Protocol.PROTOCOL_CHOICES,
+    protocol = models.CharField(max_length=128, default=ProtocolsMixin.PROTOCOL_SSH,
+                                choices=ProtocolsMixin.PROTOCOL_CHOICES,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
 
-    protocols = models.ManyToManyField('Protocol', verbose_name=_("Protocol"))
+    protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
     platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
@@ -133,14 +152,8 @@ class Asset(OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = AssetManager.from_queryset(AssetQuerySet)()
-    CONNECTIVITY_CACHE_KEY = '_JMS_ASSET_CONNECTIVITY_{}'
-    UNREACHABLE, REACHABLE, UNKNOWN = range(0, 3)
-    CONNECTIVITY_CHOICES = (
-        (UNREACHABLE, _("Unreachable")),
-        (REACHABLE, _('Reachable')),
-        (UNKNOWN, _("Unknown")),
-    )
+    objects = OrgManager.from_queryset(AssetQuerySet)()
+    _connectivity = None
 
     def __str__(self):
         return '{0.hostname}({0.ip})'.format(self)
@@ -150,41 +163,9 @@ class Asset(OrgModelMixin):
         warning = ''
         if not self.is_active:
             warning += ' inactive'
-        else:
-            return True, ''
-        return False, warning
-
-    @property
-    def protocols_name(self):
-        names = []
-        for protocol in self.protocols.all():
-            names.append(protocol.name)
-        return names
-
-    def has_protocol(self, name):
-        return name in self.protocols_name
-
-    def get_protocol_by_name(self, name):
-        for i in self.protocols.all():
-            if i.name.lower() == name.lower():
-                return i
-        return None
-
-    @property
-    def protocol_ssh(self):
-        return self.get_protocol_by_name("ssh")
-
-    @property
-    def protocol_rdp(self):
-        return self.get_protocol_by_name("rdp")
-
-    @property
-    def ssh_port(self):
-        if self.protocol_ssh:
-            port = self.protocol_ssh.port
-        else:
-            port = 22
-        return port
+        if warning:
+            return False, warning
+        return True, warning
 
     def is_windows(self):
         if self.platform in ("Windows", "Windows2016"):
@@ -215,20 +196,6 @@ class Asset(OrgModelMixin):
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
-    @classmethod
-    def get_queryset_by_fullname_list(cls, fullname_list):
-        org_fullname_map = defaultdict(list)
-        for fullname in fullname_list:
-            hostname, org = cls.split_fullname(fullname)
-            org_fullname_map[org].append(hostname)
-        filter_arg = Q()
-        for org, hosts in org_fullname_map.items():
-            if org.is_real():
-                filter_arg |= Q(hostname__in=hosts, org_id=org.id)
-            else:
-                filter_arg |= Q(Q(org_id__isnull=True) | Q(org_id=''), hostname__in=hosts)
-        return Asset.objects.filter(filter_arg)
-
     @property
     def cpu_info(self):
         info = ""
@@ -250,15 +217,18 @@ class Asset(OrgModelMixin):
 
     @property
     def connectivity(self):
+        if self._connectivity:
+            return self._connectivity
         if not self.admin_user:
-            return self.UNKNOWN
-        return self.admin_user.get_connectivity_of(self)
+            return Connectivity.unknown()
+        connectivity = self.admin_user.get_asset_connectivity(self)
+        return connectivity
 
     @connectivity.setter
     def connectivity(self, value):
         if not self.admin_user:
             return
-        self.admin_user.set_connectivity_of(self, value)
+        self.admin_user.set_asset_connectivity(self, value)
 
     def get_auth_info(self):
         if not self.admin_user:
@@ -303,10 +273,7 @@ class Asset(OrgModelMixin):
                     'id': self.id,
                     'hostname': self.hostname,
                     'ip': self.ip,
-                    'protocols': [
-                        {"name": p.name, "port": p.port}
-                        for p in self.protocols.all()
-                    ],
+                    'protocols': self.protocols_as_list,
                     'platform': self.platform,
                 }
             }
@@ -321,20 +288,25 @@ class Asset(OrgModelMixin):
     @classmethod
     def generate_fake(cls, count=100):
         from random import seed, choice
-        import forgery_py
         from django.db import IntegrityError
         from .node import Node
+        from orgs.utils import get_current_org
+        from orgs.models import Organization
+        org = get_current_org()
+        if not org or not org.is_real():
+            Organization.default().change_to()
+
         nodes = list(Node.objects.all())
         seed()
         for i in range(count):
             ip = [str(i) for i in random.sample(range(255), 4)]
             asset = cls(ip='.'.join(ip),
-                        hostname=forgery_py.internet.user_name(True),
+                        hostname='.'.join(ip),
                         admin_user=choice(AdminUser.objects.all()),
                         created_by='Fake')
             try:
                 asset.save()
-                asset.protocols.create(name="ssh", port=22)
+                asset.protocols = 'ssh/22'
                 if nodes and len(nodes) > 3:
                     _nodes = random.sample(nodes, 3)
                 else:

@@ -30,21 +30,22 @@ class AssetUserManager:
     )
 
     _prefer = "system_user"
-    _using = None
 
-    def filter(self, username=None, assets=None, latest=True):
-        if self._using:
-            backend = dict(self.backends).get(self._using)
-            if not backend:
-                return self.none()
-            instances = backend.filter(username=username, assets=assets, latest=latest)
-            return AssetUserQuerySet(instances)
+    def filter(self, username=None, assets=None, latest=True, prefer=None, prefer_id=None):
+        if assets is not None and not assets:
+            return AssetUserQuerySet([])
+
+        if prefer:
+            self._prefer = prefer
 
         instances_map = {}
         instances = []
         for name, backend in self.backends:
+            if name != "db" and self._prefer != name:
+                continue
             _instances = backend.filter(
-                username=username, assets=assets, latest=latest
+                username=username, assets=assets, latest=latest,
+                prefer=self._prefer, prefer_id=prefer_id,
             )
             instances_map[name] = _instances
 
@@ -61,12 +62,12 @@ class AssetUserManager:
         else:
             ordering.extend(["admin_user", "system_user"])
         # 根据prefer决定优先使用系统用户或管理用户谁的
-        ordering_instances = [instances_map.get(i) for i in ordering]
+        ordering_instances = [instances_map.get(i, []) for i in ordering]
         instances = self._merge_instances(*ordering_instances)
         return AssetUserQuerySet(instances)
 
-    def get(self, username, asset):
-        instances = self.filter(username, assets=[asset])
+    def get(self, username, asset, **kwargs):
+        instances = self.filter(username, assets=[asset], **kwargs)
         if len(instances) == 1:
             return instances[0]
         elif len(instances) == 0:
@@ -90,10 +91,6 @@ class AssetUserManager:
 
     def prefer(self, s):
         self._prefer = s
-        return self
-
-    def using(self, s):
-        self._using = s
         return self
 
     @staticmethod

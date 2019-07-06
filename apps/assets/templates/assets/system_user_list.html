@@ -15,27 +15,27 @@
 
 {% block table_search %}
     <div class="" style="float: right">
-                   <div class=" btn-group">
-                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class=" btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                                <span>{% trans "Update" %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                   </div>
-               </div>
+       <div class=" btn-group">
+            <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class=" btn_export" tabindex="0">
+                    <span>{% trans "Export" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
+                    <span>{% trans "Import" %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
+                    <span>{% trans "Update" %}</span>
+                    </a>
+                </li>
+            </ul>
+       </div>
+   </div>
 {% endblock %}
 
 {% block table_container %}
@@ -46,7 +46,7 @@
     <thead>
     <tr>
         <th class="text-center">
-            <input type="checkbox" id="check_all" class="ipt_check_all" >
+            <input type="checkbox" id="check_all" class="ipt_check_all">
         </th>
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
@@ -80,28 +80,30 @@ function initTable() {
             }},
             {targets: 6, createdCell: function (td, cellData) {
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-navy'>" + cellData + "</span>";
+                var data = cellData.reachable;
+                if (data !== 0) {
+                    innerHtml = "<span class='text-navy'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData +'">' + innerHtml + '</span>');
+                $(td).html(innerHtml)
             }},
             {targets: 7, createdCell: function (td, cellData) {
+                var data = cellData.unreachable;
                 var innerHtml = "";
-                if (cellData !== 0) {
-                    innerHtml = "<span class='text-danger'>" + cellData + "</span>";
+                if (data !== 0) {
+                    innerHtml = "<span class='text-danger'>" + data + "</span>";
                 } else {
-                    innerHtml = "<span>" + cellData + "</span>";
+                    innerHtml = "<span>" + data + "</span>";
                 }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
                 var val = 0;
                 var innerHtml = "";
                 var total = rowData.assets_amount;
-                var reachable = rowData.reachable_amount;
-                if (total !== 0) {
+                var reachable = cellData.reachable;
+                if (total && total !== 0) {
                     val = reachable/total * 100;
                 }
 
@@ -112,20 +114,20 @@ function initTable() {
                     innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
                 }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-
             }},
             {targets: 10, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
-            }}],
+            }},
+        ],
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
             {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "login_mode_display"}, {data: "assets_amount" },
-            {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }
+            {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "comment" }, {data: "id" }
         ],
         op_html: $('#actions').html()
-        };
+    };
     system_user_table = jumpserver.initServerSideDataTable(options);
     return system_user_table
 }

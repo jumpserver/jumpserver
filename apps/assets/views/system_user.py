@@ -74,10 +74,11 @@ class SystemUserDetailView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
+        cmd_filters_remain = CommandFilter.objects.exclude(system_users=self.object)
         context = {
             'app': _('Assets'),
             'action': _('System user detail'),
-            'cmd_filters_remain': CommandFilter.objects.exclude(system_users=self.object)
+            'cmd_filters_remain': cmd_filters_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -92,12 +93,15 @@ class SystemUserDeleteView(PermissionsMixin, DeleteView):
 
 class SystemUserAssetView(PermissionsMixin, DetailView):
     model = SystemUser
-    template_name = 'assets/system_user_asset.html'
+    template_name = 'assets/system_user_assets.html'
     context_object_name = 'system_user'
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
-        nodes_remain = sorted(Node.objects.exclude(systemuser=self.object), reverse=True)
+        from ..utils import NodeUtil
+        nodes_remain = Node.objects.exclude(systemuser=self.object)
+        util = NodeUtil()
+        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('assets'),
             'action': _('System user asset'),

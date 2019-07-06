@@ -25,6 +25,5 @@ urlpatterns = [
 
     # Command view
     path('command/', views.CommandListView.as_view(), name='command-list'),
-    path('command/export/', views.CommandExportView.as_view(), name='command-export')
 
 ]

@@ -32,7 +32,9 @@ var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
 var assetUserTable;
 var needPush = false;
 var prefer = null;
-var lastMFATime = "{{ request.session.OTP_LAST_VERIFY_TIME }}";
+var lastMFATime = "{{ request.session.MFA_VERIFY_TIME }}";
+var testDatetime = "{% trans 'Test datetime: ' %}";
+var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 
 function initAssetUserTable() {
     var options = {
@@ -41,19 +43,25 @@ function initAssetUserTable() {
         columnDefs: [
             {
                 targets: 5, createdCell: function (td, cellData) {
-                  if (cellData == 1) {
-                      $(td).html('<i class="fa fa-circle text-navy"></i>')
-                  } else if (cellData == 0) {
-                      $(td).html('<i class="fa fa-circle text-danger"></i>')
+                  var innerHtml = "";
+                  if (cellData.status == 1) {
+                      innerHtml = '<i class="fa fa-circle text-navy"></i>'
+                  } else if (cellData.status == 0) {
+                      innerHtml = '<i class="fa fa-circle text-danger"></i>'
                   } else {
-                      $(td).html('<i class="fa fa-circle text-warning"></i>')
+                      innerHtml = '<i class="fa fa-circle text-warning"></i>'
                   }
+                  var date = new Date(cellData.datetime);
+                  var dateManual = date.toLocaleString();
+                  var dataContent = testDatetime + dateManual;
+                  innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
+                  $(td).html(innerHtml);
                 }
             },
             {
                 targets: 6, createdCell: function (td, cellData) {
-                    var date = new Date(cellData);
-                    $(td).html(date.toLocaleString());
+                    var data = formatDateAsCN(cellData);
+                    $(td).html(data);
                 },
             },
             {
@@ -84,8 +92,8 @@ function initAssetUserTable() {
         ajax_url: assetUserListUrl,
         columns: [
             {data: "id"}, {data: "hostname"}, {data: "ip"},
-            {data: "username", orderable: false}, {data: "version", orderable: false},
-            {data: "connectivity", orderable: false},
+            {data: "username"}, {data: "version", orderable: false},
+            {data: "connectivity"},
             {data: "date_created", orderable: false},
             {data: "asset", orderable: false}
         ],
@@ -102,7 +110,7 @@ $(document).ready(function(){
     authUsername = $(this).data('user');
     var now = new Date();
     var nowTime = now.getTime() / 1000;
-    if (nowTime - lastMFATime > 60*10 ) {
+    if ( !lastMFATime || nowTime - lastMFATime > mfaVerifyTTL ) {
         mfaFor = "viewAuth";
         $("#mfa_auth_confirm").modal("show");
     } else {

@@ -51,7 +51,7 @@ class Signer(metaclass=Singleton):
         try:
             return s.loads(value)
         except BadSignature:
-            return {}
+            return None
 
     def sign_t(self, value, expires_in=3600):
         s = TimedJSONWebSignatureSerializer(self.secret_key, expires_in=expires_in)
@@ -62,7 +62,7 @@ class Signer(metaclass=Singleton):
         try:
             return s.loads(value)
         except (BadSignature, SignatureExpired):
-            return {}
+            return None
 
 
 def ssh_key_string_to_obj(text, password=None):

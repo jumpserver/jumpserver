@@ -61,6 +61,8 @@ REDIS_PORT: 6379
 # AUTH_OPENID_REALM_NAME: realm-name
 # AUTH_OPENID_CLIENT_ID: client-id
 # AUTH_OPENID_CLIENT_SECRET: client-secret
+# AUTH_OPENID_IGNORE_SSL_VERIFICATION: True
+# AUTH_OPENID_SHARE_SESSION: False
 #
 # Use Radius authorization
 # 使用Radius来认证

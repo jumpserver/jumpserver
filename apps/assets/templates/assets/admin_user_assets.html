@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-3" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -81,21 +81,6 @@ $(document).ready(function () {
     prefer = "admin_user";
     initAssetUserTable();
 })
-.on('click', '.btn-test-asset', function () {
-    var asset_id = $(this).data('uid');
-    var the_url = "{% url 'api-assets:asset-alive-test' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', asset_id);
-    var success = function (data) {
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600,left=400,top=400')
-    };
-    APIUpdateAttr({
-        url: the_url,
-        method: 'GET',
-        success: success,
-        flash_message: false
-    });
-})
 .on('click', '.btn-test-connective', function () {
     var the_url = "{% url 'api-assets:admin-user-connective' pk=admin_user.id %}";
     var success = function (data) {
@@ -109,18 +94,6 @@ $(document).ready(function () {
         success: success,
         flash_message: false
     });
-})
-.on('click', '.btn-update-asset-user-auth', function() {
-    asset_id = $(this).data('aid');
-    hostname = $(this).data('hostname');
-    username = '{{ admin_user.username }}';
-    $("#asset_user_auth_update_modal").modal();
-})
-.on("click", ".btn-view-auth", function (evt) {
-    asset_id = $(this).data("aid") ;
-    host = $(this).data("hostname");
-    username = "{{ admin_user.username }}";
-    $("#asset_user_auth_view").modal();
 })
 </script>
 {% endblock %}

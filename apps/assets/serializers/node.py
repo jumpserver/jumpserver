@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
+from django.utils.translation import ugettext as _
 
 from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import Asset, Node
@@ -25,11 +26,11 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
 
     def validate_value(self, data):
         instance = self.instance if self.instance else Node.root()
-        children = instance.parent.get_children().exclude(key=instance.key)
-        values = [child.value for child in children]
-        if data in values:
+        children = instance.parent.get_children()
+        children_values = [node.value for node in children if node != instance]
+        if data in children_values:
             raise serializers.ValidationError(
-                'The same level node name cannot be the same'
+                _('The same level node name cannot be the same')
             )
         return data
 

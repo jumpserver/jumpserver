@@ -191,26 +191,22 @@ class Session(OrgModelMixin):
 
     @property
     def _date_start_first_has_replay_rdp_session(self):
-        if self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
+        if self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION is None:
             instance = self.__class__.objects.filter(
-                protocol='rdp', has_replay=True).order_by('date_start').first()
+                protocol='rdp', has_replay=True
+            ).order_by('date_start').first()
             if not instance:
-                return None
-            self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = instance.date_start
-
-        return self._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION
+                date_start = timezone.now() - timezone.timedelta(days=365)
+            else:
+                date_start = instance.date_start
+            self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION = date_start
+        return self.__class__._DATE_START_FIRST_HAS_REPLAY_RDP_SESSION
 
     def can_replay(self):
         if self.has_replay:
             return True
-
-        # 判断对RDP Session添加上报has_replay状态机制之前的录像回放
-        if self._date_start_first_has_replay_rdp_session is None:
-            return True
-
         if self.date_start < self._date_start_first_has_replay_rdp_session:
             return True
-
         return False
 
     def save_to_storage(self, f):
@@ -240,6 +236,10 @@ class Session(OrgModelMixin):
     def command_amount(self):
         command_store = get_multi_command_storage()
         return command_store.count(session=str(self.id))
+
+    @property
+    def login_from_display(self):
+        return self.get_login_from_display()
 
     class Meta:
         db_table = "terminal_session"

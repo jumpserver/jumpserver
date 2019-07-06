@@ -7,116 +7,41 @@
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
-    <style>
-        #search_btn {
-            margin-bottom: 0;
-        }
-    </style>
 {% endblock %}
 
 {% block content_left_head %}
 {% endblock %}
 
+{% block table_pagination %}
+{% endblock %}
 
 {% block table_search %}
-    <form id="search_form" method="get" action="" class="pull-right form-inline">
-        <div class="form-group" id="date">
-            <div class="input-daterange input-group" id="datepicker">
-                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
-                <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
-            </div>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="user">
-                <option value="">{% trans 'User' %}</option>
-                {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="asset">
-                <option value="">{% trans 'Asset' %}</option>
-                {% for a in asset_list %}
-                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="input-group">
-            <select class="select2 form-control" name="system_user">
-                <option value="">{% trans 'System user' %}</option>
-                {% for su in system_user_list %}
-                    <option value="{{ su }}" {% if su == system_user %} selected {% endif %}>{{ su }}</option>
-                {% endfor %}
-            </select>
-        </div>
-{#        <div class="input-group">#}
-{#            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">#}
-{#        </div>#}
-        <div class="input-group">
-            <div class="input-group-btn">
-                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    {% trans 'Search' %}
-                </button>
-            </div>
-        </div>
-    </form>
 {% endblock %}
 
-{% block table_head %}
-    <th class="text-center"></th>
-    <th class="text-center">{% trans 'ID' %}</th>
-    <th class="text-center">{% trans 'User' %}</th>
-    <th class="text-center">{% trans 'Asset' %}</th>
-    <th class="text-center">{% trans 'System user' %}</th>
-    <th class="text-center">{% trans 'Remote addr' %}</th>
-    <th class="text-center">{% trans 'Protocol' %}</th>
-    <th class="text-center">{% trans 'Login from' %}</th>
-    <th class="text-center">{% trans 'Command' %}</th>
-    <th class="text-center">{% trans 'Date start' %}</th>
-{#    <th class="text-center">{% trans 'Date last active' %}</th>#}
-    <th class="text-center">{% trans 'Duration' %}</th>
-    <th class="text-center">{% trans 'Action' %}</th>
-{% endblock %}
-
-{% block table_body %}
-    {% for session in session_list %}
-        <tr class="gradeX">
-            <td class="text-center"><input type="checkbox" class="cbx-term" value="{{ session.id }}"></td>
-            <td class="text-center">
-                <a href="{% url 'terminal:session-detail' pk=session.id %}">{{ forloop.counter }}</a>
-            </td>
-            <td class="text-center">{{ session.user }}</td>
-            <td class="text-center">{{ session.asset }}</td>
-            <td class="text-center">{{ session.system_user }}</td>
-            <td class="text-center">{{ session.remote_addr|default:"" }}</td>
-            <td class="text-center">{{ session.protocol }}</td>
-            <td class="text-center">{{ session.get_login_from_display }}</td>
-            <td class="text-center">{{ session.command_amount }}</td>
-
-            <td class="text-center">{{ session.date_start }}</td>
-{#            <td class="text-center">{{ session.date_last_active }}</td>#}
-            <td class="text-center">{{ session.date_start|time_util_with_seconds:session.date_end }}</td>
-            <td>
-                {% if session.is_finished %}
-                <a {% if not session.can_replay %} disabled="" {% endif %} onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
-                {% else %}
-                    {% if session.protocol == 'ssh' and request.user.is_org_admin%}
-                        <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
-                    {% else %}
-                        <a class="btn btn-xs btn-danger btn-term" disabled value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
-                    {% endif %}
-                {% endif %}
-            </td>
+{% block table_container %}
+    <table class="table table-striped table-bordered table-hover" id="session_table" data-page="false" >
+        <thead>
+        <tr>
+            <th class="text-center"></th>
+            <th class="text-center">{% trans 'ID' %}</th>
+            <th class="text-center">{% trans 'User' %}</th>
+            <th class="text-center">{% trans 'Asset' %}</th>
+            <th class="text-center">{% trans 'System user' %}</th>
+            <th class="text-center">{% trans 'Remote addr' %}</th>
+            <th class="text-center">{% trans 'Protocol' %}</th>
+            <th class="text-center">{% trans 'Login from' %}</th>
+            <th class="text-center">{% trans 'Command' %}</th>
+            <th class="text-center">{% trans 'Date start' %}</th>
+            <th class="text-center">{% trans 'Duration' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
         </tr>
-    {% endfor %}
-{% endblock %}
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
-{% block content_bottom_left %}
-    {% if  request.user.is_org_admin %}
-    <div id="actions" {% if type != "online" %} style="display: none" {% endif %}>
+    <div id="actions" class="hide">
+        {% if type == "online" %}
         <div class="input-group">
             <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
                 <option value="terminate">{% trans 'Terminate selected' %}</option>
@@ -128,100 +53,246 @@
                 </button>
             </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
+
+    <div class="hide" id="daterange">
+        <div class="form-group p-l-5" id="date" style="padding-left: 5px">
+        <div class="input-daterange input-group p-l-5" id="datepicker">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input type="text" class="input-sm form-control" style="width: 100px;" id="date_from" name="date_from" value="{{ date_from|date:'Y-m-d' }}">
+            <span class="input-group-addon">to</span>
+            <input type="text" class="input-sm form-control" style="width: 100px;" id="date_to" name="date_to" value="{{ date_to|date:'Y-m-d' }}">
+        </div>
+        </div>
+    </div>
+
+    <ul class="dropdown-menu search-help">
+        <li><a class="search-item" data-value="user">{% trans 'User' %}</a></li>
+        <li><a class="search-item" data-value="asset">{% trans 'Asset' %}</a></li>
+        <li><a class="search-item" data-value="system_user">{% trans 'System user' %}</a></li>
+        <li><a class="search-item" data-value="remote_addr">{% trans 'Remote addr' %}</a></li>
+        <li><a class="search-item" data-value="protocol">{% trans 'Protocol' %}</a></li>
+    </ul>
 {% endblock %}
 
+
 {% block custom_foot_js %}
-    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
-    <script>
-        function terminateSession(data) {
-            function success() {
-                window.setTimeout(function () {
-                    window.location.reload()
-                }, 1000)
-            }
-            var success_message = '{% trans "Terminate task send, waiting ..." %}';
-            var the_url = "{% url 'api-terminal:kill-session' %}";
-            APIUpdateAttr({
-                url: the_url,
-                method: 'POST',
-                body: JSON.stringify(data),
-                success: success,
-                success_message: success_message
-            });
-        }
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.zh-CN.min.js' %}" ></script>
+<script>
 
-        function finishedSession(data) {
-            var the_url = "{% url 'api-terminal:session-list' %}";
-            var success_message = '{% trans "Finish session success" %}';
-            var success = function() {
-              location.reload();
-            };
-            APIUpdateAttr({
-                url: the_url,
-                method: 'PATCH',
-                body: JSON.stringify(data),
-                success: success,
-                success_message: success_message
-            });
-        }
-        $(document).ready(function() {
-            jumpserver.initStaticTable('table');
-            $('.select2').select2({
-                dropdownAutoWidth: true,
-                width: "auto"
-            });
-            $('.input-daterange.input-group').datepicker({
-                format: "yyyy-mm-dd",
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true
-            });
-        }).on('click', '.btn-term', function () {
-            var $this = $(this);
-            var session_id = $this.attr('value');
-            var data = [
-                session_id
-            ];
-            terminateSession(data)
-        }).on('click', '#btn_bulk_update', function () {
-            var action = $('#slct_bulk_update').val();
-            var id_list = [];
-            $(".cbx-term:checked").each(function (index, data) {
-                id_list.push($(data).attr("value"))
-            });
-            if (id_list.length === 0) {
-                return false;
-            }
+function terminateSession(data) {
+    function success() {
+        window.setTimeout(function () {
+            window.location.reload()
+        }, 1000)
+    }
+    var success_message = '{% trans "Terminate task send, waiting ..." %}';
+    var the_url = "{% url 'api-terminal:kill-session' %}";
+    APIUpdateAttr({
+        url: the_url,
+        method: 'POST',
+        body: JSON.stringify(data),
+        success: success,
+        success_message: success_message
+    });
+}
 
-            function doTerminate() {
-                terminateSession(id_list)
-            }
+var sessionListUrl = "{% url 'api-terminal:session-list' %}?is_finished={% if type == "online" %}0{% else %}1{% endif %}";
+var dateFrom = "{{ date_from.timestamp }}";
+var dateTo = "{{ date_to.timestamp }}";
 
-            function doFinishSession() {
-               var data = [];
-               $.each(id_list, function (i, v) {
-                   data.push({
-                       "pk": v,
-                       "is_finished": true
-                   })
-               });
-               finishedSession(data)
+function initTable() {
+    dateFrom = new Date(dateFrom * 1000).toISOString();
+    dateTo = new Date(dateTo * 1000).toISOString();
+    sessionListUrl = setUrlParam(sessionListUrl, "date_from", dateFrom);
+    sessionListUrl = setUrlParam(sessionListUrl, "date_to", dateTo);
+    var options = {
+        ele: $('#session_table'),
+        ordering: false,
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData, i) {
+                var index = i + 1;
+                var data = '<a href="{% url 'terminal:session-detail' pk=DEFAULT_PK %}">'
+                    + index + "</a>";
+                data = data.replace("{{ DEFAULT_PK }}", cellData);
+
+                $(td).html(data);
+            }},
+            {targets: 9, createdCell: function (td, cellData) {
+                var data = formatDateAsCN(cellData);
+                $(td).html(data);
+            }},
+            {targets: 10, createdCell: function (td, cellData, rowData) {
+                var data = "";
+                if (cellData && rowData.date_start) {
+                    data = timeOffset(rowData.date_start, cellData)
+                }
+                $(td).html(data);
+            }},
+            {targets: 11, createdCell: function (td, cellData, rowData) {
+                var btnGroup = "";
+                var replayBtn = '<a disabled data-session="sessionID" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>'
+                    {#var replayBtn = '<a disabled onclick="window.open("url", "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no)" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>'#}
+                replayBtn = replayBtn.replace("sessionID", rowData.id);
+                if (rowData.can_replay) {
+                    replayBtn = replayBtn.replace("disabled", "")
+                }
+                var termBtn = '<a class="btn btn-xs btn-danger btn-term" disabled value="sessionID" terminal="terminalID" >{% trans "Terminate" %}</a>';
+                if (rowData.protocol === "ssh" && "{{ request.user.is_org_admin }}" === "True") {
+                    termBtn = termBtn.replace("disabled", "")
+                        .replace("sessionID", cellData)
+                        .replace("terminalID", rowData.terminal)
+                }
+                if (rowData.is_finished) {
+                    btnGroup += replayBtn
+                } else {
+                    btnGroup += termBtn;
+                }
+                $(td).html(btnGroup);
+            }},
+        ],
+        ajax_url: sessionListUrl,
+        columns: [
+            {data: "id"}, {data: "id"}, {data: "user", orderable: false},
+            {data: "asset", orderable: false},  {data: "system_user", orderable: false},
+            {data: "remote_addr"}, {data: "protocol"}, {data: "login_from_display"},
+            {data: "command_amount"}, {data: "date_start"},
+            {data: "date_end"}, {data: "id"},
+        ],
+        op_html: $('#actions').html(),
+        fb_html: $("#daterange").html(),
+    };
+    table = jumpserver.initServerSideDataTable(options);
+    return table
+}
+
+function finishedSession(data) {
+    var the_url = "{% url 'api-terminal:session-list' %}";
+    var success_message = '{% trans "Finish session success" %}';
+    var success = function() {
+      location.reload();
+    };
+    APIUpdateAttr({
+        url: the_url,
+        method: 'PATCH',
+        body: JSON.stringify(data),
+        success: success,
+        success_message: success_message
+    });
+}
+var table;
+$(document).ready(function() {
+    table = initTable("#session_table").on('init', function () {
+        var dateFromRef = $("#date_from");
+        var dateToRef = $("#date_to");
+        var options = {
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true,
+            language: navigator.language || "en",
+        };
+        dateFromRef.datepicker(options).on("changeDate", function () {
+            if (!$(this).val()) {
+                return
             }
-            switch(action) {
-                case 'terminate':
-                    doTerminate();
-                    break;
-                case "finished":
-                    doFinishSession();
-                    break;
-                default:
-                    break;
-            }
+            var value = $(this).val() + ' 0:0:0';
+            var date = new Date(value);
+            var url = table.ajax.url();
+            url = setUrlParam(url, "date_from", date.toISOString());
+            table.ajax.url(url);
+            table.ajax.reload();
         });
-    </script>
+        dateToRef.datepicker(options).on("changeDate", function () {
+            if (!$(this).val()) {
+                return
+            }
+            var value = $(this).val() + ' 23:59:59';
+            var date = new Date(value);
+            var url = table.ajax.url();
+            url = setUrlParam(url, "date_to", date.toISOString());
+            table.ajax.url(url);
+            table.ajax.reload();
+        });
+    });
+
+}).on('click', '.btn-term', function () {
+    var $this = $(this);
+    var session_id = $this.attr('value');
+    var data = [
+        session_id
+    ];
+    terminateSession(data)
+}).on('click', '.btn-replay', function () {
+    var sessionID = $(this).data("session");
+    var replayUrl = "/luna/replay/" + sessionID;
+    window.open(replayUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
+})
+.on("click", '#session_table_filter input', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var offset1 = $('#session_table_filter input').offset();
+    var x = offset1.left;
+    var y = offset1.top;
+    var offset = $(".search-help").parent().offset();
+    x -= offset.left;
+    y -= offset.top;
+    x += 18;
+    y += 80;
+    $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
+    $('.dropdown-menu.search-help').show();
+})
+.on('click', '.search-item', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var keyword = $("#session_table_filter input");
+    var value = $(this).data('value');
+    var old_value = keyword.val();
+    var new_value = old_value + ' ' + value + ':';
+    keyword.val(new_value.trim());
+    $('.dropdown-menu.search-help').hide();
+    keyword.focus()
+})
+.on('click', 'body', function (e) {
+    $('.dropdown-menu.search-help').hide()
+})
+.on('click', '#btn_bulk_update', function () {
+    var action = $('#slct_bulk_update').val();
+    var idList = table.selected;
+
+    if (idList.length === 0) {
+        return false;
+    }
+
+    function doTerminate() {
+        terminateSession(idList)
+    }
+
+    function doFinishSession() {
+       var data = [];
+       $.each(idList, function (i, v) {
+           data.push({
+               "id": v,
+               "is_finished": true
+           })
+       });
+       finishedSession(data)
+    }
+    switch(action) {
+        case 'terminate':
+            doTerminate();
+            break;
+        case "finished":
+            doFinishSession();
+            break;
+        default:
+            break;
+    }
+});
+</script>
 {% endblock %}
 
