@@ -218,6 +218,31 @@ $(document).ready(function () {
 })
 .on('change', protocol_id, function(){
     fieldDisplay();
+}).on("submit", "form", function (evt) {
+    evt.preventDefault();
+    {% block formUrl %}
+    var the_url = '{% url 'api-assets:system-user-list' %}';
+    var redirect_to = '{% url "assets:system-user-list" %}';
+    var method = "POST";
+    {% endblock %}
+    var form = $("form");
+    var data = form.serializeObject();
+
+    objectAttrsIsBool(data, ["auto_generate_key", "auto_push"]);
+    data["private_key"] = $("#id_private_key_file").data('file');
+
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+}).on('change', '#id_private_key_file', function () {
+    readFile($(this)).on("onload", function (evt, data) {
+         $(this).attr("data-file", data)
+    })
 })
 
 </script>

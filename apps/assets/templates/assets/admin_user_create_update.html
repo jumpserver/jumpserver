@@ -54,9 +54,38 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2();
-        })
-    </script>
+<script>
+$(document).ready(function () {
+    $('.select2').select2();
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-assets:admin-user-list' %}';
+    var redirect_to = '{% url "assets:admin-user-list" %}';
+    var method = "POST";
+    {% if type == "update" %}
+        the_url = '{% url 'api-assets:admin-user-detail' pk=object.id %}';
+        redirect_to = '{% url "assets:admin-user-list" %}';
+        method = "PUT";
+    {% endif %}
+    var form = $("form");
+    var data = form.serializeObject();
+
+    data["private_key"] = $("#id_private_key_file").data('file');
+
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+})
+.on('change', '#id_private_key_file', function () {
+    readFile($(this)).on("onload", function (evt, data) {
+         $(this).attr("data-file", data)
+    })
+})
+</script>
 {% endblock %}

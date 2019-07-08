@@ -83,6 +83,7 @@ class AssetUser(OrgModelMixin):
     def set_auth(self, password=None, private_key=None, public_key=None):
         update_fields = []
         if password:
+            print("Set password: {}".format(password))
             self.password = password
             update_fields.append('password')
         if private_key:
@@ -196,6 +197,17 @@ class AssetUser(OrgModelMixin):
         self.private_key = ''
         self.public_key = ''
         self.save()
+
+    @staticmethod
+    def gen_password():
+        return str(uuid.uuid4())
+
+    @staticmethod
+    def gen_key(username):
+        private_key, public_key = ssh_key_gen(
+            username=username
+        )
+        return private_key, public_key
 
     def auto_gen_auth(self):
         password = str(uuid.uuid4())

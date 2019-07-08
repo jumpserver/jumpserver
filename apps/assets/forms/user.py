@@ -92,10 +92,11 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
+        print(self.cleaned_data)
         system_user = super().save()
-        password = self.cleaned_data.get('password', '') or None
-        login_mode = self.cleaned_data.get('login_mode', '') or None
-        protocol = self.cleaned_data.get('protocol') or None
+        password = self.cleaned_data.get('password')
+        login_mode = self.cleaned_data.get('login_mode')
+        protocol = self.cleaned_data.get('protocol')
         auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
         private_key, public_key = super().gen_keys()
 
