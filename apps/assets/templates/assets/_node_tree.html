@@ -69,6 +69,9 @@ var treeUrl = '{% url 'api-assets:node-children-tree' %}?assets=0';
 //       "showAssets": false,
 //    }
 function initNodeTree(options) {
+    if (options.showAssets) {
+        treeUrl = setUrlParam(treeUrl, 'assets', '1')
+    }
     var setting = {
         view: {
             dblClickExpand: false,
@@ -106,10 +109,6 @@ function initNodeTree(options) {
             beforeAsync: options.beforeAsync || defaultCallback("Before async")
         }
     };
-    if (options.showAssets) {
-        treeUrl = setUrlParam(treeUrl, 'assets', '1')
-    }
-
     $.get(treeUrl, function(data, status){
         zNodes = data;
         zTree = $.fn.zTree.init($("#nodeTree"), setting, zNodes);
