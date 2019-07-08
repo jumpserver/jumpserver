@@ -1216,7 +1216,7 @@ msgstr "连接"
 
 #: assets/serializers/asset.py:21
 msgid "Protocol format should {}/{}"
-msgstr ""
+msgstr "协议格式 {}/{}"
 
 #: assets/serializers/asset.py:38
 msgid "Protocol duplicate: {}"
