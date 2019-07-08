@@ -197,6 +197,17 @@ class AssetUser(OrgModelMixin):
         self.public_key = ''
         self.save()
 
+    @staticmethod
+    def gen_password():
+        return str(uuid.uuid4())
+
+    @staticmethod
+    def gen_key(username):
+        private_key, public_key = ssh_key_gen(
+            username=username
+        )
+        return private_key, public_key
+
     def auto_gen_auth(self):
         password = str(uuid.uuid4())
         private_key, public_key = ssh_key_gen(

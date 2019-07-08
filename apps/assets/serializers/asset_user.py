@@ -4,12 +4,11 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from common.utils import validate_ssh_private_key
 from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
-from .base import ConnectivitySerializer
+from .base import ConnectivitySerializer, AuthSerializerMixin
 
 
 __all__ = [
@@ -24,7 +23,7 @@ class BasicAssetSerializer(serializers.ModelSerializer):
         fields = ['hostname', 'ip']
 
 
-class AssetUserSerializer(BulkOrgResourceModelSerializer):
+class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
     connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
@@ -49,13 +48,6 @@ class AssetUserSerializer(BulkOrgResourceModelSerializer):
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
         }
-
-    def validate_private_key(self, key):
-        password = self.initial_data.get("password")
-        valid = validate_ssh_private_key(key, password)
-        if not valid:
-            raise serializers.ValidationError(_("private key invalid"))
-        return key
 
     def create(self, validated_data):
         if not validated_data.get("name") and validated_data.get("username"):

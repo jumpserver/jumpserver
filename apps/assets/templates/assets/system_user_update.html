@@ -14,3 +14,9 @@
     </div>
 {% endblock %}
 
+{% block formUrl %}
+    var the_url = '{% url 'api-assets:system-user-detail' pk=object.pk %}';
+    var redirect_to = '{% url "assets:system-user-list" %}';
+    var method = "PUT";
+{% endblock %}
+
