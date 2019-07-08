@@ -83,7 +83,6 @@ class AssetUser(OrgModelMixin):
     def set_auth(self, password=None, private_key=None, public_key=None):
         update_fields = []
         if password:
-            print("Set password: {}".format(password))
             self.password = password
             update_fields.append('password')
         if private_key:
