@@ -493,7 +493,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
             pattern.add(r'^{0}$|^{0}:'.format(node.key))
         pattern = '|'.join(list(pattern))
         if pattern:
-            assets = Asset.objects.filter(nodes__key__regex=pattern) \
+            assets = Asset.objects.filter(nodes__key__regex=pattern).valid() \
                 .prefetch_related('nodes')\
                 .only(*self.assets_only)\
                 .distinct()
