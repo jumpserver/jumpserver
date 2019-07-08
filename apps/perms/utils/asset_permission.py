@@ -470,7 +470,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         assets = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets = perm.assets.all().only(*self.assets_only)
+            _assets = perm.assets.valid().only(*self.assets_only)
             system_users = perm.system_users.all()
             iterable = itertools.product(_assets, system_users, actions)
             for asset, system_user, action in iterable:
