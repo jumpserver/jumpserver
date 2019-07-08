@@ -47,7 +47,8 @@ class AdminUserCreateView(PermissionsMixin,
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Create admin user')
+            'action': _('Create admin user'),
+            "type": "create"
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -65,6 +66,7 @@ class AdminUserUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
         context = {
             'app': _('Assets'),
             'action': _('Update admin user'),
+            "type": "update"
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

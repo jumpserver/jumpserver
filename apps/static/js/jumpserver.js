@@ -1157,3 +1157,21 @@ function timeOffset(a, b) {
     }
     return ""
 }
+
+function readFile(ref) {
+    var files = ref.prop('files');
+    var hasFile = files && files.length > 0;
+    if (hasFile) {
+        var reader = new FileReader();//新建一个FileReader
+        console.log(typeof files[0]);
+        reader.readAsText(files[0], "UTF-8");//读取文件
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            ref.trigger("onload", evt.target.result);
+        };
+    } else {
+        ref.trigger("onload", null);
+    }
+
+    return ref
+}
+
