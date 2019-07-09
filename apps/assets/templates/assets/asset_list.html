@@ -167,7 +167,7 @@ function initTable() {
             }},
             {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-asset-delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}
         ],
@@ -325,8 +325,7 @@ $(document).ready(function(){
     }
     window.open(url, '_self');
 })
-
-.on('click', '.btn_asset_delete', function () {
+.on('click', '.btn-asset-delete', function () {
     var $this = $(this);
     var $data_table = $("#asset_list_table").DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
@@ -513,6 +512,40 @@ $(document).ready(function(){
     update_node_action = "add"
 }).on('click', '#menu_asset_move', function () {
     update_node_action = "move"
+}).on('click', '.btn-test-connective', function () {
+    var url = "{% url 'api-assets:node-test-connective' pk=DEFAULT_PK %}";
+    if (!current_node_id) {
+        return null;
+    }
+    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
+    function success(data) {
+        rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
+    }
+    APIUpdateAttr({
+        url: the_url,
+        method: "GET",
+        success: success,
+        flash_message: false
+    });
+}).on('click', '.btn-refresh-hardware', function () {
+    var url = "{% url 'api-assets:node-refresh-hardware-info' pk=DEFAULT_PK %}";
+    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
+    function success(data) {
+        rMenu.css({"visibility" : "hidden"});
+        var task_id = data.task;
+        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
+        window.open(url, '', 'width=800,height=600')
+    }
+    APIUpdateAttr({
+        url: the_url,
+        method: "GET",
+        success: success,
+        flash_message: false
+    });
+
 })
 
 </script>
