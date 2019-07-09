@@ -36,11 +36,6 @@ class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'private_key', 'public_key', 'domain', 'is_active', 'date_created',
             'date_updated', 'created_by', 'comment',
         ]
-        extra_kwargs = {
-            'password': {"write_only": True},
-            'private_key': {"write_only": True},
-            'public_key': {"write_only": True},
-        }
 
 
 class GatewayWithAuthSerializer(GatewaySerializer):
