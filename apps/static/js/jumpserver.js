@@ -1111,7 +1111,8 @@ function objectAttrsIsBool(obj, attrs) {
 
 function formatDateAsCN(d) {
     var date = new Date(d);
-    return date.toISOString().replace("T", " ").replace(/\..*/, "");
+    var date_s = date.toLocaleString(navigator.language, {hour12: false});
+    return date_s.split("/").join('-')
 }
 
 function getUrlParams(url) {
