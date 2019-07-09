@@ -116,6 +116,11 @@ $(document).ready(function(){
      };
     formSubmit(props);
 })
+.on('change', '#id_private_key_file', function () {
+    readFile($(this)).on("onload", function (evt, data) {
+         $(this).attr("data-file", data)
+    })
+})
 .on('change', protocol_id, function(){
     protocolChange();
 });
