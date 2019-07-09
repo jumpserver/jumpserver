@@ -105,7 +105,6 @@ $(document).ready(function(){
     var redirect_to = '{% url "assets:domain-gateway-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.domain);
     {% if type == "update" %}
         the_url = '{% url 'api-assets:gateway-detail' pk=object.id %}';
-        redirect_to = '{% url "assets:domain-gateway-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.domain);
         method = "PUT";
     {% endif %}
     var props = {
