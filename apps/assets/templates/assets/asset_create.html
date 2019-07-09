@@ -137,7 +137,6 @@ $(document).ready(function () {
         protocolRef.val(protocolShould);
         protocolRef.trigger("change")
     }
-
 })
 .on("click", ".btn-protocol.btn-del", function () {
     $(this).parent().parent().remove();
@@ -164,9 +163,15 @@ $(document).ready(function () {
     if (protocol === "") {
         return
     }
-    if (protocolLen === 0) {
-        protocolLen = protocolsRef.length;
-    }
+    var formNameNum = [0];
+    protocolsRef.children().find("select").each(function (i, v) {
+        var fieldName = $(v).attr("name");
+        var num = fieldName.split('-')[1];
+        formNameNum.push(parseInt(num));
+    });
+
+    var protocolLenLast = Math.max(...formNameNum);
+    protocolLen = protocolLenLast + 1;
     var selectName = "form-" + protocolLen + "-name";
     var selectId = "id_" + selectName;
     var portName = "form-" + protocolLen + "-port";

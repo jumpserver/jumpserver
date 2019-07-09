@@ -8,3 +8,4 @@ from .node import *
 from .cmd_filter import *
 from .authbook import *
 from .utils import *
+from .authbook import *

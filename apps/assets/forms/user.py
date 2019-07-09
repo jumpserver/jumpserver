@@ -65,17 +65,7 @@ class PasswordAndKeyAuthForm(forms.ModelForm):
 
 class AdminUserForm(PasswordAndKeyAuthForm):
     def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        admin_user = super().save(commit=commit)
-        password = self.cleaned_data.get('password', '') or None
-        private_key, public_key = super().gen_keys()
-        admin_user.set_auth(password=password, public_key=public_key, private_key=private_key)
-        return admin_user
-
-    def clean(self):
-        super().clean()
-        if not self.instance:
-            super().validate_password_key()
+        raise forms.ValidationError("Use api to save")
 
     class Meta:
         model = AdminUser
@@ -91,51 +81,7 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
     auto_generate_key = forms.BooleanField(initial=True, required=False)
 
     def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        system_user = super().save()
-        password = self.cleaned_data.get('password', '') or None
-        login_mode = self.cleaned_data.get('login_mode', '') or None
-        protocol = self.cleaned_data.get('protocol') or None
-        auto_generate_key = self.cleaned_data.get('auto_generate_key', False)
-        private_key, public_key = super().gen_keys()
-
-        if login_mode == SystemUser.LOGIN_MANUAL or \
-                protocol in [SystemUser.PROTOCOL_TELNET,
-                             SystemUser.PROTOCOL_VNC]:
-            system_user.auto_push = 0
-            system_user.save()
-            auto_generate_key = False
-
-        if auto_generate_key:
-            logger.info('Auto generate key and set system user auth')
-            if protocol == SystemUser.PROTOCOL_SSH:
-                system_user.auto_gen_auth()
-            elif protocol == SystemUser.PROTOCOL_RDP:
-                system_user.auto_gen_auth_password()
-        else:
-            system_user.set_auth(password=password, private_key=private_key,
-                                 public_key=public_key)
-
-        return system_user
-
-    def clean(self):
-        super().clean()
-        auto_generate = self.cleaned_data.get('auto_generate_key')
-        if not self.instance and not auto_generate:
-            super().validate_password_key()
-
-    def clean_username(self):
-        username = self.data.get('username')
-        login_mode = self.data.get('login_mode')
-        protocol = self.data.get('protocol')
-
-        if username:
-            return username
-        if login_mode == SystemUser.LOGIN_AUTO and \
-                protocol != SystemUser.PROTOCOL_VNC:
-            msg = _('* Automatic login mode must fill in the username.')
-            raise forms.ValidationError(msg)
-        return username
+        raise forms.ValidationError("Use api to save")
 
     class Meta:
         model = SystemUser

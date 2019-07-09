@@ -104,7 +104,7 @@ class NodeUtil:
             _node._assets_amount = len(_node._assets)
             delattr(_node, '_assets')
         self.stack.top._children.append(_node)
-        self.stack.top._all_children.extend([_node] + _node._children)
+        self.stack.top._all_children.extend([_node] + _node._all_children)
 
     def init(self):
         all_nodes = self.get_all_nodes()
@@ -152,7 +152,7 @@ class NodeUtil:
             return []
         tree_nodes.update(node._parents)
         tree_nodes.add(node)
-        tree_nodes.update(node._children)
+        tree_nodes.update(node._all_children)
         return list(tree_nodes)
 
     # 使用给定节点生成一颗树
@@ -166,10 +166,15 @@ class NodeUtil:
         return [n.key for n in nodes]
 
     def get_some_nodes_family_by_keys(self, keys):
+        print("Kyes: {}".format(keys))
         family = set()
         for key in keys:
             family.update(self.get_family_by_key(key))
         return family
+
+    def get_some_nodes_family_keys_by_keys(self, keys):
+        family = self.get_some_nodes_family_by_keys(keys)
+        return [n.key for n in family]
 
     def get_nodes_parents_by_key(self, key, with_self=True):
         parents = set()

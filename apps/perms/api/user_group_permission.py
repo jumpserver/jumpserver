@@ -9,7 +9,7 @@ from rest_framework.generics import (
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
 from ..utils import (
-    AssetPermissionUtil, parse_asset_to_tree_node, parse_node_to_tree_node,
+    AssetPermissionUtil, ParserNode,
     RemoteAppPermissionUtil,
 )
 from ..hands import (

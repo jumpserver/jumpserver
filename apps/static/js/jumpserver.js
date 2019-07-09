@@ -654,6 +654,8 @@ jumpserver.initServerSideDataTable = function (options) {
             $.each(rows, function (id, row) {
                 table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
+                    console.log(table)
+                    console.log(table.selected);
                     table.selected.push(row.id)
                 }
             })
@@ -1109,7 +1111,8 @@ function objectAttrsIsBool(obj, attrs) {
 
 function formatDateAsCN(d) {
     var date = new Date(d);
-    return date.toISOString().replace("T", " ").replace(/\..*/, "");
+    var date_s = date.toLocaleString(navigator.language, {hour12: false});
+    return date_s.split("/").join('-')
 }
 
 function getUrlParams(url) {
@@ -1155,3 +1158,21 @@ function timeOffset(a, b) {
     }
     return ""
 }
+
+function readFile(ref) {
+    var files = ref.prop('files');
+    var hasFile = files && files.length > 0;
+    if (hasFile) {
+        var reader = new FileReader();//新建一个FileReader
+        console.log(typeof files[0]);
+        reader.readAsText(files[0], "UTF-8");//读取文件
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            ref.trigger("onload", evt.target.result);
+        };
+    } else {
+        ref.trigger("onload", null);
+    }
+
+    return ref
+}
+

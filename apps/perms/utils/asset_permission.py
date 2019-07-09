@@ -26,7 +26,7 @@ logger = get_logger(__file__)
 
 __all__ = [
     'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
-    'parse_asset_to_tree_node', 'parse_node_to_tree_node',
+    'ParserNode',
 ]
 
 
@@ -75,13 +75,13 @@ class GenerateTree:
     def root_key(self):
         if self._root_node:
             return self._root_node
-        all_nodes = self.nodes.keys()
+        all_keys = self.nodes.keys()
         # 如果没有授权节点，就放到默认的根节点下
-        if not all_nodes:
+        if not all_keys:
             return None
-        root_node = min(all_nodes, key=self.key_sort)
-        self._root_node = root_node
-        return root_node
+        root_key = min(all_keys, key=self.key_sort)
+        self._root_key = root_key
+        return root_key
 
     @property
     def all_assets_nodes_keys(self):
@@ -102,8 +102,16 @@ class GenerateTree:
         return node_key
 
     @property
+    def ungrouped_node(self):
+        return Node(key=self.ungrouped_key, id=const.UNGROUPED_NODE_ID, value=_("default"))
+
+    @property
     def empty_key(self):
         return '0:2'
+
+    @property
+    def empty_node(self):
+        return Node(key=self.empty_key, id=const.EMPTY_NODE_ID, value=_("empty"))
 
     @timeit
     def add_assets_without_system_users(self, assets_ids):
@@ -158,7 +166,8 @@ class GenerateTree:
     @timeit
     def add_nodes(self, nodes_keys_with_system_users_ids):
         _nodes_keys = nodes_keys_with_system_users_ids.keys()
-        family_keys = self.node_util.get_some_nodes_family_by_keys(_nodes_keys)
+        family_keys = self.node_util.get_some_nodes_family_keys_by_keys(_nodes_keys)
+        print("Famili keys: {}".format(len(family_keys)))
 
         family_keys_with_system_users_ids = defaultdict(lambda: defaultdict(int))
 
@@ -166,14 +175,16 @@ class GenerateTree:
             parents_keys = self.node_util.get_nodes_parents_keys_by_key(node_key, with_self=True)
             system_users_ids = defaultdict(int)
             for parent_key in parents_keys:
-                _system_users_ids = _nodes_keys.get(parent_key)
+                _system_users_ids = nodes_keys_with_system_users_ids.get(parent_key)
                 if not _system_users_ids:
                     continue
                 for system_user_id, action in _system_users_ids.items():
                     system_users_ids[system_user_id] |= action
+                    self._system_user_counter += 1
             family_keys_with_system_users_ids[node_key] = system_users_ids
 
         for node_key, system_users_ids in family_keys_with_system_users_ids.items():
+            print(node_key)
             self.add_node(node_key, system_users_ids)
 
     def get_assets(self):
@@ -191,11 +202,13 @@ class GenerateTree:
             parents_keys = self.node_util.get_nodes_parents_keys_by_key(
                 key, with_self=True
             )
-            assets = set(values["assets"])
+            _assets = set(values["assets"])
+            assets = {asset_id: self.assets.get(asset_id) for asset_id in _assets}
             for parent_key in parents_keys:
-                assets.update(self.nodes[parent_key]["assets"])
+                _assets.update(self.nodes[parent_key]["assets"])
+                self._nodes_assets_counter += 1
             nodes.append({
-                "key": key, "assets": values["assets"], "assets_amount": len(assets)
+                "key": key, "assets": assets, "assets_amount": len(_assets)
             })
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
@@ -274,7 +287,7 @@ class AssetPermissionCacheMixin:
     def _is_refresh_cache(self):
         return self.is_refresh_cache(self.cache_policy)
 
-    @timeit
+    #@timeit
     def get_cache_key(self, resource):
         cache_key = self.CACHE_KEY_PREFIX + '{obj_id}_{filter_id}_{resource}'
         return cache_key.format(
@@ -415,7 +428,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
     }
     assets_only = (
         'id', 'hostname', 'ip', "platform", "domain_id",
-        'comment', 'is_active', 'os', 'org_id', 'protocols'
+        'comment', 'is_active', 'os', 'org_id'
     )
 
     def __init__(self, obj, cache_policy='0'):
@@ -488,7 +501,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         return nodes_keys
 
     def get_nodes_without_cache(self):
-        self.get_assets_direct()
+        self.get_assets_without_cache()
         return self.tree.get_nodes()
 
     @timeit
@@ -564,67 +577,72 @@ def sort_assets(assets, order_by='hostname', reverse=False):
     return assets
 
 
-def parse_node_to_tree_node(node):
-    name = '{} ({})'.format(node.value, node.assets_amount)
-    data = {
-        'id': node.key,
-        'name': name,
-        'title': name,
-        'pId': node.parent_key,
-        'isParent': True,
-        'open': node.is_root(),
-        'meta': {
-            'node': {
-                "id": node.id,
-                "key": node.key,
-                "value": node.value,
-            },
-            'type': 'node'
-        }
-    }
-    tree_node = TreeNode(**data)
-    return tree_node
+class ParserNode:
+    nodes_only_fields = ("key", "value", "id")
+    assets_only_fields = ("platform", "hostname", "id", "ip", "protocols")
+    system_users_only_fields = (
+        "id", "name", "username", "protocol", "priority", "login_mode",
+    )
 
-
-def parse_asset_to_tree_node(node, asset, system_users):
-    icon_skin = 'file'
-    if asset.platform.lower() == 'windows':
-        icon_skin = 'windows'
-    elif asset.platform.lower() == 'linux':
-        icon_skin = 'linux'
-    _system_users = []
-    for system_user, action in system_users.items():
-        _system_users.append({
-            'id': system_user.id,
-            'name': system_user.name,
-            'username': system_user.username,
-            'protocol': system_user.protocol,
-            'priority': system_user.priority,
-            'login_mode': system_user.login_mode,
-            'actions': [Action.value_to_choices(action)],
-        })
-    data = {
-        'id': str(asset.id),
-        'name': asset.hostname,
-        'title': asset.ip,
-        'pId': node.key,
-        'isParent': False,
-        'open': False,
-        'iconSkin': icon_skin,
-        'meta': {
-            'system_users': _system_users,
-            'type': 'asset',
-            'asset': {
-                'id': asset.id,
-                'hostname': asset.hostname,
-                'ip': asset.ip,
-                'protocols': asset.protocols_as_list,
-                'platform': asset.platform,
-                'domain': None if not asset.domain else asset.domain.id,
-                'is_active': asset.is_active,
-                'comment': asset.comment
-            },
+    @staticmethod
+    def parse_node_to_tree_node(node):
+        name = '{} ({})'.format(node.value, node.assets_amount)
+        data = {
+            'id': node.key,
+            'name': name,
+            'title': name,
+            'pId': node.parent_key,
+            'isParent': True,
+            'open': node.is_root(),
+            'meta': {
+                'node': {
+                    "id": node.id,
+                    "key": node.key,
+                    "value": node.value,
+                },
+                'type': 'node'
+            }
         }
-    }
-    tree_node = TreeNode(**data)
-    return tree_node
+        tree_node = TreeNode(**data)
+        return tree_node
+
+    @staticmethod
+    def parse_asset_to_tree_node(node, asset, system_users):
+        icon_skin = 'file'
+        if asset.platform.lower() == 'windows':
+            icon_skin = 'windows'
+        elif asset.platform.lower() == 'linux':
+            icon_skin = 'linux'
+        _system_users = []
+        for system_user, action in system_users.items():
+            _system_users.append({
+                'id': system_user.id,
+                'name': system_user.name,
+                'username': system_user.username,
+                'protocol': system_user.protocol,
+                'priority': system_user.priority,
+                'login_mode': system_user.login_mode,
+                'actions': [Action.value_to_choices(action)],
+            })
+        data = {
+            'id': str(asset.id),
+            'name': asset.hostname,
+            'title': asset.ip,
+            'pId': node.key,
+            'isParent': False,
+            'open': False,
+            'iconSkin': icon_skin,
+            'meta': {
+                'system_users': _system_users,
+                'type': 'asset',
+                'asset': {
+                    'id': asset.id,
+                    'hostname': asset.hostname,
+                    'ip': asset.ip,
+                    'protocols': asset.protocols_as_list,
+                    'platform': asset.platform,
+                },
+            }
+        }
+        tree_node = TreeNode(**data)
+        return tree_node
