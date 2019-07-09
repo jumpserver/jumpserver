@@ -145,54 +145,65 @@ class NodeUtil:
     def nodes(self):
         return list(self._nodes.values())
 
+    def get_family_by_key(self, key):
+        tree_nodes = set()
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        tree_nodes.update(node._parents)
+        tree_nodes.add(node)
+        tree_nodes.update(node._children)
+        return list(tree_nodes)
+
     # 使用给定节点生成一颗树
     # 找到他们的祖先节点
     # 可选找到他们的子孙节点
-    def get_family(self, nodes, with_children=False):
-        tree_nodes = set()
-        for n in nodes:
-            node = self.get_node_by_key(n.key)
-            if not node:
-                continue
-            tree_nodes.update(node._parents)
-            tree_nodes.add(node)
-            if with_children:
-                tree_nodes.update(node._children)
-        return list(tree_nodes)
+    def get_family(self, node):
+        return self.get_family_by_key(node.key)
 
-    def get_family_keys_by_keys(self, _nodes_keys, with_children=False):
-        tree_nodes = set()
-        for key in _nodes_keys:
-            node = self.get_node_by_key(key)
-            if not node:
-                continue
-            tree_nodes.update([n.key for n in node._parents])
-            tree_nodes.add(node.key)
-            if with_children:
-                tree_nodes.update(set([n.key for n in node._children]))
-        return list(tree_nodes)
+    def get_family_keys_by_key(self, key):
+        nodes = self.get_family_by_key(key)
+        return [n.key for n in nodes]
 
-    def get_nodes_parents(self, nodes, with_self=True):
+    def get_some_nodes_family_by_keys(self, keys):
+        family = set()
+        for key in keys:
+            family.update(self.get_family_by_key(key))
+        return family
+
+    def get_nodes_parents_by_key(self, key, with_self=True):
         parents = set()
-        for n in nodes:
-            node = self.get_node_by_key(n.key)
-            if not node:
-                continue
-            parents.update(set(node._parents))
-            if with_self:
-                parents.add(node)
-        return parents
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        parents.update(set(node._parents))
+        if with_self:
+            parents.add(node)
+        return list(parents)
 
-    def get_nodes_parents_keys_by_keys(self, asset_nodes_keys, with_self=True):
-        parents = set()
-        for key in asset_nodes_keys:
-            node = self.get_node_by_key(key)
-            if not node:
-                continue
-            parents.update(set([n.key for n in node._parents]))
-            if with_self:
-                parents.add(node.key)
-        return parents
+    def get_node_parents(self, node, with_self=True):
+        return self.get_nodes_parents_by_key(node.key, with_self=with_self)
+
+    def get_nodes_parents_keys_by_key(self, key, with_self=True):
+        nodes = self.get_nodes_parents_by_key(key, with_self=with_self)
+        return [n.key for n in nodes]
+
+    def get_children_by_key(self, key, with_self=True):
+        children = set()
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        children.update(set(node._children))
+        if with_self:
+            children.add(node)
+        return list(children)
+
+    def get_children(self, node, with_self=True):
+        return self.get_children_by_key(node.key, with_self=with_self)
+
+    def get_children_keys_by_key(self, key, with_self=True):
+        nodes = self.get_children_by_key(key, with_self=with_self)
+        return [n.key for n in nodes]
 
 
 def test_node_tree():

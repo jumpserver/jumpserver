@@ -102,7 +102,7 @@ class GenerateTree:
         return node_key
 
     @property
-    def empty_node(self):
+    def empty_key(self):
         return '0:2'
 
     @timeit
@@ -125,32 +125,29 @@ class GenerateTree:
             system_users_ids = defaultdict(int)
         self._asset_counter += 1
 
+        # 获取原来资产已有的系统用户, 合并
         old_system_users_ids = self.assets[asset_id]
         for system_user_id, action in old_system_users_ids.items():
             system_users_ids[system_user_id] |= action
             self._system_user_counter += 1
 
-        # 获取父节点们
-        parents_keys = self.node_util.get_nodes_parents_keys_by_keys(
-            asset_nodes_keys, with_self=True
-        )
-        # for node_key in parents_keys:
-        #     _system_users_ids = self.nodes[node_key]["system_users"]
-        #     self.nodes[node_key]["assets_amount"] += 1
-        #     for system_user_id, action in _system_users_ids.items():
-        #         system_users_ids[system_user_id] |= action
-        #         self._counter += 1
-
-        self.assets[asset_id] = system_users_ids
-        in_nodes = set(self.nodes.keys()) & set(parents_keys)
+        # 获取用户在的节点
+        in_nodes = set(self.nodes.keys()) & set(asset_nodes_keys)
         if not in_nodes:
-            self.nodes[self.ungrouped_key]["assets_amount"] += 1
             self.nodes[self.ungrouped_key]["assets"].add(asset_id)
+            self.assets[asset_id] = system_users_ids
             return
 
-        # for key in in_nodes:
-        #     self._nodes_assets_counter += 1
-        #     self.nodes[key]["assets"].add(asset_id)
+        # 遍历用户应该在的节点
+        for key in in_nodes:
+            # 把自己加入到树上的节点中
+            self.nodes[key]["assets"].add(asset_id)
+            # 获取自己所在节点的系统用户，并添加进去
+            system_users_ids = self.nodes[key]["system_users"]
+            for system_user_id, action in system_users_ids.items():
+                system_users_ids[system_user_id] |= action
+                self._system_user_counter += 1
+        self.assets[asset_id] = system_users_ids
 
     def add_node(self, node_key, system_users_ids=None):
         if not system_users_ids:
@@ -161,9 +158,22 @@ class GenerateTree:
     @timeit
     def add_nodes(self, nodes_keys_with_system_users_ids):
         _nodes_keys = nodes_keys_with_system_users_ids.keys()
-        family = self.node_util.get_family_keys_by_keys(_nodes_keys, with_children=True)
-        for node_key in family:
-            system_users_ids = nodes_keys_with_system_users_ids.get(node_key)
+        family_keys = self.node_util.get_some_nodes_family_by_keys(_nodes_keys)
+
+        family_keys_with_system_users_ids = defaultdict(lambda: defaultdict(int))
+
+        for node_key in family_keys:
+            parents_keys = self.node_util.get_nodes_parents_keys_by_key(node_key, with_self=True)
+            system_users_ids = defaultdict(int)
+            for parent_key in parents_keys:
+                _system_users_ids = _nodes_keys.get(parent_key)
+                if not _system_users_ids:
+                    continue
+                for system_user_id, action in _system_users_ids.items():
+                    system_users_ids[system_user_id] |= action
+            family_keys_with_system_users_ids[node_key] = system_users_ids
+
+        for node_key, system_users_ids in family_keys_with_system_users_ids.items():
             self.add_node(node_key, system_users_ids)
 
     def get_assets(self):
@@ -176,18 +186,28 @@ class GenerateTree:
     def get_nodes_with_assets(self):
         if self._nodes_with_assets:
             return self._nodes_with_assets
-        nodes = {}
-        for node, values in self.nodes.items():
-            node._assets_amount = values["assets_amount"]
-            nodes[node] = {asset: self.assets.get(asset, {}) for asset in values["assets"]}
+        nodes = []
+        for key, values in self.nodes.items():
+            parents_keys = self.node_util.get_nodes_parents_keys_by_key(
+                key, with_self=True
+            )
+            assets = set(values["assets"])
+            for parent_key in parents_keys:
+                assets.update(self.nodes[parent_key]["assets"])
+            nodes.append({
+                "key": key, "assets": values["assets"], "assets_amount": len(assets)
+            })
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
-            nodes[self.empty_node] = {}
+            nodes.append({"key": self.empty_key, "assets": [], "assets_amount": 0})
         self._nodes_with_assets = nodes
-        return dict(nodes)
+        return nodes
 
     def get_nodes(self):
-        return list(self.nodes.keys())
+        nodes = list(self.nodes.keys())
+        if not nodes:
+            nodes.append(self.empty_key)
+        return list(nodes)
 
 
 def get_user_permissions(user, include_group=True):
@@ -450,6 +470,20 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
             for node_key, sys_id, action in iterable:
                 nodes_keys[node_key][sys_id] |= action
         self.tree.add_nodes(nodes_keys)
+
+        pattern = set()
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        print("Start get assets ids")
+        clock = time.clock()
+        if pattern:
+            assets_ids = Asset.objects.filter(nodes__key__regex=pattern) \
+                .values_list("id", flat=True).distinct()
+        else:
+            assets_ids = []
+        print("get assetd ids, using: {}".format(time.clock() - clock))
+        self.tree.add_assets_without_system_users(assets_ids)
         self._nodes_direct = nodes_keys
         return nodes_keys
 
@@ -485,20 +519,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         if self._assets:
             return self._assets
         self.get_assets_direct()
-        nodes_keys = self.get_nodes_direct()
-        pattern = set()
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        print("Start get assets ids")
-        clock = time.clock()
-        if pattern:
-            assets_ids = Asset.objects.filter(nodes__key__regex=pattern)\
-                .values_list("id", flat=True).distinct()
-        else:
-            assets_ids = []
-        print("get assetd ids, using: {}".format(time.clock()-clock))
-        self.tree.add_assets_without_system_users(assets_ids)
+        self.get_nodes_direct()
         assets = self.tree.get_assets()
         self._assets = assets
         return assets
