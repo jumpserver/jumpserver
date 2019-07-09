@@ -46,6 +46,7 @@ class DomainCreateView(PermissionsMixin, CreateView):
         context = {
             'app': _('Assets'),
             'action': _('Create domain'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -63,6 +64,7 @@ class DomainUpdateView(PermissionsMixin, UpdateView):
         context = {
             'app': _('Assets'),
             'action': _('Update domain'),
+            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

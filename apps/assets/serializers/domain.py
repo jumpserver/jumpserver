@@ -15,7 +15,10 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Domain
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'asset_count', 'gateway_count', 'comment', 'assets',
+            'date_created'
+        ]
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
