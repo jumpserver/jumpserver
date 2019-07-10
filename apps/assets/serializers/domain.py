@@ -19,6 +19,11 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
             'id', 'name', 'asset_count', 'gateway_count', 'comment', 'assets',
             'date_created'
         ]
+        extra_kwargs = {
+            'asset_count': {'read_only': True},
+            'gateway_count': {'read_only': True},
+            'date_created': {'read_only': True},
+        }
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
