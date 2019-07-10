@@ -18,3 +18,29 @@
     </div>
 </form>
 {% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).ready(function () {
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-assets:cmd-filter-list' %}';
+    var redirect_to = '{% url "assets:cmd-filter-list" %}';
+    var method = "POST";
+    {% if type == "update" %}
+        the_url = '{% url 'api-assets:cmd-filter-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    var form = $("form");
+    var data = form.serializeObject();
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+     };
+    formSubmit(props);
+})
+</script>
+{% endblock %}
