@@ -16,11 +16,11 @@ from django.utils.translation import ugettext as _
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit
 from common.tree import TreeNode
+from assets.utils import NodeUtil
 from .. import const
 from ..models import AssetPermission, Action
 from ..hands import Node, Asset
 from .stack import PermSystemUserNodeUtil, PermAssetsAmountUtil
-from assets.utils import NodeUtil
 
 logger = get_logger(__file__)
 
@@ -78,7 +78,6 @@ class GenerateTree:
             return self._root_node
         all_keys = self.nodes.keys()
         # 如果没有授权节点，就放到默认的根节点下
-        print("All keys: {}".format(len(all_keys)))
         if not all_keys:
             return None
         root_key = min(all_keys, key=self.key_sort)
@@ -96,26 +95,15 @@ class GenerateTree:
         if self._ungroup_node:
             return self._ungroup_node
         if self.root_key:
-            node_key = "{}:{}".format(self.root_key, '0')
+            node_key = "{}:{}".format(self.root_key, '-1')
         else:
-            node_key = '0:1'
+            node_key = '1:-1'
         self._ungroup_node = node_key
         return node_key
 
-    @property
-    def ungrouped_node(self):
-        return Node(key=self.ungrouped_key, id=const.UNGROUPED_NODE_ID, value=_("default"))
-
-    @property
-    def empty_key(self):
-        return '0:2'
-
-    @property
-    def empty_node(self):
-        return Node(key=self.empty_key, id=const.EMPTY_NODE_ID, value=_("empty"))
-
     @timeit
     def add_assets_without_system_users(self, assets_ids):
+        print("Add assets")
         for asset_id in assets_ids:
             self.add_asset(asset_id, {})
         print("Couter assets: {}".format(self._asset_counter))
@@ -124,6 +112,7 @@ class GenerateTree:
 
     @timeit
     def add_assets(self, assets_ids_with_system_users):
+        print("Add assets")
         for asset_id, system_users_ids in assets_ids_with_system_users.items():
             self.add_asset(asset_id, system_users_ids)
 
@@ -167,6 +156,7 @@ class GenerateTree:
     # 添加树节点
     @timeit
     def add_nodes(self, nodes_keys_with_system_users_ids):
+        print("Add nodes")
         util = PermSystemUserNodeUtil()
         family = util.get_nodes_family_and_system_users(nodes_keys_with_system_users_ids)
         for key, system_users in family.items():
@@ -193,7 +183,10 @@ class GenerateTree:
             })
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
-            nodes.append({"key": self.empty_key, "assets": {}, "assets_amount": 0, "all_assets": []})
+            nodes.append({
+                "key": const.EMPTY_NODE_KEY, "assets": {},
+                "assets_amount": 0, "all_assets": [],
+            })
         nodes.sort(key=lambda n: self.key_sort(n["key"]))
         self._nodes_with_assets = nodes
         return nodes
@@ -201,7 +194,7 @@ class GenerateTree:
     def get_nodes(self):
         nodes = list(self.nodes.keys())
         if not nodes:
-            nodes.append(self.empty_key)
+            nodes.append(const.EMPTY_NODE_KEY)
         return list(nodes)
 
 
@@ -514,8 +507,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         """
         if self._assets:
             return self._assets
-        self.get_assets_direct()
         self.get_nodes_direct()
+        self.get_assets_direct()
         assets = self.tree.get_assets()
         self._assets = assets
         return assets

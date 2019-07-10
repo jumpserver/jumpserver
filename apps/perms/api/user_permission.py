@@ -11,6 +11,7 @@ from rest_framework.views import APIView, Response
 from rest_framework.generics import (
     ListAPIView, get_object_or_404, RetrieveAPIView
 )
+from django.utils.translation import ugettext as _
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
@@ -199,9 +200,26 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, GrantAssetsMixin, ListAPIVi
 class NodesWithUngroupMixin:
     util = None
 
-    def add_ungrouped_nodes(self, nodes_map):
-        nodes_map[self.util.tree.ungrouped_key] = self.util.tree.ungrouped_node
-        nodes_map[self.util.tree.empty_key] = self.util.tree.empty_node
+    @staticmethod
+    def get_ungrouped_node(ungroup_key):
+        return Node(key=ungroup_key, id=const.UNGROUPED_NODE_ID,
+                    value=_("default"))
+
+    @staticmethod
+    def get_empty_node():
+        return Node(key=const.EMPTY_NODE_KEY, id=const.EMPTY_NODE_ID,
+                    value=_("empty"))
+
+    def add_ungrouped_nodes(self, node_map, node_keys):
+        ungroup_key = '1:-1'
+        for key in node_keys:
+            if key.endswith('-1'):
+                ungroup_key = key
+                break
+        ungroup_node = self.get_ungrouped_node(ungroup_key)
+        empty_node = self.get_empty_node()
+        node_map[ungroup_key] = ungroup_node
+        node_map[const.EMPTY_NODE_KEY] = empty_node
 
 
 class UserGrantedNodesApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListAPIView):
@@ -227,7 +245,7 @@ class UserGrantedNodesApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListA
             *self.only_fields
         )
         nodes_map = {n.key: n for n in nodes}
-        self.add_ungrouped_nodes(nodes_map)
+        self.add_ungrouped_nodes(nodes_map, node_keys)
 
         _nodes = []
         for n in nodes_with_assets:
@@ -325,15 +343,13 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesWithAssetsApi):
             *ParserNode.system_users_only_fields
         )
         _nodes_map = {n.key: n for n in _nodes}
-        self.add_ungrouped_nodes(_nodes_map)
+        self.add_ungrouped_nodes(_nodes_map, _nodes_keys)
         _assets_map = {a.id: a for a in _assets}
         _system_users_map = {s.id: s for s in _system_users}
         return _nodes_map, _assets_map, _system_users_map
 
     def get_serializer(self, nodes, many=True):
         queryset = []
-        print("Call get serialziers")
-        print(len(nodes))
         now = time.clock()
         _nodes_map, _assets_map, _system_users_map = self.get_maps(nodes)
 
