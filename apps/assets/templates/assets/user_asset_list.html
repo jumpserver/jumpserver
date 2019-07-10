@@ -62,7 +62,7 @@
 
 {% block custom_foot_js %}
 <script>
-var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0&cache_policy=1";
+var treeUrl = "{% url 'api-perms:my-nodes-as-tree' %}?&cache_policy=1";
 var zTree, asset_table, show=0;
 var inited = false;
 var url;

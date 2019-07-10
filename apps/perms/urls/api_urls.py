@@ -12,24 +12,29 @@ router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remot
 
 
 asset_permission_urlpatterns = [
-    # 查询某个用户授权的资产和资产组
-    path('user/<uuid:pk>/assets/', api.UserGrantedAssetsApi.as_view()),
+    # Assets
     path('users/<uuid:pk>/assets/', api.UserGrantedAssetsApi.as_view(), name='user-assets'),
-    path('user/assets/', api.UserGrantedAssetsApi.as_view()),
     path('users/assets/', api.UserGrantedAssetsApi.as_view(), name='my-assets'),
-    path('user/<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view()),
+
+    # Node as tree
+    path('users/<uuid:pk>/nodes/tree/', api.UserGrantedNodesAsTreeApi.as_view(), name='user-nodes-as-tree'),
+    path('users/nodes/tree/', api.UserGrantedNodesAsTreeApi.as_view(), name='my-nodes-as-tree'),
+
+    # Nodes
     path('users/<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view(), name='user-nodes'),
-    path('user/nodes/', api.UserGrantedNodesApi.as_view()),
     path('users/nodes/', api.UserGrantedNodesApi.as_view(), name='my-nodes'),
-    path('user/nodes/children/', api.UserGrantedNodeChildrenApi.as_view()),
-    path('users/nodes/children/', api.UserGrantedNodeChildrenApi.as_view(), name='my-node-children'),
-    path('user/<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
-    path('user/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
-    path('user/<uuid:pk>/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view(), name='user-nodes-assets'),
-    path('user/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view(), name='my-nodes-assets'),
+
+    # Node assets
+    path('users/<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='user-node-assets'),
+    path('users/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view(), name='my-node-assets'),
+
+    # Node with assets
+    path('users/<uuid:pk>/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view(), name='user-nodes-assets'),
+    path('users/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view(), name='my-nodes-assets'),
+
+    # Node assets as tree
     path('users/<uuid:pk>/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='user-nodes-assets-as-tree'),
-    path('user/<uuid:pk>/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view()),
-    path('user/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='my-nodes-assets-as-tree'),
+    path('users/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view(), name='my-nodes-assets-as-tree'),
 
     # 查询某个用户组授权的资产和资产组
     path('user-group/<uuid:pk>/assets/', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
@@ -47,6 +52,19 @@ asset_permission_urlpatterns = [
     # 验证用户是否有某个资产和系统用户的权限
     path('asset-permission/user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('asset-permission/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
+]
+
+asset_permission_urlpatterns_old = [
+    path('user/<uuid:pk>/assets/', api.UserGrantedAssetsApi.as_view()),
+    path('user/assets/', api.UserGrantedAssetsApi.as_view()),
+    path('user/<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view()),
+    path('user/nodes/', api.UserGrantedNodesApi.as_view()),
+    path('user/<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view()),
+    path('user/nodes/<uuid:node_id>/assets/', api.UserGrantedNodeAssetsApi.as_view()),
+    path('user/<uuid:pk>/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view()),
+    path('user/nodes-assets/', api.UserGrantedNodesWithAssetsApi.as_view()),
+    path('user/<uuid:pk>/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view()),
+    path('user/nodes-assets/tree/', api.UserGrantedNodesWithAssetsAsTreeApi.as_view()),
 ]
 
 

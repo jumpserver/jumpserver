@@ -64,7 +64,7 @@ var zTree;
 var inited = false;
 var url;
 var asset_table;
-var treeUrl = "{% url 'api-perms:user-nodes-assets-as-tree' pk=object.id %}?show_assets=0&cache_policy=1";
+var treeUrl = "{% url 'api-perms:user-nodes-as-tree' pk=object.id %}?&cache_policy=1";
 
 function initTable() {
     if (inited){

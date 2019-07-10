@@ -131,7 +131,7 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
         if not include_assets:
             return queryset
         assets = self.node.get_assets().only(
-            "id", "hostname", "ip", 'platform', "os", "org_id",
+            "id", "hostname", "ip", 'platform', "os", "org_id", "protocols",
         )
         for asset in assets:
             queryset.append(asset.as_tree_node(self.node))

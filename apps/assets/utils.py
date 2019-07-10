@@ -193,21 +193,21 @@ class NodeUtil:
         nodes = self.get_nodes_parents_by_key(key, with_self=with_self)
         return [n.key for n in nodes]
 
-    def get_children_by_key(self, key, with_self=True):
+    def get_all_children_by_key(self, key, with_self=True):
         children = set()
         node = self.get_node_by_key(key)
         if not node:
             return []
-        children.update(set(node._children))
+        children.update(set(node._all_children))
         if with_self:
             children.add(node)
         return list(children)
 
     def get_children(self, node, with_self=True):
-        return self.get_children_by_key(node.key, with_self=with_self)
+        return self.get_all_children_by_key(node.key, with_self=with_self)
 
     def get_children_keys_by_key(self, key, with_self=True):
-        nodes = self.get_children_by_key(key, with_self=with_self)
+        nodes = self.get_all_children_by_key(key, with_self=with_self)
         return [n.key for n in nodes]
 
 
