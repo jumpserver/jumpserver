@@ -17,6 +17,12 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
             'id', 'name', 'value', 'category', 'is_active', 'comment',
             'date_created', 'asset_count', 'assets', 'get_category_display'
         ]
+        extra_kwargs = {
+            'category': {'read_only': True},
+            'date_created': {'read_only': True},
+            'asset_count': {'read_only': True},
+            'get_category_display': {'read_only': True},
+        }
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
