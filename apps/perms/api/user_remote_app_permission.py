@@ -13,13 +13,13 @@ from ..utils import (
     RemoteAppPermissionUtil, construct_remote_apps_tree_root,
     parse_remote_app_to_tree_node,
 )
-from ..hands import User, RemoteApp, RemoteAppSerializer
+from ..hands import User, RemoteApp, RemoteAppSerializer, UserGroup
 from ..mixins import RemoteAppFilterMixin
 
 
 __all__ = [
     'UserGrantedRemoteAppsApi', 'ValidateUserRemoteAppPermissionApi',
-    'UserGrantedRemoteAppsAsTreeApi',
+    'UserGrantedRemoteAppsAsTreeApi', 'UserGroupGrantedRemoteAppsApi',
 ]
 
 
@@ -94,3 +94,20 @@ class ValidateUserRemoteAppPermissionApi(APIView):
         if remote_app not in remote_apps:
             return Response({'msg': False}, status=403)
         return Response({'msg': True}, status=200)
+
+
+# RemoteApp permission
+
+class UserGroupGrantedRemoteAppsApi(ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser, )
+    serializer_class = RemoteAppSerializer
+
+    def get_queryset(self):
+        queryset = []
+        user_group_id = self.kwargs.get('pk')
+        if not user_group_id:
+            return queryset
+        user_group = get_object_or_404(UserGroup, id=user_group_id)
+        util = RemoteAppPermissionUtil(user_group)
+        queryset = util.get_remote_apps()
+        return queryset

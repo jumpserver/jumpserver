@@ -4,11 +4,13 @@ import os
 import uuid
 
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, serializers
 
+from .http import HttpResponseTemporaryRedirect
 from .const import KEY_CACHE_RESOURCES_ID
 
 __all__ = [
@@ -86,3 +88,11 @@ class ResourcesIDCacheApi(APIView):
             cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
             cache.set(cache_key, resources_id, 300)
         return Response({'spm': spm})
+
+
+@csrf_exempt
+def redirect_plural_name_api(request, *args, **kwargs):
+    resource = kwargs.get("resource", "")
+    full_path = request.get_full_path()
+    full_path = full_path.replace(resource, resource+"s", 1)
+    return HttpResponseTemporaryRedirect(full_path)

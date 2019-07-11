@@ -291,42 +291,6 @@ function defaultCallback(action) {
 
 $(document).ready(function () {
 })
-.on('click', '.btn-refresh-hardware', function () {
-    var url = "{% url 'api-assets:node-refresh-hardware-info' pk=DEFAULT_PK %}";
-    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
-    function success(data) {
-        rMenu.css({"visibility" : "hidden"});
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
-    }
-    APIUpdateAttr({
-        url: the_url,
-        method: "GET",
-        success: success,
-        flash_message: false
-    });
-
-})
-.on('click', '.btn-test-connective', function () {
-    var url = "{% url 'api-assets:node-test-connective' pk=DEFAULT_PK %}";
-    if (!current_node_id) {
-        return null;
-    }
-    var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
-    function success(data) {
-        rMenu.css({"visibility" : "hidden"});
-        var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
-    }
-    APIUpdateAttr({
-        url: the_url,
-        method: "GET",
-        success: success,
-        flash_message: false
-    });
-})
 .on('click', '.btn-show-current-asset', function(){
     hideRMenu();
     $(this).css('display', 'none');
@@ -341,17 +305,5 @@ $(document).ready(function () {
     setCookie('show_current_asset', '');
     location.reload();
 })
-.on('click', '.btn-test-connective', function () {
-    hideRMenu();
 
-})
-.on('click', '#menu_refresh_assets_amount', function () {
-    hideRMenu();
-    var url = "{% url 'api-assets:refresh-assets-amount' %}";
-    APIUpdateAttr({
-        'url': url,
-        'method': 'GET'
-    });
-    window.location.reload();
-})
 </script>

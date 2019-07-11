@@ -99,3 +99,4 @@ class RemoteAppPermissionRemoveRemoteAppApi(generics.RetrieveUpdateAPIView):
         else:
             return Response({"error": serializer.errors})
 
+

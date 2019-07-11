@@ -1,80 +1,65 @@
 # coding: utf-8
 
+import time
 import uuid
 from collections import defaultdict
 import json
 from hashlib import md5
-import time
 import itertools
 
 from django.utils import timezone
 from django.db.models import Q
 from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import ugettext as _
 
 from orgs.utils import set_to_root_org
-from common.utils import get_logger
+from common.utils import get_logger, timeit
 from common.tree import TreeNode
+from assets.utils import NodeUtil
 from .. import const
 from ..models import AssetPermission, Action
 from ..hands import Node, Asset
-from assets.utils import NodeUtil
+from .stack import PermSystemUserNodeUtil, PermAssetsAmountUtil
 
 logger = get_logger(__file__)
 
 
 __all__ = [
     'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
-    'parse_asset_to_tree_node', 'parse_node_to_tree_node',
+    'ParserNode',
 ]
-
-
-class TreeNodeCounter(NodeUtil):
-    def __init__(self, nodes):
-        self.__nodes = nodes
-        super().__init__(with_assets_amount=True)
-
-    def get_queryset(self):
-        return self.__nodes
-
-
-def timeit(func):
-    def wrapper(*args, **kwargs):
-        logger.debug("Start call: {}".format(func.__name__))
-        now = time.time()
-        result = func(*args, **kwargs)
-        using = time.time() - now
-        logger.debug("Call {} end, using: {:.2}s".format(func.__name__, using))
-        return result
-    return wrapper
 
 
 class GenerateTree:
     def __init__(self):
         """
         nodes = {
-          "<node1>": {
+          node.key: {
             "system_users": {
-              "system_user": action,
-              "system_user2": action,
+              system_user.id: actions,
             },
-            "assets": set([<asset_instance>]),
-          }
+            "assets": set([asset.id,]),
+          },
         }
         assets = {
-           "<asset_instance2>": {
-             "system_user": action,
-             "system_user2": action,
+           asset.id: {
+             system_user.id: actions,
            },
         }
         """
         self._node_util = None
-        self.nodes = defaultdict(lambda: {"system_users": defaultdict(int), "assets": set(), "assets_amount": 0})
+        self.nodes = defaultdict(lambda: {
+            "system_users": defaultdict(int), "assets": set(),
+            "assets_amount": 0, "all_assets": set(),
+        })
         self.assets = defaultdict(lambda: defaultdict(int))
         self._root_node = None
         self._ungroup_node = None
         self._nodes_with_assets = None
+        self._all_assets_nodes_key = None
+        self._asset_counter = 0
+        self._system_user_counter = 0
+        self._nodes_assets_counter = 0
 
     @property
     def node_util(self):
@@ -82,115 +67,160 @@ class GenerateTree:
             self._node_util = NodeUtil()
         return self._node_util
 
+    @staticmethod
+    def key_sort(key):
+        key_list = [int(i) for i in key.split(':')]
+        return len(key_list), key_list
+
     @property
-    def root_node(self):
+    def root_key(self):
         if self._root_node:
             return self._root_node
-        all_nodes = self.nodes.keys()
+        all_keys = self.nodes.keys()
         # 如果没有授权节点，就放到默认的根节点下
-        if not all_nodes:
+        if not all_keys:
             return None
-        root_node = min(all_nodes)
-        self._root_node = root_node
-        return root_node
+        root_key = min(all_keys, key=self.key_sort)
+        self._root_key = root_key
+        return root_key
 
     @property
-    def ungrouped_node(self):
+    def all_assets_nodes_keys(self):
+        if not self._all_assets_nodes_key:
+            self._all_assets_nodes_key = Asset.get_all_nodes_keys()
+        return self._all_assets_nodes_key
+
+    @property
+    def ungrouped_key(self):
         if self._ungroup_node:
             return self._ungroup_node
-        node_id = const.UNGROUPED_NODE_ID
-        if self.root_node:
-            node_key = "{}:{}".format(self.root_node.key, self.root_node.child_mark)
+        if self.root_key:
+            node_key = "{}:{}".format(self.root_key, '-1')
         else:
-            node_key = '0:0'
-        node_value = _("Default")
-        node = Node(id=node_id, key=node_key, value=node_value)
-        self.add_node(node, {})
-        self._ungroup_node = node
-        return node
+            node_key = '1:-1'
+        self._ungroup_node = node_key
+        return node_key
 
-    @property
-    def empty_node(self):
-        node_id = const.EMPTY_NODE_ID
-        value = _('Empty')
-        node = Node(id=node_id, value=value)
-        return node
+    @timeit
+    def add_assets_without_system_users(self, assets_ids):
+        for asset_id in assets_ids:
+            self.add_asset(asset_id, {})
 
-    #@timeit
-    def add_assets_without_system_users(self, assets):
-        for asset in assets:
-            self.add_asset(asset, {})
+    @timeit
+    def add_assets(self, assets_ids_with_system_users):
+        for asset_id, system_users_ids in assets_ids_with_system_users.items():
+            self.add_asset(asset_id, system_users_ids)
 
-    #@timeit
-    def add_assets(self, assets):
-        for asset, system_users in assets.items():
-            self.add_asset(asset, system_users)
+    # @timeit
+    def add_asset(self, asset_id, system_users_ids=None):
+        """
+        :param asset_id:
+        :param system_users_ids: {system_user.id: actions, }
+        :return:
+        """
+        if not system_users_ids:
+            system_users_ids = defaultdict(int)
 
-    # #@timeit
-    def add_asset(self, asset, system_users=None):
-        nodes = asset.nodes.all()
-        nodes = self.node_util.get_nodes_by_queryset(nodes)
-        if not system_users:
-            system_users = defaultdict(int)
-        else:
-            system_users = {k: v for k, v in system_users.items()}
-        _system_users = self.assets[asset]
-        for system_user, action in _system_users.items():
-            system_users[system_user] |= action
+        # 获取已有资产的系统用户和actions，并更新到最新系统用户信息中
+        old_system_users_ids = self.assets[asset_id]
+        for system_user_id, action in old_system_users_ids.items():
+            system_users_ids[system_user_id] |= action
 
-        # 获取父节点们
-        parents = self.node_util.get_nodes_parents(nodes, with_self=True)
-        for node in parents:
-            _system_users = self.nodes[node]["system_users"]
-            self.nodes[node]["assets_amount"] += 1
-            for system_user, action in _system_users.items():
-                system_users[system_user] |= action
-
-        # 过滤系统用户的协议
-        system_users = {s: v for s, v in system_users.items() if asset.has_protocol(s.protocol)}
-        self.assets[asset] = system_users
-
-        in_nodes = set(self.nodes.keys()) & set(nodes)
+        asset_nodes_keys = self.all_assets_nodes_keys.get(asset_id, [])
+        # {asset.id: [node.key, ], }
+        # 获取用户在的节点
+        in_nodes = set(self.nodes.keys()) & set(asset_nodes_keys)
         if not in_nodes:
-            self.nodes[self.ungrouped_node]["assets_amount"] += 1
-            self.nodes[self.ungrouped_node]["assets"].add(system_users)
+            self.nodes[self.ungrouped_key]["assets"].add(asset_id)
+            self.assets[asset_id] = system_users_ids
             return
 
-        for node in in_nodes:
-            self.nodes[node]["assets"].add(asset)
+        # 遍历用户应该在的节点
+        for key in in_nodes:
+            # 把自己加入到树上的节点中
+            self.nodes[key]["assets"].add(asset_id)
+            # 获取自己所在节点的系统用户，并添加进去
+            node_system_users_ids = self.nodes[key]["system_users"]
+            for system_user_id, action in node_system_users_ids.items():
+                system_users_ids[system_user_id] |= action
+        self.assets[asset_id] = system_users_ids
 
-    def add_node(self, node, system_users=None):
-        if not system_users:
-            system_users = defaultdict(int)
-        self.nodes[node]["system_users"] = system_users
+    def add_node(self, node_key, system_users_ids=None):
+        """
+        :param node_key: node.key
+        :param system_users_ids: {system_user.id: actions,}
+        :return:
+        """
+        if not system_users_ids:
+            system_users_ids = defaultdict(int)
+        self.nodes[node_key]["system_users"] = system_users_ids
 
     # 添加树节点
-    #@timeit
-    def add_nodes(self, nodes):
-        _nodes = nodes.keys()
-        family = self.node_util.get_family(_nodes, with_children=True)
-        for node in family:
-            self.add_node(node, nodes.get(node, {}))
+    @timeit
+    def add_nodes(self, nodes_keys_with_system_users_ids):
+        """
+        :param nodes_keys_with_system_users_ids:
+        {node.key: {system_user.id: actions,}, }
+        :return:
+        """
+        util = PermSystemUserNodeUtil()
+        family = util.get_nodes_family_and_system_users(nodes_keys_with_system_users_ids)
+        for key, system_users in family.items():
+            self.add_node(key, system_users)
 
     def get_assets(self):
-        return dict(self.assets)
+        """
+        :return:
+        [
+            {"id": asset.id, "system_users": {system_user.id: actions, }},
+        ]
+        """
+        assets = []
+        for asset_id, system_users in self.assets.items():
+            assets.append({"id": asset_id, "system_users": system_users})
+        return assets
 
-    #@timeit
+    @timeit
     def get_nodes_with_assets(self):
+        """
+        :return:
+        [
+            {
+                'key': node.key,
+                'assets_amount': 10
+                'assets': {
+                    asset.id: {
+                        system_user.id: actions,
+                    },
+                },
+            },
+        ]
+        """
         if self._nodes_with_assets:
             return self._nodes_with_assets
-        nodes = {}
-        for node, values in self.nodes.items():
-            node._assets_amount = values["assets_amount"]
-            nodes[node] = {asset: self.assets.get(asset, {}) for asset in values["assets"]}
+        util = PermAssetsAmountUtil()
+        nodes_with_assets_amount = util.compute_nodes_assets_amount(self.nodes)
+        nodes = []
+        for key, values in nodes_with_assets_amount.items():
+            assets = {asset_id: self.assets.get(asset_id) for asset_id in values["assets"]}
+            nodes.append({
+                "key": key, "assets": assets,
+                "assets_amount": values["assets_amount"]
+            })
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
-            nodes[self.empty_node] = {}
+            nodes.append({
+                "key": const.EMPTY_NODE_KEY, "assets": {}, "assets_amount": 0
+            })
+        nodes.sort(key=lambda n: self.key_sort(n["key"]))
         self._nodes_with_assets = nodes
-        return dict(nodes)
+        return nodes
 
     def get_nodes(self):
-        return list(self.nodes.keys())
+        nodes = list(self.nodes.keys())
+        if not nodes:
+            nodes.append(const.EMPTY_NODE_KEY)
+        return list(nodes)
 
 
 def get_user_permissions(user, include_group=True):
@@ -228,8 +258,8 @@ def get_system_user_permissions(system_user):
 
 
 class AssetPermissionCacheMixin:
-    CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_'
-    CACHE_META_KEY_PREFIX = '_ASSET_PERM_META_KEY_'
+    CACHE_KEY_PREFIX = '_ASSET_PERM_CACHE_V2_'
+    CACHE_META_KEY_PREFIX = '_ASSET_PERM_META_KEY_V2_'
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     CACHE_POLICY_MAP = (('0', 'never'), ('1', 'using'), ('2', 'refresh'))
     cache_policy = '1'
@@ -283,6 +313,7 @@ class AssetPermissionCacheMixin:
         return self.get_cache_key('SYSTEM_USER')
 
     def get_resource_from_cache(self, resource):
+        logger.debug("Try get resource from cache")
         key_map = {
             "assets": self.asset_key,
             "nodes": self.node_key,
@@ -294,18 +325,22 @@ class AssetPermissionCacheMixin:
             raise ValueError("Not a valid resource: {}".format(resource))
         cached = cache.get(key)
         if not cached:
+            logger.debug("Not found resource cache, update it")
             self.update_cache()
             cached = cache.get(key)
         return cached
 
     def get_resource(self, resource):
         if self._is_using_cache():
+            logger.debug("Using cache to get resource")
             return self.get_resource_from_cache(resource)
         elif self._is_refresh_cache():
+            logger.debug("Need refresh cache")
             self.expire_cache()
             data = self.get_resource_from_cache(resource)
             return data
         else:
+            logger.debug("Not using cache get source")
             return self.get_resource_without_cache(resource)
 
     def get_resource_without_cache(self, resource):
@@ -430,88 +465,91 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self._permissions = permissions
         return permissions
 
-    #@timeit
+    @timeit
     def filter_permissions(self, **filters):
         filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
-    #@timeit
+    @timeit
     def get_nodes_direct(self):
         """
-        返回用户/组授权规则直接关联的节点
-        :return: {node1: {system_user1: {'actions': set()},}}
+        返回直接授权的节点，
+        并将节点添加到tree.nodes中，并将节点下的资产添加到tree.assets中
+        :return:
+        {node.key: {system_user.id: actions,}, }
         """
         if self._nodes_direct:
             return self._nodes_direct
-        nodes = defaultdict(lambda: defaultdict(int))
+        nodes_keys = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            system_users = perm.system_users.all()
-            _nodes = perm.nodes.all()
-            for node, system_user, action in itertools.product(_nodes, system_users, actions):
-                nodes[node][system_user] |= action
-        self.tree.add_nodes(nodes)
-        self._nodes_direct = nodes
-        return nodes
+            system_users_ids = [s.id for s in perm.system_users.all()]
+            _nodes_keys = [n.key for n in perm.nodes.all()]
+            iterable = itertools.product(_nodes_keys, system_users_ids, actions)
+            for node_key, sys_id, action in iterable:
+                nodes_keys[node_key][sys_id] |= action
+
+        self.tree.add_nodes(nodes_keys)
+
+        pattern = set()
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        if pattern:
+            assets_ids = Asset.objects.filter(
+                nodes__key__regex=pattern
+            ).values_list("id", flat=True).distinct()
+        else:
+            assets_ids = []
+        self.tree.add_assets_without_system_users(assets_ids)
+        self._nodes_direct = nodes_keys
+        return nodes_keys
 
     def get_nodes_without_cache(self):
-        self.get_assets_direct()
+        self.get_assets_without_cache()
         return self.tree.get_nodes()
 
-    #@timeit
+    @timeit
     def get_assets_direct(self):
         """
-        返回用户授权规则直接关联的资产
-        :return: {asset1: {system_user1: 1,}}
+        返回直接授权的资产，
+        并添加到tree.assets中
+        :return:
+        {asset.id: {system_user.id: actions, }, }
         """
         if self._assets_direct:
             return self._assets_direct
-        assets = defaultdict(lambda: defaultdict(int))
+        assets_ids = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets = perm.assets.valid().only(*self.assets_only)
-            system_users = perm.system_users.all()
-            iterable = itertools.product(_assets, system_users, actions)
-            for asset, system_user, action in iterable:
-                assets[asset][system_user] |= action
-        self.tree.add_assets(assets)
-        self._assets_direct = assets
-        return assets
+            _assets_ids = [a.id for a in perm.assets.all()]
+            system_users_ids = [s.id for s in perm.system_users.all()]
+            iterable = itertools.product(_assets_ids, system_users_ids, actions)
+            for asset_id, sys_id, action in iterable:
+                assets_ids[asset_id][sys_id] |= action
+        self.tree.add_assets(assets_ids)
+        self._assets_direct = assets_ids
+        return assets_ids
 
-    #@timeit
+    @timeit
     def get_assets_without_cache(self):
         """
-        :return: {asset1: set(system_user1,)}
+        :return:
+        [
+            {"id": asset.id, "system_users": {system_user.id: actions, }},
+        ]
         """
         if self._assets:
             return self._assets
+        self.get_nodes_direct()
         self.get_assets_direct()
-        nodes = self.get_nodes_direct()
-        pattern = set()
-        for node in nodes:
-            pattern.add(r'^{0}$|^{0}:'.format(node.key))
-        pattern = '|'.join(list(pattern))
-        if pattern:
-            assets = Asset.objects.filter(nodes__key__regex=pattern).valid() \
-                .prefetch_related('nodes')\
-                .only(*self.assets_only)\
-                .distinct()
-        else:
-            assets = []
-        assets = list(assets)
-        self.tree.add_assets_without_system_users(assets)
         assets = self.tree.get_assets()
         self._assets = assets
         return assets
 
-    #@timeit
+    @timeit
     def get_nodes_with_assets_without_cache(self):
-        """
-        返回节点并且包含资产
-        {"node": {"asset": {"system_user": 1})}}
-        :return:
-        """
         self.get_assets_without_cache()
         nodes_assets = self.tree.get_nodes_with_assets()
         return nodes_assets
@@ -545,67 +583,72 @@ def sort_assets(assets, order_by='hostname', reverse=False):
     return assets
 
 
-def parse_node_to_tree_node(node):
-    name = '{} ({})'.format(node.value, node.assets_amount)
-    data = {
-        'id': node.key,
-        'name': name,
-        'title': name,
-        'pId': node.parent_key,
-        'isParent': True,
-        'open': node.is_root(),
-        'meta': {
-            'node': {
-                "id": node.id,
-                "key": node.key,
-                "value": node.value,
-            },
-            'type': 'node'
-        }
-    }
-    tree_node = TreeNode(**data)
-    return tree_node
+class ParserNode:
+    nodes_only_fields = ("key", "value", "id")
+    assets_only_fields = ("platform", "hostname", "id", "ip", "protocols")
+    system_users_only_fields = (
+        "id", "name", "username", "protocol", "priority", "login_mode",
+    )
 
-
-def parse_asset_to_tree_node(node, asset, system_users):
-    icon_skin = 'file'
-    if asset.platform.lower() == 'windows':
-        icon_skin = 'windows'
-    elif asset.platform.lower() == 'linux':
-        icon_skin = 'linux'
-    _system_users = []
-    for system_user, action in system_users.items():
-        _system_users.append({
-            'id': system_user.id,
-            'name': system_user.name,
-            'username': system_user.username,
-            'protocol': system_user.protocol,
-            'priority': system_user.priority,
-            'login_mode': system_user.login_mode,
-            'actions': [Action.value_to_choices(action)],
-        })
-    data = {
-        'id': str(asset.id),
-        'name': asset.hostname,
-        'title': asset.ip,
-        'pId': node.key,
-        'isParent': False,
-        'open': False,
-        'iconSkin': icon_skin,
-        'meta': {
-            'system_users': _system_users,
-            'type': 'asset',
-            'asset': {
-                'id': asset.id,
-                'hostname': asset.hostname,
-                'ip': asset.ip,
-                'protocols': asset.protocols_as_list,
-                'platform': asset.platform,
-                'domain': None if not asset.domain else asset.domain.id,
-                'is_active': asset.is_active,
-                'comment': asset.comment
-            },
+    @staticmethod
+    def parse_node_to_tree_node(node):
+        name = '{} ({})'.format(node.value, node.assets_amount)
+        data = {
+            'id': node.key,
+            'name': name,
+            'title': name,
+            'pId': node.parent_key,
+            'isParent': True,
+            'open': node.is_root(),
+            'meta': {
+                'node': {
+                    "id": node.id,
+                    "key": node.key,
+                    "value": node.value,
+                },
+                'type': 'node'
+            }
         }
-    }
-    tree_node = TreeNode(**data)
-    return tree_node
+        tree_node = TreeNode(**data)
+        return tree_node
+
+    @staticmethod
+    def parse_asset_to_tree_node(node, asset, system_users):
+        icon_skin = 'file'
+        if asset.platform.lower() == 'windows':
+            icon_skin = 'windows'
+        elif asset.platform.lower() == 'linux':
+            icon_skin = 'linux'
+        _system_users = []
+        for system_user in system_users:
+            _system_users.append({
+                'id': system_user.id,
+                'name': system_user.name,
+                'username': system_user.username,
+                'protocol': system_user.protocol,
+                'priority': system_user.priority,
+                'login_mode': system_user.login_mode,
+                'actions': [Action.value_to_choices(system_user.actions)],
+            })
+        data = {
+            'id': str(asset.id),
+            'name': asset.hostname,
+            'title': asset.ip,
+            'pId': node.key,
+            'isParent': False,
+            'open': False,
+            'iconSkin': icon_skin,
+            'meta': {
+                'system_users': _system_users,
+                'type': 'asset',
+                'asset': {
+                    'id': asset.id,
+                    'hostname': asset.hostname,
+                    'ip': asset.ip,
+                    'protocols': asset.protocols_as_list,
+                    'platform': asset.platform,
+                },
+            }
+        }
+        tree_node = TreeNode(**data)
+        return tree_node
