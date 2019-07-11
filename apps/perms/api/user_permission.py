@@ -203,7 +203,7 @@ class NodesWithUngroupMixin:
     @staticmethod
     def get_ungrouped_node(ungroup_key):
         return Node(key=ungroup_key, id=const.UNGROUPED_NODE_ID,
-                    value=_("default"))
+                    value=_("ungrouped"))
 
     @staticmethod
     def get_empty_node():
