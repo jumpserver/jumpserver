@@ -95,6 +95,32 @@ function protocolChange() {
 $(document).ready(function(){
     protocolChange();
 })
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var form = $("form");
+    var data = form.serializeObject();
+    data["private_key"] = $("#id_private_key_file").data('file');
+    var method = "POST";
+    var the_url = '{% url "api-assets:gateway-list" %}';
+    var redirect_to = '{% url "assets:domain-gateway-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.domain);
+    {% if type == "update" %}
+        the_url = '{% url 'api-assets:gateway-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    var props = {
+        url:the_url,
+        data:data,
+        method:method,
+        form:form,
+        redirect_to:redirect_to
+     };
+    formSubmit(props);
+})
+.on('change', '#id_private_key_file', function () {
+    readFile($(this)).on("onload", function (evt, data) {
+         $(this).attr("data-file", data)
+    })
+})
 .on('change', protocol_id, function(){
     protocolChange();
 });

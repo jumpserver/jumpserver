@@ -10,13 +10,19 @@ from orgs.mixins import BulkOrgResourceModelSerializer
 
 
 class CommandFilterSerializer(BulkOrgResourceModelSerializer):
-    rules = serializers.PrimaryKeyRelatedField(queryset=CommandFilterRule.objects.all(), many=True)
-    system_users = serializers.PrimaryKeyRelatedField(queryset=SystemUser.objects.all(), many=True)
 
     class Meta:
         model = CommandFilter
         list_serializer_class = AdaptedBulkListSerializer
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'org_id', 'org_name', 'is_active', 'comment',
+            'created_by', 'date_created', 'date_updated', 'rules', 'system_users'
+        ]
+
+        extra_kwargs = {
+            'rules': {'read_only': True},
+            'system_users': {'read_only': True}
+        }
 
 
 class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):

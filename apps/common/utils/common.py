@@ -7,6 +7,7 @@ import logging
 import datetime
 import uuid
 from functools import wraps
+import time
 import copy
 import ipaddress
 
@@ -179,3 +180,18 @@ def random_string(length):
     charset = string.ascii_letters + string.digits
     s = [random.choice(charset) for i in range(length)]
     return ''.join(s)
+
+
+logger = get_logger(__name__)
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        logger.debug("Start call: {}".format(func.__name__))
+        now = time.time()
+        result = func(*args, **kwargs)
+        using = (time.time() - now) * 1000
+        msg = "Call {} end, using: {:.1f}ms".format(func.__name__, using)
+        logger.debug(msg)
+        return result
+    return wrapper

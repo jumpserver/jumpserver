@@ -2,7 +2,7 @@ import datetime
 import re
 import time
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
@@ -13,13 +13,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from django.utils.encoding import iri_to_uri
+
 
 from users.models import User
 from assets.models import Asset
 from terminal.models import Session
 from orgs.utils import current_org
 from common.permissions import PermissionsMixin, IsValidUser
+from common.http import HttpResponseTemporaryRedirect
 
 
 class IndexView(PermissionsMixin, TemplateView):
@@ -201,14 +202,6 @@ class I18NView(View):
 
 
 api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
-
-
-class HttpResponseTemporaryRedirect(HttpResponse):
-    status_code = 307
-
-    def __init__(self, redirect_to):
-        HttpResponse.__init__(self)
-        self['Location'] = iri_to_uri(redirect_to)
 
 
 @csrf_exempt

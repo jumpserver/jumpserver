@@ -21,7 +21,7 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = AdminUser
         fields = [
             'id', 'name', 'username', 'password', 'private_key', 'public_key',
-            'comment', 'connectivity_amount', 'assets_amount',
+            'comment', 'assets_amount',
             'date_created', 'date_updated', 'created_by',
         ]
 
@@ -33,7 +33,6 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'date_updated': {'read_only': True},
             'created_by': {'read_only': True},
             'assets_amount': {'label': _('Asset')},
-            'connectivity_amount': {'label': _('Connectivity')},
         }
 
 

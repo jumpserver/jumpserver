@@ -117,16 +117,6 @@ class SystemUser(AssetUser):
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
-    def to_json(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'username': self.username,
-            'protocol': self.protocol,
-            'priority': self.priority,
-            'auto_push': self.auto_push,
-        }
-
     @property
     def login_mode_display(self):
         return self.get_login_mode_display()
