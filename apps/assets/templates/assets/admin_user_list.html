@@ -2,8 +2,6 @@
 {% load i18n static %}
 {% block help_message %}
     <div class="alert alert-info help-message">
-{#    管理用户是资产（被控服务器）上的root，或拥有 NOPASSWD: ALL sudo权限的用户，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。#}
-{#    Windows或其它硬件可以随意设置一个#}
     {% trans 'Admin users are asset (charged server) on the root, or have NOPASSWD: ALL sudo permissions users, '%}
     {% trans 'Jumpserver users of the system using the user to `push system user`,  `get assets hardware information`, etc. '%}
     {% trans 'You can set any one for Windows or other hardware.' %}
@@ -47,9 +45,9 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
-        <th class="text-center">{% trans 'Reachable' %}</th>
-        <th class="text-center">{% trans 'Unreachable' %}</th>
-        <th class="text-center">{% trans 'Ratio' %}</th>
+{#        <th class="text-center">{% trans 'Reachable' %}</th>#}
+{#        <th class="text-center">{% trans 'Unreachable' %}</th>#}
+{#        <th class="text-center">{% trans 'Ratio' %}</th>#}
         <th class="text-center">{% trans 'Comment' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
@@ -73,44 +71,44 @@ function initTable() {
                 var detail_btn = '<a href="{% url "assets:admin-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 return detail_btn.replace('{{ DEFAULT_PK }}', rowData.id);
             }},
-            {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = "";
-                var data = cellData.reachable;
-                if (data !== 0) {
-                    innerHtml = "<span class='text-navy'>" + data + "</span>";
-                } else {
-                    innerHtml = "<span>" + data + "</span>";
-                }
-                $(td).html(innerHtml)
-            }},
-            {targets: 5, createdCell: function (td, cellData) {
-                var data = cellData.unreachable;
-                var innerHtml = "";
-                if (data !== 0) {
-                    innerHtml = "<span class='text-danger'>" + data + "</span>";
-                } else {
-                    innerHtml = "<span>" + data + "</span>";
-                }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');
-            }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
-                var val = 0;
-                var innerHtml = "";
-                var total = rowData.assets_amount;
-                var reachable = cellData.reachable;
-                if (total !== 0) {
-                    val = reachable/total * 100;
-                }
-
-                if (val === 100) {
-                    innerHtml = "<span class='text-navy'>" + val + "% </span>";
-                } else {
-                    var num = new Number(val);
-                    innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
-                }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-            }},
-            {targets: 8, createdCell: function (td, cellData, rowData) {
+            {#{targets: 4, createdCell: function (td, cellData) {#}
+            {#    var innerHtml = "";#}
+            {#    var data = cellData.reachable;#}
+            {#    if (data !== 0) {#}
+            {#        innerHtml = "<span class='text-navy'>" + data + "</span>";#}
+            {#    } else {#}
+            {#        innerHtml = "<span>" + data + "</span>";#}
+            {#    }#}
+            {#    $(td).html(innerHtml)#}
+            {#}},#}
+            {#{targets: 5, createdCell: function (td, cellData) {#}
+            {#    var data = cellData.unreachable;#}
+            {#    var innerHtml = "";#}
+            {#    if (data !== 0) {#}
+            {#        innerHtml = "<span class='text-danger'>" + data + "</span>";#}
+            {#    } else {#}
+            {#        innerHtml = "<span>" + data + "</span>";#}
+            {#    }#}
+            {#    $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');#}
+            {#}},#}
+            {#{targets: 6, createdCell: function (td, cellData, rowData) {#}
+            {#    var val = 0;#}
+            {#    var innerHtml = "";#}
+            {#    var total = rowData.assets_amount;#}
+            {#    var reachable = cellData.reachable;#}
+            {#    if (total !== 0) {#}
+            {#        val = reachable/total * 100;#}
+            {#    }#}
+            {##}
+            {#    if (val === 100) {#}
+            {#        innerHtml = "<span class='text-navy'>" + val + "% </span>";#}
+            {#    } else {#}
+            {#        var num = new Number(val);#}
+            {#        innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";#}
+            {#    }#}
+            {#    $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');#}
+            {#}},#}
+            {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:admin-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
@@ -118,7 +116,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [
             {data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
-            {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"},
+            {#{data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"},#}
             {data: "comment"}, {data: "id"}
         ]
     };
