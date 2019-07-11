@@ -2,6 +2,7 @@
 
 from django.urls import path, re_path
 from rest_framework import routers
+from common import api as capi
 from .. import api
 
 app_name = 'perms'
@@ -78,7 +79,7 @@ remote_app_permission_urlpatterns = [
 ]
 
 old_version_urlpatterns = [
-    re_path('(?P<resource>user|user-group|asset-permission|remote-app-permission)/.*', api.redirect_format_api)
+    re_path('(?P<resource>user|user-group|asset-permission|remote-app-permission)/.*', capi.redirect_plural_name_api)
 ]
 
 urlpatterns = asset_permission_urlpatterns + remote_app_permission_urlpatterns + old_version_urlpatterns
