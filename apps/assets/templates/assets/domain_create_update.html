@@ -59,9 +59,7 @@ $(document).ready(function () {
         the_url = '{% url 'api-assets:domain-detail' pk=object.id %}';
         method = "PUT";
     {% endif %}
-    if (typeof data["assets"] == "string") {
-        data["assets"] = [data["assets"]]
-     }
+    objectAttrsIsList(data, ['assets']);
     var props = {
         url:the_url,
         data:data,
