@@ -2,13 +2,14 @@
 #
 
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from assets.models import Node, SystemUser, Asset
-
+from assets.serializers import ProtocolsField
 from .asset_permission import ActionsField
 
 __all__ = [
-    'AssetPermissionNodeSerializer', 'GrantedNodeSerializer',
+    'GrantedNodeSerializer',
     'NodeGrantedSerializer', 'AssetGrantedSerializer',
     'ActionsSerializer', 'AssetSystemUserSerializer',
 ]
@@ -33,6 +34,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
+    protocols = ProtocolsField(label=_('Protocols'), required=False, read_only=True)
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
     system_users_only_fields = AssetSystemUserSerializer.Meta.only_fields
@@ -44,38 +46,12 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
             "platform", "org_id",
         ]
         fields = only_fields + ['system_users_granted', 'system_users_join', "org_name"]
+        read_only_fields = fields
 
     @staticmethod
     def get_system_users_join(obj):
         system_users = [s.username for s in obj.system_users_granted]
         return ', '.join(system_users)
-
-
-class AssetPermissionNodeSerializer(serializers.ModelSerializer):
-    asset = AssetGrantedSerializer(required=False)
-    assets_amount = serializers.SerializerMethodField()
-
-    tree_id = serializers.SerializerMethodField()
-    tree_parent = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Node
-        fields = [
-            'id', 'key', 'value', 'asset', 'is_node', 'org_id',
-            'tree_id', 'tree_parent', 'assets_amount',
-        ]
-
-    @staticmethod
-    def get_assets_amount(obj):
-        return obj.assets_amount
-
-    @staticmethod
-    def get_tree_id(obj):
-        return obj.key
-
-    @staticmethod
-    def get_tree_parent(obj):
-        return obj.parent_key
 
 
 class NodeGrantedSerializer(serializers.ModelSerializer):
@@ -84,7 +60,6 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
     """
     assets_granted = AssetGrantedSerializer(many=True, read_only=True)
     assets_amount = serializers.ReadOnlyField()
-    parent = serializers.SerializerMethodField()
     name = serializers.ReadOnlyField(source='value')
 
     assets_only_fields = AssetGrantedSerializer.Meta.only_fields
@@ -94,12 +69,9 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
         model = Node
         only_fields = ['id', 'key', 'value', "org_id"]
         fields = only_fields + [
-            'name', 'parent', 'assets_granted', 'assets_amount',
+            'name', 'assets_granted', 'assets_amount',
         ]
-
-    @staticmethod
-    def get_parent(obj):
-        return obj.parent_key
+        read_only_fields = fields
 
 
 class GrantedNodeSerializer(serializers.ModelSerializer):
@@ -108,6 +80,7 @@ class GrantedNodeSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'key', 'value',
         ]
+        read_only_fields = fields
 
 
 class ActionsSerializer(serializers.Serializer):

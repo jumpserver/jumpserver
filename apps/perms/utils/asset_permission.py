@@ -310,11 +310,10 @@ class AssetPermissionCacheMixin:
             data = self.get_resource_from_cache(resource)
             return data
         else:
-            print("Not using cache resource")
+            logger.debug("Not using cache get source")
             return self.get_resource_without_cache(resource)
 
     def get_resource_without_cache(self, resource):
-        logger.debug("Try get resource from db")
         attr = 'get_{}_without_cache'.format(resource)
         return getattr(self, attr)()
 
