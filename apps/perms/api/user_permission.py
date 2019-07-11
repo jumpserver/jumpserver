@@ -286,6 +286,19 @@ class UserGrantedNodesApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListA
         return super().get_permissions()
 
 
+class UserGrantedNodesAsTreeApi(UserGrantedNodesApi):
+    serializer_class = TreeNodeSerializer
+    only_fields = ParserNode.nodes_only_fields
+
+    def get_serializer(self, nodes_with_assets, many=True):
+        nodes = self.get_nodes(nodes_with_assets)
+        queryset = []
+        for node in nodes:
+            data = ParserNode.parse_node_to_tree_node(node)
+            queryset.append(data)
+        return self.get_serializer_class()(queryset, many=many)
+
+
 class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListAPIView):
     """
     用户授权的节点并带着节点下资产的api
@@ -307,6 +320,11 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
         return user
 
     def get_maps(self, nodes_items):
+        """
+        查库，并加入构造的ungrouped节点
+        :return:
+        ({asset.id: asset}, {node.key: node}, {system_user.id: system_user})
+        """
         _nodes_keys = set()
         _assets_ids = set()
         _system_users_ids = set()
@@ -332,6 +350,21 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
         return _nodes_map, _assets_map, _system_users_map
 
     def get_serializer_queryset(self, nodes_items):
+        """
+        将id转为object，同时构造queryset
+        :param nodes:
+        [
+            {
+                'key': node.key,
+                'assets_amount': 10
+                'assets': {
+                    asset.id: {
+                        system_user.id: actions,
+                    },
+                },
+            },
+        ]
+        """
         queryset = []
         _node_map, _assets_map, _system_users_map = self.get_maps(nodes_items)
         for item in nodes_items:
@@ -377,19 +410,6 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
-
-
-class UserGrantedNodesAsTreeApi(UserGrantedNodesApi):
-    serializer_class = TreeNodeSerializer
-    only_fields = ParserNode.nodes_only_fields
-
-    def get_serializer(self, nodes_with_assets, many=True):
-        nodes = self.get_nodes(nodes_with_assets)
-        queryset = []
-        for node in nodes:
-            data = ParserNode.parse_node_to_tree_node(node)
-            queryset.append(data)
-        return self.get_serializer_class()(queryset, many=many)
 
 
 class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesWithAssetsApi):
