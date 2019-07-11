@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.db.models import Q
 from django.core.cache import cache
 from django.conf import settings
-from django.utils.translation import ugettext as _
 
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit

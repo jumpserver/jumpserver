@@ -78,6 +78,7 @@ def on_system_user_assets_change(sender, instance=None, **kwargs):
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_node_changed(sender, instance=None, **kwargs):
     logger.debug("Asset nodes change signal received")
+    Asset.expire_all_nodes_keys_cache()
     if isinstance(instance, Asset):
         if kwargs['action'] == 'pre_remove':
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])

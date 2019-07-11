@@ -106,8 +106,6 @@ class NodesRelationMixin:
 
     @classmethod
     def get_all_nodes_keys(cls):
-        if cls._all_nodes_keys:
-            return cls._all_nodes_keys
         from .node import Node
         cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
         cached = cache.get(cache_key)
@@ -120,22 +118,12 @@ class NodesRelationMixin:
         for asset in assets:
             assets_nodes_keys[asset.id] = [n.key for n in asset.nodes.all()]
         cache.set(cache_key, assets_nodes_keys, cls.CACHE_TIME)
-        cls._all_nodes_keys = assets_nodes_keys
         return assets_nodes_keys
 
     @classmethod
-    def get_asset_nodes_keys_by_id(cls, i):
-        from .node import Node
-        cache_key = cls.NODES_CACHE_KEY.format(i)
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        assets = cls.objects.filter(id=i).only("id").prefetch_related(
-            models.Prefetch('nodes', queryset=Node.objects.all().only('key'))
-        )
-        if not assets:
-            return []
-        return assets[0].get_nodes_keys()
+    def expire_all_nodes_keys_cache(cls):
+        cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
+        cache.delete(cache_key)
 
     def get_nodes_keys(self):
         cache_key = self.NODES_CACHE_KEY.format(self.id)
