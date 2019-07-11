@@ -34,18 +34,16 @@ class GenerateTree:
     def __init__(self):
         """
         nodes = {
-          "<node1>": {
+          node.key: {
             "system_users": {
-              "system_user": action,
-              "system_user2": action,
+              system_user.id: actions,
             },
-            "assets": set([<asset_instance>]),
-          }
+            "assets": set([asset.id,]),
+          },
         }
         assets = {
-           "<asset_instance2>": {
-             "system_user": action,
-             "system_user2": action,
+           asset.id: {
+             system_user.id: actions,
            },
         }
         """
@@ -102,36 +100,34 @@ class GenerateTree:
 
     @timeit
     def add_assets_without_system_users(self, assets_ids):
-        print("Add assets")
         for asset_id in assets_ids:
             self.add_asset(asset_id, {})
-        print("Couter assets: {}".format(self._asset_counter))
-        print("Couter system user: {}".format(self._system_user_counter))
-        print("Couter nodes: {}".format(self._nodes_assets_counter))
 
     @timeit
     def add_assets(self, assets_ids_with_system_users):
-        print("Add assets")
         for asset_id, system_users_ids in assets_ids_with_system_users.items():
             self.add_asset(asset_id, system_users_ids)
 
     # @timeit
     def add_asset(self, asset_id, system_users_ids=None):
-        asset_nodes_keys = self.all_assets_nodes_keys.get(asset_id, [])
+        """
+        :param asset_id:
+        :param system_users_ids: {system_user.id: actions, }
+        :return:
+        """
         if not system_users_ids:
             system_users_ids = defaultdict(int)
-        self._asset_counter += 1
 
-        # 获取原来资产已有的系统用户, 合并
+        # 获取已有资产的系统用户和actions，并更新到最新系统用户信息中
         old_system_users_ids = self.assets[asset_id]
         for system_user_id, action in old_system_users_ids.items():
             system_users_ids[system_user_id] |= action
-            self._system_user_counter += 1
 
+        asset_nodes_keys = self.all_assets_nodes_keys.get(asset_id, [])
+        # {asset.id: [node.key, ], }
         # 获取用户在的节点
         in_nodes = set(self.nodes.keys()) & set(asset_nodes_keys)
         if not in_nodes:
-            print("Ungup add")
             self.nodes[self.ungrouped_key]["assets"].add(asset_id)
             self.assets[asset_id] = system_users_ids
             return
@@ -141,13 +137,17 @@ class GenerateTree:
             # 把自己加入到树上的节点中
             self.nodes[key]["assets"].add(asset_id)
             # 获取自己所在节点的系统用户，并添加进去
-            system_users_ids = self.nodes[key]["system_users"]
-            for system_user_id, action in system_users_ids.items():
+            node_system_users_ids = self.nodes[key]["system_users"]
+            for system_user_id, action in node_system_users_ids.items():
                 system_users_ids[system_user_id] |= action
-                self._system_user_counter += 1
         self.assets[asset_id] = system_users_ids
 
     def add_node(self, node_key, system_users_ids=None):
+        """
+        :param node_key: node.key
+        :param system_users_ids: {system_user.id: actions,}
+        :return:
+        """
         if not system_users_ids:
             system_users_ids = defaultdict(int)
         self.nodes[node_key]["system_users"] = system_users_ids
@@ -155,13 +155,23 @@ class GenerateTree:
     # 添加树节点
     @timeit
     def add_nodes(self, nodes_keys_with_system_users_ids):
-        print("Add nodes")
+        """
+        :param nodes_keys_with_system_users_ids:
+        {node.key: {system_user.id: actions,}, }
+        :return:
+        """
         util = PermSystemUserNodeUtil()
         family = util.get_nodes_family_and_system_users(nodes_keys_with_system_users_ids)
         for key, system_users in family.items():
             self.add_node(key, system_users)
 
     def get_assets(self):
+        """
+        :return:
+        [
+            {"id": asset.id, "system_users": {system_user.id: actions, }},
+        ]
+        """
         assets = []
         for asset_id, system_users in self.assets.items():
             assets.append({"id": asset_id, "system_users": system_users})
@@ -169,6 +179,20 @@ class GenerateTree:
 
     @timeit
     def get_nodes_with_assets(self):
+        """
+        :return:
+        [
+            {
+                'key': node.key,
+                'assets_amount': 10
+                'assets': {
+                    asset.id: {
+                        system_user.id: actions,
+                    },
+                },
+            },
+        ]
+        """
         if self._nodes_with_assets:
             return self._nodes_with_assets
         util = PermAssetsAmountUtil()
@@ -183,8 +207,7 @@ class GenerateTree:
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
             nodes.append({
-                "key": const.EMPTY_NODE_KEY, "assets": {},
-                "assets_amount": 0, "all_assets": [],
+                "key": const.EMPTY_NODE_KEY, "assets": {}, "assets_amount": 0
             })
         nodes.sort(key=lambda n: self.key_sort(n["key"]))
         self._nodes_with_assets = nodes
@@ -443,8 +466,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
     @timeit
     def get_nodes_direct(self):
         """
-        返回用户/组授权规则直接关联的节点
-        :return: {node1: {system_user1: {'actions': set()},}}
+        返回直接授权的节点，
+        并将节点添加到tree.nodes中，并将节点下的资产添加到tree.assets中
+        :return:
+        {node.key: {system_user.id: actions,}, }
         """
         if self._nodes_direct:
             return self._nodes_direct
@@ -456,20 +481,19 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
             iterable = itertools.product(_nodes_keys, system_users_ids, actions)
             for node_key, sys_id, action in iterable:
                 nodes_keys[node_key][sys_id] |= action
+
         self.tree.add_nodes(nodes_keys)
 
         pattern = set()
         for key in nodes_keys:
             pattern.add(r'^{0}$|^{0}:'.format(key))
         pattern = '|'.join(list(pattern))
-        print("Start get assets ids")
-        clock = time.clock()
         if pattern:
-            assets_ids = Asset.objects.filter(nodes__key__regex=pattern) \
-                .values_list("id", flat=True).distinct()
+            assets_ids = Asset.objects.filter(
+                nodes__key__regex=pattern
+            ).values_list("id", flat=True).distinct()
         else:
             assets_ids = []
-        print("get assetd ids, using: {}".format(time.clock() - clock))
         self.tree.add_assets_without_system_users(assets_ids)
         self._nodes_direct = nodes_keys
         return nodes_keys
@@ -481,8 +505,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
     @timeit
     def get_assets_direct(self):
         """
-        返回用户授权规则直接关联的资产
-        :return: {asset1: {system_user1: 1,}}
+        返回直接授权的资产，
+        并添加到tree.assets中
+        :return:
+        {asset.id: {system_user.id: actions, }, }
         """
         if self._assets_direct:
             return self._assets_direct
@@ -502,7 +528,10 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
     @timeit
     def get_assets_without_cache(self):
         """
-        :return: {asset1: set(system_user1,)}
+        :return:
+        [
+            {"id": asset.id, "system_users": {system_user.id: actions, }},
+        ]
         """
         if self._assets:
             return self._assets
@@ -514,11 +543,6 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
 
     @timeit
     def get_nodes_with_assets_without_cache(self):
-        """
-        返回节点并且包含资产
-        {"node": {"asset": {"system_user": 1})}}
-        :return:
-        """
         self.get_assets_without_cache()
         nodes_assets = self.tree.get_nodes_with_assets()
         return nodes_assets

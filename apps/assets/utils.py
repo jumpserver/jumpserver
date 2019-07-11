@@ -166,7 +166,6 @@ class NodeUtil:
         return [n.key for n in nodes]
 
     def get_some_nodes_family_by_keys(self, keys):
-        print("Kyes: {}".format(keys))
         family = set()
         for key in keys:
             family.update(self.get_family_by_key(key))

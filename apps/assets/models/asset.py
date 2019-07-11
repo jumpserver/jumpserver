@@ -106,6 +106,9 @@ class NodesRelationMixin:
 
     @classmethod
     def get_all_nodes_keys(cls):
+        """
+        :return: {asset.id: [node.key, ]}
+        """
         from .node import Node
         cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
         cached = cache.get(cache_key)
