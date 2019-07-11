@@ -28,6 +28,7 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
             'protocol', 'login_mode',
         )
         fields = list(only_fields) + ["actions"]
+        read_only_fields = fields
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
