@@ -2,23 +2,21 @@
 #
 
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import (
-    ListAPIView, get_object_or_404,
-)
 
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from ..hands import UserGroup
-from .. import serializers, const
+from .. import serializers
 
 from .user_permission import (
     UserGrantedAssetsApi, UserGrantedNodesApi, UserGrantedNodesWithAssetsApi,
     UserGrantedNodesWithAssetsAsTreeApi, UserGrantedNodeAssetsApi,
+    UserGrantedNodesAsTreeApi,
 )
 
 __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
     'UserGroupGrantedNodesWithAssetsApi', 'UserGroupGrantedNodeAssetsApi',
-    'UserGroupGrantedNodesWithAssetsAsTreeApi',
+    'UserGroupGrantedNodesWithAssetsAsTreeApi', 'UserGroupGrantedNodesAsTreeApi',
 ]
 
 
@@ -30,6 +28,13 @@ class UserGroupGrantedAssetsApi(UserGrantedAssetsApi):
 
 
 class UserGroupGrantedNodesApi(UserGrantedNodesApi):
+    def get_object(self):
+        user_group_id = self.kwargs.get('pk', '')
+        user_group = get_object_or_404(UserGroup, id=user_group_id)
+        return user_group
+
+
+class UserGroupGrantedNodesAsTreeApi(UserGrantedNodesAsTreeApi):
     def get_object(self):
         user_group_id = self.kwargs.get('pk', '')
         user_group = get_object_or_404(UserGroup, id=user_group_id)
