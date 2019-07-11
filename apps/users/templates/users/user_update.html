@@ -89,9 +89,8 @@ $(document).ready(function(){
     var method = "PUT";
     var form = $("form");
     var data = form.serializeObject();
-    if (typeof data["groups"] == "string") {
-        data["groups"] = [data["groups"]]
-    }
+    objectAttrsIsList(data, ['groups']);
+    objectAttrsIsDatetime(data,['date_expired']);
     var props = {
         url: the_url,
         data: data,
