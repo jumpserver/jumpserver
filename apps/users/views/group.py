@@ -44,6 +44,7 @@ class UserGroupCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
         context = {
             'app': _('Users'),
             'action': _('Create user group'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -61,6 +62,7 @@ class UserGroupUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
         context = {
             'app': _('Users'),
             'action': _('Update user group'),
+            'type': 'update'
 
         }
         kwargs.update(context)
