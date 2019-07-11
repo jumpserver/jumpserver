@@ -85,7 +85,6 @@ class UserCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
             'app': _('Users'),
             'action': _('Create user'),
             'password_check_rules': check_rules,
-            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -130,7 +129,6 @@ class UserUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
             'app': _('Users'),
             'action': _('Update user'),
             'password_check_rules': check_rules,
-            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

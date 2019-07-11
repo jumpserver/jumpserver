@@ -27,7 +27,7 @@ function passwordCheck() {
         progress = $('#id_progress'),
         password_check_rules = {{ password_check_rules|safe }},
         minLength = 6,
-        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) - 10 + 34,
+        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) -77 + 34,
         left = 377,
         i18n_fallback = {
             "veryWeak": "{% trans 'Very weak' %}",
@@ -82,10 +82,6 @@ $(document).ready(function () {
     var the_url = '{% url 'api-users:user-list' %}';
     var redirect_to = '{% url "users:user-list" %}';
     var method = "POST";
-    {% if type == "update" %}
-        the_url = '{% url 'api-users:user-detail' pk=object.id %}';
-        method = "PUT";
-    {% endif %}
     var form = $("form");
     var data = form.serializeObject();
     objectAttrsIsList(data, ['groups']);
