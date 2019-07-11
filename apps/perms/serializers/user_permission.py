@@ -3,8 +3,7 @@
 
 from rest_framework import serializers
 
-from assets.models import Node, SystemUser
-from assets.serializers import AssetSerializer
+from assets.models import Node, SystemUser, Asset
 
 from .asset_permission import ActionsField
 
@@ -30,28 +29,26 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
         fields = list(only_fields) + ["actions"]
 
 
-class AssetGrantedSerializer(AssetSerializer):
+class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     system_users_join = serializers.SerializerMethodField()
+    system_users_only_fields = AssetSystemUserSerializer.Meta.only_fields
 
-    only_fields = (
-        "id", "hostname", "ip", "protocols", "is_active", "os", 'domain',
-        "platform", "comment", "org_id",
-    )
-    system_user_only_field = AssetSystemUserSerializer.Meta.only_fields
+    class Meta:
+        model = Asset
+        only_fields = [
+            "id", "hostname", "ip", "protocols", "os", 'domain',
+            "platform", "org_id",
+        ]
+        fields = only_fields + ['system_users_granted', 'system_users_join', "org_name"]
 
     @staticmethod
     def get_system_users_join(obj):
         system_users = [s.username for s in obj.system_users_granted]
         return ', '.join(system_users)
-
-    def get_field_names(self, declared_fields, info):
-        fields = [i for i in self.only_fields]
-        fields.extend(['org_name', 'system_users_granted', 'system_users_join'])
-        return fields
 
 
 class AssetPermissionNodeSerializer(serializers.ModelSerializer):
@@ -86,28 +83,23 @@ class NodeGrantedSerializer(serializers.ModelSerializer):
     授权资产组
     """
     assets_granted = AssetGrantedSerializer(many=True, read_only=True)
-    assets_amount = serializers.SerializerMethodField()
+    assets_amount = serializers.ReadOnlyField()
     parent = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
+    name = serializers.ReadOnlyField(source='value')
+
+    assets_only_fields = AssetGrantedSerializer.Meta.only_fields
+    system_users_only_fields = AssetGrantedSerializer.system_users_only_fields
 
     class Meta:
         model = Node
-        fields = [
-            'id', 'key', 'name', 'value', 'parent',
-            'assets_granted', 'assets_amount', 'org_id',
+        only_fields = ['id', 'key', 'value', "org_id"]
+        fields = only_fields + [
+            'name', 'parent', 'assets_granted', 'assets_amount',
         ]
 
     @staticmethod
-    def get_assets_amount(obj):
-        return len(obj.assets_granted)
-
-    @staticmethod
-    def get_name(obj):
-        return obj.name
-
-    @staticmethod
     def get_parent(obj):
-        return obj.parent.id
+        return obj.parent_key
 
 
 class GrantedNodeSerializer(serializers.ModelSerializer):

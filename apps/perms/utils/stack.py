@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import re
 from collections import defaultdict
 from common.struct import Stack
+from common.utils import timeit
 from assets.utils import NodeUtil
 
 
@@ -29,6 +29,7 @@ class PermStackUtilMixin:
 
 
 class PermSystemUserNodeUtil(PermStackUtilMixin):
+    @timeit
     def get_nodes_family_and_system_users(self, nodes_with_system_users):
         node_util = NodeUtil()
         _nodes_keys = nodes_with_system_users.keys()
