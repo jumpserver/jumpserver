@@ -106,6 +106,9 @@ class NodesRelationMixin:
 
     @classmethod
     def get_all_nodes_keys(cls):
+        """
+        :return: {asset.id: [node.key, ]}
+        """
         from .node import Node
         cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
         cached = cache.get(cache_key)
@@ -124,20 +127,6 @@ class NodesRelationMixin:
     def expire_all_nodes_keys_cache(cls):
         cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
         cache.delete(cache_key)
-
-    def get_nodes_keys(self):
-        cache_key = self.NODES_CACHE_KEY.format(self.id)
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-
-        nodes = self.get_nodes()
-        if not isinstance(nodes, list):
-            keys = nodes.values_list("key")
-        else:
-            keys = [n.key for n in nodes]
-        cache.set(cache_key, keys, 0)
-        return keys
 
     def get_nodes(self):
         from .node import Node
