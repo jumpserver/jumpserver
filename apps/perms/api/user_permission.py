@@ -352,7 +352,7 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
     def get_serializer_queryset(self, nodes_items):
         """
         将id转为object，同时构造queryset
-        :param nodes:
+        :param nodes_items:
         [
             {
                 'key': node.key,

@@ -212,7 +212,6 @@ class AssetsAmountMixin:
         if cached is not None:
             return cached
         assets_amount = self.get_all_assets().count()
-        cache_key = self._assets_amount_cache_key.format(self.key)
         cache.set(cache_key, assets_amount, self.cache_time)
         return assets_amount
 
