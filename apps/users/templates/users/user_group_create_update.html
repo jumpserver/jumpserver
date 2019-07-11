@@ -58,9 +58,7 @@ $(document).ready(function () {
     {% endif %}
     var form = $("form");
     var data = form.serializeObject();
-    if (typeof data["users"] == "string") {
-        data["users"] = [data["users"]]
-    }
+    objectAttrsIsList(data, ['users']);
     var props = {
         url: the_url,
         data: data,
