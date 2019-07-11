@@ -122,8 +122,6 @@ class RoleMixin:
         (ROLE_APP, _('Application')),
         (ROLE_AUDITOR, _("Auditor"))
     )
-    is_authenticated = False
-    is_valid = False
     role = ROLE_USER
 
     @property
