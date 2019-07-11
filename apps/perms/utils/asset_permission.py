@@ -48,7 +48,10 @@ class GenerateTree:
         }
         """
         self._node_util = None
-        self.nodes = defaultdict(lambda: {"system_users": defaultdict(int), "assets": set(), "assets_amount": 0, "all_assets": set()})
+        self.nodes = defaultdict(lambda: {
+            "system_users": defaultdict(int), "assets": set(),
+            "assets_amount": 0, "all_assets": set(),
+        })
         self.assets = defaultdict(lambda: defaultdict(int))
         self._root_node = None
         self._ungroup_node = None
@@ -310,6 +313,7 @@ class AssetPermissionCacheMixin:
         return self.get_cache_key('SYSTEM_USER')
 
     def get_resource_from_cache(self, resource):
+        logger.debug("Try get resource from cache")
         key_map = {
             "assets": self.asset_key,
             "nodes": self.node_key,
@@ -321,21 +325,26 @@ class AssetPermissionCacheMixin:
             raise ValueError("Not a valid resource: {}".format(resource))
         cached = cache.get(key)
         if not cached:
+            logger.debug("Not found resource cache, update it")
             self.update_cache()
             cached = cache.get(key)
         return cached
 
     def get_resource(self, resource):
         if self._is_using_cache():
+            logger.debug("Using cache to get resource")
             return self.get_resource_from_cache(resource)
         elif self._is_refresh_cache():
+            logger.debug("Need refresh cache")
             self.expire_cache()
             data = self.get_resource_from_cache(resource)
             return data
         else:
+            print("Not using cache resource")
             return self.get_resource_without_cache(resource)
 
     def get_resource_without_cache(self, resource):
+        logger.debug("Try get resource from db")
         attr = 'get_{}_without_cache'.format(resource)
         return getattr(self, attr)()
 
@@ -476,8 +485,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         nodes_keys = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            system_users_ids = perm.system_users.all().values_list('id', flat=True)
-            _nodes_keys = perm.nodes.all().values_list('key', flat=True)
+            system_users_ids = [s.id for s in perm.system_users.all()]
+            _nodes_keys = [n.key for n in perm.nodes.all()]
             iterable = itertools.product(_nodes_keys, system_users_ids, actions)
             for node_key, sys_id, action in iterable:
                 nodes_keys[node_key][sys_id] |= action
@@ -515,12 +524,11 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         assets_ids = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets_ids = perm.assets.all().values_list('id', flat=True)
-            system_users_ids = perm.system_users.all().values_list('id', flat=True)
+            _assets_ids = [a.id for a in perm.assets.all()]
+            system_users_ids = [s.id for s in perm.system_users.all()]
             iterable = itertools.product(_assets_ids, system_users_ids, actions)
             for asset_id, sys_id, action in iterable:
                 assets_ids[asset_id][sys_id] |= action
-        print("Get assetd direct")
         self.tree.add_assets(assets_ids)
         self._assets_direct = assets_ids
         return assets_ids
@@ -613,7 +621,7 @@ class ParserNode:
         elif asset.platform.lower() == 'linux':
             icon_skin = 'linux'
         _system_users = []
-        for system_user, action in system_users.items():
+        for system_user in system_users:
             _system_users.append({
                 'id': system_user.id,
                 'name': system_user.name,
@@ -621,7 +629,7 @@ class ParserNode:
                 'protocol': system_user.protocol,
                 'priority': system_user.priority,
                 'login_mode': system_user.login_mode,
-                'actions': [Action.value_to_choices(action)],
+                'actions': [Action.value_to_choices(system_user.actions)],
             })
         data = {
             'id': str(asset.id),

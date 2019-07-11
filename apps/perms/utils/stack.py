@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import re
 from collections import defaultdict
 from common.struct import Stack
+from common.utils import timeit
 from assets.utils import NodeUtil
 
 
@@ -32,6 +32,7 @@ class PermSystemUserNodeUtil(PermStackUtilMixin):
     """
     self._nodes: {node.key: {system_user.id: actions,}}
     """
+    @timeit
     def get_nodes_family_and_system_users(self, nodes_with_system_users):
         """
         返回所有nodes_with_system_users中的node的家族节点的信息，
