@@ -228,12 +228,9 @@ $(document).ready(function () {
     var form = $("form");
     var data = form.serializeObject();
 
+    objectAttrsIsList(data, ['cmd_filters']);
     objectAttrsIsBool(data, ["auto_generate_key", "auto_push"]);
     data["private_key"] = $("#id_private_key_file").data('file');
-
-    if (typeof data["cmd_filters"] == "string") {
-        data["cmd_filters"] = [data["cmd_filters"]]
-    }
 
     var props = {
         url: the_url,
