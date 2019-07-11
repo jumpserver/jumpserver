@@ -62,9 +62,7 @@ $(document).ready(function () {
     {% endif %}
     var form = $("form");
     var data = form.serializeObject();
-    if (typeof data["assets"] == "string") {
-        data["assets"] = [data["assets"]]
-     }
+    objectAttrsIsList(data, ['assets']);
     var props = {
         url: the_url,
         data: data,
