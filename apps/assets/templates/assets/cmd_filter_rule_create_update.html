@@ -74,11 +74,11 @@ $(document).ready(function(){
     evt.preventDefault();
     var form = $("form");
     var data = form.serializeObject();
-    var the_url = '/api/assets/v1/cmd-filter/{{ DEFAULT_PK }}/rules/'.replace("{{ DEFAULT_PK }}", data.filter);
+    var the_url = '{% url "api-assets:cmd-filter-rule-list" filter_pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.filter);
     var redirect_to = '{% url "assets:cmd-filter-rule-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.filter);
     var method = "POST";
     {% if request_type == "update" %}
-        the_url = '/api/assets/v1/cmd-filter/{{ DEFAULT_PK }}/rules/{{ rule.id }}/'.replace("{{ DEFAULT_PK }}", data.filter);
+        the_url = '{% url "api-assets:cmd-filter-rule-detail" filter_pk=DEFAULT_PK pk=rule.id %}'.replace('{{ DEFAULT_PK }}', data.filter);
         method = "PUT";
     {% endif %}
     var props = {
