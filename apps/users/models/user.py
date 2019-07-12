@@ -83,6 +83,7 @@ class AuthMixin:
 
     def reset_password(self, new_password):
         self.set_password(new_password)
+        self.save()
 
     @property
     def date_password_expired(self):
