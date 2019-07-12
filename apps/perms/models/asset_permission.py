@@ -94,9 +94,16 @@ class AssetPermission(BasePermission):
         )
 
     def get_all_assets(self):
-        nodes = self.nodes.all()
-        arg = Q(nodes__in=nodes) | Q(granted_by_permissions=self)
-        assets = Asset.objects.filter(arg)
+        args = [Q(granted_by_permissions=self)]
+        pattern = set()
+        nodes_keys = self.nodes.all().values_list('key', flat=True)
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        if pattern:
+            args.append(Q(nodes__key__regex=pattern))
+        args = reduce(lambda x, y: x | y, args)
+        assets = Asset.objects.filter(args)
         return assets
 
 
