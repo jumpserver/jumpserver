@@ -240,6 +240,8 @@ class AssetPermissionAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
     pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetPermissionAssetsSerializer
+    filter_fields = ("hostname", "ip")
+    search_fields = filter_fields
 
     def get_object(self):
         pk = self.kwargs.get('pk')
@@ -247,20 +249,7 @@ class AssetPermissionAssetsApi(ListAPIView):
 
     def get_queryset(self):
         perm = self.get_object()
-        assets = list(perm.get_all_assets())
-        return assets
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = self.filter_assets(queryset)
-        return queryset
-
-    def filter_assets(self, queryset):
-        value = self.request.query_params.get('search')
-        if not value:
-            return queryset
-        assets = [
-            asset for asset in queryset
-            if is_obj_attr_has(asset, value, ('hostname', 'ip'))
-        ]
+        assets = perm.get_all_assets().only(
+            *self.serializer_class.Meta.only_fields
+        )
         return assets

@@ -2,6 +2,7 @@ import uuid
 from functools import reduce
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
@@ -92,13 +93,22 @@ class AssetPermission(BasePermission):
             models.Prefetch('system_users', queryset=SystemUser.objects.all().only('id'))
         )
 
+    def get_nodes_assets_ids(self):
+        pattern = set()
+        nodes_keys = self.nodes.all().values_list('key', flat=True)
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        if not pattern:
+            return []
+        assets_ids = Asset.objects.filter(nodes__key__regex=pattern). \
+            values_list("id", flat=True).distinct()
+        return assets_ids
+
     def get_all_assets(self):
-        assets = set()
-        for node in self.nodes.all():
-            _assets = node.get_all_assets()
-            set_or_append_attr_bulk(_assets, 'inherit', node.value)
-            assets.update(set(_assets))
-        assets.update(set(self.assets.all()))
+        assets_ids = self.get_nodes_assets_ids()
+        arg = Q(id__in=assets_ids) | Q(granted_by_permissions=self)
+        assets = Asset.objects.filter(arg)
         return assets
 
 

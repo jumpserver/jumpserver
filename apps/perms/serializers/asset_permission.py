@@ -74,8 +74,8 @@ class AssetPermissionUpdateAssetSerializer(serializers.ModelSerializer):
 
 
 class AssetPermissionAssetsSerializer(serializers.ModelSerializer):
-    inherit = serializers.CharField(default='')
 
     class Meta:
         model = Asset
-        fields = ['id', 'hostname', 'ip', 'inherit']
+        only_fields = ['id', 'hostname', 'ip']
+        fields = [field for field in only_fields]

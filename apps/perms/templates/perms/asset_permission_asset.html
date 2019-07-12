@@ -56,7 +56,6 @@
                                             </th>
                                             <th class="text-center">{% trans 'Hostname' %}</th>
                                             <th class="text-center">{% trans 'IP' %}</th>
-                                            <th class="text-center">{% trans 'Action' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -192,22 +191,10 @@ function initAssetTable() {
                     $(td).html(html);
                 }
             },
-            {
-                targets: 3, createdCell: function (td, cellData, rowData) {
-                    var btn_remove;
-                    if(rowData.inherit){
-                        btn_remove = '<button title="' + rowData.inherit+ '" data-gid="'+ rowData.id +'" class="btn btn-danger btn-xs m-l-xs btn-remove-asset disabled" type="button"><i class="fa fa-minus"></i></button>'
-
-                    }else{
-                        btn_remove = '<button title="' + rowData.inherit+ '" data-gid="'+ rowData.id +'" class="btn btn-danger btn-xs m-l-xs btn-remove-asset" type="button"><i class="fa fa-minus"></i></button>'
-                    }
-                    $(td).html(btn_remove);
-                }
-            }
         ],
         ajax_url: "{% url 'api-perms:asset-permission-assets' pk=object.id %}",
         columns: [
-            {data: "id"}, {data: "hostname"}, {data: "ip"}, {data: "id"}
+            {data: "id"}, {data: "hostname"}, {data: "ip"}
         ],
         op_html: $('#actions').html()
     };
