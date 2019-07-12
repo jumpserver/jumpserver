@@ -948,11 +948,22 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
 }
 
 // 解决input框中的资产和弹出表格中资产的显示不一致
-function initSelectedAssets2Table(id){
-    if (!id) {
-        id = "#id_assets"
+function initSelectedAssets2Table(prop){
+    var inputAssets;
+    if (!prop){
+        inputAssets = $('#id_assets').val()
     }
-    var inputAssets = $(id).val();
+    else{
+        if (prop.assets){
+            inputAssets = prop.assets
+        }
+        else if (prop.id){
+            inputAssets = $(id).val()
+        }
+        else{
+            inputAssets = $('#id_assets').val()
+        }
+    }
     var selectedAssets = asset_table2.selected.concat();
 
     // input assets无，table assets选中，则取消勾选(再次click)

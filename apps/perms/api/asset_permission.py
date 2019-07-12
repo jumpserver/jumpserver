@@ -4,7 +4,7 @@
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework.views import Response
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -14,13 +14,14 @@ from ..models import AssetPermission
 from ..hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
+from ..utils import is_obj_attr_has
 from .. import serializers
 
 
 __all__ = [
     'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
     'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi',
+    'AssetPermissionAddAssetApi', 'AssetPermissionAssetsApi',
 ]
 
 
@@ -228,7 +229,39 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
         if serializer.is_valid():
             assets = serializer.validated_data.get('assets')
             if assets:
-                perm.assets.add(*tuple(assets))
+                perm.assets.set(set(assets))
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
+
+
+class AssetPermissionAssetsApi(ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    pagination_class = LimitOffsetPagination
+    serializer_class = serializers.AssetPermissionAssetsSerializer
+    queryset = AssetPermission.objects.all()
+
+    def get_assets(self):
+        perm = self.get_object()
+        assets = list(perm.get_all_assets())
+        return assets
+
+    def filter_assets(self, assets):
+        value = self.request.query_params.get('search')
+        if not value:
+            return assets
+        assets = [
+            asset for asset in assets
+            if is_obj_attr_has(asset, value, ('hostname', 'ip'))
+        ]
+        return assets
+
+    def list(self, request, *args, **kwargs):
+        assets = self.filter_assets(self.get_assets())
+        page = self.paginate_queryset(assets)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(assets, many=True)
+        return Response(serializer.data)

@@ -93,11 +93,12 @@ class AssetPermission(BasePermission):
         )
 
     def get_all_assets(self):
-        assets = set(self.assets.all())
+        assets = set()
         for node in self.nodes.all():
             _assets = node.get_all_assets()
             set_or_append_attr_bulk(_assets, 'inherit', node.value)
             assets.update(set(_assets))
+        assets.update(set(self.assets.all()))
         return assets
 
 

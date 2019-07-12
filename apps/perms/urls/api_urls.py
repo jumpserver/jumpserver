@@ -50,6 +50,9 @@ asset_permission_urlpatterns = [
     path('asset-permissions/<uuid:pk>/asset/remove/', api.AssetPermissionRemoveAssetApi.as_view(), name='asset-permission-remove-asset'),
     path('asset-permissions/<uuid:pk>/asset/add/', api.AssetPermissionAddAssetApi.as_view(), name='asset-permission-add-asset'),
 
+    # 授权规则中授权的资产
+    path('asset-permissions/<uuid:pk>/assets/', api.AssetPermissionAssetsApi.as_view(), name='asset-permission-assets'),
+
     # 验证用户是否有某个资产和系统用户的权限
     path('asset-permissions/user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('asset-permissions/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
