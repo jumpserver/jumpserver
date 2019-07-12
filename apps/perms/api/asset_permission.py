@@ -15,7 +15,6 @@ from ..models import AssetPermission
 from ..hands import (
     User, UserGroup, Asset, Node, SystemUser,
 )
-from ..utils import is_obj_attr_has
 from .. import serializers
 
 

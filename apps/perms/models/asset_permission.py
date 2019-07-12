@@ -93,21 +93,9 @@ class AssetPermission(BasePermission):
             models.Prefetch('system_users', queryset=SystemUser.objects.all().only('id'))
         )
 
-    def get_nodes_assets_ids(self):
-        pattern = set()
-        nodes_keys = self.nodes.all().values_list('key', flat=True)
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        if not pattern:
-            return []
-        assets_ids = Asset.objects.filter(nodes__key__regex=pattern). \
-            values_list("id", flat=True).distinct()
-        return assets_ids
-
     def get_all_assets(self):
-        assets_ids = self.get_nodes_assets_ids()
-        arg = Q(id__in=assets_ids) | Q(granted_by_permissions=self)
+        nodes = self.nodes.all()
+        arg = Q(nodes__in=nodes) | Q(granted_by_permissions=self)
         assets = Asset.objects.filter(arg)
         return assets
 
