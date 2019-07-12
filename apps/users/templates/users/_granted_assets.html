@@ -1,0 +1,165 @@
+{% load i18n %}
+<div class="col-lg-3" style="padding-left: 0px">
+   <div class="ibox float-e-margins">
+       <div class="ibox-content mailbox-content" style="padding-top: 0">
+           <div class="file-manager ">
+               <div id="assetTree" class="ztree">
+               </div>
+               <div class="clearfix"></div>
+           </div>
+       </div>
+   </div>
+</div>
+<div class="col-lg-9 animated fadeInRight">
+    <div class="mail-box-header">
+        <div class="btn-group" style="float: right">
+            <button data-toggle="dropdown" class="btn btn-default btn-sm labels dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
+            <ul class="dropdown-menu labels-menu">
+            </ul>
+        </div>
+        <table class="table table-striped table-bordered table-hover" id="user_assets_table" >
+            <thead>
+                <tr>
+                    <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+                    <th class="text-center">{% trans 'Hostname' %}</th>
+                    <th class="text-center">{% trans 'IP' %}</th>
+                    <th class="text-center">{% trans 'System user' %}</th>
+                    {% if show_actions %}
+                    <th class="text-center">{% trans 'Action' %}</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+var zTree;
+var inited = false;
+var url;
+var assetTable;
+var treeUrl = "NeedInput";
+var assetTableUrl = 'NeedInput';
+var selectUrl = 'NeedInput';
+var showAssetHref = true; // Need input default true
+var actions = {};
+var labels = '';
+var requesting = false;
+
+function initTable() {
+    if (inited){
+        return assetTable
+    } else {
+        inited = true;
+    }
+    var options = {
+        ele: $('#user_assets_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
+                var assetDetailUrl = '{% url 'assets:asset-detail' pk=DEFAULT_PK %}'
+                        .replace("{{ DEFAULT_PK }}", rowData.id);
+                var detailBtn = '<a href="assetDetailUrl" class="asset-detail" data-asset="assetId">' + cellData + '</a>';
+                if (showAssetHref) {
+                    cellData = detailBtn.replace("assetDetailUrl", assetDetailUrl);
+                } else {
+                    detailBtn = detailBtn.replace("assetId", rowData.id);
+                    cellData = detailBtn.replace("assetDetailUrl", "");
+                }
+                $(td).html(cellData);
+            }},
+            {targets: 3, createdCell: function (td, cellData) {
+                var users = [];
+                $.each(cellData, function (id, data) {
+                    var name = htmlEscape(data.name);
+                    users.push(name);
+                });
+                $(td).html(users.join(', '))
+            }},
+        ],
+        ajax_url: assetTableUrl,
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" },
+            {data: "system_users_granted", orderable: false},
+            {% if show_actions %}
+            {data: "id", orderable: false}
+            {% endif %}
+        ]
+    };
+    {% if show_actions %}
+    options.columnDefs.push(actions);
+    {% endif %}
+    assetTable = jumpserver.initServerSideDataTable(options);
+    return assetTable
+}
+
+function onSelected(event, treeNode) {
+    var node_id = treeNode.meta.node.id;
+    url = selectUrl.replace("{{ DEFAULT_PK }}", node_id);
+    assetTable.ajax.url(url);
+    assetTable.ajax.reload();
+}
+
+
+function initTree() {
+    var setting = {
+        view: {
+            dblClickExpand: false,
+            showLine: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onSelected: onSelected
+        }
+    };
+
+    $.get(treeUrl, function(data, status) {
+        $.fn.zTree.init($("#assetTree"), setting, data);
+        zTree = $.fn.zTree.getZTreeObj("assetTree");
+        rootNodeAddDom(zTree, function () {
+            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
+            initTree();
+        });
+    });
+}
+
+function loadLabels() {
+    var labelListUrl = '{% url "api-assets:label-list" %}';
+    var label = '<li><a style="font-weight: bolder">labelName:labelValue</a></li>';
+    if (requesting) {
+        return
+    }
+    if (!labels) {
+        var data = {
+            url: labelListUrl,
+            method: "GET",
+            success: function (data) {
+                data.forEach(function (value) {
+                    labels += label.replace("labelName", value.name).replace("labelValue", value.value)
+                });
+                $(".labels-menu").append(labels);
+                requesting = false;
+            },
+            error: function() {
+                requesting = false;
+            },
+            flash_message: false
+        };
+        requesting = true;
+        requestApi(data)
+    }
+}
+
+$(document).ready(function () {
+    loadLabels()
+}).on('click', '.labels-menu li', function () {
+    var val = $(this).text();
+    $("#user_assets_table_filter input").val(val);
+    assetTable.search(val).draw();
+ })
+</script>

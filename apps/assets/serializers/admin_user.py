@@ -21,17 +21,14 @@ class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = AdminUser
         fields = [
             'id', 'name', 'username', 'password', 'private_key', 'public_key',
-            'comment', 'assets_amount',
-            'date_created', 'date_updated', 'created_by',
+            'comment', 'assets_amount', 'date_created', 'date_updated', 'created_by',
         ]
+        read_only_fields = ['date_created', 'date_updated', 'created_by', 'assets_amount']
 
         extra_kwargs = {
             'password': {"write_only": True},
             'private_key': {"write_only": True},
             'public_key': {"write_only": True},
-            'date_created': {'read_only': True},
-            'date_updated': {'read_only': True},
-            'created_by': {'read_only': True},
             'assets_amount': {'label': _('Asset')},
         }
 

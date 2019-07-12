@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 from django.db.models import Count
 
 from common.utils import get_logger
+from orgs.mixins import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import Label
 from .. import serializers
@@ -27,7 +27,7 @@ logger = get_logger(__file__)
 __all__ = ['LabelViewSet']
 
 
-class LabelViewSet(BulkModelViewSet):
+class LabelViewSet(OrgBulkModelViewSet):
     filter_fields = ("name", "value")
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

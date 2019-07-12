@@ -360,7 +360,7 @@ $(document).ready(function(){
             setTimeout( function () {
                 window.location.reload();}, 500);
         }
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
@@ -377,7 +377,7 @@ $(document).ready(function(){
             setTimeout( function () {
                 window.location.reload();}, 300);
         }
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
@@ -397,7 +397,7 @@ $(document).ready(function(){
         },function () {
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
-                APIUpdateAttr({
+                requestApi({
                     url:url,
                     method:'DELETE',
                     success:refreshTag,
@@ -410,7 +410,7 @@ $(document).ready(function(){
                 var msg = "{% trans 'Asset Deleting failed.' %}";
                 swal("{% trans 'Asset Delete' %}", msg, "error");
             }
-            APIUpdateAttr({
+            requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
                 method:'POST',
                 body:JSON.stringify(data),
@@ -428,7 +428,7 @@ $(document).ready(function(){
             var url = "{% url 'assets:asset-bulk-update' %}";
             location.href= setUrlParam(url, 'spm', data.spm);
          }
-        APIUpdateAttr({
+        requestApi({
             url: "{% url 'api-common:resources-cache' %}",
             method:'POST',
             body:JSON.stringify(data),
@@ -452,7 +452,7 @@ $(document).ready(function(){
            asset_table.ajax.reload()
        };
 
-       APIUpdateAttr({
+       requestApi({
            'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
            'method': 'PUT',
            'body': JSON.stringify(data),
@@ -500,7 +500,7 @@ $(document).ready(function(){
         url = "{% url 'api-assets:node-add-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
     }
 
-    APIUpdateAttr({
+    requestApi({
         'url': url,
         'method': 'PUT',
         'body': JSON.stringify(data),
@@ -524,7 +524,7 @@ $(document).ready(function(){
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
         window.open(url, '', 'width=800,height=600')
     }
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: "GET",
         success: success,
@@ -539,7 +539,7 @@ $(document).ready(function(){
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
         window.open(url, '', 'width=800,height=600')
     }
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: "GET",
         success: success,

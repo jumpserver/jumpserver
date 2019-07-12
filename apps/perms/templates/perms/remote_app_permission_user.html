@@ -158,7 +158,7 @@
         var success = function(data) {
             location.reload();
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: JSON.stringify(body),
             success: success
@@ -172,7 +172,7 @@
         var success = function(data) {
             location.reload();
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: JSON.stringify(body),
             success: success
@@ -183,7 +183,7 @@
         var body = {
             user_groups: groups
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: JSON.stringify(body)
         });

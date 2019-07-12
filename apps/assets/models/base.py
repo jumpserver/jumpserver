@@ -28,7 +28,7 @@ class AssetUser(OrgModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
+    private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, verbose_name=_("Date created"))

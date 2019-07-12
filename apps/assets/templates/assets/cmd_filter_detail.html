@@ -136,7 +136,7 @@ function updateCMDFilterSystemUsers(system_users) {
     var success = function(data) {
         location.reload();
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         method: 'PATCH',

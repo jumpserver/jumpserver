@@ -129,7 +129,7 @@ $(document).ready(function() {
                 swal("{% trans 'UserGroups Delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
-            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            requestApi({url: url_delete, method: 'DELETE', success: success, error: fail});
             jumpserver.checked = false;
         });
     }
