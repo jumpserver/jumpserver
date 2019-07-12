@@ -80,6 +80,11 @@
                                                     </select>
                                                 </td>
                                             </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-assets">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
                                         </form>
                                         </tbody>
                                     </table>
@@ -133,20 +138,6 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function getAssets(){
-    var the_url = "{% url 'api-perms:asset-permission-assets' pk=object.id %}";
-    var assets;
-    $.ajax({
-        type: 'GET',
-        url: the_url,
-        dataType: 'json',
-        async: false,
-        success: function(data){
-            assets = data;
-        }
-    });
-    return assets
-}
 function addAssets(assets) {
     var the_url = "{% url 'api-perms:asset-permission-add-asset' pk=asset_permission.id %}";
     var body = {
@@ -161,7 +152,6 @@ function addAssets(assets) {
         success: success
     });
  }
-var table;
 
 function removeAssets(assets) {
     var the_url = "{% url 'api-perms:asset-permission-remove-asset' pk=asset_permission.id %}";
@@ -190,6 +180,7 @@ function updateNodes(nodes, success) {
     });
 }
 
+var table;
 function initAssetTable() {
     var options = {
         ele: $('#asset_list_table'),
@@ -231,36 +222,36 @@ $(document).ready(function () {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
             e.preventDefault();
             e.stopPropagation();
-            var assets = getAssets();
-            var assets_ids = new Array();
-            $.each(assets, function (index, asset) {
-                assets_ids.push(asset.id)
-            });
             $("#asset_list_modal").modal();
-            initSelectedAssets2Table({"assets": assets_ids});
+            initSelectedAssets2Table('#asset_select2');
         }
     })
 })
 .on('click', '#btn_asset_modal_confirm', function () {
-    // 获取到的是授权规则包含的所有资产（直接授权的，授权节点下的）
-    var assets_selected = asset_table2.selected;
+    var assets = asset_table2.selected;
+    var options = [];
+    $('#asset_select2 option').each(function (i, v) {
+        options.push(v.value)
+    });
+    asset_table2.selected_rows.forEach(function (i) {
+        var name = i.hostname + '(' + i.ip + ')';
+        var option = new Option(name, i.id, false, true);
 
-    // 过滤掉属于授权节点下的资产（防止取消授权节点后，该资产还在授权规则下）
-    var assets = getAssets();
-    var nodes_assets_ids = new Array();
-    $.each(assets, function (index, asset) {
-        if(asset.inherit){
-            nodes_assets_ids.push(asset.id)
+        if (options.indexOf(i.id) === -1) {
+            $('#asset_select2').append(option).trigger('change');
         }
     });
-    var assets_ids = new Array();
-    $.each(assets_selected, function(index, asset_id){
-        if(nodes_assets_ids.indexOf(asset_id) === -1){
-            assets_ids.push(asset_id)
-        }
-    });
-    addAssets(assets_ids);
+    $('#asset_select2').val(assets).trigger('change');
     $("#asset_list_modal").modal('hide');
+})
+.on('click', '.btn-add-assets', function () {
+    var assets_selected = $("#asset_select2 option:selected").map(function () {
+        return $(this).attr('value');
+    }).get();
+    if (assets_selected.length === 0) {
+		return false;
+	}
+    addAssets(assets_selected);
 })
 .on('click', '.btn-remove-asset', function () {
     var asset_id = $(this).data("gid");
