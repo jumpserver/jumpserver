@@ -78,4 +78,4 @@ class AssetPermissionAssetsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         only_fields = ['id', 'hostname', 'ip']
-        fields = [field for field in only_fields]
+        fields = tuple(only_fields)
