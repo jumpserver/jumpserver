@@ -157,7 +157,7 @@ function addAssets(assets) {
     var success = function(data) {
         location.reload();
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success
@@ -172,7 +172,7 @@ function removeAssets(assets) {
     var success = function(data) {
         location.reload();
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success
@@ -184,7 +184,7 @@ function updateNodes(nodes, success) {
     var body = {
         nodes: nodes
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success

@@ -280,7 +280,7 @@ function updateUserGroups(groups) {
         // clear jumpserver.groups_selected
         jumpserver.nodes_selected = {};
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success
@@ -305,7 +305,7 @@ $(document).ready(function() {
         'is_active': checked
     };
     var success = '{% trans "Update successfully!" %}';
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success_message: success
@@ -332,7 +332,7 @@ $(document).ready(function() {
         'otp_secret_key': otp_secret_key
     };
     var success = '{% trans "Update successfully!" %}';
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success_message: success
@@ -372,7 +372,7 @@ $(document).ready(function() {
             var msg = "{% trans "An e-mail has been sent to the user`s mailbox." %}";
             swal("{% trans 'Reset password' %}", msg, "success");
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: JSON.stringify(body),
             success: success
@@ -398,7 +398,7 @@ $(document).ready(function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
             swal("{% trans 'Reset SSH public key' %}", msg, "success");
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: body,
             success: success
@@ -441,7 +441,7 @@ $(document).ready(function() {
             }
         );
     };
-    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
+    requestApi({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 }).on('click', '.btn-delete-user', function () {
     var $this = $(this);
     var name = "{{ user_object.name }}";
@@ -466,7 +466,7 @@ $(document).ready(function() {
                 }
             );
         };
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             body: JSON.stringify(body),
             success: success
@@ -485,7 +485,7 @@ $(document).ready(function() {
         doReset();
     });
 }).on('click', '#btn-reset-mfa', function () {
-    APIUpdateAttr({
+    requestApi({
         url: "{% url 'api-users:user-reset-otp' pk=user_object.id %}",
         method: "GET",
         success_message: "{% trans 'Reset user MFA success' %}"

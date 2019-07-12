@@ -182,7 +182,7 @@ $(document).ready(function(){
                 swal("{% trans 'System Users Delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
-            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            requestApi({url: url_delete, method: 'DELETE', success: success, error: fail});
             $data_table.ajax.reload();
             jumpserver.checked = false;
         });
