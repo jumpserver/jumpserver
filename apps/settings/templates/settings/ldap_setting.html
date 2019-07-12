@@ -100,7 +100,7 @@ $(document).ready(function () {
     function success(message) {
         toastr.success(message.msg)
     }
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(data),
         method: "POST",
@@ -127,7 +127,7 @@ $(document).ready(function () {
     function success(message) {
         toastr.success(message.msg)
     }
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify({'username_list':username_list}),
         method: "POST",

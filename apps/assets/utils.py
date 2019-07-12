@@ -1,7 +1,8 @@
 # ~*~ coding: utf-8 ~*~
 #
 import time
-from django.db.models import Prefetch
+from functools import reduce
+from django.db.models import Prefetch, Q
 
 from common.utils import get_object_or_none, get_logger
 from common.struct import Stack
@@ -21,24 +22,34 @@ def get_system_user_by_id(id):
     return system_user
 
 
-class LabelFilter:
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        query_keys = self.request.query_params.keys()
+class LabelFilterMixin:
+    def get_filter_labels_ids(self):
+        query_params = self.request.query_params
+        query_keys = query_params.keys()
         all_label_keys = Label.objects.values_list('name', flat=True)
         valid_keys = set(all_label_keys) & set(query_keys)
-        labels_query = {}
-        for key in valid_keys:
-            labels_query[key] = self.request.query_params.get(key)
 
-        conditions = []
-        for k, v in labels_query.items():
-            query = {'labels__name': k, 'labels__value': v}
-            conditions.append(query)
+        if not valid_keys:
+            return []
 
-        if conditions:
-            for kwargs in conditions:
-                queryset = queryset.filter(**kwargs)
+        labels_query = [
+            {"name": key, "value": query_params[key]}
+            for key in valid_keys
+        ]
+        args = [Q(**kwargs) for kwargs in labels_query]
+        args = reduce(lambda x, y: x | y, args)
+        labels_id = Label.objects.filter(args).values_list('id', flat=True)
+        return labels_id
+
+
+class LabelFilter(LabelFilterMixin):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        labels_ids = self.get_filter_labels_ids()
+        if not labels_ids:
+            return queryset
+        for labels_id in labels_ids:
+            queryset = queryset.filter(labels=labels_id)
         return queryset
 
 

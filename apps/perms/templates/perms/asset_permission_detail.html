@@ -187,7 +187,7 @@ function updateSystemUser(system_users) {
     var body = {
         system_users: Object.assign([], system_users)
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body)
     });
@@ -247,7 +247,7 @@ $(document).ready(function () {
     var body = {
         'is_active': checked
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
     });

@@ -29,58 +29,76 @@
 {% block custom_foot_js %}
     {{ block.super }}
 <script>
-    function passwordCheck() {
-        if ($('#id_password').length != 1) {
-            return
-        }
-        var el = $('#id_password_rules'),
-            idPassword = $('#id_password'),
-            idPopover = $('#popover777'),
-            container = $('#container'),
-            progress = $('#id_progress'),
-            password_check_rules = {{ password_check_rules|safe }},
-            minLength = 6,
-            top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) - 10 + 34,
-            left = 377,
-            i18n_fallback = {
-                "veryWeak": "{% trans 'Very weak' %}",
-                "weak": "{% trans 'Weak' %}",
-                "normal": "{% trans 'Normal' %}",
-                "medium": "{% trans 'Medium' %}",
-                "strong": "{% trans 'Strong' %}",
-                "veryStrong": "{% trans 'Very strong' %}"
-            };
-
-        $.each(password_check_rules, function (idx, rules) {
-            if(rules.key === 'id_security_password_min_length'){
-                minLength = rules.value
-            }
-        });
-
-        // 初始化popover
-        initPopover(container, progress, idPassword, el, password_check_rules, i18n_fallback);
-
-        // 监听事件
-        idPassword.on('focus', function () {
-            idPopover.css('top', top);
-            idPopover.css('left', left);
-            idPopover.css('display', 'block');
-        });
-        idPassword.on('blur', function () {
-            idPopover.css('display', 'none');
-        });
-        idPassword.on('keyup', function(){
-            var password = idPassword.val();
-            checkPasswordRules(password, minLength);
-        });
+function passwordCheck() {
+    if ($('#id_password').length != 1) {
+        return
     }
-    $(document).ready(function(){
-        passwordCheck();
+    var el = $('#id_password_rules'),
+        idPassword = $('#id_password'),
+        idPopover = $('#popover777'),
+        container = $('#container'),
+        progress = $('#id_progress'),
+        password_check_rules = {{ password_check_rules|safe }},
+        minLength = 6,
+        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) - 10 + 34,
+        left = 377,
+        i18n_fallback = {
+            "veryWeak": "{% trans 'Very weak' %}",
+            "weak": "{% trans 'Weak' %}",
+            "normal": "{% trans 'Normal' %}",
+            "medium": "{% trans 'Medium' %}",
+            "strong": "{% trans 'Strong' %}",
+            "veryStrong": "{% trans 'Very strong' %}"
+        };
 
-        var origin_text = $("#password_help_text").text();
-        var new_text = origin_text.replace('{}', "{{ object.source_display }}");
-        $("#password_help_text").html(new_text);
+    $.each(password_check_rules, function (idx, rules) {
+        if(rules.key === 'id_security_password_min_length'){
+            minLength = rules.value
+        }
+    });
 
-    })
+    // 初始化popover
+    initPopover(container, progress, idPassword, el, password_check_rules, i18n_fallback);
+
+    // 监听事件
+    idPassword.on('focus', function () {
+        idPopover.css('top', top);
+        idPopover.css('left', left);
+        idPopover.css('display', 'block');
+    });
+    idPassword.on('blur', function () {
+        idPopover.css('display', 'none');
+    });
+    idPassword.on('keyup', function(){
+        var password = idPassword.val();
+        checkPasswordRules(password, minLength);
+    });
+}
+$(document).ready(function(){
+    passwordCheck();
+
+    var origin_text = $("#password_help_text").text();
+    var new_text = origin_text.replace('{}', "{{ object.source_display }}");
+    $("#password_help_text").html(new_text);
+
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-users:user-detail' pk=object.id %}';
+    var redirect_to = '{% url "users:user-list" %}';
+    var method = "PUT";
+    var form = $("form");
+    var data = form.serializeObject();
+    objectAttrsIsList(data, ['groups']);
+    objectAttrsIsDatetime(data,['date_expired']);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+     };
+    formSubmit(props);
+})
 </script>
 {% endblock %}

@@ -163,12 +163,12 @@ class AssetPermissionAssetView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-        assets_granted = self.get_queryset()
+        granted_nodes = self.object.nodes.all()
+        nodes_remain = [n for n in Node.get_queryset() if n not in granted_nodes]
         context = {
             'app': _('Perms'),
             'action': _('Asset permission asset list'),
-            'assets_remain': Asset.objects.exclude(id__in=[a.id for a in assets_granted]),
-            'nodes_remain': Node.objects.exclude(granted_by_permissions=self.object),
+            'nodes_remain': nodes_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

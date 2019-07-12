@@ -23,33 +23,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-lg-3" style="padding-left: 0px">
-                           <div class="ibox float-e-margins">
-                               <div class="ibox-content mailbox-content" style="padding-top: 0">
-                                   <div class="file-manager ">
-                                       <div id="assetTree" class="ztree">
-                                       </div>
-                                       <div class="clearfix"></div>
-                                   </div>
-                               </div>
-                           </div>
-                        </div>
-                        <div class="col-lg-9 animated fadeInRight">
-                            <div class="mail-box-header">
-                                <table class="table table-striped table-bordered table-hover" id="user_assets_table" >
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                                            <th class="text-center">{% trans 'Hostname' %}</th>
-                                            <th class="text-center">{% trans 'IP' %}</th>
-                                            <th class="text-center">{% trans 'System users' %}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        {% include 'users/_granted_assets.html' %}
                     </div>
                 </div>
             </div>
@@ -58,80 +32,9 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-var zTree;
-var inited = false;
-var url;
-var asset_table;
+var assetTableUrl = "{% url 'api-perms:user-assets' pk=object.id %}?cache_policy=1";
+var selectUrl = '{% url "api-perms:user-node-assets" pk=object.id node_id=DEFAULT_PK %}?cache_policy=1';
 var treeUrl = "{% url 'api-perms:user-nodes-as-tree' pk=object.id %}?&cache_policy=1";
-
-function initTable() {
-    if (inited){
-        return asset_table
-    } else {
-        inited = true;
-    }
-    url = "{% url 'api-perms:user-assets' pk=object.id %}?cache_policy=1";
-    var options = {
-        ele: $('#user_assets_table'),
-        columnDefs: [
-            {targets: 1, createdCell: function (td, cellData, rowData) {
-                cellData = htmlEscape(cellData);
-                {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
-                var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-            }},
-            {targets: 3, createdCell: function (td, cellData) {
-                var users = [];
-                $.each(cellData, function (id, data) {
-                    var name = htmlEscape(data.name);
-                    users.push(name);
-                });
-                $(td).html(users.join(', '))
-            }}
-        ],
-        ajax_url: url,
-        columns: [
-            {data: "id"}, {data: "hostname" }, {data: "ip" },
-            {data: "system_users_granted", orderable: false}
-        ]
-    };
-    asset_table = jumpserver.initServerSideDataTable(options)
-}
-
-function onSelected(event, treeNode) {
-    url = '{% url "api-perms:user-node-assets" pk=object.id node_id=DEFAULT_PK %}?cache_policy=1';
-    var node_id = treeNode.meta.node.id;
-    url = url.replace("{{ DEFAULT_PK }}", node_id);
-    asset_table.ajax.url(url);
-    asset_table.ajax.reload();
-}
-
-
-function initTree() {
-    var setting = {
-        view: {
-            dblClickExpand: false,
-            showLine: true
-        },
-        data: {
-            simpleData: {
-                enable: true
-            }
-        },
-        callback: {
-            onSelected: onSelected
-        }
-    };
-
-    $.get(treeUrl, function(data, status) {
-        $.fn.zTree.init($("#assetTree"), setting, data);
-        zTree = $.fn.zTree.getZTreeObj("assetTree");
-        rootNodeAddDom(zTree, function () {
-            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
-            initTree();
-        });
-    });
-}
 
 $(document).ready(function () {
     initTree();

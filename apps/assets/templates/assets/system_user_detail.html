@@ -212,7 +212,7 @@ function updateCommandFilters(command_filters) {
     var success = function(data) {
         location.reload();
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success
@@ -235,7 +235,7 @@ $(document).ready(function () {
     var body = {
         'auto_push': checked
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body)
     });
@@ -254,7 +254,7 @@ $(document).ready(function () {
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
         window.open(url, '', 'width=800,height=600,left=400,top=400')
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: 'GET',
         success: success,
@@ -268,7 +268,7 @@ $(document).ready(function () {
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
         window.open(url, '', 'width=800,height=600')
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: 'GET',
         success: success,

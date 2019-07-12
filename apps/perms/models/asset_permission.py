@@ -2,6 +2,7 @@ import uuid
 from functools import reduce
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
@@ -93,11 +94,16 @@ class AssetPermission(BasePermission):
         )
 
     def get_all_assets(self):
-        assets = set(self.assets.all())
-        for node in self.nodes.all():
-            _assets = node.get_all_assets()
-            set_or_append_attr_bulk(_assets, 'inherit', node.value)
-            assets.update(set(_assets))
+        args = [Q(granted_by_permissions=self)]
+        pattern = set()
+        nodes_keys = self.nodes.all().values_list('key', flat=True)
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        if pattern:
+            args.append(Q(nodes__key__regex=pattern))
+        args = reduce(lambda x, y: x | y, args)
+        assets = Asset.objects.filter(args)
         return assets
 
 

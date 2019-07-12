@@ -235,7 +235,7 @@ function onRename(event, treeId, treeNode, isCancel){
     if (isCancel){
         return
     }
-    APIUpdateAttr({
+    requestApi({
         url: url,
         body: JSON.stringify(data),
         method: "PATCH",
@@ -274,7 +274,7 @@ function onDrop(event, treeId, treeNodes, targetNode, moveType) {
 
     var the_url = "{% url 'api-assets:node-add-children' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", targetNode.meta.node.id);
     var body = {nodes: treeNodesIds};
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: "PUT",
         body: JSON.stringify(body)

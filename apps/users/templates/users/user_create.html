@@ -4,9 +4,7 @@
 {% block user_template_title %}{% trans "Create user" %}{% endblock %}
 {% block password %}
     {% bootstrap_field form.password_strategy layout="horizontal" %}
-    <div class="form-group" id="custom_password">
-        {% bootstrap_field form.password layout="horizontal" %}
-    </div>
+    {% bootstrap_field form.password layout="horizontal" %}
     {#  密码popover  #}
     <div id="container">
         <div class="popover fade bottom in" role="tooltip" id="popover777" style=" display: none; width:260px;">
@@ -29,7 +27,7 @@ function passwordCheck() {
         progress = $('#id_progress'),
         password_check_rules = {{ password_check_rules|safe }},
         minLength = 6,
-        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) - 10 + 34,
+        top = idPassword.offset().top - $('.navbar').outerHeight(true) - $('.page-heading').outerHeight(true) -77 + 34,
         left = 377,
         i18n_fallback = {
             "veryWeak": "{% trans 'Very weak' %}",
@@ -67,9 +65,9 @@ var password_strategy_radio_input = 'input[type=radio][name=password_strategy]';
 function passwordStrategyFieldsDisplay(){
     var val = $('input:radio[name="password_strategy"]:checked').val();
     if(val === '0'){
-        $('#custom_password').addClass('hidden')
+        $('#id_password').parents('.form-group').addClass('hidden')
     }else {
-        $('#custom_password').removeClass('hidden')
+        $('#id_password').parents('.form-group').removeClass('hidden')
     }
 }
 $(document).ready(function () {
@@ -78,7 +76,25 @@ $(document).ready(function () {
 
 }).on('change', password_strategy_radio_input, function(){
         passwordStrategyFieldsDisplay()
-   })
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-users:user-list' %}';
+    var redirect_to = '{% url "users:user-list" %}';
+    var method = "POST";
+    var form = $("form");
+    var data = form.serializeObject();
+    objectAttrsIsList(data, ['groups']);
+    objectAttrsIsDatetime(data,['date_expired']);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+     };
+    formSubmit(props);
+})
 </script>
 {% endblock %}
 

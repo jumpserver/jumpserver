@@ -13,7 +13,13 @@ class LabelSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Label
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'value', 'category', 'is_active', 'comment',
+            'date_created', 'asset_count', 'assets', 'get_category_display'
+        ]
+        read_only_fields = (
+            'category', 'date_created', 'asset_count', 'get_category_display'
+        )
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod

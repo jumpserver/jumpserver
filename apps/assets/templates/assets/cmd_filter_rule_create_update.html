@@ -70,5 +70,25 @@ $(document).ready(function(){
         content_help_ref.html(content_origin_help_text);
     }
 })
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var form = $("form");
+    var data = form.serializeObject();
+    var the_url = '{% url "api-assets:cmd-filter-rule-list" filter_pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.filter);
+    var redirect_to = '{% url "assets:cmd-filter-rule-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.filter);
+    var method = "POST";
+    {% if request_type == "update" %}
+        the_url = '{% url "api-assets:cmd-filter-rule-detail" filter_pk=DEFAULT_PK pk=rule.id %}'.replace('{{ DEFAULT_PK }}', data.filter);
+        method = "PUT";
+    {% endif %}
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+     };
+    formSubmit(props);
+})
 </script>
 {% endblock %}

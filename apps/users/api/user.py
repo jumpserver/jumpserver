@@ -14,7 +14,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
-    CanUpdateSuperUser,
+    CanUpdateDeleteSuperUser,
 )
 from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
@@ -38,7 +38,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)
     serializer_class = UserSerializer
-    permission_classes = (IsOrgAdmin, CanUpdateSuperUser)
+    permission_classes = (IsOrgAdmin, CanUpdateDeleteSuperUser)
     pagination_class = LimitOffsetPagination
 
     def send_created_signal(self, users):

@@ -39,9 +39,10 @@ asset_permission_urlpatterns = [
 
     # 查询某个用户组授权的资产和资产组
     path('user-groups/<uuid:pk>/assets/', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
-    path('user-groups/<uuid:pk>/nodes/', api.UserGroupGrantedNodesApi.as_view(), name='user-group-nodes'),
-    path('user-groups/<uuid:pk>/nodes-assets/', api.UserGroupGrantedNodesWithAssetsApi.as_view(), name='user-group-nodes-assets'),
+    path('user-groups/<uuid:pk>/nodes/tree/', api.UserGroupGrantedNodesApi.as_view(), name='user-group-nodes'),
+    path('user-groups/<uuid:pk>/nodes/', api.UserGroupGrantedNodesAsTreeApi.as_view(), name='user-group-nodes-as-tree'),
     path('user-groups/<uuid:pk>/nodes-assets/tree/', api.UserGroupGrantedNodesWithAssetsAsTreeApi.as_view(), name='user-group-nodes-assets-as-tree'),
+    path('user-groups/<uuid:pk>/nodes-assets/', api.UserGroupGrantedNodesWithAssetsApi.as_view(), name='user-group-nodes-assets'),
     path('user-groups/<uuid:pk>/nodes/<uuid:node_id>/assets/', api.UserGroupGrantedNodeAssetsApi.as_view(), name='user-group-node-assets'),
 
     # 用户和资产授权变更
@@ -49,6 +50,9 @@ asset_permission_urlpatterns = [
     path('asset-permissions/<uuid:pk>/user/add/', api.AssetPermissionAddUserApi.as_view(), name='asset-permission-add-user'),
     path('asset-permissions/<uuid:pk>/asset/remove/', api.AssetPermissionRemoveAssetApi.as_view(), name='asset-permission-remove-asset'),
     path('asset-permissions/<uuid:pk>/asset/add/', api.AssetPermissionAddAssetApi.as_view(), name='asset-permission-add-asset'),
+
+    # 授权规则中授权的资产
+    path('asset-permissions/<uuid:pk>/assets/', api.AssetPermissionAssetsApi.as_view(), name='asset-permission-assets'),
 
     # 验证用户是否有某个资产和系统用户的权限
     path('asset-permissions/user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
