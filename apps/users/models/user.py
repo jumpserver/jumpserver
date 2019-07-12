@@ -46,7 +46,6 @@ class AuthMixin:
         if self.can_update_password():
             self.date_password_last_updated = timezone.now()
             super().set_password(raw_password)
-            self.save()
         else:
             error = _("User auth from {}, go there change password").format(
                 self.source)
