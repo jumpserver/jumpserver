@@ -6,11 +6,12 @@ from rest_framework import serializers
 from common.fields import StringManyToManyField
 from orgs.mixins import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
+from assets.models import Asset
 
 __all__ = [
     'AssetPermissionCreateUpdateSerializer', 'AssetPermissionListSerializer',
     'AssetPermissionUpdateUserSerializer', 'AssetPermissionUpdateAssetSerializer',
-    'ActionsField',
+    'ActionsField', 'AssetPermissionAssetsSerializer',
 ]
 
 
@@ -70,3 +71,11 @@ class AssetPermissionUpdateAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetPermission
         fields = ['id', 'assets']
+
+
+class AssetPermissionAssetsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Asset
+        only_fields = ['id', 'hostname', 'ip']
+        fields = tuple(only_fields)
