@@ -115,7 +115,7 @@ function initTable() {
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [
-            {data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount" },
+            {data: function(){return ""}}, {data: "name"}, {data: "username" }, {data: "assets_amount", orderable: false},
             {#{data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"},#}
             {data: "comment"}, {data: "id"}
         ]
