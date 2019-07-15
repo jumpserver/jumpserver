@@ -107,17 +107,20 @@ function hiddenFields(){
     });
     $('.' + app_type + '-fields').removeClass('hidden');
 }
-function constructParams(obj) {
-    var type = ['chrome', 'mysql_workbench', 'vmware_client', 'custom'];
+function constructParams(data) {
+    var typeList = ['chrome', 'mysql_workbench', 'vmware_client', 'custom'];
     var params = {};
-    type.forEach(function (attr) {
-        if (obj.type === attr){
-            for (var k in obj){
-            if (k.startsWith(obj.type)){params[k] = obj[k]}
+    for (var type in typeList){
+        if (data.type === type){
+            for (var k in data){
+                if (k.startsWith(data.type)){
+                    params[k] = data[k]
+                }
             }
+            break
         }
-    });
-    return params
+    }
+    return params;
 }
 $(document).ready(function () {
     $('.select2').select2({
