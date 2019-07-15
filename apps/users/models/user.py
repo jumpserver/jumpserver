@@ -27,97 +27,7 @@ signer = get_signer()
 logger = get_logger(__file__)
 
 
-class User(AbstractUser):
-    ROLE_ADMIN = 'Admin'
-    ROLE_USER = 'User'
-    ROLE_APP = 'App'
-    ROLE_AUDITOR = 'Auditor'
-
-    ROLE_CHOICES = (
-        (ROLE_ADMIN, _('Administrator')),
-        (ROLE_USER, _('User')),
-        (ROLE_APP, _('Application')),
-        (ROLE_AUDITOR, _("Auditor"))
-    )
-    OTP_LEVEL_CHOICES = (
-        (0, _('Disable')),
-        (1, _('Enable')),
-        (2, _("Force enable")),
-    )
-    SOURCE_LOCAL = 'local'
-    SOURCE_LDAP = 'ldap'
-    SOURCE_OPENID = 'openid'
-    SOURCE_RADIUS = 'radius'
-    SOURCE_CHOICES = (
-        (SOURCE_LOCAL, 'Local'),
-        (SOURCE_LDAP, 'LDAP/AD'),
-        (SOURCE_OPENID, 'OpenID'),
-        (SOURCE_RADIUS, 'Radius'),
-    )
-
-    CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
-
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    username = models.CharField(
-        max_length=128, unique=True, verbose_name=_('Username')
-    )
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
-    email = models.EmailField(
-        max_length=128, unique=True, verbose_name=_('Email')
-    )
-    groups = models.ManyToManyField(
-        'users.UserGroup', related_name='users',
-        blank=True, verbose_name=_('User group')
-    )
-    role = models.CharField(
-        choices=ROLE_CHOICES, default='User', max_length=10,
-        blank=True, verbose_name=_('Role')
-    )
-    avatar = models.ImageField(
-        upload_to="avatar", null=True, verbose_name=_('Avatar')
-    )
-    wechat = models.CharField(
-        max_length=128, blank=True, verbose_name=_('Wechat')
-    )
-    phone = models.CharField(
-        max_length=20, blank=True, null=True, verbose_name=_('Phone')
-    )
-    otp_level = models.SmallIntegerField(
-        default=0, choices=OTP_LEVEL_CHOICES, verbose_name=_('MFA')
-    )
-    otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
-    # Todo: Auto generate key, let user download
-    private_key = fields.EncryptTextField(
-        blank=True, null=True, verbose_name=_('Private key')
-    )
-    public_key = fields.EncryptTextField(
-        blank=True, null=True, verbose_name=_('Public key')
-    )
-    comment = models.TextField(
-        blank=True, null=True, verbose_name=_('Comment')
-    )
-    is_first_login = models.BooleanField(default=True)
-    date_expired = models.DateTimeField(
-        default=date_expired_default, blank=True, null=True,
-        db_index=True, verbose_name=_('Date expired')
-    )
-    created_by = models.CharField(
-        max_length=30, default='', verbose_name=_('Created by')
-    )
-    source = models.CharField(
-        max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
-        verbose_name=_('Source')
-    )
-    date_password_last_updated = models.DateTimeField(
-        auto_now_add=True, blank=True, null=True,
-        verbose_name=_('Date password last updated')
-    )
-
-    user_cache_key_prefix = '_User_{}'
-
-    def __str__(self):
-        return '{0.name}({0.username})'.format(self)
-
+class AuthMixin:
     @property
     def password_raw(self):
         raise AttributeError('Password raw is not a readable attribute')
@@ -134,9 +44,11 @@ class User(AbstractUser):
     def set_password(self, raw_password):
         self._set_password = True
         if self.can_update_password():
-            return super().set_password(raw_password)
+            self.date_password_last_updated = timezone.now()
+            super().set_password(raw_password)
         else:
-            error = _("User auth from {}, go there change password").format(self.source)
+            error = _("User auth from {}, go there change password").format(
+                self.source)
             raise PermissionError(error)
 
     def can_update_password(self):
@@ -145,9 +57,6 @@ class User(AbstractUser):
     def check_otp(self, code):
         from ..utils import check_otp_code
         return check_otp_code(self.otp_secret_key, code)
-
-    def get_absolute_url(self):
-        return reverse('users:user-detail', args=(self.id,))
 
     def is_public_key_valid(self):
         """
@@ -159,35 +68,11 @@ class User(AbstractUser):
         return False
 
     @property
-    def groups_display(self):
-        return ' '.join([group.name for group in self.groups.all()])
-
-    @property
-    def role_display(self):
-        return self.get_role_display()
-
-    @property
-    def source_display(self):
-        return self.get_source_display()
-
-    @property
-    def is_expired(self):
-        if self.date_expired and self.date_expired < timezone.now():
-            return True
-        else:
-            return False
-
-    @property
-    def is_valid(self):
-        if self.is_active and not self.is_expired:
-            return True
-        return False
-
-    @property
     def public_key_obj(self):
         class PubKey(object):
             def __getattr__(self, item):
                 return ''
+
         if self.public_key:
             import sshpubkeys
             try:
@@ -195,6 +80,53 @@ class User(AbstractUser):
             except (TabError, TypeError):
                 pass
         return PubKey()
+
+    def reset_password(self, new_password):
+        self.set_password(new_password)
+        self.save()
+
+    @property
+    def date_password_expired(self):
+        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        date_expired = self.date_password_last_updated + timezone.timedelta(
+            days=int(interval))
+        return date_expired
+
+    @property
+    def password_expired_remain_days(self):
+        date_remain = self.date_password_expired - timezone.now()
+        return date_remain.days
+
+    @property
+    def password_has_expired(self):
+        if self.is_local and self.password_expired_remain_days < 0:
+            return True
+        return False
+
+    @property
+    def password_will_expired(self):
+        if self.is_local and self.password_expired_remain_days < 5:
+            return True
+        return False
+
+
+class RoleMixin:
+    ROLE_ADMIN = 'Admin'
+    ROLE_USER = 'User'
+    ROLE_APP = 'App'
+    ROLE_AUDITOR = 'Auditor'
+
+    ROLE_CHOICES = (
+        (ROLE_ADMIN, _('Administrator')),
+        (ROLE_USER, _('User')),
+        (ROLE_APP, _('Application')),
+        (ROLE_AUDITOR, _("Auditor"))
+    )
+    role = ROLE_USER
+
+    @property
+    def role_display(self):
+        return self.get_role_display()
 
     @property
     def is_superuser(self):
@@ -251,41 +183,21 @@ class User(AbstractUser):
     def is_staff(self, value):
         pass
 
-    @property
-    def is_local(self):
-        return self.source == self.SOURCE_LOCAL
-    
-    @property
-    def date_password_expired(self):
-        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
-        date_expired = self.date_password_last_updated + timezone.timedelta(
-            days=int(interval))
-        return date_expired
+    @classmethod
+    def create_app_user(cls, name, comment):
+        app = cls.objects.create(
+            username=name, name=name, email='{}@local.domain'.format(name),
+            is_active=False, role='App', comment=comment,
+            is_first_login=False, created_by='System'
+        )
+        access_key = app.create_access_key()
+        return app, access_key
 
-    @property
-    def password_expired_remain_days(self):
-        date_remain = self.date_password_expired - timezone.now()
-        return date_remain.days
 
-    @property
-    def password_has_expired(self):
-        if self.is_local and self.password_expired_remain_days < 0:
-            return True
-        return False
-
-    @property
-    def password_will_expired(self):
-        if self.is_local and self.password_expired_remain_days < 5:
-            return True
-        return False
-
-    def save(self, *args, **kwargs):
-        if not self.name:
-            self.name = self.username
-        if self.username == 'admin':
-            self.role = 'Admin'
-            self.is_active = True
-        super().save(*args, **kwargs)
+class TokenMixin:
+    CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"
+    email = ''
+    id = None
 
     @property
     def private_token(self):
@@ -333,30 +245,11 @@ class User(AbstractUser):
     def access_key(self):
         return self.access_keys.first()
 
-    def is_member_of(self, user_group):
-        if user_group in self.groups.all():
-            return True
-        return False
-
-    def avatar_url(self):
-        admin_default = settings.STATIC_URL + "img/avatar/admin.png"
-        user_default = settings.STATIC_URL + "img/avatar/user.png"
-        if self.avatar:
-            return self.avatar.url
-        if self.is_superuser:
-            return admin_default
-        else:
-            return user_default
-
     def generate_reset_token(self):
         letter = string.ascii_letters + string.digits
         token = ''.join([random.choice(letter) for _ in range(50)])
         self.set_cache(token)
         return token
-
-    def set_cache(self, token):
-        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
-        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
 
     @classmethod
     def validate_reset_password_token(cls, token):
@@ -371,10 +264,24 @@ class User(AbstractUser):
             user = None
         return user
 
+    def set_cache(self, token):
+        key = self.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
+        cache.set(key, {'id': self.id, 'email': self.email}, 3600)
+
     @classmethod
     def expired_reset_password_token(cls, token):
         key = cls.CACHE_KEY_USER_RESET_PASSWORD_PREFIX.format(token)
         cache.delete(key)
+
+
+class MFAMixin:
+    otp_level = 0
+    otp_secret_key = ''
+    OTP_LEVEL_CHOICES = (
+        (0, _('Disable')),
+        (1, _('Enable')),
+        (2, _("Force enable")),
+    )
 
     @property
     def otp_enabled(self):
@@ -397,39 +304,130 @@ class User(AbstractUser):
         self.otp_level = 0
         self.otp_secret_key = None
 
-    def to_json(self):
-        return OrderedDict({
-            'id': self.id,
-            'username': self.username,
-            'name': self.name,
-            'email': self.email,
-            'is_active': self.is_active,
-            'is_superuser': self.is_superuser,
-            'role': self.get_role_display(),
-            'groups': [group.name for group in self.groups.all()],
-            'source': self.get_source_display(),
-            'wechat': self.wechat,
-            'phone': self.phone,
-            'otp_level': self.otp_level,
-            'comment': self.comment,
-            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S') \
-                if self.date_expired is not None else None
-        })
 
-    @classmethod
-    def create_app_user(cls, name, comment):
-        app = cls.objects.create(
-            username=name, name=name, email='{}@local.domain'.format(name),
-            is_active=False, role='App', comment=comment,
-            is_first_login=False, created_by='System'
-        )
-        access_key = app.create_access_key()
-        return app, access_key
+class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
+    SOURCE_LOCAL = 'local'
+    SOURCE_LDAP = 'ldap'
+    SOURCE_OPENID = 'openid'
+    SOURCE_RADIUS = 'radius'
+    SOURCE_CHOICES = (
+        (SOURCE_LOCAL, 'Local'),
+        (SOURCE_LDAP, 'LDAP/AD'),
+        (SOURCE_OPENID, 'OpenID'),
+        (SOURCE_RADIUS, 'Radius'),
+    )
 
-    def reset_password(self, new_password):
-        self.set_password(new_password)
-        self.date_password_last_updated = timezone.now()
-        self.save()
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    username = models.CharField(
+        max_length=128, unique=True, verbose_name=_('Username')
+    )
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    email = models.EmailField(
+        max_length=128, unique=True, verbose_name=_('Email')
+    )
+    groups = models.ManyToManyField(
+        'users.UserGroup', related_name='users',
+        blank=True, verbose_name=_('User group')
+    )
+    role = models.CharField(
+        choices=RoleMixin.ROLE_CHOICES, default='User', max_length=10,
+        blank=True, verbose_name=_('Role')
+    )
+    avatar = models.ImageField(
+        upload_to="avatar", null=True, verbose_name=_('Avatar')
+    )
+    wechat = models.CharField(
+        max_length=128, blank=True, verbose_name=_('Wechat')
+    )
+    phone = models.CharField(
+        max_length=20, blank=True, null=True, verbose_name=_('Phone')
+    )
+    otp_level = models.SmallIntegerField(
+        default=0, choices=MFAMixin.OTP_LEVEL_CHOICES, verbose_name=_('MFA')
+    )
+    otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
+    # Todo: Auto generate key, let user download
+    private_key = fields.EncryptTextField(
+        blank=True, null=True, verbose_name=_('Private key')
+    )
+    public_key = fields.EncryptTextField(
+        blank=True, null=True, verbose_name=_('Public key')
+    )
+    comment = models.TextField(
+        blank=True, null=True, verbose_name=_('Comment')
+    )
+    is_first_login = models.BooleanField(default=True)
+    date_expired = models.DateTimeField(
+        default=date_expired_default, blank=True, null=True,
+        db_index=True, verbose_name=_('Date expired')
+    )
+    created_by = models.CharField(
+        max_length=30, default='', verbose_name=_('Created by')
+    )
+    source = models.CharField(
+        max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,
+        verbose_name=_('Source')
+    )
+    date_password_last_updated = models.DateTimeField(
+        auto_now_add=True, blank=True, null=True,
+        verbose_name=_('Date password last updated')
+    )
+
+    user_cache_key_prefix = '_User_{}'
+
+    def __str__(self):
+        return '{0.name}({0.username})'.format(self)
+
+    def get_absolute_url(self):
+        return reverse('users:user-detail', args=(self.id,))
+
+    @property
+    def groups_display(self):
+        return ' '.join([group.name for group in self.groups.all()])
+
+    @property
+    def source_display(self):
+        return self.get_source_display()
+
+    @property
+    def is_expired(self):
+        if self.date_expired and self.date_expired < timezone.now():
+            return True
+        else:
+            return False
+
+    @property
+    def is_valid(self):
+        if self.is_active and not self.is_expired:
+            return True
+        return False
+
+    @property
+    def is_local(self):
+        return self.source == self.SOURCE_LOCAL
+    
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name = self.username
+        if self.username == 'admin':
+            self.role = 'Admin'
+            self.is_active = True
+        super().save(*args, **kwargs)
+
+    def is_member_of(self, user_group):
+        if user_group in self.groups.all():
+            return True
+        return False
+
+    def avatar_url(self):
+        admin_default = settings.STATIC_URL + "img/avatar/admin.png"
+        user_default = settings.STATIC_URL + "img/avatar/user.png"
+        if self.avatar:
+            return self.avatar.url
+        if self.is_superuser:
+            return admin_default
+        else:
+            return user_default
 
     def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':

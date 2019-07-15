@@ -53,9 +53,9 @@
         <th class="text-center">{% trans 'Protocol' %}</th>
         <th class="text-center">{% trans 'Login mode' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
-        <th class="text-center">{% trans 'Reachable' %}</th>
-        <th class="text-center">{% trans 'Unreachable' %}</th>
-        <th class="text-center">{% trans 'Ratio' %}</th>
+{#        <th class="text-center">{% trans 'Reachable' %}</th>#}
+{#        <th class="text-center">{% trans 'Unreachable' %}</th>#}
+{#        <th class="text-center">{% trans 'Ratio' %}</th>#}
         <th class="text-center">{% trans 'Comment' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
@@ -78,44 +78,44 @@ function initTable() {
                 var detail_btn = '<a href="{% url "assets:system-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
-            {targets: 6, createdCell: function (td, cellData) {
-                var innerHtml = "";
-                var data = cellData.reachable;
-                if (data !== 0) {
-                    innerHtml = "<span class='text-navy'>" + data + "</span>";
-                } else {
-                    innerHtml = "<span>" + data + "</span>";
-                }
-                $(td).html(innerHtml)
-            }},
-            {targets: 7, createdCell: function (td, cellData) {
-                var data = cellData.unreachable;
-                var innerHtml = "";
-                if (data !== 0) {
-                    innerHtml = "<span class='text-danger'>" + data + "</span>";
-                } else {
-                    innerHtml = "<span>" + data + "</span>";
-                }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');
-            }},
-            {targets: 8, createdCell: function (td, cellData, rowData) {
-                var val = 0;
-                var innerHtml = "";
-                var total = rowData.assets_amount;
-                var reachable = cellData.reachable;
-                if (total && total !== 0) {
-                    val = reachable/total * 100;
-                }
-
-                if (val === 100) {
-                    innerHtml = "<span class='text-navy'>" + val + "% </span>";
-                } else {
-                    var num = new Number(val);
-                    innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";
-                }
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-            }},
-            {targets: 10, createdCell: function (td, cellData, rowData) {
+            {#{targets: 6, createdCell: function (td, cellData) {#}
+            {#    var innerHtml = "";#}
+            {#    var data = cellData.reachable;#}
+            {#    if (data !== 0) {#}
+            {#        innerHtml = "<span class='text-navy'>" + data + "</span>";#}
+            {#    } else {#}
+            {#        innerHtml = "<span>" + data + "</span>";#}
+            {#    }#}
+            {#    $(td).html(innerHtml)#}
+            {#}},#}
+            {#{targets: 7, createdCell: function (td, cellData) {#}
+            {#    var data = cellData.unreachable;#}
+            {#    var innerHtml = "";#}
+            {#    if (data !== 0) {#}
+            {#        innerHtml = "<span class='text-danger'>" + data + "</span>";#}
+            {#    } else {#}
+            {#        innerHtml = "<span>" + data + "</span>";#}
+            {#    }#}
+            {#    $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + data + '">' + innerHtml + '</span>');#}
+            {#}},#}
+            {#{targets: 8, createdCell: function (td, cellData, rowData) {#}
+            {#    var val = 0;#}
+            {#    var innerHtml = "";#}
+            {#    var total = rowData.assets_amount;#}
+            {#    var reachable = cellData.reachable;#}
+            {#    if (total && total !== 0) {#}
+            {#        val = reachable/total * 100;#}
+            {#    }#}
+            {##}
+            {#    if (val === 100) {#}
+            {#        innerHtml = "<span class='text-navy'>" + val + "% </span>";#}
+            {#    } else {#}
+            {#        var num = new Number(val);#}
+            {#        innerHtml = "<span class='text-danger'>" + num.toFixed(1) + "% </span>";#}
+            {#    }#}
+            {#    $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');#}
+            {#}},#}
+            {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
@@ -124,7 +124,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:system-user-list" %}',
         columns: [
             {data: "id" }, {data: "name" }, {data: "username" }, {data: "protocol"}, {data: "login_mode_display"}, {data: "assets_amount" },
-            {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "connectivity_amount"}, {data: "comment" }, {data: "id" }
+            {data: "comment" }, {data: "id" }
         ],
         op_html: $('#actions').html()
     };
@@ -182,7 +182,7 @@ $(document).ready(function(){
                 swal("{% trans 'System Users Delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
-            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            requestApi({url: url_delete, method: 'DELETE', success: success, error: fail});
             $data_table.ajax.reload();
             jumpserver.checked = false;
         });

@@ -36,7 +36,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
         extra_kwargs = {
-            'password': {'write_only': True, 'required': False},
+            'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
             'groups_display': {'label': _('Groups name')},
             'source_display': {'label': _('Source name')},
@@ -56,13 +56,17 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
-    @staticmethod
-    def validate_password(value):
+    def validate_password(self, password):
         from ..utils import check_password_rules
-        if not check_password_rules(value):
+        password_strategy = self.initial_data.get('password_strategy')
+        if password_strategy == '0':
+            return
+        if password_strategy is None and not password:
+            return
+        if not check_password_rules(password):
             msg = _('Password does not match security rules')
             raise serializers.ValidationError(msg)
-        return value
+        return password
 
     @staticmethod
     def change_password_to_raw(validated_data):

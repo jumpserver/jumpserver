@@ -41,6 +41,9 @@ class AssetPermissionForm(OrgModelForm):
         users_field = self.fields.get('users')
         users_field.queryset = current_org.get_org_users()
 
+        nodes_field = self.fields['nodes']
+        nodes_field.choices = ((n.id, n.full_value) for n in Node.get_queryset())
+
         # 前端渲染优化, 防止过多资产
         if not self.data:
             instance = kwargs.get('instance')
@@ -49,8 +52,6 @@ class AssetPermissionForm(OrgModelForm):
                 assets_field.queryset = instance.assets.all()
             else:
                 assets_field.queryset = Asset.objects.none()
-            nodes_field = self.fields['nodes']
-            nodes_field._queryset = Node.get_queryset()
 
     class Meta:
         model = AssetPermission

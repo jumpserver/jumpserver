@@ -44,6 +44,7 @@ class LabelCreateView(PermissionsMixin, CreateView):
         context = {
             'app': _('Assets'),
             'action': _('Create label'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -71,6 +72,7 @@ class LabelUpdateView(PermissionsMixin, UpdateView):
         context = {
             'app': _('Assets'),
             'action': _('Update label'),
+            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

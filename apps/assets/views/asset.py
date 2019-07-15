@@ -69,7 +69,7 @@ class UserAssetListView(PermissionsMixin, TemplateView):
         context = {
             'action': _('My assets'),
             'labels': Label.objects.all().order_by('name'),
-            'system_users': SystemUser.objects.all(),
+            'show_actions': True
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

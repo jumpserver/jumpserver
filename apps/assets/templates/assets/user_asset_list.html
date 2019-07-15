@@ -11,48 +11,7 @@
 {% block content %}
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
-           <div class="ibox float-e-margins">
-               <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
-                   <div class="file-manager ">
-                       <div id="assetTree" class="ztree">
-                       </div>
-                       <div class="clearfix"></div>
-                   </div>
-               </div>
-           </div>
-       </div>
-       <div class="col-lg-9 animated fadeInRight" id="split-right">
-           <div class="tree-toggle">
-               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
-                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
-               </div>
-           </div>
-           <div class="mail-box-header">
-               <div class="btn-group" style="float: right">
-                   <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
-                   <ul class="dropdown-menu labels">
-                       {% for label in labels %}
-                           <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
-                       {% endfor %}
-                   </ul>
-               </div>
-               <table class="table table-striped table-bordered table-hover " id="user_assets_table" style="width: 100%">
-                   <thead>
-                       <tr>
-                           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                           <th class="text-center">{% trans 'Hostname' %}</th>
-                           <th class="text-center">{% trans 'IP' %}</th>
-                           <th class="text-center">{% trans 'Active' %}</th>
-                           <th class="text-center">{% trans 'System users' %}</th>
-                           <th class="text-center">{% trans 'Action' %}</th>
-                       </tr>
-                   </thead>
-                   <tbody>
-                   </tbody>
-               </table>
-           </div>
-       </div>
+       {% include 'users/_granted_assets.html' %}
    </div>
 </div>
 
@@ -62,130 +21,52 @@
 
 {% block custom_foot_js %}
 <script>
-var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?show_assets=0&cache_policy=1";
-var zTree, asset_table, show=0;
-var inited = false;
-var url;
-
-
-function initTable() {
-    if (inited){
-        return
-    } else {
-        inited = true;
-    }
-    url = "{% url 'api-perms:my-assets' %}?cache_policy=1";
-    var options = {
-        ele: $('#user_assets_table'),
-        columnDefs: [
-            {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a class="asset_detail" asset-id="rowData_id" data-toggle="modal" data-target="#user_asset_detail_modal" tabindex="0">'+ cellData +'</a>'
-                $(td).html(detail_btn.replace("rowData_id", rowData.id));
-                }},
-            {targets: 3, createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
-                }
-            }},
-            {targets: 4, createdCell: function (td, cellData) {
-                var users = [];
-                $.each(cellData, function (id, data) {
-                    users.push(data.name);
-                });
-                $(td).html(users.join(', '))
-            }},
-            {targets: 5, createdCell: function (td, cellData) {
-                var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                $(td).html(conn_btn)
-            }}
-        ],
-        ajax_url: url,
-        columns: [
-            {data: "id"}, {data: "hostname" }, {data: "ip" },
-            {data: "is_active", orderable: false },
-            {data: "system_users_granted", orderable: false},
-            {data: "id", orderable: false}
-        ]
-    };
-    asset_table = jumpserver.initServerSideDataTable(options);
-    return asset_table
-}
-
-function onSelected(event, treeNode) {
-    url = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1';
-    var node_id = treeNode.meta.node.id;
-    url = url.replace("{{ DEFAULT_PK }}", node_id);
-    setCookie('node_selected', treeNode.id);
-    asset_table.ajax.url(url);
-    asset_table.ajax.reload();
-}
-
-function initTree() {
-    var setting = {
-        view: {
-            dblClickExpand: false,
-            showLine: true,
-        },
-        data: {
-            simpleData: {
-                enable: true
-            }
-        },
-        callback: {
-            onSelected: onSelected
-        }
-    };
-
-    var zNodes = [];
-    $.get(treeUrl, function(data, status){
-        zNodes = data;
-        $.fn.zTree.init($("#assetTree"), setting, zNodes);
-        zTree = $.fn.zTree.getZTreeObj("assetTree");
-        rootNodeAddDom(zTree, function () {
-            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
-            initTree();
-        });
-    });
-}
-
+var treeUrl = "{% url 'api-perms:my-nodes-as-tree' %}?&cache_policy=1";
+var assetTableUrl = "{% url 'api-perms:my-assets' %}?cache_policy=1";
+var selectUrl = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1';
+var showAssetHref = false; // Need input default true
+var actions = {
+    targets: 4, createdCell: function (td, cellData) {
+       var conn_btn = '<a href="{% url "luna-view" %}?login_to=' + cellData +
+           '" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>';
+       $(td).html(conn_btn)
+}};
 $(document).ready(function () {
     initTree();
     initTable();
 }).on('click', '.labels li', function () {
     var val = $(this).text();
     $("#user_assets_table_filter input").val(val);
-    asset_table.search(val).draw();
+    assetTable.search(val).draw();
  })
-.on('click', '.asset_detail', function() {
-    var data = asset_table.ajax.json();
-    var asset_id = this.getAttribute("asset-id");
+.on('click', '.asset-detail', function(e) {
+    e.preventDefault();
+    var data = assetTable.ajax.json();
+    var assetId = $(this).data("asset");
     var trs = '';
     var desc = {
         'hostname': "{% trans 'Hostname' %}",
         'ip': "{% trans 'IP' %}",
-        'port': "{% trans 'Port' %}",
-        'protocol': "{% trans 'Protocol' %}",
+        'protocols': "{% trans 'Protocols' %}",
         'platform': "{% trans 'Platform' %}",
-        'os': "{% trans 'OS' %}",
         'system_users_join': "{% trans 'System user' %}",
         'domain': "{% trans 'Domain' %}",
-        'is_active': "{% trans 'Is active' %}",
-        'comment': "{% trans 'Comment' %}"
-        {#'date_joined': "{% trans 'Date joined' %}",#}
     };
-    $.each(data.results, function(index, value){
-        if(value.id === asset_id){
+    var value;
+    for (var i = 0; i < data.results.length; i++) {
+        value = data.results[i];
+        if(value.id === assetId){
             for(var i in desc){
                 trs += "<tr class='no-borders-tr'>\n" +
                   "<td>"+ desc[i] + ":</td>"+
                   "<td><b>"+ (value[i] === null?'':value[i]) + "</b></td>\n" +
                   "</tr>";
             }
+         break
         }
-    });
+    };
     $('#asset_detail_tbody').html(trs)
+    $('#user_asset_detail_modal').modal();
 });
 
 function toggle() {
@@ -204,5 +85,4 @@ function toggle() {
 }
 
 </script>
-
 {% endblock %}

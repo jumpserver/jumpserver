@@ -160,7 +160,7 @@ $(document).ready(function () {
     var body = {
         'is_active': checked
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body)
     });

@@ -48,5 +48,26 @@ $(document).ready(function () {
     $("#asset_list_modal").modal('hide');
 
 })
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var form = $("form");
+    var data = form.serializeObject();
+    var method = "POST";
+    var the_url = '{% url "api-assets:domain-list" %}';
+    var redirect_to = '{% url "assets:domain-list" %}';
+    {% if type == "update" %}
+        the_url = '{% url 'api-assets:domain-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    objectAttrsIsList(data, ['assets']);
+    var props = {
+        url:the_url,
+        data:data,
+        method:method,
+        form:form,
+        redirect_to:redirect_to
+     };
+    formSubmit(props);
+ })
 </script>
 {% endblock %}

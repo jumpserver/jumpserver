@@ -1,7 +1,8 @@
 # ~*~ coding: utf-8 ~*~
 #
 import time
-from django.db.models import Prefetch
+from functools import reduce
+from django.db.models import Prefetch, Q
 
 from common.utils import get_object_or_none, get_logger
 from common.struct import Stack
@@ -21,24 +22,34 @@ def get_system_user_by_id(id):
     return system_user
 
 
-class LabelFilter:
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        query_keys = self.request.query_params.keys()
+class LabelFilterMixin:
+    def get_filter_labels_ids(self):
+        query_params = self.request.query_params
+        query_keys = query_params.keys()
         all_label_keys = Label.objects.values_list('name', flat=True)
         valid_keys = set(all_label_keys) & set(query_keys)
-        labels_query = {}
-        for key in valid_keys:
-            labels_query[key] = self.request.query_params.get(key)
 
-        conditions = []
-        for k, v in labels_query.items():
-            query = {'labels__name': k, 'labels__value': v}
-            conditions.append(query)
+        if not valid_keys:
+            return []
 
-        if conditions:
-            for kwargs in conditions:
-                queryset = queryset.filter(**kwargs)
+        labels_query = [
+            {"name": key, "value": query_params[key]}
+            for key in valid_keys
+        ]
+        args = [Q(**kwargs) for kwargs in labels_query]
+        args = reduce(lambda x, y: x | y, args)
+        labels_id = Label.objects.filter(args).values_list('id', flat=True)
+        return labels_id
+
+
+class LabelFilter(LabelFilterMixin):
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        labels_ids = self.get_filter_labels_ids()
+        if not labels_ids:
+            return queryset
+        for labels_id in labels_ids:
+            queryset = queryset.filter(labels=labels_id)
         return queryset
 
 
@@ -104,7 +115,7 @@ class NodeUtil:
             _node._assets_amount = len(_node._assets)
             delattr(_node, '_assets')
         self.stack.top._children.append(_node)
-        self.stack.top._all_children.extend([_node] + _node._children)
+        self.stack.top._all_children.extend([_node] + _node._all_children)
 
     def init(self):
         all_nodes = self.get_all_nodes()
@@ -145,29 +156,69 @@ class NodeUtil:
     def nodes(self):
         return list(self._nodes.values())
 
+    def get_family_by_key(self, key):
+        tree_nodes = set()
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        tree_nodes.update(node._parents)
+        tree_nodes.add(node)
+        tree_nodes.update(node._all_children)
+        return list(tree_nodes)
+
     # 使用给定节点生成一颗树
     # 找到他们的祖先节点
     # 可选找到他们的子孙节点
-    def get_family(self, nodes, with_children=False):
-        tree_nodes = set()
-        for n in nodes:
-            node = self.get_node_by_key(n.key)
-            if not node:
-                continue
-            tree_nodes.update(node._parents)
-            tree_nodes.add(node)
-            if with_children:
-                tree_nodes.update(node._children)
-        return list(tree_nodes)
+    def get_family(self, node):
+        return self.get_family_by_key(node.key)
 
-    def get_nodes_parents(self, nodes, with_self=True):
+    def get_family_keys_by_key(self, key):
+        nodes = self.get_family_by_key(key)
+        return [n.key for n in nodes]
+
+    def get_some_nodes_family_by_keys(self, keys):
+        family = set()
+        for key in keys:
+            family.update(self.get_family_by_key(key))
+        return family
+
+    def get_some_nodes_family_keys_by_keys(self, keys):
+        family = self.get_some_nodes_family_by_keys(keys)
+        return [n.key for n in family]
+
+    def get_nodes_parents_by_key(self, key, with_self=True):
         parents = set()
-        for n in nodes:
-            node = self.get_node_by_key(n.key)
-            parents.update(set(node._parents))
-            if with_self:
-                parents.add(node)
-        return parents
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        parents.update(set(node._parents))
+        if with_self:
+            parents.add(node)
+        return list(parents)
+
+    def get_node_parents(self, node, with_self=True):
+        return self.get_nodes_parents_by_key(node.key, with_self=with_self)
+
+    def get_nodes_parents_keys_by_key(self, key, with_self=True):
+        nodes = self.get_nodes_parents_by_key(key, with_self=with_self)
+        return [n.key for n in nodes]
+
+    def get_all_children_by_key(self, key, with_self=True):
+        children = set()
+        node = self.get_node_by_key(key)
+        if not node:
+            return []
+        children.update(set(node._all_children))
+        if with_self:
+            children.add(node)
+        return list(children)
+
+    def get_children(self, node, with_self=True):
+        return self.get_all_children_by_key(node.key, with_self=with_self)
+
+    def get_children_keys_by_key(self, key, with_self=True):
+        nodes = self.get_all_children_by_key(key, with_self=with_self)
+        return [n.key for n in nodes]
 
 
 def test_node_tree():

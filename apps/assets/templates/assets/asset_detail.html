@@ -70,7 +70,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Protocol' %}</td>
-                                            <td>{{ asset.protocols }}</td>
+                                            <td><b>{{ asset.protocols }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>
@@ -267,7 +267,7 @@ function updateAssetNodes(nodes) {
         // clear jumpserver.groups_selected
         jumpserver.nodes_selected = {};
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success
@@ -282,7 +282,7 @@ function refreshAssetHardware() {
         var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
         window.open(url, '', 'width=800,height=600')
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         success: success,
         method: 'GET'
@@ -306,7 +306,7 @@ $(document).ready(function () {
     };
     var success = '{% trans "Update successfully!" %}';
     var status = $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").text();
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success_message: success
@@ -360,7 +360,7 @@ $(document).ready(function () {
         window.open(url, '', 'width=800,height=600')
     };
 
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: 'GET',
         success: success

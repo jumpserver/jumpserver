@@ -142,7 +142,7 @@ function updateGroupMember(users) {
         // clear jumpserver.selected_groups
         jumpserver.users_selected = {};
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
         success: success

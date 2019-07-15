@@ -116,5 +116,28 @@ $(document).ready(function () {
     $('#date_start').daterangepicker(dateOptions);
     $('#date_expired').daterangepicker(dateOptions);
 })
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var form = $("form");
+    var data = form.serializeObject();
+    var method = "POST";
+    var the_url = '{% url "api-perms:remote-app-permission-list" %}';
+    var redirect_to = '{% url "perms:remote-app-permission-list" %}';
+    {% if type == "update" %}
+        the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    objectAttrsIsList(data, ['users', 'user_groups', 'remote_apps']);
+    objectAttrsIsDatetime(data, ['date_expired', 'date_start']);
+    objectAttrsIsBool(data, ['is_active']);
+    var props = {
+        url:the_url,
+        data:data,
+        method:method,
+        form:form,
+        redirect_to:redirect_to
+     };
+    formSubmit(props);
+ })
 </script>
 {% endblock %}

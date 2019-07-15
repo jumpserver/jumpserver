@@ -222,7 +222,7 @@ $(document).ready(function(){
             setTimeout( function () {
                 window.location.reload();}, 300);
         }
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
@@ -239,7 +239,7 @@ $(document).ready(function(){
             setTimeout( function () {
                 window.location.reload();}, 300);
         }
-        APIUpdateAttr({
+        requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
@@ -259,7 +259,7 @@ $(document).ready(function(){
         },function () {
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
-                APIUpdateAttr({
+                requestApi({
                     url:url,
                     method:'DELETE',
                     success:refreshTag,
@@ -272,7 +272,7 @@ $(document).ready(function(){
                 var msg = "{% trans 'User Deleting failed.' %}";
                 swal("{% trans 'User Delete' %}", msg, "error");
             }
-            APIUpdateAttr({
+            requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
                 method:'POST',
                 body:JSON.stringify(data),
@@ -290,7 +290,7 @@ $(document).ready(function(){
             var url = "{% url 'users:user-bulk-update' %}";
             location.href= setUrlParam(url, 'spm', data.spm);
          }
-        APIUpdateAttr({
+        requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
                 method:'POST',
                 body:JSON.stringify(data),

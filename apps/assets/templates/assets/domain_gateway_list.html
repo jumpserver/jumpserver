@@ -134,7 +134,7 @@ $(document).ready(function(){
     var data = $("#test_gateway_form").serializeObject();
     var uid = data.gateway_id;
     var the_url = '{% url "api-assets:test-gateway-connective" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: "POST",
         body: JSON.stringify({'port': parseInt(data.port)}),

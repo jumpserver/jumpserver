@@ -68,7 +68,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'User group count' %}:</td>
-                                            <td><b>{{ object.users.count }}</b></td>
+                                            <td><b>{{ object.user_groups.count }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset count' %}:</td>
@@ -187,7 +187,7 @@ function updateSystemUser(system_users) {
     var body = {
         system_users: Object.assign([], system_users)
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body)
     });
@@ -247,7 +247,7 @@ $(document).ready(function () {
     var body = {
         'is_active': checked
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         body: JSON.stringify(body),
     });

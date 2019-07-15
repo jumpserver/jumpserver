@@ -90,7 +90,7 @@ function terminateSession(data) {
     }
     var success_message = '{% trans "Terminate task send, waiting ..." %}';
     var the_url = "{% url 'api-terminal:kill-session' %}";
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: 'POST',
         body: JSON.stringify(data),
@@ -174,7 +174,7 @@ function finishedSession(data) {
     var success = function() {
       location.reload();
     };
-    APIUpdateAttr({
+    requestApi({
         url: the_url,
         method: 'PATCH',
         body: JSON.stringify(data),

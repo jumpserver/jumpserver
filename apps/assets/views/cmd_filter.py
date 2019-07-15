@@ -47,6 +47,7 @@ class CommandFilterCreateView(PermissionsMixin, CreateView):
         context = {
             'app': _('Assets'),
             'action': _('Create command filter'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -64,6 +65,7 @@ class CommandFilterUpdateView(PermissionsMixin, UpdateView):
         context = {
             'app': _('Assets'),
             'action': _('Update command filter'),
+            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -136,6 +138,7 @@ class CommandFilterRuleCreateView(PermissionsMixin, CreateView):
             'app': _('Assets'),
             'action': _('Create command filter rule'),
             'object': self.cmd_filter,
+            'request_type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -170,6 +173,8 @@ class CommandFilterRuleUpdateView(PermissionsMixin, UpdateView):
             'app': _('Assets'),
             'action': _('Update command filter rule'),
             'object': self.cmd_filter,
+            'rule': self.get_object(),
+            'request_type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

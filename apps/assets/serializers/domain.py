@@ -6,6 +6,7 @@ from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins import BulkOrgResourceModelSerializer
 
 from ..models import Domain, Gateway
+from .base import AuthSerializerMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
@@ -14,7 +15,11 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
 
     class Meta:
         model = Domain
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'asset_count', 'gateway_count', 'comment', 'assets',
+            'date_created'
+        ]
+        read_only_fields = ( 'asset_count', 'gateway_count', 'date_created')
         list_serializer_class = AdaptedBulkListSerializer
 
     @staticmethod
@@ -26,14 +31,14 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         return obj.gateway_set.all().count()
 
 
-class GatewaySerializer(BulkOrgResourceModelSerializer):
+class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'ip', 'port', 'protocol', 'username',
-            'domain', 'is_active', 'date_created', 'date_updated',
-            'created_by', 'comment',
+            'id', 'name', 'ip', 'port', 'protocol', 'username', 'password',
+            'private_key', 'public_key', 'domain', 'is_active', 'date_created',
+            'date_updated', 'created_by', 'comment',
         ]
 
 

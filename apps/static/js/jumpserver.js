@@ -256,7 +256,7 @@ function formSubmit(props) {
     })
 }
 
-function APIUpdateAttr(props) {
+function requestApi(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
     var user_success_message = props.success_message;
@@ -328,7 +328,7 @@ function objectDelete(obj, name, url, redirectTo) {
             // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
             swal(gettext('Error'), "[ "+name+" ]" + gettext("Being used by the asset, please unbind the asset first."), "error");
         };
-        APIUpdateAttr({
+        requestApi({
             url: url,
             body: JSON.stringify(body),
             method: 'DELETE',
@@ -369,7 +369,7 @@ function orgDelete(obj, name, url, redirectTo){
                 swal(gettext("Error"), " [ "+ name + " ] " + gettext("Do not perform this operation under this organization. Try again after switching to another organization"), "error");
             }
         };
-        APIUpdateAttr({
+        requestApi({
             url: url,
             body: JSON.stringify(body),
             method: 'DELETE',
@@ -1109,9 +1109,22 @@ function objectAttrsIsBool(obj, attrs) {
     })
 }
 
+function cleanDate(d) {
+    for (var i=0; i<2; i++) {
+        if (isNaN(Date.parse(d))) {
+            d = d.split('+')[0].trimRight();
+        } else {
+            return d
+        }
+    }
+    return ''
+}
+
 function formatDateAsCN(d) {
+    d = cleanDate(d);
     var date = new Date(d);
-    return date.toISOString().replace("T", " ").replace(/\..*/, "");
+    var date_s = date.toLocaleString(navigator.language, {hour12: false});
+    return date_s.split("/").join('-')
 }
 
 function getUrlParams(url) {
@@ -1137,6 +1150,8 @@ function getTimeUnits(u) {
 }
 
 function timeOffset(a, b) {
+    a = cleanDate(a);
+    b = cleanDate(b);
     var start = new Date(a);
     var end = new Date(b);
     var offset = (end - start)/1000;

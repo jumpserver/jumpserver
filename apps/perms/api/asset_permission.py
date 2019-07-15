@@ -4,7 +4,8 @@
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework.views import Response
-from rest_framework.generics import RetrieveUpdateAPIView
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -20,7 +21,7 @@ from .. import serializers
 __all__ = [
     'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
     'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi',
+    'AssetPermissionAddAssetApi', 'AssetPermissionAssetsApi',
 ]
 
 
@@ -232,3 +233,22 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
+
+
+class AssetPermissionAssetsApi(ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    pagination_class = LimitOffsetPagination
+    serializer_class = serializers.AssetPermissionAssetsSerializer
+    filter_fields = ("hostname", "ip")
+    search_fields = filter_fields
+
+    def get_object(self):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(AssetPermission, pk=pk)
+
+    def get_queryset(self):
+        perm = self.get_object()
+        assets = perm.get_all_assets().only(
+            *self.serializer_class.Meta.only_fields
+        )
+        return assets
