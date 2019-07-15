@@ -85,7 +85,7 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
             queryset = queryset.filter(
                 nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
             )
-        return queryset
+        return queryset.distinct()
 
     def filter_admin_user_id(self, queryset):
         admin_user_id = self.request.query_params.get('admin_user_id')
