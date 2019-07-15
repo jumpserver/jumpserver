@@ -109,15 +109,15 @@ function hiddenFields(){
 }
 function constructParams(obj) {
     var type = ['chrome', 'mysql_workbench', 'vmware_client', 'custom'];
+    var params = {};
     type.forEach(function (attr) {
         if (obj.type === attr){
-            var params = {};
             for (var k in obj){
             if (k.startsWith(obj.type)){params[k] = obj[k]}
             }
-            obj["params"] = params
         }
-    })
+    });
+    return params
 }
 $(document).ready(function () {
     $('.select2').select2({
@@ -142,7 +142,7 @@ $(document).ready(function () {
     {% endif %}
     var form = $("form");
     var data = form.serializeObject();
-    constructParams(data);
+    data["params"] = constructParams(data);
     var props = {
         url: the_url,
         data: data,
