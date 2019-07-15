@@ -48,6 +48,7 @@ class RemoteAppPermissionCreateView(PermissionsMixin, CreateView):
         context = {
             'app': _('Perms'),
             'action': _('Create RemoteApp permission'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -63,7 +64,8 @@ class RemoteAppPermissionUpdateView(PermissionsMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Update RemoteApp permission')
+            'action': _('Update RemoteApp permission'),
+            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
