@@ -82,22 +82,6 @@ class RemoteAppSerializer(BulkOrgResourceModelSerializer):
             'system_user_info', 'get_type_display'
         ]
 
-    @staticmethod
-    def get_password_field(params):
-        for k in params.keys():
-            if k.endswith("password"):
-                return k, params[k]
-
-    def update(self, instance, validated_data):
-        data_params = validated_data.get('params')
-        instance_params = instance.params
-        data_password_key, data_password_val = self.get_password_field(data_params)
-        instance_password_key, instance_password_val = self.get_password_field(instance_params)
-        if not data_password_val:
-            data_params[data_password_key] = instance_password_val
-            validated_data['params'] = data_params
-        return super().update(instance, validated_data)
-
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
     parameter_remote_app = serializers.SerializerMethodField()
