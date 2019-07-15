@@ -301,10 +301,10 @@ LOGGING = {
             'handlers': ['gunicorn_console', 'gunicorn_file'],
             'level': 'INFO',
         },
-        # 'django.db': {
-        #     'handlers': ['console', 'file'],
-        #     'level': 'DEBUG'
-        # }
+        'django.db': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 }
 
@@ -568,7 +568,7 @@ SECURITY_PASSWORD_RULES = [
     'SECURITY_PASSWORD_SPECIAL_CHAR'
 ]
 SECURITY_MFA_VERIFY_TTL = CONFIG.SECURITY_MFA_VERIFY_TTL
-
+SECURITY_SERVICE_ACCOUNT_REGISTRATION = CONFIG.SECURITY_SERVICE_ACCOUNT_REGISTRATION
 TERMINAL_PASSWORD_AUTH = CONFIG.TERMINAL_PASSWORD_AUTH
 TERMINAL_PUBLIC_KEY_AUTH = CONFIG.TERMINAL_PUBLIC_KEY_AUTH
 TERMINAL_HEARTBEAT_INTERVAL = CONFIG.TERMINAL_HEARTBEAT_INTERVAL

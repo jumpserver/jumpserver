@@ -192,6 +192,11 @@ class SecuritySettingForm(BaseForm):
         required=False, label=_("Batch execute commands"),
         help_text=_("Allow user batch execute commands")
     )
+    SECURITY_SERVICE_ACCOUNT_REGISTRATION = forms.BooleanField(
+        required=False, label=_("Service account registration"),
+        help_text=_("Allow using bootstrap token register service account, "
+                    "when terminal setup, can disable it")
+    )
     # limit login count
     SECURITY_LOGIN_LIMIT_COUNT = forms.IntegerField(
         min_value=3, max_value=99999,
