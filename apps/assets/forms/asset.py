@@ -29,9 +29,9 @@ class ProtocolForm(forms.Form):
 class AssetCreateForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not self.data:
-            nodes_field = self.fields['nodes']
-            nodes_field._queryset = Node.get_queryset()
+        nodes_field = self.fields['nodes']
+        nodes_field.choices = ((n.id, n.full_value) for n in
+                               Node.get_queryset())
 
     class Meta:
         model = Asset
