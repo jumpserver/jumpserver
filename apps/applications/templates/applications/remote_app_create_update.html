@@ -107,6 +107,18 @@ function hiddenFields(){
     });
     $('.' + app_type + '-fields').removeClass('hidden');
 }
+function constructParams(obj) {
+    var type = ['chrome', 'mysql_workbench', 'vmware_client', 'custom'];
+    var params = {};
+    type.forEach(function (attr) {
+        if (obj.type === attr){
+            for (var k in obj){
+            if (k.startsWith(obj.type)){params[k] = obj[k]}
+            }
+        }
+    });
+    return params
+}
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: true
@@ -118,6 +130,28 @@ $(document).ready(function () {
 .on('change', app_type_id, function(){
     hiddenFields();
     setDefaultValue();
-});
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url "api-applications:remote-app-list" %}';
+    var redirect_to = '{% url "applications:remote-app-list" %}';
+    var method = "POST";
+    {% if type == "update" %}
+        the_url = '{% url "api-applications:remote-app-detail" object.id %}';
+        method = "PUT";
+    {% endif %}
+    var form = $("form");
+    var data = form.serializeObject();
+    data["params"] = constructParams(data);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+     };
+    formSubmit(props);
+ })
+;
 </script>
 {% endblock %}
