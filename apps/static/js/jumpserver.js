@@ -1110,6 +1110,7 @@ function objectAttrsIsBool(obj, attrs) {
 }
 
 function cleanDate(d) {
+    if (typeof d === 'number'){return d}
     for (var i=0; i<2; i++) {
         if (isNaN(Date.parse(d))) {
             d = d.split('+')[0].trimRight();

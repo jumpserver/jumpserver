@@ -174,6 +174,8 @@ class GrantAssetsMixin(LabelFilterMixin):
                 system_user = system_users_map.get(sid)
                 if not system_user:
                     continue
+                if not asset.has_protocol(system_user.protocol):
+                    continue
                 system_user.actions = action
                 system_users_granted.append(system_user)
             asset.system_users_granted = system_users_granted

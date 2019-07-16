@@ -22,7 +22,6 @@ class CommandFilterSerializer(BulkOrgResourceModelSerializer):
 
         extra_kwargs = {
             'rules': {'read_only': True},
-            'system_users': {'read_only': True}
         }
 
 
