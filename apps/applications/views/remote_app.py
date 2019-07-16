@@ -46,6 +46,7 @@ class RemoteAppCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
         context = {
             'app': _('Applications'),
             'action': _('Create RemoteApp'),
+            'type': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -68,6 +69,7 @@ class RemoteAppUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
         context = {
             'app': _('Applications'),
             'action': _('Update RemoteApp'),
+            'type': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
