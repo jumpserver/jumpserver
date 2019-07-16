@@ -256,6 +256,8 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
                     system_user = _system_users_map.get(system_user_id)
                     if not system_user:
                         continue
+                    if not asset.has_protocol(system_user.protocol):
+                        continue
                     system_user.actions = action
                     system_user_granted.append(system_user)
                 asset.system_users_granted = system_user_granted
