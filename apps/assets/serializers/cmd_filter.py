@@ -2,6 +2,7 @@
 #
 import re
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.fields import ChoiceDisplayField
 from common.serializers import AdaptedBulkListSerializer
