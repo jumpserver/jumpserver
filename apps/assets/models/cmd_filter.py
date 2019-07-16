@@ -17,7 +17,7 @@ __all__ = [
 
 class CommandFilter(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=64, verbose_name=_("Name"))
+    name = models.CharField(max_length=64, unique=True, verbose_name=_("Name"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     comment = models.TextField(blank=True, default='', verbose_name=_("Comment"))
     date_created = models.DateTimeField(auto_now_add=True)
