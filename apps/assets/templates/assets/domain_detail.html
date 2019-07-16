@@ -24,7 +24,7 @@
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:domain-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-del">
+                                <a class="btn btn-outline btn-danger btn-del btn-delete-domain">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
@@ -127,6 +127,15 @@ $(document).ready(function(){
     setTimeout( function () {
         $data_table.ajax.reload();
     }, 3000);
-});
+})
+.on('click', '.btn-delete-domain', function () {
+    var $this = $(this);
+    var name = "{{ object.name }}";
+    var uid = "{{ object.id }}";
+    var the_url = '{% url "api-assets:domain-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:domain-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+})
+;
 </script>
 {% endblock %}
