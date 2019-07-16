@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-15 14:43+0800\n"
+"POT-Creation-Date: 2019-07-16 17:04+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -555,7 +555,7 @@ msgid "Connect"
 msgstr "连接"
 
 #: applications/views/remote_app.py:31 applications/views/remote_app.py:47
-#: applications/views/remote_app.py:69 applications/views/remote_app.py:87
+#: applications/views/remote_app.py:70 applications/views/remote_app.py:89
 #: templates/_nav.html:33
 msgid "Applications"
 msgstr "应用管理"
@@ -564,15 +564,15 @@ msgstr "应用管理"
 msgid "RemoteApp list"
 msgstr "远程应用列表"
 
-#: applications/views/remote_app.py:70
+#: applications/views/remote_app.py:71
 msgid "Update RemoteApp"
 msgstr "更新远程应用"
 
-#: applications/views/remote_app.py:88
+#: applications/views/remote_app.py:90
 msgid "RemoteApp detail"
 msgstr "远程应用详情"
 
-#: applications/views/remote_app.py:100
+#: applications/views/remote_app.py:102
 msgid "My RemoteApp"
 msgstr "我的远程应用"
 
@@ -695,7 +695,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/cmd_filter.py:37 assets/serializers/cmd_filter.py:40
+#: assets/forms/cmd_filter.py:38 assets/serializers/cmd_filter.py:43
 msgid "Content should not be contain: {}"
 msgstr "内容不能包含: {}"
 
@@ -1249,86 +1249,86 @@ msgstr "自动登录模式，必须填写用户名"
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/tasks.py:33
+#: assets/tasks.py:34
 msgid "Asset has been disabled, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:37
+#: assets/tasks.py:38
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:50
+#: assets/tasks.py:51
 msgid "No assets matched, stop task"
 msgstr "没有匹配到资产，结束任务"
 
-#: assets/tasks.py:60
+#: assets/tasks.py:61
 msgid "No assets matched related system user protocol, stop task"
 msgstr "没有匹配到与系统用户协议相关的资产，结束任务"
 
-#: assets/tasks.py:86
+#: assets/tasks.py:87
 msgid "Get asset info failed: {}"
 msgstr "获取资产信息失败：{}"
 
-#: assets/tasks.py:136
+#: assets/tasks.py:137
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:153
+#: assets/tasks.py:154
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:178
+#: assets/tasks.py:179
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:232
+#: assets/tasks.py:233
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:274
+#: assets/tasks.py:275
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:281
+#: assets/tasks.py:282
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:349
+#: assets/tasks.py:350
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:356
+#: assets/tasks.py:357
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:369
+#: assets/tasks.py:370
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:470 assets/tasks.py:556
+#: assets/tasks.py:471 assets/tasks.py:557
 #: xpack/plugins/change_auth_plan/models.py:522
 msgid "The asset {} system platform {} does not support run Ansible tasks"
 msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
-#: assets/tasks.py:482
+#: assets/tasks.py:483
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh or "
 "rdp: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
 
-#: assets/tasks.py:489
+#: assets/tasks.py:490
 msgid "For security, do not push user {}"
 msgstr "为了安全，禁止推送用户 {}"
 
-#: assets/tasks.py:517 assets/tasks.py:531
+#: assets/tasks.py:518 assets/tasks.py:532
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:523
+#: assets/tasks.py:524
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:603
+#: assets/tasks.py:604
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 
@@ -5307,8 +5307,6 @@ msgstr "密码长度"
 
 #: xpack/plugins/change_auth_plan/forms.py:45
 #: xpack/plugins/change_auth_plan/models.py:213
-#, fuzzy
-#| msgid "For security, do not change {} user's password"
 msgid "* For security, do not change {} user's password"
 msgstr "* 为了安全，禁止更改 {} 用户的密码"
 
@@ -5933,9 +5931,6 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
-
-#~ msgid "* For security, please do not change root user's password"
-#~ msgstr "* 为了安全，请不要更改root用户的密码"
 
 #~ msgid "Interface"
 #~ msgstr "界面"
