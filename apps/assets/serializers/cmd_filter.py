@@ -2,6 +2,7 @@
 #
 import re
 from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
 
 from common.fields import ChoiceDisplayField
 from common.serializers import AdaptedBulkListSerializer
@@ -35,6 +36,9 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
 
     def validate_content(self, content):
+        tp = self.initial_data.get("type")
+        if tp == CommandFilterRule.TYPE_REGEX:
+            return content
         if self.invalid_pattern.search(content):
             invalid_char = self.invalid_pattern.pattern.replace('\\', '')
             msg = _("Content should not be contain: {}").format(invalid_char)

@@ -344,6 +344,12 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, RetrieveAPIView
         user_id = self.request.query_params.get('user_id', '')
         asset_id = self.request.query_params.get('asset_id', '')
         system_id = self.request.query_params.get('system_user_id', '')
+        try:
+            user_id = uuid.UUID(user_id)
+            asset_id = uuid.UUID(asset_id)
+            system_id = uuid.UUID(system_id)
+        except ValueError:
+            return Response({'msg': False}, status=403)
 
         user = get_object_or_404(User, id=user_id)
 
