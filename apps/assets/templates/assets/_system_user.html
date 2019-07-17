@@ -53,7 +53,7 @@
                             </div>
                             <div class="auth-fields">
                                 {% bootstrap_field form.password layout="horizontal" %}
-                                {% bootstrap_field form.private_key_file layout="horizontal" %}
+                                {% bootstrap_field form.private_key layout="horizontal" %}
                             </div>
                             <div class="form-group">
                                 <label for="{{ form.auto_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
@@ -90,7 +90,7 @@ var login_mode_id = '#' + '{{ form.login_mode.id_for_label }}';
 
 var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
 var password_id = '#' + '{{ form.password.id_for_label }}';
-var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+var private_key_id = '#' + '{{ form.private_key.id_for_label }}';
 var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
 var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
 var shell_id = '#' + '{{ form.shell.id_for_label }}';
@@ -230,7 +230,7 @@ $(document).ready(function () {
 
     objectAttrsIsList(data, ['cmd_filters']);
     objectAttrsIsBool(data, ["auto_generate_key", "auto_push"]);
-    data["private_key"] = $("#id_private_key_file").data('file');
+    data["private_key"] = $("#id_private_key").data('file');
 
     var props = {
         url: the_url,
@@ -240,9 +240,9 @@ $(document).ready(function () {
         redirect_to: redirect_to
     };
     formSubmit(props);
-}).on('change', '#id_private_key_file', function () {
+}).on('change', '#id_private_key', function () {
     readFile($(this)).on("onload", function (evt, data) {
-         $(this).attr("data-file", data)
+         $(this).data("file", data)
     })
 })
 

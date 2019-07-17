@@ -37,7 +37,7 @@
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.username layout="horizontal" %}
                             {% bootstrap_field form.password layout="horizontal" %}
-                            {% bootstrap_field form.private_key_file layout="horizontal" %}
+                            {% bootstrap_field form.private_key layout="horizontal" %}
                             {% bootstrap_field form.comment layout="horizontal" %}
 
                             <div class="form-group">
@@ -70,8 +70,9 @@ $(document).ready(function () {
     {% endif %}
     var form = $("form");
     var data = form.serializeObject();
+    console.log($("#id_private_key").data("file"));
 
-    data["private_key"] = $("#id_private_key_file").data('file');
+    data["private_key"] = $("#id_private_key").data('file');
 
     var props = {
         url: the_url,
@@ -82,9 +83,9 @@ $(document).ready(function () {
     };
     formSubmit(props);
 })
-.on('change', '#id_private_key_file', function () {
+.on('change', '#id_private_key', function () {
     readFile($(this)).on("onload", function (evt, data) {
-         $(this).attr("data-file", data)
+        $(this).data("file", data)
     })
 })
 </script>
