@@ -76,9 +76,15 @@ function initTable() {
                 var detail_btn = '<a href="{% url "users:user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.role_display);
+             }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+             }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                $(td).html(rowData.source_display);
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 if (cellData) {
@@ -114,9 +120,9 @@ function initTable() {
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [
             {data: "id"}, {data: "name" }, {data: "username" },
-            {data: "role_display", orderable: false},
+            {data: "role"},
             {data: "groups_display", orderable: false},
-            {data: "source_display", orderable: false},
+            {data: "source"},
             {data: "is_valid", orderable: false},
             {data: "id", orderable: false}
         ],
