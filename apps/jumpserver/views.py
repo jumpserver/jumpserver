@@ -100,13 +100,19 @@ class IndexView(PermissionsMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        return current_org.get_org_users().count() - self.get_month_active_user_total()
+        count = current_org.get_org_users().count() - self.get_month_active_user_total()
+        if count < 0:
+            count = 0
+        return count
 
     def get_month_active_asset_total(self):
         return self.session_month.values('asset').distinct().count()
 
     def get_month_inactive_asset_total(self):
-        return Asset.objects.all().count() - self.get_month_active_asset_total()
+        count = Asset.objects.all().count() - self.get_month_active_asset_total()
+        if count < 0:
+            count = 0
+        return count
 
     @staticmethod
     def get_user_disabled_total():
@@ -180,6 +186,7 @@ class IndexView(PermissionsMixin, TemplateView):
             'week_asset_hot_ten': self.get_week_top10_asset(),
             'last_login_ten': self.get_last10_sessions(),
             'week_user_hot_ten': self.get_week_top10_user(),
+            'app': _("Dashboard"),
         }
 
         kwargs.update(context)
