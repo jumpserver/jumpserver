@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
+
 from common.utils import ssh_pubkey_gen, validate_ssh_private_key
 
 
