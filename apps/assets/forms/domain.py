@@ -64,7 +64,7 @@ class GatewayForm(PasswordAndKeyAuthForm, OrgModelForm):
         model = Gateway
         fields = [
             'name', 'ip', 'port', 'username', 'protocol', 'domain', 'password',
-            'private_key_file',  'is_active', 'comment',
+            'private_key',  'is_active', 'comment',
         ]
         help_texts = {
             'protocol': _("SSH gateway support proxy SSH,RDP,VNC")

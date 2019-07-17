@@ -56,4 +56,6 @@ class RequestMiddleware:
     def __call__(self, request):
         set_current_request(request)
         response = self.get_response(request)
+        age = request.session.get_expiry_age()
+        request.session.set_expiry(age)
         return response

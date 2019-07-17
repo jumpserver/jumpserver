@@ -46,7 +46,7 @@
                             <div class="auth-fields">
                                 {% bootstrap_field form.username layout="horizontal" %}
                                 {% bootstrap_field form.password layout="horizontal" %}
-                                {% bootstrap_field form.private_key_file layout="horizontal" %}
+                                {% bootstrap_field form.private_key layout="horizontal" %}
                             </div>
                             {% endblock %}
 
@@ -70,7 +70,7 @@
 {% block custom_foot_js %}
 <script>
 var protocol_id = '#' + '{{ form.protocol.id_for_label }}';
-var private_key_id = '#' + '{{ form.private_key_file.id_for_label }}';
+var private_key_id = '#' + '{{ form.private_key.id_for_label }}';
 var port = '#' + '{{ form.port.id_for_label }}';
 var username = '#' + '{{ form.username.id_for_label }}';
 var password = '#' + '{{ form.password.id_for_label }}';
@@ -99,7 +99,7 @@ $(document).ready(function(){
     evt.preventDefault();
     var form = $("form");
     var data = form.serializeObject();
-    data["private_key"] = $("#id_private_key_file").data('file');
+    data["private_key"] = $("#id_private_key").data('file');
     var method = "POST";
     var the_url = '{% url "api-assets:gateway-list" %}';
     var redirect_to = '{% url "assets:domain-gateway-list" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", data.domain);
@@ -116,9 +116,9 @@ $(document).ready(function(){
      };
     formSubmit(props);
 })
-.on('change', '#id_private_key_file', function () {
+.on('change', '#id_private_key', function () {
     readFile($(this)).on("onload", function (evt, data) {
-         $(this).attr("data-file", data)
+         $(this).data("file", data)
     })
 })
 .on('change', protocol_id, function(){
