@@ -29,7 +29,7 @@
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:cmd-filter-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-del">
+                                <a class="btn btn-outline btn-danger btn-del btn-delete-cmd-filter">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
@@ -163,6 +163,14 @@ $(document).ready(function () {
         return n !== unbound_system_user
     });
     updateCMDFilterSystemUsers(system_users)
+})
+.on('click', '.btn-delete-cmd-filter', function () {
+    var $this = $(this);
+    var name = "{{object.name }}";
+    var uid = "{{ object.id }}";
+    var the_url = '{% url "api-assets:cmd-filter-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:cmd-filter-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
 })
 </script>
 {% endblock %}

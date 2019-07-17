@@ -216,6 +216,8 @@ $(document).ready(function () {
     var form = $("form");
     var protocols = {};
     var data = form.serializeObject();
+    objectAttrsIsBool(data, ['is_active']);
+    objectAttrsIsList(data, ['nodes', 'labels']);
     $.each(data, function (k, v) {
         if (k.startsWith("form")){
             delete data[k];
@@ -233,12 +235,6 @@ $(document).ready(function () {
         return v.name + '/' + v.port
     });
     data["protocols"] = protocols;
-    if (typeof data.labels === "string") {
-        data["labels"] = [data["labels"]];
-    }
-    if (typeof data["nodes"] == "string") {
-        data["nodes"] = [data["nodes"]]
-    }
     var props = {
         url: the_url,
         data: data,
