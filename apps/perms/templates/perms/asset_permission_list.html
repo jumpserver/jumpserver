@@ -182,9 +182,9 @@ function initTable() {
         ],
         ajax_url: '{% url "api-perms:asset-permission-list" %}?display=1',
         columns: [
-            {data: "id"}, {data: "name"}, {data: "users"},
-            {data: "user_groups"}, {data: "assets"},
-            {data: "nodes"}, {data: "system_users"},
+            {data: "id"}, {data: "name"}, {data: "users", orderable: false},
+            {data: "user_groups", orderable: false}, {data: "assets", orderable: false},
+            {data: "nodes", orderable: false}, {data: "system_users", orderable: false},
             {data: "is_valid", orderable: false}, {data: "id", orderable: false}
         ],
         select: {},

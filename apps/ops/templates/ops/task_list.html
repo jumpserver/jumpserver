@@ -75,7 +75,13 @@ $(document).ready(function() {
         "searching": false,
         "paging": false,
         "bInfo" : false,
-        "order": []
+        "order": [],
+        "columnDefs": [
+            { "orderable": false, "targets": 0 },
+            { "orderable": false, "targets": 4 },
+            { "orderable": false, "targets": 5 },
+            { "orderable": false, "targets": 8 }
+        ]
     });
     $('.select2').select2({
         dropdownAutoWidth : true,

@@ -140,8 +140,8 @@ function initTable() {
             }}
         ],
         ajax_url: '{% url "api-ops:history-list" %}?task={{ object.pk }}',
-        columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "stat"}, {data: "stat"}, {data: "is_finished"},
-                  {data: "is_success"}, {data: "timedelta"}, {data: 'adhoc_short_id'}, {data: "id"}]
+        columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "stat", orderable:false}, {data: "stat", orderable:false}, {data: "is_finished"},
+                  {data: "is_success"}, {data: "timedelta"}, {data: 'adhoc_short_id'}, {data: "id", orderable:false}]
     };
     jumpserver.initDataTable(options);
 }
