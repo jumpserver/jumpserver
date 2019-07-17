@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from functools import reduce
+import uuid
 from hashlib import md5
 from django.core.cache import cache
 from django.db.models import Q
@@ -186,6 +186,20 @@ class GrantAssetsMixin(LabelFilterMixin):
         data = self.get_serializer_queryset(queryset_list)
         return super().get_serializer(data, many=True)
 
+    def filter_queryset_by_id(self, assets_items):
+        i = self.request.query_params.get("id")
+        if not i:
+            return assets_items
+        try:
+            pk = uuid.UUID(i)
+        except ValueError:
+            return assets_items
+        assets_map = {asset['id']: asset for asset in assets_items}
+        if pk in assets_map:
+            return [assets_map.get(pk)]
+        else:
+            return []
+
     def search_queryset(self, assets_items):
         search = self.request.query_params.get("search")
         if not search:
@@ -221,6 +235,7 @@ class GrantAssetsMixin(LabelFilterMixin):
         return [assets_map.get(asset_id) for asset_id in assets_ids_search]
 
     def filter_queryset(self, assets_items):
+        assets_items = self.filter_queryset_by_id(assets_items)
         assets_items = self.search_queryset(assets_items)
         assets_items = self.filter_queryset_by_label(assets_items)
         assets_items = self.sort_queryset(assets_items)

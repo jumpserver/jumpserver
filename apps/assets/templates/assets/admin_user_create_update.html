@@ -70,8 +70,6 @@ $(document).ready(function () {
     {% endif %}
     var form = $("form");
     var data = form.serializeObject();
-    console.log($("#id_private_key").data("file"));
-
     data["private_key"] = $("#id_private_key").data('file');
 
     var props = {
