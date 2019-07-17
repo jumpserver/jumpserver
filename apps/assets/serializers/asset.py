@@ -112,7 +112,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             protocol = protocols_data[0].split('/')
             validated_data["protocol"] = protocol[0]
             validated_data["port"] = int(protocol[1])
-        if validated_data:
+        if protocols_data:
             validated_data["protocols"] = ' '.join(protocols_data)
 
     def create(self, validated_data):
