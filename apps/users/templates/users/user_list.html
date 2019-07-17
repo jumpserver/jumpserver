@@ -209,8 +209,8 @@ $(document).ready(function(){
     var data = {
         'resources': id_list
     };
-    function refreshTag() {
-        $('#user_list_table').DataTable().ajax.reload()
+    function reloadPage() {
+        setTimeout( function () {window.location.reload();}, 300);
     }
     function doDeactive() {
         var data = [];
@@ -218,15 +218,11 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": false};
             data.push(obj);
         });
-        function success() {
-            setTimeout( function () {
-                window.location.reload();}, 300);
-        }
         requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: success
+            success: reloadPage
         });
     }
     function doActive() {
@@ -235,15 +231,11 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": true};
             data.push(obj);
         });
-        function success() {
-            setTimeout( function () {
-                window.location.reload();}, 300);
-        }
         requestApi({
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: success
+            success: reloadPage
         });
     }
     function doDelete() {
@@ -262,7 +254,7 @@ $(document).ready(function(){
                 requestApi({
                     url:url,
                     method:'DELETE',
-                    success:refreshTag,
+                    success:reloadPage,
                     flash_message:false,
                  });
                 var msg = "{% trans 'User Deleted.' %}";
