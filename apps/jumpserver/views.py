@@ -180,6 +180,7 @@ class IndexView(PermissionsMixin, TemplateView):
             'week_asset_hot_ten': self.get_week_top10_asset(),
             'last_login_ten': self.get_last10_sessions(),
             'week_user_hot_ten': self.get_week_top10_user(),
+            'app': _("Dashboard"),
         }
 
         kwargs.update(context)
