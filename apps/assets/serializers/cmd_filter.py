@@ -35,12 +35,12 @@ class CommandFilterRuleSerializer(BulkOrgResourceModelSerializer):
         fields = '__all__'
         list_serializer_class = AdaptedBulkListSerializer
 
-    def validate_content(self, content):
-        tp = self.initial_data.get("type")
-        if tp == CommandFilterRule.TYPE_REGEX:
-            return content
-        if self.invalid_pattern.search(content):
-            invalid_char = self.invalid_pattern.pattern.replace('\\', '')
-            msg = _("Content should not be contain: {}").format(invalid_char)
-            raise serializers.ValidationError(msg)
-        return content
+    # def validate_content(self, content):
+    #     tp = self.initial_data.get("type")
+    #     if tp == CommandFilterRule.TYPE_REGEX:
+    #         return content
+    #     if self.invalid_pattern.search(content):
+    #         invalid_char = self.invalid_pattern.pattern.replace('\\', '')
+    #         msg = _("Content should not be contain: {}").format(invalid_char)
+    #         raise serializers.ValidationError(msg)
+    #     return content

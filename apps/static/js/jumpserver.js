@@ -223,7 +223,7 @@ function formSubmit(props) {
                 return
             }
             $.each(errors, function (k, v) {
-                var fieldRef = props.form.find('input[name="' + k + '"]');
+                var fieldRef = props.form.find('[name="' + k + '"]');
                 var formGroupRef = fieldRef.parents('.form-group');
                 var parentRef = fieldRef.parent();
                 var helpBlockRef = parentRef.children('.help-block.error');
@@ -237,7 +237,7 @@ function formSubmit(props) {
                     helpBlockRef.html(help_msg);
                 } else {
                     $.each(v, function (kk, vv) {
-                        if (typeof errors === "object") {
+                        if (typeof vv === "object") {
                             $.each(vv, function (kkk, vvv) {
                                 noneFieldErrorMsg += " " + vvv + '<br/>';
                             })

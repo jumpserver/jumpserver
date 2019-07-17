@@ -6,6 +6,8 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 from rest_framework.views import Response
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import condition
 
 from django.utils.translation import ugettext as _
 from common.utils import get_logger
@@ -14,12 +16,23 @@ from ..utils import (
     AssetPermissionUtil
 )
 from .. import const
-from ..hands import Asset, Node, SystemUser, Label
+from ..hands import Asset, Node, SystemUser
 from .. import serializers
 
 logger = get_logger(__name__)
 
 __all__ = ['UserPermissionCacheMixin', 'GrantAssetsMixin', 'NodesWithUngroupMixin']
+
+
+def get_etag(request, *args, **kwargs):
+    cache_policy = request.GET.get("cache_policy")
+    if cache_policy != '1':
+        return None
+    view = request.parser_context.get("view")
+    if not view:
+        return None
+    etag = view.get_meta_cache_id()
+    return etag
 
 
 class UserPermissionCacheMixin:
@@ -96,6 +109,7 @@ class UserPermissionCacheMixin:
         cache.set(key, response.data, self.CACHE_TIME)
         logger.debug("Set response to cache: {}".format(key))
 
+    @method_decorator(condition(etag_func=get_etag))
     def get(self, request, *args, **kwargs):
         self.cache_policy = request.GET.get('cache_policy', '0')
 
