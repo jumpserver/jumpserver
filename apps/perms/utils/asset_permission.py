@@ -499,7 +499,7 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         if pattern:
             assets_ids = Asset.objects.filter(
                 nodes__key__regex=pattern
-            ).values_list("id", flat=True).distinct()
+            ).valid().values_list("id", flat=True).distinct()
         else:
             assets_ids = []
         self.tree.add_assets_without_system_users(assets_ids)
@@ -523,8 +523,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         assets_ids = defaultdict(lambda: defaultdict(int))
         for perm in self.permissions:
             actions = [perm.actions]
-            _assets_ids = [a.id for a in perm.assets.all()]
-            system_users_ids = [s.id for s in perm.system_users.all()]
+            _assets_ids = perm.assets.valid().values_list("id", flat=True)
+            system_users_ids = perm.system_users.values_list("id", flat=True)
             iterable = itertools.product(_assets_ids, system_users_ids, actions)
             for asset_id, sys_id, action in iterable:
                 assets_ids[asset_id][sys_id] |= action
