@@ -62,8 +62,8 @@ function initTable() {
         ],
         ajax_url: '{% url "api-assets:cmd-filter-list" %}',
         columns: [
-            {data: "id"}, {data: "name" }, {data: "rules" },
-            {data: "system_users" }, {data: "comment"}, {data: "id"}
+            {data: "id"}, {data: "name" }, {data: "rules", orderable: false},
+            {data: "system_users", orderable: false}, {data: "comment"}, {data: "id", orderable: false}
         ],
         op_html: $('#actions').html()
     };
