@@ -19,17 +19,17 @@
                             </li>
                             <li>
                                 <a href="{% url 'perms:asset-permission-user-list' pk=asset_permission.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Users and user groups' %}
+                                <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
                                 </a>
                             </li>
                             <li class="active">
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and node' %}</a>
+                                <i class="fa fa-inbox"></i> {% trans 'Assets and node' %}</a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span style="float: left">{% trans 'Asset list of ' %} <b>{{ asset_permission.name }}</b></span>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Add asset to this permission' %}
