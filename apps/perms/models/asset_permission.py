@@ -103,7 +103,7 @@ class AssetPermission(BasePermission):
         if pattern:
             args.append(Q(nodes__key__regex=pattern))
         args = reduce(lambda x, y: x | y, args)
-        assets = Asset.objects.filter(args)
+        assets = Asset.objects.filter(args).distinct()
         return assets
 
 
