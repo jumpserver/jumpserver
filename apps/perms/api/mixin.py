@@ -28,6 +28,8 @@ def get_etag(request, *args, **kwargs):
     cache_policy = request.GET.get("cache_policy")
     if cache_policy != '1':
         return None
+    if not UserPermissionCacheMixin.CACHE_ENABLE:
+        return None
     view = request.parser_context.get("view")
     if not view:
         return None
@@ -38,6 +40,7 @@ def get_etag(request, *args, **kwargs):
 class UserPermissionCacheMixin:
     cache_policy = '0'
     RESP_CACHE_KEY = '_PERMISSION_RESPONSE_CACHE_V2_{}'
+    CACHE_ENABLE = settings.ASSETS_PERM_CACHE_ENABLE
     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
     _object = None
 
@@ -111,7 +114,10 @@ class UserPermissionCacheMixin:
 
     @method_decorator(condition(etag_func=get_etag))
     def get(self, request, *args, **kwargs):
-        self.cache_policy = request.GET.get('cache_policy', '0')
+        if not self.CACHE_ENABLE:
+            self.cache_policy = '0'
+        else:
+            self.cache_policy = request.GET.get('cache_policy', '0')
 
         obj = self._get_object()
         if obj is None:
