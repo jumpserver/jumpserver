@@ -199,8 +199,8 @@ function initTable() {
         ajax_url: commandListUrl,
         columns: [
             {data: "id"}, {data: "input", orderable: false}, {data: "user", orderable: false},
-            {data: "asset"}, {data: "system_user"},
-            {data: "session"}, {data: "timestamp", width: "160px"},
+            {data: "asset", orderable: false}, {data: "system_user", orderable: false},
+            {data: "session", orderable: false}, {data: "timestamp", width: "160px", orderable: false},
         ],
         select: {},
         op_html: $('#actions').html(),

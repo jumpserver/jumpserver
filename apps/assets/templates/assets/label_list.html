@@ -44,7 +44,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:label-list" %}?sort=name',
         columns: [
             {data: "id"}, {data: "name" }, {data: "value" },
-            {data: "asset_count" }, {data: "id"}
+            {data: "asset_count", orderable: false}, {data: "id", orderable: false}
         ],
         op_html: $('#actions').html()
     };

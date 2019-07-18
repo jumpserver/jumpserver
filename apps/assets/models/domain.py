@@ -75,7 +75,8 @@ class Gateway(AssetUser):
                           pkey=self.private_key_obj)
         except(paramiko.AuthenticationException,
                paramiko.BadAuthenticationType,
-               paramiko.SSHException) as e:
+               paramiko.SSHException,
+               paramiko.ssh_exception.NoValidConnectionsError) as e:
             return False, str(e)
 
         try:
