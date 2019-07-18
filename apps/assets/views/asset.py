@@ -5,20 +5,18 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormMixin
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.core.cache import cache
 from django.shortcuts import redirect
-from django.contrib.messages.views import SuccessMessageMixin
 from django.forms.formsets import formset_factory
 
 from common.utils import get_object_or_none, get_logger
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
-from common.const import (
-    create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
-)
+from common.const import KEY_CACHE_RESOURCES_ID
 from .. import forms
+from ..utils import NodeUtil
 from ..models import Asset, SystemUser, Label, Node
 
 
@@ -198,7 +196,9 @@ class AssetDetailView(PermissionsMixin, DetailView):
         ).select_related('admin_user', 'domain')
 
     def get_context_data(self, **kwargs):
-        nodes_remain = Node.objects.exclude(assets=self.object)
+        nodes_remain = Node.objects.exclude(assets=self.object).only('key')
+        util = NodeUtil()
+        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('Assets'),
             'action': _('Asset detail'),
