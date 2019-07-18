@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-17 13:09+0800\n"
+"POT-Creation-Date: 2019-07-18 13:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -79,7 +79,7 @@ msgstr "运行参数"
 #: assets/models/asset.py:319 assets/models/authbook.py:24
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:81
 #: assets/serializers/system_user.py:30
-#: assets/templates/assets/admin_user_list.html:47
+#: assets/templates/assets/admin_user_list.html:46
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
@@ -140,7 +140,7 @@ msgstr "系统用户"
 #: assets/models/cmd_filter.py:20 assets/models/domain.py:20
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/templates/assets/admin_user_detail.html:56
-#: assets/templates/assets/admin_user_list.html:45
+#: assets/templates/assets/admin_user_list.html:44
 #: assets/templates/assets/cmd_filter_detail.html:61
 #: assets/templates/assets/cmd_filter_list.html:24
 #: assets/templates/assets/domain_detail.html:56
@@ -263,7 +263,7 @@ msgstr "创建日期"
 #: assets/models/cmd_filter.py:55 assets/models/domain.py:21
 #: assets/models/domain.py:53 assets/models/group.py:23
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:72
-#: assets/templates/assets/admin_user_list.html:51
+#: assets/templates/assets/admin_user_list.html:50
 #: assets/templates/assets/asset_detail.html:132
 #: assets/templates/assets/cmd_filter_detail.html:65
 #: assets/templates/assets/cmd_filter_list.html:27
@@ -412,8 +412,8 @@ msgstr "详情"
 #: applications/templates/applications/remote_app_list.html:56
 #: assets/templates/assets/_asset_user_list.html:70
 #: assets/templates/assets/admin_user_detail.html:24
-#: assets/templates/assets/admin_user_list.html:27
-#: assets/templates/assets/admin_user_list.html:112
+#: assets/templates/assets/admin_user_list.html:26
+#: assets/templates/assets/admin_user_list.html:111
 #: assets/templates/assets/asset_detail.html:27
 #: assets/templates/assets/asset_list.html:78
 #: assets/templates/assets/asset_list.html:169
@@ -427,7 +427,7 @@ msgstr "详情"
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:26
 #: assets/templates/assets/system_user_list.html:33
-#: assets/templates/assets/system_user_list.html:119 audits/models.py:33
+#: assets/templates/assets/system_user_list.html:85 audits/models.py:33
 #: perms/templates/perms/asset_permission_detail.html:30
 #: perms/templates/perms/asset_permission_list.html:173
 #: perms/templates/perms/remote_app_permission_detail.html:30
@@ -439,8 +439,8 @@ msgstr "详情"
 #: users/templates/users/user_group_list.html:20
 #: users/templates/users/user_group_list.html:70
 #: users/templates/users/user_list.html:20
-#: users/templates/users/user_list.html:96
-#: users/templates/users/user_list.html:99
+#: users/templates/users/user_list.html:102
+#: users/templates/users/user_list.html:105
 #: users/templates/users/user_profile.html:177
 #: users/templates/users/user_profile.html:187
 #: users/templates/users/user_profile.html:196
@@ -456,7 +456,7 @@ msgstr "更新"
 #: applications/templates/applications/remote_app_detail.html:25
 #: applications/templates/applications/remote_app_list.html:57
 #: assets/templates/assets/admin_user_detail.html:28
-#: assets/templates/assets/admin_user_list.html:113
+#: assets/templates/assets/admin_user_list.html:112
 #: assets/templates/assets/asset_detail.html:31
 #: assets/templates/assets/asset_list.html:170
 #: assets/templates/assets/cmd_filter_detail.html:33
@@ -468,7 +468,7 @@ msgstr "更新"
 #: assets/templates/assets/domain_list.html:55
 #: assets/templates/assets/label_list.html:40
 #: assets/templates/assets/system_user_detail.html:30
-#: assets/templates/assets/system_user_list.html:120 audits/models.py:34
+#: assets/templates/assets/system_user_list.html:86 audits/models.py:34
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:174
@@ -480,8 +480,8 @@ msgstr "更新"
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
 #: users/templates/users/user_group_list.html:72
-#: users/templates/users/user_list.html:104
-#: users/templates/users/user_list.html:108
+#: users/templates/users/user_list.html:110
+#: users/templates/users/user_list.html:114
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:33
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:57
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:27
@@ -499,8 +499,8 @@ msgid ""
 "uploaded to the application server and successfully published as a RemoteApp "
 "application"
 msgstr ""
-"使用此功能前，请确保已将应用加载器上传到应用服务器并成功发布为一个RemoteApp应"
-"用"
+"使用此功能前，请确保已将应用加载器上传到应用服务器并成功发布为一个 RemoteApp "
+"应用"
 
 #: applications/templates/applications/remote_app_list.html:6
 msgid "Download application loader"
@@ -515,7 +515,7 @@ msgstr "创建远程应用"
 #: applications/templates/applications/user_remote_app_list.html:21
 #: assets/models/cmd_filter.py:54
 #: assets/templates/assets/_asset_user_list.html:20
-#: assets/templates/assets/admin_user_list.html:52
+#: assets/templates/assets/admin_user_list.html:51
 #: assets/templates/assets/asset_list.html:100
 #: assets/templates/assets/cmd_filter_list.html:28
 #: assets/templates/assets/cmd_filter_rule_list.html:63
@@ -640,7 +640,6 @@ msgstr "管理用户"
 #: assets/templates/assets/asset_create.html:48
 #: assets/templates/assets/asset_create.html:50
 #: assets/templates/assets/asset_list.html:85
-#: users/templates/users/_granted_assets.html:16
 #: xpack/plugins/orgs/templates/orgs/org_list.html:20
 msgid "Label"
 msgstr "标签"
@@ -695,7 +694,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms/cmd_filter.py:38 assets/serializers/cmd_filter.py:44
+#: assets/forms/cmd_filter.py:38
 msgid "Content should not be contain: {}"
 msgstr "内容不能包含: {}"
 
@@ -713,7 +712,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: assets/templates/assets/_asset_user_auth_view_modal.html:21
 #: assets/templates/assets/_asset_user_list.html:16
 #: assets/templates/assets/admin_user_detail.html:60
-#: assets/templates/assets/admin_user_list.html:46
+#: assets/templates/assets/admin_user_list.html:45
 #: assets/templates/assets/domain_gateway_list.html:71
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:52 audits/models.py:94
@@ -1254,86 +1253,86 @@ msgstr "自动登录模式，必须填写用户名"
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/tasks.py:33
+#: assets/tasks.py:34
 msgid "Asset has been disabled, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:37
+#: assets/tasks.py:38
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:50
+#: assets/tasks.py:51
 msgid "No assets matched, stop task"
 msgstr "没有匹配到资产，结束任务"
 
-#: assets/tasks.py:60
+#: assets/tasks.py:61
 msgid "No assets matched related system user protocol, stop task"
 msgstr "没有匹配到与系统用户协议相关的资产，结束任务"
 
-#: assets/tasks.py:86
+#: assets/tasks.py:87
 msgid "Get asset info failed: {}"
 msgstr "获取资产信息失败：{}"
 
-#: assets/tasks.py:136
+#: assets/tasks.py:137
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:153
+#: assets/tasks.py:154
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:178
+#: assets/tasks.py:179
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:232
+#: assets/tasks.py:233
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:274
+#: assets/tasks.py:275
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:281
+#: assets/tasks.py:282
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:349
+#: assets/tasks.py:350
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:356
+#: assets/tasks.py:357
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:369
+#: assets/tasks.py:370
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:470 assets/tasks.py:556
+#: assets/tasks.py:471 assets/tasks.py:557
 #: xpack/plugins/change_auth_plan/models.py:522
 msgid "The asset {} system platform {} does not support run Ansible tasks"
 msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
-#: assets/tasks.py:482
+#: assets/tasks.py:483
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh or "
 "rdp: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
 
-#: assets/tasks.py:489
+#: assets/tasks.py:490
 msgid "For security, do not push user {}"
 msgstr "为了安全，禁止推送用户 {}"
 
-#: assets/tasks.py:517 assets/tasks.py:531
+#: assets/tasks.py:518 assets/tasks.py:532
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:523
+#: assets/tasks.py:524
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:603
+#: assets/tasks.py:604
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 
@@ -1578,11 +1577,11 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:207
-#: assets/templates/assets/asset_list.html:395
+#: assets/templates/assets/asset_list.html:387
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_assets.html:100
 #: assets/templates/assets/system_user_detail.html:182
-#: assets/templates/assets/system_user_list.html:172
+#: assets/templates/assets/system_user_list.html:139
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
@@ -1592,7 +1591,7 @@ msgstr "选择节点"
 #: users/templates/users/user_detail.html:482
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:119
-#: users/templates/users/user_list.html:257
+#: users/templates/users/user_list.html:255
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create.html:36
 #: xpack/plugins/interface/templates/interface/interface.html:103
@@ -1605,19 +1604,15 @@ msgid ""
 "Admin users are asset (charged server) on the root, or have NOPASSWD: ALL "
 "sudo permissions users, "
 msgstr ""
-"管理用户是资产（被控服务器）上的root，或拥有 NOPASSWD: ALL sudo权限的用户，"
+"管理用户是资产（被控服务器）上的 root，或拥有 NOPASSWD: ALL sudo 权限的用户，"
 
 #: assets/templates/assets/admin_user_list.html:6
 msgid ""
 "Jumpserver users of the system using the user to `push system user`,  `get "
 "assets hardware information`, etc. "
-msgstr "Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等。"
+msgstr "Jumpserver 使用该用户来 `推送系统用户`、`获取资产硬件信息` 等。"
 
-#: assets/templates/assets/admin_user_list.html:7
-msgid "You can set any one for Windows or other hardware."
-msgstr "Windows或其它硬件可以随意设置一个"
-
-#: assets/templates/assets/admin_user_list.html:17
+#: assets/templates/assets/admin_user_list.html:16
 #: assets/templates/assets/asset_list.html:68
 #: assets/templates/assets/system_user_list.html:23
 #: audits/templates/audits/login_log_list.html:85
@@ -1627,7 +1622,7 @@ msgstr "Windows或其它硬件可以随意设置一个"
 msgid "Export"
 msgstr "导出"
 
-#: assets/templates/assets/admin_user_list.html:22
+#: assets/templates/assets/admin_user_list.html:21
 #: assets/templates/assets/asset_list.html:73
 #: assets/templates/assets/system_user_list.html:28
 #: settings/templates/settings/_ldap_list_users_modal.html:100
@@ -1638,21 +1633,21 @@ msgstr "导出"
 msgid "Import"
 msgstr "导入"
 
-#: assets/templates/assets/admin_user_list.html:37
+#: assets/templates/assets/admin_user_list.html:36
 #: assets/views/admin_user.py:50
 msgid "Create admin user"
 msgstr "创建管理用户"
 
-#: assets/templates/assets/admin_user_list.html:163
-#: assets/templates/assets/admin_user_list.html:194
+#: assets/templates/assets/admin_user_list.html:162
+#: assets/templates/assets/admin_user_list.html:193
 #: assets/templates/assets/asset_list.html:268
 #: assets/templates/assets/asset_list.html:305
-#: assets/templates/assets/system_user_list.html:225
-#: assets/templates/assets/system_user_list.html:256
+#: assets/templates/assets/system_user_list.html:192
+#: assets/templates/assets/system_user_list.html:223
 #: users/templates/users/user_group_list.html:163
 #: users/templates/users/user_group_list.html:194
-#: users/templates/users/user_list.html:158
-#: users/templates/users/user_list.html:190
+#: users/templates/users/user_list.html:164
+#: users/templates/users/user_list.html:196
 #: xpack/plugins/vault/templates/vault/vault.html:224
 msgid "Please select file"
 msgstr "选择文件"
@@ -1786,45 +1781,45 @@ msgstr "仅显示当前节点资产"
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-#: assets/templates/assets/asset_list.html:389
-#: assets/templates/assets/system_user_list.html:166
+#: assets/templates/assets/asset_list.html:381
+#: assets/templates/assets/system_user_list.html:133
 #: users/templates/users/user_detail.html:382
 #: users/templates/users/user_detail.html:408
 #: users/templates/users/user_detail.html:476
 #: users/templates/users/user_group_list.html:113
-#: users/templates/users/user_list.html:251
+#: users/templates/users/user_list.html:249
 #: xpack/plugins/interface/templates/interface/interface.html:97
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:390
+#: assets/templates/assets/asset_list.html:382
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:393
-#: assets/templates/assets/system_user_list.html:170
+#: assets/templates/assets/asset_list.html:385
+#: assets/templates/assets/system_user_list.html:137
 #: settings/templates/settings/terminal_setting.html:166
 #: users/templates/users/user_detail.html:386
 #: users/templates/users/user_detail.html:412
 #: users/templates/users/user_detail.html:480
 #: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:117
-#: users/templates/users/user_list.html:255
+#: users/templates/users/user_list.html:253
 #: xpack/plugins/interface/templates/interface/interface.html:101
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:406
+#: assets/templates/assets/asset_list.html:398
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:407
-#: assets/templates/assets/asset_list.html:411
+#: assets/templates/assets/asset_list.html:399
+#: assets/templates/assets/asset_list.html:403
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:410
+#: assets/templates/assets/asset_list.html:402
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -1853,16 +1848,16 @@ msgstr "当用户使用这个系统用户登录资产，然后执行一个命令
 
 #: assets/templates/assets/cmd_filter_list.html:8
 msgid "The command will be filter by rules, higher priority rule run first,"
-msgstr "这个命令需要被绑定过滤器的所有规则匹配，高优先级先被匹配,"
+msgstr "这个命令需要被绑定过滤器的所有规则匹配，高优先级先被匹配，"
 
 #: assets/templates/assets/cmd_filter_list.html:9
 msgid ""
 "When a rule matched, if rule action is allow, then allow command execute,"
-msgstr "当一个规则匹配到了，如果规则的动作是 允许, 这个命令会被放行,"
+msgstr "当一个规则匹配到了，如果规则的动作是允许，这个命令会被放行，"
 
 #: assets/templates/assets/cmd_filter_list.html:10
 msgid "else if action is deny, then command with be deny,"
-msgstr "如果规则的动作是 禁止，命令将会被禁止执行,"
+msgstr "如果规则的动作是禁止，命令将会被禁止执行，"
 
 #: assets/templates/assets/cmd_filter_list.html:11
 msgid "else match next rule, if none matched, allowed"
@@ -1978,46 +1973,46 @@ msgid ""
 "web@some-host `), rather than using a user the username login server jump (` "
 "ssh xiaoming@some-host `); "
 msgstr ""
-"系统用户是 Jumpserver跳转登录资产时使用的用户，可以理解为登录资产用户，如 "
-"web, sa, dba(`ssh web@some-host`), 而不是使用某个用户的用户名跳转登录服务器"
-"(`ssh xiaoming@some-host`);"
+"系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户，如 "
+"web，sa，dba（`ssh web@some-host`），而不是使用某个用户的用户名跳转登录服务器"
+"（`ssh xiaoming@some-host`）；"
 
 #: assets/templates/assets/system_user_list.html:11
 msgid ""
 "In simple terms, users log into Jumpserver using their own username, and "
 "Jumpserver uses system users to log into assets. "
 msgstr ""
-"简单来说是 用户使用自己的用户名登录Jumpserver, Jumpserver使用系统用户登录资"
+"简单来说是用户使用自己的用户名登录 Jumpserver，Jumpserver 使用系统用户登录资"
 "产。"
 
 #: assets/templates/assets/system_user_list.html:12
 msgid ""
 "When system users are created, if you choose auto push Jumpserver to use "
-"ansible push system users into the asset, if the asset (Switch) does not "
+"Ansible push system users into the asset, if the asset (Switch) does not "
 "support ansible, please manually fill in the account password."
 msgstr ""
-"系统用户创建时，如果选择了自动推送 Jumpserver会使用ansible自动推送系统用户到"
-"资产中，如果资产(交换机)不支持ansible, 请手动填写账号密码。"
+"系统用户创建时，如果选择了自动推送，Jumpserver 会使用 Ansible 自动推送系统用"
+"户到资产中，如果资产（交换机）不支持 Ansible，请手动填写账号密码。"
 
 #: assets/templates/assets/system_user_list.html:43
 #: assets/views/system_user.py:47
 msgid "Create system user"
 msgstr "创建系统用户"
 
-#: assets/templates/assets/system_user_list.html:167
+#: assets/templates/assets/system_user_list.html:134
 msgid "This will delete the selected System Users !!!"
 msgstr "删除选择系统用户"
 
-#: assets/templates/assets/system_user_list.html:176
+#: assets/templates/assets/system_user_list.html:143
 msgid "System Users Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/system_user_list.html:177
-#: assets/templates/assets/system_user_list.html:182
+#: assets/templates/assets/system_user_list.html:144
+#: assets/templates/assets/system_user_list.html:149
 msgid "System Users Delete"
 msgstr "删除系统用户"
 
-#: assets/templates/assets/system_user_list.html:181
+#: assets/templates/assets/system_user_list.html:148
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
@@ -2629,7 +2624,11 @@ msgstr "不能包含特殊字符"
 msgid "This field must be unique."
 msgstr "字段必须唯一"
 
-#: jumpserver/views.py:191
+#: jumpserver/views.py:189 templates/_nav.html:4 templates/_nav_audits.html:4
+msgid "Dashboard"
+msgstr "仪表盘"
+
+#: jumpserver/views.py:198
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, coco, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -2955,7 +2954,7 @@ msgstr "版本"
 msgid "Run"
 msgstr "执行"
 
-#: ops/templates/ops/task_list.html:117
+#: ops/templates/ops/task_list.html:123
 msgid "Task start: "
 msgstr "任务开始: "
 
@@ -2989,11 +2988,11 @@ msgstr "命令执行"
 msgid "Organization"
 msgstr "组织"
 
-#: perms/api/mixin.py:128
+#: perms/api/mixin.py:142
 msgid "ungrouped"
 msgstr "未分组"
 
-#: perms/api/mixin.py:133
+#: perms/api/mixin.py:147
 msgid "empty"
 msgstr "空"
 
@@ -3854,11 +3853,6 @@ msgstr "用户页面"
 #: templates/_header_bar.html:97
 msgid "Logout"
 msgstr "注销登录"
-
-#: templates/_header_bar.html:114 templates/_nav.html:4
-#: templates/_nav_audits.html:4
-msgid "Dashboard"
-msgstr "仪表盘"
 
 #: templates/_import_modal.html:12
 msgid "Download the imported template or use the exported CSV file format"
@@ -4913,28 +4907,28 @@ msgstr "用户组删除"
 msgid "UserGroup Deleting failed."
 msgstr "用户组删除失败"
 
-#: users/templates/users/user_list.html:252
+#: users/templates/users/user_list.html:250
 msgid "This will delete the selected users !!!"
 msgstr "删除选中用户 !!!"
 
-#: users/templates/users/user_list.html:268
+#: users/templates/users/user_list.html:266
 msgid "User Deleted."
 msgstr "已被删除"
 
-#: users/templates/users/user_list.html:269
-#: users/templates/users/user_list.html:273
+#: users/templates/users/user_list.html:267
+#: users/templates/users/user_list.html:271
 msgid "User Delete"
 msgstr "删除"
 
-#: users/templates/users/user_list.html:272
+#: users/templates/users/user_list.html:270
 msgid "User Deleting failed."
 msgstr "用户删除失败"
 
-#: users/templates/users/user_list.html:325
+#: users/templates/users/user_list.html:323
 msgid "User is expired"
 msgstr "用户已失效"
 
-#: users/templates/users/user_list.html:328
+#: users/templates/users/user_list.html:326
 msgid "User is inactive"
 msgstr "用户已禁用"
 
