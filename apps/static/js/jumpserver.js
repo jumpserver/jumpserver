@@ -1091,7 +1091,7 @@ function objectAttrsIsList(obj, attrs) {
 
 function objectAttrsIsDatetime(obj, attrs) {
     attrs.forEach(function (attr) {
-        obj[attr] = new Date(obj[attr]).toISOString();
+        obj[attr] = formatDateAsCN(obj[attr]);
     })
 }
 
@@ -1156,10 +1156,8 @@ function getTimeUnits(u) {
 }
 
 function timeOffset(a, b) {
-    a = cleanDate(a);
-    b = cleanDate(b);
-    var start = new Date(a);
-    var end = new Date(b);
+    var start = safeDate(a);
+    var end = safeDate(b);
     var offset = (end - start)/1000;
 
     var days = offset / 3600 / 24;
