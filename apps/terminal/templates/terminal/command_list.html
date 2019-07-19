@@ -89,14 +89,16 @@ $(document).ready(function () {
             language: navigator.language || "en",
         };
         dateFromRef.datepicker(options).on("changeDate", function () {
-            var date = new Date($(this).val() + ' 0:0:0');
+            var value = $(this).val() + ' 0:0:0';
+            var date = safeDate(value);
             var url = table.ajax.url();
             url = setUrlParam(url, "date_from", date.getTime()/1000);
             table.ajax.url(url);
             table.ajax.reload();
         });
         dateToRef.datepicker(options).on("changeDate", function () {
-            var date = new Date($(this).val() + ' 23:59:59');
+            var value = $(this).val() + ' 23:59:59';
+            var date = safeDate(value);
             var url = table.ajax.url();
             url = setUrlParam(url, "date_to", date.getTime()/1000);
             table.ajax.url(url);

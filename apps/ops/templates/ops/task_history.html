@@ -88,8 +88,9 @@ function initTable() {
         select: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var d = new Date(cellData);
-                $(td).html(d.toLocaleString());
+                var d = formatDateAsCN(cellData);
+                $(td).html(d);
+
              }},
             {targets: 2, createdCell: function (td, cellData) {
                 var total = "<span>" + cellData.total + "</span>";

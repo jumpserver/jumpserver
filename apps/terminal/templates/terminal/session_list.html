@@ -104,8 +104,8 @@ var dateFrom = "{{ date_from.timestamp }}";
 var dateTo = "{{ date_to.timestamp }}";
 
 function initTable() {
-    dateFrom = new Date(dateFrom * 1000).toISOString();
-    dateTo = new Date(dateTo * 1000).toISOString();
+    dateFrom = formatDateAsCN(dateFrom * 1000);
+    dateTo = formatDateAsCN(dateTo * 1000);
     sessionListUrl = setUrlParam(sessionListUrl, "date_from", dateFrom);
     sessionListUrl = setUrlParam(sessionListUrl, "date_to", dateTo);
     var options = {
@@ -201,9 +201,9 @@ $(document).ready(function() {
                 return
             }
             var value = $(this).val() + ' 0:0:0';
-            var date = new Date(value);
+            var date = formatDateAsCN(value);
             var url = table.ajax.url();
-            url = setUrlParam(url, "date_from", date.toISOString());
+            url = setUrlParam(url, "date_from", date);
             table.ajax.url(url);
             table.ajax.reload();
         });
@@ -212,9 +212,9 @@ $(document).ready(function() {
                 return
             }
             var value = $(this).val() + ' 23:59:59';
-            var date = new Date(value);
+            var date = formatDateAsCN(value);
             var url = table.ajax.url();
-            url = setUrlParam(url, "date_to", date.toISOString());
+            url = setUrlParam(url, "date_to", date);
             table.ajax.url(url);
             table.ajax.reload();
         });

@@ -159,8 +159,7 @@ function initTable() {
                   } else {
                       innerHtml = '<i class="fa fa-circle text-warning"></i>'
                   }
-                  var date = new Date(cellData.datetime);
-                  var dateManual = date.toLocaleString();
+                  var dateManual = formatDateAsCN(cellData.datetime);
                   var dataContent = testDatetime + dateManual;
                   innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
                   $(td).html(innerHtml);
