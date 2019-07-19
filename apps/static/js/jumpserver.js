@@ -305,7 +305,6 @@ function requestApi(props) {
             toastr.error(msg);
         }
         if (typeof props.error === 'function') {
-            console.log(jqXHR);
             return props.error(jqXHR.responseText, jqXHR.status);
         }
     });
@@ -610,7 +609,6 @@ jumpserver.initServerSideDataTable = function (options) {
                        if (kv.length === 2) {
                            var value = kv[1];
                            value = value.replace("+", " ");
-                           console.log(value);
                            search_attr[kv[0]] = value
                        } else {
                            search_raw.push(kv)
@@ -654,8 +652,6 @@ jumpserver.initServerSideDataTable = function (options) {
             $.each(rows, function (id, row) {
                 table.selected_rows.push(row);
                 if (row.id && $.inArray(row.id, table.selected) === -1){
-                    console.log(table)
-                    console.log(table.selected);
                     table.selected.push(row.id)
                 }
             })
@@ -1095,7 +1091,7 @@ function objectAttrsIsList(obj, attrs) {
 
 function objectAttrsIsDatetime(obj, attrs) {
     attrs.forEach(function (attr) {
-        obj[attr] = new Date(obj[attr]).toISOString();
+        obj[attr] = formatDateAsCN(obj[attr]);
     })
 }
 
@@ -1110,7 +1106,12 @@ function objectAttrsIsBool(obj, attrs) {
 }
 
 function cleanDate(d) {
-    if (typeof d === 'number'){return d}
+    if (typeof d === 'number'){
+        return d
+    }
+    if (typeof d === "string") {
+        d = d.replaceAll('-', '/')
+    }
     for (var i=0; i<2; i++) {
         if (isNaN(Date.parse(d))) {
             d = d.split('+')[0].trimRight();
@@ -1121,9 +1122,13 @@ function cleanDate(d) {
     return ''
 }
 
+function safeDate(s) {
+    s = cleanDate(s);
+    return new Date(s)
+}
+
 function formatDateAsCN(d) {
-    d = cleanDate(d);
-    var date = new Date(d);
+    var date = safeDate(d);
     var date_s = date.toLocaleString(navigator.language, {hour12: false});
     return date_s.split("/").join('-')
 }
@@ -1151,10 +1156,8 @@ function getTimeUnits(u) {
 }
 
 function timeOffset(a, b) {
-    a = cleanDate(a);
-    b = cleanDate(b);
-    var start = new Date(a);
-    var end = new Date(b);
+    var start = safeDate(a);
+    var end = safeDate(b);
     var offset = (end - start)/1000;
 
     var days = offset / 3600 / 24;
@@ -1179,7 +1182,6 @@ function readFile(ref) {
     var hasFile = files && files.length > 0;
     if (hasFile) {
         var reader = new FileReader();//新建一个FileReader
-        console.log(typeof files[0]);
         reader.readAsText(files[0], "UTF-8");//读取文件
         reader.onload = function(evt){ //读取完文件之后会回来这里
             ref.trigger("onload", evt.target.result);

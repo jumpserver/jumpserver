@@ -109,8 +109,8 @@ $(document).ready(function () {
                 }
             }},
             {targets: 6, createdCell: function (td, cellData) {
-                var d = new Date(cellData);
-                $(td).html(d.toLocaleString())
+                var d = formatDateAsCN(cellData);
+                $(td).html(d)
             }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
                var detail_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" href="{% url 'ops:adhoc-detail' pk=DEFAULT_PK %}">{% trans "Detail" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
