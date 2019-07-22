@@ -109,7 +109,7 @@ $(document).ready(function () {
                 }
             }},
             {targets: 6, createdCell: function (td, cellData) {
-                var d = formatDateAsCN(cellData);
+                var d = toSafeLocalDateStr(cellData);
                 $(td).html(d)
             }},
             {targets: 7, createdCell: function (td, cellData, rowData) {

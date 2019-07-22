@@ -103,9 +103,9 @@ class Migration(migrations.Migration):
             name='nodes',
             field=models.ManyToManyField(blank=True, related_name='granted_by_permissions', to='assets.Node', verbose_name='Nodes'),
         ),
-        migrations.RunPython(
-            code=migrate_node_permissions,
-        ),
+        # migrations.RunPython(
+        #     code=migrate_node_permissions,
+        # ),
         migrations.RunPython(
             code=migrate_system_assets_relation,
         ),
