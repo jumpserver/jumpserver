@@ -14,13 +14,14 @@ __all__ = [
 
 class NodeSerializer(BulkOrgResourceModelSerializer):
     assets_amount = serializers.IntegerField(read_only=True)
+    name = serializers.ReadOnlyField(source='value')
 
     class Meta:
         model = Node
         only_fields = ['id', 'key', 'value', 'org_id']
-        fields = only_fields + ['assets_amount']
+        fields = only_fields + ['name', 'assets_amount']
         read_only_fields = [
-            'key', 'assets_amount', 'org_id',
+            'key', 'name', 'assets_amount', 'org_id',
         ]
 
     def validate_value(self, data):
