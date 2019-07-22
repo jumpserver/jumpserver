@@ -203,14 +203,16 @@ class GenerateTree:
         nodes = []
         for key, values in nodes_with_assets_amount.items():
             assets = {asset_id: self.assets.get(asset_id) for asset_id in values["assets"]}
+            all_assets = {asset_id: self.assets.get(asset_id) for asset_id in values["all_assets"]}
             nodes.append({
-                "key": key, "assets": assets,
+                "key": key, "assets": assets, "all_assets": all_assets,
                 "assets_amount": values["assets_amount"]
             })
         # 如果返回空节点，页面构造授权资产树报错
         if not nodes:
             nodes.append({
-                "key": const.EMPTY_NODE_KEY, "assets": {}, "assets_amount": 0
+                "key": const.EMPTY_NODE_KEY, "assets": {}, "assets_amount": 0,
+                "all_assets": {},
             })
         nodes.sort(key=lambda n: self.key_sort(n["key"]))
         self._nodes_with_assets = nodes

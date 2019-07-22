@@ -102,7 +102,8 @@ class PermAssetsAmountUtil(PermStackUtilMixin):
         self.debug("出栈: {} 栈顶: {}".format(
             _node['key'], self.stack.top['key'] if self.stack.top else None)
         )
-        _node["assets_amount"] = len(_node["all_assets"] | _node["assets"])
+        _node["all_assets"] = _node["all_assets"] | _node["assets"]
+        _node["assets_amount"] = len(_node["all_assets"])
         self._nodes[_node.pop("key")] = _node
 
         if not self.stack.top:
