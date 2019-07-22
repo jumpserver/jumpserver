@@ -68,10 +68,12 @@ var treeUrl = '{% url 'api-assets:node-children-tree' %}?assets=0';
 //       "otherMenu": "",
 //       "showAssets": false,
 //    }
+var inited = false;
 function initNodeTree(options) {
     if (options.showAssets) {
         treeUrl = setUrlParam(treeUrl, 'assets', '1')
     }
+    var asyncTreeUrl = setUrlParam(treeUrl, 'refresh', '0');
     var setting = {
         view: {
             dblClickExpand: false,
@@ -84,7 +86,7 @@ function initNodeTree(options) {
         },
         async: {
 			enable: true,
-			url: treeUrl,
+			url: asyncTreeUrl,
 			autoParam: ["id=key", "name=n", "level=lv"],
             type: 'get'
 		},
@@ -109,15 +111,19 @@ function initNodeTree(options) {
             beforeAsync: options.beforeAsync || defaultCallback("Before async")
         }
     };
-    $.get(treeUrl, function(data, status){
-        zNodes = data;
-        zTree = $.fn.zTree.init($("#nodeTree"), setting, zNodes);
+    $.get(treeUrl, function (data, status) {
+        zTree = $.fn.zTree.init($("#nodeTree"), setting, data);
         rootNodeAddDom(zTree, function () {
             treeUrl = setUrlParam(treeUrl, 'refresh', '1');
-            initTree();
-            treeUrl = setUrlParam(treeUrl, 'refresh', '0')
+            initNodeTree(options);
+            treeUrl = setUrlParam(treeUrl, 'refresh', '0');
         });
+        inited = true;
     });
+
+    if (inited) {
+        return
+    }
 
     if (options.showMenu) {
         showMenu = true;
