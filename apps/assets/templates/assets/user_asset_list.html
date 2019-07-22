@@ -23,7 +23,7 @@
 <script>
 var treeUrl = "{% url 'api-perms:my-nodes-as-tree' %}?&cache_policy=1";
 var assetTableUrl = "{% url 'api-perms:my-assets' %}?cache_policy=1";
-var selectUrl = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1';
+var selectUrl = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1&all=1';
 var showAssetHref = false; // Need input default true
 var actions = {
     targets: 4, createdCell: function (td, cellData) {
