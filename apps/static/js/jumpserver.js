@@ -1105,25 +1105,28 @@ function objectAttrsIsBool(obj, attrs) {
     })
 }
 
-function cleanDate(d) {
-    if (typeof d === 'number'){
-        return d
-    }
-    if (typeof d === "string") {
-        d = d.replaceAll('-', '/')
-    }
-    for (var i=0; i<2; i++) {
-        if (isNaN(Date.parse(d))) {
-            d = d.split('+')[0].trimRight();
-        } else {
-            return d
+function cleanDateStr(d) {
+    for (var i=0;i<3;i++) {
+        if (!isNaN(Number(d))) {
+            return d;
+        }
+        if (!isNaN(Date.parse(d))){
+            return d;
+        }
+        switch (i) {
+            case 0:
+                d = d.replaceAll('-', '/');
+                break;
+            case 1:
+                d = d.split('+')[0].trimRight();
+                break;
         }
     }
-    return ''
+    return null;
 }
 
 function safeDate(s) {
-    s = cleanDate(s);
+    s = cleanDateStr(s);
     return new Date(s)
 }
 
@@ -1132,7 +1135,7 @@ function safeDateISOStr(s) {
     return d.toISOString();
 }
 
-function formatDateAsCN(d) {
+function toSafeLocalDateStr(d) {
     var date = safeDate(d);
     var date_s = date.toLocaleString(navigator.language, {hour12: false});
     return date_s.split("/").join('-')
@@ -1154,7 +1157,7 @@ function getTimeUnits(u) {
         "m": "分",
         "s": "秒",
     };
-    if (navigator.language || "zh-CN") {
+    if (navigator.language === "zh-CN") {
         return units[u]
     }
     return u
