@@ -31,9 +31,9 @@ from ..utils import LabelFilter
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet', 'AssetListUpdateApi',
+    'AssetViewSet',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi', 'AssetBulkUpdateSelectAPI'
+    'AssetGatewayApi',
 ]
 
 
@@ -101,29 +101,6 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         queryset = self.filter_admin_user_id(queryset)
         return queryset
 
-
-class AssetListUpdateApi(IDInCacheFilterMixin, ListBulkCreateUpdateDestroyAPIView):
-    """
-    Asset bulk update api
-    """
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetSerializer
-    permission_classes = (IsOrgAdmin,)
-
-
-class AssetBulkUpdateSelectAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
-
-    def post(self, request, *args, **kwargs):
-        assets_id = request.data.get('assets_id', '')
-        if assets_id:
-            spm = uuid.uuid4().hex
-            key = CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX.format(spm)
-            cache.set(key, assets_id, 300)
-            url = reverse_lazy('assets:asset-bulk-update') + '?spm=%s' % spm
-            return Response({'url': url})
-        error = _('Please select assets that need to be updated')
-        return Response({'error': error}, status=400)
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):

@@ -202,9 +202,11 @@ class GrantAssetsMixin(LabelFilterMixin):
             data.append(asset)
         return data
 
-    def get_serializer(self, queryset_list, many=True):
-        data = self.get_serializer_queryset(queryset_list)
-        return super().get_serializer(data, many=True)
+    def get_serializer(self, data=None, many=True):
+        if data is None:
+            data = []
+        data = self.get_serializer_queryset(data)
+        return super().get_serializer(data=data, many=many)
 
     def filter_queryset_by_id(self, assets_items):
         i = self.request.query_params.get("id")
