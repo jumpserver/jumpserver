@@ -88,13 +88,18 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, GrantAssetsMixin, ListA
 
     def get_queryset(self):
         user = self.get_object()
+        query_all = self.request.query_params.get("all", "0") == "1"
         self.util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
         key = self.get_node_key()
         nodes_items = self.util.get_nodes_with_assets()
         assets_system_users = {}
+        if query_all:
+            k = "all_assets"
+        else:
+            k = "assets"
         for item in nodes_items:
             if item["key"] == key:
-                assets_system_users = item["assets"]
+                assets_system_users = item[k]
                 break
         assets = []
         for asset_id, system_users in assets_system_users.items():
