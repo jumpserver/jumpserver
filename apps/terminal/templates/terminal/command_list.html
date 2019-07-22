@@ -193,7 +193,7 @@ function initTable() {
                 $(td).html(data);
             }},
             {targets: 6, createdCell: function (td, cellData) {
-                var data = formatDateAsCN(cellData*1000);
+                var data = toSafeLocalDateStr(cellData*1000);
                 $(td).html(data);
             }},
         ],

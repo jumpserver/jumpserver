@@ -51,7 +51,7 @@ function initAssetUserTable() {
                   } else {
                       innerHtml = '<i class="fa fa-circle text-warning"></i>'
                   }
-                  var dateManual = formatDateAsCN(cellData.datetime);
+                  var dateManual = toSafeLocalDateStr(cellData.datetime);
                   var dataContent = testDatetime + dateManual;
                   innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
                   $(td).html(innerHtml);
@@ -59,7 +59,7 @@ function initAssetUserTable() {
             },
             {
                 targets: 6, createdCell: function (td, cellData) {
-                    var data = formatDateAsCN(cellData);
+                    var data = toSafeLocalDateStr(cellData);
                     $(td).html(data);
                 },
             },
