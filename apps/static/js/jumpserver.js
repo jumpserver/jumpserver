@@ -1107,10 +1107,10 @@ function objectAttrsIsBool(obj, attrs) {
 
 function cleanDateStr(d) {
     for (var i=0;i<3;i++) {
-        if (!isNaN(Number(d))) {
+        if (!isNaN(Date.parse(d))){
             return d;
         }
-        if (!isNaN(Date.parse(d))){
+        if (!isNaN(Number(d))) {
             return d;
         }
         switch (i) {
