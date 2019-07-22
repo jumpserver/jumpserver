@@ -1091,7 +1091,7 @@ function objectAttrsIsList(obj, attrs) {
 
 function objectAttrsIsDatetime(obj, attrs) {
     attrs.forEach(function (attr) {
-        obj[attr] = formatDateAsCN(obj[attr]);
+        obj[attr] = safeDateISOStr(obj[attr]);
     })
 }
 
@@ -1125,6 +1125,11 @@ function cleanDate(d) {
 function safeDate(s) {
     s = cleanDate(s);
     return new Date(s)
+}
+
+function safeDateISOStr(s) {
+    var d = safeDate(s);
+    return d.toISOString();
 }
 
 function formatDateAsCN(d) {
