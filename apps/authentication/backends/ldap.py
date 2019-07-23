@@ -38,24 +38,20 @@ class LDAPAuthorizationBackend(LDAPBackend):
 
     def get_user(self, user_id):
         user = None
-
         try:
             user = self.get_user_model().objects.get(pk=user_id)
             LDAPUser(self, user=user)  # This sets user.ldap_user
         except ObjectDoesNotExist:
             pass
-
         return user
 
     def get_group_permissions(self, user, obj=None):
         if not hasattr(user, 'ldap_user') and self.settings.AUTHORIZE_ALL_USERS:
             LDAPUser(self, user=user)  # This sets user.ldap_user
-
         if hasattr(user, 'ldap_user'):
             permissions = user.ldap_user.get_group_permissions()
         else:
             permissions = set()
-
         return permissions
 
     def populate_user(self, username):
