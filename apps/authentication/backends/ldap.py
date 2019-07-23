@@ -17,6 +17,15 @@ class LDAPAuthorizationBackend(LDAPBackend):
     Override this class to override _LDAPUser to LDAPUser
     """
 
+    @staticmethod
+    def user_can_authenticate(user):
+        """
+        Reject users with is_active=False. Custom user models that don't have
+        that attribute are allowed.
+        """
+        is_active = getattr(user, 'is_active', None)
+        return is_active or is_active is None
+
     def authenticate(self, request=None, username=None, password=None, **kwargs):
         logger.info('Authentication LDAP backend')
         if not username:
@@ -25,7 +34,7 @@ class LDAPAuthorizationBackend(LDAPBackend):
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))
-        return user
+        return user if self.user_can_authenticate(user) else None
 
     def get_user(self, user_id):
         user = None
@@ -52,7 +61,6 @@ class LDAPAuthorizationBackend(LDAPBackend):
     def populate_user(self, username):
         ldap_user = LDAPUser(self, username=username)
         user = ldap_user.populate_user()
-
         return user
 
 
