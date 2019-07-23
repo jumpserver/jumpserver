@@ -58,7 +58,7 @@ class JMSCSVRender(BaseRenderer):
         template = request.query_params.get('template', 'export')
         view = renderer_context['view']
 
-        if isinstance(data, dict):
+        if isinstance(data, dict) and data.get('results') is not None:
             data = data["results"]
 
         if template == 'import':
