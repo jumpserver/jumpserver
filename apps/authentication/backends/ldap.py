@@ -8,6 +8,7 @@ from django_auth_ldap.backend import _LDAPUser, LDAPBackend
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
 from users.utils import construct_user_email
+from common.const import LDAP_AD_ACCOUNT_DISABLE
 
 logger = _LDAPConfig.get_logger()
 
@@ -95,13 +96,19 @@ class LDAPUser(_LDAPUser):
         for field, attr in self.settings.USER_ATTR_MAP.items():
             try:
                 value = self.attrs[attr][0]
+                if attr.lower() == 'useraccountcontrol' \
+                        and field == 'is_active' and value:
+                    value = int(value) & LDAP_AD_ACCOUNT_DISABLE \
+                            != LDAP_AD_ACCOUNT_DISABLE
             except LookupError:
                 logger.warning("{} does not have a value for the attribute {}".format(self.dn, attr))
             else:
                 if not hasattr(self._user, field):
                     continue
                 if isinstance(getattr(self._user, field), bool):
-                    value = value.lower() in ['true', '1']
+                    if isinstance(value, str):
+                        value = value.lower()
+                    value = value in ['true', '1', True]
                 setattr(self._user, field, value)
 
         email = getattr(self._user, 'email', '')
