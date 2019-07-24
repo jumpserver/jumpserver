@@ -2,40 +2,32 @@
 
 from __future__ import unicode_literals
 
-import json
-import uuid
-import csv
-import codecs
-import chardet
-from io import StringIO
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.utils import timezone
 from django.utils.translation import ugettext as _
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic.base import TemplateView
-from django.db import transaction
 from django.views.generic.edit import (
     CreateView, UpdateView, FormView
 )
 from django.views.generic.detail import DetailView
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
 from common.const import (
     create_success_msg, update_success_msg, KEY_CACHE_RESOURCES_ID
 )
-from common.mixins import JSONResponseMixin
-from common.utils import get_logger, get_object_or_none, is_uuid, ssh_key_gen
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
+from common.utils import get_logger, ssh_key_gen
+from common.permissions import (
+    PermissionsMixin, IsOrgAdmin, IsValidUser,
+    UserCanUpdatePassword, UserCanUpdateSSHKey,
+)
 from orgs.utils import current_org
 from .. import forms
 from ..models import User, UserGroup
@@ -260,6 +252,7 @@ class UserPasswordUpdateView(PermissionsMixin, UpdateView):
     model = User
     form_class = forms.UserPasswordForm
     success_url = reverse_lazy('users:user-profile')
+    permission_classes = [IsValidUser, UserCanUpdatePassword]
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -279,12 +272,6 @@ class UserPasswordUpdateView(PermissionsMixin, UpdateView):
         return super().get_success_url()
 
     def form_valid(self, form):
-        if not self.request.user.can_update_password():
-            error = _("User auth from {}, go there change password").format(
-                self.request.source_display
-            )
-            form.add_error("password", error)
-            return self.form_invalid(form)
         password = form.cleaned_data.get('new_password')
         is_ok = check_password_rules(password)
         if not is_ok:
@@ -300,7 +287,7 @@ class UserPublicKeyUpdateView(PermissionsMixin, UpdateView):
     template_name = 'users/user_pubkey_update.html'
     model = User
     form_class = forms.UserPublicKeyForm
-    permission_classes = [IsValidUser]
+    permission_classes = [IsValidUser, UserCanUpdateSSHKey]
     success_url = reverse_lazy('users:user-profile')
 
     def get_object(self, queryset=None):

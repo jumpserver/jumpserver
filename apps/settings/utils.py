@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from users.models import User
 from users.utils import construct_user_email
 from common.utils import get_logger
+from common.const import LDAP_AD_ACCOUNT_DISABLE
 
 from .models import settings
 
@@ -70,7 +71,12 @@ class LDAPUtil:
         for attr, mapping in self.attr_map.items():
             if not hasattr(entry, mapping):
                 continue
-            user_item[attr] = getattr(entry, mapping).value or ''
+            value = getattr(entry, mapping).value or ''
+            if mapping.lower() == 'useraccountcontrol' and attr == 'is_active'\
+                    and value:
+                value = int(value) & LDAP_AD_ACCOUNT_DISABLE \
+                        != LDAP_AD_ACCOUNT_DISABLE
+            user_item[attr] = value
         return user_item
 
     def search_user_items(self):
@@ -102,7 +108,9 @@ class LDAPUtil:
             if not hasattr(user, field):
                 continue
             if isinstance(getattr(user, field), bool):
-                value = value.lower() in ['true', 1]
+                if isinstance(value, str):
+                    value = value.lower()
+                value = value in ['true', 1, True]
             setattr(user, field, value)
         user.save()
 
