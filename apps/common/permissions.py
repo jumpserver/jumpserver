@@ -137,6 +137,16 @@ class PermissionsMixin(UserPassesTestMixin):
         return True
 
 
+class UserCanUpdatePassword:
+    def has_permission(self, request, view):
+        return request.user.can_update_password()
+
+
+class UserCanUpdateSSHKey:
+    def has_permission(self, request, view):
+        return request.user.can_update_ssh_key()
+
+
 class NeedMFAVerify(permissions.BasePermission):
     def has_permission(self, request, view):
         mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)

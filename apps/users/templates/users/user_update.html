@@ -23,7 +23,16 @@
         </div>
     </div>
     {% endif %}
+    {% if object.can_update_ssh_key %}
     {% bootstrap_field form.public_key layout="horizontal" %}
+    {% else %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{% trans 'ssh public key' %}</label>
+            <div class="col-sm-8 controls" style="margin-top: 8px;" id="ssh_key_help_text">
+                {% trans 'User auth from {}, ssh key login is not supported' %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -77,9 +86,13 @@ function passwordCheck() {
 $(document).ready(function(){
     passwordCheck();
 
-    var origin_text = $("#password_help_text").text();
-    var new_text = origin_text.replace('{}', "{{ object.source_display }}");
-    $("#password_help_text").html(new_text);
+    var origin_password_text = $("#password_help_text").text();
+    var new_password_text = origin_password_text.replace('{}', "{{ object.source_display }}");
+    $("#password_help_text").html(new_password_text);
+
+    var origin_ssh_key_text = $("#ssh_key_help_text").text();
+    var new_ssh_key_text = origin_ssh_key_text.replace('{}', "{{ object.source_display }}");
+    $("#ssh_key_help_text").html(new_ssh_key_text)
 
 })
 .on("submit", "form", function (evt) {
