@@ -60,7 +60,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.action == "retrieve":
+        if self.action in ["retrieve", "list"]:
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 

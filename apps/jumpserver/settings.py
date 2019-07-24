@@ -384,10 +384,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FileUploadParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'authentication.backends.api.AccessKeyAuthentication',
         'authentication.backends.api.AccessTokenAuthentication',
         'authentication.backends.api.PrivateTokenAuthentication',
+        'authentication.backends.api.SignatureAuthentication',
         'authentication.backends.api.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': (

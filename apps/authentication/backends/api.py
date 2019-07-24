@@ -11,6 +11,7 @@ from django.utils.six import text_type
 from django.contrib.auth import get_user_model
 from rest_framework import HTTP_HEADER_ENCODING
 from rest_framework import authentication, exceptions
+from common.auth import signature
 from rest_framework.authentication import CSRFCheck
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
@@ -167,3 +168,23 @@ class SessionAuthentication(authentication.SessionAuthentication):
 
         # CSRF passed with authenticated user
         return user, None
+
+
+class SignatureAuthentication(signature.SignatureAuthentication):
+    # The HTTP header used to pass the consumer key ID.
+
+    # A method to fetch (User instance, user_secret_string) from the
+    # consumer key ID, or None in case it is not found. Algorithm
+    # will be what the client has sent, in the case that both RSA
+    # and HMAC are supported at your site (and also for expansion).
+    model = get_user_model()
+
+    def fetch_user_data(self, key_id, algorithm="hmac-sha256"):
+        # ...
+        # example implementation:
+        try:
+            key = AccessKey.objects.get(id=key_id)
+            user, secret = key.user, str(key.secret)
+            return user, secret
+        except AccessKey.DoesNotExist:
+            return None, None
