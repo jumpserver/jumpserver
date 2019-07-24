@@ -24,8 +24,8 @@ class LDAPAuthorizationBackend(LDAPBackend):
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed.
         """
-        is_active = getattr(user, 'is_active', None)
-        return is_active or is_active is None
+        is_valid = getattr(user, 'is_valid', None)
+        return is_valid or is_valid is None
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
         logger.info('Authentication LDAP backend')
