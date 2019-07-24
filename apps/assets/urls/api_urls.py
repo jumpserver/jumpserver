@@ -20,7 +20,7 @@ router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
 router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
-router.register(r'asset-user-info', api.AssetUserExportViewSet, 'asset-user-info')
+router.register(r'asset-users-info', api.AssetUserExportViewSet, 'asset-user-info')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filters', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')

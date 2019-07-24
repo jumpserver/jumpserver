@@ -384,7 +384,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FileUploadParser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'authentication.backends.api.AccessKeyAuthentication',
         'authentication.backends.api.AccessTokenAuthentication',
         'authentication.backends.api.PrivateTokenAuthentication',
@@ -598,9 +598,12 @@ USER_GUIDE_URL = ""
 
 SWAGGER_SETTINGS = {
     'DEFAULT_AUTO_SCHEMA_CLASS': 'jumpserver.swagger.CustomSwaggerAutoSchema',
+    'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
-        'basic': {
-            'type': 'basic'
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
         }
     },
 }

@@ -362,7 +362,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         db_index=True, verbose_name=_('Date expired')
     )
     created_by = models.CharField(
-        max_length=30, default='', verbose_name=_('Created by')
+        max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,

@@ -16,18 +16,18 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from common.mixins import IDInCacheFilterMixin
+from common.serializers import CeleryTaskSerializer
 from orgs.mixins import OrgBulkModelViewSet
 from ..models import SystemUser, Asset
 from .. import serializers
-from ..tasks import push_system_user_to_assets_manual, \
-    test_system_user_connectivity_manual, push_system_user_a_asset_manual, \
-    test_system_user_connectivity_a_asset
+from ..tasks import (
+    push_system_user_to_assets_manual, test_system_user_connectivity_manual,
+    push_system_user_a_asset_manual, test_system_user_connectivity_a_asset,
+)
 
 
 logger = get_logger(__file__)
@@ -92,6 +92,7 @@ class SystemUserPushApi(generics.RetrieveAPIView):
     """
     queryset = SystemUser.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = CeleryTaskSerializer
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
@@ -108,6 +109,7 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     queryset = SystemUser.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = CeleryTaskSerializer
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()

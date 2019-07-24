@@ -45,7 +45,8 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
-            'created_by': {'read_only': True}, 'source': {'read_only': True}
+            'created_by': {'read_only': True, 'allow_blank': True},
+            'source': {'read_only': True},
         }
 
     def validate_role(self, value):
