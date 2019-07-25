@@ -33,10 +33,14 @@
                </div>
            </div>
           <div class="mail-box-header">
-              <div class="uc pull-left m-r-5">
-                   <a class="btn btn-sm btn-primary btn-create-permission">
-                       {% trans "Create permission" %}
-                   </a>
+              <div class="btn-group uc pull-left m-r-5">
+                 <button class="btn btn-sm btn-primary btn-create-permission">
+                     {% trans "Create permission" %}
+                 </button>
+                 <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
+                 <ul class="dropdown-menu">
+                     <li><a class="refresh-asset-permission-cache" href="#">{% trans 'Refresh permission cache' %}</a></li>
+                 </ul>
               </div>
               <table class="table table-striped table-bordered table-hover" id="permission_list_table" style="width: 100%">
                   <thead>
@@ -231,6 +235,14 @@ $(document).ready(function(){
     var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
             .replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
+})
+.on('click', '.refresh-asset-permission-cache', function () {
+    var the_url = "{% url 'api-perms:refresh-asset-permission-cache' %}";
+    requestApi({
+        url: the_url,
+        method: 'GET',
+        success_message: "{% trans 'Refresh success' %}"
+    });
 })
 .on('click', '.btn-create-permission', function () {
     var url = "{% url 'perms:asset-permission-create' %}";

@@ -9,13 +9,15 @@ from rest_framework.generics import (
 )
 from rest_framework.pagination import LimitOffsetPagination
 
-from common.permissions import IsValidUser, IsOrgAdminOrAppUser
+from common.permissions import IsValidUser, IsOrgAdminOrAppUser, IsOrgAdmin
 from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from ..utils import (
     AssetPermissionUtil, ParserNode,
 )
-from .mixin import UserPermissionCacheMixin, GrantAssetsMixin, NodesWithUngroupMixin
+from .mixin import (
+    UserPermissionCacheMixin, GrantAssetsMixin, NodesWithUngroupMixin
+)
 from .. import const
 from ..hands import User, Asset, Node, SystemUser, NodeSerializer
 from .. import serializers
@@ -29,6 +31,7 @@ __all__ = [
     'UserGrantedNodesWithAssetsApi', 'UserGrantedNodeAssetsApi',
     'ValidateUserAssetPermissionApi', 'UserGrantedNodesAsTreeApi',
     'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
+    'RefreshAssetPermissionCacheApi'
 ]
 
 
@@ -365,3 +368,12 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, RetrieveAPIView
                 actions = asset["system_users"].get(system_id, 0)
                 break
         return {"actions": actions}
+
+
+class RefreshAssetPermissionCacheApi(RetrieveAPIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def retrieve(self, request, *args, **kwargs):
+        # expire all cache
+        AssetPermissionUtil.expire_all_cache()
+        return Response({'msg': True}, status=200)
