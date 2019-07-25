@@ -7,9 +7,14 @@ from drf_yasg import openapi
 
 class CustomSwaggerAutoSchema(SwaggerAutoSchema):
     def get_tags(self, operation_keys):
-        if len(operation_keys) > 2 and operation_keys[1].startswith('v'):
-            return [operation_keys[0] + '_' + operation_keys[2]]
+        if len(operation_keys) > 2:
+            return [operation_keys[0] + '_' + operation_keys[1]]
         return super().get_tags(operation_keys)
+
+    def get_operation(self, operation_keys):
+        operation = super().get_operation(operation_keys)
+        operation.summary = operation.operation_id
+        return operation
 
 
 def get_swagger_view(version='v1'):
