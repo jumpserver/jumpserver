@@ -119,10 +119,12 @@
                                             <td>{% trans 'Last login' %}:</td>
                                             <td><b>{{ user_object.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
+                                        {% if user_object.can_update_password %}
                                         <tr>
                                             <td>{% trans 'Last password updated' %}:</td>
                                             <td><b>{{ user_object.date_password_last_updated|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
+                                        {% endif %}
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
                                             <td><b>{{ user_object.comment }}</b></td>
@@ -187,6 +189,7 @@
                                             </td>
                                         </tr>
                                         {% endif %}
+                                        {% if user_object.can_update_ssh_key %}
                                         <tr>
                                             <td>{% trans 'Send reset ssh key mail' %}:</td>
                                             <td>
@@ -195,6 +198,7 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        {% endif %}
                                         <tr style="{% if not unblock %}display:none{% endif %}">
                                             <td>{% trans 'Unblock user' %}</td>
                                             <td>

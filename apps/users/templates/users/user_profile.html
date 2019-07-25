@@ -64,6 +64,7 @@
                                                 <td>{{ user.is_active|yesno:"Yes,No,Unkown" }}</td>
                                             </tr>
 
+                                            {% if user.can_update_ssh_key %}
                                             <tr>
                                                 <td class="text-navy">{% trans 'Public key' %}</td>
                                                 <td>
@@ -81,6 +82,7 @@
                                                     </table>
                                                 </td>
                                             </tr>
+                                            {% endif %}
                                             <tr>
                                                 <td class="text-navy">{% trans 'MFA certification' %}</td>
                                                 <td>
@@ -108,10 +110,12 @@
                                                 <td class="text-navy">{% trans 'Last login' %}</td>
                                                 <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
+                                            {% if user.can_update_password %}
                                             <tr>
                                                 <td class="text-navy">{% trans 'Last password updated' %}</td>
                                                 <td>{{ user.date_password_last_updated|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
+                                            {% endif %}
                                             <tr>
                                                 <td class="text-navy">{% trans 'Date expired' %}</td>
                                                 <td>{{ user.date_expired|date:"Y-m-d H:i:s" }}</td>
@@ -189,6 +193,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
+                                    {% if request.user.can_update_ssh_key %}
                                     <tr>
                                         <td>{% trans 'Update SSH public key' %}:</td>
                                         <td>
@@ -205,6 +210,7 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    {% endif %}
                                     </tbody>
                                 </table>
                             </div>

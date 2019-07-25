@@ -73,14 +73,17 @@
                                   <p id="noTerms" class="red-fonts" style="visibility: hidden; font-size: 10px; margin-top: 10px;">* {% trans 'Please choose the terms and conditions.' %}</p>
                               {% endif %}
 
-                              {% bootstrap_form wizard.form %}
+                              {% if wizard.steps.current == '1' and not request.user.can_update_ssh_key %}
+                                  <b id="ssh_key_help_text">{% trans 'User auth from {}, ssh key login is not supported' %}</b>
+                              {% else %}
+                                  {% bootstrap_form wizard.form %}
+                              {% endif %}
 
                               {% if form.mfa_description %}
                                   <b>{{ form.mfa_description }}</b>
                               {% endif %}
 
-                              {% if form.pubkey_description %}
-                                  <span>或者：</span>
+                              {% if form.pubkey_description and request.user.can_update_ssh_key %}
                                   <a type="button" id="btn-reset-pubkey">{{ form.pubkey_description }}</a>
                               {% endif %}
 
@@ -121,26 +124,33 @@
 
 {% block custom_foot_js %}
 <script>
-    $(document).on('click', ".fl_goto", function(){
-        var $form = $('#fl_form');
-        $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
-        $form.submit();
-        return false;
-    }).on('click', '#fl_submit', function(){
-        var isFinish = $('#fl_submit').html() === "{% trans 'Finish' %}";
-        var noChecked = !$('#acceptTerms').prop('checked');
-        if ( isFinish && noChecked){
-            $('#noTerms').css('visibility', 'visible');
-        }
-        else{
-            $('#fl_form').submit();
-            return false;
-        }
-    }).on('click', '#btn-reset-pubkey', function () {
-        var the_url = '{% url "users:user-pubkey-generate" %}';
-        window.open(the_url, "_blank");
+$(document).ready(function(){
+    var origin_ssh_key_text = $("#ssh_key_help_text").text();
+    var new_ssh_key_text = origin_ssh_key_text.replace('{}', "{{ request.user.source_display }}");
+    $("#ssh_key_help_text").html(new_ssh_key_text)
+})
+.on('click', ".fl_goto", function(){
+    var $form = $('#fl_form');
+    $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
+    $form.submit();
+    return false;
+})
+.on('click', '#fl_submit', function(){
+    var isFinish = $('#fl_submit').html() === "{% trans 'Finish' %}";
+    var noChecked = !$('#acceptTerms').prop('checked');
+    if ( isFinish && noChecked){
+        $('#noTerms').css('visibility', 'visible');
+    }
+    else{
         $('#fl_form').submit();
-    })
+        return false;
+    }
+})
+.on('click', '#btn-reset-pubkey', function () {
+    var the_url = '{% url "users:user-pubkey-generate" %}';
+    window.open(the_url, "_blank");
+    $('#fl_form').submit();
+})
 
 </script>
 {% endblock %}

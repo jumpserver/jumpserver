@@ -415,14 +415,11 @@ class AssetPermissionCacheMixin:
         self.expire_cache_meta()
 
     @classmethod
-    def expire_all_cache_meta(cls):
-        key = cls.CACHE_META_KEY_PREFIX + '*'
-        cache.delete_pattern(key)
-
-    @classmethod
     def expire_all_cache(cls):
         key = cls.CACHE_KEY_PREFIX + '*'
         cache.delete_pattern(key)
+        meta_key = cls.CACHE_META_KEY_PREFIX + '*'
+        cache.delete_pattern(meta_key)
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):

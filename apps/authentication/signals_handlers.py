@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from django.http.request import QueryDict
 from django.conf import settings
 from django.dispatch import receiver
@@ -52,14 +53,15 @@ def on_ldap_create_user(sender, user, ldap_user, **kwargs):
 
 
 def generate_data(username, request):
-    if not request.user.is_anonymous and request.user.is_app:
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+    if isinstance(request, Request):
         login_ip = request.data.get('remote_addr', None)
         login_type = request.data.get('login_type', '')
-        user_agent = request.data.get('HTTP_USER_AGENT', '')
     else:
         login_ip = get_request_ip(request)
-        user_agent = request.META.get('HTTP_USER_AGENT', '')
         login_type = 'W'
+
     data = {
         'username': username,
         'ip': login_ip,
