@@ -57,6 +57,8 @@ asset_permission_urlpatterns = [
     # 验证用户是否有某个资产和系统用户的权限
     path('asset-permissions/user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('asset-permissions/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
+
+    path('asset-permissions/user/cache/refresh/', api.RefreshAssetPermissionCacheApi.as_view(), name='refresh-asset-permission-cache'),
 ]
 
 
