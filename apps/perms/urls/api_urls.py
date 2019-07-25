@@ -58,6 +58,7 @@ asset_permission_urlpatterns = [
     path('asset-permissions/user/validate/', api.ValidateUserAssetPermissionApi.as_view(), name='validate-user-asset-permission'),
     path('asset-permissions/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
 
+    # 刷新缓存
     path('asset-permissions/user/cache/refresh/', api.RefreshAssetPermissionCacheApi.as_view(), name='refresh-asset-permission-cache'),
 ]
 
