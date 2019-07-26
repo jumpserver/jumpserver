@@ -81,7 +81,7 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         manager = AssetUserManager()
         if system_user_id:
             system_user = get_object_or_404(SystemUser, id=system_user_id)
-            assets = system_user.assets.all()
+            assets = system_user.get_all_assets()
             username = system_user.username
         elif admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
