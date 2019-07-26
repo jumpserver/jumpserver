@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 
-from common.utils import get_signer, validate_ssh_public_key
+from common.utils import validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
@@ -15,11 +15,9 @@ from ..models import User, UserGroup
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
     'UserGroupSerializer', 'UserGroupListSerializer',
-    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer'
+    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer',
+    'ResetOTPSerializer',
 ]
-
-
-signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -139,3 +137,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
+
+class ResetOTPSerializer(serializers.Serializer):
+    msg = serializers.CharField(read_only=True)

@@ -16,7 +16,7 @@ from .models import Setting
 from .utils import LDAPUtil
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
-from .serializers import MailTestSerializer, LDAPTestSerializer
+from .serializers import MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer
 
 
 logger = get_logger(__file__)
@@ -96,6 +96,7 @@ class LDAPTestingAPI(APIView):
 class LDAPUserListApi(generics.ListAPIView):
     pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
+    serializer_class = LDAPUserSerializer
 
     def get_queryset(self):
         util = LDAPUtil()
@@ -103,7 +104,7 @@ class LDAPUserListApi(generics.ListAPIView):
             users = util.search_user_items()
         except Exception as e:
             users = []
-            logger.error(e, exc_info=True)
+            logger.error(e)
         # 前端data_table会根据row.id对table.selected值进行操作
         for user in users:
             user['id'] = user['username']

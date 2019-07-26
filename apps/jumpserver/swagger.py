@@ -24,8 +24,6 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         if dump_keys[0] == "perms" and dump_keys[1] == "users":
             if self.path.find('{id}') < 0:
                 dump_keys.insert(2, "my")
-            print(self.path)
-            print(dump_keys)
         if action.replace('bulk_', '') == dump_keys[-1]:
             dump_keys[-1] = action
         return super().get_operation_id(tuple(dump_keys))

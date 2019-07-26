@@ -21,4 +21,9 @@ class LDAPTestSerializer(serializers.Serializer):
     AUTH_LDAP_START_TLS = serializers.BooleanField(required=False)
 
 
+class LDAPUserSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    username = serializers.CharField()
+    email = serializers.CharField()
+    existing = serializers.BooleanField(read_only=True)
 

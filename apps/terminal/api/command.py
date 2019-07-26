@@ -91,6 +91,8 @@ class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
 
 
 class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
+    serializer_class = SessionCommandSerializer
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
