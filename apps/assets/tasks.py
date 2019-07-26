@@ -347,7 +347,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
 @shared_task
 def test_system_user_connectivity_manual(system_user):
     task_name = _("Test system user connectivity: {}").format(system_user)
-    assets = system_user.get_related_assets()
+    assets = system_user.get_all_assets()
     return test_system_user_connectivity_util(system_user, assets, task_name)
 
 
@@ -367,7 +367,7 @@ def test_system_user_connectivity_period():
     system_users = SystemUser.objects.all()
     for system_user in system_users:
         task_name = _("Test system user connectivity period: {}").format(system_user)
-        assets = system_user.get_related_assets()
+        assets = system_user.get_all_assets()
         test_system_user_connectivity_util(system_user, assets, task_name)
 
 
@@ -513,7 +513,7 @@ def push_system_user_util(system_user, assets, task_name):
 
 @shared_task
 def push_system_user_to_assets_manual(system_user):
-    assets = system_user.get_related_assets()
+    assets = system_user.get_all_assets()
     task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util(system_user, assets, task_name=task_name)
 
