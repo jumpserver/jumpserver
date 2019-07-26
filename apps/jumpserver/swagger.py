@@ -11,6 +11,25 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
             return [operation_keys[0] + '_' + operation_keys[1]]
         return super().get_tags(operation_keys)
 
+    def get_operation_id(self, operation_keys):
+        action = ''
+        dump_keys = [k for k in operation_keys]
+        if hasattr(self.view, 'action'):
+            action = self.view.action
+            if action == "bulk_destroy":
+                action = "bulk_delete"
+        if dump_keys[-2] == "children":
+            if self.path.find('id') < 0:
+                dump_keys.insert(-2, "root")
+        if dump_keys[0] == "perms" and dump_keys[1] == "users":
+            if self.path.find('{id}') < 0:
+                dump_keys.insert(2, "my")
+            print(self.path)
+            print(dump_keys)
+        if action.replace('bulk_', '') == dump_keys[-1]:
+            dump_keys[-1] = action
+        return super().get_operation_id(tuple(dump_keys))
+
     def get_operation(self, operation_keys):
         operation = super().get_operation(operation_keys)
         operation.summary = operation.operation_id

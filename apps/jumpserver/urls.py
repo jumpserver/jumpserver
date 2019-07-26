@@ -48,7 +48,7 @@ if settings.XPACK_ENABLED:
         path('xpack/', include('xpack.urls.view_urls', namespace='xpack'))
     )
     api_v1.append(
-        path('xpack/v1/', include('xpack.urls.api_urls', namespace='api-xpack'))
+        path('xpack/', include('xpack.urls.api_urls', namespace='api-xpack'))
     )
 
 js_i18n_patterns = i18n_patterns(
