@@ -198,7 +198,7 @@ def check_user_valid(**kwargs):
     if password and authenticate(username=username, password=password):
         return user, ''
 
-    if public_key and user.public_key and user.is_local:
+    if public_key and user.public_key and user.can_use_ssh_key_login():
         public_key_saved = user.public_key.split()
         if len(public_key_saved) == 1:
             if public_key == public_key_saved[0]:

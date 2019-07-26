@@ -55,7 +55,10 @@ class AuthMixin:
         return self.is_local
 
     def can_update_ssh_key(self):
-        return self.is_local
+        return self.can_use_ssh_key_login()
+
+    def can_use_ssh_key_login(self):
+        return settings.TERMINAL_PUBLIC_KEY_AUTH
 
     def check_otp(self, code):
         from ..utils import check_otp_code
