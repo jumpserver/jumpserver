@@ -12,6 +12,7 @@ class AccessKeyViewSet(ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.AccessKeySerializer
     pagination_class = LimitOffsetPagination
+    search_fields = ['^id', '^secret']
 
     def get_queryset(self):
         return self.request.user.access_keys.all()
