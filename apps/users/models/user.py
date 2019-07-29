@@ -232,7 +232,8 @@ class TokenMixin:
             token = uuid.uuid4().hex
         cache.set(token, self.id, expiration)
         cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
-        return token
+        date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
+        return token, date_expired
 
     def refresh_bearer_token(self, token):
         pass

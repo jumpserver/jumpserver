@@ -205,7 +205,6 @@ class AssetsAmountMixin:
         获取节点下所有资产数量速度太慢，所以需要重写，使用cache等方案
         :return:
         """
-        return 0
         if self._assets_amount is not None:
             return self._assets_amount
         cache_key = self._assets_amount_cache_key.format(self.key)

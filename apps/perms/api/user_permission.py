@@ -140,11 +140,11 @@ class UserGrantedNodesApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListA
             _nodes.append(node)
         return _nodes
 
-    def get_serializer(self, data=None, many=True):
-        if data is None:
-            data = []
-        nodes = self.get_nodes(data)
-        return super().get_serializer(data=nodes, many=True)
+    def get_serializer(self, nodes_items=None, many=True):
+        if nodes_items is None:
+            nodes_items = []
+        nodes = self.get_nodes(nodes_items)
+        return super().get_serializer(nodes, many=True)
 
     def get_queryset(self):
         user = self.get_object()
@@ -267,11 +267,11 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
             queryset.append(node)
         return queryset
 
-    def get_serializer(self, data=None, many=True):
-        if data is None:
-            data = []
-        queryset = self.get_serializer_queryset(data)
-        return super().get_serializer(data=queryset, many=many)
+    def get_serializer(self, nodes_items=None, many=True):
+        if nodes_items is None:
+            nodes_items = []
+        queryset = self.get_serializer_queryset(nodes_items)
+        return super().get_serializer(queryset, many=many)
 
     def get_queryset(self):
         user = self.get_object()
@@ -298,10 +298,10 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesWithAssetsApi):
     assets_only_fields = ParserNode.assets_only_fields
     system_users_only_fields = ParserNode.system_users_only_fields
 
-    def get_serializer(self, data=None, many=True):
-        if data is None:
-            data = []
-        _queryset = super().get_serializer_queryset(data)
+    def get_serializer(self, nodes_items=None, many=True):
+        if nodes_items is None:
+            nodes_items = []
+        _queryset = super().get_serializer_queryset(nodes_items)
         queryset = []
 
         for node in _queryset:
