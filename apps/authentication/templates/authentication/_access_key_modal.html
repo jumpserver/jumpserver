@@ -1,0 +1,80 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+{% block modal_id %}access_key_modal{% endblock %}
+{% block modal_title%}{% trans "API key list" %}{% endblock %}
+{% block modal_body %}
+<style>
+    .inmodal .modal-body {
+        background: #fff;
+    }
+    #access_key_list_table_wrapper {
+        padding-top: 10px;
+    }
+
+</style>
+<table class="table table-striped table-bordered table-hover " id="access_key_list_table" style="padding-top: 10px">
+    <thead>
+    <tr>
+        <th class="text-center">
+            <input type="checkbox" id="check_all" class="ipt_check_all" >
+        </th>
+        <th class="text-center">{% trans 'ID' %}</th>
+        <th class="text-center">{% trans 'Secret' %}</th>
+        <th class="text-center">{% trans 'Date' %}</th>
+        <th class="text-center">{% trans 'Action' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div id="uc" hidden>
+    <button class="btn btn-primary btn-sm" id="create-btn" href="#"> {% trans "Create" %} </button>
+</div>
+
+<script>
+var table = null;
+function initTable() {
+    var options = {
+        ele: $('#access_key_list_table'),
+        columnDefs: [
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', cellData.id));
+            }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                $(td).html(update_btn + del_btn)
+            }}
+        ],
+        ajax_url: '{% url "api-auth:access-key-list" %}',
+        columns: [
+            {data: "id"},
+            {data: "id"},
+            {data: "secret"},
+            {data: "date_created"},
+            {data: "id", orderable: false}
+        ],
+        uc_html: $('#uc').html()
+    };
+    table = jumpserver.initServerSideDataTable(options);
+}
+
+$(document).ready(function () {
+}).on("show.bs.modal", "#access_key_modal", function () {
+    initTable()
+}).on("click", "#create-btn", function () {
+    var url = "{% url "api-auth:access-key-list" %}";
+    var body = {
+        url: url,
+        method: 'POST',
+        success: function () {
+            table.ajax.reload();
+        }
+    };
+    requestApi(body)
+})
+</script>
+{% endblock %}
+{% block modal_button %}
+  <button data-dismiss="modal" class="btn btn-white close_btn2" type="button">{% trans "Close" %}</button>
+{% endblock %}

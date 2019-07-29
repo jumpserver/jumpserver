@@ -17,8 +17,8 @@ class AccessKeySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AccessKey
-        fields = ['id', 'secret']
-        read_only_fields = ['id', 'secret']
+        fields = ['id', 'secret', 'is_active', 'date_created']
+        read_only_fields = ['id', 'secret', 'date_created']
 
 
 class OtpVerifySerializer(serializers.Serializer):

@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import random
 
 from rest_framework import generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
-from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from rest_framework.pagination import LimitOffsetPagination
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.core.cache import cache
 from django.db.models import Q
-
-from common.mixins import IDInCacheFilterMixin, ApiMessageMixin
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins import OrgBulkModelViewSet
-from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \

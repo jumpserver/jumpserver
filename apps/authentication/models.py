@@ -12,6 +12,8 @@ class AccessKey(models.Model):
                               default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='User',
                              on_delete=models.CASCADE, related_name='access_keys')
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def get_id(self):
         return str(self.id)
