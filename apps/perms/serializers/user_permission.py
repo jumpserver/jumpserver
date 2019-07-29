@@ -44,7 +44,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         model = Asset
         only_fields = [
             "id", "hostname", "ip", "protocols", "os", 'domain',
-            "platform", "org_id",
+            "platform", "comment", "org_id",
         ]
         fields = only_fields + ['system_users_granted', 'system_users_join', "org_name"]
         read_only_fields = fields

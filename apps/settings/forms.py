@@ -40,8 +40,8 @@ class BaseForm(forms.Form):
                 field = self.fields[name]
                 if isinstance(field.widget, forms.PasswordInput) and not value:
                     continue
-                if value == getattr(settings, name):
-                    continue
+                # if value == getattr(settings, name):
+                #     continue
 
                 encrypted = True if isinstance(field, FormEncryptMixin) else False
                 try:

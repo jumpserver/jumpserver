@@ -82,7 +82,7 @@ function initTable() {
         select: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var d = new Date(cellData);
+                var d = toSafeLocalDateStr(cellData);
                 $(td).html(d);
              }},
             {targets: 2, createdCell: function (td, cellData) {
