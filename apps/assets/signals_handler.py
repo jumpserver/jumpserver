@@ -57,16 +57,16 @@ def on_system_user_update(sender, instance=None, created=True, **kwargs):
         push_system_user_to_assets.delay(instance, assets)
 
 
-@receiver(m2m_changed, sender=SystemUser.nodes.through)
-def on_system_user_nodes_change(sender, instance=None, **kwargs):
-    if instance and kwargs["action"] == "post_add":
-        logger.info("System user `{}` nodes update signal received".format(instance))
-        assets = set()
-        nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        for node in nodes:
-            assets.update(set(node.get_all_assets()))
-        instance.assets.add(*tuple(assets))
-
+# @receiver(m2m_changed, sender=SystemUser.nodes.through)
+# def on_system_user_nodes_change(sender, instance=None, **kwargs):
+#     if instance and kwargs["action"] == "post_add":
+#         logger.info("System user `{}` nodes update signal received".format(instance))
+#         assets = set()
+#         nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+#         for node in nodes:
+#             assets.update(set(node.get_all_assets()))
+#         instance.assets.add(*tuple(assets))
+#
 
 @receiver(m2m_changed, sender=SystemUser.assets.through)
 def on_system_user_assets_change(sender, instance=None, **kwargs):

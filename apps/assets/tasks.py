@@ -347,7 +347,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
 @shared_task
 def test_system_user_connectivity_manual(system_user):
     task_name = _("Test system user connectivity: {}").format(system_user)
-    assets = system_user.get_related_assets()
+    assets = system_user.get_all_assets()
     return test_system_user_connectivity_util(system_user, assets, task_name)
 
 
@@ -367,17 +367,43 @@ def test_system_user_connectivity_period():
     system_users = SystemUser.objects.all()
     for system_user in system_users:
         task_name = _("Test system user connectivity period: {}").format(system_user)
-        assets = system_user.get_related_assets()
+        assets = system_user.get_all_assets()
         test_system_user_connectivity_util(system_user, assets, task_name)
 
 
 ####  Push system user tasks ####
 
 def get_push_linux_system_user_tasks(system_user):
-    tasks = []
+    tasks = [
+        {
+            'name': 'Add user {}'.format(system_user.username),
+            'action': {
+                'module': 'user',
+                'args': 'name={} shell={} state=present'.format(
+                    system_user.username, system_user.shell,
+                ),
+            }
+        },
+        {
+            'name': 'Check home dir exists',
+            'action': {
+                'module': 'stat',
+                'args': 'path=/home/{}'.format(system_user.username)
+            },
+            'register': 'home_existed'
+        },
+        {
+            'name': "Set home dir permission",
+            'action': {
+                'module': 'file',
+                'args': "path=/home/{0} owner={0} group={0} mode=700".format(system_user.username)
+            },
+            'when': 'home_existed.stat.exists == true'
+        }
+    ]
     if system_user.password:
         tasks.append({
-            'name': 'Add user {}'.format(system_user.username),
+            'name': 'Set {} password'.format(system_user.username),
             'action': {
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
@@ -386,24 +412,6 @@ def get_push_linux_system_user_tasks(system_user):
                 ),
             }
         })
-        tasks.extend([
-            {
-                'name': 'Check home dir exists',
-                'action': {
-                    'module': 'stat',
-                    'args': 'path=/home/{}'.format(system_user.username)
-                },
-                'register': 'home_existed'
-            },
-            {
-                'name': "Set home dir permission",
-                'action': {
-                    'module': 'file',
-                    'args': "path=/home/{0} owner={0} group={0} mode=700".format(system_user.username)
-                },
-                'when': 'home_existed.stat.exists == true'
-            }
-        ])
     if system_user.public_key:
         tasks.append({
             'name': 'Set {} authorized key'.format(system_user.username),
@@ -513,7 +521,7 @@ def push_system_user_util(system_user, assets, task_name):
 
 @shared_task
 def push_system_user_to_assets_manual(system_user):
-    assets = system_user.get_related_assets()
+    assets = system_user.get_all_assets()
     task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util(system_user, assets, task_name=task_name)
 

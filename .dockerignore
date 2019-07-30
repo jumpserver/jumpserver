@@ -5,3 +5,5 @@ data/*
 tmp/*
 django.db
 celerybeat.pid
+### Vagrant ###
+.vagrant/

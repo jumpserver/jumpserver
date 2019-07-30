@@ -12,7 +12,6 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from .user import AdminUser, SystemUser
 from .utils import Connectivity
 from orgs.mixins import OrgModelMixin, OrgManager
 
@@ -320,6 +319,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
 
     @classmethod
     def generate_fake(cls, count=100):
+        from .user import AdminUser, SystemUser
         from random import seed, choice
         from django.db import IntegrityError
         from .node import Node
