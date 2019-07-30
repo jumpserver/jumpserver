@@ -374,10 +374,36 @@ def test_system_user_connectivity_period():
 ####  Push system user tasks ####
 
 def get_push_linux_system_user_tasks(system_user):
-    tasks = []
+    tasks = [
+        {
+            'name': 'Add user {}'.format(system_user.username),
+            'action': {
+                'module': 'user',
+                'args': 'name={} shell={} state=present'.format(
+                    system_user.username, system_user.shell,
+                ),
+            }
+        },
+        {
+            'name': 'Check home dir exists',
+            'action': {
+                'module': 'stat',
+                'args': 'path=/home/{}'.format(system_user.username)
+            },
+            'register': 'home_existed'
+        },
+        {
+            'name': "Set home dir permission",
+            'action': {
+                'module': 'file',
+                'args': "path=/home/{0} owner={0} group={0} mode=700".format(system_user.username)
+            },
+            'when': 'home_existed.stat.exists == true'
+        }
+    ]
     if system_user.password:
         tasks.append({
-            'name': 'Add user {}'.format(system_user.username),
+            'name': 'Set {} password'.format(system_user.username),
             'action': {
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
@@ -386,24 +412,6 @@ def get_push_linux_system_user_tasks(system_user):
                 ),
             }
         })
-        tasks.extend([
-            {
-                'name': 'Check home dir exists',
-                'action': {
-                    'module': 'stat',
-                    'args': 'path=/home/{}'.format(system_user.username)
-                },
-                'register': 'home_existed'
-            },
-            {
-                'name': "Set home dir permission",
-                'action': {
-                    'module': 'file',
-                    'args': "path=/home/{0} owner={0} group={0} mode=700".format(system_user.username)
-                },
-                'when': 'home_existed.stat.exists == true'
-            }
-        ])
     if system_user.public_key:
         tasks.append({
             'name': 'Set {} authorized key'.format(system_user.username),
