@@ -213,10 +213,10 @@ class NodeUtil:
             children.add(node)
         return list(children)
 
-    def get_children(self, node, with_self=True):
+    def get_all_children(self, node, with_self=True):
         return self.get_all_children_by_key(node.key, with_self=with_self)
 
-    def get_children_keys_by_key(self, key, with_self=True):
+    def get_all_children_keys_by_key(self, key, with_self=True):
         nodes = self.get_all_children_by_key(key, with_self=with_self)
         return [n.key for n in nodes]
 

@@ -449,6 +449,8 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
         self._nodes = None
         self._assets_direct = None
         self._nodes_direct = None
+        self.node_util = NodeUtil()
+        self.tree._node_util = self.node_util
 
     @staticmethod
     def change_org_if_need():
@@ -491,13 +493,14 @@ class AssetPermissionUtil(AssetPermissionCacheMixin):
 
         self.tree.add_nodes(nodes_keys)
 
-        pattern = set()
+        all_nodes_keys = set()
         for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        if pattern:
+            children_keys = self.node_util.get_all_children_keys_by_key(key)
+            all_nodes_keys.update(set(children_keys))
+
+        if all_nodes_keys:
             assets_ids = Asset.objects.filter(
-                nodes__key__regex=pattern
+                nodes__key__in=all_nodes_keys
             ).valid().values_list("id", flat=True).distinct()
         else:
             assets_ids = []
