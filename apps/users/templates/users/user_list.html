@@ -97,6 +97,7 @@ function initTable() {
                 }
              }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
+                var name = htmlEscape(rowData.name);
                 var update_btn = "";
                 if (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin')) {
                     update_btn = '<a class="btn btn-xs disabled btn-info">{% trans "Update" %}</a>';
@@ -109,11 +110,11 @@ function initTable() {
                 if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ request.user.username }}" || (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin'))) {
                     del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
-                            .replace('99991938', rowData.name);
+                            .replace('99991938', name);
                 } else {
                     del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
-                            .replace('99991938', rowData.name);
+                            .replace('99991938', name);
                 }
                 $(td).html(update_btn + del_btn)
              }}],
