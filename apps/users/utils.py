@@ -299,6 +299,12 @@ def increase_login_failed_count(username, ip):
     cache.set(key_limit, count, int(limit_time)*60)
 
 
+def get_login_failed_count(username, ip):
+    key_limit = key_prefix_limit.format(username, ip)
+    count = cache.get(key_limit, 0)
+    return count
+
+
 def clean_failed_count(username, ip):
     key_limit = key_prefix_limit.format(username, ip)
     key_block = key_prefix_block.format(username)
@@ -307,9 +313,8 @@ def clean_failed_count(username, ip):
 
 
 def is_block_login(username, ip):
-    key_limit = key_prefix_limit.format(username, ip)
+    count = get_login_failed_count(username, ip)
     key_block = key_prefix_block.format(username)
-    count = cache.get(key_limit, 0)
 
     limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
     limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
