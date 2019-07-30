@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-30 12:20+0800\n"
+"POT-Creation-Date: 2019-07-30 12:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -469,7 +469,7 @@ msgstr "更新"
 #: assets/templates/assets/label_list.html:40
 #: assets/templates/assets/system_user_detail.html:30
 #: assets/templates/assets/system_user_list.html:86 audits/models.py:34
-#: authentication/templates/authentication/_access_key_modal.html:62
+#: authentication/templates/authentication/_access_key_modal.html:65
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:178
@@ -526,7 +526,7 @@ msgstr "创建远程应用"
 #: assets/templates/assets/system_user_list.html:60 audits/models.py:38
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
-#: authentication/templates/authentication/_access_key_modal.html:27
+#: authentication/templates/authentication/_access_key_modal.html:30
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:34
 #: perms/forms/asset_permission.py:21
@@ -1413,7 +1413,7 @@ msgstr "获取认证信息错误"
 
 #: assets/templates/assets/_asset_user_auth_view_modal.html:97
 #: assets/templates/assets/_user_asset_detail_modal.html:23
-#: authentication/templates/authentication/_access_key_modal.html:140
+#: authentication/templates/authentication/_access_key_modal.html:143
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
 #: settings/templates/settings/_ldap_list_users_modal.html:99
 #: templates/_modal.html:22
@@ -1695,7 +1695,7 @@ msgid "Date joined"
 msgstr "创建日期"
 
 #: assets/templates/assets/asset_detail.html:150 authentication/models.py:15
-#: authentication/templates/authentication/_access_key_modal.html:25
+#: authentication/templates/authentication/_access_key_modal.html:28
 #: perms/models/asset_permission.py:115 perms/models/base.py:38
 #: perms/templates/perms/asset_permission_create_update.html:55
 #: perms/templates/perms/asset_permission_detail.html:120
@@ -2138,7 +2138,7 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:32
-#: authentication/templates/authentication/_access_key_modal.html:35
+#: authentication/templates/authentication/_access_key_modal.html:38
 #: xpack/plugins/vault/templates/vault/vault.html:46
 msgid "Create"
 msgstr "创建"
@@ -2251,7 +2251,7 @@ msgid "Search"
 msgstr "搜索"
 
 #: audits/templates/audits/login_log_list.html:50
-#: authentication/templates/authentication/_access_key_modal.html:23
+#: authentication/templates/authentication/_access_key_modal.html:26
 #: ops/templates/ops/adhoc_detail.html:49
 #: ops/templates/ops/adhoc_history_detail.html:49
 #: ops/templates/ops/task_detail.html:56
@@ -2270,7 +2270,7 @@ msgid "City"
 msgstr "城市"
 
 #: audits/templates/audits/login_log_list.html:59
-#: authentication/templates/authentication/_access_key_modal.html:26
+#: authentication/templates/authentication/_access_key_modal.html:29
 #: ops/templates/ops/task_list.html:32
 msgid "Date"
 msgstr "日期"
@@ -2416,22 +2416,30 @@ msgstr "ssh密钥"
 msgid "API key list"
 msgstr "API Key列表"
 
-#: authentication/templates/authentication/_access_key_modal.html:24
+#: authentication/templates/authentication/_access_key_modal.html:18
+msgid "Using api key sign api header, every requests header difference"
+msgstr "使用api key签名请求头，每个请求的头部是不一样的"
+
+#: authentication/templates/authentication/_access_key_modal.html:18
+msgid "docs"
+msgstr "文档"
+
+#: authentication/templates/authentication/_access_key_modal.html:27
 msgid "Secret"
 msgstr "密文"
 
-#: authentication/templates/authentication/_access_key_modal.html:45
+#: authentication/templates/authentication/_access_key_modal.html:48
 msgid "Show"
 msgstr "显示"
 
-#: authentication/templates/authentication/_access_key_modal.html:63
+#: authentication/templates/authentication/_access_key_modal.html:66
 #: users/models/user.py:288 users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
 msgid "Disable"
 msgstr "禁用"
 
-#: authentication/templates/authentication/_access_key_modal.html:64
+#: authentication/templates/authentication/_access_key_modal.html:67
 #: users/models/user.py:289 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"

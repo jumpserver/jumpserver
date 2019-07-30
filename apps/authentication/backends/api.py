@@ -184,6 +184,8 @@ class SignatureAuthentication(signature.SignatureAuthentication):
         # example implementation:
         try:
             key = AccessKey.objects.get(id=key_id)
+            if not key.is_active:
+                return None, None
             user, secret = key.user, str(key.secret)
             return user, secret
         except AccessKey.DoesNotExist:
