@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-29 18:24+0800\n"
+"POT-Creation-Date: 2019-07-30 18:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -429,29 +429,29 @@ msgstr "详情"
 #: assets/templates/assets/system_user_list.html:33
 #: assets/templates/assets/system_user_list.html:85 audits/models.py:33
 #: perms/templates/perms/asset_permission_detail.html:30
-#: perms/templates/perms/asset_permission_list.html:177
+#: perms/templates/perms/asset_permission_list.html:178
 #: perms/templates/perms/remote_app_permission_detail.html:30
 #: perms/templates/perms/remote_app_permission_list.html:59
 #: terminal/templates/terminal/terminal_detail.html:16
-#: terminal/templates/terminal/terminal_list.html:72
+#: terminal/templates/terminal/terminal_list.html:73
 #: users/templates/users/user_detail.html:25
 #: users/templates/users/user_group_detail.html:28
 #: users/templates/users/user_group_list.html:20
-#: users/templates/users/user_group_list.html:70
+#: users/templates/users/user_group_list.html:71
 #: users/templates/users/user_list.html:20
-#: users/templates/users/user_list.html:102
-#: users/templates/users/user_list.html:105
+#: users/templates/users/user_list.html:103
+#: users/templates/users/user_list.html:106
 #: users/templates/users/user_profile.html:181
 #: users/templates/users/user_profile.html:191
 #: users/templates/users/user_profile.html:201
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:29
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:55
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:56
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:23
-#: xpack/plugins/cloud/templates/cloud/account_list.html:39
+#: xpack/plugins/cloud/templates/cloud/account_list.html:40
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:29
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:56
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:57
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:25
-#: xpack/plugins/orgs/templates/orgs/org_list.html:87
+#: xpack/plugins/orgs/templates/orgs/org_list.html:88
 msgid "Update"
 msgstr "更新"
 
@@ -473,25 +473,25 @@ msgstr "更新"
 #: assets/templates/assets/system_user_list.html:86 audits/models.py:34
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
-#: perms/templates/perms/asset_permission_list.html:178
+#: perms/templates/perms/asset_permission_list.html:179
 #: perms/templates/perms/remote_app_permission_detail.html:34
 #: perms/templates/perms/remote_app_permission_list.html:60
 #: settings/templates/settings/terminal_setting.html:93
 #: settings/templates/settings/terminal_setting.html:115
-#: terminal/templates/terminal/terminal_list.html:74
+#: terminal/templates/terminal/terminal_list.html:75
 #: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
-#: users/templates/users/user_group_list.html:72
-#: users/templates/users/user_list.html:110
-#: users/templates/users/user_list.html:114
+#: users/templates/users/user_group_list.html:73
+#: users/templates/users/user_list.html:111
+#: users/templates/users/user_list.html:115
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:33
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:57
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:58
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:27
-#: xpack/plugins/cloud/templates/cloud/account_list.html:41
+#: xpack/plugins/cloud/templates/cloud/account_list.html:42
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:33
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:57
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:58
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:29
-#: xpack/plugins/orgs/templates/orgs/org_list.html:89
+#: xpack/plugins/orgs/templates/orgs/org_list.html:90
 msgid "Delete"
 msgstr "删除"
 
@@ -719,9 +719,9 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: assets/templates/assets/domain_gateway_list.html:71
 #: assets/templates/assets/system_user_detail.html:62
 #: assets/templates/assets/system_user_list.html:52 audits/models.py:94
-#: audits/templates/audits/login_log_list.html:51 authentication/forms.py:11
-#: authentication/templates/authentication/login.html:64
-#: authentication/templates/authentication/new_login.html:90
+#: audits/templates/audits/login_log_list.html:51 authentication/forms.py:13
+#: authentication/templates/authentication/login.html:65
+#: authentication/templates/authentication/new_login.html:91
 #: ops/models/adhoc.py:164 perms/templates/perms/asset_permission_list.html:70
 #: perms/templates/perms/asset_permission_user.html:55
 #: perms/templates/perms/remote_app_permission_user.html:54
@@ -748,9 +748,9 @@ msgstr "密码或密钥密码"
 #: assets/serializers/asset_user.py:62
 #: assets/templates/assets/_asset_user_auth_update_modal.html:21
 #: assets/templates/assets/_asset_user_auth_view_modal.html:27
-#: authentication/forms.py:13
-#: authentication/templates/authentication/login.html:67
-#: authentication/templates/authentication/new_login.html:93
+#: authentication/forms.py:15
+#: authentication/templates/authentication/login.html:68
+#: authentication/templates/authentication/new_login.html:94
 #: settings/forms.py:110 users/forms.py:16 users/forms.py:28
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_password_authentication.html:18
@@ -1595,8 +1595,8 @@ msgstr "选择节点"
 #: users/templates/users/user_detail.html:441
 #: users/templates/users/user_detail.html:486
 #: users/templates/users/user_group_create_update.html:32
-#: users/templates/users/user_group_list.html:119
-#: users/templates/users/user_list.html:255
+#: users/templates/users/user_group_list.html:120
+#: users/templates/users/user_list.html:256
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:54
 #: xpack/plugins/interface/templates/interface/interface.html:103
@@ -1649,10 +1649,10 @@ msgstr "创建管理用户"
 #: assets/templates/assets/asset_list.html:304
 #: assets/templates/assets/system_user_list.html:192
 #: assets/templates/assets/system_user_list.html:223
-#: users/templates/users/user_group_list.html:163
-#: users/templates/users/user_group_list.html:194
-#: users/templates/users/user_list.html:164
-#: users/templates/users/user_list.html:196
+#: users/templates/users/user_group_list.html:164
+#: users/templates/users/user_group_list.html:195
+#: users/templates/users/user_list.html:165
+#: users/templates/users/user_list.html:197
 #: xpack/plugins/vault/templates/vault/vault.html:224
 msgid "Please select file"
 msgstr "选择文件"
@@ -1792,8 +1792,8 @@ msgstr "显示所有子节点资产"
 #: users/templates/users/user_detail.html:386
 #: users/templates/users/user_detail.html:412
 #: users/templates/users/user_detail.html:480
-#: users/templates/users/user_group_list.html:113
-#: users/templates/users/user_list.html:249
+#: users/templates/users/user_group_list.html:114
+#: users/templates/users/user_list.html:250
 #: xpack/plugins/interface/templates/interface/interface.html:97
 msgid "Are you sure?"
 msgstr "你确认吗?"
@@ -1809,8 +1809,8 @@ msgstr "删除选择资产"
 #: users/templates/users/user_detail.html:416
 #: users/templates/users/user_detail.html:484
 #: users/templates/users/user_group_create_update.html:31
-#: users/templates/users/user_group_list.html:117
-#: users/templates/users/user_list.html:253
+#: users/templates/users/user_group_list.html:118
+#: users/templates/users/user_list.html:254
 #: xpack/plugins/interface/templates/interface/interface.html:101
 #: xpack/plugins/orgs/templates/orgs/org_create_update.html:32
 msgid "Cancel"
@@ -2392,17 +2392,29 @@ msgstr ""
 msgid "Invalid token or cache refreshed."
 msgstr ""
 
-#: authentication/forms.py:19
+#: authentication/forms.py:21
 msgid ""
-"Please enter a correct username and password. Note that both fields may be "
-"case-sensitive."
-msgstr "请输入正确的用户名和密码. 注意它们是区分大小写."
+"The username or password you entered is incorrect, please enter it again."
+msgstr "您输入的用户名或密码不正确，请重新输入。"
 
-#: authentication/forms.py:22
+#: authentication/forms.py:24
 msgid "This account is inactive."
 msgstr "此账户无效"
 
-#: authentication/forms.py:37 users/forms.py:22
+#: authentication/forms.py:26
+#, python-brace-format
+msgid ""
+"You can also try {times_try} times (The account will be temporarily locked "
+"for {block_time} minutes)"
+msgstr "您还可以尝试 {times_try} 次（账号将被临时锁定 {block_time} 分钟）"
+
+#: authentication/forms.py:30
+msgid ""
+"The account has been locked (please contact admin to unlock it or try again "
+"after {} minutes)"
+msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
+
+#: authentication/forms.py:66 users/forms.py:22
 msgid "MFA code"
 msgstr "MFA 验证码"
 
@@ -2466,8 +2478,8 @@ msgid "Changes the world, starting with a little bit."
 msgstr "改变世界，从一点点开始。"
 
 #: authentication/templates/authentication/login.html:46
-#: authentication/templates/authentication/login.html:72
-#: authentication/templates/authentication/new_login.html:99
+#: authentication/templates/authentication/login.html:73
+#: authentication/templates/authentication/new_login.html:100
 #: templates/_header_bar.html:101
 msgid "Login"
 msgstr "登录"
@@ -2482,18 +2494,18 @@ msgstr "用户密码已过期"
 msgid "Captcha invalid"
 msgstr "验证码错误"
 
-#: authentication/templates/authentication/login.html:83
-#: authentication/templates/authentication/new_login.html:103
+#: authentication/templates/authentication/login.html:84
+#: authentication/templates/authentication/new_login.html:104
 #: users/templates/users/forgot_password.html:10
 #: users/templates/users/forgot_password.html:25
 msgid "Forgot password"
 msgstr "忘记密码"
 
-#: authentication/templates/authentication/login.html:89
+#: authentication/templates/authentication/login.html:91
 msgid "More login options"
 msgstr "更多登录方式"
 
-#: authentication/templates/authentication/login.html:93
+#: authentication/templates/authentication/login.html:95
 msgid "Keycloak"
 msgstr ""
 
@@ -2542,16 +2554,16 @@ msgstr "欢迎回来，请输入用户名和密码登录"
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172 users/views/user.py:386
+#: authentication/views/login.py:173 users/views/user.py:386
 #: users/views/user.py:411
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/views/login.py:203
+#: authentication/views/login.py:204
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:204
+#: authentication/views/login.py:205
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2955,9 +2967,9 @@ msgstr "版本"
 
 #: ops/templates/ops/task_list.html:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:137
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:53
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:54
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:141
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:54
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:55
 msgid "Run"
 msgstr "执行"
 
@@ -3167,7 +3179,7 @@ msgstr "刷新授权缓存"
 msgid "Validity"
 msgstr "有效"
 
-#: perms/templates/perms/asset_permission_list.html:244
+#: perms/templates/perms/asset_permission_list.html:245
 msgid "Refresh success"
 msgstr "刷新成功"
 
@@ -4347,11 +4359,11 @@ msgstr "地址"
 msgid "Alive"
 msgstr "在线"
 
-#: terminal/templates/terminal/terminal_list.html:77
+#: terminal/templates/terminal/terminal_list.html:78
 msgid "Accept"
 msgstr "接受"
 
-#: terminal/templates/terminal/terminal_list.html:79
+#: terminal/templates/terminal/terminal_list.html:80
 msgid "Reject"
 msgstr "拒绝"
 
@@ -4911,45 +4923,45 @@ msgstr "添加用户"
 msgid "Create user group"
 msgstr "创建用户组"
 
-#: users/templates/users/user_group_list.html:114
+#: users/templates/users/user_group_list.html:115
 msgid "This will delete the selected groups !!!"
 msgstr "删除选择组"
 
-#: users/templates/users/user_group_list.html:123
+#: users/templates/users/user_group_list.html:124
 msgid "UserGroups Deleted."
 msgstr "用户组删除"
 
-#: users/templates/users/user_group_list.html:124
-#: users/templates/users/user_group_list.html:129
+#: users/templates/users/user_group_list.html:125
+#: users/templates/users/user_group_list.html:130
 msgid "UserGroups Delete"
 msgstr "用户组删除"
 
-#: users/templates/users/user_group_list.html:128
+#: users/templates/users/user_group_list.html:129
 msgid "UserGroup Deleting failed."
 msgstr "用户组删除失败"
 
-#: users/templates/users/user_list.html:250
+#: users/templates/users/user_list.html:251
 msgid "This will delete the selected users !!!"
 msgstr "删除选中用户 !!!"
 
-#: users/templates/users/user_list.html:266
+#: users/templates/users/user_list.html:267
 msgid "User Deleted."
 msgstr "已被删除"
 
-#: users/templates/users/user_list.html:267
-#: users/templates/users/user_list.html:271
+#: users/templates/users/user_list.html:268
+#: users/templates/users/user_list.html:272
 msgid "User Delete"
 msgstr "删除"
 
-#: users/templates/users/user_list.html:270
+#: users/templates/users/user_list.html:271
 msgid "User Deleting failed."
 msgstr "用户删除失败"
 
-#: users/templates/users/user_list.html:323
+#: users/templates/users/user_list.html:324
 msgid "User is expired"
 msgstr "用户已失效"
 
-#: users/templates/users/user_list.html:326
+#: users/templates/users/user_list.html:327
 msgid "User is inactive"
 msgstr "用户已禁用"
 
@@ -5484,7 +5496,7 @@ msgid "Run plan manually"
 msgstr "手动执行计划"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:179
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:102
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:103
 msgid "Execute failed"
 msgstr "执行失败"
 
@@ -5708,7 +5720,7 @@ msgid "Run task manually"
 msgstr "手动执行任务"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:181
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:98
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:99
 msgid "Sync success"
 msgstr "同步成功"
 
