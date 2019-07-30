@@ -55,19 +55,12 @@ js_i18n_patterns = i18n_patterns(
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 )
 
-api_v1_patterns = [
-    path('api/v1/', include(api_v1))
-]
-
-api_v2_patterns = [
-    path('api/v2/', include(api_v2))
-]
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
-    path('', include(api_v2_patterns)),
-    path('', include(api_v1_patterns)),
-    re_path('api/(?P<version>\w+)/(?P<app>\w+)/.*', redirect_format_api),
+    path('api/v1/', include(api_v1)),
+    path('api/v2/', include(api_v2)),
+    re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', redirect_format_api),
     path('api/health/', HealthCheckView.as_view(), name="health"),
     path('luna/', LunaView.as_view(), name='luna-view'),
     path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
