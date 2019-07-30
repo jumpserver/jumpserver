@@ -157,7 +157,7 @@ UserProfileForm.verbose_name = _("Profile")
 class UserMFAForm(forms.ModelForm):
 
     mfa_description = _(
-        'Tip: when enabled, '
+        'When enabled, '
         'you will enter the MFA binding process the next time you log in. '
         'you can also directly bind in '
         '"personal information -> quick modification -> change MFA Settings"!')

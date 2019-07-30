@@ -4,12 +4,15 @@
 
 import logging
 
+from functools import reduce
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import get_signer
 from .base import AssetUser
+from .asset import Asset
 
 
 __all__ = ['AdminUser', 'SystemUser']
@@ -143,6 +146,19 @@ class SystemUser(AssetUser):
             elif action == rule.ACTION_DENY:
                 return False, matched_cmd
         return True, None
+
+    def get_all_assets(self):
+        args = [Q(systemuser=self)]
+        pattern = set()
+        nodes_keys = self.nodes.all().values_list('key', flat=True)
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        if pattern:
+            args.append(Q(nodes__key__regex=pattern))
+        args = reduce(lambda x, y: x | y, args)
+        assets = Asset.objects.filter(args).distinct()
+        return assets
 
     class Meta:
         ordering = ['name']

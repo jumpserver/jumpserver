@@ -34,7 +34,7 @@
 <script>
 var assetTableUrl = "{% url 'api-perms:user-assets' pk=object.id %}?cache_policy=1";
 var selectUrl = '{% url "api-perms:user-node-assets" pk=object.id node_id=DEFAULT_PK %}?cache_policy=1&all=1';
-var treeUrl = "{% url 'api-perms:user-nodes-as-tree' pk=object.id %}?&cache_policy=1";
+var treeUrl = "{% url 'api-perms:user-nodes-as-tree' pk=object.id %}?cache_policy=1";
 
 $(document).ready(function () {
     initTree();

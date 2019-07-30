@@ -81,7 +81,7 @@ def make_migrations():
 def collect_static():
     print("Collect static files")
     os.chdir(os.path.join(BASE_DIR, 'apps'))
-    subprocess.call('python3 manage.py collectstatic --no-input', shell=True)
+    subprocess.call('python3 manage.py collectstatic --no-input -c &> /dev/null && echo "Collect static file done"', shell=True)
 
 
 def prepare():

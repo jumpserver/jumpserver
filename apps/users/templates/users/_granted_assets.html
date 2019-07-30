@@ -122,7 +122,7 @@ function initTree() {
         $.fn.zTree.init($("#assetTree"), setting, data);
         zTree = $.fn.zTree.getZTreeObj("assetTree");
         rootNodeAddDom(zTree, function () {
-            treeUrl = treeUrl.replace('cache_policy=1', 'cache_policy=2');
+            treeUrl = setUrlParam(treeUrl, 'cache_policy', '2');
             initTree();
         });
     });
@@ -156,7 +156,7 @@ function loadLabels() {
 }
 
 $(document).ready(function () {
-    loadLabels()
+    {#loadLabels()#}
 }).on('click', '.labels-menu li', function () {
     var val = $(this).text();
     $("#user_assets_table_filter input").val(val);

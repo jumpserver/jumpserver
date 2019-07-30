@@ -36,12 +36,16 @@
                             <li class="active">
                                 <a href="{% url 'users:user-profile-update' %}" class="text-center">{% trans 'Profile' %} </a>
                             </li>
+                            {% if request.user.can_update_password %}
                             <li>
                                 <a href="{% url 'users:user-password-update' %}" class="text-center">{% trans 'Password' %} </a>
                             </li>
+                            {% endif %}
+                            {% if request.user.can_update_ssh_key %}
                             <li>
                                 <a href="{% url 'users:user-pubkey-update' %}" class="text-center">{% trans 'Public key' %} </a>
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content" style="background-color: #ffffff">
