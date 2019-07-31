@@ -89,20 +89,20 @@ def send_reset_password_mail(user):
     recipient_list = [user.email]
     message = _("""
     Hello %(name)s:
-    </br>
+    <br>
     Please click the link below to reset your password, if not your request, concern your account security
-    </br>
+    <br>
     <a href="%(rest_password_url)s?token=%(rest_password_token)s">Click here reset password</a>
-    </br>
+    <br>
     This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
 
-    </br>
+    <br>
     ---
 
-    </br>
+    <br>
     <a href="%(login_url)s">Login direct</a>
 
-    </br>
+    <br>
     """) % {
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
@@ -122,24 +122,24 @@ def send_password_expiration_reminder_mail(user):
     recipient_list = [user.email]
     message = _("""
     Hello %(name)s:
-    </br>
+    <br>
     Your password will expire in %(date_password_expired)s,
-    </br>
+    <br>
     For your account security, please click on the link below to update your password in time
-    </br>
+    <br>
     <a href="%(update_password_url)s">Click here update password</a>
-    </br>
+    <br>
     If your password has expired, please click 
     <a href="%(forget_password_url)s?email=%(email)s">Password expired</a> 
     to apply for a password reset email.
 
-    </br>
+    <br>
     ---
 
-    </br>
+    <br>
     <a href="%(login_url)s">Login direct</a>
 
-    </br>
+    <br>
     """) % {
         'name': user.name,
         'date_password_expired': datetime.fromtimestamp(datetime.timestamp(
@@ -155,18 +155,39 @@ def send_password_expiration_reminder_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_user_expiration_reminder_mail(user):
+    subject = _('Expiration notice')
+    recipient_list = [user.email]
+    message = _("""
+       Hello %(name)s:
+       <br>
+       Your account will expire in %(date_expired)s,
+       <br>
+       In order not to affect your normal work, please contact the administrator for confirmation.
+       <br>
+       """) % {
+        'name': user.name,
+        'date_expired': datetime.fromtimestamp(datetime.timestamp(
+            user.date_expired)).strftime('%Y-%m-%d %H:%M'),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 def send_reset_ssh_key_mail(user):
     subject = _('SSH Key Reset')
     recipient_list = [user.email]
     message = _("""
     Hello %(name)s:
-    </br>
+    <br>
     Your ssh public key has been reset by site administrator.
     Please login and reset your ssh public key.
-    </br>
+    <br>
     <a href="%(login_url)s">Login direct</a>
 
-    </br>
+    <br>
     """) % {
         'name': user.name,
         'login_url': reverse('authentication:login', external=True),

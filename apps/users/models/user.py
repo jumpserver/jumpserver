@@ -403,6 +403,18 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return False
 
     @property
+    def expired_remain_days(self):
+        date_remain = self.date_expired - timezone.now()
+        return date_remain.days
+
+    @property
+    def will_expired(self):
+        if 0 <= self.expired_remain_days < 5:
+            return True
+        else:
+            return False
+
+    @property
     def is_valid(self):
         if self.is_active and not self.is_expired:
             return True
@@ -411,7 +423,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     @property
     def is_local(self):
         return self.source == self.SOURCE_LOCAL
-    
+
     def save(self, *args, **kwargs):
         if not self.name:
             self.name = self.username
