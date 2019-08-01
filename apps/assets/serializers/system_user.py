@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
+from common.utils import ssh_pubkey_gen
 from orgs.mixins import BulkOrgResourceModelSerializer
 from ..models import SystemUser
 from .base import AuthSerializer, AuthSerializerMixin
@@ -86,6 +87,13 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
                 private_key, public_key = SystemUser.gen_key(username)
                 attrs["private_key"] = private_key
                 attrs["public_key"] = public_key
+                # 如果设置了private key，没有设置public key则生成
+        elif attrs.get("private_key", None):
+            private_key = attrs["private_key"]
+            password = attrs.get("password")
+            public_key = ssh_pubkey_gen(private_key, password=password,
+                                        username=username)
+            attrs["public_key"] = public_key
         attrs.pop("auto_generate_key", None)
         return attrs
 

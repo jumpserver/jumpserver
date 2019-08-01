@@ -59,6 +59,7 @@ class AuthSerializerMixin:
             value = validated_data.get(field)
             if not value:
                 validated_data.pop(field, None)
+
         # print(validated_data)
         # raise serializers.ValidationError(">>>>>>")
 
