@@ -4,13 +4,14 @@ from rest_framework import viewsets
 from django.db import transaction
 from django.conf import settings
 
+from orgs.mixins import RootOrgViewMixin
 from common.permissions import IsValidUser
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
 from ..tasks import run_command_execution
 
 
-class CommandExecutionViewSet(viewsets.ModelViewSet):
+class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
     serializer_class = CommandExecutionSerializer
     permission_classes = (IsValidUser,)
 
