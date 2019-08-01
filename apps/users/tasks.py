@@ -20,13 +20,13 @@ logger = get_logger(__file__)
 def check_password_expired():
     users = User.objects.exclude(role=User.ROLE_APP)
     for user in users:
+        if not user.is_valid:
+            continue
         if not user.password_will_expired:
             continue
-
         send_password_expiration_reminder_mail(user)
-        logger.info("The user {} password expires in {} days".format(
-            user, user.password_expired_remain_days)
-        )
+        msg = "The user {} password expires in {} days"
+        logger.info(msg.format(user, user.password_expired_remain_days))
 
 
 @shared_task

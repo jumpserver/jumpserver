@@ -111,7 +111,7 @@ class AuthMixin:
 
     @property
     def password_will_expired(self):
-        if self.is_local and self.password_expired_remain_days < 5:
+        if self.is_local and 0 <= self.password_expired_remain_days < 5:
             return True
         return False
 

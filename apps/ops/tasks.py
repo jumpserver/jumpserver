@@ -23,7 +23,7 @@ def rerun_task():
     pass
 
 
-@shared_task
+@shared_task(queue="ansible")
 def run_ansible_task(tid, callback=None, **kwargs):
     """
     :param tid: is the tasks serialized data
@@ -98,7 +98,7 @@ def create_or_update_registered_periodic_tasks():
         create_or_update_celery_periodic_tasks(task)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def hello(name, callback=None):
     import time
     time.sleep(10)
