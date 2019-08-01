@@ -27,6 +27,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(BulkOrgResourceModelSerializer):
     command_amount = serializers.IntegerField(read_only=True)
+    org_id = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = Session
