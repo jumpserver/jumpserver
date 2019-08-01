@@ -297,10 +297,10 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': "INFO",
         },
-        'gunicorn': {
-            'handlers': ['gunicorn_console', 'gunicorn_file'],
-            'level': 'INFO',
-        },
+        # 'gunicorn': {
+        #     'handlers': ['gunicorn_console', 'gunicorn_file'],
+        #     'level': 'INFO',
+        # },
         # 'django.db': {
         #     'handlers': ['console', 'file'],
         #     'level': 'DEBUG'
