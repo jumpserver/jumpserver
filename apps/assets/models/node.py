@@ -212,12 +212,13 @@ class AssetsAmountMixin:
         if cached is not None:
             return cached
         assets_amount = self.get_all_assets().count()
-        cache.set(cache_key, assets_amount, self.cache_time)
         return assets_amount
 
     @assets_amount.setter
     def assets_amount(self, value):
         self._assets_amount = value
+        cache_key = self._assets_amount_cache_key.format(self.key)
+        cache.set(cache_key, value, self.cache_time)
 
     def expire_assets_amount(self):
         ancestor_keys = self.get_ancestor_keys(with_self=True)

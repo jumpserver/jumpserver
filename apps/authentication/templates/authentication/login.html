@@ -58,6 +58,7 @@
                             {% else %}
                                 <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
                             {% endif %}
+                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
                         {% endif %}
 
                         <div class="form-group">
@@ -78,10 +79,11 @@
                         {% endif %}
 
                         <div class="text-muted text-center">
-                        <div>
-                            <a href="{% url 'users:forgot-password' %}">
-                                <small>{% trans 'Forgot password' %}?</small>
-                            </a>
+                            <div>
+                                <a href="{% url 'users:forgot-password' %}">
+                                    <small>{% trans 'Forgot password' %}?</small>
+                                </a>
+                            </div>
                         </div>
 
                         {% if AUTH_OPENID %}

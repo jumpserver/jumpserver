@@ -49,6 +49,8 @@ class IsOrgAdmin(IsValidUser):
     """Allows access only to superuser"""
 
     def has_permission(self, request, view):
+        if not current_org:
+            return False
         return super(IsOrgAdmin, self).has_permission(request, view) \
             and current_org.can_admin_by(request.user)
 
@@ -57,6 +59,8 @@ class IsOrgAdminOrAppUser(IsValidUser):
     """Allows access between superuser and app user"""
 
     def has_permission(self, request, view):
+        if not current_org:
+            return False
         return super(IsOrgAdminOrAppUser, self).has_permission(request, view) \
             and (current_org.can_admin_by(request.user) or request.user.is_app)
 
