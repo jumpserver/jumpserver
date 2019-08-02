@@ -94,10 +94,8 @@ urlpatterns = [
 ]
 
 old_version_urlpatterns = [
-    re_path('(?P<resource>admin_user|system_user|domain|gateway|cmd-filter|asset-user)/.*', capi.redirect_plural_name_api)
+    re_path('(?P<resource>admin-user|system-user|domain|gateway|cmd-filter|asset-user)/.*', capi.redirect_plural_name_api)
 ]
 
-urlpatterns += router.urls + old_version_urlpatterns
-
-urlpatterns += router.urls + cmd_filter_router.urls
+urlpatterns += router.urls + cmd_filter_router.urls + old_version_urlpatterns
 
