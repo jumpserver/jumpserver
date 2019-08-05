@@ -71,7 +71,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         super().validate_password(password)
         auto_gen_key = self.initial_data.get("auto_generate_key", False)
         private_key = self.initial_data.get("private_key")
-        if not self.instance and not auto_gen_key and not password and not private_key:
+        login_mode = self.initial_data.get("login_mode")
+        if not self.instance and not auto_gen_key and not password and \
+                not private_key and login_mode == SystemUser.LOGIN_AUTO:
             raise serializers.ValidationError(_("Password or private key required"))
         return password
 
