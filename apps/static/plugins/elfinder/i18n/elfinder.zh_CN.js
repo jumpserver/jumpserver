@@ -422,7 +422,7 @@
 			'minsLeft'        : '剩余 $1 分钟', // from v2.1.17 added 13.11.2016
 			'openAsEncoding'  : '使用所选编码重新打开', // from v2.1.19 added 2.12.2016
 			'saveAsEncoding'  : '使用所选编码保存', // from v2.1.19 added 2.12.2016
-			'selectFolder'    : '选择目录(暂不支持)', // from v2.1.20 added 13.12.2016
+			'selectFolder'    : '选择目录', // from v2.1.20 added 13.12.2016
 			'firstLetterSearch': '首字母搜索', // from v2.1.23 added 24.3.2017
 			'presets'         : '预置', // from v2.1.25 added 26.5.2017
 			'tooManyToTrash'  : '项目太多，不能移动到回收站.', // from v2.1.25 added 9.6.2017

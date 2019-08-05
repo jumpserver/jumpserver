@@ -72,9 +72,10 @@
                             <div class="contact-form col-md-10" style="margin-top: 10px;height: 35px">
                                 <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
                                     {% csrf_token %}
-                                    <div style="height: 45px;color: red;line-height: 17px;">
+                                    <div style="height: 70px;color: red;line-height: 17px;">
                                         {% if block_login %}
                                             <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
+                                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
                                         {% elif password_expired %}
                                             <p class="red-fonts">{% trans 'The user password has expired' %}</p>
                                         {% elif form.errors %}
@@ -83,6 +84,7 @@
                                             {% else %}
                                                 <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
                                             {% endif %}
+                                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
                                         {% endif %}
                                     </div>
 

@@ -100,6 +100,7 @@ class UserLoginView(FormView):
         # limit user login failed count
         ip = get_request_ip(self.request)
         increase_login_failed_count(username, ip)
+        form.add_limit_login_error(username, ip)
         # show captcha
         cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
         self.send_auth_signal(success=False, username=username, reason=reason)
