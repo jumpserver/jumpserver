@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 
 from common.permissions import PermissionsMixin, IsSuperUser
-from common import utils
+from common.utils import get_command_storage_setting, get_replay_storage_setting
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm, EmailContentSettingForm
 
@@ -96,8 +96,8 @@ class TerminalSettingView(PermissionsMixin, TemplateView):
     permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
-        command_storage = utils.get_command_storage_setting()
-        replay_storage = utils.get_replay_storage_setting()
+        command_storage = get_command_storage_setting()
+        replay_storage = get_replay_storage_setting()
 
         context = {
             'app': _('Settings'),

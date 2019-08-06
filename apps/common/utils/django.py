@@ -37,8 +37,12 @@ def date_expired_default():
 
 
 def get_command_storage_setting():
+    from settings.models import Setting
     default = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
-    value = settings.TERMINAL_COMMAND_STORAGE
+    instance = Setting.objects.filter(name='TERMINAL_COMMAND_STORAGE').first()
+    if not instance:
+        return default
+    value = instance.cleaned_value
     if not value:
         return default
     value.update(default)
@@ -46,8 +50,12 @@ def get_command_storage_setting():
 
 
 def get_replay_storage_setting():
+    from settings.models import Setting
     default = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
-    value = settings.TERMINAL_REPLAY_STORAGE
+    instance = Setting.objects.filter(name='TERMINAL_REPLAY_STORAGE').first()
+    if not instance:
+        return default
+    value = instance.cleaned_value
     if not value:
         return default
     value.update(default)
