@@ -11,6 +11,7 @@ class Organization(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     users = models.ManyToManyField('users.User', related_name='orgs', blank=True)
     admins = models.ManyToManyField('users.User', related_name='admin_orgs', blank=True)
+    auditors = models.ManyToManyField('users.User', related_name='auditor_orgs', blank=True)
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
@@ -69,7 +70,7 @@ class Organization(models.Model):
     def get_org_users(self, include_app=False):
         from users.models import User
         if self.is_real():
-            users = self.users.all()
+            users = self.users.all() | self.auditors.all()
         else:
             users = User.objects.all()
         if not include_app:
@@ -81,10 +82,20 @@ class Organization(models.Model):
             return self.admins.all()
         return []
 
+    def get_org_auditors(self):
+        if self.is_real():
+            return self.auditors.all()
+        return []
+
     def can_admin_by(self, user):
         if user.is_superuser:
             return True
         if user in list(self.get_org_admins()):
+            return True
+        return False
+
+    def can_auditor_by(self, user):
+        if user in list(self.get_org_auditors()):
             return True
         return False
 
@@ -96,11 +107,15 @@ class Organization(models.Model):
         admin_orgs = []
         if user.is_anonymous:
             return admin_orgs
-        elif user.is_superuser or user.is_auditor:
+        elif user.is_superuser:
             admin_orgs = list(cls.objects.all())
             admin_orgs.append(cls.default())
         elif user.is_org_admin:
             admin_orgs = user.admin_orgs.all()
+        elif user.is_auditor:
+            admin_orgs = user.auditor_orgs.all()
+            if not admin_orgs:
+                admin_orgs = [cls.default()]
         return admin_orgs
 
     @classmethod

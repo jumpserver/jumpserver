@@ -67,14 +67,8 @@ class UserCreateUpdateFormMixin(OrgModelForm):
 
         # Org admin user
         else:
-            user = kwargs.get('instance')
-            # Update
-            if user:
-                role = kwargs.get('instance').role
-                roles.append((role, dict(User.ROLE_CHOICES).get(role)))
-            # Create
-            else:
-                roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+            roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
+            roles.append((User.ROLE_AUDITOR, dict(User.ROLE_CHOICES).get(User.ROLE_AUDITOR)))
 
         field = self.fields['role']
         field.choices = set(roles)

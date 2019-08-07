@@ -69,6 +69,10 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             logger.info(msg)
             return Response({'msg': msg}, status=401)
 
+        if user.is_auditor:
+            msg = _("Auditors are not authorized to log in")
+            return Response({'msg': msg}, status=401)
+
         if not user.otp_enabled:
             self.send_auth_signal(success=True, user=user)
             # 登陆成功，清除原来的缓存计数
