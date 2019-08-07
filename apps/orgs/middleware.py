@@ -20,7 +20,7 @@ class OrgMiddleware:
         org = get_org_from_request(request)
         if org.can_admin_by(request.user):
             return
-        if org.can_auditor_by(request.user):
+        if org.can_audit_by(request.user):
             return
         admin_orgs = Organization.get_user_admin_orgs(request.user)
         if admin_orgs:

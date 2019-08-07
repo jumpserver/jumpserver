@@ -165,13 +165,13 @@ class RoleMixin:
         return self.role == 'Auditor'
 
     @property
-    def auditor_orgs(self):
+    def audit_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_admin_orgs(self)
 
     @property
     def is_org_auditor(self):
-        if self.is_auditor and self.auditor_orgs.exists():
+        if self.is_auditor and self.audit_orgs.exists():
             return True
         else:
             return False
