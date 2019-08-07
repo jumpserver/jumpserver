@@ -4,13 +4,18 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction
+from rest_framework.renderers import JSONRenderer
 
 from jumpserver.utils import current_request
-from common.utils import get_request_ip, get_logger
+from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
-from .models import OperateLog, PasswordChangeLog
+from terminal.models import Session
+from . import models
+from . import serializers
 
 logger = get_logger(__name__)
+sys_logger = get_syslogger("audits")
+json_render = JSONRenderer()
 
 
 MODELS_NEED_RECORD = (
@@ -36,7 +41,7 @@ def create_operate_log(action, sender, resource):
     }
     with transaction.atomic():
         try:
-            OperateLog.objects.create(**data)
+            models.OperateLog.objects.create(**data)
         except Exception as e:
             logger.error("Create operate log error: {}".format(e))
 
@@ -44,15 +49,15 @@ def create_operate_log(action, sender, resource):
 @receiver(post_save, dispatch_uid="my_unique_identifier")
 def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
     if created:
-        action = OperateLog.ACTION_CREATE
+        action = models.OperateLog.ACTION_CREATE
     else:
-        action = OperateLog.ACTION_UPDATE
+        action = models.OperateLog.ACTION_UPDATE
     create_operate_log(action, sender, instance)
 
 
 @receiver(post_delete, dispatch_uid="my_unique_identifier")
 def on_object_delete(sender, instance=None, **kwargs):
-    create_operate_log(OperateLog.ACTION_DELETE, sender, instance)
+    create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
 
 
 @receiver(post_save, sender=User, dispatch_uid="my_unique_identifier")
@@ -61,7 +66,32 @@ def on_user_change_password(sender, instance=None, **kwargs):
         if not current_request or not current_request.user.is_authenticated:
             return
         with transaction.atomic():
-            PasswordChangeLog.objects.create(
+            models.PasswordChangeLog.objects.create(
                 user=instance, change_by=current_request.user,
                 remote_addr=get_request_ip(current_request),
             )
+
+
+def on_audits_log_create(sender, instance=None, **kwargs):
+    if sender == models.UserLoginLog:
+        category = "login_log"
+        serializer = serializers.LoginLogSerializer
+    elif sender == models.FTPLog:
+        serializer = serializers.FTPLogSerializer
+        category = "ftp_log"
+    elif sender == models.OperateLog:
+        category = "operation_log"
+        serializer = serializers.OperateLogSerializer
+    elif sender == models.PasswordChangeLog:
+        category = "password_change_log"
+        serializer = serializers.PasswordChangeLogSerializer
+    elif sender == Session:
+        category = "host_session_log"
+        serializer = serializers.SessionAuditSerializer
+    else:
+        return
+
+    s = serializer(instance=instance)
+    data = json_render.render(s.data).decode(errors='ignore')
+    msg = "{} - {}".format(category, data)
+    sys_logger.info(msg)

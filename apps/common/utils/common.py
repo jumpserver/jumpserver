@@ -31,6 +31,10 @@ def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
 
 
+def get_syslogger(name=None):
+    return logging.getLogger('jms.%s' % name)
+
+
 def timesince(dt, since='', default="just now"):
     """
     Returns string representing "time since" e.g.
