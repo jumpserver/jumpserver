@@ -1,8 +1,24 @@
 {% load i18n %}
 
+{% block user_expired_message %}
+    {% if request.user.is_expired %}
+        <div class="alert alert-danger help-message alert-dismissable">
+            {% blocktrans %}
+                Your account has expired, please contact the administrator.
+            {% endblocktrans %}
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
+        </div>
+    {% elif request.user.will_expired %}
+        <div class="alert alert-danger help-message alert-dismissable">
+            {% trans 'Your account will at' %} {{ request.user.date_expired }} {% trans 'expired. ' %}
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button" style="outline: none;">×</button>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block password_expired_message %}
     {% url 'users:user-password-update' as user_password_update_url %}
-    {% if request.user.password_has_expired  %}
+    {% if request.user.password_has_expired %}
         <div class="alert alert-danger help-message alert-dismissable">
             {% blocktrans %}
                 Your password has expired, please click <a href="{{ user_password_update_url }}"> this link </a> update password.
