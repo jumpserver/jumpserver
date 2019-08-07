@@ -215,7 +215,7 @@ LOGGING = {
             'format': '%(levelname)s %(message)s'
         },
         'syslog': {
-            'format': '%(name)s: %(message)s'
+            'format': 'jumpserver: %(message)s'
         },
         'msg': {
             'format': '%(message)s'
@@ -249,6 +249,11 @@ LOGGING = {
             'backupCount': 7,
             'filename': ANSIBLE_LOG_FILE,
         },
+        'syslog': {
+            'level': 'INFO',
+            'class': 'logging.NullHandler',
+            'formatter': 'syslog'
+        },
     },
     'loggers': {
         'django': {
@@ -257,17 +262,17 @@ LOGGING = {
             'level': LOG_LEVEL,
         },
         'django.request': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'syslog'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'django.server': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'syslog'],
             'level': LOG_LEVEL,
             'propagate': False,
         },
         'jumpserver': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'syslog'],
             'level': LOG_LEVEL,
         },
         'ops.ansible_api': {
@@ -277,6 +282,10 @@ LOGGING = {
         'django_auth_ldap': {
             'handlers': ['console', 'file'],
             'level': "INFO",
+        },
+        'jms_audits': {
+            'handlers': ['syslog'],
+            'level': 'INFO'
         },
         # 'django.db': {
         #     'handlers': ['console', 'file'],
@@ -290,17 +299,11 @@ SYSLOG_ENABLE = False
 if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
     host, port = CONFIG.SYSLOG_ADDR.split(':')
     SYSLOG_ENABLE = True
-    LOGGING['handlers']['syslog'] = {
-        'level': 'INFO',
+    LOGGING['handlers']['syslog'].update({
         'class': 'logging.handlers.SysLogHandler',
         'facility': CONFIG.SYSLOG_FACILITY,
         'address': (host, int(port)),
-        'formatter': 'syslog'
-    }
-    LOGGING['loggers']['jms'] = {
-        'handlers': ['syslog'],
-        'level': 'INFO'
-    }
+    })
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
