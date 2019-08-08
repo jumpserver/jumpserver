@@ -179,6 +179,11 @@ class UserProfileApi(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+    def retrieve(self, request, *args, **kwargs):
+        age = request.session.get_expiry_age()
+        request.session.set_expiry(age)
+        return super().retrieve(request, *args, **kwargs)
+
 
 class UserResetOTPApi(generics.RetrieveAPIView):
     queryset = User.objects.all()
