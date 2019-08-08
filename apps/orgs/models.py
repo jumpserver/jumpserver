@@ -70,9 +70,29 @@ class Organization(models.Model):
     def get_org_users(self, include_app=False):
         from users.models import User
         if self.is_real():
+            users = self.users.all()
+        else:
+            users = User.objects.all()
+        if not include_app:
+            users = users.exclude(role=User.ROLE_APP)
+        return users
+
+    def get_org_users_and_auditors(self, include_app=False):
+        from users.models import User
+        if self.is_real():
             users = self.users.all() | self.auditors.all()
         else:
             users = User.objects.all()
+        if not include_app:
+            users = users.exclude(role=User.ROLE_APP)
+        return users
+
+    def get_org_users_exclude_auditors(self, include_app=False):
+        from users.models import User
+        if self.is_real():
+            users = self.users.all()
+        else:
+            users = User.objects.exclude(role=User.ROLE_AUDITOR)
         if not include_app:
             users = users.exclude(role=User.ROLE_APP)
         return users
@@ -115,7 +135,8 @@ class Organization(models.Model):
         elif user.is_auditor:
             admin_orgs = user.audit_orgs.all()
             if not admin_orgs:
-                admin_orgs = [cls.default()]
+                admin_orgs = list(cls.objects.all())
+                admin_orgs.append(cls.default())
         return admin_orgs
 
     @classmethod

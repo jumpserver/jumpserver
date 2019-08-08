@@ -67,8 +67,14 @@ class UserCreateUpdateFormMixin(OrgModelForm):
 
         # Org admin user
         else:
-            roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
-            roles.append((User.ROLE_AUDITOR, dict(User.ROLE_CHOICES).get(User.ROLE_AUDITOR)))
+            user = kwargs.get('instance')
+            # Update
+            if user:
+                role = kwargs.get('instance').role
+                roles.append((role, dict(User.ROLE_CHOICES).get(role)))
+            # Create
+            else:
+                roles.append((User.ROLE_USER, dict(User.ROLE_CHOICES).get(User.ROLE_USER)))
 
         field = self.fields['role']
         field.choices = set(roles)
@@ -329,7 +335,7 @@ class UserGroupForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
+            users_field.queryset = current_org.get_org_users_exclude_auditors()
 
     def save(self, commit=True):
         group = super().save(commit=commit)

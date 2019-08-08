@@ -50,7 +50,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     def validate_role(self, value):
         request = self.context.get('request')
-        if not request.user.is_org_admin and value != User.ROLE_USER:
+        if not request.user.is_superuser and value != User.ROLE_USER:
             role_display = dict(User.ROLE_CHOICES)[User.ROLE_USER]
             msg = _("Role limit to {}".format(role_display))
             raise serializers.ValidationError(msg)

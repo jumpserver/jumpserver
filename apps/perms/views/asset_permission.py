@@ -135,7 +135,7 @@ class AssetPermissionUserView(PermissionsMixin,
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': current_org.get_org_users().exclude(
+            'users_remain': current_org.get_org_users_exclude_auditors().exclude(
                 assetpermission=self.object
             ),
             'user_groups_remain': UserGroup.objects.exclude(

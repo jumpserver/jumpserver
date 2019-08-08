@@ -45,7 +45,7 @@ class IndexView(PermissionsMixin, TemplateView):
 
     @staticmethod
     def get_user_count():
-        return current_org.get_org_users().count()
+        return current_org.get_org_users_and_auditors().count()
 
     @staticmethod
     def get_asset_count():
@@ -100,7 +100,7 @@ class IndexView(PermissionsMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        count = current_org.get_org_users().count() - self.get_month_active_user_total()
+        count = current_org.get_org_users_and_auditors().count() - self.get_month_active_user_total()
         if count < 0:
             count = 0
         return count
@@ -116,7 +116,7 @@ class IndexView(PermissionsMixin, TemplateView):
 
     @staticmethod
     def get_user_disabled_total():
-        return current_org.get_org_users().filter(is_active=False).count()
+        return current_org.get_org_users_and_auditors().filter(is_active=False).count()
 
     @staticmethod
     def get_asset_disabled_total():
