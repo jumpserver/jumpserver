@@ -120,6 +120,13 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
 
+    def validate_users(self, users):
+        for user in users:
+            if user.is_auditor:
+                msg = _('Auditors cannot be join in the group')
+                raise serializers.ValidationError(msg)
+        return users
+
 
 class UserGroupListSerializer(UserGroupSerializer):
     users = StringManyToManyField(many=True, read_only=True)
