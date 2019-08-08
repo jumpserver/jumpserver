@@ -205,22 +205,23 @@ class TokenMixin:
     email = ''
     id = None
 
+    def _get_or_create_private_token(self):
+        from authentication.models import PrivateToken
+        token, created = PrivateToken.objects.get_or_create(user=self)
+        return token
+
     @property
     def private_token(self):
-        from authentication.models import PrivateToken
-        try:
-            token = PrivateToken.objects.get(user=self)
-        except PrivateToken.DoesNotExist:
-            token = self.create_private_token()
-        return token
+        return self._get_or_create_private_token()
 
     def create_private_token(self):
-        from authentication.models import PrivateToken
-        token = PrivateToken.objects.create(user=self)
-        return token
+        return self._get_or_create_private_token()
+
+    def delete_private_token(self):
+        self.private_token.delete()
 
     def refresh_private_token(self):
-        self.private_token.delete()
+        self.delete_private_token()
         return self.create_private_token()
 
     def create_bearer_token(self, request=None):
