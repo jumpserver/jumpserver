@@ -180,6 +180,19 @@ class GenerateTree:
             assets.append({"id": asset_id, "system_users": system_users})
         return assets
 
+    def set_ungrouped_assets_nodes_if_need(self):
+        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            return
+        ungrouped_assets_ids = self.nodes[self.ungrouped_key]["assets"]
+        for asset_id in ungrouped_assets_ids:
+            in_nodes = self.all_assets_nodes_keys.get(asset_id, [])
+            for node_key in in_nodes:
+                parents_keys = self.node_util.get_nodes_parents_keys_by_key(node_key, with_self=False)
+                for parent_key in parents_keys:
+                    n = self.nodes[parent_key]
+                self.nodes[node_key]["assets"].add(asset_id)
+        self.nodes.pop(self.ungrouped_key, None)
+
     @timeit
     def get_nodes_with_assets(self):
         """
@@ -198,6 +211,7 @@ class GenerateTree:
         """
         if self._nodes_with_assets:
             return self._nodes_with_assets
+        self.set_ungrouped_assets_nodes_if_need()
         util = PermAssetsAmountUtil()
         nodes_with_assets_amount = util.compute_nodes_assets_amount(self.nodes)
         nodes = []
@@ -219,6 +233,7 @@ class GenerateTree:
         return nodes
 
     def get_nodes(self):
+        self.set_ungrouped_assets_nodes_if_need()
         nodes = list(self.nodes.keys())
         if not nodes:
             nodes.append(const.EMPTY_NODE_KEY)
