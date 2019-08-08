@@ -124,15 +124,14 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not user:
             return queryset.none()
+        kwargs = {}
+        args = []
+        if query_group:
+            groups = user.groups.all()
+            args.append(Q(users=user) | Q(user_groups__in=groups))
         else:
-            kwargs = {}
-            args = []
-            if query_group:
-                groups = user.groups.all()
-                args.append(Q(users=user) | Q(user_groups__in=groups))
-            else:
-                kwargs["users"] = user
-            return queryset.filter(*args, **kwargs).distinct()
+            kwargs["users"] = user
+        return queryset.filter(*args, **kwargs).distinct()
 
     def filter_user_group(self, queryset):
         user_group_id = self.request.query_params.get('user_group_id')
