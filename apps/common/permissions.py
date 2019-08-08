@@ -165,6 +165,9 @@ class CanUpdateDeleteSuperUser(permissions.BasePermission):
             return True
         elif request.method == 'DELETE' and str(request.user.id) == str(obj.id):
             return False
+        elif request.method in ('DELETE', 'PATCH', 'PUT') and \
+                not request.user.is_superuser and obj.is_auditor:
+            return False
         elif request.user.is_superuser:
             return True
         if hasattr(obj, 'is_superuser') and obj.is_superuser:

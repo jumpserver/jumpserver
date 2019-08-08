@@ -73,7 +73,8 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         check current user has permission to handle instance
         (update, destroy, bulk_update, bulk destroy)
         """
-        if not self.request.user.is_superuser and instance.is_superuser:
+        if not self.request.user.is_superuser \
+                and (instance.is_superuser or instance.is_auditor):
             return True
         if self.request.user == instance:
             return True
