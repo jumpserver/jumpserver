@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
+
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-
 from rest_framework.generics import (
     ListAPIView, get_object_or_404, RetrieveAPIView
 )
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser, IsOrgAdmin
 from common.tree import TreeNodeSerializer
@@ -40,7 +39,6 @@ class UserGrantedAssetsApi(UserPermissionCacheMixin, GrantAssetsMixin, ListAPIVi
     用户授权的所有资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    pagination_class = LimitOffsetPagination
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
@@ -67,7 +65,6 @@ class UserGrantedNodeAssetsApi(UserPermissionCacheMixin, GrantAssetsMixin, ListA
     查询用户授权的节点下的资产的api, 与上面api不同的是，只返回某个节点下的资产
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    pagination_class = LimitOffsetPagination
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
@@ -121,7 +118,6 @@ class UserGrantedNodesApi(UserPermissionCacheMixin, NodesWithUngroupMixin, ListA
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = NodeSerializer
-    pagination_class = LimitOffsetPagination
     only_fields = NodeSerializer.Meta.only_fields
 
     def get_object(self):
@@ -187,8 +183,6 @@ class UserGrantedNodesWithAssetsApi(UserPermissionCacheMixin, NodesWithUngroupMi
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.NodeGrantedSerializer
-    pagination_class = LimitOffsetPagination
-
     nodes_only_fields = serializers.NodeGrantedSerializer.Meta.only_fields
     assets_only_fields = serializers.NodeGrantedSerializer.assets_only_fields
     system_users_only_fields = serializers.NodeGrantedSerializer.system_users_only_fields

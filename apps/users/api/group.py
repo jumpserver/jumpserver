@@ -3,7 +3,6 @@
 
 from rest_framework import generics
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.pagination import LimitOffsetPagination
 
 from ..serializers import (
     UserGroupSerializer,
@@ -24,7 +23,6 @@ class UserGroupViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permission_classes = (IsOrgAdmin,)
-    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve') and \

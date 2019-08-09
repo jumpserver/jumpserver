@@ -16,7 +16,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
@@ -49,7 +48,6 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
-    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         queryset = super().get_queryset().all()
@@ -120,7 +118,6 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
 class SystemUserAssetsListView(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
-    pagination_class = LimitOffsetPagination
     filter_fields = ("hostname", "ip")
     http_method_names = ['get']
     search_fields = filter_fields

@@ -7,7 +7,6 @@ import jms_storage
 
 from rest_framework import generics
 from rest_framework.views import Response, APIView
-from rest_framework.pagination import LimitOffsetPagination
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
@@ -94,7 +93,6 @@ class LDAPTestingAPI(APIView):
 
 
 class LDAPUserListApi(generics.ListAPIView):
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
     serializer_class = LDAPUserSerializer
 

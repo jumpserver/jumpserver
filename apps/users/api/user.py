@@ -10,7 +10,6 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
@@ -38,7 +37,6 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     queryset = User.objects.exclude(role=User.ROLE_APP)
     serializer_class = serializers.UserSerializer
     permission_classes = (IsOrgAdmin, CanUpdateDeleteSuperUser)
-    pagination_class = LimitOffsetPagination
 
     def send_created_signal(self, users):
         if not isinstance(users, list):
@@ -82,9 +80,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             return False
 
     def allow_bulk_destroy(self, qs, filtered):
-        if self._bulk_deny_permission(filtered):
-            return False
-        return qs.count() != filtered.count()
+        return False
 
     def bulk_update(self, request, *args, **kwargs):
         """

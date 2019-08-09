@@ -34,6 +34,9 @@ class OrgBulkModelViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             queryset = self.serializer_class.setup_eager_loading(queryset)
         return queryset
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return False
+
 
 class OrgMembershipModelViewSetMixin:
     org = None

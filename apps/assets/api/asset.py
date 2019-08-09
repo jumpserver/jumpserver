@@ -5,7 +5,6 @@ import random
 
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.pagination import LimitOffsetPagination
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -37,7 +36,6 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
     success_message = _("%(hostname)s was %(action)s successfully")
 

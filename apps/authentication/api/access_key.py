@@ -2,7 +2,6 @@
 #
 
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsValidUser
 from .. import serializers
@@ -11,7 +10,6 @@ from .. import serializers
 class AccessKeyViewSet(ModelViewSet):
     permission_classes = (IsValidUser,)
     serializer_class = serializers.AccessKeySerializer
-    pagination_class = LimitOffsetPagination
     search_fields = ['^id', '^secret']
 
     def get_queryset(self):

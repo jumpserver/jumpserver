@@ -3,7 +3,6 @@
 
 
 from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework_bulk import BulkModelViewSet
 
 from ..hands import IsOrgAdmin, IsAppUser
@@ -22,7 +21,6 @@ class RemoteAppViewSet(BulkModelViewSet):
     permission_classes = (IsOrgAdmin,)
     queryset = RemoteApp.objects.all()
     serializer_class = RemoteAppSerializer
-    pagination_class = LimitOffsetPagination
 
 
 class RemoteAppConnectionInfoApi(generics.RetrieveAPIView):

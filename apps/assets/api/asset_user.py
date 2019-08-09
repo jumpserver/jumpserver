@@ -3,7 +3,6 @@
 
 from rest_framework.response import Response
 from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
@@ -54,7 +53,6 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
 
 
 class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
-    pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetUserSerializer
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
@@ -67,6 +65,9 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         filters.OrderingFilter,
         AssetUserFilterBackend, AssetUserSearchBackend,
     )
+
+    def allow_bulk_destroy(self, qs, filtered):
+        return False
 
     def get_queryset(self):
         # 尽可能先返回更少的数据
