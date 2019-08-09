@@ -24,7 +24,7 @@ FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*2
-disk_pattern = re.compile(r'^hd|sd|xvd|vd')
+disk_pattern = re.compile(r'^hd|sd|xvd|vd|nv')
 PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
 
 
