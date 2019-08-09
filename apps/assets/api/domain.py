@@ -1,11 +1,11 @@
 # ~*~ coding: utf-8 ~*~
 
-from rest_framework_bulk import BulkModelViewSet
 from rest_framework.views import APIView, Response
 from django.views.generic.detail import SingleObjectMixin
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from orgs.mixins import OrgBulkModelViewSet
 from ..models import Domain, Gateway
 from .. import serializers
 
@@ -14,7 +14,7 @@ logger = get_logger(__file__)
 __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 
-class DomainViewSet(BulkModelViewSet):
+class DomainViewSet(OrgBulkModelViewSet):
     queryset = Domain.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.DomainSerializer
@@ -34,7 +34,7 @@ class DomainViewSet(BulkModelViewSet):
         return super().get_permissions()
 
 
-class GatewayViewSet(BulkModelViewSet):
+class GatewayViewSet(OrgBulkModelViewSet):
     filter_fields = ("domain__name", "name", "username", "ip", "domain")
     search_fields = filter_fields
     queryset = Gateway.objects.all()

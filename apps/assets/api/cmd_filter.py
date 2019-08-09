@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
 
+from orgs.mixins import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers
@@ -12,7 +12,7 @@ from .. import serializers
 __all__ = ['CommandFilterViewSet', 'CommandFilterRuleViewSet']
 
 
-class CommandFilterViewSet(BulkModelViewSet):
+class CommandFilterViewSet(OrgBulkModelViewSet):
     filter_fields = ("name",)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
@@ -20,7 +20,7 @@ class CommandFilterViewSet(BulkModelViewSet):
     serializer_class = serializers.CommandFilterSerializer
 
 
-class CommandFilterRuleViewSet(BulkModelViewSet):
+class CommandFilterRuleViewSet(OrgBulkModelViewSet):
     filter_fields = ("content",)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

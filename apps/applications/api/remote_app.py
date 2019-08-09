@@ -3,8 +3,8 @@
 
 
 from rest_framework import generics
-from rest_framework_bulk import BulkModelViewSet
 
+from orgs.mixins import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin, IsAppUser
 from ..models import RemoteApp
 from ..serializers import RemoteAppSerializer, RemoteAppConnectionInfoSerializer
@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class RemoteAppViewSet(BulkModelViewSet):
+class RemoteAppViewSet(OrgBulkModelViewSet):
     filter_fields = ('name',)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

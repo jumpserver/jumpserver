@@ -91,7 +91,6 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         return queryset
 
 
-
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     """
     Refresh asset hardware info
