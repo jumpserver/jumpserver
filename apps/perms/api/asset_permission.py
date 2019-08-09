@@ -115,6 +115,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     def filter_user(self, queryset):
         user_id = self.request.query_params.get('user_id')
         username = self.request.query_params.get('username')
+        query_group = self.request.query_params.get('all')
         if user_id:
             user = get_object_or_none(User, pk=user_id)
         elif username:
@@ -123,6 +124,14 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not user:
             return queryset.none()
+        kwargs = {}
+        args = []
+        if query_group:
+            groups = user.groups.all()
+            args.append(Q(users=user) | Q(user_groups__in=groups))
+        else:
+            kwargs["users"] = user
+        return queryset.filter(*args, **kwargs).distinct()
 
     def filter_user_group(self, queryset):
         user_group_id = self.request.query_params.get('user_group_id')
@@ -148,6 +157,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         queryset = self.filter_valid(queryset)
+        queryset = self.filter_user(queryset)
         queryset = self.filter_keyword(queryset)
         queryset = self.filter_asset(queryset)
         queryset = self.filter_node(queryset)

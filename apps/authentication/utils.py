@@ -11,7 +11,7 @@ from . import const
 def write_login_log(*args, **kwargs):
     from audits.models import UserLoginLog
     default_city = _("Unknown")
-    ip = kwargs.get('ip', '')
+    ip = kwargs.get('ip') or ''
     if not (ip and validate_ip(ip)):
         ip = ip[:15]
         city = default_city

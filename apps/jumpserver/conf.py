@@ -381,6 +381,7 @@ defaults = {
     'ASSETS_PERM_CACHE_ENABLE': False,
     'SYSLOG_ADDR': '',  # '192.168.0.1:514'
     'SYSLOG_FACILITY': 'user',
+    'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
 }
 
 

@@ -94,7 +94,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
                 break
         else:
             ___cpu_model = 'Unknown'
-        ___cpu_model = ___cpu_model[:64]
+        ___cpu_model = ___cpu_model[:48]
         ___cpu_count = info.get('ansible_processor_count', 0)
         ___cpu_cores = info.get('ansible_processor_cores', None) or \
                        len(info.get('ansible_processor', []))
