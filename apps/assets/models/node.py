@@ -211,7 +211,8 @@ class AssetsAmountMixin:
         cached = cache.get(cache_key)
         if cached is not None:
             return cached
-        assets_amount = self.get_all_assets().count()
+        assets_amount = self.get_all_assets().only('id').count()
+        self.assets_amount = assets_amount
         return assets_amount
 
     @assets_amount.setter
@@ -328,14 +329,8 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
 
     def get_all_assets(self):
         from .asset import Asset
-        pattern = r'^{0}$|^{0}:'.format(self.key)
-        args = []
-        kwargs = {}
-        if self.is_root():
-            args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
-        else:
-            kwargs['nodes__key__regex'] = pattern
-        assets = Asset.objects.filter(*args, **kwargs).distinct()
+        children = self.get_all_children()
+        assets = Asset.objects.filter(nodes__in=children).distinct()
         return assets
 
     def get_all_valid_assets(self):
