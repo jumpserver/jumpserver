@@ -29,6 +29,9 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         instance = serializer.save()
         instance.user = self.request.user
         instance.save()
+        cols = self.request.query_params.get("cols", '80')
+        rows = self.request.query_params.get("rows", '24')
         transaction.on_commit(lambda: run_command_execution.apply_async(
-            args=(instance.id,), task_id=str(instance.id)
+            args=(instance.id,), kwargs={"cols": cols, "rows": rows},
+            task_id=str(instance.id)
         ))

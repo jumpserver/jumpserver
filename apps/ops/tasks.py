@@ -45,6 +45,10 @@ def run_command_execution(cid, **kwargs):
     execution = get_object_or_none(CommandExecution, id=cid)
     if execution:
         try:
+            os.environ.update({
+                "TERM_ROWS": kwargs.get("rows", ""),
+                "TERM_COLS": kwargs.get("cols", ""),
+            })
             execution.run()
         except SoftTimeLimitExceeded:
             logger.error("Run time out")

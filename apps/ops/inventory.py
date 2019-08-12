@@ -30,8 +30,6 @@ class JMSBaseInventory(BaseInventory):
             info.update(asset.get_auth_info())
             if asset.is_unixlike():
                 info["become"] = asset.admin_user.become_info
-        for node in asset.nodes.all():
-            info["groups"].append(node.value)
         if asset.is_windows():
             info["vars"].update({
                 "ansible_connection": "ssh",
@@ -45,7 +43,6 @@ class JMSBaseInventory(BaseInventory):
             info["vars"].update({
                 "domain": asset.domain.name,
             })
-            info["groups"].append("domain_"+asset.domain.name)
         return info
 
     @staticmethod
