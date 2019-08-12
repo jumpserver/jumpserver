@@ -76,7 +76,7 @@ class UserGroupDetailView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
-        users = current_org.get_org_members_exclude_anditors().exclude(id__in=self.object.users.all())
+        users = current_org.get_org_members_exclude_auditors().exclude(id__in=self.object.users.all())
         context = {
             'app': _('Users'),
             'action': _('User group detail'),
