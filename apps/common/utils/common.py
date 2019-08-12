@@ -106,7 +106,7 @@ def capacity_convert(size, expect='auto', rate=1000):
 
     if expect == 'auto':
         for unit, rate_ in rate_mapping.items():
-            if rate > std_size/rate_ > 1:
+            if rate > std_size/rate_ >= 1 or unit == "T":
                 expect = unit
                 break
 

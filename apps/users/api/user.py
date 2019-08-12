@@ -5,10 +5,10 @@ from django.core.cache import cache
 from django.contrib.auth import logout
 from django.utils.translation import ugettext as _
 
-from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.serializers import ValidationError
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework.pagination import LimitOffsetPagination
 
@@ -69,9 +69,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         check current user has permission to handle instance
         (update, destroy, bulk_update, bulk destroy)
         """
-        if not self.request.user.is_superuser and instance.is_superuser:
-            return True
-        if self.request.user == instance:
+        if instance.is_superuser and not self.request.user.is_superuser:
             return True
         return False
 
@@ -87,16 +85,14 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             return False
         return qs.count() != filtered.count()
 
-    def bulk_update(self, request, *args, **kwargs):
-        """
-        rewrite because limit org_admin update superuser
-        """
-        # restrict the update to the filtered queryset
-        queryset = self.filter_queryset(self.get_queryset())
-        if self._bulk_deny_permission(queryset):
-            data = {'msg': _("You do not have permission.")}
-            return Response(data=data, status=status.HTTP_403_FORBIDDEN)
-        return super().bulk_update(request, *args, **kwargs)
+    def perform_bulk_update(self, serializer):
+        users_ids = [d.get("id") or d.get("pk") for d in serializer.validated_data]
+        users = User.objects.filter(id__in=users_ids)
+        deny_instances = [str(i.id) for i in users if self._deny_permission(i)]
+        if deny_instances:
+            msg = "{} can't be update".format(deny_instances)
+            raise ValidationError({"id": msg})
+        return super().perform_bulk_update(serializer)
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
@@ -178,6 +174,11 @@ class UserProfileApi(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def retrieve(self, request, *args, **kwargs):
+        age = request.session.get_expiry_age()
+        request.session.set_expiry(age)
+        return super().retrieve(request, *args, **kwargs)
 
 
 class UserResetOTPApi(generics.RetrieveAPIView):

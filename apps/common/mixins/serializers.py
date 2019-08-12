@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
@@ -74,16 +75,21 @@ class BulkListSerializerMixin(object):
         for item in data:
             try:
                 # prepare child serializer to only handle one instance
-                if 'id' in item.keys():
-                    self.child.instance = self.instance.get(id=item['id']) if self.instance else None
-                if 'pk' in item.keys():
-                    self.child.instance = self.instance.get(id=item['pk']) if self.instance else None
-
+                if 'id' in item:
+                    pk = item["id"]
+                elif 'pk' in item:
+                    pk = item["pk"]
+                else:
+                    raise ValidationError("id or pk not in data")
+                child = self.instance.get(id=pk)
+                self.child.instance = child
                 self.child.initial_data = item
                 # raw
                 validated = self.child.run_validation(item)
             except ValidationError as exc:
                 errors.append(exc.detail)
+            except ObjectDoesNotExist as e:
+                errors.append(e)
             else:
                 ret.append(validated)
                 errors.append({})

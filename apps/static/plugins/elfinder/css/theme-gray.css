@@ -1280,7 +1280,8 @@ div.elfinder-cwd-wrapper-list .ui-icon-grip-dotted-vertical {
 }
 .elfinder-cwd-file.ui-selected {
   background: #455158;
-  color: #555;
+  /*color: #555;*/
+  color: #ddd;
   width: 120px !important;
 }
 .elfinder-cwd-filename input,
@@ -1309,10 +1310,10 @@ div.elfinder-cwd-wrapper-list .ui-icon-grip-dotted-vertical {
   padding: 0;
 }
 .elfinder-cwd table tr:nth-child(odd) {
-  background-color: transparent;
+  /*background-color: transparent;*/
 }
 .elfinder-cwd table tr:nth-child(odd).ui-state-hover {
-  background-color: #4c5961;
+  /*background-color: #4c5961;*/
 }
 #elfinder-elfinder-cwd-thead td {
   background: #353b42;

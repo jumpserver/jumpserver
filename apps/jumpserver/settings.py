@@ -54,6 +54,9 @@ LOG_LEVEL = CONFIG.LOG_LEVEL
 
 ALLOWED_HOSTS = ['*']
 
+# Max post update field num
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 # Application definition
 
 INSTALLED_APPS = [
