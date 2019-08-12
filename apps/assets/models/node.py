@@ -329,8 +329,14 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
 
     def get_all_assets(self):
         from .asset import Asset
-        children = self.get_all_children()
-        assets = Asset.objects.filter(nodes__in=children).distinct()
+        pattern = r'^{0}$|^{0}:'.format(self.key)
+        args = []
+        kwargs = {}
+        if self.is_root():
+            args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
+        else:
+            kwargs['nodes__key__regex'] = pattern
+        assets = Asset.objects.filter(*args, **kwargs).distinct()
         return assets
 
     def get_all_valid_assets(self):
