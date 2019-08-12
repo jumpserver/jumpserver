@@ -67,35 +67,20 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    def get_org_users(self, include_app=False):
-        from users.models import User
-        if self.is_real():
-            users = self.users.all()
-        else:
-            users = User.objects.all()
-        if not include_app:
-            users = users.exclude(role=User.ROLE_APP)
-        return users
+    # def get_org_users(self, include_app=False):
+    #     from users.models import User
+    #     if self.is_real():
+    #         users = self.users.all()
+    #     else:
+    #         users = User.objects.all()
+    #     if not include_app:
+    #         users = users.exclude(role=User.ROLE_APP)
+    #     return users
 
-    def get_org_users_and_auditors(self, include_app=False):
-        from users.models import User
+    def get_org_users(self):
         if self.is_real():
-            users = self.users.all() | self.auditors.all()
-        else:
-            users = User.objects.all()
-        if not include_app:
-            users = users.exclude(role=User.ROLE_APP)
-        return users
-
-    def get_org_users_exclude_auditors(self, include_app=False):
-        from users.models import User
-        if self.is_real():
-            users = self.users.all()
-        else:
-            users = User.objects.exclude(role=User.ROLE_AUDITOR)
-        if not include_app:
-            users = users.exclude(role=User.ROLE_APP)
-        return users
+            return self.users.all()
+        return []
 
     def get_org_admins(self):
         if self.is_real():
@@ -106,6 +91,26 @@ class Organization(models.Model):
         if self.is_real():
             return self.auditors.all()
         return []
+
+    def get_org_members(self, include_app=False):
+        from users.models import User
+        if self.is_real():
+            members = self.users.all() | self.auditors.all()
+        else:
+            members = User.objects.all()
+        if not include_app:
+            members = members.exclude(role=User.ROLE_APP)
+        return members
+
+    def get_org_members_exclude_auditors(self, include_app=False):
+        from users.models import User
+        if self.is_real():
+            members_exclude_auditors = self.users.all()
+        else:
+            members_exclude_auditors = User.objects.exclude(role=User.ROLE_AUDITOR)
+        if not include_app:
+            members_exclude_auditors = members_exclude_auditors.exclude(role=User.ROLE_APP)
+        return members_exclude_auditors
 
     def can_admin_by(self, user):
         if user.is_superuser:

@@ -195,7 +195,7 @@ class UserDetailView(PermissionsMixin, DetailView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users_and_auditors().values_list('id', flat=True)
+        org_users = current_org.get_org_members().values_list('id', flat=True)
         queryset = queryset.filter(id__in=org_users)
         return queryset
 

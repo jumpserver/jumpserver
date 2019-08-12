@@ -119,7 +119,7 @@ class OperateLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'user_list': current_org.get_org_users_and_auditors(),
+            'user_list': current_org.get_org_members(),
             'actions': self.actions_dict,
             'resource_type_list': get_resource_type_list(),
             'date_from': self.date_from,
@@ -142,7 +142,7 @@ class PasswordChangeLogList(PermissionsMixin, DatetimeSearchMixin, ListView):
     permission_classes = [IsOrgAdmin | IsAuditor]
 
     def get_queryset(self):
-        users = current_org.get_org_users_and_auditors()
+        users = current_org.get_org_members()
         self.queryset = super().get_queryset().filter(
             user__in=[user.__str__() for user in users]
         )
@@ -159,7 +159,7 @@ class PasswordChangeLogList(PermissionsMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'user_list': current_org.get_org_users_and_auditors(),
+            'user_list': current_org.get_org_members(),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user': self.user,
@@ -180,7 +180,7 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 
     @staticmethod
     def get_org_users():
-        users = current_org.get_org_users_and_auditors().values_list('username', flat=True)
+        users = current_org.get_org_members().values_list('username', flat=True)
         return users
 
     def get_queryset(self):
@@ -234,7 +234,7 @@ class CommandExecutionListView(UserCommandExecutionListView):
         return queryset
 
     def get_user_list(self):
-        users = current_org.get_org_users_exclude_auditors()
+        users = current_org.get_org_members_exclude_anditors()
         return users
 
     def get_context_data(self, **kwargs):
