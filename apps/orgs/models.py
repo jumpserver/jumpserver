@@ -104,12 +104,8 @@ class Organization(models.Model):
 
     def get_org_members_exclude_auditors(self, include_app=False):
         from users.models import User
-        if self.is_real():
-            members_exclude_auditors = self.users.all()
-        else:
-            members_exclude_auditors = User.objects.exclude(role=User.ROLE_AUDITOR)
-        if not include_app:
-            members_exclude_auditors = members_exclude_auditors.exclude(role=User.ROLE_APP)
+        members = self.get_org_members(include_app=include_app)
+        members_exclude_auditors = members.exclude(role=User.ROLE_AUDITOR)
         return members_exclude_auditors
 
     def can_admin_by(self, user):
