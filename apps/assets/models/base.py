@@ -164,9 +164,6 @@ class AssetUser(OrgModelMixin):
     def set_asset_connectivity(self, asset, c):
         key = self.get_asset_connectivity_key(asset)
         Connectivity.set(key, c)
-        # 当为某个系统用户或管理用户设置的的时候，失效掉他们的连接数量
-        amount_key = self.CONNECTIVITY_AMOUNT_CACHE_KEY.format(self.username, '*')
-        cache.delete_pattern(amount_key)
 
     def get_asset_user(self, asset):
         from ..backends import AssetUserManager
