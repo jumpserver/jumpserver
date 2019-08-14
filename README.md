@@ -7,27 +7,20 @@
 [![Ansible](https://img.shields.io/badge/ansible-2.4.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
 [![Paramiko](https://img.shields.io/badge/paramiko-2.4.1-green.svg?style=plastic)](http://www.paramiko.org/)
 
-
 ----
 
-Jumpserver 是全球首款完全开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 的专业运维审计系统。
+Jumpserver 是全球首款完全开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 的运维安全审计系统。
 
 Jumpserver 使用 Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 解决方案，交互界面美观、用户体验好。
 
-Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点提供 API，各机房部署登录节点，可横向扩展、无并发限制。
+Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向扩展，无资产数量及并发限制。
 
 改变世界，从一点点开始。
 
-- [English Version](https://github.com/jumpserver/jumpserver/blob/master/README_EN.md)
-
-
-### 功能
+### 核心功能列表
 ----
 
 <table class="subscription-level-table">
-    <tr class="subscription-level-tr-border">
-        <th  style="background-color: #1ab394;color: #ffffff;" colspan="3">Jumpserver提供的堡垒机必备功能</th>
-    </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-first-td-background-style" rowspan="4">身份验证 Authentication</td>
         <td class="features-second-td-background-style" rowspan="3" >登录认证
@@ -36,11 +29,11 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">LDAP认证
+        <td class="features-third-td-background-style">LDAP 认证
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">支持OpenID，实现单点登录
+        <td class="features-third-td-background-style">支持 OpenID，实现单点登录
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
@@ -180,35 +173,32 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，中心节点
     </tr>
 </table>
 
-
-### 开始使用
+### 安装及使用文档
 ----
 
-- 快速开始文档  [Docker 安装](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
+-  [Docker 快速安装文档](http://docs.jumpserver.org/zh/docs/dockerinstall.html)
+-  [Step by Step 安装文档](http://docs.jumpserver.org/zh/docs/step_by_step.html)
+-  [完整文档](http://docs.jumpserver.org)
 
-- Step by Step 安装文档 [详细部署](http://docs.jumpserver.org/zh/docs/step_by_step.html)
-
-- 也可以查看我们完整文档 [文档](http://docs.jumpserver.org)
-
-### Demo、视频 和 截图
+### 演示视频和系统截图
 ----
 
-我们提供了 Demo 、演示视频和截图可以让你快速了解 Jumpserver
+我们提供了演示视频和系统截图可以让你快速了解 Jumpserver。
 
-- [Demo](https://demo.jumpserver.org/auth/login/?next=/)
-- [视频](https://fit2cloud2-offline-installer.oss-cn-beijing.aliyuncs.com/tools/Jumpserver%20%E4%BB%8B%E7%BB%8Dv1.4.mp4)
-- [截图](http://docs.jumpserver.org/zh/docs/snapshot.html)
+- [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
+- [系统截图](http://docs.jumpserver.org/zh/docs/snapshot.html)
 
 ### SDK
 ----
 
-我们还编写了一些SDK，供你的其它系统快速和 Jumpserver API 交互
+我们编写了一些SDK，供你的其它系统快速和 Jumpserver API 交互。
 
-- [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver其它组件使用这个SDK完成交互
-- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的Java版本的SDK
-
+- [Python](https://github.com/jumpserver/jumpserver-python-sdk) Jumpserver 其它组件使用这个 SDK 完成交互
+- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的 Java 版本的 SDK
 
 ### License & Copyright
+----
+
 Copyright (c) 2014-2019 飞致云 FIT2CLOUD, All rights reserved.
 
 Licensed under The GNU General Public License version 2 (GPLv2)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
