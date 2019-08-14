@@ -1,10 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 #
-import time
 from functools import reduce
+from treelib import Tree
 from django.db.models import Prefetch, Q
 
-from common.utils import get_object_or_none, get_logger
+from common.utils import get_object_or_none, get_logger, timeit
 from common.struct import Stack
 from .models import SystemUser, Label, Node, Asset
 
@@ -54,10 +54,12 @@ class LabelFilter(LabelFilterMixin):
 
 
 class NodeUtil:
+    full_value_sep = ' / '
+
     def __init__(self, with_assets_amount=False, debug=False):
         self.stack = Stack()
-        self._nodes = {}
         self.with_assets_amount = with_assets_amount
+        self._nodes = {}
         self._debug = debug
         self.init()
 
@@ -65,62 +67,85 @@ class NodeUtil:
     def sorted_by(node):
         return [int(i) for i in node.key.split(':')]
 
+    @timeit
     def get_queryset(self):
-        all_nodes = Node.objects.all()
+        queryset = Node.objects.all().only('id', 'key', 'value')
         if self.with_assets_amount:
-            all_nodes = all_nodes.prefetch_related(
-                Prefetch('assets', queryset=Asset.objects.all().only('id'))
-            )
-            all_nodes = list(all_nodes)
-            for node in all_nodes:
-                node._assets = set(node.assets.all())
-        return all_nodes
+            queryset = queryset.prefetch_related(
+                Prefetch('assets', queryset=Asset.objects.all().only('id')
+            ))
+        return list(queryset)
 
+    @staticmethod
+    def set_node_default_attr(node):
+        setattr(node, '_full_value', node.value)
+        setattr(node, '_children', [])
+        setattr(node, '_all_children', [])
+        setattr(node, '_parents', [])
+
+    @timeit
     def get_all_nodes(self):
-        all_nodes = sorted(self.get_queryset(), key=self.sorted_by)
-
-        guarder = Node(key='', value='Guarder')
-        guarder._assets = []
-        all_nodes.append(guarder)
-        return all_nodes
+        queryset = sorted(list(self.get_queryset()), key=self.sorted_by)
+        guarder = Node(key='', value='ROOT')
+        self.set_node_default_attr(guarder)
+        queryset.append(guarder)
+        for node in queryset[:-1]:
+            self.set_node_default_attr(node)
+            if not self.with_assets_amount:
+                continue
+            assets = set([str(a.id) for a in node.assets.all()])
+            node._assets = assets
+            node._all_assets = assets
+        return queryset
 
     def push_to_stack(self, node):
         # 入栈之前检查
         # 如果栈是空的，证明是一颗树的根部
         if self.stack.is_empty():
             node._full_value = node.value
-            node._parents = []
         else:
             # 如果不是根节点,
             # 该节点的祖先应该是父节点的祖先加上父节点
             # 该节点的名字是父节点的名字+自己的名字
-            node._parents = [self.stack.top] + self.stack.top._parents
-            node._full_value = ' / '.join(
-                [self.stack.top._full_value, node.value]
+            node._parents = [self.stack.top] + getattr(self.stack.top, '_parents')
+            node._full_value = self.full_value_sep.join(
+                [getattr(self.stack.top, '_full_value', ''), node.value]
             )
-        node._children = []
-        node._all_children = []
-        self.debug("入栈: {}".format(node.key))
+        # self.debug("入栈: {}".format(node.key))
         self.stack.push(node)
 
     # 出栈
+    # @timeit
     def pop_from_stack(self):
         _node = self.stack.pop()
-        self.debug("出栈: {} 栈顶: {}".format(_node.key, self.stack.top.key if self.stack.top else None))
+        # self.debug("出栈: {} 栈顶: {}".format(
+        #     _node.key, self.stack.top.key if self.stack.top else None)
+        # )
         self._nodes[_node.key] = _node
         if not self.stack.top:
             return
-        if self.with_assets_amount:
-            self.stack.top._assets.update(_node._assets)
-            _node._assets_amount = len(_node._assets)
-            delattr(_node, '_assets')
-        self.stack.top._children.append(_node)
-        self.stack.top._all_children.extend([_node] + _node._all_children)
+        parent = self.stack.top
+        parent_children = getattr(parent, '_children')
+        parent_all_children = getattr(parent, '_all_children')
+        node_all_children = getattr(_node, '_all_children')
+        parent_children.append(_node)
+        parent_all_children.extend([_node] + node_all_children)
 
+        if not self.with_assets_amount:
+            return
+
+        node_all_assets = getattr(_node, '_all_assets')
+        parent_all_assets = getattr(parent, '_all_assets')
+        _node._assets_amount = len(node_all_assets)
+        parent_all_assets.update(node_all_assets)
+
+    @timeit
     def init(self):
         all_nodes = self.get_all_nodes()
         for node in all_nodes:
-            self.debug("准备: {} 栈顶: {}".format(node.key, self.stack.top.key if self.stack.top else None))
+            self.debug("准备: {} 栈顶: {}".format(
+                node.key, self.stack.top.key if self.stack.top else None)
+            )
             # 入栈之前检查，该节点是不是栈顶节点的子节点
             # 如果不是，则栈顶出栈
             while self.stack.top and not self.stack.top.is_children(node):
@@ -144,27 +169,19 @@ class NodeUtil:
     def debug(self, msg):
         self._debug and logger.debug(msg)
 
-    def set_assets_amount(self):
-        for node in self._nodes.values():
-            node.assets_amount = node._assets_amount
-
-    def set_full_value(self):
-        for node in self._nodes.values():
-            node.full_value = node._full_value
-
     @property
     def nodes(self):
         return list(self._nodes.values())
 
     def get_family_by_key(self, key):
-        tree_nodes = set()
+        family = set()
         node = self.get_node_by_key(key)
         if not node:
             return []
-        tree_nodes.update(node._parents)
-        tree_nodes.add(node)
-        tree_nodes.update(node._all_children)
-        return list(tree_nodes)
+        family.update(getattr(node, '_parents'))
+        family.add(node)
+        family.update(getattr(node, '_all_children'))
+        return list(family)
 
     # 使用给定节点生成一颗树
     # 找到他们的祖先节点
@@ -179,8 +196,8 @@ class NodeUtil:
     def get_some_nodes_family_by_keys(self, keys):
         family = set()
         for key in keys:
-            family.update(self.get_family_by_key(key))
-        return family
+            family.update(set(self.get_family_by_key(key)))
+        return list(family)
 
     def get_some_nodes_family_keys_by_keys(self, keys):
         family = self.get_some_nodes_family_by_keys(keys)
@@ -191,7 +208,7 @@ class NodeUtil:
         node = self.get_node_by_key(key)
         if not node:
             return []
-        parents.update(set(node._parents))
+        parents.update(set(getattr(node, '_parents')))
         if with_self:
             parents.add(node)
         return list(parents)
@@ -203,21 +220,20 @@ class NodeUtil:
         nodes = self.get_nodes_parents_by_key(key, with_self=with_self)
         return [n.key for n in nodes]
 
-    def get_all_children_by_key(self, key, with_self=True):
-        children = set()
+    def get_node_all_children_by_key(self, key, with_self=True):
         node = self.get_node_by_key(key)
         if not node:
             return []
-        children.update(set(node._all_children))
+        children = set(getattr(node, '_all_children'))
         if with_self:
             children.add(node)
         return list(children)
 
     def get_all_children(self, node, with_self=True):
-        return self.get_all_children_by_key(node.key, with_self=with_self)
+        return self.get_node_all_children_by_key(node.key, with_self=with_self)
 
     def get_all_children_keys_by_key(self, key, with_self=True):
-        nodes = self.get_all_children_by_key(key, with_self=with_self)
+        nodes = self.get_node_all_children_by_key(key, with_self=with_self)
         return [n.key for n in nodes]
 
 
@@ -250,7 +266,42 @@ def test_node_tree():
             )
 
 
+class TreeService(Tree):
+    tag_sep = ' / '
 
+    @classmethod
+    @timeit
+    def new(cls):
+        from .models import Node
+        all_nodes = Node.objects.all()
+        tree = cls()
+        tree.create_node(tag='', identifier='')
+        for node in all_nodes:
+            tree.create_node(
+                tag=node.value, identifier=node.key,
+                parent=node.parent_key, data=node
+            )
+        return tree
 
+    def all_children(self, nid, with_self=True):
+        children_ids = self.expand_tree(nid)
+        if not with_self:
+            next(children_ids)
+        return [self[i] for i in children_ids]
 
+    def ancestors(self, nid, with_self=True):
+        ancestor_ids = list(self.rsearch(nid))
+        ancestor_ids.pop()
+        if not with_self:
+            ancestor_ids.pop(0)
+        return [self.get_node(i) for i in ancestor_ids]
 
+    def get_node_full_tag(self, nid):
+        ancestors = self.ancestors(nid)
+        ancestors.reverse()
+        return self.tag_sep.join(n.tag for n in ancestors)
+
+    def get_family(self, nid):
+        ancestors = self.ancestors(nid, with_self=False)
+        children = self.all_children(nid, with_self=False)
+        return ancestors + [self[nid]] + children

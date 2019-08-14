@@ -13,16 +13,23 @@ __all__ = [
 
 
 class NodeSerializer(BulkOrgResourceModelSerializer):
-    assets_amount = serializers.IntegerField(read_only=True)
     name = serializers.ReadOnlyField(source='value')
+    full_value = serializers.SerializerMethodField(label=_("Full value"))
 
     class Meta:
         model = Node
         only_fields = ['id', 'key', 'value', 'org_id']
-        fields = only_fields + ['name', 'assets_amount']
+        fields = only_fields + ['name', 'full_value']
         read_only_fields = [
-            'key', 'name', 'assets_amount', 'org_id',
+            'key', 'name', 'full_value', 'org_id',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tree = Node.tree()
+
+    def get_full_value(self, obj):
+        return self.tree.get_node_full_tag(obj.key)
 
     def validate_value(self, data):
         instance = self.instance if self.instance else Node.root()

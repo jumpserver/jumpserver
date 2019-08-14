@@ -13,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import generics, mixins, viewsets
+import time
+
+from rest_framework import generics, mixins
 from rest_framework.serializers import ValidationError
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
@@ -22,6 +25,7 @@ from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
+from orgs.mixins import OrgModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
@@ -39,29 +43,26 @@ __all__ = [
 ]
 
 
-class NodeViewSet(viewsets.ModelViewSet):
-    filter_fields = ('value', 'key', )
-    search_fields = filter_fields
+class NodeViewSet(OrgModelViewSet):
+    filter_fields = ('value', 'key', 'id')
+    search_fields = ('value', )
     queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
+    pagination_class = LimitOffsetPagination
 
+    # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
         child_key = Node.root().get_next_child_key()
         serializer.validated_data["key"] = child_key
         serializer.save()
 
-    def update(self, request, *args, **kwargs):
+    def perform_update(self, serializer):
         node = self.get_object()
-        if node.is_root():
-            node_value = node.value
-            post_value = request.data.get('value')
-            if node_value != post_value:
-                return Response(
-                    {"msg": _("You can't update the root node name")},
-                    status=400
-                )
-        return super().update(request, *args, **kwargs)
+        if node.is_root() and node.value != serializer.validated_data['value']:
+            msg = _("You can't update the root node name")
+            raise ValidationError({"error": msg})
+        return super().perform_update(serializer)
 
 
 class NodeListAsTreeApi(generics.ListAPIView):
@@ -79,17 +80,19 @@ class NodeListAsTreeApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = TreeNodeSerializer
 
-    def get_queryset(self):
-        queryset = Node.objects.all()
+    def to_tree_queryset(self, queryset):
         util = NodeUtil()
         nodes = util.get_nodes_by_queryset(queryset)
         queryset = [node.as_tree_node() for node in nodes]
         return queryset
 
-    @staticmethod
-    def refresh_nodes(queryset):
-        Node.expire_nodes_assets_amount()
-        Node.expire_nodes_full_value()
+    def get_queryset(self):
+        queryset = Node.objects.all()
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        queryset = self.to_tree_queryset(queryset)
         return queryset
 
 
@@ -112,18 +115,28 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
     is_root = False
 
     def get_queryset(self):
+        t1 = time.time()
         self.check_need_refresh_nodes()
+        t2 = time.time()
+        print("1: ", t2 - t1)
         node_key = self.request.query_params.get('key')
-        util = NodeUtil()
+        # util = NodeUtil()
         # 是否包含自己
         with_self = False
         if not node_key:
             node_key = Node.root().key
             with_self = True
-        self.node = util.get_node_by_key(node_key)
+        # self.node = util.get_node_by_key(node_key)
+        self.node = get_object_or_404(Node, key=node_key)
+        t3 = time.time()
+        print("2: ", t3 - t2)
         queryset = self.node.get_children(with_self=with_self)
+        t4 = time.time()
         queryset = [node.as_tree_node() for node in queryset]
+        print("3: ", t4 - t3)
+        t5 = time.time()
         queryset = sorted(queryset)
+        print("4: ", t5 - t4)
         return queryset
 
     def filter_assets(self, queryset):
@@ -131,7 +144,8 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
         if not include_assets:
             return queryset
         assets = self.node.get_assets().only(
-            "id", "hostname", "ip", 'platform', "os", "org_id", "protocols",
+            "id", "hostname", "ip", 'platform', "os",
+            "org_id", "protocols",
         )
         for asset in assets:
             queryset.append(asset.as_tree_node(self.node))
