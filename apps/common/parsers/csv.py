@@ -40,7 +40,7 @@ class JMSCSVParser(BaseParser):
     @staticmethod
     def _get_fields_map(serializer):
         fields_map = {}
-        fields = serializer.get_fields()
+        fields = serializer.fields
         fields_map.update({v.label: k for k, v in fields.items()})
         fields_map.update({k: k for k, _ in fields.items()})
         return fields_map
@@ -91,7 +91,7 @@ class JMSCSVParser(BaseParser):
 
             header = next(rows)
             fields_map = self._get_fields_map(serializer)
-            header = [fields_map.get(name, '') for name in header]
+            header = [fields_map.get(name.strip('*'), '') for name in header]
 
             data = []
             for row in rows:
