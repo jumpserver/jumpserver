@@ -189,7 +189,8 @@ function updateSystemUser(system_users) {
     };
     requestApi({
         url: the_url,
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        success: function () {window.location.reload()}
     });
 }
 
