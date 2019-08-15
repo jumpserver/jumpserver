@@ -132,7 +132,8 @@ $(document).ready(function () {
                 var results = $.map(data.results, function (v, i) {
                     return {id: v.id, text: v.full_value}
                 });
-                return {results: results, pagination: {"more": true}}
+                var more = !!data.next;
+                return {results: results, pagination: {"more": more }}
             }
         },
     });
