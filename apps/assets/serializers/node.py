@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from django.utils.translation import ugettext as _
 
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import Asset, Node
 
 

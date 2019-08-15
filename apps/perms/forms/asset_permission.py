@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from orgs.utils import current_org
 from assets.models import Asset, Node
 from ..models import AssetPermission, Action

@@ -5,10 +5,10 @@ import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.utils import timezone
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
-from orgs.mixins import OrgManager
+from orgs.mixins.models import OrgManager
 
 
 __all__ = [

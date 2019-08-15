@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 
 from common.utils import get_logger, get_request_ip
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
-from orgs.mixins import RootOrgViewMixin
+from orgs.mixins.api import RootOrgViewMixin
 from users.serializers import UserSerializer
 from users.models import User
 from assets.models import Asset, SystemUser

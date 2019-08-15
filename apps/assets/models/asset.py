@@ -13,7 +13,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .utils import Connectivity
-from orgs.mixins import OrgModelMixin, OrgManager
+from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = ['Asset', 'ProtocolsMixin']
 logger = logging.getLogger(__name__)

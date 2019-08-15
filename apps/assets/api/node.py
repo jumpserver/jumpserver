@@ -15,7 +15,7 @@
 
 import time
 
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, viewsets
 from rest_framework.serializers import ValidationError
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
@@ -25,7 +25,7 @@ from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
-from orgs.mixins import OrgModelViewSet
+from orgs.mixins.api import OrgModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
@@ -96,70 +96,6 @@ class NodeListAsTreeApi(generics.ListAPIView):
         return queryset
 
 
-class NodeChildrenAsTreeApi(generics.ListAPIView):
-    """
-    节点子节点作为树返回，
-    [
-      {
-        "id": "",
-        "name": "",
-        "pId": "",
-        "meta": ""
-      }
-    ]
-
-    """
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = TreeNodeSerializer
-    node = None
-    is_root = False
-
-    def get_queryset(self):
-        t1 = time.time()
-        self.check_need_refresh_nodes()
-        t2 = time.time()
-        print("1: ", t2 - t1)
-        node_key = self.request.query_params.get('key')
-        # util = NodeUtil()
-        # 是否包含自己
-        with_self = False
-        if not node_key:
-            node_key = Node.root().key
-            with_self = True
-        # self.node = util.get_node_by_key(node_key)
-        self.node = get_object_or_404(Node, key=node_key)
-        t3 = time.time()
-        print("2: ", t3 - t2)
-        queryset = self.node.get_children(with_self=with_self)
-        t4 = time.time()
-        queryset = [node.as_tree_node() for node in queryset]
-        print("3: ", t4 - t3)
-        t5 = time.time()
-        queryset = sorted(queryset)
-        print("4: ", t5 - t4)
-        return queryset
-
-    def filter_assets(self, queryset):
-        include_assets = self.request.query_params.get('assets', '0') == '1'
-        if not include_assets:
-            return queryset
-        assets = self.node.get_assets().only(
-            "id", "hostname", "ip", 'platform', "os",
-            "org_id", "protocols",
-        )
-        for asset in assets:
-            queryset.append(asset.as_tree_node(self.node))
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = self.filter_assets(queryset)
-        return queryset
-
-    def check_need_refresh_nodes(self):
-        if self.request.query_params.get('refresh', '0') == '1':
-            Node.refresh_nodes()
-
-
 class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
     queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
@@ -211,6 +147,59 @@ class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
             children = node.get_children()
         queryset.extend(list(children))
         return queryset
+
+
+class NodeChildrenAsTreeApi(generics.ListAPIView):
+    """
+    节点子节点作为树返回，
+    [
+      {
+        "id": "",
+        "name": "",
+        "pId": "",
+        "meta": ""
+      }
+    ]
+
+    """
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = TreeNodeSerializer
+    node = None
+    is_root = False
+
+    def get_queryset(self):
+        self.check_need_refresh_nodes()
+        node_key = self.request.query_params.get('key')
+        # 是否包含自己
+        with_self = False
+        if not node_key:
+            node_key = Node.root().key
+            with_self = True
+        self.node = get_object_or_404(Node, key=node_key)
+        queryset = self.node.get_children(with_self=with_self)
+        queryset = [node.as_tree_node() for node in queryset]
+        queryset = sorted(queryset)
+        return queryset
+
+    def filter_assets(self, queryset):
+        include_assets = self.request.query_params.get('assets', '0') == '1'
+        if not include_assets:
+            return queryset
+        assets = self.node.get_assets().only(
+            "id", "hostname", "ip", 'platform', "os",
+            "org_id", "protocols",
+        )
+        for asset in assets:
+            queryset.append(asset.as_tree_node(self.node))
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = self.filter_assets(queryset)
+        return queryset
+
+    def check_need_refresh_nodes(self):
+        if self.request.query_params.get('refresh', '0') == '1':
+            Node.refresh_nodes()
 
 
 class NodeAssetsApi(generics.ListAPIView):

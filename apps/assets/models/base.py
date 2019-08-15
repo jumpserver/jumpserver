@@ -15,7 +15,7 @@ from common.utils import (
 )
 from common.validators import alphanumeric
 from common import fields
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 from .utils import private_key_validator, Connectivity
 
 signer = get_signer()

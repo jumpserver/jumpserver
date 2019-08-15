@@ -8,7 +8,7 @@ from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
 from .utils import set_current_org, get_current_org
 from .models import Organization
-from .mixins import OrgMembershipSerializerMixin
+from .mixins.serializers import OrgMembershipSerializerMixin
 
 
 class OrgSerializer(ModelSerializer):

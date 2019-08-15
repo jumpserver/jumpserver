@@ -3,7 +3,7 @@
 
 from django.utils.translation import ugettext as _
 from django import forms
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from orgs.utils import current_org
 
 from ..models import RemoteAppPermission

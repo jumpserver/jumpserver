@@ -108,8 +108,8 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
     keyword = 'Bearer'
-    model = get_user_model()
     expiration = settings.TOKEN_EXPIRATION or 3600
+    model = get_user_model()
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
@@ -133,8 +133,9 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         return self.authenticate_credentials(token)
 
     def authenticate_credentials(self, token):
+        model = get_user_model()
         user_id = cache.get(token)
-        user = get_object_or_none(self.model, id=user_id)
+        user = get_object_or_none(model, id=user_id)
 
         if not user:
             msg = _('Invalid token or cache refreshed.')

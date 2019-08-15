@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from django.db import transaction
 from django.conf import settings
 
-from orgs.mixins import RootOrgViewMixin
+from orgs.mixins.api import RootOrgViewMixin
 from common.permissions import IsValidUser
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
