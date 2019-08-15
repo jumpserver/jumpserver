@@ -273,7 +273,13 @@ class TreeService(Tree):
     @timeit
     def new(cls):
         from .models import Node
+        from orgs.utils import get_current_org, set_to_root_org
+
+        origin_org = get_current_org()
+        set_to_root_org()
         all_nodes = Node.objects.all()
+        origin_org.change_to()
+
         tree = cls()
         tree.create_node(tag='', identifier='')
         for node in all_nodes:
