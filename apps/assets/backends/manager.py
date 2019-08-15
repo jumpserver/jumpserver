@@ -71,9 +71,9 @@ class AssetUserManager:
         if len(instances) == 1:
             return instances[0]
         elif len(instances) == 0:
-            self.raise_does_not_exist(self.__name__)
+            self.raise_does_not_exist(self.__class__.__name__)
         else:
-            self.raise_multiple_return(self.__name__, len(instances))
+            self.raise_multiple_return(self.__class__.__name__, len(instances))
 
     def raise_does_not_exist(self, name):
         raise self.ObjectDoesNotExist(self.MSG_NOT_EXIST.format(name))
