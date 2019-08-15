@@ -110,16 +110,15 @@ function hiddenFields(){
 function constructParams(data) {
     var typeList = ['chrome', 'mysql_workbench', 'vmware_client', 'custom'];
     var params = {};
-    for (var type in typeList){
-        if (data.type === type){
+    $.each(typeList, function(index, value){
+        if (data.type === value){
             for (var k in data){
-                if (k.startsWith(data.type)){
+                if (k.startsWith(value)){
                     params[k] = data[k]
                 }
             }
-            break
         }
-    }
+    });
     return params;
 }
 $(document).ready(function () {
