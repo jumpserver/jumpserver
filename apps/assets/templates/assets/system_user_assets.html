@@ -101,7 +101,7 @@
 
                                         {% for node in system_user.nodes.all|sort %}
                                         <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>
+                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
