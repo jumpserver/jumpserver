@@ -67,16 +67,6 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    # def get_org_users(self, include_app=False):
-    #     from users.models import User
-    #     if self.is_real():
-    #         users = self.users.all()
-    #     else:
-    #         users = User.objects.all()
-    #     if not include_app:
-    #         users = users.exclude(role=User.ROLE_APP)
-    #     return users
-
     def get_org_users(self):
         if self.is_real():
             return self.users.all()
@@ -92,21 +82,17 @@ class Organization(models.Model):
             return self.auditors.all()
         return []
 
-    def get_org_members(self, include_app=False):
+    def get_org_members(self, include_app=False, include_auditors=True):
         from users.models import User
         if self.is_real():
-            members = self.users.all() | self.auditors.all()
+            members = self.get_org_users() | self.get_org_auditors()
         else:
             members = User.objects.all()
         if not include_app:
             members = members.exclude(role=User.ROLE_APP)
+        if not include_auditors:
+            members = members.exclude(role=User.ROLE_AUDITOR)
         return members
-
-    def get_org_members_exclude_auditors(self, include_app=False):
-        from users.models import User
-        members = self.get_org_members(include_app=include_app)
-        members_exclude_auditors = members.exclude(role=User.ROLE_AUDITOR)
-        return members_exclude_auditors
 
     def can_admin_by(self, user):
         if user.is_superuser:
@@ -139,6 +125,13 @@ class Organization(models.Model):
                 admin_orgs = list(cls.objects.all())
                 admin_orgs.append(cls.default())
         return admin_orgs
+
+    @classmethod
+    def get_user_audit_orgs(cls, user):
+        audit_orgs = []
+        if user.is_auditor:
+            audit_orgs = user.audit_orgs.all()
+        return audit_orgs
 
     @classmethod
     def default(cls):

@@ -234,7 +234,7 @@ class CommandExecutionListView(UserCommandExecutionListView):
         return queryset
 
     def get_user_list(self):
-        users = current_org.get_org_members_exclude_auditors()
+        users = current_org.get_org_members(include_auditors=False)
         return users
 
     def get_context_data(self, **kwargs):

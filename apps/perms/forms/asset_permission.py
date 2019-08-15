@@ -39,7 +39,7 @@ class AssetPermissionForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
-        users_field.queryset = current_org.get_org_members_exclude_auditors()
+        users_field.queryset = current_org.get_org_members(include_auditors=False)
 
         nodes_field = self.fields['nodes']
         nodes_field.choices = ((n.id, n.full_value) for n in Node.get_queryset())

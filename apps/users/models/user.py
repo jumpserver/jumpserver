@@ -167,7 +167,7 @@ class RoleMixin:
     @property
     def audit_orgs(self):
         from orgs.models import Organization
-        return Organization.get_user_admin_orgs(self)
+        return Organization.get_user_audit_orgs(self)
 
     @property
     def is_org_auditor(self):
