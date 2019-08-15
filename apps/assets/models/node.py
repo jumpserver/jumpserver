@@ -229,12 +229,13 @@ class NodeAssetsMixin:
 
     def expire_assets_amount(self):
         ancestor_keys = self.get_ancestor_keys(with_self=True)
-        cache_keys = [self._assets_amount_cache_key.format(k) for k in
-                      ancestor_keys]
+        cache_keys = [
+            self._assets_amount_cache_key.format(k) for k in ancestor_keys
+        ]
         cache.delete_many(cache_keys)
 
     @classmethod
-    def expire_nodes_assets_amount(cls, nodes=None):
+    def expire_nodes_assets_amount(cls, nodes):
         for node in nodes:
             node.expire_assets_amount()
 

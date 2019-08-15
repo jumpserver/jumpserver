@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from collections import defaultdict
-from django.db.models.signals import post_save, m2m_changed, post_delete
+from django.db.models.signals import post_save, m2m_changed, pre_delete
 from django.dispatch import receiver
 
 from common.utils import get_logger
@@ -42,7 +42,7 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         Node.expire_nodes_assets_amount(nodes)
 
 
-@receiver(post_delete, sender=Asset, dispatch_uid="my_unique_identifier")
+@receiver(pre_delete, sender=Asset, dispatch_uid="my_unique_identifier")
 def on_asset_delete(sender, instance=None, **kwargs):
     # 过期节点资产数量
     nodes = instance.nodes.all()
@@ -80,19 +80,19 @@ def on_asset_node_changed(sender, instance=None, **kwargs):
     logger.debug("Asset nodes change signal received")
     Asset.expire_all_nodes_keys_cache()
     if isinstance(instance, Asset):
+        nodes = []
         if kwargs['action'] == 'pre_remove':
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-            Node.expire_nodes_assets_amount(nodes)
         if kwargs['action'] == 'post_add':
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-            Node.expire_nodes_assets_amount(nodes)
             system_users_assets = defaultdict(set)
             system_users = SystemUser.objects.filter(nodes__in=nodes)
-            # 清理节点缓存
             for system_user in system_users:
                 system_users_assets[system_user].update({instance})
             for system_user, assets in system_users_assets.items():
                 system_user.assets.add(*tuple(assets))
+        # 清理节点数量缓存
+        Node.expire_nodes_assets_amount(nodes)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

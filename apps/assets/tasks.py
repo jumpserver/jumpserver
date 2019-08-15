@@ -106,7 +106,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
         for dev, dev_info in info.get('ansible_devices', {}).items():
             if disk_pattern.match(dev) and dev_info['removable'] == '0':
                 disk_info[dev] = dev_info['size']
-        ___disk_total = '%s %s' % sum_capacity(disk_info.values())
+        ___disk_total = '%.1f %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)
 
         # ___platform = info.get('ansible_system', 'Unknown')
