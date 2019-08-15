@@ -153,29 +153,9 @@ jumpserver.nodes_selected = {};
 
 $(document).ready(function () {
 	$('.select2').select2()
-	$(".nodes-select2").select2({
-        closeOnSelect: false,
-        ajax: {
-            url: '{% url "api-assets:node-list" %}',
-            data: function (params) {
-                var page = params.page || 1;
-                var query = {
-                   search: params.term,
-                   offset: (page -1) * 10,
-                   limit: 10
-                };
-                return query
-            },
-            processResults: function (data) {
-                var results = $.map(data.results, function (v, i) {
-                    return {id: v.id, text: v.full_value}
-                });
-                var more = !!data.next;
-                console.log(more);
-                return {results: results, pagination: {"more": more }}
-            }
-        },
-    }).on('select2:select', function(evt) {
+    var url = "{% url 'api-assets:node-list' %}";
+    nodesSelect2Init(".nodes-select2", url)
+	.on('select2:select', function(evt) {
             var data = evt.params.data;
             jumpserver.nodes_selected[data.id] = data.text;
     })
