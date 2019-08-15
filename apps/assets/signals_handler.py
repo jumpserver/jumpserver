@@ -112,8 +112,7 @@ def on_node_assets_changed(sender, instance=None, **kwargs):
 @receiver(post_save, sender=Node)
 def on_node_update_or_created(sender, instance=None, created=False, **kwargs):
     if instance and not created:
-        pass
-        # instance.expire_full_value()
+        Node.refresh_nodes()
 
 
 @receiver(post_save, sender=AuthBook)
