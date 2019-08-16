@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden
 from django.views.generic import DetailView, View
 
 from .models import Organization
+from common.utils import UUID_PATTERN
 
 
 class SwitchOrgView(DetailView):
@@ -17,10 +18,11 @@ class SwitchOrgView(DetailView):
         request.session['oid'] = oid
         host = request.get_host()
         referer = request.META.get('HTTP_REFERER')
-        if referer.find(host) != -1:
-            return redirect(referer)
-        else:
-            return redirect('index')
+        if referer.find(host) == -1:
+            return redirect(reverse('index'))
+        if UUID_PATTERN.search(referer):
+            return redirect(reverse('index'))
+        return redirect(referer)
 
 
 class SwitchToAOrgView(View):
