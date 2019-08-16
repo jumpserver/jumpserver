@@ -122,9 +122,9 @@ class GenerateTree:
             system_users_ids = defaultdict(int)
 
         # 获取已有资产的系统用户和actions，并更新到最新系统用户信息中
-        # old_system_users_ids = self.assets[asset_id]
-        # for system_user_id, action in old_system_users_ids.items():
-        #     system_users_ids[system_user_id] |= action
+        old_system_users_ids = self.assets[asset_id]
+        for system_user_id, action in old_system_users_ids.items():
+            system_users_ids[system_user_id] |= action
 
         asset_nodes_keys = self.all_assets_nodes_keys.get(asset_id, [])
         # {asset.id: [node.key, ], }
@@ -140,10 +140,10 @@ class GenerateTree:
             # 把自己加入到树上的节点中
             self.nodes[key]["assets"].add(asset_id)
             # 获取自己所在节点的系统用户，并添加进去
-            # node_system_users_ids = self.nodes[key]["system_users"]
-            # for system_user_id, action in node_system_users_ids.items():
-            #     system_users_ids[system_user_id] |= action
-        # self.assets[asset_id] = system_users_ids
+            node_system_users_ids = self.nodes[key]["system_users"]
+            for system_user_id, action in node_system_users_ids.items():
+                system_users_ids[system_user_id] |= action
+        self.assets[asset_id] = system_users_ids
 
     def add_node(self, node_key, system_users_ids=None):
         """
