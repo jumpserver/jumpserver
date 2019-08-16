@@ -15,7 +15,7 @@ from django.conf import settings
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit
 from common.tree import TreeNode
-from assets.utils import NodeUtil
+from assets.utils import NodeUtil, TreeService
 from .. import const
 from ..models import AssetPermission, Action
 from ..hands import Node, Asset
@@ -122,9 +122,9 @@ class GenerateTree:
             system_users_ids = defaultdict(int)
 
         # 获取已有资产的系统用户和actions，并更新到最新系统用户信息中
-        old_system_users_ids = self.assets[asset_id]
-        for system_user_id, action in old_system_users_ids.items():
-            system_users_ids[system_user_id] |= action
+        # old_system_users_ids = self.assets[asset_id]
+        # for system_user_id, action in old_system_users_ids.items():
+        #     system_users_ids[system_user_id] |= action
 
         asset_nodes_keys = self.all_assets_nodes_keys.get(asset_id, [])
         # {asset.id: [node.key, ], }
@@ -140,10 +140,10 @@ class GenerateTree:
             # 把自己加入到树上的节点中
             self.nodes[key]["assets"].add(asset_id)
             # 获取自己所在节点的系统用户，并添加进去
-            node_system_users_ids = self.nodes[key]["system_users"]
-            for system_user_id, action in node_system_users_ids.items():
-                system_users_ids[system_user_id] |= action
-        self.assets[asset_id] = system_users_ids
+            # node_system_users_ids = self.nodes[key]["system_users"]
+            # for system_user_id, action in node_system_users_ids.items():
+            #     system_users_ids[system_user_id] |= action
+        # self.assets[asset_id] = system_users_ids
 
     def add_node(self, node_key, system_users_ids=None):
         """
@@ -435,6 +435,159 @@ class AssetPermissionCacheMixin:
         cache.delete_pattern(key)
         meta_key = cls.CACHE_META_KEY_PREFIX + '*'
         cache.delete_pattern(meta_key)
+
+
+class AssetPermissionUtilV2:
+    get_permissions_map = {
+        "User": get_user_permissions,
+        "UserGroup": get_user_group_permissions,
+        "Asset": get_asset_permissions,
+        "Node": get_node_permissions,
+        "SystemUser": get_system_user_permissions,
+    }
+    assets_only = (
+        'id', 'hostname', 'ip', "platform", "domain_id",
+        'comment', 'is_active', 'os', 'org_id'
+    )
+
+    def __init__(self, obj, cache_policy='0'):
+        self.object = obj
+        self.obj_id = str(obj.id)
+        self._permissions = None
+        self._permissions_id = None  # 标记_permission的唯一值
+        self._assets = None
+        self._filter_id = 'None'  # 当通过filter更改 permission是标记
+        self.change_org_if_need()
+        self.nodes = None
+        self._nodes = None
+        self._assets_direct = None
+        self._nodes_direct = None
+        self._user_tree = None
+        self.full_tree = Node.tree()
+
+    @staticmethod
+    def change_org_if_need():
+        set_to_root_org()
+
+    @property
+    def permissions(self):
+        if self._permissions:
+            return self._permissions
+        object_cls = self.object.__class__.__name__
+        func = self.get_permissions_map[object_cls]
+        permissions = func(self.object)
+        self._permissions = permissions
+        return permissions
+
+    @timeit
+    def filter_permissions(self, **filters):
+        filters_json = json.dumps(filters, sort_keys=True)
+        self._permissions = self.permissions.filter(**filters)
+        self._filter_id = md5(filters_json.encode()).hexdigest()
+
+    @timeit
+    def get_assets_direct(self):
+        """
+        返回直接授权的资产，
+        并添加到tree.assets中
+        :return:
+        {asset.id: {system_user.id: actions, }, }
+        """
+        assets_ids = self.permissions.values_list('assets', flat=True)
+        return Asset.objects.filter(id__in=assets_ids)
+
+    @timeit
+    def get_nodes_direct(self):
+        """
+        返回直接授权的节点，
+        并将节点添加到tree.nodes中，并将节点下的资产添加到tree.assets中
+        :return:
+        {node.key: {system_user.id: actions,}, }
+        """
+        nodes_ids = self.permissions.values_list('nodes', flat=True)
+        return Node.objects.filter(id__in=nodes_ids)
+
+    def add_direct_nodes_to_user_tree(self, user_tree):
+        nodes_direct_keys = self.permissions \
+            .exclude(nodes__isnull=True) \
+            .values_list('nodes__key', flat=True) \
+            .distinct()
+        nodes_direct_keys = list(nodes_direct_keys)
+        # 排序，保证从上层节点开始加
+        nodes_direct_keys.sort(key=lambda x: len(x))
+        for key in nodes_direct_keys:
+            # 如果树上已经有这个节点，代表子树已经存在
+            if user_tree.contains(key):
+                continue
+            # 找到这个节点的父节点，如果父节点不在树上，则挂到ROOT上
+            parent = self.full_tree.parent(key)
+            if not user_tree.contains(parent.identifier):
+                parent = user_tree.root_node()
+            subtree = self.full_tree.subtree(key)
+            user_tree.paste(parent.identifier, subtree, deep=True)
+
+        for node in user_tree.all_nodes_itr():
+            node.assets = 'all'
+
+    def add_single_assets_node_to_user_tree(self, user_tree):
+        # 添加单独授权资产的节点
+        nodes_single = defaultdict(set)
+        queryset = self.permissions.exclude(assets__isnull=True) \
+            .values_list('assets', 'assets__nodes__key') \
+            .distinct()
+
+        for item in queryset:
+            nodes_single[item[1]].add(item[0])
+        nodes_single.pop(None, None)
+
+        for key in tuple(nodes_single.keys()):
+            if user_tree.contains(key):
+                nodes_single.pop(key)
+
+        # 获取单独授权资产，并没有在授权的节点上
+        for key, assets in nodes_single.items():
+            node = self.full_tree.get_node(key, deep=True)
+            parent_id = self.full_tree.parent(key).identifier
+            parent = user_tree.get_node(parent_id)
+            if not parent:
+                parent = user_tree.root_node()
+            user_tree.add_node(node, parent)
+
+    def parse_user_tree_to_full_tree(self, user_tree):
+        # 开始修正user_tree，保证父节点都在树上
+        root_children = user_tree.children('')
+        for child in root_children:
+            if child.data.is_root():
+                continue
+            ancestors = self.full_tree.ancestors(
+                child.identifier, with_self=False, deep=True
+            )
+            if not ancestors:
+                continue
+            parent_id = ancestors[0].identifier
+            user_tree.safe_add_ancestors(ancestors)
+            user_tree.move_node(child.identifier, parent_id)
+
+    def get_user_tree(self):
+        if self._user_tree:
+            return self._user_tree
+        user_tree = TreeService()
+        full_tree_root = self.full_tree.root_node()
+        user_tree.create_node(
+            tag=full_tree_root.tag, identifier=full_tree_root.identifier
+        )
+        self.add_direct_nodes_to_user_tree(user_tree)
+        self.add_single_assets_node_to_user_tree(user_tree)
+        self.parse_user_tree_to_full_tree(user_tree)
+        self._user_tree = user_tree
+        return user_tree
+
+    def get_nodes(self):
+        user_tree = self.get_user_tree()
+        return [node.data.id for node in user_tree.all_nodes_itr()]
+
+    def get_assets(self):
+        pass
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
