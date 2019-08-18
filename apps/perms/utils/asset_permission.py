@@ -26,7 +26,7 @@ logger = get_logger(__file__)
 
 __all__ = [
     'AssetPermissionUtil', 'is_obj_attr_has', 'sort_assets',
-    'ParserNode',
+    'ParserNode', 'AssetPermissionUtilV2',
 ]
 
 
@@ -552,6 +552,7 @@ class AssetPermissionUtilV2:
             if not parent:
                 parent = user_tree.root_node()
             user_tree.add_node(node, parent)
+            node.assets = assets
 
     def parse_user_tree_to_full_tree(self, user_tree):
         # 开始修正user_tree，保证父节点都在树上
@@ -574,7 +575,8 @@ class AssetPermissionUtilV2:
         user_tree = TreeService()
         full_tree_root = self.full_tree.root_node()
         user_tree.create_node(
-            tag=full_tree_root.tag, identifier=full_tree_root.identifier
+            tag=full_tree_root.tag,
+            identifier=full_tree_root.identifier
         )
         self.add_direct_nodes_to_user_tree(user_tree)
         self.add_single_assets_node_to_user_tree(user_tree)
@@ -584,7 +586,16 @@ class AssetPermissionUtilV2:
 
     def get_nodes(self):
         user_tree = self.get_user_tree()
-        return [node.data.id for node in user_tree.all_nodes_itr()]
+        return [
+            node.data.id for node in user_tree.all_nodes_itr() if node.data
+        ]
+
+    def get_nodes_with_assets(self):
+        user_tree = self.get_user_tree()
+        return [
+            {"id": node.data.id, "assets": getattr(node, 'assets', None)}
+            for node in user_tree.all_nodes_itr() if node.data
+        ]
 
     def get_assets(self):
         pass
