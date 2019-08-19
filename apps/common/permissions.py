@@ -163,8 +163,11 @@ class CanUpdateDeleteSuperUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in ['GET', 'OPTIONS']:
             return True
-        elif request.method == 'DELETE' and str(request.user.id) == str(obj.id):
-            return False
+        elif request.method == 'DELETE':
+            if str(request.user.id) == str(obj.id):
+                return False
+            if request.user.is_org_admin and obj.is_org_admin:
+                return False
         elif request.user.is_superuser:
             return True
         if hasattr(obj, 'is_superuser') and obj.is_superuser:

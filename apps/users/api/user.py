@@ -52,11 +52,13 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         if isinstance(users, User):
             users = [users]
         if current_org and current_org.is_real():
-            current_org.users.add(*users)
+            for user in users:
+                if user.is_common_user:
+                    current_org.users.add(user)
         self.send_created_signal(users)
 
     def get_queryset(self):
-        queryset = current_org.get_org_users().prefetch_related('groups')
+        queryset = current_org.get_org_members().prefetch_related('groups')
         return queryset
 
     def get_permissions(self):

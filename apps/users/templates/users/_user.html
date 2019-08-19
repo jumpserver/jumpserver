@@ -61,6 +61,17 @@
     <link rel="stylesheet" type="text/css" href={% static "css/plugins/daterangepicker/daterangepicker.css" %} />
 
     <script>
+        var role_id = '#' + '{{ form.role.id_for_label }}';
+        var groups_id = '#' + '{{ form.groups.id_for_label }}';
+        function fieldDisplay(){
+            var role = $(role_id).val();
+            if (role === 'Auditor'){
+                $(groups_id).closest('.form-group').addClass('hidden');
+            }
+            else {
+                $(groups_id).closest('.form-group').removeClass('hidden');
+            }}
+
         var dateOptions = {
             singleDatePicker: true,
             showDropdowns: true,
@@ -76,7 +87,10 @@
             $('#id_date_expired').daterangepicker(dateOptions);
             var mfa_radio = $('#id_otp_level');
             mfa_radio.addClass("form-inline");
-            mfa_radio.children().css("margin-right","15px")
+            mfa_radio.children().css("margin-right","15px");
+            fieldDisplay()
+        }).on('change', role_id, function(){
+            fieldDisplay();
         })
     </script>
 {% endblock %}

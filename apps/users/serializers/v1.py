@@ -75,12 +75,29 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             validated_data['password_raw'] = password
         return validated_data
 
+    @staticmethod
+    def create_auditor_role_clean_groups(validated_data):
+        role = validated_data.get('role', None)
+        if role == 'Auditor':
+            validated_data.pop('groups', None)
+        return validated_data
+
+    @staticmethod
+    def update_auditor_role_clean_groups(instance, validated_data):
+        role = validated_data.get('role', None)
+        if (role and role == 'Auditor') or (not role and instance.role == 'Auditor'):
+            validated_data.pop('groups', None)
+            instance.groups.set([])
+        return instance, validated_data
+
     def create(self, validated_data):
         validated_data = self.change_password_to_raw(validated_data)
+        validated_data = self.create_auditor_role_clean_groups(validated_data)
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         validated_data = self.change_password_to_raw(validated_data)
+        instance, validated_data = self.update_auditor_role_clean_groups(instance, validated_data)
         return super().update(instance, validated_data)
 
 
@@ -119,6 +136,13 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
+
+    def validate_users(self, users):
+        for user in users:
+            if user.is_auditor:
+                msg = _('Auditors cannot be join in the group')
+                raise serializers.ValidationError(msg)
+        return users
 
 
 class UserGroupListSerializer(UserGroupSerializer):
