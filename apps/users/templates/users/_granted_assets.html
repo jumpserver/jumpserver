@@ -113,6 +113,12 @@ function initTree() {
                 enable: true
             }
         },
+        async: {
+			enable: true,
+			url: treeUrl,
+			autoParam: ["id=key", "name=n", "level=lv"],
+            type: 'get'
+		},
         callback: {
             onSelected: onSelected
         }

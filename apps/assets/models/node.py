@@ -74,52 +74,36 @@ class FamilyMixin:
     def all_children(self):
         return self.get_all_children(with_self=False)
 
-    def _get_children(self, with_self=False):
+    def get_children(self, with_self=False):
         pattern = r'^{0}:[0-9]+$'.format(self.key)
         if with_self:
-            pattern += r'^{0}$'
+            pattern += r'|^{0}$'.format(self.key)
         return Node.objects.filter(key__regex=pattern)
 
-    def get_children(self, with_self=False):
-        _children = self._tree.children(self.key)
-        children = [n.data for n in _children]
-        if with_self:
-            children.append(self)
-        return children
-
-    def _get_all_children(self, with_self=False):
+    def get_all_children(self, with_self=False):
         pattern = r'^{0}:'.format(self.key)
         if with_self:
-            pattern += r'|^{0}$'
+            pattern += r'|^{0}$'.format(self.key)
         children = Node.objects.filter(key__regex=pattern)
-        return children
-
-    def get_all_children(self, with_self=False):
-        _children = self._tree.all_children(self.key, with_self=with_self)
-        children = [n.data for n in _children]
         return children
 
     @property
     def parents(self):
         return self.get_ancestor(with_self=False)
 
-    def _get_ancestor(self, with_self=False):
+    def get_ancestor(self, with_self=False):
         parents = self.parents
         if with_self:
             parents = list(parents)
             parents.append(self)
         return parents
 
-    def get_ancestor(self, with_self=False):
-        _ancestor = self._tree.ancestors(self.key, with_self=with_self)
-        ancestor = [n.data for n in _ancestor]
-        return ancestor
-
     @property
     def parent(self):
         if self.is_root():
             return self
-        return self._tree.parent(self.key).data
+        parent_key = self.parent_key
+        return Node.objects.get(key=parent_key)
 
     @parent.setter
     def parent(self, parent):
@@ -135,7 +119,7 @@ class FamilyMixin:
                 child.save()
             self.save()
 
-    def _get_siblings(self, with_self=False):
+    def get_siblings(self, with_self=False):
         key = ':'.join(self.key.split(':')[:-1])
         pattern = r'^{}:[0-9]+$'.format(key)
         sibling = Node.objects.filter(
@@ -144,13 +128,6 @@ class FamilyMixin:
         if not with_self:
             sibling = sibling.exclude(key=self.key)
         return sibling
-
-    def get_siblings(self, with_self=False):
-        _siblings = self._tree.siblings(self.key)
-        siblings = [n.data for n in _siblings]
-        if with_self:
-            siblings.append(self)
-        return siblings
 
     def get_family(self):
         ancestor = self.get_ancestor()
@@ -205,6 +182,7 @@ class FullValueMixin:
 
 class NodeAssetsMixin:
     _assets_amount_cache_key = '_NODE_ASSETS_AMOUNT_{}'
+    _assets_cache_key = '_NODE_ASSETS_{}'
     _assets_amount = None
     key = ''
     cache_time = 3600 * 24 * 7
@@ -251,6 +229,15 @@ class NodeAssetsMixin:
         children = self.get_all_children(with_self=True)
         assets = Asset.objects.filter(nodes__in=children).distinct()
         return assets
+
+    def assets_ids(self):
+        cache_key = self._assets_cache_key.format(self.key)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        assets_ids = self.get_assets().values_list('id', flat=True)
+        cache.set(cache_key, assets_ids, self.cache_time)
+        return assets_ids
 
     def get_assets(self):
         from .asset import Asset

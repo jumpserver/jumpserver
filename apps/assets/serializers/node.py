@@ -29,7 +29,8 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         self.tree = Node.tree()
 
     def get_full_value(self, obj):
-        return self.tree.get_node_full_tag(obj.key)
+        return ''
+        # return self.tree.get_node_full_tag(obj.key)
 
     def validate_value(self, data):
         instance = self.instance if self.instance else Node.root()

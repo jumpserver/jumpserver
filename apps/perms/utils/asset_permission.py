@@ -3,6 +3,7 @@
 import time
 import uuid
 from collections import defaultdict
+from functools import reduce
 import json
 from hashlib import md5
 import itertools
@@ -450,6 +451,8 @@ class AssetPermissionUtilV2:
         'comment', 'is_active', 'os', 'org_id'
     )
 
+    user_tree_map = {}
+
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
         self.obj_id = str(obj.id)
@@ -485,6 +488,10 @@ class AssetPermissionUtilV2:
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
+    @property
+    def user_tree(self):
+        return self._user_tree
+
     @timeit
     def get_assets_direct(self):
         """
@@ -507,14 +514,22 @@ class AssetPermissionUtilV2:
         nodes_ids = self.permissions.values_list('nodes', flat=True)
         return Node.objects.filter(id__in=nodes_ids)
 
+    @timeit
     def add_direct_nodes_to_user_tree(self, user_tree):
+        now = time.time()
         nodes_direct_keys = self.permissions \
             .exclude(nodes__isnull=True) \
             .values_list('nodes__key', flat=True) \
             .distinct()
         nodes_direct_keys = list(nodes_direct_keys)
+        t2 = time.time()
+        print("Get nodes keys using: {}".format(t2 - now))
         # 排序，保证从上层节点开始加
         nodes_direct_keys.sort(key=lambda x: len(x))
+        print("Keys len: {}".format(len(nodes_direct_keys)))
+        t3 = time.time()
+        print("Sorting using: {}".format(t3 - t2))
+        count = 0
         for key in nodes_direct_keys:
             # 如果树上已经有这个节点，代表子树已经存在
             if user_tree.contains(key):
@@ -523,12 +538,20 @@ class AssetPermissionUtilV2:
             parent = self.full_tree.parent(key)
             if not user_tree.contains(parent.identifier):
                 parent = user_tree.root_node()
+            t5 = time.time()
             subtree = self.full_tree.subtree(key)
             user_tree.paste(parent.identifier, subtree, deep=True)
+            t6 = time.time()
+            print("Past 1 using: {}".format(t6-t5))
+            count += 1
+            print("Parse subtree {}".format(count))
+        t4 = time.time()
+        print("Parse subtree using: {}".format(t4 - t3))
 
         for node in user_tree.all_nodes_itr():
             node.assets = 'all'
 
+    @timeit
     def add_single_assets_node_to_user_tree(self, user_tree):
         # 添加单独授权资产的节点
         nodes_single = defaultdict(set)
@@ -554,11 +577,12 @@ class AssetPermissionUtilV2:
             user_tree.add_node(node, parent)
             node.assets = assets
 
+    @timeit
     def parse_user_tree_to_full_tree(self, user_tree):
         # 开始修正user_tree，保证父节点都在树上
         root_children = user_tree.children('')
         for child in root_children:
-            if child.data.is_root():
+            if child.identifier.isdigit():
                 continue
             ancestors = self.full_tree.ancestors(
                 child.identifier, with_self=False, deep=True
@@ -572,6 +596,10 @@ class AssetPermissionUtilV2:
     def get_user_tree(self):
         if self._user_tree:
             return self._user_tree
+        # obj_id = self.object.id
+        # user_tree = self.__class__.user_tree_map.get(obj_id)
+        # if user_tree:
+        #     return user_tree
         user_tree = TreeService()
         full_tree_root = self.full_tree.root_node()
         user_tree.create_node(
@@ -582,23 +610,97 @@ class AssetPermissionUtilV2:
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
         self._user_tree = user_tree
+        # self.__class__.user_tree_map[obj_id] = user_tree
         return user_tree
 
     def get_nodes(self):
         user_tree = self.get_user_tree()
         return [
-            node.data.id for node in user_tree.all_nodes_itr() if node.data
+            node.identifier for node in user_tree.all_nodes_itr()
         ]
 
     def get_nodes_with_assets(self):
         user_tree = self.get_user_tree()
-        return [
-            {"id": node.data.id, "assets": getattr(node, 'assets', None)}
+        return {
+            node.data.id:  getattr(node, 'assets', None)
             for node in user_tree.all_nodes_itr() if node.data
-        ]
+        }
+
+    def get_asset_system_users(self, asset):
+        nodes = asset.get_nodes()
+        nodes_keys_related = set()
+        for node in nodes:
+            ancestor_keys = node.get_ancestor_keys(with_self=True)
+            nodes_keys_related.update(set(ancestor_keys))
+        pattern = []
+        for key in nodes_keys_related:
+            pattern.append(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        kwargs = {"asset": asset}
+
+        if pattern:
+            kwargs["nodes__key__regex"] = pattern
+
+        queryset = self.permissions
+        if len(kwargs) == 1:
+            queryset = queryset.filter(**kwargs)
+        elif len(kwargs) > 1:
+            kwargs = [{k: v} for k, v in kwargs.items()]
+            args = [Q(**kw) for kw in kwargs]
+            args = reduce(lambda x, y: x | y, args)
+            queryset = queryset.filter(args)
+        else:
+            queryset = queryset.none()
+        return queryset.distinct()
+
+    def get_permissions_nodes_and_assets(self):
+        permissions = self.permissions.values_list('assets', 'nodes__key').distinct()
+        nodes_keys = set()
+        assets_ids = set()
+        for asset_id, node_key in permissions:
+            if asset_id:
+                assets_ids.add(asset_id)
+            if node_key:
+                nodes_keys.add(node_key)
+        nodes_keys = self.clean_nodes_keys(nodes_keys)
+        return nodes_keys, assets_ids
 
     def get_assets(self):
-        pass
+        nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
+        pattern = set()
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        kwargs = {}
+        if assets_ids:
+            kwargs["id__in"] = assets_ids
+        if pattern:
+            kwargs["nodes__key__regex"] = pattern
+        if len(kwargs) == 1:
+            queryset = Asset.objects.filter(**kwargs)
+        elif len(kwargs) > 1:
+            kwargs = [{k: v} for k, v in kwargs.items()]
+            args = [Q(**kw) for kw in kwargs]
+            args = reduce(lambda x, y: x | y, args)
+            queryset = Asset.objects.filter(args)
+        else:
+            queryset = Asset.objects.none()
+        return queryset.valid().distinct()
+
+    @staticmethod
+    def clean_nodes_keys(nodes_keys):
+        nodes_keys = sorted(list(nodes_keys), key=lambda x: (len(x), x))
+        nodes_keys_clean = []
+        for key in nodes_keys[::-1]:
+            found = False
+            for k in nodes_keys:
+                if key.startswith(k + ':'):
+                    found = True
+                    break
+            if not found:
+                nodes_keys_clean.append(key)
+        return nodes_keys_clean
+
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
@@ -773,7 +875,8 @@ class ParserNode:
 
     @staticmethod
     def parse_node_to_tree_node(node):
-        name = '{} ({})'.format(node.value, node.assets_amount)
+        # name = '{} ({})'.format(node.value, node.assets_amount)
+        name = node.value
         data = {
             'id': node.key,
             'name': name,

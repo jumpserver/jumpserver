@@ -287,7 +287,7 @@ class TreeService(Tree):
         for node in all_nodes:
             tree.create_node(
                 tag=node.value, identifier=node.key,
-                parent=node.parent_key, data=node
+                parent=node.parent_key,
             )
         return tree
 
