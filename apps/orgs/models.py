@@ -67,6 +67,10 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
+    def get_none_queryset(self):
+        from users.models import User
+        return User.objects.none()
+
     def get_org_users(self):
         from users.models import User
         if self.is_real():
@@ -74,16 +78,14 @@ class Organization(models.Model):
         return User.objects.all()
 
     def get_org_admins(self):
-        from users.models import User
         if self.is_real():
             return self.admins.all()
-        return User.objects.none()
+        return self.get_none_queryset()
 
     def get_org_auditors(self):
-        from users.models import User
         if self.is_real():
             return self.auditors.all()
-        return User.objects.none()
+        return self.get_none_queryset()
 
     def get_org_members(self, exclude=('App', )):
         members = self.get_org_users() | self.get_org_auditors() | self.get_org_admins()

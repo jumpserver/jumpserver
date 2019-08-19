@@ -77,8 +77,7 @@ function initTable() {
                 $(td).html(detail_btn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
             {targets: 3, createdCell: function (td, cellData, rowData) {
-                    $(td).html(rowData.role_display);
-
+                $(td).html(rowData.role_display);
              }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
