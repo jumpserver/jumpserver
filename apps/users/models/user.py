@@ -132,9 +132,8 @@ class RoleMixin:
 
     @property
     def role_display(self):
-        if self.is_auditor:
-            if self.is_org_auditor:
-                return _('Org Auditor')
+        if not self.is_auditor and self.is_org_auditor:
+            return _('Org Auditor')
         if not self.is_superuser and self.is_org_admin:
             return _('Org Admin')
         return self.get_role_display()
@@ -172,7 +171,7 @@ class RoleMixin:
 
     @property
     def is_org_auditor(self):
-        if self.is_auditor and self.audit_orgs.exists():
+        if self.is_auditor or self.is_superuser or self.audit_orgs.exists():
             return True
         else:
             return False

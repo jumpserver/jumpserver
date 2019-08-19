@@ -126,11 +126,11 @@ class Organization(models.Model):
         audit_orgs = []
         if user.is_anonymous:
             return audit_orgs
-        elif user.is_auditor:
+        elif user.is_superuser or user.is_auditor:
+            audit_orgs = list(cls.objects.all())
+            audit_orgs.append(cls.default())
+        elif user.is_org_auditor:
             audit_orgs = user.audit_orgs.all()
-            if not audit_orgs:
-                audit_orgs = list(cls.objects.all())
-                audit_orgs.append(cls.default())
         return audit_orgs
 
     @classmethod

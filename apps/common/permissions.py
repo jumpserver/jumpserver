@@ -30,7 +30,7 @@ class IsAppUser(IsValidUser):
 class IsAuditor(IsValidUser):
     def has_permission(self, request, view):
         return super(IsAuditor, self).has_permission(request, view) \
-               and request.user.is_auditor
+               and (request.user.is_auditor or request.user.is_org_auditor)
 
 
 class IsSuperUser(IsValidUser):
