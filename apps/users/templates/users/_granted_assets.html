@@ -71,16 +71,16 @@ function initTable() {
                 $(td).html(cellData);
             }},
             {targets: 3, createdCell: function (td, cellData) {
-                {#function success(systemUsers) {#}
-                {#    var users = [];#}
-                {#    $.each(systemUsers, function (id, data) {#}
-                {#        var name = htmlEscape(data.name);#}
-                {#        users.push(name);#}
-                {#    });#}
-                {#    $(td).html(users.join(','))#}
-                {#}#}
-                {#$(td).html("{% trans 'Loading' %}");#}
-                {#getGrantedAssetSystemUsers(cellData, success)#}
+                function success(systemUsers) {
+                    var users = [];
+                    $.each(systemUsers, function (id, data) {
+                        var name = htmlEscape(data.name);
+                        users.push(name);
+                    });
+                    $(td).html(users.join(','))
+                }
+                $(td).html("{% trans 'Loading' %}");
+                getGrantedAssetSystemUsers(cellData, success)
             }},
         ],
         ajax_url: assetTableUrl,

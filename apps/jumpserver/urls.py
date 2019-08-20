@@ -27,7 +27,6 @@ api_v1 = [
 api_v2 = [
    path('terminal/v2/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
    path('users/v2/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
-   path('perms/v2/', include('perms.urls.api_urls_v2', namespace='api-perms-v2')),
 ]
 
 

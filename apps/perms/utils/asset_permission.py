@@ -517,20 +517,13 @@ class AssetPermissionUtilV2:
 
     @timeit
     def add_direct_nodes_to_user_tree(self, user_tree):
-        now = time.time()
         nodes_direct_keys = self.permissions \
             .exclude(nodes__isnull=True) \
             .values_list('nodes__key', flat=True) \
             .distinct()
         nodes_direct_keys = list(nodes_direct_keys)
-        t2 = time.time()
-        print("Get nodes keys using: {}".format(t2 - now))
         # 排序，保证从上层节点开始加
         nodes_direct_keys.sort(key=lambda x: len(x))
-        print("Keys len: {}".format(len(nodes_direct_keys)))
-        t3 = time.time()
-        print("Sorting using: {}".format(t3 - t2))
-        count = 0
         for key in nodes_direct_keys:
             # 如果树上已经有这个节点，代表子树已经存在
             if user_tree.contains(key):
@@ -539,15 +532,8 @@ class AssetPermissionUtilV2:
             parent = self.full_tree.parent(key)
             if not user_tree.contains(parent.identifier):
                 parent = user_tree.root_node()
-            t5 = time.time()
             subtree = self.full_tree.subtree(key)
             user_tree.paste(parent.identifier, subtree, deep=True)
-            t6 = time.time()
-            print("Past 1 using: {}".format(t6-t5))
-            count += 1
-            print("Parse subtree {}".format(count))
-        t4 = time.time()
-        print("Parse subtree using: {}".format(t4 - t3))
 
         for node in user_tree.all_nodes_itr():
             node.assets = 'all'
@@ -935,23 +921,12 @@ class ParserNode:
         return tree_node
 
     @staticmethod
-    def parse_asset_to_tree_node(node, asset, system_users):
+    def parse_asset_to_tree_node(node, asset):
         icon_skin = 'file'
         if asset.platform.lower() == 'windows':
             icon_skin = 'windows'
         elif asset.platform.lower() == 'linux':
             icon_skin = 'linux'
-        _system_users = []
-        for system_user in system_users:
-            _system_users.append({
-                'id': system_user.id,
-                'name': system_user.name,
-                'username': system_user.username,
-                'protocol': system_user.protocol,
-                'priority': system_user.priority,
-                'login_mode': system_user.login_mode,
-                'actions': [Action.value_to_choices(system_user.actions)],
-            })
         data = {
             'id': str(asset.id),
             'name': asset.hostname,
@@ -961,7 +936,6 @@ class ParserNode:
             'open': False,
             'iconSkin': icon_skin,
             'meta': {
-                'system_users': _system_users,
                 'type': 'asset',
                 'asset': {
                     'id': asset.id,

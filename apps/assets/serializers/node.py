@@ -8,39 +8,41 @@ from ..models import Asset, Node
 
 __all__ = [
     'NodeSerializer', "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer",
+    "NodeAssetsSerializer", 'NodeFullValueSerializer',
 ]
 
 
 class NodeSerializer(BulkOrgResourceModelSerializer):
     name = serializers.ReadOnlyField(source='value')
-    full_value = serializers.SerializerMethodField(label=_("Full value"))
+    value = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("value"))
 
     class Meta:
         model = Node
         only_fields = ['id', 'key', 'value', 'org_id']
         fields = only_fields + ['name', 'full_value']
-        read_only_fields = [
-            'key', 'name', 'full_value', 'org_id',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.tree = Node.tree()
-
-    def get_full_value(self, obj):
-        return ''
-        # return self.tree.get_node_full_tag(obj.key)
+        read_only_fields = ['key', 'org_id']
 
     def validate_value(self, data):
-        instance = self.instance if self.instance else Node.root()
-        children = instance.parent.get_children()
-        children_values = [node.value for node in children if node != instance]
-        if data in children_values:
+        if not self.instance and not data:
+            return data
+        instance = self.instance
+        siblings = instance.get_siblings()
+        if siblings.filter(value=data):
             raise serializers.ValidationError(
                 _('The same level node name cannot be the same')
             )
         return data
+
+
+class NodeFullValueSerializer(NodeSerializer):
+
+    # Todo: 使用新的serializer
+    def get_field_names(self, declared_fields, info):
+        names = super().get_field_names(declared_fields, info)
+        names.append('full_value')
+
+
+        # return self.tree.get_node_full_tag(obj.key)
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):

@@ -168,14 +168,16 @@ class FamilyMixin:
 
 
 class FullValueMixin:
-    _full_value_cache_key = '_NODE_VALUE_{}'
-    _full_value = ''
+    _full_value = None
     key = ''
 
     @property
     def full_value(self):
         if self.is_root():
             return self.value
+        if self._full_value is not None:
+            return self._full_value
+        print("Get full value")
         value = self._tree.get_node_full_tag(self.key)
         return value
 
@@ -196,47 +198,18 @@ class NodeAssetsMixin:
         """
         if self._assets_amount is not None:
             return self._assets_amount
-        cache_key = self._assets_amount_cache_key.format(self.key)
-        cached = cache.get(cache_key)
-        if cached is not None:
-            return cached
-        assets_amount = self.get_all_assets().only('id').count()
-        cache_key = self._assets_amount_cache_key.format(self.key)
-        cache.set(cache_key, assets_amount, self.cache_time)
-        return assets_amount
-
-    def expire_assets_amount(self):
-        ancestor_keys = self.get_ancestor_keys(with_self=True)
-        cache_keys = [
-            self._assets_amount_cache_key.format(k) for k in ancestor_keys
-        ]
-        cache.delete_many(cache_keys)
-
-    @classmethod
-    def expire_nodes_assets_amount(cls, nodes):
-        for node in nodes:
-            node.expire_assets_amount()
-
-    @classmethod
-    def refresh_assets_amount(cls):
-        cache_key = cls._assets_amount_cache_key.format('*')
-        cache.delete_pattern(cache_key)
+        amount = self._tree.assets_amount(self.key)
+        return amount
 
     def get_all_assets(self):
         from .asset import Asset
         if self.is_root():
             return Asset.objects.filter(org_id=self.org_id)
-        children = self.get_all_children(with_self=True)
-        assets = Asset.objects.filter(nodes__in=children).distinct()
-        return assets
+        assets_ids = self._tree.all_assets(self.key)
+        return Asset.objects.filter(id__in=assets_ids)
 
     def assets_ids(self):
-        cache_key = self._assets_cache_key.format(self.key)
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        assets_ids = self.get_assets().values_list('id', flat=True)
-        cache.set(cache_key, assets_ids, self.cache_time)
+        assets_ids = self._tree.assets(self.key)
         return assets_ids
 
     def get_assets(self):
@@ -244,7 +217,7 @@ class NodeAssetsMixin:
         if self.is_default_node():
             assets = Asset.objects.filter(Q(nodes__id=self.id) | Q(nodes__isnull=True))
         else:
-            assets = Asset.objects.filter(nodes__id=self.id)
+            assets = Asset.objects.filter(id=self.assets_ids())
         return assets.distinct()
 
     def get_valid_assets(self):
@@ -332,7 +305,6 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
 
     @classmethod
     def refresh_nodes(cls):
-        cls.refresh_assets_amount()
         cls.refresh_tree()
 
     def is_default_node(self):

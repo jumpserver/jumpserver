@@ -80,7 +80,8 @@ class NodeListAsTreeApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = TreeNodeSerializer
 
-    def to_tree_queryset(self, queryset):
+    @staticmethod
+    def to_tree_queryset(queryset):
         util = NodeUtil()
         nodes = util.get_nodes_by_queryset(queryset)
         queryset = [node.as_tree_node() for node in nodes]
@@ -96,60 +97,57 @@ class NodeListAsTreeApi(generics.ListAPIView):
         return queryset
 
 
-class NodeChildrenApi(mixins.ListModelMixin, generics.CreateAPIView):
+class NodeChildrenApi(generics.ListCreateAPIView):
     queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
     instance = None
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def initial(self, request, *args, **kwargs):
+        self.instance = self.get_object()
+        return super().initial(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if not request.data.get("value"):
-            request.data["value"] = instance.get_next_child_preset_name()
-        return super().post(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        instance = self.get_object()
-        value = request.data.get("value")
-        _id = request.data.get('id') or None
-        values = [child.value for child in instance.get_children()]
-        if value in values:
-            raise ValidationError(
-                'The same level node name cannot be the same'
-            )
-        node = instance.create_child(value=value, _id=_id)
-        return Response(self.serializer_class(instance=node).data, status=201)
+    def perform_create(self, serializer):
+        data = serializer.validated_data
+        _id = data.get("id")
+        value = data.get("value")
+        if not value:
+            value = self.instance.get_next_child_preset_name()
+        node = self.instance.create_child(value=value, _id=_id)
+        # 避免查询 full value
+        node._full_value = node.value
+        serializer.instance = node
 
     def get_object(self):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
-        if not pk:
+        key = self.request.query_params.get("key")
+        if not pk and not key:
             node = Node.root()
-        else:
+            return node
+        if pk:
             node = get_object_or_404(Node, pk=pk)
+        else:
+            node = get_object_or_404(Node, key=key)
         return node
 
     def get_queryset(self):
-        queryset = []
-        query_all = self.request.query_params.get("all")
-        node = self.get_object()
+        query_all = self.request.query_params.get("all", "0") == "all"
+        if not self.instance:
+            return Node.objects.none()
 
-        if node is None:
-            node = Node.root()
-            node.assets__count = node.get_all_assets().count()
-            queryset.append(node)
+        if self.instance.is_root():
+            with_self = True
+        else:
+            with_self = False
 
         if query_all:
-            children = node.get_all_children()
+            queryset = self.instance.get_all_children(with_self=with_self)
         else:
-            children = node.get_children()
-        queryset.extend(list(children))
+            queryset = self.instance.get_children(with_self=with_self)
         return queryset
 
 
-class NodeChildrenAsTreeApi(generics.ListAPIView):
+class NodeChildrenAsTreeApi(NodeChildrenApi):
     """
     节点子节点作为树返回，
     [
@@ -162,39 +160,26 @@ class NodeChildrenAsTreeApi(generics.ListAPIView):
     ]
 
     """
-    permission_classes = (IsOrgAdmin,)
     serializer_class = TreeNodeSerializer
-    node = None
-    is_root = False
+    http_method_names = ['get']
 
     def get_queryset(self):
-        self.check_need_refresh_nodes()
-        node_key = self.request.query_params.get('key')
-        # 是否包含自己
-        with_self = False
-        if not node_key:
-            node_key = Node.root().key
-            with_self = True
-        self.node = get_object_or_404(Node, key=node_key)
-        queryset = self.node.get_children(with_self=with_self)
+        queryset = super().get_queryset()
         queryset = [node.as_tree_node() for node in queryset]
+        queryset = self.add_assets_if_need(queryset)
         queryset = sorted(queryset)
         return queryset
 
-    def filter_assets(self, queryset):
+    def add_assets_if_need(self, queryset):
         include_assets = self.request.query_params.get('assets', '0') == '1'
         if not include_assets:
             return queryset
-        assets = self.node.get_assets().only(
+        assets = self.instance.get_assets().only(
             "id", "hostname", "ip", 'platform', "os",
             "org_id", "protocols",
         )
         for asset in assets:
-            queryset.append(asset.as_tree_node(self.node))
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = self.filter_assets(queryset)
+            queryset.append(asset.as_tree_node(self.instance))
         return queryset
 
     def check_need_refresh_nodes(self):

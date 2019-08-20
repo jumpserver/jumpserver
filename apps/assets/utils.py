@@ -2,7 +2,10 @@
 #
 from functools import reduce
 from treelib import Tree
+import time
+from collections import defaultdict
 from copy import deepcopy
+from threading import Thread, Lock
 from treelib.exceptions import DuplicatedNodeIdError
 from django.db.models import Prefetch, Q
 
@@ -271,6 +274,12 @@ def test_node_tree():
 class TreeService(Tree):
     tag_sep = ' / '
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.assets_map = {}
+        self.all_assets_map = {}
+        self.mutex = Lock()
+
     @classmethod
     @timeit
     def new(cls):
@@ -289,7 +298,29 @@ class TreeService(Tree):
                 tag=node.value, identifier=node.key,
                 parent=node.parent_key,
             )
+        tree.init_assets_async()
         return tree
+
+    def init_assets_async(self):
+        t = Thread(target=self.init_assets)
+        t.start()
+
+    def init_assets(self):
+        from orgs.utils import get_current_org, set_to_root_org
+        with self.mutex:
+            origin_org = get_current_org()
+            print("Origin org: ", origin_org)
+            set_to_root_org()
+            queryset = Asset.objects.all().valid().values_list('id', 'nodes__key')
+            for n in self.all_nodes_itr():
+                self.assets_map[n.identifier] = set()
+            print(len(queryset))
+            if origin_org:
+                origin_org.change_to()
+            for asset_id, key in queryset:
+                if not key:
+                    continue
+                self.assets_map[key].add(asset_id)
 
     def all_children(self, nid, with_self=True, deep=False):
         children_ids = self.expand_tree(nid)
@@ -328,6 +359,34 @@ class TreeService(Tree):
         if deep:
             parent = self.copy_node(parent)
         return parent
+
+    def assets(self, nid):
+        with self.mutex:
+            assets = self.assets_map.get(nid)
+            if assets is not None:
+                return assets
+            print('asset is none,', assets, len(self.assets_map))
+            assets = []
+            # assets = Asset.objects.filter(nodes__key=nid).values_list('id', flat=True)
+            # self.assets_map[nid] = assets
+            return assets
+
+    def set_assets(self, nid, assets):
+        with self.mutex:
+            self.assets_map[nid] = assets
+
+    def all_assets(self, nid):
+        assets = self.all_assets_map.get(nid)
+        if assets:
+            return assets
+        assets = set(self.assets(nid))
+        children = self.children(nid)
+        for child in children:
+            assets.update(self.all_assets(child.identifier))
+        return assets
+
+    def assets_amount(self, nid):
+        return len(self.all_assets(nid))
 
     @staticmethod
     def copy_node(node):

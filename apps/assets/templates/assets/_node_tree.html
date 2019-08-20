@@ -248,9 +248,12 @@ function onRename(event, treeId, treeNode, isCancel){
         method: "PATCH",
         success_message: "{% trans 'Rename success' %}",
         success: function () {
-            treeNode.name = treeNode.name + ' (' + treeNode.meta.node.assets_amount + ')';
+            var assets_amount = treeNode.meta.node.assets_amount;
+            if (!assets_amount) {
+                assets_amount = 0;
+            }
+            treeNode.name = treeNode.name + ' (' + assets_amount + ')';
             zTree.updateNode(treeNode);
-            console.log("Success: " + treeNode.name)
         },
     })
 }
