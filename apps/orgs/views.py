@@ -30,12 +30,16 @@ class SwitchToAOrgView(View):
         if not (admin_orgs or audit_orgs):
             return HttpResponseForbidden()
         default_org = Organization.default()
-        if (default_org in admin_orgs) or (default_org in audit_orgs):
-            redirect_org = default_org
-        else:
-            if admin_orgs:
+        if admin_orgs:
+            if default_org in admin_orgs:
+                redirect_org = default_org
+            else:
                 redirect_org = admin_orgs[0]
-            if audit_orgs:
+            return redirect(reverse('orgs:org-switch', kwargs={'pk': redirect_org.id}))
+        if audit_orgs:
+            if default_org in audit_orgs:
+                redirect_org = default_org
+            else:
                 redirect_org = audit_orgs[0]
-
-        return redirect(reverse('orgs:org-switch', kwargs={'pk': redirect_org.id}))
+            return redirect(
+                reverse('orgs:org-switch', kwargs={'pk': redirect_org.id}))
