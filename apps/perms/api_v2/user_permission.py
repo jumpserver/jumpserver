@@ -12,7 +12,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser, IsOrgAdmin
 from common.tree import TreeNodeSerializer
-from common.utils import get_logger
+from common.utils import get_logger, timeit
 from ..utils import (
     ParserNode, AssetPermissionUtilV2
 )
@@ -21,13 +21,16 @@ from .. import serializers_v2 as serializers
 
 __all__ = [
     'UserGrantedNodesApi', 'UserGrantedNodeChildrenApi',
-    'UserGrantedNodeChildrenAsTreeApi', 'UserGrantedAssetApi',
+    'UserGrantedNodeChildrenAsTreeApi', 'UserGrantedAssetsApi',
+    'UserGrantedAssetSystemUsersApi', 'UserGrantedNodeAssetsApi',
 ]
 
 logger = get_logger(__name__)
 
 
 class UserPermissionMixin:
+    permission_classes = (IsOrgAdminOrAppUser,)
+
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
         if user_id:
@@ -96,7 +99,7 @@ class UserGrantedNodeChildrenAsTreeApi(UserGrantedNodeChildrenApi):
         return self.get_serializer_class()(queryset, many=many)
 
 
-class UserGrantedAssetApi(UserPermissionMixin, ListAPIView):
+class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     pagination_class = LimitOffsetPagination
@@ -117,15 +120,29 @@ class UserGrantedAssetApi(UserPermissionMixin, ListAPIView):
             queryset = queryset.filter(nodes=node)
         return queryset
 
+    @timeit
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
         queryset = self.filter_by_nodes(queryset)
+        # print("queryset length: ", len(list(queryset)))
         return queryset
 
     def get_queryset(self):
         user = self.get_object()
         util = AssetPermissionUtilV2(user)
-        queryset = util.get_assets()
+        queryset = util.get_assets().only(*self.only_fields)
+        return queryset
+
+
+class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
+    def get_queryset(self):
+        user = self.get_object()
+        node_id = self.kwargs.get("node_id")
+        node = get_object_or_404(Node, pk=node_id)
+        deep = self.request.query_params.get("all", "0") == "1"
+        util = AssetPermissionUtilV2(user)
+        queryset = util.get_nodes_assets(node, deep=deep)\
+            .only(*self.only_fields)
         return queryset
 
 
@@ -137,9 +154,12 @@ class UserGrantedAssetSystemUsersApi(UserPermissionMixin, ListAPIView):
     def get_queryset(self):
         user = self.get_object()
         util = AssetPermissionUtilV2(user)
-        asset_id = self.request.query_params.get("asset")
+        asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
-        system_users = util.get_asset_system_users(asset)
-
-
-
+        system_users_with_actions = util.get_asset_system_users_with_actions(asset)
+        system_users = []
+        for system_user, actions in system_users_with_actions.items():
+            system_user.actions = actions
+            system_users.append(system_user)
+        system_users.sort(key=lambda x: x.priority)
+        return system_users

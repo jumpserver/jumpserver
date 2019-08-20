@@ -2,6 +2,7 @@
 
 import time
 import uuid
+import re
 from collections import defaultdict
 from functools import reduce
 import json
@@ -626,7 +627,7 @@ class AssetPermissionUtilV2:
             for node in user_tree.all_nodes_itr() if node.data
         }
 
-    def get_asset_system_users(self, asset):
+    def get_asset_system_users_with_actions(self, asset):
         nodes = asset.get_nodes()
         nodes_keys_related = set()
         for node in nodes:
@@ -636,7 +637,7 @@ class AssetPermissionUtilV2:
         for key in nodes_keys_related:
             pattern.append(r'^{0}$|^{0}:'.format(key))
         pattern = '|'.join(list(pattern))
-        kwargs = {"asset": asset}
+        kwargs = {"assets": asset}
 
         if pattern:
             kwargs["nodes__key__regex"] = pattern
@@ -651,7 +652,17 @@ class AssetPermissionUtilV2:
             queryset = queryset.filter(args)
         else:
             queryset = queryset.none()
-        return queryset.distinct()
+        queryset = queryset.distinct().prefetch_related('system_users')
+        system_users_actions = defaultdict(int)
+        for perm in queryset:
+            system_users = perm.system_users.all()
+            if not system_users or not perm.actions:
+                continue
+            for s in system_users:
+                if not asset.has_protocol(s.protocol):
+                    continue
+                system_users_actions[s] |= perm.actions
+        return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
         permissions = self.permissions.values_list('assets', 'nodes__key').distinct()
@@ -665,6 +676,20 @@ class AssetPermissionUtilV2:
         nodes_keys = self.clean_nodes_keys(nodes_keys)
         return nodes_keys, assets_ids
 
+    @staticmethod
+    def filter_assets_by_or_kwargs(kwargs):
+        if len(kwargs) == 1:
+            queryset = Asset.objects.filter(**kwargs)
+        elif len(kwargs) > 1:
+            kwargs = [{k: v} for k, v in kwargs.items()]
+            args = [Q(**kw) for kw in kwargs]
+            args = reduce(lambda x, y: x | y, args)
+            queryset = Asset.objects.filter(args)
+        else:
+            queryset = Asset.objects.none()
+        return queryset
+
+    @timeit
     def get_assets(self):
         nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
         pattern = set()
@@ -676,15 +701,29 @@ class AssetPermissionUtilV2:
             kwargs["id__in"] = assets_ids
         if pattern:
             kwargs["nodes__key__regex"] = pattern
-        if len(kwargs) == 1:
-            queryset = Asset.objects.filter(**kwargs)
-        elif len(kwargs) > 1:
-            kwargs = [{k: v} for k, v in kwargs.items()]
-            args = [Q(**kw) for kw in kwargs]
-            args = reduce(lambda x, y: x | y, args)
-            queryset = Asset.objects.filter(args)
+        queryset = self.filter_assets_by_or_kwargs(kwargs)
+        return queryset.valid().distinct()
+
+    def get_nodes_assets(self, node, deep=False):
+        all_nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
+        kwargs = {}
+        pattern = set()
+        for key in all_nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+
+        matched = re.match(pattern, node.key)
+        if matched:
+            kwargs['nodes__key__regex'] = r'^{0}$|^{0}:'.format(node.key)
+        if assets_ids:
+            kwargs["id__in"] = assets_ids
+
+        queryset = self.filter_assets_by_or_kwargs(kwargs)
+        if deep:
+            pt = r'^{0}$|^{0}:'.format(node.key)
+            queryset = queryset.filter(nodes__key__regex=pt)
         else:
-            queryset = Asset.objects.none()
+            queryset = queryset.filter(nodes=node)
         return queryset.valid().distinct()
 
     @staticmethod
@@ -700,7 +739,6 @@ class AssetPermissionUtilV2:
             if not found:
                 nodes_keys_clean.append(key)
         return nodes_keys_clean
-
 
 
 class AssetPermissionUtil(AssetPermissionCacheMixin):
