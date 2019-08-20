@@ -30,7 +30,7 @@ class IsAppUser(IsValidUser):
 class IsAuditor(IsValidUser):
     def has_permission(self, request, view):
         return super(IsAuditor, self).has_permission(request, view) \
-               and (request.user.is_auditor or request.user.is_org_auditor)
+               and request.user.is_auditor
 
 
 class IsSuperUser(IsValidUser):
@@ -53,6 +53,14 @@ class IsOrgAdmin(IsValidUser):
             return False
         return super(IsOrgAdmin, self).has_permission(request, view) \
             and current_org.can_admin_by(request.user)
+
+
+class IsOrgAuditor(IsValidUser):
+    def has_permission(self, request, view):
+        if not current_org:
+            return False
+        return super(IsOrgAuditor, self).has_permission(request, view) \
+            and current_org.can_audit_by(request.user)
 
 
 class IsOrgAdminOrAppUser(IsValidUser):

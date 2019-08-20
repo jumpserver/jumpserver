@@ -35,11 +35,9 @@ class IndexView(PermissionsMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        if request.user.is_auditor:
-            return super(IndexView, self).dispatch(request, *args, **kwargs)
-        if not request.user.is_org_admin:
+        if not (request.user.is_org_admin or request.user.is_org_auditor):
             return redirect('assets:user-asset-list')
-        if not current_org or not current_org.can_admin_by(request.user):
+        if not current_org or not (current_org.can_admin_by(request.user) or current_org.can_audit_by(request.user)):
             return redirect('orgs:switch-a-org')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 

@@ -85,7 +85,7 @@
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Role' %}:</td>
-                                            <td><b>{{ user_object.get_role_display }}</b></td>
+                                            <td><b>{{ user_object.role_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'MFA certification' %}:</td>
@@ -212,7 +212,7 @@
                                 </div>
                             </div>
 
-                            {% if not user_object.is_auditor %}
+                            {% if not user_object.is_org_auditor %}
                                 <div class="panel panel-info">
                                     <div class="panel-heading">
                                         <i class="fa fa-info-circle"></i> {% trans 'User group' %}

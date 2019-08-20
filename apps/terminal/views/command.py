@@ -5,14 +5,14 @@ from django.views.generic import TemplateView
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
 
 __all__ = ['CommandListView']
 
 
 class CommandListView(PermissionsMixin, TemplateView):
     template_name = "terminal/command_list.html"
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     default_days_ago = 5
 
     def get_context_data(self, **kwargs):

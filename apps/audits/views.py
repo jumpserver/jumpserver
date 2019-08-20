@@ -18,8 +18,9 @@ from django.db.models import Q
 
 from audits.utils import get_excel_response, write_content_to_excel
 from common.mixins import DatetimeSearchMixin
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor, IsValidUser
-
+from common.permissions import (
+    PermissionsMixin, IsOrgAdmin, IsValidUser, IsOrgAuditor
+)
 from orgs.utils import current_org
 from ops.views import CommandExecutionListView as UserCommandExecutionListView
 from .models import FTPLog, OperateLog, PasswordChangeLog, UserLoginLog
@@ -47,7 +48,7 @@ class FTPLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.DISPLAY_PER_PAGE
     user = asset = system_user = filename = ''
     date_from = date_to = None
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def get_queryset(self):
         self.queryset = super().get_queryset()
@@ -96,7 +97,7 @@ class OperateLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     user = action = resource_type = ''
     date_from = date_to = None
     actions_dict = dict(OperateLog.ACTION_CHOICES)
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def get_queryset(self):
         self.queryset = super().get_queryset()
@@ -139,7 +140,7 @@ class PasswordChangeLogList(PermissionsMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.DISPLAY_PER_PAGE
     user = ''
     date_from = date_to = None
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def get_queryset(self):
         users = current_org.get_org_members()
@@ -176,7 +177,7 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.DISPLAY_PER_PAGE
     user = keyword = ""
     date_to = date_from = None
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     @staticmethod
     def get_org_users():

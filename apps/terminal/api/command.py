@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from django.template import loader
 
 
-from common.permissions import IsOrgAdminOrAppUser, IsAuditor
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.utils import get_logger
 from ..backends import (
     get_command_storage, get_multi_command_storage,
@@ -24,7 +24,7 @@ __all__ = ['CommandViewSet', 'CommandExportApi']
 class CommandQueryMixin:
     command_store = get_command_storage()
     pagination_class = LimitOffsetPagination
-    permission_classes = [IsOrgAdminOrAppUser | IsAuditor]
+    permission_classes = [IsOrgAdminOrAppUser | IsOrgAuditor]
     filter_fields = [
         "asset", "system_user", "user", "session",
     ]

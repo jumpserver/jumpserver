@@ -13,7 +13,7 @@ from rest_framework.generics import GenericAPIView
 import jms_storage
 
 from common.utils import is_uuid, get_logger
-from common.permissions import IsOrgAdminOrAppUser, IsAuditor
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.filters import DatetimeRangeFilter
 from orgs.mixins import OrgBulkModelViewSet
 from ..hands import SystemUser
@@ -29,7 +29,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
+    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
@@ -64,7 +64,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
+    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
     session = None
 
     def create(self, request, *args, **kwargs):

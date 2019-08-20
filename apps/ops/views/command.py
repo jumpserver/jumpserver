@@ -6,7 +6,7 @@ from django.conf import settings
 from django.views.generic import ListView, TemplateView
 
 from common.permissions import (
-    PermissionsMixin, IsOrgAdmin, IsAuditor, IsValidUser
+    PermissionsMixin, IsOrgAdmin,  IsValidUser, IsOrgAuditor
 )
 from common.mixins import DatetimeSearchMixin
 from ..models import CommandExecution
@@ -25,7 +25,7 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     keyword = ''
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def _get_queryset(self):
         self.keyword = self.request.GET.get('keyword', '')
