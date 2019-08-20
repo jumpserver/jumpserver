@@ -73,6 +73,8 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         """
         if instance.is_superuser and not self.request.user.is_superuser:
             return True
+        if instance.is_auditor and not self.request.user.is_superuser:
+            return True
         return False
 
     def _bulk_deny_permission(self, instances):
