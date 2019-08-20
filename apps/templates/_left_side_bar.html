@@ -4,9 +4,17 @@
             {% include '_user_profile.html' %}
             {% if request.user.is_org_admin and request.COOKIES.IN_ADMIN_PAGE != "No" %}
                 {% include '_nav.html' %}
+            {% elif request.user.is_auditor %}
+                {% include '_nav_dashboard.html' %}
+                {% include '_nav_user_info.html' %}
+                {% include '_nav_audits.html' %}
             {% elif request.user.is_org_auditor %}
+                {% include '_nav_dashboard.html' %}
+                {% include '_nav_user_info.html' %}
+                {% include '_nav_user.html' %}
                 {% include '_nav_audits.html' %}
             {% else %}
+                {% include '_nav_user_info.html' %}
                 {% include '_nav_user.html' %}
             {% endif %}
         </ul>
