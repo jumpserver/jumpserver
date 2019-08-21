@@ -359,7 +359,6 @@ class Node(OrgModelMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixi
     def as_tree_node(self):
         from common.tree import TreeNode
         name = '{} ({})'.format(self.value, self.assets_amount)
-        # name = self.value
         data = {
             'id': self.key,
             'name': name,
