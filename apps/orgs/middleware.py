@@ -15,7 +15,7 @@ class OrgMiddleware:
             return
         if not request.user.is_authenticated:
             return
-        if not (request.user.is_org_admin or request.user.is_org_auditor):
+        if not request.user.is_org_admin and not request.user.is_org_auditor:
             return
         org = get_org_from_request(request)
         if org.can_admin_by(request.user):

@@ -169,17 +169,12 @@ class NeedMFAVerify(permissions.BasePermission):
 
 class CanUpdateDeleteSuperUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in ['GET', 'OPTIONS']:
+        if request.user.is_superuser:
             return True
-        elif request.user.is_superuser:
-            return True
-        elif request.method == 'DELETE':
-            if str(request.user.id) == str(obj.id):
+        if request.method in ['PUT', 'PATCH']:
+            if obj.is_superuser or obj.is_auditor:
                 return False
-            if not request.user.is_superuser and obj.is_org_admin:
+        if request.method in ['DELETE']:
+            if obj.is_org_admin or obj.is_auditor:
                 return False
-            if not request.user.is_superuser and obj.is_auditor:
-                return False
-        if hasattr(obj, 'is_superuser') and obj.is_superuser:
-            return False
         return True
