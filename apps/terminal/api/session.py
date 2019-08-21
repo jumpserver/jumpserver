@@ -14,7 +14,7 @@ import jms_storage
 from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsAuditor
 from common.filters import DatetimeRangeFilter
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers

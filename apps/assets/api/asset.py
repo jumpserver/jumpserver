@@ -11,7 +11,9 @@ from django.db.models import Q
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
+from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
@@ -62,19 +64,21 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         node = get_object_or_404(Node, id=node_id)
         show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
+        # 当前节点是顶层节点, 并且仅显示直接资产
         if node.is_root() and show_current_asset:
             queryset = queryset.filter(
                 Q(nodes=node_id) | Q(nodes__isnull=True)
-            )
+            ).distinct()
+        # 当前节点是顶层节点，显示所有资产
         elif node.is_root() and not show_current_asset:
-            pass
+            return queryset
+        # 当前节点不是鼎城节点，只显示直接资产
         elif not node.is_root() and show_current_asset:
             queryset = queryset.filter(nodes=node)
         else:
-            queryset = queryset.filter(
-                nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
-            )
-        return queryset.distinct()
+            children = node.get_all_children(with_self=True)
+            queryset = queryset.filter(nodes__in=children).distinct()
+        return queryset
 
     def filter_admin_user_id(self, queryset):
         admin_user_id = self.request.query_params.get('admin_user_id')

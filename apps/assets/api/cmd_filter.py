@@ -3,7 +3,7 @@
 
 from django.shortcuts import get_object_or_404
 
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import CommandFilter, CommandFilterRule
 from .. import serializers

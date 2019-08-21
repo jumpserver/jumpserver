@@ -20,26 +20,18 @@ class JMSCSVRender(BaseRenderer):
     format = 'csv'
 
     @staticmethod
-    def _get_header(fields, template):
-        if template == 'import':
-            header = [
-                k for k, v in fields.items()
-                if not v.read_only and k != 'org_id'
-            ]
-        elif template == 'update':
-            header = [k for k, v in fields.items() if not v.read_only]
+    def _get_show_fields(fields, template):
+        if template in ('import', 'update'):
+            return [v for k, v in fields.items() if not v.read_only and k != "org_id"]
         else:
-            # template in ['export']
-            header = [k for k, v in fields.items() if not v.write_only]
-        return header
+            return [v for k, v in fields.items() if not v.write_only and k != "org_id"]
 
     @staticmethod
-    def _gen_table(data, header, labels=None):
-        labels = labels or {}
-        yield [labels.get(k, k) for k in header]
+    def _gen_table(data, fields):
+        yield ['*{}'.format(f.label) if f.required else f.label for f in fields]
 
         for item in data:
-            row = [item.get(key) for key in header]
+            row = [item.get(f.field_name) for f in fields]
             yield row
 
     def set_response_disposition(self, serializer, context):
@@ -73,10 +65,9 @@ class JMSCSVRender(BaseRenderer):
             logger.debug(e, exc_info=True)
             value = 'The resource not support export!'.encode('utf-8')
         else:
-            fields = serializer.get_fields()
-            header = self._get_header(fields, template)
-            labels = {k: v.label for k, v in fields.items() if v.label}
-            table = self._gen_table(data, header, labels)
+            fields = serializer.fields
+            show_fields = self._get_show_fields(fields, template)
+            table = self._gen_table(data, show_fields)
 
             csv_buffer = BytesIO()
             csv_buffer.write(codecs.BOM_UTF8)

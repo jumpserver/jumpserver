@@ -2,6 +2,7 @@
 #
 import uuid
 import re
+import time
 
 from django.db import models, transaction
 from django.db.models import Q
@@ -9,9 +10,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from orgs.mixins import OrgModelMixin, OrgManager
+from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org
 from orgs.models import Organization
+
 
 __all__ = ['Node']
 
@@ -22,57 +24,73 @@ class NodeQuerySet(models.QuerySet):
 
 
 class FamilyMixin:
-    _parents = None
-    _children = None
-    _all_children = None
+    __parents = None
+    __children = None
+    __all_children = None
     is_node = True
+    time_tree_updated = None
+    time_tree_updated_cache_key = 'NODE_TREE_CREATED_AT'
+    tree_cache_time = 3600
+    _tree_service = None
+
+    @classmethod
+    def tree(cls):
+        from ..utils import TreeService
+        cache_updated_time = cls.get_cache_time()
+        if not cls.time_tree_updated or \
+                cache_updated_time != cls.time_tree_updated:
+            t = TreeService.new()
+            cls.update_cache_tree(t)
+            return t
+        return cls._tree_service
+
+    @classmethod
+    def get_cache_time(cls):
+        return cache.get(cls.time_tree_updated_cache_key)
+
+    @classmethod
+    def update_cache_tree(cls, t):
+        cls._tree_service = t
+        now = time.time()
+        cls.time_tree_updated = now
+        cache.set(cls.time_tree_updated_cache_key, now, cls.tree_cache_time)
+
+    @classmethod
+    def expire_cache_tree(cls):
+        cache.delete(cls.time_tree_updated_cache_key)
+
+    @classmethod
+    def refresh_tree(cls):
+        cls.expire_cache_tree()
+
+    @property
+    def _tree(self):
+        return self.__class__.tree()
 
     @property
     def children(self):
-        if self._children:
-            return self._children
-        pattern = r'^{0}:[0-9]+$'.format(self.key)
-        return Node.objects.filter(key__regex=pattern)
-
-    @children.setter
-    def children(self, value):
-        self._children = value
+        return self.get_children(with_self=False)
 
     @property
     def all_children(self):
-        if self._all_children:
-            return self._all_children
-        pattern = r'^{0}:'.format(self.key)
-        return Node.objects.filter(
-            key__regex=pattern
-        )
+        return self.get_all_children(with_self=False)
 
     def get_children(self, with_self=False):
-        children = list(self.children)
+        pattern = r'^{0}:[0-9]+$'.format(self.key)
         if with_self:
-            children.append(self)
-        return children
+            pattern += r'|^{0}$'.format(self.key)
+        return Node.objects.filter(key__regex=pattern)
 
     def get_all_children(self, with_self=False):
-        children = self.all_children
+        pattern = r'^{0}:'.format(self.key)
         if with_self:
-            children = list(children)
-            children.append(self)
+            pattern += r'|^{0}$'.format(self.key)
+        children = Node.objects.filter(key__regex=pattern)
         return children
 
     @property
     def parents(self):
-        if self._parents:
-            return self._parents
-        ancestor_keys = self.get_ancestor_keys()
-        ancestor = Node.objects.filter(
-            key__in=ancestor_keys
-        ).order_by('key')
-        return ancestor
-
-    @parents.setter
-    def parents(self, value):
-        self._parents = value
+        return self.get_ancestor(with_self=False)
 
     def get_ancestor(self, with_self=False):
         parents = self.parents
@@ -83,15 +101,10 @@ class FamilyMixin:
 
     @property
     def parent(self):
-        if self._parents:
-            return self._parents[0]
         if self.is_root():
             return self
-        try:
-            parent = Node.objects.get(key=self.parent_key)
-            return parent
-        except Node.DoesNotExist:
-            return Node.root()
+        parent_key = self.parent_key
+        return Node.objects.get(key=parent_key)
 
     @parent.setter
     def parent(self, parent):
@@ -107,7 +120,7 @@ class FamilyMixin:
                 child.save()
             self.save()
 
-    def get_sibling(self, with_self=False):
+    def get_siblings(self, with_self=False):
         key = ':'.join(self.key.split(':')[:-1])
         pattern = r'^{}:[0-9]+$'.format(key)
         sibling = Node.objects.filter(
@@ -133,12 +146,10 @@ class FamilyMixin:
         return parent_keys
 
     def is_children(self, other):
-        pattern = re.compile(r'^{0}:[0-9]+$'.format(self.key))
-        return pattern.match(other.key)
+        return other.key.startswith(self.key + ':')
 
     def is_parent(self, other):
-        pattern = re.compile(r'^{0}:[0-9]+$'.format(other.key))
-        return pattern.match(self.key)
+        return other.is_children(self)
 
     @property
     def parent_key(self):
@@ -158,46 +169,27 @@ class FamilyMixin:
 
 
 class FullValueMixin:
-    _full_value_cache_key = '_NODE_VALUE_{}'
-    _full_value = ''
+    _full_value = None
     key = ''
 
     @property
     def full_value(self):
-        if self._full_value:
-            return self._full_value
-        key = self._full_value_cache_key.format(self.key)
-        cached = cache.get(key)
-        if cached:
-            return cached
         if self.is_root():
             return self.value
-        parent_full_value = self.parent.full_value
-        value = parent_full_value + ' / ' + self.value
-        self.full_value = value
+        if self._full_value is not None:
+            return self._full_value
+        print("Get full value")
+        value = self._tree.get_node_full_tag(self.key)
         return value
 
-    @full_value.setter
-    def full_value(self, value):
-        self._full_value = value
-        key = self._full_value_cache_key.format(self.key)
-        cache.set(key, value, 3600*24)
 
-    def expire_full_value(self):
-        key = self._full_value_cache_key.format(self.key)
-        cache.delete_pattern(key+'*')
-
-    @classmethod
-    def expire_nodes_full_value(cls, nodes=None):
-        key = cls._full_value_cache_key.format('*')
-        cache.delete_pattern(key+'*')
-
-
-class AssetsAmountMixin:
+class NodeAssetsMixin:
     _assets_amount_cache_key = '_NODE_ASSETS_AMOUNT_{}'
+    _assets_cache_key = '_NODE_ASSETS_{}'
     _assets_amount = None
     key = ''
     cache_time = 3600 * 24 * 7
+    id = None
 
     @property
     def assets_amount(self):
@@ -207,39 +199,36 @@ class AssetsAmountMixin:
         """
         if self._assets_amount is not None:
             return self._assets_amount
-        cache_key = self._assets_amount_cache_key.format(self.key)
-        cached = cache.get(cache_key)
-        if cached is not None:
-            return cached
-        assets_amount = self.get_all_assets().count()
-        return assets_amount
+        amount = self._tree.assets_amount(self.key)
+        return amount
 
-    @assets_amount.setter
-    def assets_amount(self, value):
-        self._assets_amount = value
-        cache_key = self._assets_amount_cache_key.format(self.key)
-        cache.set(cache_key, value, self.cache_time)
+    def get_all_assets(self):
+        from .asset import Asset
+        if self.is_root():
+            return Asset.objects.filter(org_id=self.org_id)
+        assets_ids = self._tree.all_assets(self.key)
+        return Asset.objects.filter(id__in=assets_ids)
 
-    def expire_assets_amount(self):
-        ancestor_keys = self.get_ancestor_keys(with_self=True)
-        cache_keys = [self._assets_amount_cache_key.format(k) for k in
-                      ancestor_keys]
-        cache.delete_many(cache_keys)
+    def assets_ids(self):
+        assets_ids = self._tree.assets(self.key)
+        return assets_ids
 
-    @classmethod
-    def expire_nodes_assets_amount(cls, nodes=None):
-        key = cls._assets_amount_cache_key.format('*')
-        cache.delete_pattern(key)
+    def get_assets(self):
+        from .asset import Asset
+        if self.is_default_node():
+            assets = Asset.objects.filter(Q(nodes__id=self.id) | Q(nodes__isnull=True))
+        else:
+            assets = Asset.objects.filter(id=self.assets_ids())
+        return assets.distinct()
 
-    @classmethod
-    def refresh_nodes(cls):
-        from ..utils import NodeUtil
-        util = NodeUtil(with_assets_amount=True)
-        util.set_assets_amount()
-        util.set_full_value()
+    def get_valid_assets(self):
+        return self.get_assets().valid()
+
+    def get_all_valid_assets(self):
+        return self.get_all_assets().valid()
 
 
-class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
+class Node(OrgModelMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
@@ -315,31 +304,9 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
             child = self.__class__.objects.create(id=_id, key=child_key, value=value)
             return child
 
-    def get_assets(self):
-        from .asset import Asset
-        if self.is_default_node():
-            assets = Asset.objects.filter(Q(nodes__id=self.id) | Q(nodes__isnull=True))
-        else:
-            assets = Asset.objects.filter(nodes__id=self.id)
-        return assets.distinct()
-
-    def get_valid_assets(self):
-        return self.get_assets().valid()
-
-    def get_all_assets(self):
-        from .asset import Asset
-        pattern = r'^{0}$|^{0}:'.format(self.key)
-        args = []
-        kwargs = {}
-        if self.is_root():
-            args.append(Q(nodes__key__regex=pattern) | Q(nodes=None))
-        else:
-            kwargs['nodes__key__regex'] = pattern
-        assets = Asset.objects.filter(*args, **kwargs).distinct()
-        return assets
-
-    def get_all_valid_assets(self):
-        return self.get_all_assets().valid()
+    @classmethod
+    def refresh_nodes(cls):
+        cls.refresh_tree()
 
     def is_default_node(self):
         return self.is_root() and self.key == '1'
@@ -383,6 +350,7 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
     def as_tree_node(self):
         from common.tree import TreeNode
         name = '{} ({})'.format(self.value, self.assets_amount)
+        # name = self.value
         data = {
             'id': self.key,
             'name': name,
@@ -421,7 +389,14 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, AssetsAmountMixin):
         org = get_current_org()
         if not org or not org.is_real():
             Organization.default().change_to()
+        i = 0
+        while i < count:
+            nodes = list(cls.objects.all())
+            if count > 100:
+                length = 100
+            else:
+                length = count
 
-        for i in range(count):
-            node = random.choice(cls.objects.all())
-            node.create_child('Node {}'.format(i))
+            for i in range(length):
+                node = random.choice(nodes)
+                node.create_child('Node {}'.format(i))

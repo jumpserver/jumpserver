@@ -9,7 +9,7 @@ from ..serializers import (
     UserGroupUpdateMemberSerializer,
 )
 from ..models import UserGroup
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from common.permissions import IsOrgAdmin
 
 

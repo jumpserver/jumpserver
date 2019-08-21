@@ -4,7 +4,7 @@
 
 from rest_framework import generics
 
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin, IsAppUser
 from ..models import RemoteApp
 from ..serializers import RemoteAppSerializer, RemoteAppConnectionInfoSerializer

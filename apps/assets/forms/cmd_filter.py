@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 import re
 
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from ..models import CommandFilter, CommandFilterRule
 
 __all__ = ['CommandFilterForm', 'CommandFilterRuleForm']

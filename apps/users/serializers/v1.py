@@ -8,7 +8,7 @@ from common.utils import validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 
 

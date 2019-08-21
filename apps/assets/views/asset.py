@@ -196,13 +196,9 @@ class AssetDetailView(PermissionsMixin, DetailView):
         ).select_related('admin_user', 'domain')
 
     def get_context_data(self, **kwargs):
-        nodes_remain = Node.objects.exclude(assets=self.object).only('key')
-        util = NodeUtil()
-        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('Assets'),
             'action': _('Asset detail'),
-            'nodes_remain': nodes_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

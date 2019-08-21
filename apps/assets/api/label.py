@@ -16,7 +16,7 @@
 from django.db.models import Count
 
 from common.utils import get_logger
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import IsOrgAdmin
 from ..models import Label
 from .. import serializers

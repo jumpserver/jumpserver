@@ -17,10 +17,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
 
+from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from common.serializers import CeleryTaskSerializer
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import SystemUser, Asset
 from .. import serializers
 from ..tasks import (

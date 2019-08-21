@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from orgs.utils import current_org
 from assets.models import Asset, Node
 from ..models import AssetPermission, Action
@@ -41,17 +41,17 @@ class AssetPermissionForm(OrgModelForm):
         users_field = self.fields.get('users')
         users_field.queryset = current_org.get_org_users()
 
-        nodes_field = self.fields['nodes']
-        nodes_field.choices = ((n.id, n.full_value) for n in Node.get_queryset())
-
+        if self.data:
+            return
         # 前端渲染优化, 防止过多资产
-        if not self.data:
-            instance = kwargs.get('instance')
-            assets_field = self.fields['assets']
-            if instance:
-                assets_field.queryset = instance.assets.all()
-            else:
-                assets_field.queryset = Asset.objects.none()
+        assets_field = self.fields['assets']
+        nodes_field = self.fields['nodes']
+        if self.instance:
+            assets_field.queryset = self.instance.assets.all()
+            nodes_field.queryset = self.instance.nodes.all()
+        else:
+            assets_field.queryset = Asset.objects.none()
+            nodes_field.queryset = Node.objects.none()
 
     class Meta:
         model = AssetPermission
@@ -69,7 +69,7 @@ class AssetPermissionForm(OrgModelForm):
                 attrs={'class': 'select2', 'data-placeholder': _("Asset")}
             ),
             'nodes': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _("Node")}
+                attrs={'class': 'nodes-select2', 'data-placeholder': _("Node")}
             ),
             'system_users': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}

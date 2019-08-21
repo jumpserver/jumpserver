@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Node, Label
 from .base import ConnectivitySerializer

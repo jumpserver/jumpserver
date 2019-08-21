@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 
 __all__ = [
     'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',

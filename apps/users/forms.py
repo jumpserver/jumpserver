@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
 from .utils import check_password_rules

@@ -5,7 +5,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import Domain, Gateway
 from .. import serializers
 

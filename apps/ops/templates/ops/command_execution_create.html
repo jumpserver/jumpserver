@@ -83,7 +83,7 @@
 var zTree, show = 0;
 var systemUserId = null;
 var url = null;
-var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?cache_policy=1";
+var treeUrl = "{% url 'api-perms:my-nodes-children-with-assets-as-tree' %}?cache_policy=1";
 
 function proposeGeometry(term) {
     if (!term.element.parentElement) {
@@ -121,6 +121,12 @@ function fit(term) {
 }
 
 function initTree() {
+    if (systemUserId) {
+        url = treeUrl + '&system_user=' + systemUserId
+    }
+    else{
+        url = treeUrl
+    }
     var setting = {
         check: {
             enable: true
@@ -134,6 +140,12 @@ function initTree() {
                 enable: true
             }
         },
+        async: {
+			enable: true,
+			url: url,
+			autoParam: ["id=key", "name=n", "level=lv"],
+            type: 'get'
+		},
         edit: {
             enable: true,
 			showRemoveBtn: false,
@@ -147,12 +159,7 @@ function initTree() {
             onCheck: onCheck
         }
     };
-    if (systemUserId) {
-        url = treeUrl + '&system_user=' + systemUserId
-    }
-    else{
-        url = treeUrl
-    }
+
 
     $.get(url, function(data, status){
         $.fn.zTree.init($("#assetTree"), setting, data);

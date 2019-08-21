@@ -17,7 +17,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 
 from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
