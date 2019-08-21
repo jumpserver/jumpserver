@@ -14,7 +14,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
-    CanUpdateDeleteAdminOrAuditor,
+    AllowUpdateDelete,
 )
 from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
@@ -38,7 +38,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)
     serializer_class = UserSerializer
-    permission_classes = (IsOrgAdmin, CanUpdateDeleteAdminOrAuditor)
+    permission_classes = (IsOrgAdmin, AllowUpdateDelete)
     pagination_class = LimitOffsetPagination
 
     def send_created_signal(self, users):
@@ -52,9 +52,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         if isinstance(users, User):
             users = [users]
         if current_org and current_org.is_real():
-            for user in users:
-                if user.is_common_user:
-                    current_org.users.add(user)
+            current_org.users.add(*users)
         self.send_created_signal(users)
 
     def get_queryset(self):
@@ -73,7 +71,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         """
         if instance.is_superuser and not self.request.user.is_superuser:
             return True
-        if instance.is_auditor and not self.request.user.is_superuser:
+        if instance.is_super_auditor and not self.request.user.is_superuser:
             return True
         return False
 

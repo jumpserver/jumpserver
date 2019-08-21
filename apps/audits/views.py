@@ -180,7 +180,7 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     @staticmethod
-    def get_org_users():
+    def get_org_members():
         users = current_org.get_org_members().values_list('username', flat=True)
         return users
 
@@ -188,7 +188,7 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
         if current_org.is_default():
             queryset = super().get_queryset()
         else:
-            users = self.get_org_users()
+            users = self.get_org_members()
             queryset = super().get_queryset().filter(username__in=users)
 
         self.user = self.request.GET.get('user', '')
@@ -215,7 +215,7 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
             'date_to': self.date_to,
             'user': self.user,
             'keyword': self.keyword,
-            'user_list': self.get_org_users(),
+            'user_list': self.get_org_members(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

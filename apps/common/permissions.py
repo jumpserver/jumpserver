@@ -30,7 +30,7 @@ class IsAppUser(IsValidUser):
 class IsAuditor(IsValidUser):
     def has_permission(self, request, view):
         return super(IsAuditor, self).has_permission(request, view) \
-               and request.user.is_auditor
+               and request.user.is_super_auditor
 
 
 class IsSuperUser(IsValidUser):
@@ -167,14 +167,18 @@ class NeedMFAVerify(permissions.BasePermission):
         return False
 
 
-class CanUpdateDeleteAdminOrAuditor(permissions.BasePermission):
+class AllowUpdateDelete(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if not current_org.can_admin_by(request.user):
+            return False
         if request.user.is_superuser:
             return True
         if request.method in ['PUT', 'PATCH']:
-            if obj.is_superuser or obj.is_auditor:
+            if str(request.user.id) == str(obj.id):
+                return True
+            if obj.is_org_admin or obj.is_super_auditor:
                 return False
         if request.method in ['DELETE']:
-            if obj.is_org_admin or obj.is_auditor:
+            if obj.is_org_admin or obj.is_super_auditor:
                 return False
         return True

@@ -34,6 +34,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
+            'is_org_admin'
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
@@ -45,7 +46,8 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
-            'created_by': {'read_only': True}, 'source': {'read_only': True}
+            'created_by': {'read_only': True}, 'source': {'read_only': True},
+            'is_org_admin': {'read_only': True, 'label': _('Is org admin')}
         }
 
     def validate_role(self, value):
@@ -139,7 +141,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
 
     def validate_users(self, users):
         for user in users:
-            if user.is_auditor:
+            if user.is_super_auditor:
                 msg = _('Auditors cannot be join in the group')
                 raise serializers.ValidationError(msg)
         return users

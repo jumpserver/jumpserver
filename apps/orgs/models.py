@@ -67,25 +67,23 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    def get_none_queryset(self):
-        from users.models import User
-        return User.objects.none()
-
     def get_org_users(self):
         from users.models import User
         if self.is_real():
             return self.users.all()
-        return User.objects.all()
+        return User.objects.filter(role=User.ROLE_USER)
 
     def get_org_admins(self):
+        from users.models import User
         if self.is_real():
             return self.admins.all()
-        return self.get_none_queryset()
+        return User.objects.filter(role=User.ROLE_ADMIN)
 
     def get_org_auditors(self):
+        from users.models import User
         if self.is_real():
             return self.auditors.all()
-        return self.get_none_queryset()
+        return User.objects.filter(role=User.ROLE_AUDITOR)
 
     def get_org_members(self, exclude=('App', )):
         members = self.get_org_users() | self.get_org_auditors() | self.get_org_admins()
@@ -102,7 +100,9 @@ class Organization(models.Model):
         return False
 
     def can_audit_by(self, user):
-        if user.is_superuser or user.is_auditor or self.get_org_auditors().filter(id=user.id):
+        if user.is_superuser or user.is_super_auditor:
+            return True
+        if self.get_org_auditors().filter(id=user.id):
             return True
         return False
 
@@ -126,7 +126,7 @@ class Organization(models.Model):
         audit_orgs = []
         if user.is_anonymous:
             return audit_orgs
-        elif user.is_auditor or user.is_superuser:
+        elif user.is_super_auditor or user.is_superuser:
             audit_orgs = list(cls.objects.all())
             audit_orgs.append(cls.default())
         elif user.is_org_auditor:
