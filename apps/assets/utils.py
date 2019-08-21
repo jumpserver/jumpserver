@@ -2,11 +2,8 @@
 #
 from functools import reduce
 from treelib import Tree
-import time
-from collections import defaultdict
 from copy import deepcopy
-from threading import Thread, Lock
-from treelib.exceptions import DuplicatedNodeIdError
+import threading
 from django.db.models import Prefetch, Q
 
 from common.utils import get_object_or_none, get_logger, timeit
@@ -273,12 +270,14 @@ def test_node_tree():
 
 class TreeService(Tree):
     tag_sep = ' / '
+    cache_key = '_NODE_FULL_TREE'
+    cache_time = 3600
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assets_map = {}
         self.all_assets_map = {}
-        self.mutex = Lock()
+        self.mutex = threading.Lock()
 
     @classmethod
     @timeit
@@ -302,7 +301,7 @@ class TreeService(Tree):
         return tree
 
     def init_assets_async(self):
-        t = Thread(target=self.init_assets)
+        t = threading.Thread(target=self.init_assets)
         t.start()
 
     def init_assets(self):
@@ -362,13 +361,7 @@ class TreeService(Tree):
 
     def assets(self, nid):
         with self.mutex:
-            assets = self.assets_map.get(nid)
-            if assets is not None:
-                return assets
-            print('asset is none,', assets, len(self.assets_map))
-            assets = []
-            # assets = Asset.objects.filter(nodes__key=nid).values_list('id', flat=True)
-            # self.assets_map[nid] = assets
+            assets = self.assets_map.get(nid, [])
             return assets
 
     def set_assets(self, nid, assets):
@@ -414,3 +407,5 @@ class TreeService(Tree):
             self.move_node(node.identifier, parent.identifier)
         else:
             self.add_node(node, parent)
+
+

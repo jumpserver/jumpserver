@@ -37,7 +37,8 @@ class FamilyMixin:
     def tree(cls):
         from ..utils import TreeService
         cache_updated_time = cls.get_cache_time()
-        if not cls.time_tree_updated or cache_updated_time != cls.time_tree_updated:
+        if not cls.time_tree_updated or \
+                cache_updated_time != cls.time_tree_updated:
             t = TreeService.new()
             cls.update_cache_tree(t)
             return t

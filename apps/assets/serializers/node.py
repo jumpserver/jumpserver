@@ -8,7 +8,7 @@ from ..models import Asset, Node
 
 __all__ = [
     'NodeSerializer', "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer", 'NodeFullValueSerializer',
+    "NodeAssetsSerializer",
 ]
 
 
@@ -32,17 +32,6 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
                 _('The same level node name cannot be the same')
             )
         return data
-
-
-class NodeFullValueSerializer(NodeSerializer):
-
-    # Todo: 使用新的serializer
-    def get_field_names(self, declared_fields, info):
-        names = super().get_field_names(declared_fields, info)
-        names.append('full_value')
-
-
-        # return self.tree.get_node_full_tag(obj.key)
 
 
 class NodeAssetsSerializer(serializers.ModelSerializer):

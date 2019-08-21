@@ -15,7 +15,7 @@
 
 import time
 
-from rest_framework import generics, mixins, viewsets
+from rest_framework import generics
 from rest_framework.serializers import ValidationError
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView

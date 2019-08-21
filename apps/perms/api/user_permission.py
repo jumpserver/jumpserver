@@ -14,7 +14,7 @@ from common.tree import TreeNodeSerializer
 from common.utils import get_logger
 from orgs.utils import set_to_root_org
 from ..utils import (
-    AssetPermissionUtil, ParserNode, AssetPermissionUtilV2
+    ParserNode, AssetPermissionUtilV2
 )
 from .mixin import (
     UserPermissionCacheMixin, GrantAssetsMixin, NodesWithUngroupMixin
@@ -39,6 +39,11 @@ __all__ = [
 
 class UserPermissionMixin:
     permission_classes = (IsOrgAdminOrAppUser,)
+    obj = None
+
+    def initial(self, *args, **kwargs):
+        super().initial(*args, *kwargs)
+        self.obj = self.get_object()
 
     def get(self, request, *args, **kwargs):
         set_to_root_org()
@@ -85,19 +90,17 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
         return queryset
 
     def get_queryset(self):
-        user = self.get_object()
-        util = AssetPermissionUtilV2(user)
+        util = AssetPermissionUtilV2(self.obj)
         queryset = util.get_assets().only(*self.only_fields)
         return queryset
 
 
 class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
     def get_queryset(self):
-        user = self.get_object()
         node_id = self.kwargs.get("node_id")
         node = get_object_or_404(Node, pk=node_id)
         deep = self.request.query_params.get("all", "0") == "1"
-        util = AssetPermissionUtilV2(user)
+        util = AssetPermissionUtilV2(self.obj)
         queryset = util.get_nodes_assets(node, deep=deep)\
             .only(*self.only_fields)
         return queryset
@@ -113,8 +116,7 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
     only_fields = NodeSerializer.Meta.only_fields
 
     def get_queryset(self):
-        user = self.get_object()
-        util = AssetPermissionUtilV2(user)
+        util = AssetPermissionUtilV2(self.obj)
         node_keys = util.get_nodes()
         queryset = Node.objects.filter(key__in=node_keys)
         return queryset
@@ -129,9 +131,11 @@ class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
     def get(self, request, *args, **kwargs):
         key = self.request.query_params.get("key")
         pk = self.request.query_params.get("id")
-        obj = self.get_object()
-
-        self.util = AssetPermissionUtilV2(obj)
+        system_user_id = self.request.query_params.get("system_user")
+        self.util = AssetPermissionUtilV2(self.obj)
+        if system_user_id:
+            system_user = get_object_or_404(SystemUser, id=system_user_id)
+            self.util.filter_permissions(system_users=system_user_id)
         self.tree = self.util.get_user_tree()
 
         node = None
@@ -164,6 +168,7 @@ class UserGrantedNodeChildrenAsTreeApi(UserGrantedNodeChildrenApi):
         nodes = super().get_queryset()
         queryset = []
         for node in nodes:
+            node._assets_amount = self.tree.assets_amount(node.key)
             data = ParserNode.parse_node_to_tree_node(node)
             queryset.append(data)
         return queryset
@@ -183,16 +188,8 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
         elif self.root_keys:
             nodes = Node.objects.filter(key__in=self.root_keys)
 
-        print(nodes)
         for node in nodes:
-            n = self.tree.get_node(node.key)
-            assets_ids = getattr(n, 'assets', None)
-            if assets_ids == 'all':
-                assets = Asset.objects.filter(nodes=self.node)
-            elif assets_ids:
-                assets = Asset.objects.filter(id__in=assets_ids)
-            assets = assets.only(*self.assets_only_fields).valid()
-            print("Asset len: ", len(assets))
+            assets = self.util.get_nodes_assets(node).only(*self.assets_only_fields)
             for asset in assets:
                 data = ParserNode.parse_asset_to_tree_node(node, asset)
                 queryset.append(data)
@@ -200,7 +197,33 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
         return queryset
 
 
-class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
+class GetUserAssetPermissionActionsApi(RetrieveAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.ActionsSerializer
+
+    def get_object(self):
+        user_id = self.request.query_params.get('user_id', '')
+        asset_id = self.request.query_params.get('asset_id', '')
+        system_id = self.request.query_params.get('system_user_id', '')
+
+        try:
+            user_id = uuid.UUID(user_id)
+            asset_id = uuid.UUID(asset_id)
+            system_id = uuid.UUID(system_id)
+        except ValueError:
+            return Response({'msg': False}, status=403)
+
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_id)
+
+        util = AssetPermissionUtilV2(user)
+        system_users_actions = util.get_asset_system_users_with_actions(asset)
+        actions = system_users_actions.get(system_user)
+        return {"actions": actions}
+
+
+class ValidateUserAssetPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     
     def get(self, request, *args, **kwargs):
@@ -211,32 +234,6 @@ class ValidateUserAssetPermissionApi(UserPermissionCacheMixin, APIView):
         cache_policy = self.request.query_params.get("cache_policy", '0')
 
         try:
-            asset_id = uuid.UUID(asset_id)
-            system_id = uuid.UUID(system_id)
-        except ValueError:
-            return Response({'msg': False}, status=403)
-
-        user = get_object_or_404(User, id=user_id)
-        util = AssetPermissionUtil(user, cache_policy=cache_policy)
-        assets = util.get_assets()
-        for asset in assets:
-            if asset_id == asset["id"]:
-                action = asset["system_users"].get(system_id)
-                if action and action_name in Action.value_to_choices(action):
-                    return Response({'msg': True}, status=200)
-                break
-        return Response({'msg': False}, status=403)
-
-
-class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, RetrieveAPIView):
-    permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = serializers.ActionsSerializer
-
-    def get_object(self):
-        user_id = self.request.query_params.get('user_id', '')
-        asset_id = self.request.query_params.get('asset_id', '')
-        system_id = self.request.query_params.get('system_user_id', '')
-        try:
             user_id = uuid.UUID(user_id)
             asset_id = uuid.UUID(asset_id)
             system_id = uuid.UUID(system_id)
@@ -244,15 +241,15 @@ class GetUserAssetPermissionActionsApi(UserPermissionCacheMixin, RetrieveAPIView
             return Response({'msg': False}, status=403)
 
         user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_id)
 
-        util = AssetPermissionUtil(user, cache_policy=self.cache_policy)
-        assets = util.get_assets()
-        actions = 0
-        for asset in assets:
-            if asset_id == asset["id"]:
-                actions = asset["system_users"].get(system_id, 0)
-                break
-        return {"actions": actions}
+        util = AssetPermissionUtilV2(user)
+        system_users_actions = util.get_asset_system_users_with_actions(asset)
+        actions = system_users_actions.get(system_user)
+        if action_name in Action.value_to_choices(actions):
+            return Response({'msg': True}, status=200)
+        return Response({'msg': False}, status=403)
 
 
 class RefreshAssetPermissionCacheApi(RetrieveAPIView):
@@ -260,7 +257,7 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         # expire all cache
-        AssetPermissionUtil.expire_all_cache()
+        # AssetPermissionUtil.expire_all_cache()
         return Response({'msg': True}, status=200)
 
 
@@ -270,8 +267,7 @@ class UserGrantedAssetSystemUsersApi(UserPermissionMixin, ListAPIView):
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
 
     def get_queryset(self):
-        user = self.get_object()
-        util = AssetPermissionUtilV2(user)
+        util = AssetPermissionUtilV2(self.obj)
         asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
         system_users_with_actions = util.get_asset_system_users_with_actions(asset)
