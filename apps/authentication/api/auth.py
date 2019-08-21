@@ -16,15 +16,17 @@ from rest_framework.views import APIView
 
 from common.utils import get_logger, get_request_ip
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
-from orgs.mixins import RootOrgViewMixin
+from orgs.mixins.api import RootOrgViewMixin
 from users.serializers import UserSerializer
 from users.models import User
 from assets.models import Asset, SystemUser
 from audits.models import UserLoginLog as LoginLog
 from users.utils import (
-    check_user_valid, check_otp_code, increase_login_failed_count,
+    check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
 )
+from .. import const
+from ..utils import check_user_valid
 from ..serializers import OtpVerifySerializer
 from ..signals import post_auth_success, post_auth_failed
 
@@ -53,27 +55,15 @@ class UserAuthApi(RootOrgViewMixin, APIView):
         user, msg = self.check_user_valid(request)
         if not user:
             username = request.data.get('username', '')
-            exist = User.objects.filter(username=username).first()
-            reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
-            self.send_auth_signal(success=False, username=username, reason=reason)
+            self.send_auth_signal(success=False, username=username, reason=msg)
             increase_login_failed_count(username, ip)
-            return Response({'msg': msg}, status=401)
-
-        if user.password_has_expired:
-            self.send_auth_signal(
-                success=False, username=username,
-                reason=LoginLog.REASON_PASSWORD_EXPIRED
-            )
-            msg = _("The user {} password has expired, please update.".format(
-                user.username))
-            logger.info(msg)
             return Response({'msg': msg}, status=401)
 
         if not user.otp_enabled:
             self.send_auth_signal(success=True, user=user)
             # 登陆成功，清除原来的缓存计数
             clean_failed_count(username, ip)
-            token = user.create_bearer_token(request)
+            token, expired_at = user.create_bearer_token(request)
             return Response(
                 {'token': token, 'user': self.serializer_class(user).data}
             )
@@ -167,10 +157,10 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
                 status=401
             )
         if not check_otp_code(user.otp_secret_key, otp_code):
-            self.send_auth_signal(success=False, username=user.username, reason=LoginLog.REASON_MFA)
+            self.send_auth_signal(success=False, username=user.username, reason=const.mfa_failed)
             return Response({'msg': _('MFA certification failed')}, status=401)
         self.send_auth_signal(success=True, user=user)
-        token = user.create_bearer_token(request)
+        token, expired_at = user.create_bearer_token(request)
         data = {'token': token, 'user': self.serializer_class(user).data}
         return Response(data)
 

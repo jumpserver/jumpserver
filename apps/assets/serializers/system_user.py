@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
 from common.utils import ssh_pubkey_gen
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser
 from .base import AuthSerializer, AuthSerializerMixin
 

@@ -24,7 +24,7 @@ FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*2
-disk_pattern = re.compile(r'^hd|sd|xvd|vd')
+disk_pattern = re.compile(r'^hd|sd|xvd|vd|nv')
 PERIOD_TASK = os.environ.get("PERIOD_TASK", "on")
 
 
@@ -62,7 +62,7 @@ def clean_hosts_by_protocol(system_user, assets):
     return hosts
 
 
-@shared_task
+@shared_task(queue="ansible")
 def set_assets_hardware_info(assets, result, **kwargs):
     """
     Using ops task run result, to update asset info
@@ -106,7 +106,7 @@ def set_assets_hardware_info(assets, result, **kwargs):
         for dev, dev_info in info.get('ansible_devices', {}).items():
             if disk_pattern.match(dev) and dev_info['removable'] == '0':
                 disk_info[dev] = dev_info['size']
-        ___disk_total = '%s %s' % sum_capacity(disk_info.values())
+        ___disk_total = '%.1f %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)
 
         # ___platform = info.get('ansible_system', 'Unknown')
@@ -148,7 +148,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     return result
 
 
-@shared_task
+@shared_task(queue="ansible")
 def update_asset_hardware_info_manual(asset):
     task_name = _("Update asset hardware info: {}").format(asset.hostname)
     update_assets_hardware_info_util(
@@ -156,7 +156,7 @@ def update_asset_hardware_info_manual(asset):
     )
 
 
-@shared_task
+@shared_task(queue="ansible")
 def update_assets_hardware_info_period():
     """
     Update asset hardware period task
@@ -170,7 +170,7 @@ def update_assets_hardware_info_period():
 ##  ADMIN USER CONNECTIVE  ##
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_asset_connectivity_util(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
@@ -227,7 +227,7 @@ def test_asset_connectivity_util(assets, task_name=None):
     return results_summary
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_asset_connectivity_manual(asset):
     task_name = _("Test assets connectivity: {}").format(asset)
     summary = test_asset_connectivity_util([asset], task_name=task_name)
@@ -238,7 +238,7 @@ def test_asset_connectivity_manual(asset):
         return True, ""
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_admin_user_connectivity_util(admin_user, task_name):
     """
     Test asset admin user can connect or not. Using ansible api do that
@@ -254,7 +254,7 @@ def test_admin_user_connectivity_util(admin_user, task_name):
     return summary
 
 
-@shared_task
+@shared_task(queue="ansible")
 @register_as_period_task(interval=3600)
 def test_admin_user_connectivity_period():
     """
@@ -276,7 +276,7 @@ def test_admin_user_connectivity_period():
     cache.set(key, 1, 60*40)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_admin_user_connectivity_manual(admin_user):
     task_name = _("Test admin user connectivity: {}").format(admin_user.name)
     test_admin_user_connectivity_util(admin_user, task_name)
@@ -286,7 +286,7 @@ def test_admin_user_connectivity_manual(admin_user):
 ##  System user connective ##
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_system_user_connectivity_util(system_user, assets, task_name):
     """
     Test system cant connect his assets or not.
@@ -344,14 +344,14 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     return results_summary
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_system_user_connectivity_manual(system_user):
     task_name = _("Test system user connectivity: {}").format(system_user)
     assets = system_user.get_all_assets()
     return test_system_user_connectivity_util(system_user, assets, task_name)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_system_user_connectivity_a_asset(system_user, asset):
     task_name = _("Test system user connectivity: {} => {}").format(
         system_user, asset
@@ -359,7 +359,7 @@ def test_system_user_connectivity_a_asset(system_user, asset):
     return test_system_user_connectivity_util(system_user, [asset], task_name)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_system_user_connectivity_period():
     if PERIOD_TASK != "on":
         logger.debug("Period task disabled, test system user connectivity pass")
@@ -483,7 +483,7 @@ def get_push_system_user_tasks(host, system_user):
     return tasks
 
 
-@shared_task
+@shared_task(queue="ansible")
 def push_system_user_util(system_user, assets, task_name):
     from ops.utils import update_or_create_ansible_task
     if not system_user.is_need_push():
@@ -519,14 +519,14 @@ def push_system_user_util(system_user, assets, task_name):
         task.run()
 
 
-@shared_task
+@shared_task(queue="ansible")
 def push_system_user_to_assets_manual(system_user):
     assets = system_user.get_all_assets()
     task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util(system_user, assets, task_name=task_name)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def push_system_user_a_asset_manual(system_user, asset):
     task_name = _("Push system users to asset: {} => {}").format(
         system_user.name, asset
@@ -534,7 +534,7 @@ def push_system_user_a_asset_manual(system_user, asset):
     return push_system_user_util(system_user, [asset], task_name=task_name)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def push_system_user_to_assets(system_user, assets):
     task_name = _("Push system users to assets: {}").format(system_user.name)
     return push_system_user_util(system_user, assets, task_name)
@@ -569,7 +569,7 @@ def get_test_asset_user_connectivity_tasks(asset):
     return tasks
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
     """
     :param asset_user: <AuthBook>对象
@@ -602,7 +602,7 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
     asset_user.set_connectivity(summary)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def test_asset_users_connectivity_manual(asset_users, run_as_admin=False):
     """
     :param asset_users: <AuthBook>对象

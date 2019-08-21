@@ -42,6 +42,7 @@ var assetTable;
 var treeUrl = "NeedInput";
 var assetTableUrl = 'NeedInput';
 var selectUrl = 'NeedInput';
+var systemUsersUrl = "NeedInput";
 var showAssetHref = true; // Need input default true
 var actions = {};
 var labels = '';
@@ -70,18 +71,22 @@ function initTable() {
                 $(td).html(cellData);
             }},
             {targets: 3, createdCell: function (td, cellData) {
-                var users = [];
-                $.each(cellData, function (id, data) {
-                    var name = htmlEscape(data.name);
-                    users.push(name);
-                });
-                $(td).html(users.join(', '))
+                function success(systemUsers) {
+                    var users = [];
+                    $.each(systemUsers, function (id, data) {
+                        var name = htmlEscape(data.name);
+                        users.push(name);
+                    });
+                    $(td).html(users.join(','))
+                }
+                $(td).html("{% trans 'Loading' %}");
+                getGrantedAssetSystemUsers(cellData, success)
             }},
         ],
         ajax_url: assetTableUrl,
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" },
-            {data: "system_users_granted", orderable: false},
+            {data: "id", orderable: false},
             {% if show_actions %}
             {data: "id", orderable: false}
             {% endif %}
@@ -113,6 +118,12 @@ function initTree() {
                 enable: true
             }
         },
+        async: {
+			enable: true,
+			url: treeUrl,
+			autoParam: ["id=key", "name=n", "level=lv"],
+            type: 'get'
+		},
         callback: {
             onSelected: onSelected
         }
@@ -126,6 +137,16 @@ function initTree() {
             initTree();
         });
     });
+}
+
+function getGrantedAssetSystemUsers(assetID, success) {
+    var url = systemUsersUrl.replace("{{ DEFAULT_PK }}", assetID);
+    requestApi({
+        url: url,
+        method: "GET",
+        success: success,
+        flash_message: false
+    })
 }
 
 function loadLabels() {

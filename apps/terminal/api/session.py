@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
 from django.conf import settings
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
@@ -15,7 +14,7 @@ import jms_storage
 from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsAuditor
 from common.filters import DatetimeRangeFilter
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
@@ -28,7 +27,6 @@ logger = get_logger(__name__)
 class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",

@@ -16,8 +16,7 @@ from common.utils import get_object_or_none, get_logger
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 from common.const import KEY_CACHE_RESOURCES_ID
 from .. import forms
-from ..utils import NodeUtil
-from ..models import Asset, SystemUser, Label, Node
+from ..models import Asset, Label, Node
 
 
 __all__ = [
@@ -196,13 +195,9 @@ class AssetDetailView(PermissionsMixin, DetailView):
         ).select_related('admin_user', 'domain')
 
     def get_context_data(self, **kwargs):
-        nodes_remain = Node.objects.exclude(assets=self.object).only('key')
-        util = NodeUtil()
-        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('Assets'),
             'action': _('Asset detail'),
-            'nodes_remain': nodes_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-31 16:35+0800\n"
+"POT-Creation-Date: 2019-08-07 16:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -78,7 +78,7 @@ msgstr "运行参数"
 #: assets/forms/domain.py:15 assets/forms/label.py:13
 #: assets/models/asset.py:318 assets/models/authbook.py:24
 #: assets/serializers/admin_user.py:32 assets/serializers/asset_user.py:81
-#: assets/serializers/system_user.py:30
+#: assets/serializers/system_user.py:31
 #: assets/templates/assets/admin_user_list.html:46
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
@@ -218,7 +218,7 @@ msgstr "参数"
 #: perms/models/asset_permission.py:117 perms/models/base.py:41
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
-#: users/models/user.py:372 users/serializers/v1.py:120
+#: users/models/user.py:372 users/serializers/v1.py:119
 #: users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:106
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
@@ -471,6 +471,7 @@ msgstr "更新"
 #: assets/templates/assets/label_list.html:40
 #: assets/templates/assets/system_user_detail.html:30
 #: assets/templates/assets/system_user_list.html:86 audits/models.py:34
+#: authentication/templates/authentication/_access_key_modal.html:65
 #: ops/templates/ops/task_list.html:64
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:179
@@ -527,6 +528,7 @@ msgstr "创建远程应用"
 #: assets/templates/assets/system_user_list.html:60 audits/models.py:38
 #: audits/templates/audits/operate_log_list.html:41
 #: audits/templates/audits/operate_log_list.html:67
+#: authentication/templates/authentication/_access_key_modal.html:30
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:34
 #: perms/forms/asset_permission.py:21
@@ -579,14 +581,10 @@ msgstr "远程应用详情"
 msgid "My RemoteApp"
 msgstr "我的远程应用"
 
-#: assets/api/asset.py:51
+#: assets/api/asset.py:42
 #, python-format
 msgid "%(hostname)s was %(action)s successfully"
 msgstr "%(hostname)s %(action)s成功"
-
-#: assets/api/asset.py:125
-msgid "Please select assets that need to be updated"
-msgstr "请选择需要更新的资产"
 
 #: assets/api/node.py:61
 msgid "You can't update the root node name"
@@ -609,7 +607,7 @@ msgstr "不可达"
 msgid "Reachable"
 msgstr "可连接"
 
-#: assets/const.py:79 assets/models/utils.py:45 authentication/utils.py:9
+#: assets/const.py:79 assets/models/utils.py:45 authentication/utils.py:13
 #: xpack/plugins/license/models.py:78
 msgid "Unknown"
 msgstr "未知"
@@ -656,7 +654,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:58 assets/forms/asset.py:80 assets/forms/asset.py:93
-#: assets/forms/asset.py:128 assets/models/node.py:253
+#: assets/forms/asset.py:128 assets/models/node.py:254
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:72 perms/forms/asset_permission.py:79
 #: perms/models/asset_permission.py:112
@@ -718,7 +716,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: assets/templates/assets/admin_user_list.html:45
 #: assets/templates/assets/domain_gateway_list.html:71
 #: assets/templates/assets/system_user_detail.html:62
-#: assets/templates/assets/system_user_list.html:52 audits/models.py:94
+#: assets/templates/assets/system_user_list.html:52 audits/models.py:80
 #: audits/templates/audits/login_log_list.html:51 authentication/forms.py:13
 #: authentication/templates/authentication/login.html:65
 #: authentication/templates/authentication/new_login.html:92
@@ -1116,8 +1114,8 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:65
 #: terminal/templates/terminal/session_list.html:27
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:316
-#: users/models/user.py:128 users/models/user.py:458
-#: users/serializers/v1.py:109 users/templates/users/user_group_detail.html:78
+#: users/models/user.py:127 users/models/user.py:458
+#: users/serializers/v1.py:108 users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:36 users/views/user.py:243
 #: xpack/plugins/orgs/forms.py:26
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:113
@@ -1125,7 +1123,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:244
+#: assets/models/label.py:19 assets/models/node.py:245
 #: assets/templates/assets/label_list.html:15 settings/models.py:30
 msgid "Value"
 msgstr "值"
@@ -1134,11 +1132,11 @@ msgstr "值"
 msgid "Category"
 msgstr "分类"
 
-#: assets/models/node.py:243
+#: assets/models/node.py:244
 msgid "Key"
 msgstr "键"
 
-#: assets/models/node.py:301
+#: assets/models/node.py:302
 msgid "New node"
 msgstr "新节点"
 
@@ -1244,98 +1242,98 @@ msgstr "密钥不合法"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:31
+#: assets/serializers/system_user.py:32
 msgid "Login mode display"
 msgstr "登录模式显示"
 
-#: assets/serializers/system_user.py:66
+#: assets/serializers/system_user.py:67
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:75
+#: assets/serializers/system_user.py:78
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
-#: assets/tasks.py:34
+#: assets/tasks.py:33
 msgid "Asset has been disabled, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:38
+#: assets/tasks.py:37
 msgid "Asset may not be support ansible, skipped: {}"
 msgstr "资产或许不支持ansible, 跳过: {}"
 
-#: assets/tasks.py:51
+#: assets/tasks.py:50
 msgid "No assets matched, stop task"
 msgstr "没有匹配到资产，结束任务"
 
-#: assets/tasks.py:61
+#: assets/tasks.py:60
 msgid "No assets matched related system user protocol, stop task"
 msgstr "没有匹配到与系统用户协议相关的资产，结束任务"
 
-#: assets/tasks.py:87
+#: assets/tasks.py:86
 msgid "Get asset info failed: {}"
 msgstr "获取资产信息失败：{}"
 
-#: assets/tasks.py:137
+#: assets/tasks.py:136
 msgid "Update some assets hardware info"
 msgstr "更新资产硬件信息"
 
-#: assets/tasks.py:154
+#: assets/tasks.py:153
 msgid "Update asset hardware info: {}"
 msgstr "更新资产硬件信息: {}"
 
-#: assets/tasks.py:179
+#: assets/tasks.py:178
 msgid "Test assets connectivity"
 msgstr "测试资产可连接性"
 
-#: assets/tasks.py:233
+#: assets/tasks.py:232
 msgid "Test assets connectivity: {}"
 msgstr "测试资产可连接性: {}"
 
-#: assets/tasks.py:275
+#: assets/tasks.py:274
 msgid "Test admin user connectivity period: {}"
 msgstr "定期测试管理账号可连接性: {}"
 
-#: assets/tasks.py:282
+#: assets/tasks.py:281
 msgid "Test admin user connectivity: {}"
 msgstr "测试管理行号可连接性: {}"
 
-#: assets/tasks.py:350
+#: assets/tasks.py:349
 msgid "Test system user connectivity: {}"
 msgstr "测试系统用户可连接性: {}"
 
-#: assets/tasks.py:357
+#: assets/tasks.py:356
 msgid "Test system user connectivity: {} => {}"
 msgstr "测试系统用户可连接性: {} => {}"
 
-#: assets/tasks.py:370
+#: assets/tasks.py:369
 msgid "Test system user connectivity period: {}"
 msgstr "定期测试系统用户可连接性: {}"
 
-#: assets/tasks.py:479 assets/tasks.py:565
+#: assets/tasks.py:478 assets/tasks.py:564
 #: xpack/plugins/change_auth_plan/models.py:522
 msgid "The asset {} system platform {} does not support run Ansible tasks"
 msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
-#: assets/tasks.py:491
+#: assets/tasks.py:490
 msgid ""
 "Push system user task skip, auto push not enable or protocol is not ssh or "
 "rdp: {}"
 msgstr "推送系统用户任务跳过，自动推送没有打开，或协议不是ssh或rdp: {}"
 
-#: assets/tasks.py:498
+#: assets/tasks.py:497
 msgid "For security, do not push user {}"
 msgstr "为了安全，禁止推送用户 {}"
 
-#: assets/tasks.py:526 assets/tasks.py:540
+#: assets/tasks.py:525 assets/tasks.py:539
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
-#: assets/tasks.py:532
+#: assets/tasks.py:531
 msgid "Push system users to asset: {} => {}"
 msgstr "推送系统用户到入资产: {} => {}"
 
-#: assets/tasks.py:612
+#: assets/tasks.py:611
 msgid "Test asset user connectivity: {}"
 msgstr "测试资产用户可连接性: {}"
 
@@ -1418,6 +1416,7 @@ msgstr "获取认证信息错误"
 
 #: assets/templates/assets/_asset_user_auth_view_modal.html:97
 #: assets/templates/assets/_user_asset_detail_modal.html:23
+#: authentication/templates/authentication/_access_key_modal.html:143
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
 #: settings/templates/settings/_ldap_list_users_modal.html:99
 #: templates/_modal.html:22
@@ -1701,7 +1700,8 @@ msgstr "硬盘"
 msgid "Date joined"
 msgstr "创建日期"
 
-#: assets/templates/assets/asset_detail.html:150
+#: assets/templates/assets/asset_detail.html:150 authentication/models.py:15
+#: authentication/templates/authentication/_access_key_modal.html:28
 #: perms/models/asset_permission.py:115 perms/models/base.py:38
 #: perms/templates/perms/asset_permission_create_update.html:55
 #: perms/templates/perms/asset_permission_detail.html:120
@@ -2133,7 +2133,7 @@ msgstr "操作"
 msgid "Filename"
 msgstr "文件名"
 
-#: audits/models.py:23 audits/models.py:90
+#: audits/models.py:23 audits/models.py:76
 #: audits/templates/audits/ftp_log_list.html:76
 #: ops/templates/ops/command_execution_list.html:65
 #: ops/templates/ops/task_list.html:31
@@ -2143,7 +2143,9 @@ msgstr "文件名"
 msgid "Success"
 msgstr "成功"
 
-#: audits/models.py:32 xpack/plugins/vault/templates/vault/vault.html:46
+#: audits/models.py:32
+#: authentication/templates/authentication/_access_key_modal.html:38
+#: xpack/plugins/vault/templates/vault/vault.html:46
 msgid "Create"
 msgstr "创建"
 
@@ -2169,55 +2171,39 @@ msgstr "禁用"
 msgid "Enabled"
 msgstr "启用"
 
-#: audits/models.py:72 audits/models.py:82
+#: audits/models.py:72
 msgid "-"
 msgstr ""
 
-#: audits/models.py:83
-msgid "Username/password check failed"
-msgstr "用户名/密码 校验失败"
-
-#: audits/models.py:84
-msgid "MFA authentication failed"
-msgstr "MFA 认证失败"
-
-#: audits/models.py:85
-msgid "Username does not exist"
-msgstr "用户名不存在"
-
-#: audits/models.py:86
-msgid "Password expired"
-msgstr "密码过期"
-
-#: audits/models.py:91 xpack/plugins/cloud/models.py:267
+#: audits/models.py:77 xpack/plugins/cloud/models.py:267
 #: xpack/plugins/cloud/models.py:290
 msgid "Failed"
 msgstr "失败"
 
-#: audits/models.py:95
+#: audits/models.py:81
 msgid "Login type"
 msgstr "登录方式"
 
-#: audits/models.py:96
+#: audits/models.py:82
 msgid "Login ip"
 msgstr "登录IP"
 
-#: audits/models.py:97
+#: audits/models.py:83
 msgid "Login city"
 msgstr "登录城市"
 
-#: audits/models.py:98
+#: audits/models.py:84
 msgid "User agent"
 msgstr "Agent"
 
-#: audits/models.py:99 audits/templates/audits/login_log_list.html:56
+#: audits/models.py:85 audits/templates/audits/login_log_list.html:56
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
 #: users/forms.py:175 users/models/user.py:353
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
 
-#: audits/models.py:100 audits/templates/audits/login_log_list.html:57
+#: audits/models.py:86 audits/templates/audits/login_log_list.html:57
 #: xpack/plugins/change_auth_plan/models.py:417
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:15
 #: xpack/plugins/cloud/models.py:281
@@ -2225,14 +2211,14 @@ msgstr "MFA"
 msgid "Reason"
 msgstr "原因"
 
-#: audits/models.py:101 audits/templates/audits/login_log_list.html:58
+#: audits/models.py:87 audits/templates/audits/login_log_list.html:58
 #: xpack/plugins/cloud/models.py:278 xpack/plugins/cloud/models.py:313
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
 msgid "Status"
 msgstr "状态"
 
-#: audits/models.py:102
+#: audits/models.py:88
 msgid "Date login"
 msgstr "登录日期"
 
@@ -2264,13 +2250,14 @@ msgstr "选择用户"
 #: ops/templates/ops/command_execution_list.html:43
 #: ops/templates/ops/command_execution_list.html:48
 #: ops/templates/ops/task_list.html:13 ops/templates/ops/task_list.html:18
-#: templates/_base_list.html:41 templates/_header_bar.html:8
+#: templates/_base_list.html:41
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:48
 msgid "Search"
 msgstr "搜索"
 
 #: audits/templates/audits/login_log_list.html:50
+#: authentication/templates/authentication/_access_key_modal.html:26
 #: ops/templates/ops/adhoc_detail.html:49
 #: ops/templates/ops/adhoc_history_detail.html:49
 #: ops/templates/ops/task_detail.html:56
@@ -2289,6 +2276,7 @@ msgid "City"
 msgstr "城市"
 
 #: audits/templates/audits/login_log_list.html:59
+#: authentication/templates/authentication/_access_key_modal.html:29
 #: ops/templates/ops/task_list.html:32
 msgid "Date"
 msgstr "日期"
@@ -2319,78 +2307,98 @@ msgstr "登录日志"
 msgid "Command execution log"
 msgstr "命令执行"
 
-#: authentication/api/auth.py:49
+#: authentication/api/auth.py:51 authentication/api/token.py:45
 #: authentication/templates/authentication/login.html:52
 #: authentication/templates/authentication/new_login.html:77
 msgid "Log in frequently and try again later"
 msgstr "登录频繁, 稍后重试"
 
-#: authentication/api/auth.py:67
-msgid "The user {} password has expired, please update."
-msgstr "用户 {} 密码已经过期，请更新。"
-
-#: authentication/api/auth.py:86
+#: authentication/api/auth.py:76
 msgid "Please carry seed value and conduct MFA secondary certification"
 msgstr "请携带seed值, 进行MFA二次认证"
 
-#: authentication/api/auth.py:166
+#: authentication/api/auth.py:156
 msgid "Please verify the user name and password first"
 msgstr "请先进行用户名和密码验证"
 
-#: authentication/api/auth.py:171
+#: authentication/api/auth.py:161
 msgid "MFA certification failed"
 msgstr "MFA认证失败"
 
-#: authentication/backends/api.py:52
+#: authentication/api/token.py:80
+msgid "MFA required"
+msgstr ""
+
+#: authentication/backends/api.py:53
 msgid "Invalid signature header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:55
+#: authentication/backends/api.py:56
 msgid "Invalid signature header. Signature string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:62
+#: authentication/backends/api.py:63
 msgid "Invalid signature header. Format like AccessKeyId:Signature"
 msgstr ""
 
-#: authentication/backends/api.py:66
+#: authentication/backends/api.py:67
 msgid ""
 "Invalid signature header. Signature string should not contain invalid "
 "characters."
 msgstr ""
 
-#: authentication/backends/api.py:86 authentication/backends/api.py:102
+#: authentication/backends/api.py:87 authentication/backends/api.py:103
 msgid "Invalid signature."
 msgstr ""
 
-#: authentication/backends/api.py:93
+#: authentication/backends/api.py:94
 msgid "HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT"
 msgstr ""
 
-#: authentication/backends/api.py:98
+#: authentication/backends/api.py:99
 msgid "Expired, more than 15 minutes"
 msgstr ""
 
-#: authentication/backends/api.py:105
+#: authentication/backends/api.py:106
 msgid "User disabled."
 msgstr "用户已禁用"
 
-#: authentication/backends/api.py:120
+#: authentication/backends/api.py:121
 msgid "Invalid token header. No credentials provided."
 msgstr ""
 
-#: authentication/backends/api.py:123
+#: authentication/backends/api.py:124
 msgid "Invalid token header. Sign string should not contain spaces."
 msgstr ""
 
-#: authentication/backends/api.py:130
+#: authentication/backends/api.py:131
 msgid ""
 "Invalid token header. Sign string should not contain invalid characters."
 msgstr ""
 
-#: authentication/backends/api.py:140
+#: authentication/backends/api.py:141
 msgid "Invalid token or cache refreshed."
 msgstr ""
+
+#: authentication/const.py:6
+msgid "Username/password check failed"
+msgstr "用户名/密码 校验失败"
+
+#: authentication/const.py:7
+msgid "MFA authentication failed"
+msgstr "MFA 认证失败"
+
+#: authentication/const.py:8
+msgid "Username does not exist"
+msgstr "用户名不存在"
+
+#: authentication/const.py:9
+msgid "Password expired"
+msgstr "密码过期"
+
+#: authentication/const.py:10
+msgid "Disabled or expired"
+msgstr "禁用或失效"
 
 #: authentication/forms.py:21
 msgid ""
@@ -2418,9 +2426,42 @@ msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 msgid "MFA code"
 msgstr "MFA 验证码"
 
-#: authentication/models.py:33
+#: authentication/models.py:35
 msgid "Private Token"
 msgstr "ssh密钥"
+
+#: authentication/templates/authentication/_access_key_modal.html:6
+msgid "API key list"
+msgstr "API Key列表"
+
+#: authentication/templates/authentication/_access_key_modal.html:18
+msgid "Using api key sign api header, every requests header difference"
+msgstr "使用api key签名请求头，每个请求的头部是不一样的"
+
+#: authentication/templates/authentication/_access_key_modal.html:18
+msgid "docs"
+msgstr "文档"
+
+#: authentication/templates/authentication/_access_key_modal.html:27
+msgid "Secret"
+msgstr "密文"
+
+#: authentication/templates/authentication/_access_key_modal.html:48
+msgid "Show"
+msgstr "显示"
+
+#: authentication/templates/authentication/_access_key_modal.html:66
+#: users/models/user.py:288 users/templates/users/user_profile.html:94
+#: users/templates/users/user_profile.html:163
+#: users/templates/users/user_profile.html:166
+msgid "Disable"
+msgstr "禁用"
+
+#: authentication/templates/authentication/_access_key_modal.html:67
+#: users/models/user.py:289 users/templates/users/user_profile.html:92
+#: users/templates/users/user_profile.html:170
+msgid "Enable"
+msgstr "启用"
 
 #: authentication/templates/authentication/_mfa_confirm_modal.html:5
 msgid "MFA confirm"
@@ -2480,7 +2521,7 @@ msgstr "改变世界，从一点点开始。"
 #: authentication/templates/authentication/login.html:46
 #: authentication/templates/authentication/login.html:73
 #: authentication/templates/authentication/new_login.html:101
-#: templates/_header_bar.html:101
+#: templates/_header_bar.html:83
 msgid "Login"
 msgstr "登录"
 
@@ -2550,20 +2591,20 @@ msgstr "如果不能提供MFA验证码，请联系管理员!"
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/views/login.py:80
+#: authentication/views/login.py:81
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:173 users/views/user.py:386
+#: authentication/views/login.py:174 users/views/user.py:386
 #: users/views/user.py:411
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
-#: authentication/views/login.py:204
+#: authentication/views/login.py:205
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:205
+#: authentication/views/login.py:206
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -2642,11 +2683,11 @@ msgstr "不能包含特殊字符"
 msgid "This field must be unique."
 msgstr "字段必须唯一"
 
-#: jumpserver/views.py:189 templates/_nav.html:4 templates/_nav_audits.html:4
+#: jumpserver/views.py:188 templates/_nav.html:4 templates/_nav_audits.html:4
 msgid "Dashboard"
 msgstr "仪表盘"
 
-#: jumpserver/views.py:198
+#: jumpserver/views.py:197
 msgid ""
 "<div>Luna is a separately deployed program, you need to deploy Luna, coco, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
@@ -3298,21 +3339,21 @@ msgstr "连接LDAP成功"
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:160
+#: settings/api.py:161
 msgid "succeed: {} failed: {} total: {}"
 msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:182 settings/api.py:218
+#: settings/api.py:183 settings/api.py:219
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:188 settings/api.py:224
+#: settings/api.py:189 settings/api.py:225
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:206 settings/api.py:244
+#: settings/api.py:207 settings/api.py:245
 #: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -3846,19 +3887,19 @@ msgstr "创建录像存储"
 msgid "Create command storage"
 msgstr "创建命令存储"
 
-#: templates/_header_bar.html:31
+#: templates/_header_bar.html:12
 msgid "Help"
 msgstr "帮助"
 
-#: templates/_header_bar.html:38 users/templates/users/_base_otp.html:29
+#: templates/_header_bar.html:19 users/templates/users/_base_otp.html:29
 msgid "Docs"
 msgstr "文档"
 
-#: templates/_header_bar.html:44
+#: templates/_header_bar.html:25
 msgid "Commercial support"
 msgstr "商业支持"
 
-#: templates/_header_bar.html:89 templates/_nav_user.html:32 users/forms.py:154
+#: templates/_header_bar.html:70 templates/_nav_user.html:32 users/forms.py:154
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -3869,15 +3910,19 @@ msgstr "商业支持"
 msgid "Profile"
 msgstr "个人信息"
 
-#: templates/_header_bar.html:92
+#: templates/_header_bar.html:73
 msgid "Admin page"
 msgstr "管理页面"
 
-#: templates/_header_bar.html:94
+#: templates/_header_bar.html:75
 msgid "User page"
 msgstr "用户页面"
 
-#: templates/_header_bar.html:97
+#: templates/_header_bar.html:78
+msgid "API Key"
+msgstr ""
+
+#: templates/_header_bar.html:79
 msgid "Logout"
 msgstr "注销登录"
 
@@ -4413,7 +4458,7 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api/user.py:97
+#: users/api/user.py:96
 msgid "You do not have permission."
 msgstr "你没有权限"
 
@@ -4450,7 +4495,7 @@ msgstr "添加到用户组"
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:91 users/forms.py:252 users/serializers/v1.py:95
+#: users/forms.py:91 users/forms.py:252 users/serializers/v1.py:94
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
@@ -4540,29 +4585,28 @@ msgstr "选择用户"
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:127 users/models/user.py:466
+#: users/models/user.py:126 users/models/user.py:466
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:129
+#: users/models/user.py:128
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:130
+#: users/models/user.py:129
 msgid "Auditor"
 msgstr "审计员"
 
-#: users/models/user.py:288 users/templates/users/user_profile.html:94
-#: users/templates/users/user_profile.html:163
-#: users/templates/users/user_profile.html:166
-msgid "Disable"
-msgstr "禁用"
-
-#: users/models/user.py:289 users/templates/users/user_profile.html:92
-#: users/templates/users/user_profile.html:170
-msgid "Enable"
-msgstr "启用"
-
+# #: users/models/user.py:288 users/templates/users/user_profile.html:94
+# #: users/templates/users/user_profile.html:163
+# #: users/templates/users/user_profile.html:166
+# msgid "Disable"
+# msgstr "禁用"
+#
+# #: users/models/user.py:289 users/templates/users/user_profile.html:92
+# #: users/templates/users/user_profile.html:170
+# msgid "Enable"
+# msgstr "启用"
 #: users/models/user.py:290 users/templates/users/user_profile.html:90
 msgid "Force enable"
 msgstr "强制启用"
@@ -4589,39 +4633,39 @@ msgstr "最后更新密码日期"
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
-#: users/serializers/v1.py:41
+#: users/serializers/v1.py:39
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/v1.py:42
+#: users/serializers/v1.py:40
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/v1.py:43
+#: users/serializers/v1.py:41
 msgid "Is first login"
 msgstr "首次登录"
 
-#: users/serializers/v1.py:44
+#: users/serializers/v1.py:42
 msgid "Role name"
 msgstr "角色名"
 
-#: users/serializers/v1.py:45
+#: users/serializers/v1.py:43
 msgid "Is valid"
 msgstr "账户是否有效"
 
-#: users/serializers/v1.py:46
+#: users/serializers/v1.py:44
 msgid "Is expired"
 msgstr " 是否过期"
 
-#: users/serializers/v1.py:47
+#: users/serializers/v1.py:45
 msgid "Avatar url"
 msgstr "头像路径"
 
-#: users/serializers/v1.py:55
+#: users/serializers/v1.py:54
 msgid "Role limit to {}"
 msgstr "角色只能为 {}"
 
-#: users/serializers/v1.py:67
+#: users/serializers/v1.py:66
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
@@ -4753,7 +4797,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:377 users/utils.py:88
+#: users/templates/users/user_detail.html:377 users/utils.py:84
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -5069,7 +5113,7 @@ msgid ""
 "corresponding private key."
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
-#: users/utils.py:28
+#: users/utils.py:24
 #, python-format
 msgid ""
 "\n"
@@ -5114,16 +5158,16 @@ msgstr ""
 "    </p>\n"
 "    "
 
-#: users/utils.py:63
+#: users/utils.py:59
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:67
+#: users/utils.py:63
 #, python-format
 msgid "Hello %(name)s"
 msgstr "您好 %(name)s"
 
-#: users/utils.py:90
+#: users/utils.py:86
 #, python-format
 msgid ""
 "\n"
@@ -5167,11 +5211,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:121
+#: users/utils.py:117
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:123
+#: users/utils.py:119
 #, python-format
 msgid ""
 "\n"
@@ -5220,11 +5264,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:159
+#: users/utils.py:155
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/utils.py:161
+#: users/utils.py:157
 #, python-format
 msgid ""
 "\n"
@@ -5246,11 +5290,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/utils.py:180
+#: users/utils.py:176
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:182
+#: users/utils.py:178
 #, python-format
 msgid ""
 "\n"
@@ -5274,18 +5318,6 @@ msgstr ""
 "\n"
 "    <br>\n"
 "    "
-
-#: users/utils.py:215
-msgid "User not exist"
-msgstr "用户不存在"
-
-#: users/utils.py:217
-msgid "Disabled or expired"
-msgstr "禁用或失效"
-
-#: users/utils.py:230
-msgid "Password or SSH public key invalid"
-msgstr "密码或密钥不合法"
 
 #: users/views/group.py:29
 msgid "User group list"
@@ -5718,12 +5750,16 @@ msgid "Create account"
 msgstr "创建账户"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:33
+#, fuzzy
+#| msgid "Instance"
 msgid "Region & Instance"
-msgstr "地域 & 实例"
+msgstr "实例"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:37
+#, fuzzy
+#| msgid "Admin user"
 msgid "Node & AdminUser"
-msgstr "节点 & 管理用户"
+msgstr "管理用户"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:66
 msgid "Loading..."
@@ -5791,6 +5827,8 @@ msgstr "执行次数"
 msgid "Instance count"
 msgstr "实例个数"
 
+# msgid "Sync success"
+# msgstr "同步成功"
 #: xpack/plugins/cloud/views.py:63
 msgid "Update account"
 msgstr "更新账户"
@@ -6034,14 +6072,22 @@ msgstr "密码匣子"
 msgid "vault create"
 msgstr "创建"
 
+#~ msgid "User not exist"
+#~ msgstr "用户不存在"
+
+# msgid "Disabled or expired"
+# msgstr "禁用或失效"
+#~ msgid "Password or SSH public key invalid"
+#~ msgstr "密码或密钥不合法"
+
+#~ msgid "Please select assets that need to be updated"
+#~ msgstr "请选择需要更新的资产"
+
 #~ msgid "Interface"
 #~ msgstr "界面"
 
 #~ msgid "Orgs"
 #~ msgstr "组织管理"
-
-#~ msgid "Org"
-#~ msgstr "组织"
 
 #~ msgid "already exists"
 #~ msgstr "已经存在"

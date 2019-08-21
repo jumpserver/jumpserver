@@ -5,7 +5,6 @@ from rest_framework.views import APIView, Response
 from rest_framework.generics import (
     ListAPIView, get_object_or_404,
 )
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
@@ -26,7 +25,6 @@ __all__ = [
 class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
-    pagination_class = LimitOffsetPagination
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')

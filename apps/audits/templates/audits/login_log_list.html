@@ -72,7 +72,7 @@
 	            <td class="text-center">{{ login_log.ip }}</td>
 	            <td class="text-center">{{ login_log.city }}</td>
 	            <td class="text-center">{{ login_log.get_mfa_display }}</td>
-	            <td class="text-center">{{ login_log.get_reason_display }}</td>
+	            <td class="text-center">{% trans login_log.reason %}</td>
 	            <td class="text-center">{{ login_log.get_status_display }}</td>
 	            <td class="text-center">{{ login_log.datetime }}</td>
 	        </tr>

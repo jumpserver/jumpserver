@@ -26,6 +26,7 @@ from users.utils import (
 )
 from ..signals import post_auth_success, post_auth_failed
 from .. import forms
+from .. import const
 
 
 __all__ = [
@@ -81,7 +82,7 @@ class UserLoginView(FormView):
         user = form.get_user()
         # user password expired
         if user.password_has_expired:
-            reason = LoginLog.REASON_PASSWORD_EXPIRED
+            reason = const.password_expired
             self.send_auth_signal(success=False, username=user.username, reason=reason)
             return self.render_to_response(self.get_context_data(password_expired=True))
 
@@ -96,7 +97,7 @@ class UserLoginView(FormView):
         # write login failed log
         username = form.cleaned_data.get('username')
         exist = User.objects.filter(username=username).first()
-        reason = LoginLog.REASON_PASSWORD if exist else LoginLog.REASON_NOT_EXIST
+        reason = const.password_failed if exist else const.user_not_exist
         # limit user login failed count
         ip = get_request_ip(self.request)
         increase_login_failed_count(username, ip)
@@ -167,7 +168,7 @@ class UserLoginOtpView(FormView):
         else:
             self.send_auth_signal(
                 success=False, username=user.username,
-                reason=LoginLog.REASON_MFA
+                reason=const.mfa_failed
             )
             form.add_error(
                 'otp_code', _('MFA code invalid, or ntp sync server time')

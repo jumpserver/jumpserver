@@ -83,9 +83,50 @@
 var zTree, show = 0;
 var systemUserId = null;
 var url = null;
-var treeUrl = "{% url 'api-perms:my-nodes-assets-as-tree' %}?cache_policy=1";
+var treeUrl = "{% url 'api-perms:my-nodes-children-with-assets-as-tree' %}?cache_policy=1";
+
+function proposeGeometry(term) {
+    if (!term.element.parentElement) {
+        return null;
+    }
+    var parentElementStyle = window.getComputedStyle(term.element.parentElement);
+    var parentElementHeight = parseInt(parentElementStyle.getPropertyValue('height'));
+    var parentElementWidth = Math.max(0, parseInt(parentElementStyle.getPropertyValue('width')));
+    var elementStyle = window.getComputedStyle(term.element);
+    var elementPadding = {
+        top: parseInt(elementStyle.getPropertyValue('padding-top')),
+        bottom: parseInt(elementStyle.getPropertyValue('padding-bottom')),
+        right: parseInt(elementStyle.getPropertyValue('padding-right')),
+        left: parseInt(elementStyle.getPropertyValue('padding-left'))
+    };
+    var elementPaddingVer = elementPadding.top + elementPadding.bottom;
+    var elementPaddingHor = elementPadding.right + elementPadding.left;
+    var availableHeight = parentElementHeight - elementPaddingVer;
+    var availableWidth = parentElementWidth - elementPaddingHor - term._core.viewport.scrollBarWidth;
+    var geometry = {
+        cols: Math.floor(availableWidth / term._core.renderer.dimensions.actualCellWidth),
+        rows: Math.floor(availableHeight / term._core.renderer.dimensions.actualCellHeight)
+    };
+    return geometry;
+}
+
+function fit(term) {
+    var geometry = proposeGeometry(term);
+    if (geometry) {
+        if (term.rows !== geometry.rows || term.cols !== geometry.cols) {
+            term._core.renderer.clear();
+            term.resize(geometry.cols, geometry.rows);
+        }
+    }
+}
 
 function initTree() {
+    if (systemUserId) {
+        url = treeUrl + '&system_user=' + systemUserId
+    }
+    else{
+        url = treeUrl
+    }
     var setting = {
         check: {
             enable: true
@@ -99,6 +140,12 @@ function initTree() {
                 enable: true
             }
         },
+        async: {
+			enable: true,
+			url: url,
+			autoParam: ["id=key", "name=n", "level=lv"],
+            type: 'get'
+		},
         edit: {
             enable: true,
 			showRemoveBtn: false,
@@ -112,12 +159,7 @@ function initTree() {
             onCheck: onCheck
         }
     };
-    if (systemUserId) {
-        url = treeUrl + '&system_user=' + systemUserId
-    }
-    else{
-        url = treeUrl
-    }
+
 
     $.get(url, function(data, status){
         $.fn.zTree.init($("#assetTree"), setting, data);
@@ -183,6 +225,7 @@ function initResultTerminal() {
         screenKeys: false,
         fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
         fontSize: 14,
+        lineHeight: 1,
         rightClickSelectsWord: true,
         disableStdin: true,
         theme: {
@@ -190,7 +233,9 @@ function initResultTerminal() {
         }
     });
     term.open(document.getElementById('term'));
-    term.write("{% trans 'Select the left asset, select the running system user, execute command in batch' %}" + "\r\n")
+    var msg = "{% trans 'Select the left asset, select the running system user, execute command in batch' %}" + "\r\n";
+    fit(term);
+    term.write(msg)
 }
 
 function wrapperError(msg) {
@@ -201,7 +246,8 @@ function execute() {
     if (!term) {
         initResultTerminal()
     }
-    var url = '{% url "api-ops:command-execution-list" %}';
+    var size = 'rows=' + term.rows  + '&cols=' + term.cols;
+    var url = '{% url "api-ops:command-execution-list" %}?' + size;
     var run_as = systemUserId;
     var command = editor.getValue();
     var hosts = getSelectedAssetsNode().map(function (node) {

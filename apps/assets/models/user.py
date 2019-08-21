@@ -31,7 +31,7 @@ class AdminUser(AssetUser):
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
-    _become_pass = models.CharField(default='', max_length=128)
+    _become_pass = models.CharField(default='', blank=True, max_length=128)
     CONNECTIVITY_CACHE_KEY = '_ADMIN_USER_CONNECTIVE_{}'
     _prefer = "admin_user"
 

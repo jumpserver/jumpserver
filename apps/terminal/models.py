@@ -11,7 +11,7 @@ from django.core.files.storage import default_storage
 from django.core.cache import cache
 
 from users.models import User
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 from common.utils import get_command_storage_setting, get_replay_storage_setting
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand

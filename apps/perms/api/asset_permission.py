@@ -7,7 +7,6 @@ from rest_framework.views import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
@@ -31,7 +30,6 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
-    pagination_class = LimitOffsetPagination
     filter_fields = ['name']
     permission_classes = (IsOrgAdmin,)
 
@@ -247,7 +245,6 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
 
 class AssetPermissionAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
-    pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetPermissionAssetsSerializer
     filter_fields = ("hostname", "ip")
     search_fields = filter_fields

@@ -88,10 +88,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>
-                                                        {% endfor %}
+                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="nodes-select2" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -104,7 +101,7 @@
 
                                         {% for node in system_user.nodes.all|sort %}
                                         <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>
+                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
@@ -156,6 +153,8 @@ jumpserver.nodes_selected = {};
 
 $(document).ready(function () {
 	$('.select2').select2()
+    var url = "{% url 'api-assets:node-list' %}";
+    nodesSelect2Init(".nodes-select2", url)
 	.on('select2:select', function(evt) {
             var data = evt.params.data;
             jumpserver.nodes_selected[data.id] = data.text;

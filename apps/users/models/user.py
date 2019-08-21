@@ -207,20 +207,19 @@ class TokenMixin:
 
     @property
     def private_token(self):
-        from authentication.models import PrivateToken
-        try:
-            token = PrivateToken.objects.get(user=self)
-        except PrivateToken.DoesNotExist:
-            token = self.create_private_token()
-        return token
+        return self.create_private_token()
 
     def create_private_token(self):
         from authentication.models import PrivateToken
-        token = PrivateToken.objects.create(user=self)
+        token, created = PrivateToken.objects.get_or_create(user=self)
         return token
 
+    def delete_private_token(self):
+        from authentication.models import PrivateToken
+        PrivateToken.objects.filter(user=self).delete()
+
     def refresh_private_token(self):
-        self.private_token.delete()
+        self.delete_private_token()
         return self.create_private_token()
 
     def create_bearer_token(self, request=None):
@@ -238,7 +237,8 @@ class TokenMixin:
             token = uuid.uuid4().hex
         cache.set(token, self.id, expiration)
         cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
-        return token
+        date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
+        return token, date_expired
 
     def refresh_bearer_token(self, token):
         pass
@@ -368,7 +368,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         db_index=True, verbose_name=_('Date expired')
     )
     created_by = models.CharField(
-        max_length=30, default='', verbose_name=_('Created by')
+        max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,

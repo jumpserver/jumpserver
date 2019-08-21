@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from collections import defaultdict
-from django.db.models.signals import post_save, m2m_changed, post_delete
+from django.db.models.signals import post_save, m2m_changed, pre_delete
 from django.dispatch import receiver
 
 from common.utils import get_logger
@@ -38,15 +38,13 @@ def on_asset_created_or_update(sender, instance=None, created=False, **kwargs):
         test_asset_conn_on_created(instance)
 
         # 过期节点资产数量
-        nodes = instance.nodes.all()
-        Node.expire_nodes_assets_amount(nodes)
+        Node.refresh_nodes()
 
 
-@receiver(post_delete, sender=Asset, dispatch_uid="my_unique_identifier")
+@receiver(pre_delete, sender=Asset, dispatch_uid="my_unique_identifier")
 def on_asset_delete(sender, instance=None, **kwargs):
     # 过期节点资产数量
-    nodes = instance.nodes.all()
-    Node.expire_nodes_assets_amount(nodes)
+    Node.refresh_nodes()
 
 
 @receiver(post_save, sender=SystemUser, dispatch_uid="my_unique_identifier")
@@ -80,19 +78,18 @@ def on_asset_node_changed(sender, instance=None, **kwargs):
     logger.debug("Asset nodes change signal received")
     Asset.expire_all_nodes_keys_cache()
     if isinstance(instance, Asset):
-        if kwargs['action'] == 'pre_remove':
-            nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-            Node.expire_nodes_assets_amount(nodes)
+        # nodes = []
+        # if kwargs['action'] == 'pre_remove':
+        #     nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
         if kwargs['action'] == 'post_add':
             nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-            Node.expire_nodes_assets_amount(nodes)
             system_users_assets = defaultdict(set)
             system_users = SystemUser.objects.filter(nodes__in=nodes)
-            # 清理节点缓存
             for system_user in system_users:
                 system_users_assets[system_user].update({instance})
             for system_user, assets in system_users_assets.items():
                 system_user.assets.add(*tuple(assets))
+        Node.refresh_nodes()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
@@ -100,7 +97,6 @@ def on_node_assets_changed(sender, instance=None, **kwargs):
     if isinstance(instance, Node):
         logger.debug("Node assets change signal {} received".format(instance))
         # 当节点和资产关系发生改变时，过期资产数量缓存
-        instance.expire_assets_amount()
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
         if kwargs['action'] == 'post_add':
             # 重新关联系统用户和资产的关系
@@ -112,7 +108,7 @@ def on_node_assets_changed(sender, instance=None, **kwargs):
 @receiver(post_save, sender=Node)
 def on_node_update_or_created(sender, instance=None, created=False, **kwargs):
     if instance and not created:
-        instance.expire_full_value()
+        Node.refresh_nodes()
 
 
 @receiver(post_save, sender=AuthBook)

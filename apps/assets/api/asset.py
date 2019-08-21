@@ -1,27 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 
-import uuid
 import random
 
 from rest_framework import generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
-from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
-from rest_framework.pagination import LimitOffsetPagination
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.core.cache import cache
 from django.db.models import Q
-
-from common.mixins import IDInCacheFilterMixin, ApiMessageMixin
 
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
-from orgs.mixins import OrgBulkModelViewSet
-from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \
@@ -31,9 +21,9 @@ from ..utils import LabelFilter
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet', 'AssetListUpdateApi',
+    'AssetViewSet',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi', 'AssetBulkUpdateSelectAPI'
+    'AssetGatewayApi',
 ]
 
 
@@ -46,7 +36,6 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdminOrAppUser,)
     success_message = _("%(hostname)s was %(action)s successfully")
 
@@ -73,19 +62,21 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         node = get_object_or_404(Node, id=node_id)
         show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
+        # 当前节点是顶层节点, 并且仅显示直接资产
         if node.is_root() and show_current_asset:
             queryset = queryset.filter(
                 Q(nodes=node_id) | Q(nodes__isnull=True)
-            )
+            ).distinct()
+        # 当前节点是顶层节点，显示所有资产
         elif node.is_root() and not show_current_asset:
-            pass
+            return queryset
+        # 当前节点不是鼎城节点，只显示直接资产
         elif not node.is_root() and show_current_asset:
             queryset = queryset.filter(nodes=node)
         else:
-            queryset = queryset.filter(
-                nodes__key__regex='^{}(:[0-9]+)*$'.format(node.key),
-            )
-        return queryset.distinct()
+            children = node.get_all_children(with_self=True)
+            queryset = queryset.filter(nodes__in=children).distinct()
+        return queryset
 
     def filter_admin_user_id(self, queryset):
         admin_user_id = self.request.query_params.get('admin_user_id')
@@ -100,30 +91,6 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         queryset = self.filter_node(queryset)
         queryset = self.filter_admin_user_id(queryset)
         return queryset
-
-
-class AssetListUpdateApi(IDInCacheFilterMixin, ListBulkCreateUpdateDestroyAPIView):
-    """
-    Asset bulk update api
-    """
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetSerializer
-    permission_classes = (IsOrgAdmin,)
-
-
-class AssetBulkUpdateSelectAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
-
-    def post(self, request, *args, **kwargs):
-        assets_id = request.data.get('assets_id', '')
-        if assets_id:
-            spm = uuid.uuid4().hex
-            key = CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX.format(spm)
-            cache.set(key, assets_id, 300)
-            url = reverse_lazy('assets:asset-bulk-update') + '?spm=%s' % spm
-            return Response({'url': url})
-        error = _('Please select assets that need to be updated')
-        return Response({'error': error}, status=400)
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):
