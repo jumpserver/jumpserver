@@ -23,11 +23,7 @@ class NodeQuerySet(models.QuerySet):
         raise PermissionError("Bulk delete node deny")
 
 
-class FamilyMixin:
-    __parents = None
-    __children = None
-    __all_children = None
-    is_node = True
+class TreeMixin:
     time_tree_updated = None
     time_tree_updated_cache_key = 'NODE_TREE_CREATED_AT'
     tree_cache_time = 3600
@@ -35,6 +31,10 @@ class FamilyMixin:
 
     @classmethod
     def tree(cls):
+        # Todo: 有待优化, 因为每次刷新都会导致其他节点的tree失效
+        # Todo: ungroup node
+        # TOdo: 游离的资产，在树上显示的数量不对
+        # Todo: api key页面有bug
         from ..utils import TreeService
         cache_updated_time = cls.get_cache_time()
         if not cls.time_tree_updated or \
@@ -66,6 +66,13 @@ class FamilyMixin:
     @property
     def _tree(self):
         return self.__class__.tree()
+
+
+class FamilyMixin:
+    __parents = None
+    __children = None
+    __all_children = None
+    is_node = True
 
     @property
     def children(self):
@@ -146,7 +153,8 @@ class FamilyMixin:
         return parent_keys
 
     def is_children(self, other):
-        return other.key.startswith(self.key + ':')
+        pattern = r'^{0}:[0-9]+$'.format(self.key)
+        return re.match(pattern, other.key)
 
     def is_parent(self, other):
         return other.is_children(self)
@@ -202,6 +210,7 @@ class NodeAssetsMixin:
         amount = self._tree.assets_amount(self.key)
         return amount
 
+    # TOdo: 是否依赖tree
     def get_all_assets(self):
         from .asset import Asset
         if self.is_root():
@@ -228,7 +237,7 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
 
-class Node(OrgModelMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
+class Node(OrgModelMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
@@ -376,12 +385,6 @@ class Node(OrgModelMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
         if self.children or self.get_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
-
-    @classmethod
-    def get_queryset(cls):
-        from ..utils import NodeUtil
-        util = NodeUtil()
-        return sorted(util.nodes)
 
     @classmethod
     def generate_fake(cls, count=100):

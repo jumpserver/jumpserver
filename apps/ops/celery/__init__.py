@@ -2,7 +2,7 @@
 
 import os
 
-from kombu import Exchange,Queue
+from kombu import Exchange, Queue
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.

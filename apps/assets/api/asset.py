@@ -12,8 +12,6 @@ from django.db.models import Q
 from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
-from orgs.mixins.api import OrgBulkModelViewSet
-from ..const import CACHE_KEY_ASSET_BULK_UPDATE_ID_PREFIX
 from ..models import Asset, AdminUser, Node
 from .. import serializers
 from ..tasks import update_asset_hardware_info_manual, \

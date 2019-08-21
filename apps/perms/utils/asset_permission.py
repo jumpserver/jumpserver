@@ -1,27 +1,17 @@
 # coding: utf-8
 
-import time
-import uuid
 import re
 from collections import defaultdict
 from functools import reduce
-import json
-from hashlib import md5
-import itertools
 
-from django.utils import timezone
 from django.db.models import Q
-from django.core.cache import cache
-from django.conf import settings
 
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit
 from common.tree import TreeNode
-from assets.utils import NodeUtil, TreeService
-from .. import const
-from ..models import AssetPermission, Action
+from assets.utils import TreeService
+from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser
-from .stack import PermSystemUserNodeUtil, PermAssetsAmountUtil
 
 logger = get_logger(__file__)
 
@@ -165,21 +155,22 @@ class AssetPermissionUtilV2:
     @timeit
     def add_single_assets_node_to_user_tree(self, user_tree):
         # 添加单独授权资产的节点
-        nodes_single = defaultdict(set)
+        nodes_single_assets = defaultdict(set)
         queryset = self.permissions.exclude(assets__isnull=True) \
             .values_list('assets', 'assets__nodes__key') \
             .distinct()
 
         for item in queryset:
-            nodes_single[item[1]].add(item[0])
-        nodes_single.pop(None, None)
+            nodes_single_assets[item[1]].add(item[0])
+        # Todo: 游离资产
+        nodes_single_assets.pop(None, None)
 
-        for key in tuple(nodes_single.keys()):
+        for key in tuple(nodes_single_assets.keys()):
             if user_tree.contains(key):
-                nodes_single.pop(key)
+                nodes_single_assets.pop(key)
 
         # 获取单独授权资产，并没有在授权的节点上
-        for key, assets in nodes_single.items():
+        for key, assets in nodes_single_assets.items():
             node = self.full_tree.get_node(key, deep=True)
             parent_id = self.full_tree.parent(key).identifier
             parent = user_tree.get_node(parent_id)
@@ -220,6 +211,7 @@ class AssetPermissionUtilV2:
         self._user_tree = user_tree
         return user_tree
 
+    # Todo: 是否可以获取多个资产的系统用户
     def get_asset_system_users_with_actions(self, asset):
         nodes = asset.get_nodes()
         nodes_keys_related = set()
@@ -298,24 +290,11 @@ class AssetPermissionUtilV2:
         return queryset.valid().distinct()
 
     def get_nodes_assets(self, node, deep=False):
-        all_nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
-        kwargs = {}
-        pattern = set()
-        for key in all_nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-
-        if pattern and re.match(pattern, node.key):
-            kwargs['nodes__key__regex'] = r'^{0}$|^{0}:'.format(node.key)
-        if assets_ids:
-            kwargs["id__in"] = assets_ids
-
-        queryset = self.filter_assets_by_or_kwargs(kwargs)
         if deep:
-            pt = r'^{0}$|^{0}:'.format(node.key)
-            queryset = queryset.filter(nodes__key__regex=pt)
+            assets_ids = self.user_tree.all_assets(node.key)
         else:
-            queryset = queryset.filter(nodes=node)
+            assets_ids = self.user_tree.assets(node.key)
+        queryset = Asset.objects.filter(id__in=assets_ids)
         return queryset.valid().distinct()
 
     @staticmethod

@@ -17,7 +17,6 @@ import time
 
 from rest_framework import generics
 from rest_framework.serializers import ValidationError
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
@@ -30,7 +29,6 @@ from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
 from .. import serializers
-from ..utils import NodeUtil
 
 
 logger = get_logger(__file__)
@@ -49,7 +47,6 @@ class NodeViewSet(OrgModelViewSet):
     queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
-    pagination_class = LimitOffsetPagination
 
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
@@ -82,9 +79,7 @@ class NodeListAsTreeApi(generics.ListAPIView):
 
     @staticmethod
     def to_tree_queryset(queryset):
-        util = NodeUtil()
-        nodes = util.get_nodes_by_queryset(queryset)
-        queryset = [node.as_tree_node() for node in nodes]
+        queryset = [node.as_tree_node() for node in queryset]
         return queryset
 
     def get_queryset(self):
