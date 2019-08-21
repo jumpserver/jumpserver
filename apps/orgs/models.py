@@ -102,7 +102,7 @@ class Organization(models.Model):
         return False
 
     def can_audit_by(self, user):
-        if user.is_auditor or self.get_org_auditors().filter(id=user.id):
+        if user.is_superuser or user.is_auditor or self.get_org_auditors().filter(id=user.id):
             return True
         return False
 
