@@ -25,10 +25,10 @@ class SwitchOrgView(DetailView):
 
 class SwitchToAOrgView(View):
     def get(self, request, *args, **kwargs):
+        if request.user.is_common_user:
+            return HttpResponseForbidden()
         admin_orgs = Organization.get_user_admin_orgs(request.user)
         audit_orgs = Organization.get_user_audit_orgs(request.user)
-        if not (admin_orgs or audit_orgs):
-            return HttpResponseForbidden()
         default_org = Organization.default()
         if admin_orgs:
             if default_org in admin_orgs:
