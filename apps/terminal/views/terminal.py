@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
+import time
 from django.views.generic import ListView, UpdateView, DeleteView, \
     DetailView, View
 from django.utils.translation import ugettext as _
@@ -128,7 +129,8 @@ class TerminalConnectView(PermissionsMixin, DetailView):
 
 class WebTerminalView(View):
     def get(self, request, *args, **kwargs):
-        return redirect('/luna/?' + request.GET.urlencode())
+        redirect_url = '/luna/?_={}&'.format(int(time.time()))
+        return redirect(redirect_url + request.GET.urlencode())
 
 
 class WebSFTPView(View):
