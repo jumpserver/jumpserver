@@ -25,9 +25,11 @@ class OrgMiddleware:
         admin_orgs = Organization.get_user_admin_orgs(request.user)
         if admin_orgs:
             request.session['oid'] = str(admin_orgs[0].id)
+            return
         audit_orgs = Organization.get_user_audit_orgs(request.user)
         if audit_orgs:
             request.session['oid'] = str(audit_orgs[0].id)
+            return
 
     def __call__(self, request):
         self.set_permed_org_if_need(request)

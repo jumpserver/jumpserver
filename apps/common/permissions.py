@@ -4,8 +4,6 @@ import time
 
 from rest_framework import permissions
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.shortcuts import redirect
-from django.http.response import HttpResponseForbidden
 from django.conf import settings
 
 from orgs.utils import current_org
@@ -27,12 +25,6 @@ class IsAppUser(IsValidUser):
             and request.user.is_app
 
 
-class IsAuditor(IsValidUser):
-    def has_permission(self, request, view):
-        return super(IsAuditor, self).has_permission(request, view) \
-               and request.user.is_super_auditor
-
-
 class IsSuperUser(IsValidUser):
     def has_permission(self, request, view):
         return super(IsSuperUser, self).has_permission(request, view) \
@@ -45,6 +37,20 @@ class IsSuperUserOrAppUser(IsSuperUser):
             or request.user.is_app
 
 
+class IsSuperAuditor(IsValidUser):
+    def has_permission(self, request, view):
+        return super(IsSuperAuditor, self).has_permission(request, view) \
+               and request.user.is_super_auditor
+
+
+class IsOrgAuditor(IsValidUser):
+    def has_permission(self, request, view):
+        if not current_org:
+            return False
+        return super(IsOrgAuditor, self).has_permission(request, view) \
+               and current_org.can_audit_by(request.user)
+
+
 class IsOrgAdmin(IsValidUser):
     """Allows access only to superuser"""
 
@@ -53,14 +59,6 @@ class IsOrgAdmin(IsValidUser):
             return False
         return super(IsOrgAdmin, self).has_permission(request, view) \
             and current_org.can_admin_by(request.user)
-
-
-class IsOrgAuditor(IsValidUser):
-    def has_permission(self, request, view):
-        if not current_org:
-            return False
-        return super(IsOrgAuditor, self).has_permission(request, view) \
-            and current_org.can_audit_by(request.user)
 
 
 class IsOrgAdminOrAppUser(IsValidUser):
@@ -87,43 +85,6 @@ class IsCurrentUserOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj == request.user
-
-
-class LoginRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        if self.request.user.is_authenticated:
-            return True
-        else:
-            return False
-
-
-class AdminUserRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        if not self.request.user.is_authenticated:
-            return False
-        elif not current_org.can_admin_by(self.request.user):
-            self.raise_exception = True
-            return False
-        return True
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-
-        if not current_org:
-            return redirect('orgs:switch-a-org')
-
-        if not current_org.can_admin_by(request.user):
-            if request.user.is_org_admin:
-                return redirect('orgs:switch-a-org')
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
-
-
-class SuperUserRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        if self.request.user.is_authenticated and self.request.user.is_superuser:
-            return True
 
 
 class WithBootstrapToken(permissions.BasePermission):
@@ -167,18 +128,24 @@ class NeedMFAVerify(permissions.BasePermission):
         return False
 
 
-class AllowUpdateDelete(permissions.BasePermission):
+class CanUpdateDeleteUser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if not current_org.can_admin_by(request.user):
             return False
-        if request.user.is_superuser:
-            return True
+        if request.method in ['DELETE']:
+            if str(request.user.id) == str(obj.id):
+                return False
+            if request.user.is_superuser:
+                return True
+            if obj.is_org_admin:
+                return False
+            if obj.is_super_auditor:
+                return False
         if request.method in ['PUT', 'PATCH']:
             if str(request.user.id) == str(obj.id):
                 return True
-            if obj.is_org_admin or obj.is_super_auditor:
+            if obj.is_org_admin:
                 return False
-        if request.method in ['DELETE']:
-            if obj.is_org_admin or obj.is_super_auditor:
+            if obj.is_super_auditor:
                 return False
         return True

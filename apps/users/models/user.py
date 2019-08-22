@@ -5,7 +5,6 @@ import uuid
 import base64
 import string
 import random
-from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -16,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from orgs.utils import current_org
 from common.utils import get_signer, date_expired_default, get_logger
 from common import fields
 
@@ -132,11 +132,16 @@ class RoleMixin:
 
     @property
     def role_display(self):
-        if not self.is_superuser and self.is_org_admin:
-            return _('Org Admin')
-        if not self.is_superuser and not self.is_super_auditor and self.is_org_auditor:
-            return _('Org Auditor')
-        return self.get_role_display()
+        if not current_org.is_real():
+            return self.get_role_display()
+        roles = []
+        if self in current_org.get_org_admins():
+            roles.append(str(_('Org admin')))
+        if self in current_org.get_org_auditors():
+            roles.append(str(_('Org auditor')))
+        if self in current_org.get_org_users():
+            roles.append(str(_('User')))
+        return " | ".join(roles)
 
     @property
     def is_superuser(self):
@@ -171,7 +176,7 @@ class RoleMixin:
 
     @property
     def is_org_auditor(self):
-        if self.is_superuser or self.is_super_auditor or self.audit_orgs.exists():
+        if self.is_super_auditor or self.audit_orgs.exists():
             return True
         else:
             return False

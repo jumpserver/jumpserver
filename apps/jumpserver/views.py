@@ -36,10 +36,6 @@ class IndexView(PermissionsMixin, TemplateView):
             return self.handle_no_permission()
         if request.user.is_common_user:
             return redirect('assets:user-asset-list')
-        if not current_org:
-            return redirect('orgs:switch-a-org')
-        if not current_org.can_admin_by(request.user) and not current_org.can_audit_by(request.user):
-            return redirect('orgs:switch-a-org')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod

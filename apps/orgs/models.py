@@ -85,12 +85,16 @@ class Organization(models.Model):
             return self.auditors.all()
         return User.objects.filter(role=User.ROLE_AUDITOR)
 
-    def get_org_members(self, exclude=('App', )):
-        members = self.get_org_users() | self.get_org_auditors() | self.get_org_admins()
-        members = members.distinct()
-        if exclude:
-            members = members.exclude(role__in=exclude)
-        return members
+    def get_org_members(self, exclude=()):
+        from users.models import User
+        members = User.objects.none()
+        if 'Admin' not in exclude:
+            members |= self.get_org_admins()
+        if 'User' not in exclude:
+            members |= self.get_org_users()
+        if 'Auditor' not in exclude:
+            members |= self.get_org_auditors()
+        return members.exclude(role=User.ROLE_APP).distinct()
 
     def can_admin_by(self, user):
         if user.is_superuser:
@@ -100,7 +104,7 @@ class Organization(models.Model):
         return False
 
     def can_audit_by(self, user):
-        if user.is_superuser or user.is_super_auditor:
+        if user.is_super_auditor:
             return True
         if self.get_org_auditors().filter(id=user.id):
             return True
@@ -126,7 +130,7 @@ class Organization(models.Model):
         audit_orgs = []
         if user.is_anonymous:
             return audit_orgs
-        elif user.is_super_auditor or user.is_superuser:
+        elif user.is_super_auditor:
             audit_orgs = list(cls.objects.all())
             audit_orgs.append(cls.default())
         elif user.is_org_auditor:
