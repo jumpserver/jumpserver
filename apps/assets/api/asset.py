@@ -63,15 +63,15 @@ class AssetViewSet(LabelFilter, OrgBulkModelViewSet):
         show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
 
         # 当前节点是顶层节点, 并且仅显示直接资产
-        if node.is_root() and show_current_asset:
+        if node.is_org_root() and show_current_asset:
             queryset = queryset.filter(
                 Q(nodes=node_id) | Q(nodes__isnull=True)
             ).distinct()
         # 当前节点是顶层节点，显示所有资产
-        elif node.is_root() and not show_current_asset:
+        elif node.is_org_root() and not show_current_asset:
             return queryset
         # 当前节点不是鼎城节点，只显示直接资产
-        elif not node.is_root() and show_current_asset:
+        elif not node.is_org_root() and show_current_asset:
             queryset = queryset.filter(nodes=node)
         else:
             children = node.get_all_children(with_self=True)

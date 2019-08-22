@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import re
 from collections import defaultdict
 from functools import reduce
 
@@ -250,6 +249,7 @@ class AssetPermissionUtilV2:
         return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
+        from assets.models import Node
         permissions = self.permissions.values_list('assets', 'nodes__key').distinct()
         nodes_keys = set()
         assets_ids = set()
@@ -258,7 +258,7 @@ class AssetPermissionUtilV2:
                 assets_ids.add(asset_id)
             if node_key:
                 nodes_keys.add(node_key)
-        nodes_keys = self.clean_nodes_keys(nodes_keys)
+        nodes_keys = Node.clean_children_keys(nodes_keys)
         return nodes_keys, assets_ids
 
     @staticmethod
@@ -296,20 +296,6 @@ class AssetPermissionUtilV2:
             assets_ids = self.user_tree.assets(node.key)
         queryset = Asset.objects.filter(id__in=assets_ids)
         return queryset.valid().distinct()
-
-    @staticmethod
-    def clean_nodes_keys(nodes_keys):
-        nodes_keys = sorted(list(nodes_keys), key=lambda x: (len(x), x))
-        nodes_keys_clean = []
-        for key in nodes_keys[::-1]:
-            found = False
-            for k in nodes_keys:
-                if key.startswith(k + ':'):
-                    found = True
-                    break
-            if not found:
-                nodes_keys_clean.append(key)
-        return nodes_keys_clean
 
     def get_nodes(self):
         return [n.identifier for n in self.user_tree.all_nodes_itr()]
@@ -357,7 +343,7 @@ class ParserNode:
             'title': name,
             'pId': node.parent_key,
             'isParent': True,
-            'open': node.is_root(),
+            'open': node.is_org_root(),
             'meta': {
                 'node': {
                     "id": node.id,

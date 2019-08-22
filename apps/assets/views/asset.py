@@ -32,7 +32,7 @@ class AssetListView(PermissionsMixin, TemplateView):
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
-        Node.root()
+        Node.org_root()
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),
@@ -85,7 +85,7 @@ class AssetCreateView(PermissionsMixin, FormMixin, TemplateView):
         if node_id:
             node = get_object_or_none(Node, id=node_id)
         else:
-            node = Node.root()
+            node = Node.org_root()
         form["nodes"].initial = node
         return form
 

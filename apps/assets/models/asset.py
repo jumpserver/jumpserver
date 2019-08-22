@@ -6,8 +6,7 @@ import uuid
 import logging
 import random
 from functools import reduce
-from collections import OrderedDict, defaultdict
-from django.core.cache import cache
+from collections import OrderedDict
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -32,7 +31,7 @@ def default_cluster():
 def default_node():
     try:
         from .node import Node
-        root = Node.root()
+        root = Node.org_root()
         return root
     except:
         return None
@@ -103,33 +102,11 @@ class NodesRelationMixin:
     id = ""
     _all_nodes_keys = None
 
-    @classmethod
-    def get_all_nodes_keys(cls):
-        """
-        :return: {asset.id: [node.key, ]}
-        """
-        from .node import Node
-        cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        assets = Asset.objects.all().only('id').prefetch_related(
-            models.Prefetch('nodes', queryset=Node.objects.all().only('key'))
-        )
-        assets_nodes_keys = {}
-        for asset in assets:
-            assets_nodes_keys[asset.id] = [n.key for n in asset.nodes.all()]
-        cache.set(cache_key, assets_nodes_keys, cls.CACHE_TIME)
-        return assets_nodes_keys
-
-    @classmethod
-    def expire_all_nodes_keys_cache(cls):
-        cache_key = cls.ALL_ASSET_NODES_CACHE_KEY
-        cache.delete(cache_key)
-
     def get_nodes(self):
         from .node import Node
-        nodes = self.nodes.all() or [Node.root()]
+        nodes = self.nodes.all()
+        if not nodes:
+            nodes = Node.objects.filter(id=Node.org_root().id)
         return nodes
 
     def get_all_nodes(self, flat=False):
@@ -140,6 +117,16 @@ class NodesRelationMixin:
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
+
+    @classmethod
+    def get_nodes_all_assets(cls, nodes_keys):
+        from .node import Node
+        nodes_keys = Node.clean_children_keys(nodes_keys)
+        pattern = set()
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        return Asset.objects.filter(nodes__key__regex=pattern)
 
 
 class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
