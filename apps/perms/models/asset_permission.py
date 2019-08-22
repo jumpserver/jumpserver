@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 from assets.models import Asset, SystemUser, Node
 
 from .base import BasePermission

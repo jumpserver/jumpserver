@@ -14,7 +14,7 @@ from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from orgs.utils import current_org
 from common.utils import get_logger
-from .mixins import OrgMembershipModelViewSetMixin
+from .mixins.api import OrgMembershipModelViewSetMixin
 
 logger = get_logger(__file__)
 

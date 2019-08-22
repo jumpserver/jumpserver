@@ -2,14 +2,13 @@ import datetime
 import re
 import time
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -208,7 +207,7 @@ class I18NView(View):
         return response
 
 
-api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
+api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>v\d)/(?P<extra>.*)$')
 
 
 @csrf_exempt
@@ -216,18 +215,16 @@ def redirect_format_api(request, *args, **kwargs):
     _path, query = request.path, request.GET.urlencode()
     matched = api_url_pattern.match(_path)
     if matched:
-        version, app, extra = matched.groups()
-        _path = '/api/{app}/{version}/{extra}?{query}'.format(**{
-            "app": app, "version": version, "extra": extra,
-            "query": query
-        })
+        kwargs = matched.groupdict()
+        kwargs["query"] = query
+        _path = '/api/{version}/{app}/{extra}?{query}'.format(**kwargs).rstrip("?")
         return HttpResponseTemporaryRedirect(_path)
     else:
-        return Response({"msg": "Redirect url failed: {}".format(_path)}, status=404)
+        return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
 
 
 class HealthCheckView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        return Response({"status": 1, "time": int(time.time())})
+        return JsonResponse({"status": 1, "time": int(time.time())})

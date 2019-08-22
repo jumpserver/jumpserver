@@ -13,7 +13,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from .utils import Connectivity
-from orgs.mixins import OrgModelMixin, OrgManager
+from orgs.mixins.models import OrgModelMixin, OrgManager
 
 __all__ = ['Asset', 'ProtocolsMixin']
 logger = logging.getLogger(__name__)
@@ -345,7 +345,6 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                 else:
                     _nodes = [Node.default_node()]
                 asset.nodes.set(_nodes)
-                asset.system_users = [choice(SystemUser.objects.all()) for i in range(3)]
                 logger.debug('Generate fake asset : %s' % asset.ip)
             except IntegrityError:
                 print('Error continue')

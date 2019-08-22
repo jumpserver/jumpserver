@@ -6,7 +6,7 @@ from rest_framework import serializers
 from common.serializers import AdaptedBulkListSerializer
 
 from ..models import Node, AdminUser
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .base import AuthSerializer, AuthSerializerMixin
 

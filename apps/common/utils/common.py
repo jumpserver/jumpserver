@@ -12,7 +12,7 @@ import copy
 import ipaddress
 
 
-UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
+UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
 
 
@@ -29,6 +29,10 @@ def combine_seq(s1, s2, callback=None):
 
 def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
+
+
+def get_syslogger(name=None):
+    return logging.getLogger('jms.%s' % name)
 
 
 def timesince(dt, since='', default="just now"):

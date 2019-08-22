@@ -1,13 +1,10 @@
 #  coding: utf-8
 #
 
-
 from rest_framework import viewsets, generics
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import Response
 
 from common.permissions import IsOrgAdmin
-
 from ..models import RemoteAppPermission
 from ..serializers import (
     RemoteAppPermissionSerializer,
@@ -28,7 +25,6 @@ class RemoteAppPermissionViewSet(viewsets.ModelViewSet):
     search_fields = filter_fields
     queryset = RemoteAppPermission.objects.all()
     serializer_class = RemoteAppPermissionSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsOrgAdmin,)
 
 

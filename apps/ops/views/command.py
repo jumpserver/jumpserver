@@ -65,9 +65,9 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
         return super().get_permissions()
 
     def get_user_system_users(self):
-        from perms.utils import AssetPermissionUtil
+        from perms.utils import AssetPermissionUtilV2
         user = self.request.user
-        util = AssetPermissionUtil(user)
+        util = AssetPermissionUtilV2(user)
         system_users = [s for s in util.get_system_users() if s.protocol == 'ssh']
         return system_users
 

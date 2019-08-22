@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import get_logger
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 
 from ..models import Asset, Node
 
@@ -29,9 +29,14 @@ class ProtocolForm(forms.Form):
 class AssetCreateForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.data:
+            return
         nodes_field = self.fields['nodes']
-        nodes_field.choices = ((n.id, n.full_value) for n in
-                               Node.get_queryset())
+        if self.instance:
+            nodes_field.choices = ((n.id, n.full_value) for n in
+                                   self.instance.nodes.all())
+        else:
+            nodes_field.choices = []
 
     class Meta:
         model = Asset
@@ -42,7 +47,7 @@ class AssetCreateForm(OrgModelForm):
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Nodes')
+                'class': 'nodes-select2', 'data-placeholder': _('Nodes')
             }),
             'admin_user': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Admin user')
@@ -68,6 +73,17 @@ class AssetCreateForm(OrgModelForm):
 
 
 class AssetUpdateForm(OrgModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.data:
+            return
+        nodes_field = self.fields['nodes']
+        if self.instance:
+            nodes_field.choices = ((n.id, n.full_value) for n in
+                                   self.instance.nodes.all())
+        else:
+            nodes_field.choices = []
+
     class Meta:
         model = Asset
         fields = [
@@ -77,7 +93,7 @@ class AssetUpdateForm(OrgModelForm):
         ]
         widgets = {
             'nodes': forms.SelectMultiple(attrs={
-                'class': 'select2', 'data-placeholder': _('Node')
+                'class': 'nodes-select2', 'data-placeholder': _('Node')
             }),
             'admin_user': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Admin user')
