@@ -118,16 +118,6 @@ class NodesRelationMixin:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
         return nodes
 
-    @classmethod
-    def get_nodes_all_assets(cls, nodes_keys):
-        from .node import Node
-        nodes_keys = Node.clean_children_keys(nodes_keys)
-        pattern = set()
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        return Asset.objects.filter(nodes__key__regex=pattern)
-
 
 class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important

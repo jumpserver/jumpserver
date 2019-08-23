@@ -36,9 +36,10 @@ class TreeMixin:
         # Todo: ungroup node
         # Todo: api key页面有bug 完成
         from ..utils import TreeService
-        tree_updated_time = cache.get(cls.tree_updated_time_cache_key)
+        tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
         if not cls.tree_created_time or \
                 tree_updated_time > cls.tree_created_time:
+            print("New tree")
             tree = TreeService.new()
             cls.tree_created_time = time.time()
             cls._tree_service = tree
@@ -233,6 +234,16 @@ class NodeAssetsMixin:
 
     def get_all_valid_assets(self):
         return self.get_all_assets().valid()
+
+    @classmethod
+    def get_nodes_all_assets(cls, nodes_keys):
+        from .asset import Asset
+        nodes_keys = cls.clean_children_keys(nodes_keys)
+        pattern = set()
+        for key in nodes_keys:
+            pattern.add(r'^{0}$|^{0}:'.format(key))
+        pattern = '|'.join(list(pattern))
+        return Asset.objects.filter(nodes__key__regex=pattern)
 
 
 class Node(OrgModelMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
