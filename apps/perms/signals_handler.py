@@ -2,22 +2,13 @@
 #
 from django.db.models.signals import m2m_changed, post_save, post_delete
 from django.dispatch import receiver
-from django.db import transaction
 
 from common.utils import get_logger
+from common.decorator import on_transaction_commit
 from .models import AssetPermission
 
 
 logger = get_logger(__file__)
-
-
-def on_transaction_commit(func):
-    """
-    如果不调用on_commit, 对象创建时添加多对多字段值失败
-    """
-    def inner(*args, **kwargs):
-        transaction.on_commit(lambda: func(*args, **kwargs))
-    return inner
 
 
 @receiver(post_save, sender=AssetPermission, dispatch_uid="my_unique_identifier")

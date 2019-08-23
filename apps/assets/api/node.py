@@ -50,13 +50,13 @@ class NodeViewSet(OrgModelViewSet):
 
     # 仅支持根节点指直接创建，子节点下的节点需要通过children接口创建
     def perform_create(self, serializer):
-        child_key = Node.root().get_next_child_key()
+        child_key = Node.org_root().get_next_child_key()
         serializer.validated_data["key"] = child_key
         serializer.save()
 
     def perform_update(self, serializer):
         node = self.get_object()
-        if node.is_root() and node.value != serializer.validated_data['value']:
+        if node.is_org_root() and node.value != serializer.validated_data['value']:
             msg = _("You can't update the root node name")
             raise ValidationError({"error": msg})
         return super().perform_update(serializer)
@@ -97,6 +97,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
     instance = None
+    is_initial = False
 
     def initial(self, request, *args, **kwargs):
         self.instance = self.get_object()
@@ -117,7 +118,8 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         pk = self.kwargs.get('pk') or self.request.query_params.get('id')
         key = self.request.query_params.get("key")
         if not pk and not key:
-            node = Node.root()
+            node = Node.org_root()
+            self.is_initial = True
             return node
         if pk:
             node = get_object_or_404(Node, pk=pk)
@@ -130,7 +132,7 @@ class NodeChildrenApi(generics.ListCreateAPIView):
         if not self.instance:
             return Node.objects.none()
 
-        if self.instance.is_root():
+        if self.is_initial:
             with_self = True
         else:
             with_self = False
@@ -234,7 +236,7 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
     def perform_update(self, serializer):
         assets = serializer.validated_data.get('assets')
         instance = self.get_object()
-        if instance != Node.root():
+        if instance != Node.org_root():
             instance.assets.remove(*tuple(assets))
         else:
             assets = [asset for asset in assets if asset.nodes.count() > 1]
@@ -287,5 +289,4 @@ class RefreshAssetsAmount(APIView):
     model = Node
 
     def get(self, request, *args, **kwargs):
-        self.model.expire_nodes_assets_amount()
         return Response("Ok")

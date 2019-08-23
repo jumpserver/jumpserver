@@ -40,7 +40,7 @@
 
 <script>
 var table = null;
-function initTable() {
+function initAccessKeyTable() {
     var options = {
         ele: $('#access_key_list_table'),
         columnDefs: [
@@ -93,7 +93,7 @@ function initTable() {
 $(document).ready(function () {
 }).on("show.bs.modal", "#access_key_modal", function () {
     if (!table) {
-        initTable()
+        initAccessKeyTable()
     }
 }).on("click", "#create-btn", function () {
     var url = "{% url "api-auth:access-key-list" %}";

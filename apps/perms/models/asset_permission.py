@@ -97,6 +97,7 @@ class AssetPermission(BasePermission):
         args = [Q(granted_by_permissions=self)]
         pattern = set()
         nodes_keys = self.nodes.all().values_list('key', flat=True)
+        nodes_keys = Node.clean_children_keys(nodes_keys)
         for key in nodes_keys:
             pattern.add(r'^{0}$|^{0}:'.format(key))
         pattern = '|'.join(list(pattern))
