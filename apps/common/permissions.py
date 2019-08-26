@@ -144,6 +144,8 @@ class CanUpdateDeleteUser(permissions.BasePermission):
         if request.method in ['PUT', 'PATCH']:
             if str(request.user.id) == str(obj.id):
                 return True
+            if request.user.is_superuser:
+                return True
             if obj.is_org_admin:
                 return False
             if obj.is_super_auditor:
