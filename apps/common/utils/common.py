@@ -12,7 +12,7 @@ import copy
 import ipaddress
 
 
-UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
+UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
 ipip_db = None
 
 
