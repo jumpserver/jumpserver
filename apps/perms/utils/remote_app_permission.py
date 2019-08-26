@@ -74,6 +74,14 @@ def construct_remote_apps_tree_root():
 
 
 def parse_remote_app_to_tree_node(parent, remote_app):
+    system_user = remote_app.system_user
+    user = {
+        'id': system_user.id,
+        'name': system_user.name,
+        'username': system_user.username,
+        'protocol': system_user.protocol,
+        'login_mode': system_user.login_mode,
+    }
     tree_node = {
         'id': remote_app.id,
         'name': remote_app.name,
@@ -82,6 +90,6 @@ def parse_remote_app_to_tree_node(parent, remote_app):
         'open': False,
         'isParent': False,
         'iconSkin': 'file',
-        'meta': {'type': 'remote_app'}
+        'meta': {'type': 'remote_app', 'user': user}
     }
     return TreeNode(**tree_node)
