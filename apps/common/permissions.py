@@ -129,25 +129,40 @@ class NeedMFAVerify(permissions.BasePermission):
 
 
 class CanUpdateDeleteUser(permissions.BasePermission):
+
+    @staticmethod
+    def has_delete_object_permission(request, view, obj):
+        if not current_org.can_admin_by(request.user):
+            return False
+        if str(request.user.id) == str(obj.id):
+            return False
+        if request.user.is_superuser:
+            return True
+        if obj.is_org_admin:
+            return False
+        if obj.is_super_auditor:
+            return False
+        return True
+
+    @staticmethod
+    def has_update_object_permission(request, view, obj):
+        if not current_org.can_admin_by(request.user):
+            return False
+        if str(request.user.id) == str(obj.id):
+            return True
+        if request.user.is_superuser:
+            return True
+        if obj.is_org_admin:
+            return False
+        if obj.is_super_auditor:
+            return False
+        return True
+
     def has_object_permission(self, request, view, obj):
         if not current_org.can_admin_by(request.user):
             return False
         if request.method in ['DELETE']:
-            if str(request.user.id) == str(obj.id):
-                return False
-            if request.user.is_superuser:
-                return True
-            if obj.is_org_admin:
-                return False
-            if obj.is_super_auditor:
-                return False
+            return self.has_delete_object_permission(request, view, obj)
         if request.method in ['PUT', 'PATCH']:
-            if str(request.user.id) == str(obj.id):
-                return True
-            if request.user.is_superuser:
-                return True
-            if obj.is_org_admin:
-                return False
-            if obj.is_super_auditor:
-                return False
+            return self.has_update_object_permission(request, view, obj)
         return True

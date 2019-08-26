@@ -27,6 +27,7 @@ from common.utils import get_logger, ssh_key_gen
 from common.permissions import (
     PermissionsMixin, IsOrgAdmin, IsValidUser,
     UserCanUpdatePassword, UserCanUpdateSSHKey,
+    CanUpdateDeleteUser,
 )
 from orgs.utils import current_org
 from .. import forms
@@ -189,6 +190,12 @@ class UserDetailView(PermissionsMixin, DetailView):
             'action': _('User detail'),
             'groups': groups,
             'unblock': is_need_unblock(key_block),
+            'can_update': CanUpdateDeleteUser.has_update_object_permission(
+                self.request, self, user
+            ),
+            'can_delete': CanUpdateDeleteUser.has_delete_object_permission(
+                self.request, self, user
+            ),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

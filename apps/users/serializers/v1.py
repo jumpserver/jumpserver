@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import copy
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -8,6 +9,7 @@ from common.utils import validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
+from common.permissions import CanUpdateDeleteUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 
@@ -22,6 +24,9 @@ __all__ = [
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
+    can_update = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         list_serializer_class = AdaptedBulkListSerializer
@@ -32,7 +37,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
-            'is_org_admin'
+            'can_update', 'can_delete',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
@@ -46,8 +51,19 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'avatar_url': {'label': _('Avatar url')},
             'source': {'read_only': True},
             'created_by': {'read_only': True, 'allow_blank': True},
-            'is_org_admin': {'read_only': True, 'label': _('Is org admin')}
+            'can_update': {'read_only': True},
+            'can_delete': {'read_only': True},
         }
+
+    def get_can_update(self, obj):
+        return CanUpdateDeleteUser.has_update_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
+
+    def get_can_delete(self, obj):
+        return CanUpdateDeleteUser.has_delete_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
 
     def validate_role(self, value):
         request = self.context.get('request')

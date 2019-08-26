@@ -8,7 +8,6 @@ from django.utils.translation import ugettext as _
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.serializers import ValidationError
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import (
