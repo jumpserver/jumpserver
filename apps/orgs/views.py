@@ -43,5 +43,4 @@ class SwitchToAOrgView(View):
                 redirect_org = default_org
             else:
                 redirect_org = audit_orgs[0]
-            return redirect(
-                reverse('orgs:org-switch', kwargs={'pk': redirect_org.id}))
+            return redirect(reverse('orgs:org-switch', kwargs={'pk': redirect_org.id}))
