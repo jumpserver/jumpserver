@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {# Index #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditors or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
     <li id="index">
         <a href="{% url 'index' %}">
             <i class="fa fa-dashboard" style="width: 14px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span>
@@ -75,7 +75,7 @@
 
 
 {# Terminal #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditors or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
     <li id="terminal">
         <a>
             <i class="fa fa-rocket" style="width: 14px"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
@@ -113,7 +113,7 @@
 
 
 {# Audits #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditors or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
     <li id="audits">
         <a>
             <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
