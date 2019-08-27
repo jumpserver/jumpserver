@@ -59,6 +59,8 @@ class TreeService(Tree):
     tag_sep = ' / '
     cache_key = '_NODE_FULL_TREE'
     cache_time = 3600
+    has_empty_node = False
+    has_ungrouped_node = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

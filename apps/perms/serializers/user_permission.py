@@ -43,7 +43,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
             "id", "hostname", "ip", "protocols", "os", 'domain',
             "platform", "comment", "org_id",
         ]
-        fields = only_fields
+        fields = only_fields + ['org_name']
         read_only_fields = fields
 
 

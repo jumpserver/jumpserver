@@ -56,7 +56,7 @@ def on_asset_delete(sender, instance=None, **kwargs):
     当资产删除时，刷新节点，节点中存在节点和资产的关系
     """
     logger.debug("Asset delete signal recv: {}".format(instance))
-    Node.refresh_node_assets()
+    Node.refresh_assets()
 
 
 @receiver(post_save, sender=SystemUser, dispatch_uid="jms")
@@ -120,7 +120,7 @@ def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
     """
     if action.startswith('post'):
         logger.debug("Asset nodes change signal recv: {}".format(instance))
-        Node.refresh_node_assets()
+        Node.refresh_assets()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
@@ -152,7 +152,9 @@ def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None
 def on_asset_nodes_remove(sender, instance=None, action='', model=None,
                           pk_set=None, **kwargs):
 
-    # 监控资产删除节点关系
+    """
+    监控资产删除节点关系, 或节点删除资产，避免产生游离资产
+    """
     if action not in ["post_remove", "pre_clear", "post_clear"]:
         return
     if action == "pre_clear":
@@ -184,7 +186,7 @@ def on_asset_nodes_remove(sender, instance=None, action='', model=None,
     Node.org_root().assets.add(*tuple(assets_not_has_node))
 
 
-@receiver(post_save, sender=Node)
+@receiver([post_save, post_delete], sender=Node)
 def on_node_update_or_created(sender, **kwargs):
     # 刷新节点
     Node.refresh_nodes()

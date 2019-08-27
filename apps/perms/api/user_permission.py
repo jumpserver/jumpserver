@@ -66,8 +66,8 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip']
-    search_fields = filter_fields
+    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    search_fields = ['hostname', 'ip', 'comment']
 
     def filter_by_nodes(self, queryset):
         node_id = self.request.query_params.get("node")
@@ -114,6 +114,8 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
 
     def get_queryset(self):
         util = AssetPermissionUtilV2(self.obj)
+        has_empty_node = util.user_tree.has_empty_node
+        has_ungrouped_node = util.user_tree.has_ungrouped_node
         node_keys = util.get_nodes()
         queryset = Node.objects.filter(key__in=node_keys)
         return queryset

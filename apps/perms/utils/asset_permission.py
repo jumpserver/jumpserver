@@ -4,6 +4,7 @@ from collections import defaultdict
 from functools import reduce
 
 from django.db.models import Q
+from django.conf import settings
 
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit
@@ -11,6 +12,7 @@ from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser
+from .. import const
 
 logger = get_logger(__file__)
 
@@ -161,12 +163,24 @@ class AssetPermissionUtilV2:
 
         for item in queryset:
             nodes_single_assets[item[1]].add(item[0])
-        # Todo: 游离资产
         nodes_single_assets.pop(None, None)
 
         for key in tuple(nodes_single_assets.keys()):
             if user_tree.contains(key):
                 nodes_single_assets.pop(key)
+
+        # 如果要设置到ungroup中
+        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            ungrouped_node = Node.ungrouped_node()
+            user_tree.create_node(
+                identifier=ungrouped_node.key, tag=ungrouped_node.value,
+                parent=user_tree.root,
+            )
+            assets = set()
+            for _assets in nodes_single_assets.values():
+                assets.update(set(_assets))
+            user_tree.set_assets(ungrouped_node.key, assets)
+            return
 
         # 获取单独授权资产，并没有在授权的节点上
         for key, assets in nodes_single_assets.items():
@@ -185,6 +199,8 @@ class AssetPermissionUtilV2:
         for child in root_children:
             if child.identifier.isdigit():
                 continue
+            if child.identifier.startswith('-'):
+                continue
             ancestors = self.full_tree.ancestors(
                 child.identifier, with_self=False, deep=True
             )
@@ -193,6 +209,17 @@ class AssetPermissionUtilV2:
             parent_id = ancestors[0].identifier
             user_tree.safe_add_ancestors(ancestors)
             user_tree.move_node(child.identifier, parent_id)
+
+    @staticmethod
+    def add_empty_node_if_need(user_tree):
+        if not user_tree.children(user_tree.root):
+            empty_node = Node.empty_node()
+            empty_key = empty_node.key
+            empty_name = empty_node.value
+            user_tree.create_node(
+                identifier=empty_key, tag=empty_name,
+                parent=user_tree.root,
+            )
 
     @timeit
     def get_user_tree(self):
@@ -207,6 +234,7 @@ class AssetPermissionUtilV2:
         self.add_direct_nodes_to_user_tree(user_tree)
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
+        self.add_empty_node_if_need(user_tree)
         self._user_tree = user_tree
         return user_tree
 

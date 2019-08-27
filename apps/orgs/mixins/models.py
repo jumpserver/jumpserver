@@ -64,8 +64,9 @@ class OrgModelMixin(models.Model):
     sep = '@'
 
     def save(self, *args, **kwargs):
-        if current_org is not None and current_org.is_real():
-            self.org_id = current_org.id
+        org = get_current_org()
+        if org is not None and org.is_real():
+            self.org_id = org.id
         return super().save(*args, **kwargs)
 
     @property

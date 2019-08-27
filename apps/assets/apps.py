@@ -7,5 +7,7 @@ class AssetsConfig(AppConfig):
     name = 'assets'
 
     def ready(self):
-        from . import signals_handler
         super().ready()
+        from . import signals_handler
+        from .models import Node
+        Node.initial_some_nodes()
