@@ -23,6 +23,15 @@
     </li>
 {% endif %}
 
+{# User info #}
+{% if request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
+    <li id="users">
+        <a href="{% url 'users:user-profile' %}">
+            <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
+        </a>
+    </li>
+{% endif %}
+
 {# Assets #}
 {% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
     <li id="assets">
