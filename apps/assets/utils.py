@@ -119,9 +119,9 @@ class TreeService(Tree):
         return [self.get_node(i, deep=deep) for i in ancestor_ids]
 
     def get_node_full_tag(self, nid):
-        ancestors = self.ancestors(nid)
+        ancestors = self.ancestors(nid, with_self=True)
         ancestors.reverse()
-        return self.tag_sep.join(n.tag for n in ancestors)
+        return self.tag_sep.join([n.tag for n in ancestors])
 
     def get_family(self, nid, deep=False):
         ancestors = self.ancestors(nid, with_self=False, deep=deep)

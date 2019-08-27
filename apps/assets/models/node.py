@@ -25,37 +25,44 @@ class NodeQuerySet(models.QuerySet):
 
 class TreeMixin:
     tree_created_time = None
-    tree_updated_time_cache_key = 'NODE_TREE_CREATED_AT'
-    tree_update_time_cache_time = 3600
+    tree_updated_time_cache_key = 'NODE_TREE_UPDATED_AT'
+    tree_cache_time = 3600
+    tree_assets_cache_key = 'NODE_TREE_ASSETS_UPDATED_AT'
+    tree_assets_created_time = None
     _tree_service = None
 
     @classmethod
     def tree(cls):
-        # Todo: 有待优化, 因为每次刷新都会导致其他节点的tree失效 完成
         # TOdo: 游离的资产，在树上显示的数量不对
         # Todo: ungroup node
-        # Todo: api key页面有bug 完成
         from ..utils import TreeService
         tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
         if not cls.tree_created_time or \
                 tree_updated_time > cls.tree_created_time:
-            print("New tree")
             tree = TreeService.new()
             cls.tree_created_time = time.time()
+            cls.tree_assets_created_time = time.time()
             cls._tree_service = tree
             return tree
+        node_assets_updated_time = cache.get(cls.tree_assets_cache_key, 0)
+        if not cls.tree_assets_created_time or \
+                node_assets_updated_time > cls.tree_assets_created_time:
+            cls._tree_service.init_assets_async()
         return cls._tree_service
 
     @classmethod
-    def expire_cache_tree(cls):
+    def refresh_tree(cls):
         key = cls.tree_updated_time_cache_key
-        ttl = cls.tree_update_time_cache_time
+        ttl = cls.tree_cache_time
         value = time.time()
         cache.set(key, value, ttl)
 
     @classmethod
-    def refresh_tree(cls):
-        cls.expire_cache_tree()
+    def refresh_node_assets(cls):
+        key = cls.tree_assets_cache_key
+        ttl = cls.tree_cache_time
+        value = time.time()
+        cache.set(key, value, ttl)
 
     @property
     def _tree(self):
