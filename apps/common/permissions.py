@@ -136,6 +136,8 @@ class CanUpdateDeleteUser(permissions.BasePermission):
             return False
         if str(request.user.id) == str(obj.id):
             return False
+        if obj.username == 'admin':
+            return False
         if request.user.is_superuser:
             return True
         if obj.is_org_admin:
