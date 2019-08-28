@@ -40,24 +40,14 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def filter_valid(self, queryset):
-        valid = self.request.query_params.get('is_valid', None)
-        if valid is None:
+        valid_query = self.request.query_params.get('is_valid', None)
+        if valid_query is None:
             return queryset
-        if valid in ['0', 'N', 'false', 'False']:
-            valid = False
+        invalid = valid_query in ['0', 'N', 'false', 'False']
+        if invalid:
+            queryset = queryset.invalid()
         else:
-            valid = True
-        now = timezone.now()
-        if valid:
-            queryset = queryset.filter(is_active=True).filter(
-                date_start__lt=now, date_expired__gt=now,
-            )
-        else:
-            queryset = queryset.filter(
-                Q(is_active=False) |
-                Q(date_start__gt=now) |
-                Q(date_expired__lt=now)
-            )
+            queryset = queryset.valid()
         return queryset
 
     def filter_system_user(self, queryset):

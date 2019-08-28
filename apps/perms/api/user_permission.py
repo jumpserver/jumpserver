@@ -15,10 +15,6 @@ from orgs.utils import set_to_root_org
 from ..utils import (
     ParserNode, AssetPermissionUtilV2
 )
-from .mixin import (
-    UserPermissionCacheMixin, GrantAssetsMixin, NodesWithUngroupMixin
-)
-from .. import const
 from ..hands import User, Asset, Node, SystemUser, NodeSerializer
 from .. import serializers
 from ..models import Action
@@ -66,8 +62,8 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
-    filter_fields = ['hostname', 'ip']
-    search_fields = filter_fields
+    filter_fields = ['hostname', 'ip', 'id', 'comment']
+    search_fields = ['hostname', 'ip', 'comment']
 
     def filter_by_nodes(self, queryset):
         node_id = self.request.query_params.get("node")
@@ -109,12 +105,21 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
     查询用户授权的所有节点的API
     """
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = serializers.GrantedNodeSerializer
+    serializer_class = serializers.NodeGrantedSerializer
     only_fields = NodeSerializer.Meta.only_fields
+    util = None
+
+    def get(self, request, *args, **kwargs):
+        self.util = AssetPermissionUtilV2(self.obj)
+        return super().get(request, *args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["tree"] = self.util.user_tree
+        return context
 
     def get_queryset(self):
-        util = AssetPermissionUtilV2(self.obj)
-        node_keys = util.get_nodes()
+        node_keys = self.util.get_nodes()
         queryset = Node.objects.filter(key__in=node_keys)
         return queryset
 
@@ -131,7 +136,6 @@ class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
         system_user_id = self.request.query_params.get("system_user")
         self.util = AssetPermissionUtilV2(self.obj)
         if system_user_id:
-            system_user = get_object_or_404(SystemUser, id=system_user_id)
             self.util.filter_permissions(system_users=system_user_id)
         self.tree = self.util.get_user_tree()
 

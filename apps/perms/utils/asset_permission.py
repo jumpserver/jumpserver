@@ -4,6 +4,7 @@ from collections import defaultdict
 from functools import reduce
 
 from django.db.models import Q
+from django.conf import settings
 
 from orgs.utils import set_to_root_org
 from common.utils import get_logger, timeit
@@ -11,6 +12,7 @@ from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser
+from .. import const
 
 logger = get_logger(__file__)
 
@@ -129,6 +131,9 @@ class AssetPermissionUtilV2:
 
     @timeit
     def add_direct_nodes_to_user_tree(self, user_tree):
+        """
+        将授权规则的节点放到用户树上, 从full tree中粘贴子树
+        """
         nodes_direct_keys = self.permissions \
             .exclude(nodes__isnull=True) \
             .values_list('nodes__key', flat=True) \
@@ -153,6 +158,10 @@ class AssetPermissionUtilV2:
 
     @timeit
     def add_single_assets_node_to_user_tree(self, user_tree):
+        """
+        将单独授权的资产放到树上，如果设置了单独资产到 未分组中，则放到未分组中
+        如果没有，则查询资产属于的资产组，放到树上
+        """
         # 添加单独授权资产的节点
         nodes_single_assets = defaultdict(set)
         queryset = self.permissions.exclude(assets__isnull=True) \
@@ -161,12 +170,25 @@ class AssetPermissionUtilV2:
 
         for item in queryset:
             nodes_single_assets[item[1]].add(item[0])
-        # Todo: 游离资产
         nodes_single_assets.pop(None, None)
 
         for key in tuple(nodes_single_assets.keys()):
             if user_tree.contains(key):
                 nodes_single_assets.pop(key)
+
+        # 如果要设置到ungroup中
+        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+            node_key = Node.ungrouped_key
+            node_value = Node.ungrouped_value
+            user_tree.create_node(
+                identifier=node_key, tag=node_value,
+                parent=user_tree.root,
+            )
+            assets = set()
+            for _assets in nodes_single_assets.values():
+                assets.update(set(_assets))
+            user_tree.set_assets(node_key, assets)
+            return
 
         # 获取单独授权资产，并没有在授权的节点上
         for key, assets in nodes_single_assets.items():
@@ -180,10 +202,16 @@ class AssetPermissionUtilV2:
 
     @timeit
     def parse_user_tree_to_full_tree(self, user_tree):
+        """
+        经过前面两个动作，用户授权的节点已放到树上，但是树不是完整的，
+        这里要讲树构造成一个完整的书
+        """
         # 开始修正user_tree，保证父节点都在树上
         root_children = user_tree.children('')
         for child in root_children:
             if child.identifier.isdigit():
+                continue
+            if child.identifier.startswith('-'):
                 continue
             ancestors = self.full_tree.ancestors(
                 child.identifier, with_self=False, deep=True
@@ -193,6 +221,19 @@ class AssetPermissionUtilV2:
             parent_id = ancestors[0].identifier
             user_tree.safe_add_ancestors(ancestors)
             user_tree.move_node(child.identifier, parent_id)
+
+    @staticmethod
+    def add_empty_node_if_need(user_tree):
+        """
+        添加空节点，如果根节点没有子节点的话
+        """
+        if not user_tree.children(user_tree.root):
+            node_key = Node.empty_key
+            node_value = Node.empty_value
+            user_tree.create_node(
+                identifier=node_key, tag=node_value,
+                parent=user_tree.root,
+            )
 
     @timeit
     def get_user_tree(self):
@@ -207,6 +248,7 @@ class AssetPermissionUtilV2:
         self.add_direct_nodes_to_user_tree(user_tree)
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
+        self.add_empty_node_if_need(user_tree)
         self._user_tree = user_tree
         return user_tree
 

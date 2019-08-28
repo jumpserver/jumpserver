@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
-
 from rest_framework import generics
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView

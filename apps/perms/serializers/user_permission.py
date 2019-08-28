@@ -9,8 +9,8 @@ from assets.serializers import ProtocolsField
 from .asset_permission import ActionsField
 
 __all__ = [
-    'GrantedNodeSerializer',
-    'NodeGrantedSerializer', 'AssetGrantedSerializer',
+    'NodeGrantedSerializer',
+    'AssetGrantedSerializer',
     'ActionsSerializer', 'AssetSystemUserSerializer',
 ]
 
@@ -43,35 +43,28 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
             "id", "hostname", "ip", "protocols", "os", 'domain',
             "platform", "comment", "org_id",
         ]
-        fields = only_fields
+        fields = only_fields + ['org_name']
         read_only_fields = fields
 
 
 class NodeGrantedSerializer(serializers.ModelSerializer):
-    """
-    授权资产组
-    """
-    # assets_granted = AssetGrantedSerializer(many=True, read_only=True)
-    # assets_amount = serializers.ReadOnlyField()
-    name = serializers.ReadOnlyField(source='value')
+    assets_amount = serializers.SerializerMethodField()
 
-    # assets_only_fields = AssetGrantedSerializer.Meta.only_fields
-    # system_users_only_fields = AssetGrantedSerializer.system_users_only_fields
-
-    class Meta:
-        model = Node
-        only_fields = ['id', 'key', 'value', "org_id"]
-        fields = only_fields + ['name']
-        read_only_fields = fields
-
-
-class GrantedNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = [
-            'id', 'name', 'key', 'value',
+            'id', 'name', 'key', 'value', 'org_id', "assets_amount"
         ]
         read_only_fields = fields
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tree = self.context.get("tree")
+
+    def get_assets_amount(self, obj):
+        if not self.tree:
+            return 0
+        return self.tree.assets_amount(obj.key)
 
 
 class ActionsSerializer(serializers.Serializer):
