@@ -59,6 +59,8 @@ class TreeService(Tree):
     tag_sep = ' / '
     cache_key = '_NODE_FULL_TREE'
     cache_time = 3600
+    has_empty_node = False
+    has_ungrouped_node = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,9 +121,9 @@ class TreeService(Tree):
         return [self.get_node(i, deep=deep) for i in ancestor_ids]
 
     def get_node_full_tag(self, nid):
-        ancestors = self.ancestors(nid)
+        ancestors = self.ancestors(nid, with_self=True)
         ancestors.reverse()
-        return self.tag_sep.join(n.tag for n in ancestors)
+        return self.tag_sep.join([n.tag for n in ancestors])
 
     def get_family(self, nid, deep=False):
         ancestors = self.ancestors(nid, with_self=False, deep=deep)

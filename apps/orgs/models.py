@@ -21,6 +21,8 @@ class Organization(models.Model):
     ROOT_NAME = 'ROOT'
     DEFAULT_ID = 'DEFAULT'
     DEFAULT_NAME = 'DEFAULT'
+    SYSTEM_ID = '00000000-0000-0000-0000-000000000002'
+    SYSTEM_NAME = 'SYSTEM'
     _user_admin_orgs = None
 
     class Meta:
@@ -55,6 +57,8 @@ class Organization(models.Model):
             return cls.default()
         elif id_or_name in [cls.ROOT_ID, cls.ROOT_NAME]:
             return cls.root()
+        elif id_or_name in [cls.SYSTEM_ID, cls.SYSTEM_NAME]:
+            return cls.system()
 
         try:
             if is_uuid(id_or_name):
@@ -89,7 +93,7 @@ class Organization(models.Model):
         return False
 
     def is_real(self):
-        return self.id not in (self.DEFAULT_NAME, self.ROOT_ID)
+        return self.id not in (self.DEFAULT_NAME, self.ROOT_ID, self.SYSTEM_ID)
 
     @classmethod
     def get_user_admin_orgs(cls, user):
@@ -111,17 +115,18 @@ class Organization(models.Model):
     def root(cls):
         return cls(id=cls.ROOT_ID, name=cls.ROOT_NAME)
 
+    @classmethod
+    def system(cls):
+        return cls(id=cls.SYSTEM_ID, name=cls.SYSTEM_NAME)
+
     def is_root(self):
-        if self.id is self.ROOT_ID:
-            return True
-        else:
-            return False
+        return self.id is self.ROOT_ID
 
     def is_default(self):
-        if self.id is self.DEFAULT_ID:
-            return True
-        else:
-            return False
+        return self.id is self.DEFAULT_ID
+
+    def is_system(self):
+        return self.id is self.SYSTEM_ID
 
     def change_to(self):
         from .utils import set_current_org

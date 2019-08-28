@@ -11,7 +11,7 @@ from django.utils.translation import ugettext
 from django.core.cache import cache
 
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import set_current_org, get_current_org
+from orgs.utils import set_current_org, get_current_org, tmp_to_root_org, tmp_to_org
 from orgs.models import Organization
 
 
@@ -25,37 +25,42 @@ class NodeQuerySet(models.QuerySet):
 
 class TreeMixin:
     tree_created_time = None
-    tree_updated_time_cache_key = 'NODE_TREE_CREATED_AT'
-    tree_update_time_cache_time = 3600
+    tree_updated_time_cache_key = 'NODE_TREE_UPDATED_AT'
+    tree_cache_time = 3600
+    tree_assets_cache_key = 'NODE_TREE_ASSETS_UPDATED_AT'
+    tree_assets_created_time = None
     _tree_service = None
 
     @classmethod
     def tree(cls):
-        # Todo: 有待优化, 因为每次刷新都会导致其他节点的tree失效 完成
-        # TOdo: 游离的资产，在树上显示的数量不对
-        # Todo: ungroup node
-        # Todo: api key页面有bug 完成
         from ..utils import TreeService
         tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
         if not cls.tree_created_time or \
                 tree_updated_time > cls.tree_created_time:
-            print("New tree")
             tree = TreeService.new()
             cls.tree_created_time = time.time()
+            cls.tree_assets_created_time = time.time()
             cls._tree_service = tree
             return tree
+        node_assets_updated_time = cache.get(cls.tree_assets_cache_key, 0)
+        if not cls.tree_assets_created_time or \
+                node_assets_updated_time > cls.tree_assets_created_time:
+            cls._tree_service.init_assets_async()
         return cls._tree_service
 
     @classmethod
-    def expire_cache_tree(cls):
+    def refresh_tree(cls):
         key = cls.tree_updated_time_cache_key
-        ttl = cls.tree_update_time_cache_time
+        ttl = cls.tree_cache_time
         value = time.time()
         cache.set(key, value, ttl)
 
     @classmethod
-    def refresh_tree(cls):
-        cls.expire_cache_tree()
+    def refresh_node_assets(cls):
+        key = cls.tree_assets_cache_key
+        ttl = cls.tree_cache_time
+        value = time.time()
+        cache.set(key, value, ttl)
 
     @property
     def _tree(self):
@@ -183,6 +188,31 @@ class FamilyMixin:
             key_list.pop()
         return keys
 
+    def get_next_child_key(self):
+        mark = self.child_mark
+        self.child_mark += 1
+        self.save()
+        return "{}:{}".format(self.key, mark)
+
+    def get_next_child_preset_name(self):
+        name = ugettext("New node")
+        values = [
+            child.value[child.value.rfind(' '):]
+            for child in self.get_children()
+            if child.value.startswith(name)
+        ]
+        values = [int(value) for value in values if value.strip().isdigit()]
+        count = max(values) + 1 if values else 1
+        return '{} {}'.format(name, count)
+
+    def create_child(self, value, _id=None):
+        with transaction.atomic():
+            child_key = self.get_next_child_key()
+            child = self.__class__.objects.create(
+                id=_id, key=child_key, value=value
+            )
+            return child
+
 
 class FullValueMixin:
     _full_value = None
@@ -246,7 +276,85 @@ class NodeAssetsMixin:
         return Asset.objects.filter(nodes__key__regex=pattern)
 
 
-class Node(OrgModelMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
+class SomeNodesMixin:
+    key = ''
+    default_key = '1'
+    default_value = 'Default'
+    ungrouped_key = '-10'
+    ungrouped_value = _('ungrouped')
+    empty_key = '-11'
+    empty_value = _("empty")
+
+    def is_default_node(self):
+        return self.key == self.default_key
+
+    def is_org_root(self):
+        if self.key.isdigit():
+            return True
+        else:
+            return False
+
+    @classmethod
+    def create_org_root_node(cls):
+        # 如果使用current_org 在set_current_org时会死循环
+        ori_org = get_current_org()
+        with transaction.atomic():
+            if not ori_org.is_real():
+                return cls.default_node()
+            set_current_org(Organization.root())
+            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
+            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
+            if not org_nodes_roots_keys:
+                org_nodes_roots_keys = ['1']
+            key = max([int(k) for k in org_nodes_roots_keys])
+            key = str(key + 1) if key != 0 else '2'
+            set_current_org(ori_org)
+            root = cls.objects.create(key=key, value=ori_org.name)
+            return root
+
+    @classmethod
+    def org_root(cls):
+        root = cls.objects.filter(key__regex=r'^[0-9]+$')
+        if root:
+            return root[0]
+        else:
+            return cls.create_org_root_node()
+
+    @classmethod
+    def ungrouped_node(cls):
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.ungrouped_key}
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.ungrouped_key
+            )
+            return obj
+
+    @classmethod
+    def empty_node(cls):
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.empty_value}
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.empty_key
+            )
+            return obj
+
+    @classmethod
+    def default_node(cls):
+        with tmp_to_org(Organization.default()):
+            defaults = {'value': cls.default_value}
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.default_key,
+            )
+            return obj
+
+    @classmethod
+    def initial_some_nodes(cls):
+        cls.default_node()
+        cls.empty_node()
+        cls.ungrouped_node()
+
+
+class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     key = models.CharField(unique=True, max_length=64, verbose_name=_("Key"))  # '1:1:1:1'
     value = models.CharField(max_length=128, verbose_name=_("Value"))
@@ -290,75 +398,13 @@ class Node(OrgModelMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixi
     def level(self):
         return len(self.key.split(':'))
 
-    def get_next_child_key(self):
-        mark = self.child_mark
-        self.child_mark += 1
-        self.save()
-        return "{}:{}".format(self.key, mark)
-
-    def get_next_child_preset_name(self):
-        name = ugettext("New node")
-        values = [
-            child.value[child.value.rfind(' '):]
-            for child in self.get_children()
-            if child.value.startswith(name)
-        ]
-        values = [int(value) for value in values if value.strip().isdigit()]
-        count = max(values) + 1 if values else 1
-        return '{} {}'.format(name, count)
-
-    def create_child(self, value, _id=None):
-        with transaction.atomic():
-            child_key = self.get_next_child_key()
-            child = self.__class__.objects.create(
-                id=_id, key=child_key, value=value
-            )
-            return child
-
     @classmethod
     def refresh_nodes(cls):
         cls.refresh_tree()
 
-    def is_default_node(self):
-        return self.key == '1'
-
-    def is_org_root(self):
-        if self.key.isdigit():
-            return True
-        else:
-            return False
-
     @classmethod
-    def create_org_root_node(cls):
-        # 如果使用current_org 在set_current_org时会死循环
-        ori_org = get_current_org()
-        with transaction.atomic():
-            if not ori_org.is_real():
-                return cls.default_node()
-            set_current_org(Organization.root())
-            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
-            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
-            if not org_nodes_roots_keys:
-                org_nodes_roots_keys = ['1']
-            key = max([int(k) for k in org_nodes_roots_keys])
-            key = str(key + 1) if key != 0 else '2'
-            set_current_org(ori_org)
-            root = cls.objects.create(key=key, value=ori_org.name)
-            return root
-
-    @classmethod
-    def org_root(cls):
-        root = cls.objects.filter(key__regex=r'^[0-9]+$')
-        if root:
-            return root[0]
-        else:
-            return cls.create_org_root_node()
-
-    @classmethod
-    def default_node(cls):
-        defaults = {'value': 'Default'}
-        obj, created = cls.objects.get_or_create(defaults=defaults, key='1')
-        return obj
+    def refresh_assets(cls):
+        cls.refresh_node_assets()
 
     def as_tree_node(self):
         from common.tree import TreeNode
