@@ -84,6 +84,7 @@ class AssetPermission(BasePermission):
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
+        ordering = ('-date_created',)
 
     @classmethod
     def get_queryset_with_prefetch(cls):
