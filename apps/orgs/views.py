@@ -22,6 +22,8 @@ class SwitchOrgView(DetailView):
             return redirect(reverse('index'))
         if UUID_PATTERN.search(referer):
             return redirect(reverse('index'))
+        if request.user in self.object.get_org_auditors():
+            return redirect(reverse('index'))
         return redirect(referer)
 
 
