@@ -11,7 +11,7 @@ from django.utils.translation import ugettext
 from django.core.cache import cache
 
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import set_current_org, get_current_org, tmp_to_root_org
+from orgs.utils import set_current_org, get_current_org, tmp_to_root_org, tmp_to_org
 from orgs.models import Organization
 
 
@@ -33,7 +33,6 @@ class TreeMixin:
 
     @classmethod
     def tree(cls):
-        # todo: ungroup node
         from ..utils import TreeService
         tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
         if not cls.tree_created_time or \
@@ -279,9 +278,15 @@ class NodeAssetsMixin:
 
 class SomeNodesMixin:
     key = ''
+    default_key = '1'
+    default_value = 'Default'
+    ungrouped_key = '-10'
+    ungrouped_value = _('ungrouped')
+    empty_key = '-11'
+    empty_value = _("empty")
 
     def is_default_node(self):
-        return self.key == '1'
+        return self.key == self.default_key
 
     def is_org_root(self):
         if self.key.isdigit():
@@ -317,28 +322,28 @@ class SomeNodesMixin:
 
     @classmethod
     def ungrouped_node(cls):
-        with tmp_to_root_org():
-            defaults = {'value': _('ungrouped')}
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.ungrouped_key}
             obj, created = cls.objects.get_or_create(
-                defaults=defaults, key='-10', org_id='system'
+                defaults=defaults, key=cls.ungrouped_key
             )
             return obj
 
     @classmethod
     def empty_node(cls):
-        with tmp_to_root_org():
-            defaults = {'value': _('empty')}
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.empty_value}
             obj, created = cls.objects.get_or_create(
-                defaults=defaults, key='-11', org_id='system'
+                defaults=defaults, key=cls.empty_key
             )
             return obj
 
     @classmethod
     def default_node(cls):
-        with tmp_to_root_org():
-            defaults = {'value': 'Default'}
+        with tmp_to_org(Organization.default()):
+            defaults = {'value': cls.default_value}
             obj, created = cls.objects.get_or_create(
-                defaults=defaults, key='1', org_id=''
+                defaults=defaults, key=cls.default_key,
             )
             return obj
 

@@ -65,8 +65,10 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if org is not None and org.is_real():
+        if org is not None and (org.is_real() or org.is_system()):
             self.org_id = org.id
+        elif org is not None and org.is_default():
+            self.org_id = ''
         return super().save(*args, **kwargs)
 
     @property

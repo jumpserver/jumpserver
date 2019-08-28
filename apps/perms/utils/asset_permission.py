@@ -131,6 +131,9 @@ class AssetPermissionUtilV2:
 
     @timeit
     def add_direct_nodes_to_user_tree(self, user_tree):
+        """
+        将授权规则的节点放到用户树上, 从full tree中粘贴子树
+        """
         nodes_direct_keys = self.permissions \
             .exclude(nodes__isnull=True) \
             .values_list('nodes__key', flat=True) \
@@ -155,6 +158,10 @@ class AssetPermissionUtilV2:
 
     @timeit
     def add_single_assets_node_to_user_tree(self, user_tree):
+        """
+        将单独授权的资产放到树上，如果设置了单独资产到 未分组中，则放到未分组中
+        如果没有，则查询资产属于的资产组，放到树上
+        """
         # 添加单独授权资产的节点
         nodes_single_assets = defaultdict(set)
         queryset = self.permissions.exclude(assets__isnull=True) \
@@ -171,15 +178,16 @@ class AssetPermissionUtilV2:
 
         # 如果要设置到ungroup中
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
-            ungrouped_node = Node.ungrouped_node()
+            node_key = Node.ungrouped_key
+            node_value = Node.ungrouped_value
             user_tree.create_node(
-                identifier=ungrouped_node.key, tag=ungrouped_node.value,
+                identifier=node_key, tag=node_value,
                 parent=user_tree.root,
             )
             assets = set()
             for _assets in nodes_single_assets.values():
                 assets.update(set(_assets))
-            user_tree.set_assets(ungrouped_node.key, assets)
+            user_tree.set_assets(node_key, assets)
             return
 
         # 获取单独授权资产，并没有在授权的节点上
@@ -194,6 +202,10 @@ class AssetPermissionUtilV2:
 
     @timeit
     def parse_user_tree_to_full_tree(self, user_tree):
+        """
+        经过前面两个动作，用户授权的节点已放到树上，但是树不是完整的，
+        这里要讲树构造成一个完整的书
+        """
         # 开始修正user_tree，保证父节点都在树上
         root_children = user_tree.children('')
         for child in root_children:
@@ -212,12 +224,14 @@ class AssetPermissionUtilV2:
 
     @staticmethod
     def add_empty_node_if_need(user_tree):
+        """
+        添加空节点，如果根节点没有子节点的话
+        """
         if not user_tree.children(user_tree.root):
-            empty_node = Node.empty_node()
-            empty_key = empty_node.key
-            empty_name = empty_node.value
+            node_key = Node.empty_key
+            node_value = Node.empty_value
             user_tree.create_node(
-                identifier=empty_key, tag=empty_name,
+                identifier=node_key, tag=node_value,
                 parent=user_tree.root,
             )
 

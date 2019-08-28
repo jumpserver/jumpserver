@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import date_expired_default, set_or_append_attr_bulk
+from common.utils import date_expired_default
 from orgs.mixins.models import OrgModelMixin
 from assets.models import Asset, SystemUser, Node
 
