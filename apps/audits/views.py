@@ -224,6 +224,10 @@ class LoginLogListView(PermissionsMixin, DatetimeSearchMixin, ListView):
 class CommandExecutionListView(UserCommandExecutionListView):
     user_id = None
 
+    def get_user_list(self):
+        users = current_org.get_org_members(exclude=('Auditor',))
+        return users
+
     def get_queryset(self):
         queryset = self._get_queryset()
         self.user_id = self.request.GET.get('user')
@@ -233,10 +237,6 @@ class CommandExecutionListView(UserCommandExecutionListView):
         else:
             queryset = queryset.filter(user__in=org_users)
         return queryset
-
-    def get_user_list(self):
-        users = current_org.get_org_members(exclude=('App', 'Auditor'))
-        return users
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
