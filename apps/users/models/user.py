@@ -158,42 +158,6 @@ class RoleMixin:
             self.role = 'User'
 
     @property
-    def admin_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_orgs(self)
-
-    @property
-    def is_org_admin(self):
-        if self.is_superuser or self.admin_orgs.exists():
-            return True
-        else:
-            return False
-
-    @property
-    def audit_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_audit_orgs(self)
-
-    @property
-    def is_org_auditor(self):
-        if self.is_super_auditor or self.audit_orgs.exists():
-            return True
-        else:
-            return False
-
-    @property
-    def is_current_org_admin(self):
-        if self in current_org.get_org_admins():
-            return True
-        return False
-
-    @property
-    def is_current_org_auditor(self):
-        if self in current_org.get_org_auditors():
-            return True
-        return False
-
-    @property
     def is_super_auditor(self):
         return self.role == 'Auditor'
 
@@ -210,6 +174,52 @@ class RoleMixin:
     @property
     def is_app(self):
         return self.role == 'App'
+
+    @property
+    def user_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_user_orgs(self)
+
+    @property
+    def admin_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_admin_orgs(self)
+
+    @property
+    def audit_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_audit_orgs(self)
+
+    @property
+    def admin_or_audit_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_admin_or_audit_orgs(self)
+
+    @property
+    def is_org_admin(self):
+        if self.is_superuser or self.related_admin_orgs.exists():
+            return True
+        else:
+            return False
+
+    @property
+    def is_org_auditor(self):
+        if self.is_super_auditor or self.related_audit_orgs.exists():
+            return True
+        else:
+            return False
+
+    @property
+    def can_admin_current_org(self):
+        return current_org.can_admin_by(self)
+
+    @property
+    def can_audit_current_org(self):
+        return current_org.can_audit_by(self)
+
+    @property
+    def can_admin_or_audit_current_org(self):
+        return self.can_admin_current_org or self.can_audit_current_org
 
     @property
     def is_staff(self):

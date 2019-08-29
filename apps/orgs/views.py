@@ -5,6 +5,7 @@ from django.views.generic import DetailView, View
 
 from .models import Organization
 from common.utils import UUID_PATTERN
+from orgs.utils import current_org
 
 
 class SwitchOrgView(DetailView):
@@ -22,7 +23,8 @@ class SwitchOrgView(DetailView):
             return redirect(reverse('index'))
         if UUID_PATTERN.search(referer):
             return redirect(reverse('index'))
-        if request.user in self.object.get_org_auditors():
+        # 组织管理员切换到组织审计员时(403)
+        if not self.object.get_org_admins().filter(id=request.user.id):
             return redirect(reverse('index'))
         return redirect(referer)
 
@@ -31,8 +33,8 @@ class SwitchToAOrgView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_common_user:
             return HttpResponseForbidden()
-        admin_orgs = Organization.get_user_admin_orgs(request.user)
-        audit_orgs = Organization.get_user_audit_orgs(request.user)
+        admin_orgs = request.user.admin_orgs
+        audit_orgs = request.user.audit_orgs
         default_org = Organization.default()
         if admin_orgs:
             if default_org in admin_orgs:

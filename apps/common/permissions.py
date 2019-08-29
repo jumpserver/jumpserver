@@ -132,36 +132,54 @@ class CanUpdateDeleteUser(permissions.BasePermission):
 
     @staticmethod
     def has_delete_object_permission(request, view, obj):
-        if not current_org.can_admin_by(request.user):
+        if not request.user.can_admin_current_org:
             return False
+        # 超级管理员 / 组织管理员
         if str(request.user.id) == str(obj.id):
             return False
-        if obj.username == 'admin':
-            return False
+        # 超级管理员
         if request.user.is_superuser:
+            if obj.is_superuser and obj.username in ['admin']:
+                return False
             return True
-        if obj.is_org_admin:
+        # 组织管理员
+        if obj.is_superuser:
             return False
         if obj.is_super_auditor:
+            return False
+        if obj.is_org_admin:
+            return False
+        if len(obj.audit_orgs) > 1:
+            return False
+        if len(obj.user_orgs) > 1:
             return False
         return True
 
     @staticmethod
     def has_update_object_permission(request, view, obj):
-        if not current_org.can_admin_by(request.user):
+        if not request.user.can_admin_current_org:
             return False
+        # 超级管理员 / 组织管理员
         if str(request.user.id) == str(obj.id):
             return True
+        # 超级管理员
         if request.user.is_superuser:
             return True
-        if obj.is_org_admin:
+        # 组织管理员
+        if obj.is_superuser:
             return False
         if obj.is_super_auditor:
+            return False
+        if obj.is_org_admin:
+            return False
+        if len(obj.audit_orgs) > 1:
+            return False
+        if len(obj.user_orgs) > 1:
             return False
         return True
 
     def has_object_permission(self, request, view, obj):
-        if not current_org.can_admin_by(request.user):
+        if not request.user.can_admin_current_org:
             return False
         if request.method in ['DELETE']:
             return self.has_delete_object_permission(request, view, obj)

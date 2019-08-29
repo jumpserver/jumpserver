@@ -9,8 +9,8 @@
     <div class="logo-element">
         <img alt="image" height="40" src="{{ LOGO_URL }}"/>
     </div>
-    {% if ADMIN_AUDIT_ORGS and request.COOKIES.IN_ADMIN_PAGE != 'No' %}
-        {% if ADMIN_AUDIT_ORGS|length > 1 or not CURRENT_ORG.is_default %}
+    {% if ADMIN_OR_AUDIT_ORGS and request.COOKIES.IN_ADMIN_PAGE != 'No' %}
+        {% if ADMIN_OR_AUDIT_ORGS|length > 1 or not CURRENT_ORG.is_default %}
             <div>
                 <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="display: block; background-color: transparent; color: #8095a8; padding: 14px 20px 14px 25px">
                     <i class="fa fa-bookmark" style="width: 14px; "></i>
@@ -20,7 +20,7 @@
                     <span class="fa fa-sort-desc pull-right"></span>
                 </a>
                 <ul class="dropdown-menu" style="min-width: 220px">
-                    {% for org in ADMIN_AUDIT_ORGS %}
+                    {% for org in ADMIN_OR_AUDIT_ORGS %}
                         <li>
                             <a class="org-dropdown" href="{% url 'orgs:org-switch' pk=org.id %}" data-id="{{ org.id }}">
                                 {{ org.name }}

@@ -9,9 +9,9 @@ from common.utils import is_uuid
 class Organization(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
-    users = models.ManyToManyField('users.User', related_name='orgs', blank=True)
-    admins = models.ManyToManyField('users.User', related_name='admin_orgs', blank=True)
-    auditors = models.ManyToManyField('users.User', related_name='audit_orgs', blank=True)
+    users = models.ManyToManyField('users.User', related_name='related_user_orgs', blank=True)
+    admins = models.ManyToManyField('users.User', related_name='related_admin_orgs', blank=True)
+    auditors = models.ManyToManyField('users.User', related_name='related_audit_orgs', blank=True)
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
@@ -126,8 +126,16 @@ class Organization(models.Model):
             admin_orgs = list(cls.objects.all())
             admin_orgs.append(cls.default())
         elif user.is_org_admin:
-            admin_orgs = user.admin_orgs.all()
+            admin_orgs = user.related_admin_orgs.all()
         return admin_orgs
+
+    @classmethod
+    def get_user_user_orgs(self, user):
+        user_orgs = []
+        if user.is_anonymous:
+            return user_orgs
+        user_orgs = user.related_user_orgs.all()
+        return user_orgs
 
     @classmethod
     def get_user_audit_orgs(cls, user):
@@ -138,16 +146,15 @@ class Organization(models.Model):
             audit_orgs = list(cls.objects.all())
             audit_orgs.append(cls.default())
         elif user.is_org_auditor:
-            audit_orgs = user.audit_orgs.all()
+            audit_orgs = user.related_audit_orgs.all()
         return audit_orgs
 
     @classmethod
-    def get_user_admin_audit_orgs(self, user):
+    def get_user_admin_or_audit_orgs(self, user):
         admin_orgs = self.get_user_admin_orgs(user)
         audit_orgs = self.get_user_audit_orgs(user)
-        _orgs = set(admin_orgs)
-        _orgs.update(set(audit_orgs))
-        return _orgs
+        orgs = set(admin_orgs) | set(audit_orgs)
+        return orgs
 
     @classmethod
     def default(cls):

@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {# Index #}
-{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
+{% if request.user.can_admin_or_audit_current_org %}
     <li id="index">
         <a href="{% url 'index' %}">
             <i class="fa fa-dashboard" style="width: 14px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span>
@@ -11,7 +11,7 @@
 {% endif %}
 
 {# Users #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
+{% if request.user.can_admin_current_org %}
     <li id="users">
         <a href="#">
             <i class="fa fa-group" style="width: 14px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
@@ -24,18 +24,16 @@
 {% endif %}
 
 {# User info #}
-{% if not request.user.is_current_org_admin %}
-    {% if request.user.is_super_auditor or request.user.is_current_org_auditor %}
-        <li id="users">
-            <a href="{% url 'users:user-profile' %}">
-                <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
-            </a>
-        </li>
-    {% endif %}
+{% if not request.user.can_admin_current_org and request.user.can_audit_current_org %}
+    <li id="users">
+        <a href="{% url 'users:user-profile' %}">
+            <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
+        </a>
+    </li>
 {% endif %}
 
 {# Assets #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
+{% if request.user.can_admin_current_org %}
     <li id="assets">
         <a>
             <i class="fa fa-inbox" style="width: 14px"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
@@ -53,22 +51,20 @@
 
 
 {# Applications #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
-    {% if LICENSE_VALID %}
-        <li id="applications">
-            <a>
-                <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
-            </a>
-            <ul class="nav nav-second-level">
-                <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
-            </ul>
-        </li>
-    {% endif %}
+{% if request.user.can_admin_current_org and LICENSE_VALID %}
+    <li id="applications">
+        <a>
+            <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
+        </ul>
+    </li>
 {% endif %}
 
 
 {# Perms #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
+{% if request.user.can_admin_current_org %}
     <li id="perms">
         <a href="#"><i class="fa fa-edit" style="width: 14px"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
         <ul class="nav nav-second-level">
@@ -86,7 +82,7 @@
 
 
 {# Terminal #}
-{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
+{% if request.user.can_admin_or_audit_current_org %}
     <li id="terminal">
         <a>
             <i class="fa fa-rocket" style="width: 14px"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
@@ -96,7 +92,7 @@
             <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
             <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Commands' %}</a></li>
 
-            {% if request.user.is_superuser or request.user.is_current_org_admin %}
+            {% if request.user.can_admin_current_org %}
                 <li><a href="{% url 'terminal:web-terminal' %}" target="_blank"><span class="nav-label">{% trans 'Web terminal' %}</span></a></li>
                 <li><a href="{% url 'terminal:web-sftp' %}" target="_blank"><span class="nav-label">{% trans 'File manager' %}</span></a></li>
             {% endif %}
@@ -110,7 +106,7 @@
 
 
 {# Ops #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
+{% if request.user.can_admin_current_org %}
     <li id="ops">
         <a>
             <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
@@ -124,8 +120,7 @@
 
 
 {# Audits #}
-{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
-
+{% if request.user.can_admin_or_audit_current_org %}
     <li id="audits">
         <a>
             <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
@@ -142,29 +137,27 @@
 
 
 {# X-Pack #}
-{% if request.user.is_superuser or request.user.is_current_org_admin %}
-    {% if XPACK_PLUGINS %}
-        <li id="xpack">
-            <a>
-                <i class="fa fa-sitemap" style="width: 14px"></i> <span class="nav-label">{% trans 'XPack' %}</span><span class="fa arrow"></span>
-            </a>
-            <ul class="nav nav-second-level">
-                {% for plugin in XPACK_PLUGINS %}
-                    {% ifequal plugin.name 'cloud'%}
-                        <li id="{{ plugin.name }}">
-                            <a href="#"><span class="nav-label">{% trans plugin.verbose_name %}</span><span class="fa arrow"></span></a>
-                            <ul class="nav nav-third-level">
-                                <li id="account"><a href="{% url 'xpack:cloud:account-list' %}">{% trans 'Account list' %}</a></li>
-                                <li id="sync-instance-task"><a href="{% url 'xpack:cloud:sync-instance-task-list' %}">{% trans 'Sync instance' %}</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
-                    {% endifequal %}
-                {% endfor %}
-            </ul>
-        </li>
-    {% endif %}
+{% if request.user.can_admin_current_org and XPACK_PLUGINS %}
+    <li id="xpack">
+        <a>
+            <i class="fa fa-sitemap" style="width: 14px"></i> <span class="nav-label">{% trans 'XPack' %}</span><span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            {% for plugin in XPACK_PLUGINS %}
+                {% ifequal plugin.name 'cloud'%}
+                    <li id="{{ plugin.name }}">
+                        <a href="#"><span class="nav-label">{% trans plugin.verbose_name %}</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li id="account"><a href="{% url 'xpack:cloud:account-list' %}">{% trans 'Account list' %}</a></li>
+                            <li id="sync-instance-task"><a href="{% url 'xpack:cloud:sync-instance-task-list' %}">{% trans 'Sync instance' %}</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li id="{{ plugin.name }}"><a href="{{ plugin.endpoint }}">{% trans plugin.verbose_name %}</a></li>
+                {% endifequal %}
+            {% endfor %}
+        </ul>
+    </li>
 {% endif %}
 
 {# Settings #}

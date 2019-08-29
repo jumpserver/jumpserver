@@ -22,11 +22,11 @@ class OrgMiddleware:
             return
         if org.can_audit_by(request.user):
             return
-        admin_orgs = Organization.get_user_admin_orgs(request.user)
+        admin_orgs = request.user.admin_orgs
         if admin_orgs:
             request.session['oid'] = str(admin_orgs[0].id)
             return
-        audit_orgs = Organization.get_user_audit_orgs(request.user)
+        audit_orgs = request.user.audit_orgs
         if audit_orgs:
             request.session['oid'] = str(audit_orgs[0].id)
             return
