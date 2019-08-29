@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {# Index #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
     <li id="index">
         <a href="{% url 'index' %}">
             <i class="fa fa-dashboard" style="width: 14px"></i> <span class="nav-label">{% trans 'Dashboard' %}</span>
@@ -11,7 +11,7 @@
 {% endif %}
 
 {# Users #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     <li id="users">
         <a href="#">
             <i class="fa fa-group" style="width: 14px"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
@@ -24,8 +24,8 @@
 {% endif %}
 
 {# User info #}
-{% if request.user not in CURRENT_ORG.get_org_admins %}
-    {% if request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
+{% if not request.user.is_current_org_admin %}
+    {% if request.user.is_super_auditor or request.user.is_current_org_auditor %}
         <li id="users">
             <a href="{% url 'users:user-profile' %}">
                 <i class="fa fa-user" style="width: 14px"></i> <span class="nav-label">{% trans 'Profile' %}</span><span class="label label-info pull-right"></span>
@@ -35,7 +35,7 @@
 {% endif %}
 
 {# Assets #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     <li id="assets">
         <a>
             <i class="fa fa-inbox" style="width: 14px"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
@@ -53,7 +53,7 @@
 
 
 {# Applications #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     {% if LICENSE_VALID %}
         <li id="applications">
             <a>
@@ -68,7 +68,7 @@
 
 
 {# Perms #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     <li id="perms">
         <a href="#"><i class="fa fa-edit" style="width: 14px"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
         <ul class="nav nav-second-level">
@@ -86,7 +86,7 @@
 
 
 {# Terminal #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
     <li id="terminal">
         <a>
             <i class="fa fa-rocket" style="width: 14px"></i> <span class="nav-label">{% trans 'Sessions' %}</span><span class="fa arrow"></span>
@@ -96,7 +96,7 @@
             <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
             <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Commands' %}</a></li>
 
-            {% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+            {% if request.user.is_superuser or request.user.is_current_org_admin %}
                 <li><a href="{% url 'terminal:web-terminal' %}" target="_blank"><span class="nav-label">{% trans 'Web terminal' %}</span></a></li>
                 <li><a href="{% url 'terminal:web-sftp' %}" target="_blank"><span class="nav-label">{% trans 'File manager' %}</span></a></li>
             {% endif %}
@@ -110,7 +110,7 @@
 
 
 {# Ops #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     <li id="ops">
         <a>
             <i class="fa fa-coffee" style="width: 14px"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
@@ -124,7 +124,8 @@
 
 
 {# Audits #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins or request.user.is_super_auditor or request.user in CURRENT_ORG.get_org_auditors %}
+{% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
+
     <li id="audits">
         <a>
             <i class="fa fa-history" style="width: 14px"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span>
@@ -141,7 +142,7 @@
 
 
 {# X-Pack #}
-{% if request.user.is_superuser or request.user in CURRENT_ORG.get_org_admins %}
+{% if request.user.is_superuser or request.user.is_current_org_admin %}
     {% if XPACK_PLUGINS %}
         <li id="xpack">
             <a>
