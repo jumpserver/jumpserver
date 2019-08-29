@@ -14,7 +14,9 @@ __all__ = [
 
 class NodeSerializer(BulkOrgResourceModelSerializer):
     name = serializers.ReadOnlyField(source='value')
-    value = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("value"))
+    value = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True, label=_("value")
+    )
 
     class Meta:
         model = Node

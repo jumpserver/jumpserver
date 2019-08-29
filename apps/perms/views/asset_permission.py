@@ -51,7 +51,8 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
 
         if nodes_id:
             nodes_id = nodes_id.split(",")
-            nodes = Node.objects.filter(id__in=nodes_id).exclude(id=Node.root().id)
+            nodes = Node.objects.filter(id__in=nodes_id)\
+                .exclude(id=Node.org_root().id)
             form['nodes'].initial = nodes
         if assets_id:
             assets_id = assets_id.split(",")
