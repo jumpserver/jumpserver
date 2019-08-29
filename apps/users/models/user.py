@@ -182,6 +182,18 @@ class RoleMixin:
             return False
 
     @property
+    def is_current_org_admin(self):
+        if self in current_org.get_org_admins():
+            return True
+        return False
+
+    @property
+    def is_current_org_auditor(self):
+        if self in current_org.get_org_auditors():
+            return True
+        return False
+
+    @property
     def is_super_auditor(self):
         return self.role == 'Auditor'
 
