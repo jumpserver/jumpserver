@@ -142,7 +142,7 @@ class Organization(models.Model):
         return audit_orgs
 
     @classmethod
-    def get_user_admin_or_audit_orgs(self, user):
+    def get_user_admin_audit_orgs(self, user):
         admin_orgs = self.get_user_admin_orgs(user)
         audit_orgs = self.get_user_audit_orgs(user)
         _orgs = set(admin_orgs)
