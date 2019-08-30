@@ -66,27 +66,23 @@ class TreeService(Tree):
         super().__init__(*args, **kwargs)
         self.nodes_assets_map = defaultdict(set)
         self.all_nodes_assets_map = {}
-        self.mutex = threading.Lock()
 
     @classmethod
     @timeit
     def new(cls):
         from .models import Node
-        from orgs.utils import get_current_org, set_to_root_org
+        from orgs.utils import tmp_to_root_org
 
-        origin_org = get_current_org()
-        set_to_root_org()
-        all_nodes = Node.objects.all()
-        origin_org.change_to()
-
-        tree = cls()
-        tree.create_node(tag='', identifier='')
-        for node in all_nodes:
-            tree.create_node(
-                tag=node.value, identifier=node.key,
-                parent=node.parent_key,
-            )
-        tree.init_assets_async()
+        with tmp_to_root_org():
+            all_nodes = Node.objects.all()
+            tree = cls()
+            tree.create_node(tag='', identifier='')
+            for node in all_nodes:
+                tree.create_node(
+                    tag=node.value, identifier=node.key,
+                    parent=node.parent_key,
+                )
+            tree.init_assets()
         return tree
 
     def init_assets_async(self):
@@ -95,17 +91,16 @@ class TreeService(Tree):
 
     def init_assets(self):
         from orgs.utils import get_current_org, set_to_root_org
-        with self.mutex:
-            origin_org = get_current_org()
-            set_to_root_org()
-            queryset = Asset.objects.all().valid().values_list('id', 'nodes__key')
+        origin_org = get_current_org()
+        set_to_root_org()
+        queryset = Asset.objects.all().valid().values_list('id', 'nodes__key')
 
-            if origin_org:
-                origin_org.change_to()
-            for asset_id, key in queryset:
-                if not key:
-                    continue
-                self.nodes_assets_map[key].add(asset_id)
+        if origin_org:
+            origin_org.change_to()
+        for asset_id, key in queryset:
+            if not key:
+                continue
+            self.nodes_assets_map[key].add(asset_id)
 
     def all_children(self, nid, with_self=True, deep=False):
         children_ids = self.expand_tree(nid)
@@ -146,13 +141,11 @@ class TreeService(Tree):
         return parent
 
     def assets(self, nid):
-        with self.mutex:
-            assets = self.nodes_assets_map[nid]
-            return assets
+        assets = self.nodes_assets_map[nid]
+        return assets
 
     def set_assets(self, nid, assets):
-        with self.mutex:
-            self.nodes_assets_map[nid] = assets
+        self.nodes_assets_map[nid] = assets
 
     def all_assets(self, nid):
         assets = self.all_nodes_assets_map.get(nid)
@@ -186,12 +179,17 @@ class TreeService(Tree):
                 self.safe_add_ancestors(ancestors)
             parent = self.get_node(parent_id)
 
-        print("Add node: {} {}".format(node.identifier, parent.identifier))
         # 如果当前节点已再树中，则移动当前节点到父节点中
         # 这个是由于 当前节点放到了二级节点中
         if self.contains(node.identifier):
             self.move_node(node.identifier, parent.identifier)
         else:
             self.add_node(node, parent)
-
-
+    #
+    # def __getstate__(self):
+    #     self.mutex = None
+    #     return self.__dict__
+    #
+    # def __setstate__(self, state):
+    #     self.__dict__ = state
+    #     self.mutex = threading.Lock()
