@@ -1,8 +1,11 @@
 # coding: utf-8
 
+import pickle
+import threading
 from collections import defaultdict
 from functools import reduce
 
+from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 
@@ -12,7 +15,6 @@ from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser
-from .. import const
 
 logger = get_logger(__file__)
 
@@ -69,9 +71,12 @@ class AssetPermissionUtilV2:
         'id', 'hostname', 'ip', "platform", "domain_id",
         'comment', 'is_active', 'os', 'org_id'
     )
+    user_tree_cache_key = 'USER_PERM_TREE_{}'
+    user_tree_cache_ttl = 3600
 
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
+        self.cache_policy = cache_policy
         self.obj_id = str(obj.id)
         self._permissions = None
         self._permissions_id = None  # 标记_permission的唯一值
@@ -84,6 +89,7 @@ class AssetPermissionUtilV2:
         self._nodes_direct = None
         self._user_tree = None
         self.full_tree = Node.tree()
+        self.mutex = threading.Lock()
 
     @staticmethod
     def change_org_if_need():
@@ -102,6 +108,31 @@ class AssetPermissionUtilV2:
     @timeit
     def filter_permissions(self, **filters):
         self._permissions = self.permissions.filter(**filters)
+
+    @classmethod
+    def get_user_tree_from_cache(cls, obj_id):
+        return None
+        key = cls.user_tree_cache_key.format(obj_id)
+        data = cache.get(key)
+        if not data:
+            return None
+        user_tree = pickle.loads(data)
+        return user_tree
+
+    @classmethod
+    def expire_user_tree_cache(cls, obj_id):
+        if obj_id == 'all':
+            key = cls.user_tree_cache_key.format('*')
+            cache.delete_pattern(key)
+        else:
+            key = cls.user_tree_cache_key.format(obj_id)
+            cache.delete(key)
+
+    @classmethod
+    def set_user_tree_to_cache(cls, obj_id, user_tree):
+        data = pickle.dumps(user_tree)
+        key = cls.user_tree_cache_key.format(obj_id)
+        cache.set(key, data, cls.user_tree_cache_ttl)
 
     @property
     def user_tree(self):
@@ -237,20 +268,26 @@ class AssetPermissionUtilV2:
 
     @timeit
     def get_user_tree(self):
-        if self._user_tree:
-            return self._user_tree
-        user_tree = TreeService()
-        full_tree_root = self.full_tree.root_node()
-        user_tree.create_node(
-            tag=full_tree_root.tag,
-            identifier=full_tree_root.identifier
-        )
-        self.add_direct_nodes_to_user_tree(user_tree)
-        self.add_single_assets_node_to_user_tree(user_tree)
-        self.parse_user_tree_to_full_tree(user_tree)
-        self.add_empty_node_if_need(user_tree)
-        self._user_tree = user_tree
-        return user_tree
+        with self.mutex:
+            if self._user_tree:
+                return self._user_tree
+            print(id(self), self._user_tree)
+            user_tree = self.__class__.get_user_tree_from_cache(self.obj_id)
+            if user_tree:
+                self._user_tree = user_tree
+                return user_tree
+            user_tree = TreeService()
+            full_tree_root = self.full_tree.root_node()
+            user_tree.create_node(
+                tag=full_tree_root.tag,
+                identifier=full_tree_root.identifier
+            )
+            self.add_direct_nodes_to_user_tree(user_tree)
+            self.add_single_assets_node_to_user_tree(user_tree)
+            self.parse_user_tree_to_full_tree(user_tree)
+            self.add_empty_node_if_need(user_tree)
+            self.__class__.set_user_tree_to_cache(self.obj_id, user_tree)
+            return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
     def get_asset_system_users_with_actions(self, asset):
@@ -401,15 +438,17 @@ class ParserNode:
     @staticmethod
     def parse_asset_to_tree_node(node, asset):
         icon_skin = 'file'
-        if asset.platform.lower() == 'windows':
+        platform = asset.platform.lower()
+        if platform == 'windows':
             icon_skin = 'windows'
-        elif asset.platform.lower() == 'linux':
+        elif platform == 'linux':
             icon_skin = 'linux'
+        parent_id = node.key if node else ''
         data = {
             'id': str(asset.id),
             'name': asset.hostname,
             'title': asset.ip,
-            'pId': node.key,
+            'pId': parent_id,
             'isParent': False,
             'open': False,
             'iconSkin': icon_skin,

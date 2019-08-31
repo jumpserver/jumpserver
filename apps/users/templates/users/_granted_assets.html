@@ -108,7 +108,7 @@ function onSelected(event, treeNode) {
 }
 
 
-function initTree() {
+function initTree(refresh) {
     var setting = {
         view: {
             dblClickExpand: false,
@@ -131,11 +131,13 @@ function initTree() {
     };
 
     $.get(treeUrl, function(data, status) {
-        $.fn.zTree.init($("#assetTree"), setting, data);
-        zTree = $.fn.zTree.getZTreeObj("assetTree");
+        zTree = $.fn.zTree.init($("#assetTree"), setting, data);
+        if (!refresh) {
+            initTable();
+        }
         rootNodeAddDom(zTree, function () {
             treeUrl = setUrlParam(treeUrl, 'cache_policy', '2');
-            initTree();
+            initTree(true);
         });
     });
 }
