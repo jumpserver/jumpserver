@@ -10,9 +10,10 @@ from . import user_permission as uapi
 __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
     'UserGroupGrantedNodeAssetsApi', 'UserGroupGrantedNodeChildrenApi',
-    'UserGroupGrantedNodeChildrenAsTreeApi', 'UserGroupGrantedNodesWithAssetsAsTreeApi',
+    'UserGroupGrantedNodeChildrenAsTreeApi',
+    'UserGroupGrantedNodeChildrenWithAssetsAsTreeApi',
     'UserGroupGrantedAssetSystemUsersApi',
-    # 'UserGroupGrantedNodesWithAssetsAsTreeApi',
+    # 'UserGroupGrantedNodeChildrenWithAssetsAsTreeApi',
 ]
 
 
@@ -45,7 +46,7 @@ class UserGroupGrantedNodeChildrenAsTreeApi(UserGroupPermissionMixin, uapi.UserG
     pass
 
 
-class UserGroupGrantedNodesWithAssetsAsTreeApi(UserGroupPermissionMixin, uapi.UserGrantedNodesWithAssetsAsTreeApi):
+class UserGroupGrantedNodeChildrenWithAssetsAsTreeApi(UserGroupPermissionMixin, uapi.UserGrantedNodeChildrenWithAssetsAsTreeApi):
     pass
 
 

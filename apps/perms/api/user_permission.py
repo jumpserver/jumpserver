@@ -23,12 +23,19 @@ from ..models import Action
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetsApi', 'UserGrantedNodesApi',
+    'UserGrantedAssetsApi',
+    'UserGrantedAssetsAsTreeApi',
     'UserGrantedNodeAssetsApi',
+    'UserGrantedNodesApi',
+    'UserGrantedNodesAsTreeApi',
+    'UserGrantedNodesWithAssetsAsTreeApi',
+    'UserGrantedNodeChildrenApi',
+    'UserGrantedNodeChildrenAsTreeApi',
+    'UserGrantedNodeChildrenWithAssetsAsTreeApi',
+    'RefreshAssetPermissionCacheApi',
+    'UserGrantedAssetSystemUsersApi',
     'ValidateUserAssetPermissionApi',
-    'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
-    'RefreshAssetPermissionCacheApi', 'UserGrantedAssetSystemUsersApi',
-    'UserGrantedNodeChildrenAsTreeApi', 'UserGrantedNodesWithAssetsAsTreeApi',
+    'GetUserAssetPermissionActionsApi',
 ]
 
 
@@ -56,6 +63,66 @@ class UserPermissionMixin:
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class UserNodePermissionMixin(UserPermissionMixin):
+    util = None
+
+    def initial(self, *args, **kwargs):
+        super().initial(*args, *kwargs)
+        self.util = AssetPermissionUtilV2(self.obj)
+
+
+class UserNodeTreeMixin:
+    serializer_class = TreeNodeSerializer
+    nodes_only_fields = ParserNode.nodes_only_fields
+    tree = None
+
+    def parse_nodes_to_queryset(self, nodes):
+        nodes = nodes.only(*self.nodes_only_fields)
+        _queryset = []
+
+        tree = self.util.get_user_tree()
+        for node in nodes:
+            assets_amount = tree.assets_amount(node.key)
+            if assets_amount == 0:
+                continue
+            node._assets_amount = assets_amount
+            data = ParserNode.parse_node_to_tree_node(node)
+            _queryset.append(data)
+        return _queryset
+
+    def get_serializer_queryset(self, queryset):
+        queryset = self.parse_nodes_to_queryset(queryset)
+        return queryset
+
+    def get_serializer(self, queryset, many=True, **kwargs):
+        queryset = self.get_serializer_queryset(queryset)
+        queryset.sort()
+        return super().get_serializer(queryset, many=many, **kwargs)
+
+
+class UserAssetTreeMixin:
+    serializer_class = TreeNodeSerializer
+    nodes_only_fields = ParserNode.assets_only_fields
+
+    @staticmethod
+    def parse_assets_to_queryset(assets, node):
+        _queryset = []
+        for asset in assets:
+            data = ParserNode.parse_asset_to_tree_node(node, asset)
+            _queryset.append(data)
+        return _queryset
+
+    def get_serializer_queryset(self, queryset):
+        queryset = queryset.only(*self.nodes_only_fields)
+        _queryset = self.parse_assets_to_queryset(queryset, None)
+        return _queryset
+
+    def get_serializer(self, queryset, many=True, **kwargs):
+        queryset = self.get_serializer_queryset(queryset)
+        queryset.sort()
+        return super().get_serializer(queryset, many=many, **kwargs)
 
 
 class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
@@ -89,6 +156,10 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
         return queryset
 
 
+class UserGrantedAssetsAsTreeApi(UserAssetTreeMixin, UserGrantedAssetsApi):
+    pass
+
+
 class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
     def get_queryset(self):
         node_id = self.kwargs.get("node_id")
@@ -100,18 +171,13 @@ class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
         return queryset
 
 
-class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
+class UserGrantedNodesApi(UserNodePermissionMixin, ListAPIView):
     """
     查询用户授权的所有节点的API
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.NodeGrantedSerializer
-    only_fields = NodeSerializer.Meta.only_fields
-    util = None
-
-    def get(self, request, *args, **kwargs):
-        self.util = AssetPermissionUtilV2(self.obj)
-        return super().get(request, *args, **kwargs)
+    nodes_only_fields = NodeSerializer.Meta.only_fields
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -120,21 +186,35 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
 
     def get_queryset(self):
         node_keys = self.util.get_nodes()
-        queryset = Node.objects.filter(key__in=node_keys)
+        queryset = Node.objects.filter(key__in=node_keys)\
+            .only(*self.nodes_only_fields)
         return queryset
+
+
+class UserGrantedNodesAsTreeApi(UserNodeTreeMixin, UserGrantedNodesApi):
+    pass
+
+
+class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesAsTreeApi):
+    def get_serializer_queryset(self, queryset):
+        _queryset = super().get_serializer_queryset(queryset)
+        for node in queryset:
+            assets = self.util.get_nodes_assets(node)
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
+        return _queryset
 
 
 class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
     node = None
-    util = None
     tree = None
-    root_keys = None
+    root_keys = None  # 如果是第一次访问，则需要把二级节点添加进去，这个 roots_keys
 
     def get(self, request, *args, **kwargs):
         key = self.request.query_params.get("key")
         pk = self.request.query_params.get("id")
         system_user_id = self.request.query_params.get("system_user")
-        self.util = AssetPermissionUtilV2(self.obj)
         if system_user_id:
             self.util.filter_permissions(system_users=system_user_id)
         self.tree = self.util.get_user_tree()
@@ -161,26 +241,16 @@ class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
         return queryset
 
 
-class UserGrantedNodeChildrenAsTreeApi(UserGrantedNodeChildrenApi):
-    serializer_class = TreeNodeSerializer
-    only_fields = ParserNode.nodes_only_fields
-
-    def get_queryset(self):
-        nodes = super().get_queryset()
-        queryset = []
-        for node in nodes:
-            node._assets_amount = self.tree.assets_amount(node.key)
-            data = ParserNode.parse_node_to_tree_node(node)
-            queryset.append(data)
-        return queryset
+class UserGrantedNodeChildrenAsTreeApi(UserNodeTreeMixin, UserGrantedNodeChildrenApi):
+    pass
 
 
-class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
     nodes_only_fields = ParserNode.nodes_only_fields
     assets_only_fields = ParserNode.assets_only_fields
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get_serializer_queryset(self, queryset):
+        _queryset = super().get_serializer_queryset(queryset)
         nodes = []
         if self.node:
             nodes.append(self.node)
@@ -188,12 +258,13 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
             nodes = Node.objects.filter(key__in=self.root_keys)
 
         for node in nodes:
-            assets = self.util.get_nodes_assets(node).only(*self.assets_only_fields)
-            for asset in assets:
-                data = ParserNode.parse_asset_to_tree_node(node, asset)
-                queryset.append(data)
-        queryset = sorted(queryset)
-        return queryset
+            assets = self.util.get_nodes_assets(node).only(
+                *self.assets_only_fields
+            )
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
+        return _queryset
 
 
 class GetUserAssetPermissionActionsApi(RetrieveAPIView):
