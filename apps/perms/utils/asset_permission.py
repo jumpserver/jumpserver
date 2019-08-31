@@ -438,15 +438,17 @@ class ParserNode:
     @staticmethod
     def parse_asset_to_tree_node(node, asset):
         icon_skin = 'file'
-        if asset.platform.lower() == 'windows':
+        platform = asset.platform.lower()
+        if platform == 'windows':
             icon_skin = 'windows'
-        elif asset.platform.lower() == 'linux':
+        elif platform == 'linux':
             icon_skin = 'linux'
+        parent_id = node.key if node else ''
         data = {
             'id': str(asset.id),
             'name': asset.hostname,
             'title': asset.ip,
-            'pId': node.key,
+            'pId': parent_id,
             'isParent': False,
             'open': False,
             'iconSkin': icon_skin,

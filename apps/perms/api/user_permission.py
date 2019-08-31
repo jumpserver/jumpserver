@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 
 __all__ = [
     'UserGrantedAssetsApi',
+    'UserGrantedAssetsAsTreeApi',
     'UserGrantedNodeAssetsApi',
     'UserGrantedNodesApi',
     'UserGrantedNodesAsTreeApi',
@@ -91,6 +92,20 @@ class UserNodeTreeMixin:
             _queryset.append(data)
         return _queryset
 
+    def get_serializer_queryset(self, queryset):
+        queryset = self.parse_nodes_to_queryset(queryset)
+        return queryset
+
+    def get_serializer(self, queryset, many=True, **kwargs):
+        queryset = self.get_serializer_queryset(queryset)
+        queryset.sort()
+        return super().get_serializer(queryset, many=many, **kwargs)
+
+
+class UserAssetTreeMixin:
+    serializer_class = TreeNodeSerializer
+    nodes_only_fields = ParserNode.assets_only_fields
+
     @staticmethod
     def parse_assets_to_queryset(assets, node):
         _queryset = []
@@ -100,8 +115,9 @@ class UserNodeTreeMixin:
         return _queryset
 
     def get_serializer_queryset(self, queryset):
-        queryset = self.parse_nodes_to_queryset(queryset)
-        return queryset
+        queryset = queryset.only(*self.nodes_only_fields)
+        _queryset = self.parse_assets_to_queryset(queryset, None)
+        return _queryset
 
     def get_serializer(self, queryset, many=True, **kwargs):
         queryset = self.get_serializer_queryset(queryset)
@@ -138,6 +154,10 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
         util = AssetPermissionUtilV2(self.obj)
         queryset = util.get_assets().only(*self.only_fields)
         return queryset
+
+
+class UserGrantedAssetsAsTreeApi(UserAssetTreeMixin, UserGrantedAssetsApi):
+    pass
 
 
 class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
@@ -180,7 +200,9 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesAsTreeApi):
         _queryset = super().get_serializer_queryset(queryset)
         for node in queryset:
             assets = self.util.get_nodes_assets(node)
-            _queryset.extend(self.parse_assets_to_queryset(assets, node))
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
         return _queryset
 
 
@@ -239,7 +261,9 @@ class UserGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeAp
             assets = self.util.get_nodes_assets(node).only(
                 *self.assets_only_fields
             )
-            _queryset.extend(self.parse_assets_to_queryset(assets, node))
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
         return _queryset
 
 

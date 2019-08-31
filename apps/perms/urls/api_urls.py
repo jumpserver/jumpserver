@@ -17,6 +17,10 @@ asset_permission_urlpatterns = [
     path('users/<uuid:pk>/assets/', api.UserGrantedAssetsApi.as_view(), name='user-assets'),
     path('users/assets/', api.UserGrantedAssetsApi.as_view(), name='my-assets'),
 
+    # Assets as tree
+    path('users/<uuid:pk>/assets/tree/', api.UserGrantedAssetsAsTreeApi.as_view(), name='user-assets-as-tree'),
+    path('users/assets/tree/', api.UserGrantedAssetsAsTreeApi.as_view(), name='my-assets-as-tree'),
+
     # Nodes
     path('users/<uuid:pk>/nodes/', api.UserGrantedNodesApi.as_view(), name='user-nodes'),
     path('users/nodes/', api.UserGrantedNodesApi.as_view(), name='my-nodes'),
