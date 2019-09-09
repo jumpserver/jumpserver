@@ -73,13 +73,13 @@ class RemoteAppSerializer(BulkOrgResourceModelSerializer):
         model = RemoteApp
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'asset', 'system_user', 'type', 'path', 'params',
+            'id', 'name', 'asset', 'type', 'path', 'params',
             'comment', 'created_by', 'date_created', 'asset_info',
-            'system_user_info', 'get_type_display',
+            'get_type_display',
         ]
         read_only_fields = [
             'created_by', 'date_created', 'asset_info',
-            'system_user_info', 'get_type_display'
+            'get_type_display'
         ]
 
 
