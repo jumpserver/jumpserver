@@ -12,6 +12,7 @@ __all__ = [
     'NodeGrantedSerializer',
     'AssetGrantedSerializer',
     'ActionsSerializer', 'AssetSystemUserSerializer',
+    'RemoteAppSystemUserSerializer',
 ]
 
 
@@ -24,10 +25,19 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         only_fields = (
-            'id', 'name', 'username', 'priority',
-            'protocol', 'login_mode',
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
         )
         fields = list(only_fields) + ["actions"]
+        read_only_fields = fields
+
+
+class RemoteAppSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
         read_only_fields = fields
 
 

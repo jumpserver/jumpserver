@@ -58,6 +58,20 @@ class RemoteAppPermissionUtil:
             remote_apps.update(list(perm.remote_apps.all()))
         return remote_apps
 
+    def get_remote_app_system_users(self, remote_app):
+        queryset = self.permissions
+        kwargs = {"remote_app": remote_app}
+        queryset = queryset.filter(**kwargs)
+        queryset = queryset.distinct().prefetch_related('system_users')
+        system_users = set()
+        for perm in queryset:
+            _system_users = perm.system_users.all()
+            if not _system_users:
+                continue
+            system_users.update(_system_users)
+        system_users = list(system_users)
+        return system_users
+
 
 def construct_remote_apps_tree_root():
     tree_root = {
