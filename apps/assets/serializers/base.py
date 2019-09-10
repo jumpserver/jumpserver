@@ -91,12 +91,7 @@ class UnionValidateSerializerMixin:
             attrs[field.field_name] = final_value
         return attrs
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-
-        # 获取字段最终的值（会根据其他字段联合确定）
-        attrs = self.to_final_value(attrs)
-
+    def union_validate(self, attrs):
         errors = OrderedDict()
         fields = self._writable_fields
 
@@ -117,4 +112,11 @@ class UnionValidateSerializerMixin:
         if errors:
             raise serializers.ValidationError(errors)
 
+        return attrs
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # 获取字段最终的值（会根据其他字段联合确定）
+        attrs = self.to_final_value(attrs)
+        attrs = self.union_validate(attrs)
         return attrs
