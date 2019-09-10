@@ -6,7 +6,7 @@ from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from ..models import Domain, Gateway
-from .base import AuthSerializerMixin
+from .base import AuthSerializerMixin, UnionValidateSerializerMixin
 
 
 class DomainSerializer(BulkOrgResourceModelSerializer):
@@ -31,7 +31,9 @@ class DomainSerializer(BulkOrgResourceModelSerializer):
         return obj.gateway_set.all().count()
 
 
-class GatewaySerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class GatewaySerializer(AuthSerializerMixin,
+                        UnionValidateSerializerMixin,
+                        BulkOrgResourceModelSerializer):
     class Meta:
         model = Gateway
         list_serializer_class = AdaptedBulkListSerializer

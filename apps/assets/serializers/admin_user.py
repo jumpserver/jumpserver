@@ -8,10 +8,12 @@ from common.serializers import AdaptedBulkListSerializer
 from ..models import Node, AdminUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
-from .base import AuthSerializer, AuthSerializerMixin
+from .base import AuthSerializer, AuthSerializerMixin, UnionValidateSerializerMixin
 
 
-class AdminUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class AdminUserSerializer(AuthSerializerMixin,
+                          UnionValidateSerializerMixin,
+                          BulkOrgResourceModelSerializer):
     """
     管理用户
     """

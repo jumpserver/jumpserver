@@ -8,7 +8,7 @@ from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
-from .base import ConnectivitySerializer, AuthSerializerMixin
+from .base import ConnectivitySerializer, AuthSerializerMixin, UnionValidateSerializerMixin
 
 
 __all__ = [
@@ -23,7 +23,9 @@ class BasicAssetSerializer(serializers.ModelSerializer):
         fields = ['hostname', 'ip']
 
 
-class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class AssetUserSerializer(AuthSerializerMixin,
+                          UnionValidateSerializerMixin,
+                          BulkOrgResourceModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
     connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))

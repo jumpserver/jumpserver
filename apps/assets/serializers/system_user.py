@@ -4,13 +4,15 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
-from common.utils import ssh_pubkey_gen, validate_ssh_private_key
+from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser
-from .base import AuthSerializer, AuthSerializerMixin
+from .base import AuthSerializer, AuthSerializerMixin, UnionValidateSerializerMixin
 
 
-class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
+class SystemUserSerializer(AuthSerializerMixin,
+                           UnionValidateSerializerMixin,
+                           BulkOrgResourceModelSerializer):
     """
     系统用户
     """
@@ -34,15 +36,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'created_by': {'read_only': True},
         }
 
-    def validate_private_key(self, private_key):
-        if not private_key:
-            return
-        if 'OPENSSH' in private_key:
-            msg = _("Not support openssh format key, "
-                    "using ssh-keygen -t rsa -m pem to generate")
-            raise serializers.ValidationError(msg)
-        return private_key
-
     def get_final_auto_generate_key(self, value, attrs):
         login_mode = attrs.get("login_mode")
         protocol = attrs.get("protocol")
@@ -65,19 +58,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         if protocol in [SystemUser.PROTOCOL_TELNET, SystemUser.PROTOCOL_VNC]:
             value = False
         return value
-
-    def to_final_value(self, attrs):
-        fields = self._writable_fields
-        for field in fields:
-            if field.field_name not in attrs.keys():
-                continue
-            get_final_method = getattr(self, 'get_final_' + field.field_name, None)
-            if get_final_method is None:
-                continue
-            value = attrs.get(field.field_name)
-            final_value = get_final_method(value, attrs)
-            attrs[field.field_name] = final_value
-        return attrs
 
     @staticmethod
     def union_validate_username(username, attrs):
@@ -123,40 +103,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             )
         return public_key
 
-    @staticmethod
-    def union_validate_private_key(private_key, attrs):
-        if not private_key:
-            return
-        password = attrs.get("password")
-        valid = validate_ssh_private_key(private_key, password)
-        if not valid:
-            raise serializers.ValidationError(_("private key invalid"))
-        return private_key
-
     def validate(self, attrs):
-        # 转化为最后的值（有一些字段的值传递的可能和其他字段有冲突）
-        attrs = self.to_final_value(attrs)
-
-        errors = OrderedDict()
-        fields = self._writable_fields
-
-        for field in fields:
-            if field.field_name not in attrs.keys():
-                continue
-            union_validate_method = getattr(self, 'union_validate_' + field.field_name, None)
-            if union_validate_method is None:
-                continue
-            try:
-                value = attrs.get(field.field_name)
-                union_validate_value = union_validate_method(value, attrs)
-            except serializers.ValidationError as exc:
-                errors[field.field_name] = exc.detail
-            else:
-                attrs[field.field_name] = union_validate_value
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
+        attrs = super().validate(attrs)
         attrs.pop("auto_generate_key", None)
         return attrs
 
