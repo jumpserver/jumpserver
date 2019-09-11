@@ -39,9 +39,9 @@ class TreeMixin:
         tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
         if not cls.tree_created_time or \
                 tree_updated_time > cls.tree_created_time:
+            logger.debug("Create node tree")
             tree = TreeService.new()
             cls.tree_created_time = time.time()
-            cls.refresh_tree(cls.tree_assets_created_time)
             cls.tree_assets_created_time = time.time()
             cls._tree_service = tree
             return tree
@@ -50,7 +50,7 @@ class TreeMixin:
                 node_assets_updated_time > cls.tree_assets_created_time:
             cls._tree_service.init_assets_async()
             cls.tree_assets_created_time = time.time()
-            cls.refresh_node_assets(cls.tree_assets_created_time)
+            logger.debug("Refresh node tree assets")
         return cls._tree_service
 
     @classmethod

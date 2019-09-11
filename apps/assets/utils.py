@@ -92,6 +92,8 @@ class TreeService(Tree):
     def init_assets(self):
         from orgs.utils import tmp_to_root_org
         self.all_nodes_assets_map = {}
+        self.nodes_assets_map = defaultdict(set)
+        logger.debug('Init tree assets')
         with tmp_to_root_org():
             queryset = Asset.objects.all().values_list('id', 'nodes__key')
             for asset_id, key in queryset:
