@@ -3,7 +3,8 @@
  * @author I.Taskinoglu & A.Kaya <alikaya@armsyazilim.com>
  * @author Abdullah ELEN <abdullahelen@msn.com>
  * @author Osman KAYAN <osmnkayan@gmail.com>
- * @version 2018-04-13
+ * @author alikayan95@gmail.com
+ * @version 2018-11-02
  */
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -15,12 +16,12 @@
 	}
 }(this, function(elFinder) {
 	elFinder.prototype.i18.tr = {
-		translator : 'I.Taskinoglu & A.Kaya &lt;alikaya@armsyazilim.com&gt;, Abdullah ELEN &lt;abdullahelen@msn.com&gt;, Osman KAYAN &lt;osmnkayan@gmail.com&gt;',
+		translator : 'I.Taskinoglu & A.Kaya &lt;alikaya@armsyazilim.com&gt;, Abdullah ELEN &lt;abdullahelen@msn.com&gt;, Osman KAYAN &lt;osmnkayan@gmail.com&gt;, alikayan95@gmail.com',
 		language   : 'Türkçe',
 		direction  : 'ltr',
-		dateFormat : 'd.m.Y H:i', // Mar 13, 2012 05:27 PM
-		fancyDateFormat : '$1 H:i', // will produce smth like: Today 12:25 PM
-		nonameDateFormat : 'ymd-His', // to apply if upload file is noname: 120513172700
+		dateFormat : 'd.m.Y H:i', // will show like: 02.11.2018 11:51
+		fancyDateFormat : '$1 H:i', // will show like: Bugün 11:51
+		nonameDateFormat : 'ymd-His', // noname upload will show like: 181102-115159
 		messages   : {
 
 			/********************************** errors **********************************/
@@ -164,6 +165,7 @@
 			'cmdselectnone': 'Seçimi temizle', // from v2.1.28 added 15.08.2017
 			'cmdselectinvert': 'Diğerlerini seç', // from v2.1.28 added 15.08.2017
 			'cmdopennew'   : 'Yeni Sekmede aç', // from v2.1.38 added 3.4.2018
+			'cmdhide'      : 'Ögeyi Gizle', // from v2.1.41 added 24.7.2018
 
 			/*********************************** buttons ***********************************/
 			'btnClose'  : 'Kapat',
@@ -225,6 +227,7 @@
 			'ntfchkdir'   : 'Hedef klasör kontrol ediliyor', // from v2.1.24 added 3.5.2017
 			'ntfundo'     : 'Önceki işlemi geri alma', // from v2.1.27 added 31.07.2017
 			'ntfredo'     : 'Önceki geri almayı tekrarlama', // from v2.1.27 added 31.07.2017
+			'ntfchkcontent' : 'Checking contents', // from v2.1.41 added 3.8.2018
 
 			/*********************************** volumes *********************************/
 			'volume_Trash' : 'Çöp', //from v2.1.24 added 29.4.2017
@@ -288,6 +291,9 @@
 			'untitled file.txt' : 'YeniDosya.txt', // added 10.11.2015
 			'untitled folder'   : 'YeniKlasor',   // added 10.11.2015
 			'Archive'           : 'YeniArsiv',  // from v2.1 added 10.11.2015
+			'untitled file'     : 'YeniDosya.$1',  // from v2.1.41 added 6.8.2018
+			'extentionfile'     : '$1: Dosya',    // from v2.1.41 added 6.8.2018
+			'extentiontype'     : '$1: $2',      // from v2.1.43 added 17.10.2018
 
 			/********************************** messages **********************************/
 			'confirmReq'      : 'Onay gerekli',
@@ -315,6 +321,10 @@
 			'selectlfile'     : 'Son dosyayı seç',
 			'viewlist'        : 'Liste görünümü',
 			'viewicons'       : 'Simge görünümü',
+			'viewSmall'       : 'Small iconlar', // from v2.1.39 added 22.5.2018
+			'viewMedium'      : 'Medium iconlar', // from v2.1.39 added 22.5.2018
+			'viewLarge'       : 'Large iconlar', // from v2.1.39 added 22.5.2018
+			'viewExtraLarge'  : 'Extra large iconlar', // from v2.1.39 added 22.5.2018
 			'places'          : 'Yerler',
 			'calc'            : 'Hesapla',
 			'path'            : 'Yol',
@@ -458,6 +468,26 @@
 			'workspace'       : 'Çalışma alanı', // from v2.1.38 added 4.4.2018
 			'dialog'          : 'Diyalog', // from v2.1.38 added 4.4.2018
 			'all'             : 'Tümü', // from v2.1.38 added 4.4.2018
+			'iconSize'        : 'İcon Boyutu (İcon Görünümü İçin)', // from v2.1.39 added 7.5.2018
+			'editorMaximized' : 'Maksimum düzenleyici penceresini aç', // from v2.1.40 added 30.6.2018
+			'editorConvNoApi' : 'Because conversion by API is not currently available, please convert on the website.', //from v2.1.40 added 8.7.2018
+			'editorConvNeedUpload' : 'After conversion, you must be upload with the item URL or a downloaded file to save the converted file.', //from v2.1.40 added 8.7.2018
+			'convertOn'       : 'Convert on the site of $1', // from v2.1.40 added 10.7.2018
+			'integrations'    : 'Entegrasyonlar', // from v2.1.40 added 11.7.2018
+			'integrationWith' : 'This elFinder has the following external services integrated. Please check the terms of use, privacy policy, etc. before using it.', // from v2.1.40 added 11.7.2018
+			'showHidden'      : 'Gizli ögeleri aç.', // from v2.1.41 added 24.7.2018
+			'hideHidden'      : 'Gizli ögeleri kapat.', // from v2.1.41 added 24.7.2018
+			'toggleHidden'    : 'Gizli ögeleri aç/kapat', // from v2.1.41 added 24.7.2018
+			'makefileTypes'   : 'File types to enable with "New file"', // from v2.1.41 added 7.8.2018
+			'typeOfTextfile'  : 'Text dosyası tipi.', // from v2.1.41 added 7.8.2018
+			'add'             : 'Ekle', // from v2.1.41 added 7.8.2018
+			'theme'           : 'Tema', // from v2.1.43 added 19.10.2018
+			'default'         : 'Varsayılan', // from v2.1.43 added 19.10.2018
+			'description'     : 'Açıklama', // from v2.1.43 added 19.10.2018
+			'website'         : 'Websayfası', // from v2.1.43 added 19.10.2018
+			'author'          : 'Yazar', // from v2.1.43 added 19.10.2018
+			'email'           : 'E-mail', // from v2.1.43 added 19.10.2018
+			'license'         : 'Lisans', // from v2.1.43 added 19.10.2018
 
 			/********************************** mimetypes **********************************/
 			'kindUnknown'     : 'Bilinmiyor',
