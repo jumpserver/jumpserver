@@ -5,7 +5,8 @@
  * @author Max Wen<max.wen@qq.com>
  * @author Kejun Chang <changkejun@hotmail.com>
  * @author LDMING <china-live@live.cn>
- * @version 2018-01-26
+ * @author Andy Lee <oraclei@126.com>
+ * @version 2019-06-26
  */
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -17,12 +18,12 @@
 	}
 }(this, function(elFinder) {
 	elFinder.prototype.i18.zh_CN = {
-		translator : '翻译者 deerchao &lt;deerchao@gmail.com&gt;, Andy Hu &lt;andyhu7@yahoo.com.hk&gt;, Max Wen&lt;max.wen@qq.com&gt;, Kejun Chang &lt;changkejun@hotmail.com&gt;, LDMING &lt;china-live@live.cn&gt;',
+		translator : '翻译者 deerchao &lt;deerchao@gmail.com&gt;, Andy Hu &lt;andyhu7@yahoo.com.hk&gt;, Max Wen&lt;max.wen@qq.com&gt;, Kejun Chang &lt;changkejun@hotmail.com&gt;, LDMING &lt;china-live@live.cn&gt;, Andy Lee &lt;oraclei@126.com&gt;',
 		language   : '简体中文',
 		direction  : 'ltr',
-		dateFormat : 'Y-m-d H:i', // Mar 13, 2012 05:27 PM
-		fancyDateFormat : '$1 H:i', // will produce smth like: Today 12:25 PM
-		nonameDateFormat : 'ymd-His', // to apply if upload file is noname: 120513172700
+		dateFormat : 'Y-m-d H:i', // will show like: 2019-06-26 22:33
+		fancyDateFormat : '$1 H:i', // will show like: 今天 22:33
+		nonameDateFormat : 'ymd-His', // noname upload will show like: 190626-223309
 		messages   : {
 
 			/********************************** errors **********************************/
@@ -118,6 +119,7 @@
 			'errEditorNotFound'    : '找不到这个文件的编辑器.', // from v2.1.25 added 23.5.2017
 			'errServerError'       : '服务端发生错误.', // from v2.1.25 added 16.6.2017
 			'errEmpty'             : '无法清空文件夹 "$1".', // from v2.1.25 added 22.6.2017
+			'moreErrors'           : '存在 $1 多个错误.', // from v2.1.44 added 9.12.2018
 
 			/******************************* commands names ********************************/
 			'cmdarchive'   : '创建压缩包',
@@ -165,6 +167,8 @@
 			'cmdselectall' : '全选', // from v2.1.28 added 15.08.2017
 			'cmdselectnone': '全不选', // from v2.1.28 added 15.08.2017
 			'cmdselectinvert': '反向选择', // from v2.1.28 added 15.08.2017
+			'cmdopennew'   : '在新窗口打开', // from v2.1.38 added 3.4.2018
+			'cmdhide'      : '隐藏 (偏好)', // from v2.1.41 added 24.7.2018
 
 			/*********************************** buttons ***********************************/
 			'btnClose'  : '关闭',
@@ -187,8 +191,8 @@
 			'btnBackup' : '备份', // fromv2.1 added 28.11.2015
 			'btnRename'    : '重命名',      // from v2.1.24 added 6.4.2017
 			'btnRenameAll' : '重命名(All)', // from v2.1.24 added 6.4.2017
-			'btnPrevious' : 'Prev ($1/$2)', // from v2.1.24 added 11.5.2017
-			'btnNext'     : 'Next ($1/$2)', // from v2.1.24 added 11.5.2017
+			'btnPrevious' : '向前 ($1/$2)', // from v2.1.24 added 11.5.2017
+			'btnNext'     : '向后 ($1/$2)', // from v2.1.24 added 11.5.2017
 			'btnSaveAs'   : '另存为', // from v2.1.25 added 24.5.2017
 
 			/******************************** notifications ********************************/
@@ -226,6 +230,7 @@
 			'ntfchkdir'   : '检查目标文件夹', // from v2.1.24 added 3.5.2017
 			'ntfundo'     : '撤消上一个全局操作', // from v2.1.27 added 31.07.2017
 			'ntfredo'     : '重做上一全局操作', // from v2.1.27 added 31.07.2017
+			'ntfchkcontent' : '检查内容', // from v2.1.41 added 3.8.2018
 
 			/*********************************** volumes *********************************/
 			'volume_Trash' : '回收站', //from v2.1.24 added 29.4.2017
@@ -289,6 +294,9 @@
 			'untitled file.txt' : '新文件.txt', // added 10.11.2015
 			'untitled folder'   : '新文件夹',   // added 10.11.2015
 			'Archive'           : '新压缩包',  // from v2.1 added 10.11.2015
+			'untitled file'     : '新文件.$1',  // from v2.1.41 added 6.8.2018
+			'extentionfile'     : '$1: 文件',    // from v2.1.41 added 6.8.2018
+			'extentiontype'     : '$1: $2',      // from v2.1.43 added 17.10.2018
 
 			/********************************** messages **********************************/
 			'confirmReq'      : '请确认',
@@ -316,6 +324,10 @@
 			'selectlfile'     : '选择最后一个文件',
 			'viewlist'        : '列表视图',
 			'viewicons'       : '图标视图',
+			'viewSmall'       : '小图标', // from v2.1.39 added 22.5.2018
+			'viewMedium'      : '中图标', // from v2.1.39 added 22.5.2018
+			'viewLarge'       : '大图标', // from v2.1.39 added 22.5.2018
+			'viewExtraLarge'  : '超大图标', // from v2.1.39 added 22.5.2018
 			'places'          : '位置',
 			'calc'            : '计算',
 			'path'            : '路径',
@@ -375,7 +387,7 @@
 			'pass'                : '密码', // added 18.04.2012
 			'confirmUnmount'      : '确实要卸载 $1?',  // from v2.1 added 30.04.2012
 			'dropFilesBrowser': '从浏览器中拖放或粘贴文件', // from v2.1 added 30.05.2012
-			'dropPasteFiles'  : '拖放文件，或粘贴剪贴板图像', // from v2.1 added 07.04.2014
+			'dropPasteFiles'  : '拖放文件，粘贴网址或剪贴板图像', // from v2.1 added 07.04.2014
 			'encoding'        : '编码', // from v2.1 added 19.12.2014
 			'locale'          : '语言环境',   // from v2.1 added 19.12.2014
 			'searchTarget'    : '目标: $1',                // from v2.1 added 22.5.2015
@@ -447,6 +459,41 @@
 			'asPrefix'        : '添加前缀', // from v2.1.31 added 8.12.2017
 			'asSuffix'        : '添加后缀', // from v2.1.31 added 8.12.2017
 			'changeExtention' : '变化范围', // from v2.1.31 added 8.12.2017
+			'columnPref'      : '列设置 (列表视图)', // from v2.1.32 added 6.2.2018
+			'reflectOnImmediate' : '所有修改将立即反馈到文档.', // from v2.1.33 added 2.3.2018
+			'reflectOnUnmount'   : '所有修改在卸载本卷之前不会反馈', // from v2.1.33 added 2.3.2018
+			'unmountChildren' : '安装在本卷上的以下卷也会卸载.你确定要卸载吗?', // from v2.1.33 added 5.3.2018
+			'selectionInfo'   : '选择信息', // from v2.1.33 added 7.3.2018
+			'hashChecker'     : '显示文件散列值的算法', // from v2.1.33 added 10.3.2018
+			'infoItems'       : '信息条目 (选择信息面板)', // from v2.1.38 added 28.3.2018
+			'pressAgainToExit': '再按退出', // from v2.1.38 added 1.4.2018
+			'toolbar'         : '工具条', // from v2.1.38 added 4.4.2018
+			'workspace'       : '工作空间', // from v2.1.38 added 4.4.2018
+			'dialog'          : '对话框', // from v2.1.38 added 4.4.2018
+			'all'             : '全部', // from v2.1.38 added 4.4.2018
+			'iconSize'        : '图标尺寸 (图标视图)', // from v2.1.39 added 7.5.2018
+			'editorMaximized' : '打开最大化编辑器窗口', // from v2.1.40 added 30.6.2018
+			'editorConvNoApi' : '由于通过 API 转换功能当前不可用，请到网站上转换.', //from v2.1.40 added 8.7.2018
+			'editorConvNeedUpload' : '转换后，必须上传条目URL或一个下载的文件,以保存转换后的文件.', //from v2.1.40 added 8.7.2018
+			'convertOn'       : '在 $1 站点上转换', // from v2.1.40 added 10.7.2018
+			'integrations'    : '集成', // from v2.1.40 added 11.7.2018
+			'integrationWith' : '本 elFinder 集成以下外部服务.使用前请检查使用条款、隐私政策等.', // from v2.1.40 added 11.7.2018
+			'showHidden'      : '显示已隐藏的条目', // from v2.1.41 added 24.7.2018
+			'hideHidden'      : '隐藏已隐藏的条目', // from v2.1.41 added 24.7.2018
+			'toggleHidden'    : '显示/隐藏已隐藏的条目', // from v2.1.41 added 24.7.2018
+			'makefileTypes'   : '允许"新文件"使用的文件类型', // from v2.1.41 added 7.8.2018
+			'typeOfTextfile'  : '文本文件类型', // from v2.1.41 added 7.8.2018
+			'add'             : '添加', // from v2.1.41 added 7.8.2018
+			'theme'           : '主题', // from v2.1.43 added 19.10.2018
+			'default'         : '缺省', // from v2.1.43 added 19.10.2018
+			'description'     : '描述', // from v2.1.43 added 19.10.2018
+			'website'         : '网站', // from v2.1.43 added 19.10.2018
+			'author'          : '作者', // from v2.1.43 added 19.10.2018
+			'email'           : '邮箱', // from v2.1.43 added 19.10.2018
+			'license'         : '许可证', // from v2.1.43 added 19.10.2018
+			'exportToSave'    : '本条目不能保存. 为避免丢失编辑数据,须要导出到你的电脑.', // from v2.1.44 added 1.12.2018
+			'dblclickToSelect': '在文件上双击以选中它.', // from v2.1.47 added 22.1.2019
+			'useFullscreen'   : '使用全屏模式', // from v2.1.47 added 19.2.2019
 
 			/********************************** mimetypes **********************************/
 			'kindUnknown'     : '未知',
@@ -532,3 +579,4 @@
 		}
 	};
 }));
+
