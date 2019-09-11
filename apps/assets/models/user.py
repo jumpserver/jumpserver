@@ -96,7 +96,7 @@ class SystemUser(AssetUser):
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
     )
 

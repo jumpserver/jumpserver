@@ -108,7 +108,7 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     else:
         nodes_keys = [instance.key]
         system_users = queryset
-    assets = Node.get_nodes_all_assets(nodes_keys)
+    assets = Node.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
     for system_user in system_users:
         system_user.assets.add(*tuple(assets))
 
@@ -132,7 +132,7 @@ def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None
     if action != "post_add":
         return
     logger.debug("Assets node add signal recv: {}".format(action))
-    queryset = model.objects.filter(pk__in=pk_set)
+    queryset = model.objects.filter(pk__in=pk_set).values_list('id', flat=True)
     if model == Node:
         nodes = queryset
         assets = [instance]

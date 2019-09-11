@@ -11,7 +11,7 @@ from django.utils.translation import ugettext
 from django.core.cache import cache
 
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import set_current_org, get_current_org, tmp_to_root_org, tmp_to_org
+from orgs.utils import set_current_org, get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
@@ -398,13 +398,24 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     def level(self):
         return len(self.key.split(':'))
 
+    @staticmethod
+    def refresh_user_tree_cache():
+        """
+        当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
+        :return:
+        """
+        from perms.utils.asset_permission import AssetPermissionUtilV2
+        AssetPermissionUtilV2.expire_all_user_tree_cache()
+
     @classmethod
     def refresh_nodes(cls):
         cls.refresh_tree()
+        cls.refresh_user_tree_cache()
 
     @classmethod
     def refresh_assets(cls):
         cls.refresh_node_assets()
+        cls.refresh_user_tree_cache()
 
     def as_tree_node(self):
         from common.tree import TreeNode
