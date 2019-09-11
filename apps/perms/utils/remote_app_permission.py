@@ -7,7 +7,7 @@ from common.tree import TreeNode
 from orgs.utils import set_to_root_org
 
 from ..models import RemoteAppPermission
-from ..hands import RemoteApp
+from ..hands import RemoteApp, SystemUser
 
 
 __all__ = [
@@ -61,16 +61,12 @@ class RemoteAppPermissionUtil:
 
     def get_remote_app_system_users(self, remote_app):
         queryset = self.permissions
-        kwargs = {"remote_app": remote_app}
+        kwargs = {"remote_apps": remote_app}
         queryset = queryset.filter(**kwargs)
-        queryset = queryset.distinct().prefetch_related('system_users')
-        system_users = set()
-        for perm in queryset:
-            _system_users = perm.system_users.all()
-            if not _system_users:
-                continue
-            system_users.update(_system_users)
-        system_users = list(system_users)
+        system_users_ids = queryset.values_list('system_users', flat=True)
+        system_users_ids = system_users_ids.distinct()
+        system_users = SystemUser.objects.filter(id__in=system_users_ids)
+        system_users = system_users.order_by('-priority')
         return system_users
 
 

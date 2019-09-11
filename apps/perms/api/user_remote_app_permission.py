@@ -79,7 +79,6 @@ class UserGrantedRemoteAppSystemUsersApi(UserPermissionMixin, ListAPIView):
         remote_app_id = self.kwargs.get('remote_app_id')
         remote_app = get_object_or_404(RemoteApp, id=remote_app_id)
         system_users = util.get_remote_app_system_users(remote_app)
-        system_users.sort(key=lambda x: x.priority)
         return system_users
 
 
