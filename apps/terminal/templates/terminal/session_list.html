@@ -140,7 +140,7 @@ function initTable() {
                     replayBtn = replayBtn.replace("disabled", "")
                 }
                 var termBtn = '<a class="btn btn-xs btn-danger btn-term" disabled value="sessionID" terminal="terminalID" >{% trans "Terminate" %}</a>';
-                if (rowData.protocol === "ssh" && "{{ request.user.is_org_admin }}" === "True") {
+                if ("{{ request.user.is_org_admin }}" === "True") {
                     termBtn = termBtn.replace("disabled", "")
                         .replace("sessionID", cellData)
                         .replace("terminalID", rowData.terminal)
