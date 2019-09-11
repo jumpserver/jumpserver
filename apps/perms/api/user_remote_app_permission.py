@@ -29,6 +29,7 @@ __all__ = [
 class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
+    filter_fields = ['id']
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
@@ -41,7 +42,6 @@ class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
     def get_queryset(self):
         util = RemoteAppPermissionUtil(self.get_object())
         queryset = util.get_remote_apps()
-        queryset = list(queryset)
         return queryset
 
     def get_permissions(self):
@@ -50,36 +50,23 @@ class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
         return super().get_permissions()
 
 
-class UserGrantedRemoteAppsAsTreeApi(ListAPIView):
+class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
-    def get_object(self):
-        user_id = self.kwargs.get('pk', '')
-        if not user_id:
-            user = self.request.user
-        else:
-            user = get_object_or_404(User, id=user_id)
-        return user
-
-    def get_queryset(self):
-        queryset = []
-        tree_root = construct_remote_apps_tree_root()
-        queryset.append(tree_root)
-
-        util = RemoteAppPermissionUtil(self.get_object())
-        remote_apps = util.get_remote_apps()
-        for remote_app in remote_apps:
+    def get_serializer(self, *args, **kwargs):
+        only_remote_app = self.request.query_params.get('only', '0') == '1'
+        tree_root = None
+        data = []
+        if not only_remote_app:
+            tree_root = construct_remote_apps_tree_root()
+            data.append(tree_root)
+        queryset = super().get_queryset()
+        for remote_app in queryset:
             node = parse_remote_app_to_tree_node(tree_root, remote_app)
-            queryset.append(node)
-
-        queryset = sorted(queryset)
-        return queryset
-
-    def get_permissions(self):
-        if self.kwargs.get('pk') is None:
-            self.permission_classes = (IsValidUser,)
-        return super().get_permissions()
+            data.append(node)
+        data.sort()
+        return super().get_serializer(data, many=True)
 
 
 class UserGrantedRemoteAppSystemUsersApi(UserPermissionMixin, ListAPIView):
@@ -119,6 +106,7 @@ class ValidateUserRemoteAppPermissionApi(APIView):
         system_users = util.get_remote_app_system_users(remote_app)
         if system_user in system_users:
             return Response({'msg': True}, status=200)
+
         return Response({'msg': False}, status=403)
 
 
