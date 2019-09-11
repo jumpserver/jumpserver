@@ -70,7 +70,6 @@ class TreeService(Tree):
     @classmethod
     @timeit
     def new(cls):
-        print("Call new")
         from .models import Node
         from orgs.utils import tmp_to_root_org
 
@@ -91,17 +90,14 @@ class TreeService(Tree):
         t.start()
 
     def init_assets(self):
-        from orgs.utils import get_current_org, set_to_root_org
-        origin_org = get_current_org()
-        set_to_root_org()
-        queryset = Asset.objects.all().valid().values_list('id', 'nodes__key')
-
-        if origin_org:
-            origin_org.change_to()
-        for asset_id, key in queryset:
-            if not key:
-                continue
-            self.nodes_assets_map[key].add(asset_id)
+        from orgs.utils import tmp_to_root_org
+        self.all_nodes_assets_map = {}
+        with tmp_to_root_org():
+            queryset = Asset.objects.all().values_list('id', 'nodes__key')
+            for asset_id, key in queryset:
+                if not key:
+                    continue
+                self.nodes_assets_map[key].add(asset_id)
 
     def all_children(self, nid, with_self=True, deep=False):
         children_ids = self.expand_tree(nid)

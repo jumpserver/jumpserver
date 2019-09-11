@@ -35,7 +35,7 @@ __all__ = [
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
     'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
     'TestNodeConnectiveApi', 'NodeListAsTreeApi',
-    'NodeChildrenAsTreeApi', 'RefreshAssetsAmount',
+    'NodeChildrenAsTreeApi', 'RefreshNodesCacheApi',
 ]
 
 
@@ -282,9 +282,13 @@ class TestNodeConnectiveApi(APIView):
         return Response({"task": task.id})
 
 
-class RefreshAssetsAmount(APIView):
+class RefreshNodesCacheApi(APIView):
     permission_classes = (IsOrgAdmin,)
-    model = Node
 
     def get(self, request, *args, **kwargs):
+        Node.refresh_nodes()
         return Response("Ok")
+
+    def delete(self, *args, **kwargs):
+        self.get(*args, **kwargs)
+        return Response(status=204)

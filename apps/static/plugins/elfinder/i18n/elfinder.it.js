@@ -151,7 +151,7 @@
 			'cmdsort'      : 'Ordina',
 			'cmdnetmount'  : 'Monta disco di rete', // added 18.04.2012
 			'cmdnetunmount': 'Smonta', // from v2.1 added 30.04.2012
-			'cmdplaces'    : 'Alle cartelle', // added 28.12.2014
+			'cmdplaces'    : 'Aggiungi ad Accesso rapido', // added 28.12.2014
 			'cmdchmod'     : 'Cambia modalità', // from v2.1 added 20.6.2015
 			'cmdopendir'   : 'Apri una cartella', // from v2.1 added 13.1.2016
 			'cmdcolwidth'  : 'Reimposta dimensione colonne', // from v2.1.13 added 12.06.2016
@@ -320,7 +320,7 @@
 			'viewMedium'      : 'Icone medie', // from v2.1.39 added 22.5.2018
 			'viewLarge'       : 'Icone grandi', // from v2.1.39 added 22.5.2018
 			'viewExtraLarge'  : 'Icone molto grandi', // from v2.1.39 added 22.5.2018
-			'places'          : 'Cartelle',
+			'places'          : 'Accesso rapido',
 			'calc'            : 'Calcola',
 			'path'            : 'Percorso',
 			'aliasfor'        : 'Alias per',
@@ -360,7 +360,7 @@
 			'moveFiles'       : 'Sposta file',
 			'copyFiles'       : 'Copia file',
 			'restoreFiles'    : 'Ripristina oggetti', // from v2.1.24 added 5.5.2017
-			'rmFromPlaces'    : 'Rimuovi da places',
+			'rmFromPlaces'    : 'Rimuovi da Accesso rapido',
 			'aspectRatio'     : 'Proporzioni',
 			'scale'           : 'Scala',
 			'width'           : 'Larghezza',

@@ -10,12 +10,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
+from common.utils import get_logger
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org, tmp_to_org
 from orgs.models import Organization
 
 
 __all__ = ['Node']
+logger = get_logger(__name__)
 
 
 class NodeQuerySet(models.QuerySet):
@@ -39,6 +41,7 @@ class TreeMixin:
                 tree_updated_time > cls.tree_created_time:
             tree = TreeService.new()
             cls.tree_created_time = time.time()
+            cls.refresh_tree(cls.tree_assets_created_time)
             cls.tree_assets_created_time = time.time()
             cls._tree_service = tree
             return tree
@@ -46,25 +49,40 @@ class TreeMixin:
         if not cls.tree_assets_created_time or \
                 node_assets_updated_time > cls.tree_assets_created_time:
             cls._tree_service.init_assets_async()
+            cls.tree_assets_created_time = time.time()
+            cls.refresh_node_assets(cls.tree_assets_created_time)
         return cls._tree_service
 
     @classmethod
-    def refresh_tree(cls):
+    def refresh_tree(cls, t=None):
+        logger.debug("Refresh node tree")
         key = cls.tree_updated_time_cache_key
         ttl = cls.tree_cache_time
-        value = time.time()
-        cache.set(key, value, ttl)
+        if not t:
+            t = time.time()
+        cache.set(key, t, ttl)
 
     @classmethod
-    def refresh_node_assets(cls):
+    def refresh_node_assets(cls, t=None):
+        logger.debug("Refresh node tree assets")
         key = cls.tree_assets_cache_key
         ttl = cls.tree_cache_time
-        value = time.time()
-        cache.set(key, value, ttl)
+        if not t:
+            t = time.time()
+        cache.set(key, t, ttl)
 
     @property
     def _tree(self):
         return self.__class__.tree()
+
+    @staticmethod
+    def refresh_user_tree_cache():
+        """
+        当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
+        :return:
+        """
+        from perms.utils.asset_permission import AssetPermissionUtilV2
+        AssetPermissionUtilV2.expire_all_user_tree_cache()
 
 
 class FamilyMixin:
@@ -113,11 +131,8 @@ class FamilyMixin:
         return self.get_ancestor(with_self=False)
 
     def get_ancestor(self, with_self=False):
-        parents = self.parents
-        if with_self:
-            parents = list(parents)
-            parents.append(self)
-        return parents
+        ancestor_keys = self.get_ancestor_keys(with_self=with_self)
+        return self.__class__.objects.filter(key__in=ancestor_keys)
 
     @property
     def parent(self):
@@ -155,15 +170,21 @@ class FamilyMixin:
         children = self.get_all_children()
         return [*tuple(ancestor), self, *tuple(children)]
 
-    def get_ancestor_keys(self, with_self=False):
+    @classmethod
+    def get_nodes_ancestor_keys_by_key(cls, key, with_self=False):
         parent_keys = []
-        key_list = self.key.split(":")
+        key_list = key.split(":")
         if not with_self:
             key_list.pop()
         for i in range(len(key_list)):
             parent_keys.append(":".join(key_list))
             key_list.pop()
         return parent_keys
+
+    def get_ancestor_keys(self, with_self=False):
+        return self.__class__.get_nodes_ancestor_keys_by_key(
+            self.key, with_self=with_self
+        )
 
     def is_children(self, other):
         pattern = r'^{0}:[0-9]+$'.format(self.key)
@@ -398,24 +419,13 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     def level(self):
         return len(self.key.split(':'))
 
-    @staticmethod
-    def refresh_user_tree_cache():
-        """
-        当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
-        :return:
-        """
-        from perms.utils.asset_permission import AssetPermissionUtilV2
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
-
     @classmethod
     def refresh_nodes(cls):
         cls.refresh_tree()
-        cls.refresh_user_tree_cache()
 
     @classmethod
     def refresh_assets(cls):
         cls.refresh_node_assets()
-        cls.refresh_user_tree_cache()
 
     def as_tree_node(self):
         from common.tree import TreeNode

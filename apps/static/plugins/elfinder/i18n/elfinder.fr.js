@@ -3,7 +3,7 @@
  * @author Régis Guyomarch <regisg@gmail.com>
  * @author Benoit Delachaux <benorde33@gmail.com>
  * @author Jonathan Grunder <jonathan.grunder@gmail.com>
- * @version 2018-06-06
+ * @version 2019-06-11
  */
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -18,9 +18,9 @@
 		translator : 'Régis Guyomarch &lt;regisg@gmail.com&gt;, Benoit Delachaux &lt;benorde33@gmail.com&gt;, Jonathan Grunder &lt;jonathan.grunder@gmail.com&gt;',
 		language   : 'française',
 		direction  : 'ltr',
-		dateFormat : 'd/M/Y H:i', // Mar 13, 2012 05:27 PM
-		fancyDateFormat : '$1 H:i', // will produce smth like: Today 12:25 PM
-		nonameDateFormat : 'ymd-His', // to apply if upload file is noname: 120513172700
+		dateFormat : 'd/M/Y H:i', // will show like: 11/Jun/2019 19:33
+		fancyDateFormat : '$1 H:i', // will show like: Aujourd'hui 19:33
+		nonameDateFormat : 'ymd-His', // noname upload will show like: 190611-193346
 		messages   : {
 
 			/********************************** errors **********************************/
@@ -112,10 +112,11 @@
 			'errSearchTimeout'     : 'Délai d’attente dépassé pour la recherche "$1". Le résultat de la recherche est partiel.', // from v2.1 added 12.1.2016
 			'errReauthRequire'     : 'Réauthorisation requise.', // from v2.1.10 added 24.3.2016
 			'errMaxTargets'        : 'Le nombre maximal d\'éléments pouvant être sélectionnés est $1.', // from v2.1.17 added 17.10.2016
-			'errRestore'           : 'Impossible de restorer la corbeille. La destination de la restoration n\'a pu être identifiée.', // from v2.1.24 added 3.5.2017
+			'errRestore'           : 'Impossible de restaurer la corbeille. La destination de la restauration n\'a pu être identifiée.', // from v2.1.24 added 3.5.2017
 			'errEditorNotFound'    : 'Aucun éditeur n\'a été trouvé pour ce type de fichier.', // from v2.1.25 added 23.5.2017
 			'errServerError'       : 'Une erreur est survenue du côté serveur.', // from v2.1.25 added 16.6.2017
 			'errEmpty'             : 'Impossible de vider le dossier "$1".', // from v2.1.25 added 22.6.2017
+			'moreErrors'           : 'There are $1 more errors.', // from v2.1.44 added 9.12.2018
 
 			/******************************* commands names ********************************/
 			'cmdarchive'   : 'Créer une archive',
@@ -141,7 +142,7 @@
 			'cmdrename'    : 'Renommer',
 			'cmdrm'        : 'Supprimer',
 			'cmdtrash'     : 'À la corbeille', //from v2.1.24 added 29.4.2017
-			'cmdrestore'   : 'Restorer', //from v2.1.24 added 3.5.2017
+			'cmdrestore'   : 'Restaurer', //from v2.1.24 added 3.5.2017
 			'cmdsearch'    : 'Trouver les fichiers',
 			'cmdup'        : 'Remonter au dossier parent',
 			'cmdupload'    : 'Envoyer les fichiers',
@@ -150,7 +151,7 @@
 			'cmdsort'      : 'Trier',
 			'cmdnetmount'  : 'Monter un volume réseau', // added 18.04.2012
 			'cmdnetunmount': 'Démonter', // from v2.1 added 30.04.2012
-			'cmdplaces'    : 'Vers Places', // added 28.12.2014
+			'cmdplaces'    : 'Vers Favoris', // added 28.12.2014
 			'cmdchmod'     : 'Changer de mode', // from v2.1 added 20.6.2015
 			'cmdopendir'   : 'Ouvrir un dossier', // from v2.1 added 13.1.2016
 			'cmdcolwidth'  : 'Réinitialiser largeur colone', // from v2.1.13 added 12.06.2016
@@ -164,6 +165,7 @@
 			'cmdselectnone': 'Tout désélectionner', // from v2.1.28 added 15.08.2017
 			'cmdselectinvert': 'Inverser la sélection', // from v2.1.28 added 15.08.2017
 			'cmdopennew'   : 'Ouvrir dans une nouvelle fenêtre', // from v2.1.38 added 3.4.2018
+			'cmdhide'      : 'Hide (Preference)', // from v2.1.41 added 24.7.2018
 
 			/*********************************** buttons ***********************************/
 			'btnClose'  : 'Fermer',
@@ -221,10 +223,11 @@
 			'ntfparents'  : 'Traitement de l\'information du chemin', // from v2.1.17 added 2.11.2016
 			'ntfchunkmerge': 'Traitement du fichier envoyé', // from v2.1.17 added 2.11.2016
 			'ntftrash'    : 'Mettre à la corbeille', // from v2.1.24 added 2.5.2017
-			'ntfrestore'  : 'Restorer depuis la corbeille', // from v2.1.24 added 3.5.2017
+			'ntfrestore'  : 'Restaurer depuis la corbeille', // from v2.1.24 added 3.5.2017
 			'ntfchkdir'   : 'Validation du dossier de destination', // from v2.1.24 added 3.5.2017
 			'ntfundo'     : 'Annuler l\'opération précédente', // from v2.1.27 added 31.07.2017
 			'ntfredo'     : 'Refaire l\'opération annulée', // from v2.1.27 added 31.07.2017
+			'ntfchkcontent' : 'Checking contents', // from v2.1.41 added 3.8.2018
 
 			/*********************************** volumes *********************************/
 			'volume_Trash' : 'Corbeille', //from v2.1.24 added 29.4.2017
@@ -288,6 +291,9 @@
 			'untitled file.txt' : 'NouveauFichier.txt', // added 10.11.2015
 			'untitled folder'   : 'NouveauDossier',   // added 10.11.2015
 			'Archive'           : 'NouvelleArchive',  // from v2.1 added 10.11.2015
+			'untitled file'     : 'NewFile.$1',  // from v2.1.41 added 6.8.2018
+			'extentionfile'     : '$1: File',    // from v2.1.41 added 6.8.2018
+			'extentiontype'     : '$1: $2',      // from v2.1.43 added 17.10.2018
 
 			/********************************** messages **********************************/
 			'confirmReq'      : 'Confirmation requise',
@@ -319,7 +325,7 @@
 			'viewMedium'      : 'Moyennes icônes', // from v2.1.39 added 22.5.2018
 			'viewLarge'       : 'Grandes icônes', // from v2.1.39 added 22.5.2018
 			'viewExtraLarge'  : 'Très grandes icônes', // from v2.1.39 added 22.5.2018
-			'places'          : 'Places',
+			'places'          : 'Favoris',
 			'calc'            : 'Calculer',
 			'path'            : 'Chemin',
 			'aliasfor'        : 'Raccourcis pour',
@@ -358,8 +364,8 @@
 			'selectForUpload' : 'Sélectionner les fichiers à envoyer',
 			'moveFiles'       : 'Déplacer les éléments',
 			'copyFiles'       : 'Copier les éléments',
-			'restoreFiles'    : 'Restorer les éléments', // from v2.1.24 added 5.5.2017
-			'rmFromPlaces'    : 'Retirer des places',
+			'restoreFiles'    : 'Restaurer les éléments', // from v2.1.24 added 5.5.2017
+			'rmFromPlaces'    : 'Retirer des favoris',
 			'aspectRatio'     : 'Ratio d’affichage',
 			'scale'           : 'Mise à l\'échelle',
 			'width'           : 'Largeur',
@@ -462,7 +468,29 @@
 			'workspace'       : 'Espace de travail', // from v2.1.38 added 4.4.2018
 			'dialog'          : 'Dialogue', // from v2.1.38 added 4.4.2018
 			'all'             : 'Tout', // from v2.1.38 added 4.4.2018
-			'iconSize'        : 'Icon Size (Icons view)', // form v2.1.39 added 7.5.2018
+			'iconSize'        : 'Icon Size (Icons view)', // from v2.1.39 added 7.5.2018
+			'editorMaximized' : 'Open the maximized editor window', // from v2.1.40 added 30.6.2018
+			'editorConvNoApi' : 'Because conversion by API is not currently available, please convert on the website.', //from v2.1.40 added 8.7.2018
+			'editorConvNeedUpload' : 'After conversion, you must be upload with the item URL or a downloaded file to save the converted file.', //from v2.1.40 added 8.7.2018
+			'convertOn'       : 'Convert on the site of $1', // from v2.1.40 added 10.7.2018
+			'integrations'    : 'Integrations', // from v2.1.40 added 11.7.2018
+			'integrationWith' : 'This elFinder has the following external services integrated. Please check the terms of use, privacy policy, etc. before using it.', // from v2.1.40 added 11.7.2018
+			'showHidden'      : 'Show hidden items', // from v2.1.41 added 24.7.2018
+			'hideHidden'      : 'Hide hidden items', // from v2.1.41 added 24.7.2018
+			'toggleHidden'    : 'Show/Hide hidden items', // from v2.1.41 added 24.7.2018
+			'makefileTypes'   : 'File types to enable with "New file"', // from v2.1.41 added 7.8.2018
+			'typeOfTextfile'  : 'Type of the Text file', // from v2.1.41 added 7.8.2018
+			'add'             : 'Add', // from v2.1.41 added 7.8.2018
+			'theme'           : 'Theme', // from v2.1.43 added 19.10.2018
+			'default'         : 'Default', // from v2.1.43 added 19.10.2018
+			'description'     : 'Description', // from v2.1.43 added 19.10.2018
+			'website'         : 'Website', // from v2.1.43 added 19.10.2018
+			'author'          : 'Author', // from v2.1.43 added 19.10.2018
+			'email'           : 'Email', // from v2.1.43 added 19.10.2018
+			'license'         : 'License', // from v2.1.43 added 19.10.2018
+			'exportToSave'    : 'This item can\'t be saved. To avoid losing the edits you need to export to your PC.', // from v2.1.44 added 1.12.2018
+			'dblclickToSelect': 'Double click on the file to select it.', // from v2.1.47 added 22.1.2019
+			'useFullscreen'   : 'Use fullscreen mode', // from v2.1.47 added 19.2.2019
 
 			/********************************** mimetypes **********************************/
 			'kindUnknown'     : 'Inconnu',
@@ -548,4 +576,3 @@
 		}
 	};
 }));
-
