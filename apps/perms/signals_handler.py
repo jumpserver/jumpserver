@@ -14,7 +14,6 @@ logger = get_logger(__file__)
 permission_m2m_senders = (
     AssetPermission.nodes.through,
     AssetPermission.assets.through,
-    AssetPermission.system_users.through,
     AssetPermission.users.through,
     AssetPermission.user_groups.through,
 )
@@ -24,6 +23,7 @@ permission_m2m_senders = (
 def on_permission_m2m_change(sender, action='', **kwargs):
     if not action.startswith('post'):
         return
+    logger.debug('Asset permission m2m changed, refresh user tree cache')
     AssetPermissionUtilV2.expire_all_user_tree_cache()
 
 
@@ -31,9 +31,10 @@ for sender in permission_m2m_senders:
     m2m_changed.connect(on_permission_m2m_change, sender=sender)
 
 
-@receiver([post_save, post_delete], sender=AssetPermission, dispatch_uid="my_unique_identifier")
+@receiver([post_save, post_delete], sender=AssetPermission)
 @on_transaction_commit
-def on_permission_change(sender, **kwargs):
+def on_permission_change(sender, action='', **kwargs):
+    logger.debug('Asset permission changed, refresh user tree cache')
     AssetPermissionUtilV2.expire_all_user_tree_cache()
 
 # Todo: 检查授权规则到期，从而修改授权规则

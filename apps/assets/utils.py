@@ -70,6 +70,7 @@ class TreeService(Tree):
     @classmethod
     @timeit
     def new(cls):
+        print("Call new")
         from .models import Node
         from orgs.utils import tmp_to_root_org
 
