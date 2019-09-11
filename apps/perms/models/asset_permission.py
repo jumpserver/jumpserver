@@ -13,7 +13,7 @@ from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'NodePermission', 'Action',
+    'AssetPermission', 'Action',
 ]
 
 
@@ -78,12 +78,12 @@ class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
-    # actions = models.ManyToManyField(Action, related_name='permissions', blank=True, verbose_name=_('Action'))
     actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
 
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
+        ordering = ('name',)
 
     @classmethod
     def get_queryset_with_prefetch(cls):
@@ -106,21 +106,3 @@ class AssetPermission(BasePermission):
         args = reduce(lambda x, y: x | y, args)
         assets = Asset.objects.filter(args).distinct()
         return assets
-
-
-class NodePermission(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, verbose_name=_("Node"))
-    user_group = models.ForeignKey('users.UserGroup', on_delete=models.CASCADE, verbose_name=_("User group"))
-    system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, verbose_name=_("System user"))
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
-    comment = models.TextField(verbose_name=_('Comment'), blank=True)
-
-    def __str__(self):
-        return "{}:{}:{}".format(self.node.value, self.user_group.name, self.system_user.name)
-
-    class Meta:
-        verbose_name = _("Asset permission")
