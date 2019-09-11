@@ -9,8 +9,8 @@ def migrate_system_user_from_remote_app_to_remote_app_perms(apps, schema_editor)
     db_alias = schema_editor.connection.alias
     perms = remote_app_perms_model.objects.using(db_alias).all()
     for perm in perms:
-        system_user_ids = perm.remote_apps.values_list('system_user', flat=True)
-        perm.system_users.set(system_user_ids)
+        system_users_ids = perm.remote_apps.values_list('system_user', flat=True)
+        perm.system_users.set(system_users_ids)
 
 
 class Migration(migrations.Migration):
