@@ -400,11 +400,15 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
 
     @classmethod
     def refresh_nodes(cls):
+        from perms.utils.asset_permission import AssetPermissionUtilV2
         cls.refresh_tree()
+        AssetPermissionUtilV2.expire_all_user_tree_cache()
 
     @classmethod
     def refresh_assets(cls):
+        from perms.utils.asset_permission import AssetPermissionUtilV2
         cls.refresh_node_assets()
+        AssetPermissionUtilV2.expire_all_user_tree_cache()
 
     def as_tree_node(self):
         from common.tree import TreeNode
