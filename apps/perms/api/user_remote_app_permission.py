@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import (
@@ -12,13 +13,16 @@ from ..utils import (
     RemoteAppPermissionUtil, construct_remote_apps_tree_root,
     parse_remote_app_to_tree_node,
 )
-from ..hands import User, RemoteAppSerializer, UserGroup
+from ..hands import User, RemoteApp, RemoteAppSerializer, UserGroup, SystemUser
 from ..mixins import RemoteAppFilterMixin
+from .mixin import UserPermissionMixin
+from .. import serializers
 
 
 __all__ = [
     'UserGrantedRemoteAppsApi', 'ValidateUserRemoteAppPermissionApi',
     'UserGrantedRemoteAppsAsTreeApi', 'UserGroupGrantedRemoteAppsApi',
+    'UserGrantedRemoteAppSystemUsersApi',
 ]
 
 
@@ -65,18 +69,43 @@ class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
         return super().get_serializer(data, many=True)
 
 
+class UserGrantedRemoteAppSystemUsersApi(UserPermissionMixin, ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.RemoteAppSystemUserSerializer
+    only_fields = serializers.RemoteAppSystemUserSerializer.Meta.only_fields
+
+    def get_queryset(self):
+        util = RemoteAppPermissionUtil(self.obj)
+        remote_app_id = self.kwargs.get('remote_app_id')
+        remote_app = get_object_or_404(RemoteApp, id=remote_app_id)
+        system_users = util.get_remote_app_system_users(remote_app)
+        return system_users
+
+
 class ValidateUserRemoteAppPermissionApi(APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')
         remote_app_id = request.query_params.get('remote_app_id', '')
+        system_id = request.query_params.get('system_user_id', '')
+
+        try:
+            user_id = uuid.UUID(user_id)
+            remote_app_id = uuid.UUID(remote_app_id)
+            system_id = uuid.UUID(system_id)
+        except ValueError:
+            return Response({'msg': False}, status=403)
 
         user = get_object_or_404(User, id=user_id)
+        remote_app = get_object_or_404(RemoteApp, id=remote_app_id)
+        system_user = get_object_or_404(SystemUser, id=system_id)
+
         util = RemoteAppPermissionUtil(user)
-        remote_app = util.get_remote_apps().filter(id=remote_app_id).exists()
-        if remote_app:
+        system_users = util.get_remote_app_system_users(remote_app)
+        if system_user in system_users:
             return Response({'msg': True}, status=200)
+
         return Response({'msg': False}, status=403)
 
 

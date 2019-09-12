@@ -91,6 +91,10 @@ remote_app_permission_urlpatterns = [
     # 查询用户组授权的RemoteApp
     path('user-groups/<uuid:pk>/remote-apps/', api.UserGroupGrantedRemoteAppsApi.as_view(), name='user-group-remote-apps'),
 
+    # RemoteApp System users
+    path('users/<uuid:pk>/remote-apps/<uuid:remote_app_id>/system-users/', api.UserGrantedRemoteAppSystemUsersApi.as_view(), name='user-remote-app-system-users'),
+    path('users/remote-apps/<uuid:remote_app_id>/system-users/', api.UserGrantedRemoteAppSystemUsersApi.as_view(), name='my-remote-app-system-users'),
+
     # 校验用户对RemoteApp的权限
     path('remote-app-permissions/user/validate/', api.ValidateUserRemoteAppPermissionApi.as_view(), name='validate-user-remote-app-permission'),
 

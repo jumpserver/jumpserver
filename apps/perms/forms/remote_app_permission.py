@@ -35,6 +35,9 @@ class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
             ),
             'remote_apps': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('RemoteApp')}
+            ),
+            'system_users': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('System user')}
             )
         }
 

@@ -9,16 +9,49 @@ from rest_framework.views import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import condition
 
+from rest_framework.generics import get_object_or_404
 from django.utils.translation import ugettext as _
-from common.utils import get_logger
 from assets.utils import LabelFilterMixin
-from .. import const
-from ..hands import Asset, Node, SystemUser
+from common.permissions import IsValidUser, IsOrgAdminOrAppUser, IsOrgAdmin
+from common.utils import get_logger
+from orgs.utils import set_to_root_org
+from ..hands import User, Asset, Node, SystemUser
 from .. import serializers
+from .. import const
+
 
 logger = get_logger(__name__)
 
-__all__ = ['UserPermissionCacheMixin', 'GrantAssetsMixin', 'NodesWithUngroupMixin']
+__all__ = [
+    'UserPermissionCacheMixin', 'GrantAssetsMixin', 'NodesWithUngroupMixin',
+    'UserPermissionMixin',
+]
+
+
+class UserPermissionMixin:
+    permission_classes = (IsOrgAdminOrAppUser,)
+    obj = None
+
+    def initial(self, *args, **kwargs):
+        super().initial(*args, *kwargs)
+        self.obj = self.get_obj()
+
+    def get(self, request, *args, **kwargs):
+        set_to_root_org()
+        return super().get(request, *args, **kwargs)
+
+    def get_obj(self):
+        user_id = self.kwargs.get('pk', '')
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+        else:
+            user = self.request.user
+        return user
+
+    def get_permissions(self):
+        if self.kwargs.get('pk') is None:
+            self.permission_classes = (IsValidUser,)
+        return super().get_permissions()
 
 
 # def get_etag(request, *args, **kwargs):

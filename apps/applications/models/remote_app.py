@@ -22,10 +22,6 @@ class RemoteApp(OrgModelMixin):
     asset = models.ForeignKey(
         'assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset')
     )
-    system_user = models.ForeignKey(
-        'assets.SystemUser', on_delete=models.CASCADE,
-        verbose_name=_('System user')
-    )
     type = models.CharField(
         default=const.REMOTE_APP_TYPE_CHROME,
         choices=const.REMOTE_APP_TYPE_CHOICES,
@@ -79,11 +75,4 @@ class RemoteApp(OrgModelMixin):
         return {
             'id': self.asset.id,
             'hostname': self.asset.hostname
-        }
-
-    @property
-    def system_user_info(self):
-        return {
-            'id': self.system_user.id,
-            'name': self.system_user.name
         }

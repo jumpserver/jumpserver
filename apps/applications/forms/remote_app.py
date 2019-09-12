@@ -89,23 +89,16 @@ class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
         super().__init__(*args, **kwargs)
         field_asset = self.fields['asset']
         field_asset.queryset = field_asset.queryset.has_protocol('rdp')
-        field_system_user = self.fields['system_user']
-        field_system_user.queryset = field_system_user.queryset.filter(
-            protocol=SystemUser.PROTOCOL_RDP
-        )
 
     class Meta:
         model = RemoteApp
         fields = [
-            'name', 'asset', 'system_user', 'type', 'path', 'comment'
+            'name', 'asset', 'type', 'path', 'comment'
         ]
         widgets = {
             'asset': forms.Select(attrs={
                 'class': 'select2', 'data-placeholder': _('Asset')
             }),
-            'system_user': forms.Select(attrs={
-                'class': 'select2', 'data-placeholder': _('System user')
-            })
         }
 
     def _clean_params(self):

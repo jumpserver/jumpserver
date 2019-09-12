@@ -47,6 +47,7 @@
 
                             <h3>{% trans 'RemoteApp' %}</h3>
                             {% bootstrap_field form.remote_apps layout="horizontal" %}
+                            {% bootstrap_field form.system_users layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
 
                             <h3>{% trans 'Other' %}</h3>
@@ -127,7 +128,7 @@ $(document).ready(function () {
         the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
         method = "PUT";
     {% endif %}
-    objectAttrsIsList(data, ['users', 'user_groups', 'remote_apps']);
+    objectAttrsIsList(data, ['users', 'user_groups', 'remote_apps', 'system_users']);
     objectAttrsIsDatetime(data, ['date_expired', 'date_start']);
     objectAttrsIsBool(data, ['is_active']);
     var props = {
