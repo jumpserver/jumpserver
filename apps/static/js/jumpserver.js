@@ -412,7 +412,7 @@ var jumpserver = {};
 jumpserver.checked = false;
 jumpserver.selected = {};
 jumpserver.language = {
-    processing: gettext('Loading ...'),
+    processing: gettext('Loading') + '...',
     search: gettext('Search'),
     select: {
         rows: {
