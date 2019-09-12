@@ -110,10 +110,16 @@ $(document).ready(function() {
             data_list.pop();
         }
         var html = createPopover(data_list);
-        console.log(html);
         $(this).html(html);
     });
-    $('[data-toggle=popover]').popover({html : true});
+    $('[data-toggle="popover"]').popover({
+        html: true,
+        placement: 'bottom',
+        trigger: 'click',
+        container: 'body'
+    }).on('click', function (e) {
+        $('[data-toggle="popover"]').not(this).popover('hide');
+    });
 })
 </script>
 {% endblock %}

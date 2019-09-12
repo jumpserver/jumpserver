@@ -227,7 +227,6 @@ function toggle() {
 $(document).ready(function(){
     initTable();
     initTree();
-
 })
 .on('click', '.btn-del', function () {
     var $this = $(this);
@@ -247,17 +246,19 @@ $(document).ready(function(){
 })
 .on('click', '.btn-create-permission', function () {
     var url = "{% url 'perms:asset-permission-create' %}";
-    var nodes = zTree.getSelectedNodes();
-    var _nodes = [];
-    var _assets = [];
-    $.each(nodes, function (id, node) {
-        if (node.meta.type === 'node') {
-            _nodes.push(node.meta.node.id)
-        } else {
-            _assets.push(node.meta.asset.id)
-        }
-    });
-    url += "?assets=" + _assets.join(",") + "&nodes=" + _nodes.join(",");
+    if (zTree) {
+        var nodes = zTree.getSelectedNodes();
+        var _nodes = [];
+        var _assets = [];
+        $.each(nodes, function (id, node) {
+            if (node.meta.type === 'node') {
+                _nodes.push(node.meta.node.id)
+            } else {
+                _assets.push(node.meta.asset.id)
+            }
+        });
+        url += "?assets=" + _assets.join(",") + "&nodes=" + _nodes.join(",");
+    }
     window.open(url, '_self');
 }).on('click', '.toggle', function (e) {
     e.preventDefault();
@@ -283,7 +284,6 @@ $(document).ready(function(){
             detailRows.push(tr.attr('id'));
         }
     }
-
 }).on('click', '#permission_list_table_filter input', function (e) {
     e.preventDefault();
     e.stopPropagation();

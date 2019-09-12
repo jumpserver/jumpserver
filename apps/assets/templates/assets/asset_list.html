@@ -226,6 +226,33 @@ function onNodeSelected(event, treeNode) {
     asset_table.ajax.reload();
 }
 
+function onAssetModalConfirmAddAssetToNode(table) {
+    var assets_selected = table.selected;
+    if (!current_node_id) {
+        return
+    }
+
+    var data = {'assets': assets_selected};
+    var success = function () {
+        table.selected = [];
+        table.ajax.reload()
+    };
+
+    var url = '';
+    if (update_node_action === "move") {
+        url = "{% url 'api-assets:node-replace-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
+    } else {
+        url = "{% url 'api-assets:node-add-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
+    }
+
+    requestApi({
+        'url': url,
+        'method': 'PUT',
+        'body': JSON.stringify(data),
+        'success': success
+    })
+}
+
 $(document).ready(function(){
     initTable();
     initTree();
@@ -236,6 +263,12 @@ $(document).ready(function(){
     else{
         $('#show_current_asset').css('display', 'inline-block');
     }
+
+    var modalOption = {
+        onModalConfirm: onAssetModalConfirmAddAssetToNode,
+        onModalTableDone: null
+    };
+    setAssetModalOptions(modalOption);
 })
 .on('click', '.labels li', function () {
     var val = $(this).text();
@@ -429,7 +462,6 @@ $(document).ready(function(){
      }
 
     function doRemove() {
-       var nodes = zTree.getSelectedNodes();
        if (!current_node_id) {
            return
        }
@@ -472,32 +504,7 @@ $(document).ready(function(){
     }
     $(".ipt_check_all").prop("checked", false)
 })
-.on('click', '#btn_asset_modal_confirm', function () {
-    var assets_selected = asset_table2.selected;
-    if (!current_node_id) {
-        return
-    }
-
-    var data = {'assets': assets_selected};
-    var success = function () {
-        asset_table2.selected = [];
-        asset_table2.ajax.reload()
-    };
-
-    var url = '';
-    if (update_node_action === "move") {
-        url = "{% url 'api-assets:node-replace-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-    } else {
-        url = "{% url 'api-assets:node-add-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-    }
-
-    requestApi({
-        'url': url,
-        'method': 'PUT',
-        'body': JSON.stringify(data),
-        'success': success
-    })
-}).on('hidden.bs.modal', '#asset_list_modal', function () {
+.on('hidden.bs.modal', '#asset_list_modal', function () {
     window.location.reload();
 }).on('click', '#menu_asset_add', function () {
     update_node_action = "add"

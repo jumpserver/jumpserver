@@ -47,7 +47,7 @@ def on_permission_nodes_changed(sender, instance=None, action='', **kwargs):
     if isinstance(instance, AssetPermission):
         logger.debug("Asset permission nodes change signal received")
         nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users = instance.system_users.all().values_list('id', flat=True)
+        system_users = instance.system_users.all()
         for system_user in system_users:
             system_user.nodes.add(*tuple(nodes))
 
@@ -59,7 +59,7 @@ def on_permission_assets_changed(sender, instance=None, action='', **kwargs):
     if isinstance(instance, AssetPermission):
         logger.debug("Asset permission assets change signal received")
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users = instance.system_users.all().values_list('id', flat=True)
+        system_users = instance.system_users.all()
         for system_user in system_users:
             system_user.assets.add(*tuple(assets))
 

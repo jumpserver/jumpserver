@@ -607,7 +607,9 @@ SWAGGER_SETTINGS = {
             'in': 'header'
         }
     },
+    'DEFAULT_API_URL': 'http://www.fit2cloud.com'
 }
+
 
 # Default email suffix
 EMAIL_SUFFIX = CONFIG.EMAIL_SUFFIX

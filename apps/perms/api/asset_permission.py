@@ -97,6 +97,8 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         inherit_nodes_keys = assets.all().values_list('nodes__key', flat=True)
 
         for key in inherit_nodes_keys:
+            if key is None:
+                continue
             ancestor_keys = Node.get_nodes_ancestor_keys_by_key(key, with_self=True)
             inherit_all_nodes.update(ancestor_keys)
         queryset = queryset.filter(
