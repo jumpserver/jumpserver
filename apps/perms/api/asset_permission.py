@@ -93,11 +93,15 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not assets:
             return queryset.none()
-        inherit_nodes = set()
-        for asset in assets:
-            for node in asset.nodes.all():
-                inherit_nodes.update(set(node.get_ancestor(with_self=True)))
-        queryset = queryset.filter(Q(assets__in=assets) | Q(nodes__in=inherit_nodes))
+        inherit_all_nodes = set()
+        inherit_nodes_keys = assets.all().values_list('nodes__key', flat=True)
+
+        for key in inherit_nodes_keys:
+            ancestor_keys = Node.get_nodes_ancestor_keys_by_key(key, with_self=True)
+            inherit_all_nodes.update(ancestor_keys)
+        queryset = queryset.filter(
+            Q(assets__in=assets) | Q(nodes__key__in=inherit_all_nodes)
+        )
         return queryset
 
     def filter_user(self, queryset):

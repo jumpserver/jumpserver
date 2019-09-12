@@ -1,8 +1,11 @@
 # coding: utf-8
 
+import pickle
+import threading
 from collections import defaultdict
 from functools import reduce
 
+from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 
@@ -12,7 +15,6 @@ from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
 from ..hands import Node, Asset, SystemUser
-from .. import const
 
 logger = get_logger(__file__)
 
@@ -57,7 +59,55 @@ def get_system_user_permissions(system_user):
     )
 
 
-class AssetPermissionUtilV2:
+class AssetPermissionUtilCacheMixin:
+    user_tree_cache_key = 'USER_PERM_TREE_{}'
+    user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
+    user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
+    cache_policy = '0'
+    obj_id = ''
+
+    def expire_user_tree_cache(self):
+        key = self.user_tree_cache_key.format(self.obj_id)
+        cache.delete(key)
+
+    @classmethod
+    def expire_all_user_tree_cache(cls):
+        key = cls.user_tree_cache_key.format('*')
+        cache.delete_pattern(key)
+
+    def set_user_tree_to_cache(self, user_tree):
+        data = pickle.dumps(user_tree)
+        key = self.user_tree_cache_key.format(self.obj_id)
+        cache.set(key, data, self.user_tree_cache_ttl)
+
+    def get_user_tree_from_cache(self):
+        key = self.user_tree_cache_key.format(self.obj_id)
+        data = cache.get(key)
+        if not data:
+            return None
+        user_tree = pickle.loads(data)
+        return user_tree
+
+    def get_user_tree_from_cache_if_need(self):
+        if not self.user_tree_cache_enable:
+            return None
+        if self.cache_policy == '1':
+            return self.get_user_tree_from_cache()
+        elif self.cache_policy == '2':
+            self.expire_user_tree_cache()
+            return None
+        else:
+            return None
+
+    def set_user_tree_to_cache_if_need(self, user_tree):
+        if self.cache_policy == '0':
+            return
+        if not self.user_tree_cache_enable:
+            return None
+        self.set_user_tree_to_cache(user_tree)
+
+
+class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
     get_permissions_map = {
         "User": get_user_permissions,
         "UserGroup": get_user_group_permissions,
@@ -72,18 +122,15 @@ class AssetPermissionUtilV2:
 
     def __init__(self, obj, cache_policy='0'):
         self.object = obj
+        self.cache_policy = cache_policy
         self.obj_id = str(obj.id)
         self._permissions = None
         self._permissions_id = None  # 标记_permission的唯一值
-        self._assets = None
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.change_org_if_need()
-        self.nodes = None
-        self._nodes = None
-        self._assets_direct = None
-        self._nodes_direct = None
         self._user_tree = None
         self.full_tree = Node.tree()
+        self.mutex = threading.Lock()
 
     @staticmethod
     def change_org_if_need():
@@ -237,20 +284,27 @@ class AssetPermissionUtilV2:
 
     @timeit
     def get_user_tree(self):
-        if self._user_tree:
-            return self._user_tree
-        user_tree = TreeService()
-        full_tree_root = self.full_tree.root_node()
-        user_tree.create_node(
-            tag=full_tree_root.tag,
-            identifier=full_tree_root.identifier
-        )
-        self.add_direct_nodes_to_user_tree(user_tree)
-        self.add_single_assets_node_to_user_tree(user_tree)
-        self.parse_user_tree_to_full_tree(user_tree)
-        self.add_empty_node_if_need(user_tree)
-        self._user_tree = user_tree
-        return user_tree
+        # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
+        with self.mutex:
+            if self._user_tree:
+                return self._user_tree
+            user_tree = self.get_user_tree_from_cache_if_need()
+            if user_tree:
+                self._user_tree = user_tree
+                return user_tree
+            user_tree = TreeService()
+            full_tree_root = self.full_tree.root_node()
+            user_tree.create_node(
+                tag=full_tree_root.tag,
+                identifier=full_tree_root.identifier
+            )
+            self.add_direct_nodes_to_user_tree(user_tree)
+            self.add_single_assets_node_to_user_tree(user_tree)
+            self.parse_user_tree_to_full_tree(user_tree)
+            self.add_empty_node_if_need(user_tree)
+            self.set_user_tree_to_cache_if_need(user_tree)
+            self._user_tree = user_tree
+            return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
     def get_asset_system_users_with_actions(self, asset):
@@ -401,15 +455,17 @@ class ParserNode:
     @staticmethod
     def parse_asset_to_tree_node(node, asset):
         icon_skin = 'file'
-        if asset.platform.lower() == 'windows':
+        platform = asset.platform.lower()
+        if platform == 'windows':
             icon_skin = 'windows'
-        elif asset.platform.lower() == 'linux':
+        elif platform == 'linux':
             icon_skin = 'linux'
+        parent_id = node.key if node else ''
         data = {
             'id': str(asset.id),
             'name': asset.hostname,
             'title': asset.ip,
-            'pId': node.key,
+            'pId': parent_id,
             'isParent': False,
             'open': False,
             'iconSkin': icon_skin,

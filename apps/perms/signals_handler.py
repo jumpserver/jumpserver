@@ -6,25 +6,38 @@ from django.dispatch import receiver
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from .models import AssetPermission
+from .utils.asset_permission import AssetPermissionUtilV2
 
 
 logger = get_logger(__file__)
 
+permission_m2m_senders = (
+    AssetPermission.nodes.through,
+    AssetPermission.assets.through,
+    AssetPermission.users.through,
+    AssetPermission.user_groups.through,
+)
 
-@receiver(post_save, sender=AssetPermission, dispatch_uid="my_unique_identifier")
+
 @on_transaction_commit
-def on_permission_created(sender, instance=None, created=False, **kwargs):
-    pass
+def on_permission_m2m_change(sender, action='', **kwargs):
+    if not action.startswith('post'):
+        return
+    logger.debug('Asset permission m2m changed, refresh user tree cache')
+    AssetPermissionUtilV2.expire_all_user_tree_cache()
 
 
-@receiver(post_save, sender=AssetPermission)
-def on_permission_update(sender, **kwargs):
-    pass
+for sender in permission_m2m_senders:
+    m2m_changed.connect(on_permission_m2m_change, sender=sender)
 
 
-@receiver(post_delete, sender=AssetPermission)
-def on_permission_delete(sender, **kwargs):
-    pass
+@receiver([post_save, post_delete], sender=AssetPermission)
+@on_transaction_commit
+def on_permission_change(sender, action='', **kwargs):
+    logger.debug('Asset permission changed, refresh user tree cache')
+    AssetPermissionUtilV2.expire_all_user_tree_cache()
+
+# Todo: 检查授权规则到期，从而修改授权规则
 
 
 @receiver(m2m_changed, sender=AssetPermission.nodes.through)
@@ -34,7 +47,7 @@ def on_permission_nodes_changed(sender, instance=None, action='', **kwargs):
     if isinstance(instance, AssetPermission):
         logger.debug("Asset permission nodes change signal received")
         nodes = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users = instance.system_users.all()
+        system_users = instance.system_users.all().values_list('id', flat=True)
         for system_user in system_users:
             system_user.nodes.add(*tuple(nodes))
 
@@ -46,7 +59,7 @@ def on_permission_assets_changed(sender, instance=None, action='', **kwargs):
     if isinstance(instance, AssetPermission):
         logger.debug("Asset permission assets change signal received")
         assets = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
-        system_users = instance.system_users.all()
+        system_users = instance.system_users.all().values_list('id', flat=True)
         for system_user in system_users:
             system_user.assets.add(*tuple(assets))
 
@@ -58,8 +71,8 @@ def on_permission_system_users_changed(sender, instance=None, action='', **kwarg
     if isinstance(instance, AssetPermission):
         system_users = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
         logger.debug("Asset permission system_users change signal received")
-        assets = instance.assets.all()
-        nodes = instance.nodes.all()
+        assets = instance.assets.all().values_list('id', flat=True)
+        nodes = instance.nodes.all().values_list('id', flat=True)
         for system_user in system_users:
             system_user.nodes.add(*tuple(nodes))
             system_user.assets.add(*tuple(assets))

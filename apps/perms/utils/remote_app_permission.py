@@ -7,6 +7,7 @@ from common.tree import TreeNode
 from orgs.utils import set_to_root_org
 
 from ..models import RemoteAppPermission
+from ..hands import RemoteApp
 
 
 __all__ = [
@@ -53,9 +54,9 @@ class RemoteAppPermissionUtil:
         return _permissions
 
     def get_remote_apps(self):
-        remote_apps = set()
-        for perm in self.permissions:
-            remote_apps.update(list(perm.remote_apps.all()))
+        remote_apps = RemoteApp.objects.filter(
+            granted_by_permissions__in=self.permissions
+        )
         return remote_apps
 
 
@@ -82,11 +83,12 @@ def parse_remote_app_to_tree_node(parent, remote_app):
         'protocol': system_user.protocol,
         'login_mode': system_user.login_mode,
     }
+    pid = parent.id if parent else ''
     tree_node = {
         'id': remote_app.id,
         'name': remote_app.name,
         'title': remote_app.name,
-        'pId': parent.id,
+        'pId': pid,
         'open': False,
         'isParent': False,
         'iconSkin': 'file',

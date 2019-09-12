@@ -34,7 +34,6 @@ var actions = {
 }};
 $(document).ready(function () {
     initTree();
-    initTable();
 }).on('click', '.labels li', function () {
     var val = $(this).text();
     $("#user_assets_table_filter input").val(val);

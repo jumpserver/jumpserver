@@ -23,12 +23,19 @@ from ..models import Action
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserGrantedAssetsApi', 'UserGrantedNodesApi',
+    'UserGrantedAssetsApi',
+    'UserGrantedAssetsAsTreeApi',
     'UserGrantedNodeAssetsApi',
+    'UserGrantedNodesApi',
+    'UserGrantedNodesAsTreeApi',
+    'UserGrantedNodesWithAssetsAsTreeApi',
+    'UserGrantedNodeChildrenApi',
+    'UserGrantedNodeChildrenAsTreeApi',
+    'UserGrantedNodeChildrenWithAssetsAsTreeApi',
+    'RefreshAssetPermissionCacheApi',
+    'UserGrantedAssetSystemUsersApi',
     'ValidateUserAssetPermissionApi',
-    'UserGrantedNodesWithAssetsAsTreeApi', 'GetUserAssetPermissionActionsApi',
-    'RefreshAssetPermissionCacheApi', 'UserGrantedAssetSystemUsersApi',
-    'UserGrantedNodeChildrenAsTreeApi', 'UserGrantedNodesWithAssetsAsTreeApi',
+    'GetUserAssetPermissionActionsApi',
 ]
 
 
@@ -38,13 +45,13 @@ class UserPermissionMixin:
 
     def initial(self, *args, **kwargs):
         super().initial(*args, *kwargs)
-        self.obj = self.get_object()
+        self.obj = self.get_obj()
 
     def get(self, request, *args, **kwargs):
         set_to_root_org()
         return super().get(request, *args, **kwargs)
 
-    def get_object(self):
+    def get_obj(self):
         user_id = self.kwargs.get('pk', '')
         if user_id:
             user = get_object_or_404(User, id=user_id)
@@ -58,7 +65,68 @@ class UserPermissionMixin:
         return super().get_permissions()
 
 
-class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
+class UserAssetPermissionMixin(UserPermissionMixin):
+    util = None
+
+    def initial(self, *args, **kwargs):
+        super().initial(*args, *kwargs)
+        cache_policy = self.request.query_params.get('cache_policy', '0')
+        self.util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
+
+
+class UserNodeTreeMixin:
+    serializer_class = TreeNodeSerializer
+    nodes_only_fields = ParserNode.nodes_only_fields
+    tree = None
+
+    def parse_nodes_to_queryset(self, nodes):
+        nodes = nodes.only(*self.nodes_only_fields)
+        _queryset = []
+
+        tree = self.util.get_user_tree()
+        for node in nodes:
+            assets_amount = tree.assets_amount(node.key)
+            if assets_amount == 0:
+                continue
+            node._assets_amount = assets_amount
+            data = ParserNode.parse_node_to_tree_node(node)
+            _queryset.append(data)
+        return _queryset
+
+    def get_serializer_queryset(self, queryset):
+        queryset = self.parse_nodes_to_queryset(queryset)
+        return queryset
+
+    def get_serializer(self, queryset, many=True, **kwargs):
+        queryset = self.get_serializer_queryset(queryset)
+        queryset.sort()
+        return super().get_serializer(queryset, many=many, **kwargs)
+
+
+class UserAssetTreeMixin:
+    serializer_class = TreeNodeSerializer
+    nodes_only_fields = ParserNode.assets_only_fields
+
+    @staticmethod
+    def parse_assets_to_queryset(assets, node):
+        _queryset = []
+        for asset in assets:
+            data = ParserNode.parse_asset_to_tree_node(node, asset)
+            _queryset.append(data)
+        return _queryset
+
+    def get_serializer_queryset(self, queryset):
+        queryset = queryset.only(*self.nodes_only_fields)
+        _queryset = self.parse_assets_to_queryset(queryset, None)
+        return _queryset
+
+    def get_serializer(self, queryset, many=True, **kwargs):
+        queryset = self.get_serializer_queryset(queryset)
+        queryset.sort()
+        return super().get_serializer(queryset, many=many, **kwargs)
+
+
+class UserGrantedAssetsApi(UserAssetPermissionMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetGrantedSerializer
     only_fields = serializers.AssetGrantedSerializer.Meta.only_fields
@@ -84,9 +152,12 @@ class UserGrantedAssetsApi(UserPermissionMixin, ListAPIView):
         return queryset
 
     def get_queryset(self):
-        util = AssetPermissionUtilV2(self.obj)
-        queryset = util.get_assets().only(*self.only_fields)
+        queryset = self.util.get_assets().only(*self.only_fields)
         return queryset
+
+
+class UserGrantedAssetsAsTreeApi(UserAssetTreeMixin, UserGrantedAssetsApi):
+    pass
 
 
 class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
@@ -94,24 +165,18 @@ class UserGrantedNodeAssetsApi(UserGrantedAssetsApi):
         node_id = self.kwargs.get("node_id")
         node = get_object_or_404(Node, pk=node_id)
         deep = self.request.query_params.get("all", "0") == "1"
-        util = AssetPermissionUtilV2(self.obj)
-        queryset = util.get_nodes_assets(node, deep=deep)\
+        queryset = self.util.get_nodes_assets(node, deep=deep)\
             .only(*self.only_fields)
         return queryset
 
 
-class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
+class UserGrantedNodesApi(UserAssetPermissionMixin, ListAPIView):
     """
     查询用户授权的所有节点的API
     """
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.NodeGrantedSerializer
-    only_fields = NodeSerializer.Meta.only_fields
-    util = None
-
-    def get(self, request, *args, **kwargs):
-        self.util = AssetPermissionUtilV2(self.obj)
-        return super().get(request, *args, **kwargs)
+    nodes_only_fields = NodeSerializer.Meta.only_fields
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -120,21 +185,35 @@ class UserGrantedNodesApi(UserPermissionMixin, ListAPIView):
 
     def get_queryset(self):
         node_keys = self.util.get_nodes()
-        queryset = Node.objects.filter(key__in=node_keys)
+        queryset = Node.objects.filter(key__in=node_keys)\
+            .only(*self.nodes_only_fields)
         return queryset
+
+
+class UserGrantedNodesAsTreeApi(UserNodeTreeMixin, UserGrantedNodesApi):
+    pass
+
+
+class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesAsTreeApi):
+    def get_serializer_queryset(self, queryset):
+        _queryset = super().get_serializer_queryset(queryset)
+        for node in queryset:
+            assets = self.util.get_nodes_assets(node)
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
+        return _queryset
 
 
 class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
     node = None
-    util = None
     tree = None
-    root_keys = None
+    root_keys = None  # 如果是第一次访问，则需要把二级节点添加进去，这个 roots_keys
 
     def get(self, request, *args, **kwargs):
         key = self.request.query_params.get("key")
         pk = self.request.query_params.get("id")
         system_user_id = self.request.query_params.get("system_user")
-        self.util = AssetPermissionUtilV2(self.obj)
         if system_user_id:
             self.util.filter_permissions(system_users=system_user_id)
         self.tree = self.util.get_user_tree()
@@ -161,26 +240,16 @@ class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
         return queryset
 
 
-class UserGrantedNodeChildrenAsTreeApi(UserGrantedNodeChildrenApi):
-    serializer_class = TreeNodeSerializer
-    only_fields = ParserNode.nodes_only_fields
-
-    def get_queryset(self):
-        nodes = super().get_queryset()
-        queryset = []
-        for node in nodes:
-            node._assets_amount = self.tree.assets_amount(node.key)
-            data = ParserNode.parse_node_to_tree_node(node)
-            queryset.append(data)
-        return queryset
+class UserGrantedNodeChildrenAsTreeApi(UserNodeTreeMixin, UserGrantedNodeChildrenApi):
+    pass
 
 
-class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
+class UserGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
     nodes_only_fields = ParserNode.nodes_only_fields
     assets_only_fields = ParserNode.assets_only_fields
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get_serializer_queryset(self, queryset):
+        _queryset = super().get_serializer_queryset(queryset)
         nodes = []
         if self.node:
             nodes.append(self.node)
@@ -188,63 +257,65 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeApi):
             nodes = Node.objects.filter(key__in=self.root_keys)
 
         for node in nodes:
-            assets = self.util.get_nodes_assets(node).only(*self.assets_only_fields)
-            for asset in assets:
-                data = ParserNode.parse_asset_to_tree_node(node, asset)
-                queryset.append(data)
-        queryset = sorted(queryset)
-        return queryset
+            assets = self.util.get_nodes_assets(node).only(
+                *self.assets_only_fields
+            )
+            _queryset.extend(
+                UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
+            )
+        return _queryset
 
 
-class GetUserAssetPermissionActionsApi(RetrieveAPIView):
+class GetUserAssetPermissionActionsApi(UserAssetPermissionMixin, RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.ActionsSerializer
 
-    def get_object(self):
+    def get_obj(self):
         user_id = self.request.query_params.get('user_id', '')
+        user = get_object_or_404(User, id=user_id)
+        return user
+
+    def get_object(self):
         asset_id = self.request.query_params.get('asset_id', '')
         system_id = self.request.query_params.get('system_user_id', '')
 
         try:
-            user_id = uuid.UUID(user_id)
             asset_id = uuid.UUID(asset_id)
             system_id = uuid.UUID(system_id)
         except ValueError:
             return Response({'msg': False}, status=403)
 
-        user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        util = AssetPermissionUtilV2(user)
-        system_users_actions = util.get_asset_system_users_with_actions(asset)
+        system_users_actions = self.util.get_asset_system_users_with_actions(asset)
         actions = system_users_actions.get(system_user)
         return {"actions": actions}
 
 
-class ValidateUserAssetPermissionApi(APIView):
+class ValidateUserAssetPermissionApi(UserAssetPermissionMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get_obj(self):
+        user_id = self.request.query_params.get('user_id', '')
+        user = get_object_or_404(User, id=user_id)
+        return user
     
     def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id', '')
         asset_id = request.query_params.get('asset_id', '')
         system_id = request.query_params.get('system_user_id', '')
         action_name = request.query_params.get('action_name', '')
-        cache_policy = self.request.query_params.get("cache_policy", '0')
 
         try:
-            user_id = uuid.UUID(user_id)
             asset_id = uuid.UUID(asset_id)
             system_id = uuid.UUID(system_id)
         except ValueError:
             return Response({'msg': False}, status=403)
 
-        user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        util = AssetPermissionUtilV2(user)
-        system_users_actions = util.get_asset_system_users_with_actions(asset)
+        system_users_actions = self.util.get_asset_system_users_with_actions(asset)
         actions = system_users_actions.get(system_user)
         if action_name in Action.value_to_choices(actions):
             return Response({'msg': True}, status=200)
@@ -255,21 +326,19 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
-        # expire all cache
-        # AssetPermissionUtil.expire_all_cache()
+        AssetPermissionUtilV2.expire_all_user_tree_cache()
         return Response({'msg': True}, status=200)
 
 
-class UserGrantedAssetSystemUsersApi(UserPermissionMixin, ListAPIView):
+class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetSystemUserSerializer
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
 
     def get_queryset(self):
-        util = AssetPermissionUtilV2(self.obj)
         asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
-        system_users_with_actions = util.get_asset_system_users_with_actions(asset)
+        system_users_with_actions = self.util.get_asset_system_users_with_actions(asset)
         system_users = []
         for system_user, actions in system_users_with_actions.items():
             system_user.actions = actions
