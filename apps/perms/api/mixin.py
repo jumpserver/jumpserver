@@ -34,13 +34,13 @@ class UserPermissionMixin:
 
     def initial(self, *args, **kwargs):
         super().initial(*args, *kwargs)
-        self.obj = self.get_object()
+        self.obj = self.get_obj()
 
     def get(self, request, *args, **kwargs):
         set_to_root_org()
         return super().get(request, *args, **kwargs)
 
-    def get_object(self):
+    def get_obj(self):
         user_id = self.kwargs.get('pk', '')
         if user_id:
             user = get_object_or_404(User, id=user_id)

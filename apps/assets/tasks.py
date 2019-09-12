@@ -385,6 +385,15 @@ def get_push_linux_system_user_tasks(system_user):
             }
         },
         {
+            'name': 'Add group {}'.format(system_user.username),
+            'action': {
+                'module': 'group',
+                'args': 'name={} state=present'.format(
+                    system_user.username,
+                ),
+            }
+        },
+        {
             'name': 'Check home dir exists',
             'action': {
                 'module': 'stat',

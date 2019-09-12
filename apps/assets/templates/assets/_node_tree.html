@@ -74,7 +74,6 @@ function initNodeTree(options) {
     if (options.showAssets) {
         treeUrl = setUrlParam(treeUrl, 'assets', '1')
     }
-    var asyncTreeUrl = setUrlParam(treeUrl, 'refresh', '0');
     var setting = {
         view: {
             dblClickExpand: false,
@@ -87,7 +86,7 @@ function initNodeTree(options) {
         },
         async: {
 			enable: true,
-			url: asyncTreeUrl,
+			url: treeUrl,
 			autoParam: ["id=key", "name=n", "level=lv"],
             type: 'get'
 		},
@@ -115,9 +114,15 @@ function initNodeTree(options) {
     $.get(treeUrl, function (data, status) {
         zTree = $.fn.zTree.init($("#nodeTree"), setting, data);
         rootNodeAddDom(zTree, function () {
-            treeUrl = setUrlParam(treeUrl, 'refresh', '1');
-            initNodeTree(options);
-            treeUrl = setUrlParam(treeUrl, 'refresh', '0');
+            const url = '{% url 'api-assets:refresh-nodes-cache' %}';
+            requestApi({
+                url: url,
+                method: 'GET',
+                flash_message: false,
+                success: function () {
+                    initNodeTree(options);
+                }
+            });
         });
         inited = true;
     });
