@@ -774,8 +774,7 @@ function createPopover(dataset, title, callback) {
         });
         dataset = new_dataset;
     }
-    var data_content = dataset.join("</br>");
-
+    var data_content = dataset.join("<br>");
     var html = "<a data-toggle='popover' data-content='" + data_content + "'>" + dataset.length + "</a>";
     return html;
 }

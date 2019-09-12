@@ -76,10 +76,9 @@ $(document).ready(function () {
         if(!$("body").hasClass('body-small')) {
             fix_height();
         }
-    })
+    });
 
-    $("[data-toggle=popover]")
-        .popover();
+    $("[data-toggle=popover]").popover();
 });
 
 

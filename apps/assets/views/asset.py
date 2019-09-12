@@ -86,7 +86,7 @@ class AssetCreateView(PermissionsMixin, FormMixin, TemplateView):
             node = get_object_or_none(Node, id=node_id)
         else:
             node = Node.org_root()
-        form["nodes"].initial = node
+        form.add_nodes_initial(node)
         return form
 
     def get_protocol_formset(self):
