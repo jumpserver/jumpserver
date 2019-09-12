@@ -27,6 +27,7 @@ from common.utils import get_logger, ssh_key_gen
 from common.permissions import (
     PermissionsMixin, IsOrgAdmin, IsValidUser,
     UserCanUpdatePassword, UserCanUpdateSSHKey,
+    CanUpdateDeleteUser,
 )
 from orgs.utils import current_org
 from .. import forms
@@ -86,7 +87,7 @@ class UserCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
         user.created_by = self.request.user.username or 'System'
         user.save()
         if current_org and current_org.is_real():
-            user.orgs.add(current_org.id)
+            user.related_user_orgs.add(current_org.id)
         post_user_create.send(self.__class__, user=user)
         return super().form_valid(form)
 
@@ -189,13 +190,19 @@ class UserDetailView(PermissionsMixin, DetailView):
             'action': _('User detail'),
             'groups': groups,
             'unblock': is_need_unblock(key_block),
+            'can_update': CanUpdateDeleteUser.has_update_object_permission(
+                self.request, self, user
+            ),
+            'can_delete': CanUpdateDeleteUser.has_delete_object_permission(
+                self.request, self, user
+            ),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        org_users = current_org.get_org_users().values_list('id', flat=True)
+        org_users = current_org.get_org_members().values_list('id', flat=True)
         queryset = queryset.filter(id__in=org_users)
         return queryset
 

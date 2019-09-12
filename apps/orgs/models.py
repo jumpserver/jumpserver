@@ -9,8 +9,9 @@ from common.utils import is_uuid
 class Organization(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
-    users = models.ManyToManyField('users.User', related_name='orgs', blank=True)
-    admins = models.ManyToManyField('users.User', related_name='admin_orgs', blank=True)
+    users = models.ManyToManyField('users.User', related_name='related_user_orgs', blank=True)
+    admins = models.ManyToManyField('users.User', related_name='related_admin_orgs', blank=True)
+    auditors = models.ManyToManyField('users.User', related_name='related_audit_orgs', blank=True)
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
@@ -70,25 +71,46 @@ class Organization(models.Model):
             org = cls.default() if default else None
         return org
 
-    def get_org_users(self, include_app=False):
+    def get_org_users(self):
         from users.models import User
         if self.is_real():
-            users = self.users.all()
-        else:
-            users = User.objects.all()
-        if not include_app:
-            users = users.exclude(role=User.ROLE_APP)
-        return users
+            return self.users.all()
+        return User.objects.filter(role=User.ROLE_USER)
 
     def get_org_admins(self):
+        from users.models import User
         if self.is_real():
             return self.admins.all()
-        return []
+        return User.objects.filter(role=User.ROLE_ADMIN)
+
+    def get_org_auditors(self):
+        from users.models import User
+        if self.is_real():
+            return self.auditors.all()
+        return User.objects.filter(role=User.ROLE_AUDITOR)
+
+    def get_org_members(self, exclude=()):
+        from users.models import User
+        members = User.objects.none()
+        if 'Admin' not in exclude:
+            members |= self.get_org_admins()
+        if 'User' not in exclude:
+            members |= self.get_org_users()
+        if 'Auditor' not in exclude:
+            members |= self.get_org_auditors()
+        return members.exclude(role=User.ROLE_APP).distinct()
 
     def can_admin_by(self, user):
         if user.is_superuser:
             return True
-        if user in list(self.get_org_admins()):
+        if self.get_org_admins().filter(id=user.id):
+            return True
+        return False
+
+    def can_audit_by(self, user):
+        if user.is_super_auditor:
+            return True
+        if self.get_org_auditors().filter(id=user.id):
             return True
         return False
 
@@ -100,12 +122,39 @@ class Organization(models.Model):
         admin_orgs = []
         if user.is_anonymous:
             return admin_orgs
-        elif user.is_superuser or user.is_auditor:
+        elif user.is_superuser:
             admin_orgs = list(cls.objects.all())
             admin_orgs.append(cls.default())
         elif user.is_org_admin:
-            admin_orgs = user.admin_orgs.all()
+            admin_orgs = user.related_admin_orgs.all()
         return admin_orgs
+
+    @classmethod
+    def get_user_user_orgs(self, user):
+        user_orgs = []
+        if user.is_anonymous:
+            return user_orgs
+        user_orgs = user.related_user_orgs.all()
+        return user_orgs
+
+    @classmethod
+    def get_user_audit_orgs(cls, user):
+        audit_orgs = []
+        if user.is_anonymous:
+            return audit_orgs
+        elif user.is_super_auditor:
+            audit_orgs = list(cls.objects.all())
+            audit_orgs.append(cls.default())
+        elif user.is_org_auditor:
+            audit_orgs = user.related_audit_orgs.all()
+        return audit_orgs
+
+    @classmethod
+    def get_user_admin_or_audit_orgs(self, user):
+        admin_orgs = self.get_user_admin_orgs(user)
+        audit_orgs = self.get_user_audit_orgs(user)
+        orgs = set(admin_orgs) | set(audit_orgs)
+        return orgs
 
     @classmethod
     def default(cls):

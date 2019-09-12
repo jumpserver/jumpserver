@@ -335,7 +335,7 @@ class UserGroupForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
+            users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
 
     def save(self, commit=True):
         group = super().save(commit=commit)

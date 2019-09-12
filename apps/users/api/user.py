@@ -8,12 +8,11 @@ from django.utils.translation import ugettext as _
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.serializers import ValidationError
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
-    CanUpdateDeleteSuperUser,
+    CanUpdateDeleteUser,
 )
 from common.mixins import IDInCacheFilterMixin
 from common.utils import get_logger
@@ -36,7 +35,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsOrgAdmin, CanUpdateDeleteSuperUser)
+    permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
     def send_created_signal(self, users):
         if not isinstance(users, list):
@@ -53,7 +52,7 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         self.send_created_signal(users)
 
     def get_queryset(self):
-        queryset = current_org.get_org_users().prefetch_related('groups')
+        queryset = current_org.get_org_members().prefetch_related('groups')
         return queryset
 
     def get_permissions(self):
@@ -61,32 +60,17 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
-    def _deny_permission(self, instance):
-        """
-        check current user has permission to handle instance
-        (update, destroy, bulk_update, bulk destroy)
-        """
-        if instance.is_superuser and not self.request.user.is_superuser:
-            return True
-        return False
-
-    def _bulk_deny_permission(self, instances):
-        deny_instances = [i for i in instances if self._deny_permission(i)]
-        if len(deny_instances) > 0:
-            return True
-        else:
-            return False
-
     def allow_bulk_destroy(self, qs, filtered):
         return False
 
     def perform_bulk_update(self, serializer):
-        users_ids = [d.get("id") or d.get("pk") for d in serializer.validated_data]
-        users = User.objects.filter(id__in=users_ids)
-        deny_instances = [str(i.id) for i in users if self._deny_permission(i)]
-        if deny_instances:
-            msg = "{} can't be update".format(deny_instances)
-            raise ValidationError({"id": msg})
+        # TODO: 需要测试
+        users_ids = [
+            d.get("id") or d.get("pk") for d in serializer.validated_data
+        ]
+        users = current_org.get_org_members().filter(id__in=users_ids)
+        for user in users:
+            self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
 

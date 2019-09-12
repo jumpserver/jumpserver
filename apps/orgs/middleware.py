@@ -13,14 +13,23 @@ class OrgMiddleware:
     def set_permed_org_if_need(request):
         if request.path.startswith('/api'):
             return
-        if not (request.user.is_authenticated and request.user.is_org_admin):
+        if not request.user.is_authenticated:
+            return
+        if request.user.is_common_user:
             return
         org = get_org_from_request(request)
         if org.can_admin_by(request.user):
             return
-        admin_orgs = Organization.get_user_admin_orgs(request.user)
+        if org.can_audit_by(request.user):
+            return
+        admin_orgs = request.user.admin_orgs
         if admin_orgs:
             request.session['oid'] = str(admin_orgs[0].id)
+            return
+        audit_orgs = request.user.audit_orgs
+        if audit_orgs:
+            request.session['oid'] = str(audit_orgs[0].id)
+            return
 
     def __call__(self, request):
         self.set_permed_org_if_need(request)

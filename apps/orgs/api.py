@@ -33,7 +33,7 @@ class OrgViewSet(BulkModelViewSet):
 
     def get_data_from_model(self, model):
         if model == User:
-            data = model.objects.filter(orgs__id=self.org.id)
+            data = model.objects.filter(related_user_orgs__id=self.org.id)
         else:
             data = model.objects.filter(org_id=self.org.id)
         return data

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
 
-from common.permissions import PermissionsMixin, IsOrgAdmin, IsAuditor
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
 from common.mixins import DatetimeSearchMixin
 from ..models import Session, Command, Terminal
 from ..backends import get_multi_command_storage
@@ -24,7 +24,7 @@ class SessionListView(PermissionsMixin, TemplateView):
     model = Session
     template_name = 'terminal/session_list.html'
     date_from = date_to = None
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
     default_days_ago = 5
 
     def get_context_data(self, **kwargs):
@@ -63,7 +63,7 @@ class SessionDetailView(SingleObjectMixin, PermissionsMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
     object = None
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=self.model.objects.all())

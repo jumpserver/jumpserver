@@ -2,12 +2,10 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             {% include '_user_profile.html' %}
-            {% if request.user.is_org_admin and request.COOKIES.IN_ADMIN_PAGE != "No" %}
-                {% include '_nav.html' %}
-            {% elif request.user.is_auditor %}
-                {% include '_nav_audits.html' %}
-            {% else %}
+            {% if request.user.is_common_user or request.COOKIES.IN_ADMIN_PAGE == 'No' %}
                 {% include '_nav_user.html' %}
+            {% else %}
+                {% include '_nav.html' %}
             {% endif %}
         </ul>
     </div>
