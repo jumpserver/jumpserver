@@ -68,7 +68,7 @@
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
                     <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs"> </i><span> {% trans 'Profile' %}</span></a></li>
-                    {% if request.user.is_superuser or request.user.is_current_org_admin or request.user.is_super_auditor or request.user.is_current_org_auditor %}
+                    {% if request.user.can_admin_or_audit_current_org %}
                         {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
                             <li><a id="switch_admin"><i class="fa fa-exchange"></i><span> {% trans 'Admin page' %}</span></a></li>
                         {% else %}

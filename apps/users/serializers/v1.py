@@ -85,41 +85,24 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return password
 
+    def validate_groups(self, groups):
+        role = self.initial_data.get('role')
+        if self.instance:
+            role = role or self.instance.role
+        if role == User.ROLE_AUDITOR:
+            return []
+        return groups
+
     @staticmethod
-    def change_password_to_raw(validated_data):
-        password = validated_data.pop('password', None)
+    def change_password_to_raw(attrs):
+        password = attrs.pop('password', None)
         if password:
-            validated_data['password_raw'] = password
-        return validated_data
+            attrs['password_raw'] = password
+        return attrs
 
-    @staticmethod
-    def create_auditor_role_clean_groups(validated_data):
-        # TODO: 需要考虑
-        role = validated_data.get('role', None)
-        if role == User.ROLE_AUDITOR:
-            validated_data.pop('groups', None)
-        return validated_data
-
-    @staticmethod
-    def update_auditor_role_clean_groups(instance, validated_data):
-        # TODO: 需要考虑
-        role = validated_data.get('role', instance.role)
-        if role == User.ROLE_AUDITOR:
-            validated_data.pop('groups', None)
-            user_groups_ids = UserGroup.objects.filter(users=instance).\
-                values_list('id', flat=True)
-            instance.groups.remove(*user_groups_ids)
-        return instance, validated_data
-
-    def create(self, validated_data):
-        validated_data = self.change_password_to_raw(validated_data)
-        validated_data = self.create_auditor_role_clean_groups(validated_data)
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data = self.change_password_to_raw(validated_data)
-        instance, validated_data = self.update_auditor_role_clean_groups(instance, validated_data)
-        return super().update(instance, validated_data)
+    def validate(self, attrs):
+        attrs = self.change_password_to_raw(attrs)
+        return attrs
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
