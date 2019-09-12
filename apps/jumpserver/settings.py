@@ -607,7 +607,6 @@ SWAGGER_SETTINGS = {
             'in': 'header'
         }
     },
-    'DEFAULT_API_URL': 'http://www.fit2cloud.com'
 }
 
 
