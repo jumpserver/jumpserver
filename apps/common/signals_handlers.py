@@ -14,7 +14,7 @@ from .local import thread_local
 
 pattern = re.compile(r'FROM `(\w+)`')
 logger = get_logger(__name__)
-DEBUG_DB_QUERY = os.environ.get('DEBUG_DB_QUERY', '0') == '1'
+DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 
 class Counter:
@@ -58,7 +58,7 @@ def on_request_finished_release_local(sender, **kwargs):
     thread_local.__release_local__()
 
 
-if settings.DEBUG and DEBUG_DB_QUERY:
+if settings.DEBUG and DEBUG_DB:
     request_finished.connect(on_request_finished_logging_db_query)
 
 

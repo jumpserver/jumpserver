@@ -44,8 +44,10 @@ class IDInCacheFilterMixin(object):
             return queryset
         cache_key = KEY_CACHE_RESOURCES_ID.format(spm)
         resources_id = cache.get(cache_key)
-        if resources_id and isinstance(resources_id, list):
-            queryset = queryset.filter(id__in=resources_id)
+        if not resources_id or not isinstance(resources_id, list):
+            queryset = queryset.none()
+            return queryset
+        queryset = queryset.filter(id__in=resources_id)
         return queryset
 
 

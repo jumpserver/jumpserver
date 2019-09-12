@@ -37,19 +37,22 @@ class TreeMixin:
     def tree(cls):
         from ..utils import TreeService
         tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
+        now = time.time()
+        # 什么时候重新初始化 _tree_service
         if not cls.tree_created_time or \
                 tree_updated_time > cls.tree_created_time:
             logger.debug("Create node tree")
             tree = TreeService.new()
-            cls.tree_created_time = time.time()
-            cls.tree_assets_created_time = time.time()
+            cls.tree_created_time = now
+            cls.tree_assets_created_time = now
             cls._tree_service = tree
             return tree
+        # 是否要重新初始化节点资产
         node_assets_updated_time = cache.get(cls.tree_assets_cache_key, 0)
         if not cls.tree_assets_created_time or \
                 node_assets_updated_time > cls.tree_assets_created_time:
-            cls._tree_service.init_assets_async()
-            cls.tree_assets_created_time = time.time()
+            cls._tree_service.init_assets()
+            cls.tree_assets_created_time = now
             logger.debug("Refresh node tree assets")
         return cls._tree_service
 

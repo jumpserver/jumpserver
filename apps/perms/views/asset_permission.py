@@ -53,11 +53,11 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
             nodes_id = nodes_id.split(",")
             nodes = Node.objects.filter(id__in=nodes_id)\
                 .exclude(id=Node.org_root().id)
-            form['nodes'].initial = nodes
+            form.set_nodes_initial(nodes)
         if assets_id:
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
-            form['assets'].initial = assets
+            form.set_assets_initial(assets)
         return form
 
     def get_context_data(self, **kwargs):

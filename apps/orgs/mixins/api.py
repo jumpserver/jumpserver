@@ -35,6 +35,10 @@ class OrgBulkModelViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         return queryset
 
     def allow_bulk_destroy(self, qs, filtered):
+        if qs.count() <= filtered.count():
+            return False
+        if self.request.query_params.get('spm', ''):
+            return True
         return False
 
 

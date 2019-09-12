@@ -33,10 +33,15 @@ class AssetCreateForm(OrgModelForm):
             return
         nodes_field = self.fields['nodes']
         if self.instance:
-            nodes_field.choices = ((n.id, n.full_value) for n in
-                                   self.instance.nodes.all())
+            nodes_field.choices = [(n.id, n.full_value) for n in
+                                   self.instance.nodes.all()]
         else:
             nodes_field.choices = []
+
+    def add_nodes_initial(self, node):
+        nodes_field = self.fields['nodes']
+        nodes_field.choices.append((node.id, node.full_value))
+        nodes_field.initial = [node]
 
     class Meta:
         model = Asset

@@ -15,11 +15,11 @@
     text-align: center;
 }
 
-#assetTree2.ztree * {
-    background-color: #f8fafb;
+#asset_modal_tree.ztree * {
+    background-color: white;
 }
-#assetTree2.ztree {
-    background-color: #f8fafb;
+#asset_modal_tree.ztree {
+    background-color: white;
 }
 </style>
 
@@ -29,7 +29,8 @@
            <div class="ibox float-e-margins">
                <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
                    <div class="file-manager ">
-                       <div id="assetTree2" class="ztree">
+                       <div id="asset_modal_tree" class="ztree">
+                           {% trans 'Loading' %} ...
                        </div>
                        <div class="clearfix"></div>
                    </div>
@@ -55,12 +56,77 @@
 </div>
 
 <script>
-var zTree2, asset_table2 = 0;
-function initTable2() {
-    if(asset_table2){
-        return
+function syncTableSelectedAssetToSelect2(table) {
+    var assets = table.selected;
+    var options = [];
+    var select2Id = assetModalOption.select2Id;
+    $(select2Id + ' option').each(function (i, v) {
+        options.push(v.value)
+    });
+    table.selected_rows.forEach(function (i) {
+        var name = i.hostname + '(' + i.ip + ')';
+        var option = new Option(name, i.id, false, true);
+
+        if (options.indexOf(i.id) === -1) {
+            $(select2Id).append(option).trigger('change');
+        }
+    });
+    $(select2Id).val(assets).trigger('change');
+}
+
+
+
+// 解决input框中的资产和弹出表格中资产的显示不一致
+function syncSelectedAssetsToModalTable(assetModalTable) {
+    var select2Id = assetModalOption.select2Id;
+    var inputAssets = $(select2Id).val();
+    var selectedAssets = assetModalTable.selected.concat();
+
+    // input assets无，table assets选中，则取消勾选(再次click)
+    if (selectedAssets.length !== 0) {
+        $.each(selectedAssets, function (index, assetId) {
+            if ($.inArray(assetId, inputAssets) === -1) {
+                $('#' + assetId).trigger('click');  // 取消勾选
+            }
+        });
     }
 
+    // input assets有，table assets没选，则选中(click)
+    if (inputAssets !== null) {
+        assetModalTable.selected = inputAssets;
+        $.each(inputAssets, function (index, assetId) {
+            var dom = document.getElementById(assetId);
+            if (dom !== null) {
+                var selected = dom.parentElement.parentElement.className.indexOf('selected')
+            }
+            if (selected === -1) {
+                $('#' + assetId).trigger('click');
+            }
+        });
+    }
+}
+
+defaultOnAssetModalConfirm = syncTableSelectedAssetToSelect2;
+defaultOnModalTableDone = syncSelectedAssetsToModalTable;
+
+
+var assetModalOption = {
+    selectStyle: 'multi',
+    select2Id: '#id_assets',
+    onModalTableDone: defaultOnModalTableDone,
+    onModalTreeDone: null,
+    onModalConfirm: defaultOnAssetModalConfirm,
+};
+
+var assetModalTable, assetModalTree = null;
+
+function initAssetModalTable() {
+    if(assetModalTable){
+        return
+    }
+    if (assetModalOption.selectStyle === 'single') {
+        $('.ipt_check_all').addClass('hidden')
+    }
     var options = {
         ele: $('#asset_list_modal_table'),
         ajax_url: '{% url "api-assets:asset-list" %}?show_current_asset=1',
@@ -68,22 +134,26 @@ function initTable2() {
             {data: "id"}, {data: "hostname" }, {data: "ip" }
         ],
         lengthMenu: [[10, 25, 50], [10, 25, 50]],
-        pageLength: 10
+        pageLength: 10,
+        select_style: assetModalOption.selectStyle
     };
-    asset_table2 = jumpserver.initServerSideDataTable(options);
-    return asset_table2
+    assetModalTable = jumpserver.initServerSideDataTable(options);
+    if (assetModalOption.onModalTableDone) {
+        assetModalOption.onModalTableDone(assetModalTable);
+    }
+    return assetModalTable
 }
 
-function onNodeSelected2(event, treeNode) {
-    var url = asset_table2.ajax.url();
+function onModalTreeNodeSelected(event, treeNode) {
+    var url = assetModalTable.ajax.url();
     url = setUrlParam(url, "node_id", treeNode.meta.node.id);
     url = setUrlParam(url, "show_current_asset", "");
-    asset_table2.ajax.url(url);
-    asset_table2.ajax.reload();
+    assetModalTable.ajax.url(url);
+    assetModalTable.ajax.reload();
 }
 
 
-function initTree2() {
+function initModalTree() {
     var url = '{% url 'api-assets:node-children-tree' %}?assets=0';
     var setting = {
         view: {
@@ -102,17 +172,34 @@ function initTree2() {
             type: 'get'
 		},
         callback: {
-            onSelected: onNodeSelected2
+            onSelected: onModalTreeNodeSelected
         }
     };
-    zTree2 = $.fn.zTree.init($("#assetTree2"), setting);
+    $.get(url, function(data, status){
+        $.fn.zTree.init($("#asset_modal_tree"), setting);
+        assetModalTree = $.fn.zTree.getZTreeObj("assetTree2");
+        if (assetModalOption.onModalTreeDone) {
+            assetModalOption.onModalTreeDone(assetModalTree);
+        }
+        return assetModalTree;
+    });
+}
+
+function setAssetModalOptions(options) {
+    assetModalOption = options;
 }
 
 
 $(document).ready(function(){
+
 }).on('show.bs.modal', function () {
-    initTable2();
-    initTree2();
+    initAssetModalTable();
+    initModalTree();
+}).on('click', '#btn_asset_modal_confirm', function () {
+    if (assetModalOption.onModalConfirm) {
+        assetModalOption.onModalConfirm(assetModalTable, assetModalTree);
+    }
+    $("#asset_list_modal").modal('hide');
 })
 </script>
 {% endblock %}

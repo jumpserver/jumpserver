@@ -53,6 +53,16 @@ class AssetPermissionForm(OrgModelForm):
             assets_field.queryset = Asset.objects.none()
             nodes_field.queryset = Node.objects.none()
 
+    def set_nodes_initial(self, nodes):
+        field = self.fields['nodes']
+        field.choices = [(n.id, n.full_value) for n in nodes]
+        field.initial = nodes
+
+    def set_assets_initial(self, assets):
+        field = self.fields['assets']
+        field.choices = [(a.id, a.hostname) for a in assets]
+        field.initial = assets
+
     class Meta:
         model = AssetPermission
         exclude = (

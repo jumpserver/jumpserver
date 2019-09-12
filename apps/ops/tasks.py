@@ -40,7 +40,7 @@ def run_ansible_task(tid, callback=None, **kwargs):
         logger.error("No task found")
 
 
-@shared_task(soft_time_limit=60)
+@shared_task(soft_time_limit=60, queue="ansible")
 def run_command_execution(cid, **kwargs):
     execution = get_object_or_none(CommandExecution, id=cid)
     if execution:
