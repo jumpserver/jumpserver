@@ -42,7 +42,7 @@ class OrgResourceSerializerMixin(serializers.Serializer):
         return fields
 
 
-class BulkOrgResourceSerializerMixin(OrgResourceSerializerMixin, BulkSerializerMixin):
+class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerMixin):
     pass
 
 

@@ -23,7 +23,7 @@ def rerun_task():
     pass
 
 
-@shared_task
+@shared_task(queue="ansible")
 def run_ansible_task(tid, callback=None, **kwargs):
     """
     :param tid: is the tasks serialized data
@@ -45,6 +45,10 @@ def run_command_execution(cid, **kwargs):
     execution = get_object_or_none(CommandExecution, id=cid)
     if execution:
         try:
+            os.environ.update({
+                "TERM_ROWS": kwargs.get("rows", ""),
+                "TERM_COLS": kwargs.get("cols", ""),
+            })
             execution.run()
         except SoftTimeLimitExceeded:
             logger.error("Run time out")
@@ -98,7 +102,7 @@ def create_or_update_registered_periodic_tasks():
         create_or_update_celery_periodic_tasks(task)
 
 
-@shared_task
+@shared_task(queue="ansible")
 def hello(name, callback=None):
     import time
     time.sleep(10)
@@ -109,7 +113,9 @@ def hello(name, callback=None):
 # @after_app_shutdown_clean_periodic
 # @register_as_period_task(interval=30)
 def hello123():
+    p = subprocess.Popen('ls /tmp', shell=True)
     print("{} Hello world".format(datetime.datetime.now().strftime("%H:%M:%S")))
+    return None
 
 
 @shared_task

@@ -1,8 +1,8 @@
 /**
  * Czech translation
- * @author Jay Gridley <gridley.jay@hotmail.com>
  * @author RobiNN <kelcakrobo@gmail.com>
- * @version 2018-05-05
+ * @author Jay Gridley <gridley.jay@hotmail.com>
+ * @version 2019-08-09
  */
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -14,12 +14,12 @@
 	}
 }(this, function(elFinder) {
 	elFinder.prototype.i18.cs = {
-		translator : 'Jay Gridley &lt;gridley.jay@hotmail.com&gt;, RobiNN &lt;kelcakrobo@gmail.com&gt;',
+		translator : 'RobiNN &lt;kelcakrobo@gmail.com&gt;, Jay Gridley &lt;gridley.jay@hotmail.com&gt;',
 		language   : 'Čeština',
 		direction  : 'ltr',
-		dateFormat : 'd. m. Y H:i', // Mar 13, 2012 05:27 PM
-		fancyDateFormat : '$1 H:i', // will produce smth like: Today 12:25 PM
-		nonameDateFormat : 'ymd-His', // to apply if upload file is noname: 120513172700
+		dateFormat : 'd. m. Y H:i', // will show like: 09. 08. 2019 14:18
+		fancyDateFormat : '$1 H:i', // will show like: Dnes 14:18
+		nonameDateFormat : 'ymd-His', // noname upload will show like: 190809-141840
 		messages   : {
 
 			/********************************** errors **********************************/
@@ -115,6 +115,7 @@
 			'errEditorNotFound'    : 'Editor tohoto typu souboru nebyl nalezen.', // from v2.1.25 added 23.5.2017
 			'errServerError'       : 'Došlo k chybě na straně serveru.', // from v2.1.25 added 16.6.2017
 			'errEmpty'             : 'Nelze vyprázdnit složku "$1".', // from v2.1.25 added 22.6.2017
+			'moreErrors'           : 'Existují ještě další $1 chyby.', // from v2.1.44 added 9.12.2018
 
 			/******************************* commands names ********************************/
 			'cmdarchive'   : 'Vytvořit archív',
@@ -163,6 +164,7 @@
 			'cmdselectnone': 'Nic nevyberať', // from v2.1.28 added 15.08.2017
 			'cmdselectinvert': 'Invertovat výběr', // from v2.1.28 added 15.08.2017
 			'cmdopennew'   : 'Otevři v novém okně', // from v2.1.38 added 3.4.2018
+			'cmdhide'      : 'Skrýt (Předvolba)', // from v2.1.41 added 24.7.2018
 
 			/*********************************** buttons ***********************************/
 			'btnClose'  : 'Zavřít',
@@ -224,6 +226,7 @@
 			'ntfchkdir'   : 'Kontrola cílové složky', // from v2.1.24 added 3.5.2017
 			'ntfundo'     : 'Zrušit  předchozí operaci', // from v2.1.27 added 31.07.2017
 			'ntfredo'     : 'Obnovit předchozí zrušení', // from v2.1.27 added 31.07.2017
+			'ntfchkcontent' : 'Kontrola obsahu', // from v2.1.41 added 3.8.2018
 
 			/*********************************** volumes *********************************/
 			'volume_Trash' : 'Koš', //from v2.1.24 added 29.4.2017
@@ -284,9 +287,12 @@
 			'sortAlsoTreeview'  : 'Také stromové zobrazení',  // from v2.1.15 added 01.08.2016
 
 			/********************************** new items **********************************/
-			'untitled file.txt' : 'Nový textový soubor.txt', // added 10.11.2015
+			'untitled file.txt' : 'Nový soubor.txt', // added 10.11.2015
 			'untitled folder'   : 'Nová složka',   // added 10.11.2015
 			'Archive'           : 'Nový archiv',  // from v2.1 added 10.11.2015
+			'untitled file'     : 'Nový soubor.$1',  // from v2.1.41 added 6.8.2018
+			'extentionfile'     : '$1 soubor',    // from v2.1.41 added 6.8.2018
+			'extentiontype'     : '$1: $2',      // from v2.1.43 added 17.10.2018
 
 			/********************************** messages **********************************/
 			'confirmReq'      : 'Požadováno potvrzení',
@@ -297,6 +303,7 @@
 			'confirmNonUTF8'  : 'Kódování tohoto souboru nemoholo rozpoznán. Pro úpravy je třeba dočasně převést do kódování UTF-8.<br/>Prosím, vyberte kódování znaků souboru.', // from v2.1.19 added 28.11.2016
 			'confirmNotSave'  : 'Byl změněn.<br/>Pokud obsahuje neuložené změny, dojde ke ztrátě práce.', // from v2.1 added 15.7.2015
 			'confirmTrash'    : 'Opravdu chcete položky přesunout do koše?', //from v2.1.24 added 29.4.2017
+			'confirmMove'     : 'Opravdu chcete položky přesunout do "$1"?', //from v2.1.50 added 27.7.2019
 			'apllyAll'        : 'Pro všechny',
 			'name'            : 'Název',
 			'size'            : 'Velikost',
@@ -314,6 +321,10 @@
 			'selectlfile'     : 'Vybrat poslední položku',
 			'viewlist'        : 'Seznam',
 			'viewicons'       : 'Ikony',
+			'viewSmall'       : 'Malé ikony', // from v2.1.39 added 22.5.2018
+			'viewMedium'      : 'Střední ikony', // from v2.1.39 added 22.5.2018
+			'viewLarge'       : 'Velké ikony', // from v2.1.39 added 22.5.2018
+			'viewExtraLarge'  : 'Extra velké ikony', // from v2.1.39 added 22.5.2018
 			'places'          : 'Místa',
 			'calc'            : 'Vypočítat',
 			'path'            : 'Cesta',
@@ -408,7 +419,7 @@
 			'contextmenu'     : 'Kontextové menu', // from v2.1.15 added 9.9.2016
 			'pageTurning'     : 'Otáčení stránky', // from v2.1.15 added 10.9.2016
 			'volumeRoots'     : 'Kořeny média', // from v2.1.16 added 16.9.2016
-			'reset'           : 'Reset', // from v2.1.16 added 1.10.2016
+			'reset'           : 'Obnovit', // from v2.1.16 added 1.10.2016
 			'bgcolor'         : 'Barva pozadí', // from v2.1.16 added 1.10.2016
 			'colorPicker'     : 'Výběr barvy', // from v2.1.16 added 1.10.2016
 			'8pxgrid'         : '8px mřížka', // from v2.1.16 added 4.10.2016
@@ -427,7 +438,7 @@
 			'TextArea'        : 'Textarea', // from v2.1.25 added 14.6.2017
 			'folderToEmpty'   : 'Vyprázdnit složku "$1".', // from v2.1.25 added 22.6.2017
 			'filderIsEmpty'   : 'Ve složce "$1" nejsou žádné položky.', // from v2.1.25 added 22.6.2017
-			'preference'      : 'Preference', // from v2.1.26 added 28.6.2017
+			'preference'      : 'Předvolby', // from v2.1.26 added 28.6.2017
 			'language'        : 'Nastavte jazyk', // from v2.1.26 added 28.6.2017
 			'clearBrowserData': 'Inicializujte nastavení uložená v tomto prohlížeči', // from v2.1.26 added 28.6.2017
 			'toolbarPref'     : 'Nastavení panelu nástrojů', // from v2.1.27 added 2.8.2017
@@ -457,6 +468,29 @@
 			'workspace'       : 'Pracovní prostor', // from v2.1.38 added 4.4.2018
 			'dialog'          : 'Dialog', // from v2.1.38 added 4.4.2018
 			'all'             : 'Všechno', // from v2.1.38 added 4.4.2018
+			'iconSize'        : 'Velikost ikony (zobrazení ikon)', // from v2.1.39 added 7.5.2018
+			'editorMaximized' : 'Otevřete maximalizované okno editora', // from v2.1.40 added 30.6.2018
+			'editorConvNoApi' : 'Protože konverze podle API momentálně není k dispozici, převeďte na webové stránce.', //from v2.1.40 added 8.7.2018
+			'editorConvNeedUpload' : 'Po konverzi musíte nahrát převeden soubor pomocí URL položky nebo stažený soubor k uložení převedeného souboru.', //from v2.1.40 added 8.7.2018
+			'convertOn'       : 'Převést na stránce $1', // from v2.1.40 added 10.7.2018
+			'integrations'    : 'Integrace', // from v2.1.40 added 11.7.2018
+			'integrationWith' : 'Tento elFinder má integrované následující externí služby. Před použitím zkontrolujte podmínky používání, zásady ochrany osobních údajů atd.', // from v2.1.40 added 11.7.2018
+			'showHidden'      : 'Zobrazit skryté položky', // from v2.1.41 added 24.7.2018
+			'hideHidden'      : 'Skrýt skryté položky', // from v2.1.41 added 24.7.2018
+			'toggleHidden'    : 'Zobrazit/skrýt skryté položky', // from v2.1.41 added 24.7.2018
+			'makefileTypes'   : 'Typy souborů, jež mají být povoleny pomocí "Nový soubor"', // from v2.1.41 added 7.8.2018
+			'typeOfTextfile'  : 'Typ textového souboru', // from v2.1.41 added 7.8.2018
+			'add'             : 'Přidat', // from v2.1.41 added 7.8.2018
+			'theme'           : 'Téma', // from v2.1.43 added 19.10.2018
+			'default'         : 'Výchozí', // from v2.1.43 added 19.10.2018
+			'description'     : 'Popis', // from v2.1.43 added 19.10.2018
+			'website'         : 'Stránka', // from v2.1.43 added 19.10.2018
+			'author'          : 'Autor', // from v2.1.43 added 19.10.2018
+			'email'           : 'E-mail', // from v2.1.43 added 19.10.2018
+			'license'         : 'Licence', // from v2.1.43 added 19.10.2018
+			'exportToSave'    : 'Tuto položku nelze uložit. Abyste se vyhnuli ztrátě úprav, musíte je exportovat do počítače.', // from v2.1.44 added 1.12.2018
+			'dblclickToSelect': 'Poklepáním na soubor jej vyberte.', // from v2.1.47 added 22.1.2019
+			'useFullscreen'   : 'Použít režim celé obrazovky', // from v2.1.47 added 19.2.2019
 
 			/********************************** mimetypes **********************************/
 			'kindUnknown'     : 'Neznámý',

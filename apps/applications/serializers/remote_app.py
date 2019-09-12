@@ -5,7 +5,7 @@
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .. import const
 from ..models import RemoteApp

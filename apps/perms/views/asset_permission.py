@@ -10,7 +10,6 @@ from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
-from assets.utils import NodeUtil
 from perms.hands import Node, Asset, SystemUser, UserGroup
 from perms.models import AssetPermission
 from perms.forms import AssetPermissionForm
@@ -52,7 +51,8 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
 
         if nodes_id:
             nodes_id = nodes_id.split(",")
-            nodes = Node.objects.filter(id__in=nodes_id).exclude(id=Node.root().id)
+            nodes = Node.objects.filter(id__in=nodes_id)\
+                .exclude(id=Node.org_root().id)
             form['nodes'].initial = nodes
         if assets_id:
             assets_id = assets_id.split(",")
@@ -167,8 +167,6 @@ class AssetPermissionAssetView(PermissionsMixin,
         nodes_remain = Node.objects.exclude(
             id__in=self.object.nodes.all().values_list('id', flat=True)
         ).only('key')
-        util = NodeUtil()
-        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission asset list'),

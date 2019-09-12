@@ -608,8 +608,9 @@ jumpserver.initServerSideDataTable = function (options) {
                        var kv = val.split(":");
                        if (kv.length === 2) {
                            var value = kv[1];
-                           value = value.replace("+", " ");
-                           search_attr[kv[0]] = value
+                           var key = kv[0].trim();
+                           value = value.replace("+", " ").trim();
+                           search_attr[key] = value
                        } else {
                            search_raw.push(kv)
                        }
@@ -1199,5 +1200,30 @@ function readFile(ref) {
     }
 
     return ref
+}
+
+function nodesSelect2Init(selector, url) {
+    return $(selector).select2({
+        closeOnSelect: false,
+        ajax: {
+            url: url,
+            data: function (params) {
+                var page = params.page || 1;
+                var query = {
+                   search: params.term,
+                   offset: (page -1) * 10,
+                   limit: 10
+                };
+                return query
+            },
+            processResults: function (data) {
+                var results = $.map(data.results, function (v, i) {
+                    return {id: v.id, text: v.full_value}
+                });
+                var more = !!data.next;
+                return {results: results, pagination: {"more": more }}
+            }
+        },
+    })
 }
 

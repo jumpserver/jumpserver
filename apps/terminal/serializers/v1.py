@@ -2,7 +2,7 @@
 #
 from rest_framework import serializers
 
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Terminal, Status, Session, Task

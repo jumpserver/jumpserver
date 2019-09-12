@@ -7,7 +7,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 
 
 __all__ = [

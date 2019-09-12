@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import re
+import os
 from collections import defaultdict
 from django.conf import settings
 from django.dispatch import receiver
@@ -12,8 +13,8 @@ from common.utils import get_logger
 from .local import thread_local
 
 pattern = re.compile(r'FROM `(\w+)`')
-# logger = logging.getLogger('jmsdb')
 logger = get_logger(__name__)
+DEBUG_DB_QUERY = os.environ.get('DEBUG_DB_QUERY', '0') == '1'
 
 
 class Counter:
@@ -57,7 +58,7 @@ def on_request_finished_release_local(sender, **kwargs):
     thread_local.__release_local__()
 
 
-if settings.DEBUG:
+if settings.DEBUG and DEBUG_DB_QUERY:
     request_finished.connect(on_request_finished_logging_db_query)
 
 

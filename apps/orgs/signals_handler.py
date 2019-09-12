@@ -16,7 +16,7 @@ def on_org_create_or_update(sender, instance=None, created=False, **kwargs):
     if instance:
         old_org = get_current_org()
         set_current_org(instance)
-        node_root = Node.root()
+        node_root = Node.org_root()
         if node_root.value != instance.name:
             node_root.value = instance.name
             node_root.save()

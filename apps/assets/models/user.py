@@ -31,7 +31,7 @@ class AdminUser(AssetUser):
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
-    _become_pass = models.CharField(default='', max_length=128)
+    _become_pass = models.CharField(default='', blank=True, max_length=128)
     CONNECTIVITY_CACHE_KEY = '_ADMIN_USER_CONNECTIVE_{}'
     _prefer = "admin_user"
 
@@ -96,7 +96,7 @@ class SystemUser(AssetUser):
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
-        (PROTOCOL_TELNET, 'telnet (beta)'),
+        (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
     )
 
@@ -148,9 +148,11 @@ class SystemUser(AssetUser):
         return True, None
 
     def get_all_assets(self):
+        from .node import Node
         args = [Q(systemuser=self)]
         pattern = set()
         nodes_keys = self.nodes.all().values_list('key', flat=True)
+        nodes_keys = Node.clean_children_keys(nodes_keys)
         for key in nodes_keys:
             pattern.add(r'^{0}$|^{0}:'.format(key))
         pattern = '|'.join(list(pattern))

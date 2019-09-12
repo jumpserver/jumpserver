@@ -4,22 +4,20 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 
-from common.utils import get_signer, validate_ssh_public_key
+from common.utils import validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 
 
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
     'UserGroupSerializer', 'UserGroupListSerializer',
-    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer'
+    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer',
+    'ResetOTPSerializer',
 ]
-
-
-signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -45,7 +43,8 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
-            'created_by': {'read_only': True}, 'source': {'read_only': True}
+            'created_by': {'read_only': True, 'allow_blank': True},
+            'source': {'read_only': True},
         }
 
     def validate_role(self, value):
@@ -138,3 +137,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
+
+class ResetOTPSerializer(serializers.Serializer):
+    msg = serializers.CharField(read_only=True)

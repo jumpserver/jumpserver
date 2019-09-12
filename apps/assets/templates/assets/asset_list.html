@@ -124,7 +124,6 @@
    </div>
 </div>
 
-{% include 'assets/_node_tree.html' %}
 {% include 'assets/_asset_update_modal.html' %}
 {% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
@@ -442,9 +441,10 @@ $(document).ready(function(){
        var success = function () {
            asset_table.ajax.reload()
        };
+       var url = "{% url 'api-assets:node-remove-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
 
        requestApi({
-           'url': '/api/assets/v1/nodes/' + current_node_id + '/assets/remove/',
+           'url': url,
            'method': 'PUT',
            'body': JSON.stringify(data),
            'success': success

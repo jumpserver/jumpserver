@@ -3,7 +3,6 @@
 import time
 from django.utils import timezone
 from django.shortcuts import HttpResponse
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.response import Response
@@ -23,7 +22,6 @@ __all__ = ['CommandViewSet', 'CommandExportApi']
 
 class CommandQueryMixin:
     command_store = get_command_storage()
-    pagination_class = LimitOffsetPagination
     permission_classes = [IsOrgAdminOrAppUser | IsAuditor]
     filter_fields = [
         "asset", "system_user", "user", "session",
@@ -91,6 +89,8 @@ class CommandViewSet(CommandQueryMixin, viewsets.ModelViewSet):
 
 
 class CommandExportApi(CommandQueryMixin, generics.ListAPIView):
+    serializer_class = SessionCommandSerializer
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 

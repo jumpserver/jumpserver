@@ -4,11 +4,12 @@
 import uuid
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 
 from common.utils import date_expired_default, set_or_append_attr_bulk
-from orgs.mixins import OrgManager
+from orgs.mixins.models import OrgManager
 
 
 __all__ = [
@@ -23,6 +24,18 @@ class BasePermissionQuerySet(models.QuerySet):
     def valid(self):
         return self.active().filter(date_start__lt=timezone.now()) \
             .filter(date_expired__gt=timezone.now())
+
+    def inactive(self):
+        return self.filter(is_active=False)
+
+    def invalid(self):
+        now = timezone.now
+        q = (
+            Q(is_active=False) |
+            Q(date_start__gt=now) |
+            Q(date_expired__lt=now)
+        )
+        return self.filter(q)
 
 
 class BasePermissionManager(OrgManager):

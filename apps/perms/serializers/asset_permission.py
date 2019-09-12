@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from perms.models import AssetPermission, Action
 from assets.models import Asset
 

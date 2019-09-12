@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.utils import html
 from rest_framework.settings import api_settings
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import SkipField
+from rest_framework.fields import SkipField, empty
 
 __all__ = ['BulkSerializerMixin', 'BulkListSerializerMixin']
 
@@ -35,6 +35,18 @@ class BulkSerializerMixin(object):
                     id_value = id_field.to_internal_value(data.get("pk"))
                 ret[id_attr] = id_value
         return ret
+
+    def run_validation(self, data=empty):
+        """
+        批量创建时，获取到的self.initial_data是list，
+        所以想用一个属性来存放当前操作的数据集，在validate_field中使用
+        :param data:
+        :return:
+        """
+        # 只有批量创建的时候，才需要重写 initial_data
+        if self.parent:
+            self.initial_data = data
+        return super().run_validation(data)
 
 
 class BulkListSerializerMixin(object):

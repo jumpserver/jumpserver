@@ -25,7 +25,7 @@ try {
 					preview.hide();
 					$('<div class="elfinder-quicklook-info-data"><button class="elfinder-info-button">'+fm.i18n('getLink')+'</button></div>').appendTo(ql.info.find('.elfinder-quicklook-info'))
 					.on('click', function() {
-						$(this).html('<span class="elfinder-info-spinner">');
+						$(this).html('<span class="elfinder-spinner">');
 						fm.request({
 							data : {cmd : 'url', target : file.hash},
 							preventDefault : true
@@ -45,22 +45,27 @@ try {
 				}
 				if (file.url !== '' && file.url != '1') {
 					e.stopImmediatePropagation();
+
+					loading = $('<div class="elfinder-quicklook-info-data"><span class="elfinder-spinner-text">'+fm.i18n('nowLoading')+'</span><span class="elfinder-spinner"/></div>').appendTo(ql.info.find('.elfinder-quicklook-info'));
+
+					node = $('<iframe class="elfinder-quicklook-preview-iframe"/>')
+						.css('background-color', 'transparent')
+						.on('load', function() {
+							ql.hideinfo();
+							loading.remove();
+							node.css('background-color', '#fff');
+						})
+						.on('error', function() {
+							loading.remove();
+							node.remove();
+						})
+						.appendTo(preview)
+						.attr('src', fm.url(file.hash));
+
 					preview.one('change', function() {
 						loading.remove();
 						node.off('load').remove();
 					});
-					
-					loading = $('<div class="elfinder-quicklook-info-data">'+fm.i18n('nowLoading')+'<span class="elfinder-info-spinner"></div>').appendTo(ql.info.find('.elfinder-quicklook-info'));
-					
-					node = $('<iframe class="elfinder-quicklook-preview-iframe"/>')
-						.css('background-color', 'transparent')
-						.appendTo(preview)
-						.on('load', function() {
-							ql.hideinfo();
-							loading.remove();
-							$(this).css('background-color', '#fff').show();
-						})
-						.attr('src', fm.url(file.hash));
 				}
 			}
 			

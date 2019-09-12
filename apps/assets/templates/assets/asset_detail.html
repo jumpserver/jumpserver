@@ -195,10 +195,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Nodes' %}" id="groups_selected" class="select2 groups" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}" >{{ node }}</option>
-                                                        {% endfor %}
+                                                    <select data-placeholder="{% trans 'Nodes' %}" id="groups_selected" class="nodes-select2 groups" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -211,7 +208,7 @@
 
                                         {% for node in asset.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node }}</b></td>
+                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn-leave-node" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
@@ -291,7 +288,9 @@ function refreshAssetHardware() {
 
 
 $(document).ready(function () {
-    $('.select2.groups').select2().on('select2:select', function(evt) {
+    var url = "{% url 'api-assets:node-list' %}";
+    nodesSelect2Init(".nodes-select2", url)
+    .on('select2:select', function(evt) {
         var data = evt.params.data;
         jumpserver.nodes_selected[data.id] = data.text;
     }).on('select2:unselect', function(evt) {
