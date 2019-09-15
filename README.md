@@ -178,12 +178,13 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
 -  [Step by Step 安装文档](http://docs.jumpserver.org/zh/docs/step_by_step.html)
 -  [完整文档](http://docs.jumpserver.org)
 
-## 演示视频和截屏
+## 案例、视频和截屏
 
-我们提供了演示视频和系统截图可以让你快速了解 Jumpserver：
+我们提供了典型案例、演示视频和截屏可以让你快速了解 Jumpserver：
 
+- [典型案例](http://jumpserver.org/customers.html)
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
-- [系统截图](http://docs.jumpserver.org/zh/docs/snapshot.html)
+- [系统截屏](http://docs.jumpserver.org/zh/docs/snapshot.html)
 
 ## SDK
 
