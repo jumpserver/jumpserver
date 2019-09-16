@@ -258,25 +258,28 @@ $(document).ready(function(){
         },function () {
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
+                function success() {
+                    var msg = "{% trans 'User Deleted.' %}";
+                    swal("{% trans 'User Delete' %}", msg, "success");
+                }
+                function fail() {
+                    var msg = "{% trans 'User Deleting failed.' %}";
+                    swal("{% trans 'User Delete' %}", msg, "error");
+                }
                 requestApi({
                     url:url,
                     method:'DELETE',
+                    flash_message:true,
                     success:reloadPage,
-                    flash_message:false,
+                    error: fail
                  });
-                var msg = "{% trans 'User Deleted.' %}";
-                swal("{% trans 'User Delete' %}", msg, "success");
-            }
-            function fail() {
-                var msg = "{% trans 'User Deleting failed.' %}";
-                swal("{% trans 'User Delete' %}", msg, "error");
             }
             requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
                 method:'POST',
                 body:JSON.stringify(data),
+                flash_message:false,
                 success:success,
-                error:fail
              })
         })
     }
