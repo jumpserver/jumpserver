@@ -60,8 +60,10 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
-    def allow_bulk_destroy(self, qs, filtered):
-        return False
+    def perform_bulk_destroy(self, objects):
+        for obj in objects:
+            self.check_object_permissions(self.request, obj)
+            self.perform_destroy(obj)
 
     def perform_bulk_update(self, serializer):
         # TODO: 需要测试
