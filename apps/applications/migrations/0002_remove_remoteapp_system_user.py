@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('applications', '0001_initial'),
-        ('perms', '0008_remoteapppermission_system_users'),
+        ('perms', '0009_remoteapppermission_system_users'),
     ]
 
     operations = [

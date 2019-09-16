@@ -131,16 +131,15 @@ class AssetPermissionUserView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-
+        user_remain = current_org.get_org_members(exclude=('Auditor',)).exclude(
+            assetpermission=self.object)
+        user_groups_remain = UserGroup.objects.exclude(
+            assetpermission=self.object)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': current_org.get_org_users().exclude(
-                assetpermission=self.object
-            ),
-            'user_groups_remain': UserGroup.objects.exclude(
-                assetpermission=self.object
-            )
+            'users_remain': user_remain,
+            'user_groups_remain': user_groups_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

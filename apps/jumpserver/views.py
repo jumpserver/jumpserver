@@ -34,17 +34,13 @@ class IndexView(PermissionsMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        if request.user.is_auditor:
-            return super(IndexView, self).dispatch(request, *args, **kwargs)
-        if not request.user.is_org_admin:
+        if request.user.is_common_user:
             return redirect('assets:user-asset-list')
-        if not current_org or not current_org.can_admin_by(request.user):
-            return redirect('orgs:switch-a-org')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod
     def get_user_count():
-        return current_org.get_org_users().count()
+        return current_org.get_org_members().count()
 
     @staticmethod
     def get_asset_count():
@@ -99,7 +95,7 @@ class IndexView(PermissionsMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        count = current_org.get_org_users().count() - self.get_month_active_user_total()
+        count = current_org.get_org_members().count() - self.get_month_active_user_total()
         if count < 0:
             count = 0
         return count
@@ -115,7 +111,7 @@ class IndexView(PermissionsMixin, TemplateView):
 
     @staticmethod
     def get_user_disabled_total():
-        return current_org.get_org_users().filter(is_active=False).count()
+        return current_org.get_org_members().filter(is_active=False).count()
 
     @staticmethod
     def get_asset_disabled_total():

@@ -39,7 +39,7 @@ class AssetPermissionForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
-        users_field.queryset = current_org.get_org_users()
+        users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
 
         if self.data:
             return

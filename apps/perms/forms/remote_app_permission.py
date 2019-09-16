@@ -19,7 +19,7 @@ class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
         super().__init__(*args, **kwargs)
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
+            users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
 
     class Meta:
         model = RemoteAppPermission
