@@ -8,25 +8,28 @@ from common.tree import TreeNodeSerializer
 
 class UserAssetPermissionMixin(UserPermissionMixin):
     util = None
+    tree = None
 
     def initial(self, *args, **kwargs):
         super().initial(*args, *kwargs)
         cache_policy = self.request.query_params.get('cache_policy', '0')
+        system_user_id = self.request.query_params.get("system_user")
         self.util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
+        if system_user_id:
+            self.util.filter_permissions(system_users=system_user_id)
+        self.tree = self.util.get_user_tree()
 
 
 class UserNodeTreeMixin:
     serializer_class = TreeNodeSerializer
     nodes_only_fields = ParserNode.nodes_only_fields
-    tree = None
 
     def parse_nodes_to_queryset(self, nodes):
         nodes = nodes.only(*self.nodes_only_fields)
         _queryset = []
 
-        tree = self.util.get_user_tree()
         for node in nodes:
-            assets_amount = tree.assets_amount(node.key)
+            assets_amount = self.tree.assets_amount(node.key)
             if assets_amount == 0 and node.key != Node.empty_key:
                 continue
             node._assets_amount = assets_amount

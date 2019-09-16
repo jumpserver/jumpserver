@@ -19,10 +19,15 @@ __all__ = [
 
 
 class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesAsTreeApi):
+    assets_only_fields = ParserNode.assets_only_fields
+
     def get_serializer_queryset(self, queryset):
         _queryset = super().get_serializer_queryset(queryset)
+        _all_assets = self.util.get_assets().only(*self.assets_only_fields)
+        _all_assets_map = {a.id: a for a in _all_assets}
         for node in queryset:
-            assets = self.util.get_nodes_assets(node)
+            assets_ids = self.tree.all_assets(node.key)
+            assets = [_all_assets_map[_id] for _id in assets_ids if _id in _all_assets_map]
             _queryset.extend(
                 UserAssetTreeMixin.parse_assets_to_queryset(assets, node)
             )

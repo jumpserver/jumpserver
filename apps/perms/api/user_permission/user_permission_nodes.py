@@ -34,7 +34,7 @@ class UserGrantedNodesApi(UserAssetPermissionMixin, ListAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         if self.serializer_class == serializers.NodeGrantedSerializer:
-            context["tree"] = self.util.user_tree
+            context["tree"] = self.tree
         return context
 
     def get_queryset(self):
@@ -50,16 +50,11 @@ class UserGrantedNodesAsTreeApi(UserNodeTreeMixin, UserGrantedNodesApi):
 
 class UserGrantedNodeChildrenApi(UserGrantedNodesApi):
     node = None
-    tree = None
     root_keys = None  # 如果是第一次访问，则需要把二级节点添加进去，这个 roots_keys
 
     def get(self, request, *args, **kwargs):
         key = self.request.query_params.get("key")
         pk = self.request.query_params.get("id")
-        system_user_id = self.request.query_params.get("system_user")
-        if system_user_id:
-            self.util.filter_permissions(system_users=system_user_id)
-        self.tree = self.util.get_user_tree()
 
         node = None
         if pk is not None:
