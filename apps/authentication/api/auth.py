@@ -41,6 +41,16 @@ class UserAuthApi(RootOrgViewMixin, APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
     def post(self, request):
         # limit login
         username = request.data.get('username')
@@ -65,7 +75,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
             clean_failed_count(username, ip)
             token, expired_at = user.create_bearer_token(request)
             return Response(
-                {'token': token, 'user': self.serializer_class(user).data}
+                {'token': token, 'user': self.get_serializer(user).data}
             )
 
         seed = uuid.uuid4().hex
@@ -77,7 +87,7 @@ class UserAuthApi(RootOrgViewMixin, APIView):
                          'conduct MFA secondary certification'),
                 'otp_url': reverse('api-auth:user-otp-auth'),
                 'seed': seed,
-                'user': self.serializer_class(user).data
+                'user': self.get_serializer(user).data
             }, status=300
         )
 
@@ -147,6 +157,16 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
     permission_classes = (AllowAny,)
     serializer_class = UserSerializer
 
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
     def post(self, request):
         otp_code = request.data.get('otp_code', '')
         seed = request.data.get('seed', '')
@@ -161,7 +181,7 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
             return Response({'msg': _('MFA certification failed')}, status=401)
         self.send_auth_signal(success=True, user=user)
         token, expired_at = user.create_bearer_token(request)
-        data = {'token': token, 'user': self.serializer_class(user).data}
+        data = {'token': token, 'user': self.get_serializer(user).data}
         return Response(data)
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
