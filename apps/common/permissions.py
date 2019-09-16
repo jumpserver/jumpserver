@@ -132,6 +132,8 @@ class CanUpdateDeleteUser(permissions.BasePermission):
 
     @staticmethod
     def has_delete_object_permission(request, view, obj):
+        if request.user.is_anonymous:
+            return False
         if not request.user.can_admin_current_org:
             return False
         # 超级管理员 / 组织管理员
@@ -157,6 +159,8 @@ class CanUpdateDeleteUser(permissions.BasePermission):
 
     @staticmethod
     def has_update_object_permission(request, view, obj):
+        if request.user.is_anonymous:
+            return False
         if not request.user.can_admin_current_org:
             return False
         # 超级管理员 / 组织管理员
@@ -179,6 +183,8 @@ class CanUpdateDeleteUser(permissions.BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj):
+        if request.user.is_anonymous:
+            return False
         if not request.user.can_admin_current_org:
             return False
         if request.method in ['DELETE']:
