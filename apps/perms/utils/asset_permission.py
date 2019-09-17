@@ -4,6 +4,8 @@ import pickle
 import threading
 from collections import defaultdict
 from functools import reduce
+from hashlib import md5
+import json
 
 from django.core.cache import cache
 from django.db.models import Q
@@ -60,29 +62,33 @@ def get_system_user_permissions(system_user):
 
 
 class AssetPermissionUtilCacheMixin:
-    user_tree_cache_key = 'USER_PERM_TREE_{}'
+    user_tree_cache_key = 'USER_PERM_TREE_{}_{}'
     user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
     user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
     cache_policy = '0'
     obj_id = ''
+    _filter_id = 'None'
+
+    @property
+    def cache_key(self):
+        return self.user_tree_cache_key.format(self.obj_id, self._filter_id)
 
     def expire_user_tree_cache(self):
-        key = self.user_tree_cache_key.format(self.obj_id)
-        cache.delete(key)
+        cache.delete(self.cache_key)
 
     @classmethod
     def expire_all_user_tree_cache(cls):
-        key = cls.user_tree_cache_key.format('*')
+        key = cls.user_tree_cache_key.format('*', '*')
+        key = key.split('_')[:-1]
+        key = '_'.join(key)
         cache.delete_pattern(key)
 
     def set_user_tree_to_cache(self, user_tree):
         data = pickle.dumps(user_tree)
-        key = self.user_tree_cache_key.format(self.obj_id)
-        cache.set(key, data, self.user_tree_cache_ttl)
+        cache.set(self.cache_key, data, self.user_tree_cache_ttl)
 
     def get_user_tree_from_cache(self):
-        key = self.user_tree_cache_key.format(self.obj_id)
-        data = cache.get(key)
+        data = cache.get(self.cache_key)
         if not data:
             return None
         user_tree = pickle.loads(data)
@@ -129,6 +135,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.change_org_if_need()
         self._user_tree = None
+        self._user_tree_filter_id = 'None'
         self.full_tree = Node.tree()
         self.mutex = threading.Lock()
 
@@ -148,7 +155,9 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
 
     @timeit
     def filter_permissions(self, **filters):
+        filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
+        self._filter_id = md5(filters_json.encode()).hexdigest()
 
     @property
     def user_tree(self):
@@ -282,15 +291,25 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
                 parent=user_tree.root,
             )
 
+    def set_user_tree_to_local(self, user_tree):
+        self._user_tree = user_tree
+        self._user_tree_filter_id = self._filter_id
+
+    def get_user_tree_from_local(self):
+        if self._user_tree and self._user_tree_filter_id == self._filter_id:
+            return self._user_tree
+        return None
+
     @timeit
     def get_user_tree(self):
         # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
         with self.mutex:
-            if self._user_tree:
-                return self._user_tree
+            user_tree = self.get_user_tree_from_local()
+            if user_tree:
+                return user_tree
             user_tree = self.get_user_tree_from_cache_if_need()
             if user_tree:
-                self._user_tree = user_tree
+                self.set_user_tree_to_local(user_tree)
                 return user_tree
             user_tree = TreeService()
             full_tree_root = self.full_tree.root_node()
@@ -303,7 +322,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             self.parse_user_tree_to_full_tree(user_tree)
             self.add_empty_node_if_need(user_tree)
             self.set_user_tree_to_cache_if_need(user_tree)
-            self._user_tree = user_tree
+            self.set_user_tree_to_local(user_tree)
             return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户

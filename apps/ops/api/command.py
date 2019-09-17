@@ -30,10 +30,10 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         util = AssetPermissionUtilV2(self.request.user)
         util.filter_permissions(system_users=system_user.id)
         permed_assets = util.get_assets().filter(id__in=[a.id for a in assets])
-        unpermed_assets = set(assets) - set(permed_assets)
-        if unpermed_assets:
+        invalid_assets = set(assets) - set(permed_assets)
+        if invalid_assets:
             msg = _("Not has host {} permission").format(
-                [str(a.id) for a in unpermed_assets]
+                [str(a.id) for a in invalid_assets]
             )
             raise ValidationError({"hosts": msg})
 

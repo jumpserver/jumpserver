@@ -1,29 +1,20 @@
 # -*- coding: utf-8 -*-
 #
 import uuid
-from hashlib import md5
-from django.core.cache import cache
 from django.db.models import Q
-from django.conf import settings
-from rest_framework.views import Response
-from django.utils.decorators import method_decorator
-from django.views.decorators.http import condition
 
 from rest_framework.generics import get_object_or_404
-from django.utils.translation import ugettext as _
 from assets.utils import LabelFilterMixin
-from common.permissions import IsValidUser, IsOrgAdminOrAppUser, IsOrgAdmin
+from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.utils import get_logger
 from orgs.utils import set_to_root_org
-from ..hands import User, Asset, Node, SystemUser
+from ..hands import User, Asset, SystemUser
 from .. import serializers
-from .. import const
 
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserPermissionCacheMixin', 'GrantAssetsMixin', 'NodesWithUngroupMixin',
     'UserPermissionMixin',
 ]
 
@@ -52,147 +43,6 @@ class UserPermissionMixin:
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
-
-
-# def get_etag(request, *args, **kwargs):
-#     cache_policy = request.GET.get("cache_policy")
-#     if cache_policy != '1':
-#         return None
-#     if not UserPermissionCacheMixin.CACHE_ENABLE:
-#         return None
-#     view = request.parser_context.get("view")
-#     if not view:
-#         return None
-#     etag = view.get_meta_cache_id()
-#     return etag
-
-
-class UserPermissionCacheMixin:
-    pass
-#     cache_policy = '0'
-#     RESP_CACHE_KEY = '_PERMISSION_RESPONSE_CACHE_V2_{}'
-#     CACHE_ENABLE = settings.ASSETS_PERM_CACHE_ENABLE
-#     CACHE_TIME = settings.ASSETS_PERM_CACHE_TIME
-#     _object = None
-#
-#     def get_object(self):
-#         return None
-#
-#     # 内部使用可控制缓存
-#     def _get_object(self):
-#         if not self._object:
-#             self._object = self.get_object()
-#         return self._object
-#
-#     def get_object_id(self):
-#         obj = self._get_object()
-#         if obj:
-#             return str(obj.id)
-#         return None
-#
-#     def get_request_md5(self):
-#         path = self.request.path
-#         query = {k: v for k, v in self.request.GET.items()}
-#         query.pop("_", None)
-#         query = "&".join(["{}={}".format(k, v) for k, v in query.items()])
-#         full_path = "{}?{}".format(path, query)
-#         return md5(full_path.encode()).hexdigest()
-#
-#     def get_meta_cache_id(self):
-#         obj = self._get_object()
-#         util = AssetPermissionUtil(obj, cache_policy=self.cache_policy)
-#         meta_cache_id = util.cache_meta.get('id')
-#         return meta_cache_id
-#
-#     def get_response_cache_id(self):
-#         obj_id = self.get_object_id()
-#         request_md5 = self.get_request_md5()
-#         meta_cache_id = self.get_meta_cache_id()
-#         resp_cache_id = '{}_{}_{}'.format(obj_id, request_md5, meta_cache_id)
-#         return resp_cache_id
-#
-#     def get_response_from_cache(self):
-#         # 没有数据缓冲
-#         meta_cache_id = self.get_meta_cache_id()
-#         if not meta_cache_id:
-#             logger.debug("Not get meta id: {}".format(meta_cache_id))
-#             return None
-#         # 从响应缓冲里获取响应
-#         key = self.get_response_key()
-#         data = cache.get(key)
-#         if not data:
-#             logger.debug("Not get response from cache: {}".format(key))
-#             return None
-#         logger.debug("Get user permission from cache: {}".format(self.get_object()))
-#         response = Response(data)
-#         return response
-#
-#     def expire_response_cache(self):
-#         obj_id = self.get_object_id()
-#         expire_cache_id = '{}_{}'.format(obj_id, '*')
-#         key = self.RESP_CACHE_KEY.format(expire_cache_id)
-#         cache.delete_pattern(key)
-#
-#     def get_response_key(self):
-#         resp_cache_id = self.get_response_cache_id()
-#         key = self.RESP_CACHE_KEY.format(resp_cache_id)
-#         return key
-#
-#     def set_response_to_cache(self, response):
-#         key = self.get_response_key()
-#         cache.set(key, response.data, self.CACHE_TIME)
-#         logger.debug("Set response to cache: {}".format(key))
-#
-#     @method_decorator(condition(etag_func=get_etag))
-#     def get(self, request, *args, **kwargs):
-#         if not self.CACHE_ENABLE:
-#             self.cache_policy = '0'
-#         else:
-#             self.cache_policy = request.GET.get('cache_policy', '0')
-#
-#         obj = self._get_object()
-#         if obj is None:
-#             logger.debug("Not get response from cache: obj is none")
-#             return super().get(request, *args, **kwargs)
-#
-#         if AssetPermissionUtil.is_not_using_cache(self.cache_policy):
-#             logger.debug("Not get resp from cache: {}".format(self.cache_policy))
-#             return super().get(request, *args, **kwargs)
-#         elif AssetPermissionUtil.is_refresh_cache(self.cache_policy):
-#             logger.debug("Not get resp from cache: {}".format(self.cache_policy))
-#             self.expire_response_cache()
-#
-#         logger.debug("Try get response from cache")
-#         resp = self.get_response_from_cache()
-#         if not resp:
-#             resp = super().get(request, *args, **kwargs)
-#             self.set_response_to_cache(resp)
-#         return resp
-
-
-class NodesWithUngroupMixin:
-    util = None
-
-    @staticmethod
-    def get_ungrouped_node(ungroup_key):
-        return Node(key=ungroup_key, id=const.UNGROUPED_NODE_ID,
-                    value=_("ungrouped"))
-
-    @staticmethod
-    def get_empty_node():
-        return Node(key=const.EMPTY_NODE_KEY, id=const.EMPTY_NODE_ID,
-                    value=_("empty"))
-
-    def add_ungrouped_nodes(self, node_map, node_keys):
-        ungroup_key = '1:-1'
-        for key in node_keys:
-            if key.endswith('-1'):
-                ungroup_key = key
-                break
-        ungroup_node = self.get_ungrouped_node(ungroup_key)
-        empty_node = self.get_empty_node()
-        node_map[ungroup_key] = ungroup_node
-        node_map[const.EMPTY_NODE_KEY] = empty_node
 
 
 class GrantAssetsMixin(LabelFilterMixin):
