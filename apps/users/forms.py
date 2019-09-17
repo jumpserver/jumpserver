@@ -306,10 +306,6 @@ class UserBulkUpdateForm(OrgModelForm):
         return users
 
 
-def user_limit_to():
-    return {"orgs": current_org}
-
-
 class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
@@ -321,7 +317,6 @@ class UserGroupForm(OrgModelForm):
             }
         ),
         required=False,
-        limit_choices_to=user_limit_to
     )
 
     def __init__(self, **kwargs):
