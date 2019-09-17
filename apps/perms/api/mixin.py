@@ -8,14 +8,14 @@ from assets.utils import LabelFilterMixin
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.utils import get_logger
 from orgs.utils import set_to_root_org
-from ..hands import User, Asset, SystemUser
+from ..hands import User, UserGroup, Asset, SystemUser
 from .. import serializers
 
 
 logger = get_logger(__name__)
 
 __all__ = [
-    'UserPermissionMixin',
+    'UserPermissionMixin', 'UserGroupPermissionMixin',
 ]
 
 
@@ -43,6 +43,15 @@ class UserPermissionMixin:
         if self.kwargs.get('pk') is None:
             self.permission_classes = (IsValidUser,)
         return super().get_permissions()
+
+
+class UserGroupPermissionMixin:
+    obj = None
+
+    def get_obj(self):
+        user_group_id = self.kwargs.get('pk', '')
+        user_group = get_object_or_404(UserGroup, id=user_group_id)
+        return user_group
 
 
 class GrantAssetsMixin(LabelFilterMixin):
