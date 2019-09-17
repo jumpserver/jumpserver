@@ -26,7 +26,7 @@ class UserGrantedNodesWithAssetsAsTreeApi(UserGrantedNodesAsTreeApi):
         _all_assets = self.util.get_assets().only(*self.assets_only_fields)
         _all_assets_map = {a.id: a for a in _all_assets}
         for node in queryset:
-            assets_ids = self.tree.all_assets(node.key)
+            assets_ids = self.tree.assets(node.key)
             assets = [_all_assets_map[_id] for _id in assets_ids if _id in _all_assets_map]
             _queryset.extend(
                 UserAssetTreeMixin.parse_assets_to_queryset(assets, node)

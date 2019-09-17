@@ -102,7 +102,7 @@
         var zTree, show = 0;
         var systemUserId = null;
         var url = null;
-        var treeUrl = "{% url 'api-perms:my-nodes-children-with-assets-as-tree' %}?cache_policy=1";
+        var treeUrl = "{% url 'api-perms:my-nodes-with-assets-as-tree' %}?cache_policy=1";
 
         function proposeGeometry(term) {
             if (!term.element.parentElement) {
@@ -163,7 +163,7 @@
                     url: url,
                     autoParam: ["id=key", "name=n", "level=lv"],
                     type: 'get'
-                },
+                 },
                 edit: {
                     enable: true,
                     showRemoveBtn: false,
