@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import os
 from django.utils.translation import ugettext_lazy as _
+
+
+PERIOD_TASK_ENABLED = os.environ.get("PERIOD_TASK", "on") == 'on'
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {
@@ -79,3 +83,22 @@ CONNECTIVITY_CHOICES = (
     (CONN_UNKNOWN, _("Unknown")),
 )
 
+GATHER_ASSET_USERS_TASKS = [
+    {
+        "name": "gather host users",
+        "action": {
+            "module": 'getent',
+            "args": "database=passwd"
+        },
+    },
+]
+
+GATHER_ASSET_USERS_TASKS_WINDOWS = [
+    {
+        "name": "gather windows host users",
+        "action": {
+            "module": 'win_shell',
+            "args": "net user"
+        }
+    }
+]
