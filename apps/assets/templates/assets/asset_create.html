@@ -28,7 +28,7 @@
             <div class="col-md-2 col-md-offset-2" style="text-align: right">{{ fm.name }}</div>
             <div class="col-md-6">{{ fm.port }}</div>
             <div class="col-md-1" style="padding: 6px 0">
-                <a class="btn btn-danger btn-xs btn-protocol btn-del"><span class="fa fa-minus"></span> </a>
+                <a class="btn btn-danger btn-xs btn-protocol btn-delete"><span class="fa fa-minus"></span> </a>
                 <a class="btn btn-primary btn-xs btn-protocol btn-add" style="display: none"><span class="fa fa-plus"></span></a>
             </div>
         </div>
@@ -97,7 +97,7 @@ function format(item) {
 function protocolBtnShow() {
     $(".btn-protocol.btn-add").hide();
     $(".btn-protocol.btn-add:last").show();
-    var btnDel = $(".btn-protocol.btn-del");
+    var btnDel = $(".btn-protocol.btn-delete");
     if (btnDel.length === 1) {
         btnDel.addClass("disabled")
     } else {
@@ -140,7 +140,7 @@ $(document).ready(function () {
         protocolRef.trigger("change")
     }
 })
-.on("click", ".btn-protocol.btn-del", function () {
+.on("click", ".btn-protocol.btn-delete", function () {
     $(this).parent().parent().remove();
     protocolBtnShow()
 })
