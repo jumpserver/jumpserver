@@ -92,7 +92,7 @@ function syncSelectedAssetsToModalTable(assetModalTable) {
     }
 
     // input assets有，table assets没选，则选中(click)
-    if (inputAssets !== null) {
+    if (inputAssets) {
         assetModalTable.selected = inputAssets;
         $.each(inputAssets, function (index, assetId) {
             var dom = document.getElementById(assetId);
