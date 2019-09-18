@@ -6,7 +6,9 @@ import os
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
 from django.db.utils import ProgrammingError, OperationalError
-from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
+from django_celery_beat.models import (
+    PeriodicTask, IntervalSchedule, CrontabSchedule, PeriodicTasks
+)
 
 
 def create_or_update_celery_periodic_tasks(tasks):
@@ -75,17 +77,20 @@ def create_or_update_celery_periodic_tasks(tasks):
         task = PeriodicTask.objects.update_or_create(
             defaults=defaults, name=name,
         )
+        PeriodicTasks.update_changed()
         return task
 
 
 def disable_celery_periodic_task(task_name):
     from django_celery_beat.models import PeriodicTask
     PeriodicTask.objects.filter(name=task_name).update(enabled=False)
+    PeriodicTasks.update_changed()
 
 
 def delete_celery_periodic_task(task_name):
     from django_celery_beat.models import PeriodicTask
     PeriodicTask.objects.filter(name=task_name).delete()
+    PeriodicTasks.update_changed()
 
 
 def get_celery_task_log_path(task_id):

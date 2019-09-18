@@ -85,7 +85,7 @@
                   <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
                   <ul class="dropdown-menu labels">
                       {% for label in labels %}
-                          <li><a style="font-weight: bolder">{{ label.name }}:{{ label.value }}</a></li>
+                          <li><a style="font-weight: bolder">{{ label.name }}#{{ label.value }}</a></li>
                       {% endfor %}
                   </ul>
                </div>
@@ -171,9 +171,13 @@ function initTable() {
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
         columns: [
-            {data: "id"}, {data: "hostname" }, {data: "ip" },
+            {data: "id"}, {data: "hostname"}, {data: "ip"},
             {data: "cpu_cores", orderable: false},
-            {data: "connectivity", orderable: false}, {data: "id", orderable: false }
+            {
+                data: "connectivity",
+                orderable: false,
+                width: '60px'
+            }, {data: "id", orderable: false}
         ],
         op_html: $('#actions').html()
     };
@@ -271,7 +275,7 @@ $(document).ready(function(){
     setAssetModalOptions(modalOption);
 })
 .on('click', '.labels li', function () {
-    var val = $(this).text();
+    var val = 'label:' + $(this).text();
     $("#asset_list_table_filter input").val(val);
     asset_table.search(val).draw();
  })

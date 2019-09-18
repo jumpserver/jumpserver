@@ -10,7 +10,7 @@ from django.http import Http404
 
 from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from ..backends import AssetUserManager
 from ..models import Asset, Node, SystemUser, AdminUser
 from .. import serializers
@@ -52,7 +52,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
         return _queryset
 
 
-class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     serializer_class = serializers.AssetUserSerializer
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']

@@ -18,6 +18,8 @@ def get_org_from_request(request):
 
 
 def set_current_org(org):
+    if isinstance(org, str):
+        org = Organization.get_instance(org)
     setattr(thread_local, 'current_org_id', org.id)
 
 

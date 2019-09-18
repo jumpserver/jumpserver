@@ -153,6 +153,7 @@ function activeNav() {
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
+        $('#' + app + ' #' + resource.replace('-', '_')).addClass('active');
     }
 }
 

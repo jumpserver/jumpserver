@@ -97,6 +97,8 @@ class LDAPUserListApi(generics.ListAPIView):
     serializer_class = LDAPUserSerializer
 
     def get_queryset(self):
+        if hasattr(self, 'swagger_fake_view'):
+            return []
         util = LDAPUtil()
         try:
             users = util.search_user_items()

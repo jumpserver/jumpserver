@@ -116,16 +116,24 @@ class FamilyMixin:
     def all_children(self):
         return self.get_all_children(with_self=False)
 
-    def get_children(self, with_self=False):
+    def get_children_key_pattern(self, with_self=False):
         pattern = r'^{0}:[0-9]+$'.format(self.key)
         if with_self:
             pattern += r'|^{0}$'.format(self.key)
+        return pattern
+
+    def get_children(self, with_self=False):
+        pattern = self.get_children_key_pattern(with_self=with_self)
         return Node.objects.filter(key__regex=pattern)
 
-    def get_all_children(self, with_self=False):
+    def get_all_children_pattern(self, with_self=False):
         pattern = r'^{0}:'.format(self.key)
         if with_self:
             pattern += r'|^{0}$'.format(self.key)
+        return pattern
+
+    def get_all_children(self, with_self=False):
+        pattern = self.get_all_children_pattern(with_self=with_self)
         children = Node.objects.filter(key__regex=pattern)
         return children
 

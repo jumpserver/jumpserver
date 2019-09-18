@@ -2,12 +2,12 @@
 #
 from ..mixin import UserPermissionMixin
 from ...utils import AssetPermissionUtilV2, ParserNode
-from ...hands import Node
+from ...hands import Node, Asset
 from common.tree import TreeNodeSerializer
 
 
 class UserAssetPermissionMixin(UserPermissionMixin):
-    util = None
+    util = AssetPermissionUtilV2(None)
     tree = None
 
     def initial(self, *args, **kwargs):
@@ -41,7 +41,9 @@ class UserNodeTreeMixin:
         queryset = self.parse_nodes_to_queryset(queryset)
         return queryset
 
-    def get_serializer(self, queryset, many=True, **kwargs):
+    def get_serializer(self, queryset=None, many=True, **kwargs):
+        if queryset is None:
+            queryset = Node.objects.none()
         queryset = self.get_serializer_queryset(queryset)
         queryset.sort()
         return super().get_serializer(queryset, many=many, **kwargs)
@@ -64,7 +66,9 @@ class UserAssetTreeMixin:
         _queryset = self.parse_assets_to_queryset(queryset, None)
         return _queryset
 
-    def get_serializer(self, queryset, many=True, **kwargs):
+    def get_serializer(self, queryset=None, many=True, **kwargs):
+        if queryset is None:
+            queryset = Asset.objects.none()
         queryset = self.get_serializer_queryset(queryset)
         queryset.sort()
         return super().get_serializer(queryset, many=many, **kwargs)

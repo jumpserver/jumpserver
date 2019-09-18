@@ -14,7 +14,7 @@ from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
     CanUpdateDeleteUser,
 )
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
 from .. import serializers
@@ -30,7 +30,7 @@ __all__ = [
 ]
 
 
-class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class UserViewSet(CommonApiMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)

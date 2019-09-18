@@ -126,10 +126,10 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         'comment', 'is_active', 'os', 'org_id'
     )
 
-    def __init__(self, obj, cache_policy='0'):
+    def __init__(self, obj=None, cache_policy='0'):
         self.object = obj
         self.cache_policy = cache_policy
-        self.obj_id = str(obj.id)
+        self.obj_id = str(obj.id) if obj else None
         self._permissions = None
         self._permissions_id = None  # 标记_permission的唯一值
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
@@ -147,6 +147,8 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
     def permissions(self):
         if self._permissions:
             return self._permissions
+        if self.object is None:
+            return AssetPermission.objects.none()
         object_cls = self.object.__class__.__name__
         func = self.get_permissions_map[object_cls]
         permissions = func(self.object)

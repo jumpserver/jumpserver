@@ -19,7 +19,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from orgs.mixins.api import OrgBulkModelViewSet
 
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset

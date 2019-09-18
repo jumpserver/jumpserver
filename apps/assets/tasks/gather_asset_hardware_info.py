@@ -103,7 +103,7 @@ def update_assets_hardware_info_util(assets, task_name=None):
     )
     result = task.run()
     set_assets_hardware_info(assets, result)
-    return result
+    return True
 
 
 @shared_task(queue="ansible")
