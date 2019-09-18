@@ -345,7 +345,7 @@ defaults = {
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
     'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-    'AUTH_OPENID_SHARE_SESSION': False,
+    'AUTH_OPENID_SHARE_SESSION': True,
     'OTP_VALID_WINDOW': 2,
     'OTP_ISSUER_NAME': 'Jumpserver',
     'EMAIL_SUFFIX': 'jumpserver.org',
