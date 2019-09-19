@@ -7,13 +7,14 @@ from django.db.models.signals import (
 from django.db.models.aggregates import Count
 from django.dispatch import receiver
 
-from common.utils import get_logger
+from common.utils import get_logger, timeit
 from common.decorator import on_transaction_commit
 from .models import Asset, SystemUser, Node
 from .tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
-    push_system_user_to_assets
+    push_system_user_to_assets,
+    add_nodes_assets_to_system_users
 )
 
 
@@ -99,7 +100,7 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     """
     if action != "post_add":
         return
-    logger.info("System user `{}` nodes update signal recv".format(instance))
+    logger.info("System user nodes update signal recv: {}".format(instance))
 
     queryset = model.objects.filter(pk__in=pk_set)
     if model == Node:
@@ -108,9 +109,7 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     else:
         nodes_keys = [instance.key]
         system_users = queryset
-    assets = Node.get_nodes_all_assets(nodes_keys).values_list('id', flat=True)
-    for system_user in system_users:
-        system_user.assets.add(*tuple(assets))
+    add_nodes_assets_to_system_users.delay(nodes_keys, system_users)
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)

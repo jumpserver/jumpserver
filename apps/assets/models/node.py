@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from common.utils import get_logger
+from common.utils import get_logger, timeit
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org, tmp_to_org
 from orgs.models import Organization
@@ -298,14 +298,15 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
+    @timeit
     def get_nodes_all_assets(cls, nodes_keys):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
-        pattern = set()
+        assets_ids = set()
         for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        return Asset.objects.filter(nodes__key__regex=pattern)
+            node_assets_ids = cls.tree().all_assets(key)
+            assets_ids.update(set(node_assets_ids))
+        return Asset.objects.filter(id__in=assets_ids)
 
 
 class SomeNodesMixin:

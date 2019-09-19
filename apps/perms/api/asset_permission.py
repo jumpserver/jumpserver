@@ -180,6 +180,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
             users = serializer.validated_data.get('users')
             if users:
                 perm.users.remove(*tuple(users))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -197,6 +198,7 @@ class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
             users = serializer.validated_data.get('users')
             if users:
                 perm.users.add(*tuple(users))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -217,6 +219,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
             assets = serializer.validated_data.get('assets')
             if assets:
                 perm.assets.remove(*tuple(assets))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -234,6 +237,7 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
             assets = serializer.validated_data.get('assets')
             if assets:
                 perm.assets.add(*tuple(assets))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})

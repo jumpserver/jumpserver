@@ -213,3 +213,16 @@ def dict_get_any(d, keys):
         if value:
             return value
     return None
+
+
+class lazyproperty:
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        else:
+            value = self.func(instance)
+            setattr(instance, self.func.__name__, value)
+            return value

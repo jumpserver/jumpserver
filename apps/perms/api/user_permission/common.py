@@ -51,8 +51,7 @@ class GetUserAssetPermissionActionsApi(UserAssetPermissionMixin,
         asset = get_object_or_404(Asset, id=asset_id)
         system_user = get_object_or_404(SystemUser, id=system_id)
 
-        system_users_actions = self.util.get_asset_system_users_with_actions(
-            asset)
+        system_users_actions = self.util.get_asset_system_users_with_actions(asset)
         actions = system_users_actions.get(system_user)
         return {"actions": actions}
 
@@ -103,8 +102,7 @@ class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
     def get_queryset(self):
         asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
-        system_users_with_actions = self.util.get_asset_system_users_with_actions(
-            asset)
+        system_users_with_actions = self.util.get_asset_system_users_with_actions(asset)
         system_users = []
         for system_user, actions in system_users_with_actions.items():
             system_user.actions = actions

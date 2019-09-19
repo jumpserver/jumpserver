@@ -1,7 +1,7 @@
 # coding: utf-8
 
+import time
 import pickle
-import threading
 from collections import defaultdict
 from functools import reduce
 from hashlib import md5
@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from orgs.utils import set_to_root_org
-from common.utils import get_logger, timeit
+from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
@@ -131,17 +131,18 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self.cache_policy = cache_policy
         self.obj_id = str(obj.id) if obj else None
         self._permissions = None
-        self._permissions_id = None  # 标记_permission的唯一值
         self._filter_id = 'None'  # 当通过filter更改 permission是标记
         self.change_org_if_need()
         self._user_tree = None
         self._user_tree_filter_id = 'None'
-        self.full_tree = Node.tree()
-        self.mutex = threading.Lock()
 
     @staticmethod
     def change_org_if_need():
         set_to_root_org()
+
+    @lazyproperty
+    def full_tree(self):
+        return Node.tree()
 
     @property
     def permissions(self):
@@ -161,7 +162,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self._permissions = self.permissions.filter(**filters)
         self._filter_id = md5(filters_json.encode()).hexdigest()
 
-    @property
+    @lazyproperty
     def user_tree(self):
         return self.get_user_tree()
 
@@ -305,27 +306,26 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
     @timeit
     def get_user_tree(self):
         # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
-        with self.mutex:
-            user_tree = self.get_user_tree_from_local()
-            if user_tree:
-                return user_tree
-            user_tree = self.get_user_tree_from_cache_if_need()
-            if user_tree:
-                self.set_user_tree_to_local(user_tree)
-                return user_tree
-            user_tree = TreeService()
-            full_tree_root = self.full_tree.root_node()
-            user_tree.create_node(
-                tag=full_tree_root.tag,
-                identifier=full_tree_root.identifier
-            )
-            self.add_direct_nodes_to_user_tree(user_tree)
-            self.add_single_assets_node_to_user_tree(user_tree)
-            self.parse_user_tree_to_full_tree(user_tree)
-            self.add_empty_node_if_need(user_tree)
-            self.set_user_tree_to_cache_if_need(user_tree)
+        user_tree = self.get_user_tree_from_local()
+        if user_tree:
+            return user_tree
+        user_tree = self.get_user_tree_from_cache_if_need()
+        if user_tree:
             self.set_user_tree_to_local(user_tree)
             return user_tree
+        user_tree = TreeService()
+        full_tree_root = self.full_tree.root_node()
+        user_tree.create_node(
+            tag=full_tree_root.tag,
+            identifier=full_tree_root.identifier
+        )
+        self.add_direct_nodes_to_user_tree(user_tree)
+        self.add_single_assets_node_to_user_tree(user_tree)
+        self.parse_user_tree_to_full_tree(user_tree)
+        self.add_empty_node_if_need(user_tree)
+        self.set_user_tree_to_cache_if_need(user_tree)
+        self.set_user_tree_to_local(user_tree)
+        return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
     def get_asset_system_users_with_actions(self, asset):

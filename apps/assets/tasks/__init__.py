@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from .utils import *
+from .common import *
 from .admin_user_connectivity import *
 from .asset_connectivity import *
 from .asset_user_connectivity import *

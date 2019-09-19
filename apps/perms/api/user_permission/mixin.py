@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
 #
+from common.utils import lazyproperty
+from common.tree import TreeNodeSerializer
 from ..mixin import UserPermissionMixin
 from ...utils import AssetPermissionUtilV2, ParserNode
 from ...hands import Node, Asset
-from common.tree import TreeNodeSerializer
 
 
 class UserAssetPermissionMixin(UserPermissionMixin):
     util = None
-    tree = None
 
-    def initial(self, *args, **kwargs):
-        super().initial(*args, *kwargs)
+    @lazyproperty
+    def util(self):
         cache_policy = self.request.query_params.get('cache_policy', '0')
         system_user_id = self.request.query_params.get("system_user")
-        self.util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
+        util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
         if system_user_id:
-            self.util.filter_permissions(system_users=system_user_id)
-        self.tree = self.util.get_user_tree()
+            util.filter_permissions(system_users=system_user_id)
+        return util
+
+    @lazyproperty
+    def tree(self):
+        return self.util.get_user_tree()
 
 
 class UserNodeTreeMixin:
