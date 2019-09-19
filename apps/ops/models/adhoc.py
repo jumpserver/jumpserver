@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 
-from common.utils import get_signer, get_logger
+from common.utils import get_signer, get_logger, lazyproperty
 from orgs.utils import set_to_root_org
 from ..celery.utils import delete_celery_periodic_task, \
     create_or_update_celery_periodic_tasks, \
@@ -42,7 +42,8 @@ class Task(models.Model):
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     created_by = models.CharField(max_length=128, blank=True, default='')
-    date_created = models.DateTimeField(auto_now_add=True, db_index=True)
+    date_created = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("Date created"))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     __latest_adhoc = None
     _ignore_auto_created_by = True
 
@@ -51,16 +52,39 @@ class Task(models.Model):
         return str(self.id).split('-')[-1]
 
     @property
-    def latest_adhoc(self):
-        if not self.__latest_adhoc:
-            self.__latest_adhoc = self.get_latest_adhoc()
-        return self.__latest_adhoc
-
-    @latest_adhoc.setter
-    def latest_adhoc(self, item):
-        self.__latest_adhoc = item
+    def versions(self):
+        return self.adhoc.all().count()
 
     @property
+    def is_success(self):
+        if self.latest_history:
+            return self.latest_history.is_success
+        else:
+            return False
+
+    @property
+    def timedelta(self):
+        if self.latest_history:
+            return self.latest_history.timedelta
+        else:
+            return 0
+
+    @property
+    def date_start(self):
+        if self.latest_history:
+            return self.latest_history.date_start
+        else:
+            return None
+
+    @property
+    def assets_amount(self):
+        return self.latest_adhoc.hosts.count()
+
+    @lazyproperty
+    def latest_adhoc(self):
+        return self.get_latest_adhoc()
+
+    @lazyproperty
     def latest_history(self):
         try:
             return self.history.all().latest()
@@ -139,6 +163,7 @@ class Task(models.Model):
     class Meta:
         db_table = 'ops_task'
         unique_together = ('name', 'created_by')
+        ordering = ('-date_updated',)
         get_latest_by = 'date_created'
 
 
@@ -246,6 +271,7 @@ class AdHoc(models.Model):
             )
 
     def _run_only(self):
+        Task.objects.filter(id=self.task.id).update(date_updated=timezone.now())
         runner = AdHocRunner(self.inventory, options=self.options)
         try:
             result = runner.run(

@@ -128,7 +128,7 @@ def hello_callback(result):
 @shared_task
 def add(a, b):
     time.sleep(5)
-    return max(b)
+    return a + b
 
 
 @shared_task

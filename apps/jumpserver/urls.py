@@ -7,7 +7,9 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
-from .views import IndexView, LunaView, I18NView, HealthCheckView, redirect_format_api
+# from .views import IndexView, LunaView, I18NView, HealthCheckView, redirect_format_api
+from . import views
+from .celery_flower import celery_flower_view
 from .swagger import get_swagger_view
 
 api_v1 = [
@@ -40,6 +42,7 @@ app_view_patterns = [
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
+    re_path(r'flower/(?P<path>.*)', celery_flower_view, name='flower-view'),
 ]
 
 
@@ -57,13 +60,13 @@ js_i18n_patterns = i18n_patterns(
 
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
+    path('', views.IndexView.as_view(), name='index'),
     path('api/v1/', include(api_v1)),
     path('api/v2/', include(api_v2)),
-    re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', redirect_format_api),
-    path('api/health/', HealthCheckView.as_view(), name="health"),
-    path('luna/', LunaView.as_view(), name='luna-view'),
-    path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
+    re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
+    path('api/health/', views.HealthCheckView.as_view(), name="health"),
+    path('luna/', views.LunaView.as_view(), name='luna-view'),
+    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),
 
     # External apps url

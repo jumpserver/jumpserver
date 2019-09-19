@@ -2,7 +2,7 @@
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 from common.mixins import DatetimeSearchMixin
 from common.permissions import PermissionsMixin, IsOrgAdmin
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class TaskListView(PermissionsMixin, DatetimeSearchMixin, ListView):
+class TaskListView(PermissionsMixin, TemplateView):
     paginate_by = settings.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
@@ -26,27 +26,10 @@ class TaskListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     keyword = ''
     permission_classes = [IsOrgAdmin]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if current_org.is_real():
-            queryset = queryset.filter(created_by=current_org.id)
-        else:
-            queryset = queryset.filter(created_by='')
-
-        self.keyword = self.request.GET.get('keyword', '')
-        if self.keyword:
-            queryset = queryset.filter(
-                name__icontains=self.keyword,
-            )
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Ops'),
             'action': _('Task list'),
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'keyword': self.keyword,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -382,7 +382,8 @@ defaults = {
     'SYSLOG_ADDR': '',  # '192.168.0.1:514'
     'SYSLOG_FACILITY': 'user',
     'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
-    'WINDOWS_SSH_DEFAULT_SHELL': 'cmd'
+    'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
+    'FLOWER_URL': "127.0.0.1:5555"
 }
 
 
