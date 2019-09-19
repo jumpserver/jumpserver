@@ -7,7 +7,7 @@ from common.tree import TreeNodeSerializer
 
 
 class UserAssetPermissionMixin(UserPermissionMixin):
-    util = AssetPermissionUtilV2(None)
+    util = None
     tree = None
 
     def initial(self, *args, **kwargs):

@@ -20,12 +20,7 @@ class RootOrgViewMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrgModelViewSet(CommonApiMixin, ModelViewSet):
-    def get_queryset(self):
-        return super().get_queryset().all()
-
-
-class OrgBulkModelViewSet(CommonApiMixin, BulkModelViewSet):
+class OrgQuerySetMixin:
     def get_queryset(self):
         queryset = super().get_queryset().all()
         if hasattr(self, 'swagger_fake_view'):
@@ -36,6 +31,12 @@ class OrgBulkModelViewSet(CommonApiMixin, BulkModelViewSet):
             queryset = self.serializer_class.setup_eager_loading(queryset)
         return queryset
 
+
+class OrgModelViewSet(CommonApiMixin, OrgQuerySetMixin, ModelViewSet):
+    pass
+
+
+class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
     def allow_bulk_destroy(self, qs, filtered):
         if qs.count() <= filtered.count():
             return False

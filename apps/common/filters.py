@@ -70,7 +70,6 @@ class IDSpmFilter(filters.BaseFilterBackend):
 
 
 class CustomFilter(filters.BaseFilterBackend):
-    custom_filter_fields = []  # ["node", "asset"]
 
     def get_schema_fields(self, view):
         fields = []
@@ -79,7 +78,10 @@ class CustomFilter(filters.BaseFilterBackend):
             type='string', example='',
             description=''
         )
-        for field in self.custom_filter_fields:
+        if not hasattr(view, 'custom_filter_fields'):
+            return []
+
+        for field in view.custom_filter_fields:
             if isinstance(field, str):
                 defaults['name'] = field
             elif isinstance(field, dict):

@@ -36,6 +36,7 @@ class AssetViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend]
+    custom_filter_fields = ['admin_user_id']
 
     def set_assets_node(self, assets):
         if not isinstance(assets, list):

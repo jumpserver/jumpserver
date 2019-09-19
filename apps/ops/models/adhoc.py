@@ -218,28 +218,32 @@ class AdHoc(models.Model):
             hid = str(uuid.uuid4())
         history = AdHocRunHistory(id=hid, adhoc=self, task=self.task)
         time_start = time.time()
+        date_start = timezone.now()
+        is_success = False
+
         try:
-            date_start = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            history.date_start = timezone.now()
-            print(_("{} Start task: {}").format(date_start, self.task.name))
+            date_start_s = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(_("{} Start task: {}").format(date_start_s, self.task.name))
             raw, summary = self._run_only()
-            date_end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(_("{} Task finish").format(date_end))
-            history.is_finished = True
-            if summary.get('dark'):
-                history.is_success = False
-            else:
-                history.is_success = True
-            history.result = raw
-            history.summary = summary
+            is_success = summary.get('success', False)
             return raw, summary
         except Exception as e:
             logger.error(e, exc_info=True)
-            return {}, {"dark": {"all": str(e)}, "contacted": []}
+            summary = {}
+            raw = {"dark": {"all": str(e)}, "contacted": []}
+            return raw, summary
         finally:
-            history.date_finished = timezone.now()
-            history.timedelta = time.time() - time_start
-            history.save()
+            date_end = timezone.now()
+            date_end_s = date_end.strftime('%Y-%m-%d %H:%M:%S')
+            print(_("{} Task finish").format(date_end_s))
+            print('.\n\n.')
+            AdHocRunHistory.objects.filter(id=history.id).update(
+                date_start=date_start,
+                is_finished=True,
+                is_success=is_success,
+                date_finished=timezone.now(),
+                timedelta=time.time() - time_start
+            )
 
     def _run_only(self):
         runner = AdHocRunner(self.inventory, options=self.options)

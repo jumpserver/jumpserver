@@ -116,8 +116,9 @@ def gather_asset_users(assets, task_name=None):
     for k, value in hosts_category.items():
         if not value['hosts']:
             continue
+        _task_name = '{}: {}'.format(task_name, k)
         task, created = update_or_create_ansible_task(
-            task_name=task_name, hosts=value['hosts'], tasks=value['tasks'],
+            task_name=_task_name, hosts=value['hosts'], tasks=value['tasks'],
             pattern='all', options=const.TASK_OPTIONS,
             run_as_admin=True, created_by=value['hosts'][0].org_id,
         )

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 
-from ..models import GatheredUser
+from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import OrgResourceModelSerializerMixin
+from ..models import GatheredUser
 
 
 class GatheredUserSerializer(OrgResourceModelSerializerMixin):
@@ -14,3 +15,7 @@ class GatheredUserSerializer(OrgResourceModelSerializerMixin):
             'present', 'date_created', 'date_updated'
         ]
         read_only_fields = fields
+        labels = {
+            'hostname': _("Hostname"),
+            'ip': "IP"
+        }

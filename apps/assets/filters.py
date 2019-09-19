@@ -12,63 +12,54 @@ from .models import Node, Label
 class AssetByNodeFilterBackend(filters.BaseFilterBackend):
     fields = ['node', 'all']
 
-    # def filter_node(self, queryset):
-    #     node_id = self.request.query_params.get("node_id")
-    #     if not node_id:
-    #         return queryset
-    #
-    #     node = get_object_or_404(Node, id=node_id)
-    #     show_current_asset = self.request.query_params.get("show_current_asset") in ('1', 'true')
-    #
-    #     # 当前节点是顶层节点, 并且仅显示直接资产
-    #     if node.is_org_root() and show_current_asset:
-    #         queryset = queryset.filter(
-    #             Q(nodes=node_id) | Q(nodes__isnull=True)
-    #         ).distinct()
-    #     # 当前节点是顶层节点，显示所有资产
-    #     elif node.is_org_root() and not show_current_asset:
-    #         return queryset
-    #     # 当前节点不是鼎城节点，只显示直接资产
-    #     elif not node.is_org_root() and show_current_asset:
-    #         queryset = queryset.filter(nodes=node)
-    #     else:
-    #         children = node.get_all_children(with_self=True)
-    #         queryset = queryset.filter(nodes__in=children).distinct()
-    #     return queryset
-
     def get_schema_fields(self, view):
         return [
             coreapi.Field(
                 name=field, location='query', required=False,
-                type='string', example='', description=''
+                type='string', example='', description='', schema=None,
             )
             for field in self.fields
         ]
 
-    def filter_queryset(self, request, queryset, view):
-        node_id = dict_get_any(request.query_params, ['node', 'node_id'])
-        if not node_id:
-            return queryset
+    @staticmethod
+    def is_query_all(request):
         query_all_arg = request.query_params.get('all')
         show_current_asset_arg = request.query_params.get('show_current_asset')
 
         query_all = query_all_arg == '1'
         if show_current_asset_arg is not None:
             query_all = show_current_asset_arg != '1'
+        return query_all
+
+    @staticmethod
+    def get_query_node(request):
+        node_id = dict_get_any(request.query_params, ['node', 'node_id'])
+        if not node_id:
+            return None, False
 
         if is_uuid(node_id):
             node = get_object_or_none(Node, id=node_id)
         else:
             node = get_object_or_none(Node, key=node_id)
+        return node, True
 
-        if not node:
+    @staticmethod
+    def perform_query(pattern, queryset):
+        return queryset.filter(nodes__key__regex=pattern)
+
+    def filter_queryset(self, request, queryset, view):
+        node, has_query_arg = self.get_query_node(request)
+        if not has_query_arg:
+            return queryset
+
+        if node is None:
             return queryset.none()
-
+        query_all = self.is_query_all(request)
         if query_all:
             pattern = node.get_all_children_pattern(with_self=True)
         else:
             pattern = node.get_children_key_pattern(with_self=True)
-        return queryset.filter(nodes__key__regex=pattern)
+        return self.perform_query(pattern, queryset)
 
 
 class LabelFilterBackend(filters.BaseFilterBackend):
@@ -116,4 +107,9 @@ class LabelFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(labels=label)
         return queryset
 
+
+class AssetRelatedByNodeFilterBackend(AssetByNodeFilterBackend):
+    @staticmethod
+    def perform_query(pattern, queryset):
+        return queryset.filter(asset__nodes__key__regex=pattern).distinct()
 
