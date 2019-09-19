@@ -298,14 +298,15 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
-    @timeit
-    def get_nodes_all_assets(cls, nodes_keys):
+    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
         assets_ids = set()
         for key in nodes_keys:
             node_assets_ids = cls.tree().all_assets(key)
             assets_ids.update(set(node_assets_ids))
+        if extra_assets_ids:
+            assets_ids.update(set(extra_assets_ids))
         return Asset.objects.filter(id__in=assets_ids)
 
 

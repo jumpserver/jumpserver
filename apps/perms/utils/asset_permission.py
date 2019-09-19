@@ -334,17 +334,13 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         for node in nodes:
             ancestor_keys = node.get_ancestor_keys(with_self=True)
             nodes_keys_related.update(set(ancestor_keys))
-        pattern = []
-        for key in nodes_keys_related:
-            pattern.append(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
         kwargs = {"assets": asset}
 
-        if pattern:
-            kwargs["nodes__key__regex"] = pattern
+        if nodes_keys_related:
+            kwargs["nodes__key__in"] = nodes_keys_related
 
         queryset = self.permissions
-        if len(kwargs) == 1:
+        if kwargs == 1:
             queryset = queryset.filter(**kwargs)
         elif len(kwargs) > 1:
             kwargs = [{k: v} for k, v in kwargs.items()]
@@ -378,33 +374,11 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         nodes_keys = Node.clean_children_keys(nodes_keys)
         return nodes_keys, assets_ids
 
-    @staticmethod
-    def filter_assets_by_or_kwargs(kwargs):
-        if len(kwargs) == 1:
-            queryset = Asset.objects.filter(**kwargs)
-        elif len(kwargs) > 1:
-            kwargs = [{k: v} for k, v in kwargs.items()]
-            args = [Q(**kw) for kw in kwargs]
-            args = reduce(lambda x, y: x | y, args)
-            queryset = Asset.objects.filter(args)
-        else:
-            queryset = Asset.objects.none()
-        return queryset
-
     @timeit
     def get_assets(self):
         nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
-        pattern = set()
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        kwargs = {}
-        if assets_ids:
-            kwargs["id__in"] = assets_ids
-        if pattern:
-            kwargs["nodes__key__regex"] = pattern
-        queryset = self.filter_assets_by_or_kwargs(kwargs)
-        return queryset.valid().distinct()
+        queryset = Node.get_nodes_all_assets(nodes_keys, extra_assets_ids=assets_ids)
+        return queryset.valid()
 
     def get_nodes_assets(self, node, deep=False):
         if deep:
@@ -412,7 +386,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         else:
             assets_ids = self.user_tree.assets(node.key)
         queryset = Asset.objects.filter(id__in=assets_ids)
-        return queryset.valid().distinct()
+        return queryset.valid()
 
     def get_nodes(self):
         return [n.identifier for n in self.user_tree.all_nodes_itr()]
