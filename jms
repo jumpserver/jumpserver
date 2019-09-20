@@ -200,9 +200,13 @@ def is_running(s, unlink=True):
 
 
 def parse_service(s):
-    all_services = ['gunicorn', 'celery_ansible', 'celery_default', 'beat']
+    all_services = [
+        'gunicorn', 'celery_ansible', 'celery_default', 'beat', 'flower'
+    ]
     if s == 'all':
         return all_services
+    elif s == 'gunicorn':
+        return ['gunicorn', 'flower']
     elif s == "celery":
         return ["celery_ansible", "celery_default"]
     elif "," in s:
@@ -240,17 +244,19 @@ def get_start_gunicorn_kwargs():
 
 
 def get_start_celery_ansible_kwargs():
-    print("\n- Start Celery as Distributed Task Queue")
+    print("\n- Start Celery as Distributed Task Queue: Ansible")
     return get_start_worker_kwargs('ansible', 4)
 
 
 def get_start_celery_default_kwargs():
+    print("\n- Start Celery as Distributed Task Queue: Celery")
     return get_start_worker_kwargs('celery', 2)
 
 
 def get_start_worker_kwargs(queue, num):
     # Todo: Must set this environment, otherwise not no ansible result return
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
+    os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
 
     if os.getuid() == 0:
         os.environ.setdefault('C_FORCE_ROOT', '1')
@@ -261,6 +267,24 @@ def get_start_worker_kwargs(queue, num):
         '-l', 'INFO',
         '-c', str(num),
         '-Q', queue,
+        '-n', '{}@%h'.format(queue)
+    ]
+    return {"cmd": cmd, "cwd": APPS_DIR}
+
+
+def get_start_flower_kwargs():
+    print("\n- Start Flower as Task Monitor")
+    if os.getuid() == 0:
+        os.environ.setdefault('C_FORCE_ROOT', '1')
+
+    cmd = [
+        'celery', 'flower',
+        '-A', 'ops',
+        '-l', 'INFO',
+        '--url_prefix=flower',
+        '--auto_refresh=False',
+        '--max_tasks=1000',
+        '--tasks_columns=uuid,name,args,state,received,started,runtime,worker'
     ]
     return {"cmd": cmd, "cwd": APPS_DIR}
 
@@ -333,6 +357,7 @@ def start_service(s):
         "celery_ansible": get_start_celery_ansible_kwargs,
         "celery_default": get_start_celery_default_kwargs,
         "beat": get_start_beat_kwargs,
+        "flower": get_start_flower_kwargs,
     }
 
     kwargs = services_kwargs.get(s)()
@@ -449,7 +474,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "service", type=str, default="all", nargs="?",
-        choices=("all", "gunicorn", "celery", "beat", "celery,beat"),
+        choices=("all", "gunicorn", "celery", "beat", "celery,beat", "flower"),
         help="The service to start",
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=1)

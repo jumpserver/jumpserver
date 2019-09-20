@@ -24,37 +24,6 @@ def get_system_user_by_id(id):
     return system_user
 
 
-class LabelFilterMixin:
-    def get_filter_labels_ids(self):
-        query_params = self.request.query_params
-        query_keys = query_params.keys()
-        all_label_keys = Label.objects.values_list('name', flat=True)
-        valid_keys = set(all_label_keys) & set(query_keys)
-
-        if not valid_keys:
-            return []
-
-        labels_query = [
-            {"name": key, "value": query_params[key]}
-            for key in valid_keys
-        ]
-        args = [Q(**kwargs) for kwargs in labels_query]
-        args = reduce(lambda x, y: x | y, args)
-        labels_id = Label.objects.filter(args).values_list('id', flat=True)
-        return labels_id
-
-
-class LabelFilter(LabelFilterMixin):
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        labels_ids = self.get_filter_labels_ids()
-        if not labels_ids:
-            return queryset
-        for labels_id in labels_ids:
-            queryset = queryset.filter(labels=labels_id)
-        return queryset
-
-
 class TreeService(Tree):
     tag_sep = ' / '
     cache_key = '_NODE_FULL_TREE'

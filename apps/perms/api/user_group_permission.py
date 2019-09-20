@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.shortcuts import get_object_or_404
-
-from ..hands import UserGroup
 
 from . import user_permission as uapi
+from .mixin import UserGroupPermissionMixin
 
 __all__ = [
     'UserGroupGrantedAssetsApi', 'UserGroupGrantedNodesApi',
@@ -15,15 +13,6 @@ __all__ = [
     'UserGroupGrantedAssetSystemUsersApi',
     # 'UserGroupGrantedNodeChildrenWithAssetsAsTreeApi',
 ]
-
-
-class UserGroupPermissionMixin:
-    obj = None
-
-    def get_object(self):
-        user_group_id = self.kwargs.get('pk', '')
-        user_group = get_object_or_404(UserGroup, id=user_group_id)
-        return user_group
 
 
 class UserGroupGrantedAssetsApi(UserGroupPermissionMixin, uapi.UserGrantedAssetsApi):

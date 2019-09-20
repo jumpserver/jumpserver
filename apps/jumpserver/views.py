@@ -224,3 +224,6 @@ class HealthCheckView(APIView):
 
     def get(self, request):
         return JsonResponse({"status": 1, "time": int(time.time())})
+
+
+

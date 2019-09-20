@@ -153,6 +153,7 @@ function activeNav() {
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
+        $('#' + app + ' #' + resource.replace('-', '_')).addClass('active');
     }
 }
 
@@ -1138,7 +1139,10 @@ function timeOffset(a, b) {
     var start = safeDate(a);
     var end = safeDate(b);
     var offset = (end - start) / 1000;
+    return readableSecond(offset)
+}
 
+function readableSecond(offset) {
     var days = offset / 3600 / 24;
     var hours = offset / 3600;
     var minutes = offset / 60;

@@ -58,5 +58,5 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class TerminalRegistrationSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128)
-    comment = serializers.CharField(max_length=128)
+    comment = serializers.CharField(max_length=128, )
     service_account = ServiceAccountSerializer(read_only=True)

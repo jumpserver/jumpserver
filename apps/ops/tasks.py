@@ -2,6 +2,7 @@
 import os
 import subprocess
 import datetime
+import time
 
 from django.conf import settings
 from celery import shared_task, subtask
@@ -122,3 +123,22 @@ def hello123():
 def hello_callback(result):
     print(result)
     print("Hello callback")
+
+
+@shared_task
+def add(a, b):
+    time.sleep(5)
+    return a + b
+
+
+@shared_task
+def add_m(x):
+    from celery import chain
+    a = range(x)
+    b = [a[i:i + 10] for i in range(0, len(a), 10)]
+    s = list()
+    s.append(add.s(b[0], b[1]))
+    for i in b[1:]:
+        s.append(add.s(i))
+    res = chain(*tuple(s))()
+    return res

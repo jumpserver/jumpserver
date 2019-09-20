@@ -72,16 +72,10 @@ function initTable() {
                 $(td).html(cellData);
             }},
             {targets: 3, createdCell: function (td, cellData) {
-                function success(systemUsers) {
-                    var users = [];
-                    $.each(systemUsers, function (id, data) {
-                        var name = htmlEscape(data.name);
-                        users.push(name);
-                    });
-                    $(td).html(users.join(','))
-                }
-                $(td).html("{% trans 'Loading' %}");
-                getGrantedAssetSystemUsers(cellData, success)
+                var innerHtml = '<a class="btn-show-system-users" data-aid="99999999"> {% trans "Show" %} </a>'
+                    .replace('99999999', cellData);
+                $(td).html(innerHtml);
+
             }},
         ],
         ajax_url: assetTableUrl,
@@ -185,5 +179,19 @@ $(document).ready(function () {
     var val = $(this).text();
     $("#user_assets_table_filter input").val(val);
     assetTable.search(val).draw();
- })
+}).on('click', '.btn-show-system-users', function () {
+    var $this = $(this);
+    var assetId = $this.data('aid');
+
+    function success(systemUsers) {
+        var users = [];
+        $.each(systemUsers, function (id, data) {
+            var name = htmlEscape(data.name);
+            users.push(name);
+        });
+        $this.parent().html(users.join(','))
+    }
+
+    getGrantedAssetSystemUsers(assetId, success)
+})
 </script>

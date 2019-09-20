@@ -19,18 +19,6 @@ permission_m2m_senders = (
 )
 
 
-@on_transaction_commit
-def on_permission_m2m_change(sender, action='', **kwargs):
-    if not action.startswith('post'):
-        return
-    logger.debug('Asset permission m2m changed, refresh user tree cache')
-    AssetPermissionUtilV2.expire_all_user_tree_cache()
-
-
-for sender in permission_m2m_senders:
-    m2m_changed.connect(on_permission_m2m_change, sender=sender)
-
-
 @receiver([post_save, post_delete], sender=AssetPermission)
 @on_transaction_commit
 def on_permission_change(sender, action='', **kwargs):

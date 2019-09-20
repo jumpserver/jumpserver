@@ -33,6 +33,21 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         operation.summary = operation.operation_id
         return operation
 
+    def get_filter_parameters(self):
+        if not self.should_filter():
+            return []
+
+        fields = []
+        if hasattr(self.view, 'get_filter_backends'):
+            backends = self.view.get_filter_backends()
+        elif hasattr(self.view, 'filter_backends'):
+            backends = self.view.filter_backends
+        else:
+            backends = []
+        for filter_backend in backends:
+            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
+        return fields
+
 
 def get_swagger_view(version='v1'):
     from .urls import api_v1, api_v2

@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from common.utils import get_logger
+from common.utils import get_logger, timeit
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org, tmp_to_org
 from orgs.models import Organization
@@ -116,16 +116,24 @@ class FamilyMixin:
     def all_children(self):
         return self.get_all_children(with_self=False)
 
-    def get_children(self, with_self=False):
+    def get_children_key_pattern(self, with_self=False):
         pattern = r'^{0}:[0-9]+$'.format(self.key)
         if with_self:
             pattern += r'|^{0}$'.format(self.key)
+        return pattern
+
+    def get_children(self, with_self=False):
+        pattern = self.get_children_key_pattern(with_self=with_self)
         return Node.objects.filter(key__regex=pattern)
 
-    def get_all_children(self, with_self=False):
+    def get_all_children_pattern(self, with_self=False):
         pattern = r'^{0}:'.format(self.key)
         if with_self:
             pattern += r'|^{0}$'.format(self.key)
+        return pattern
+
+    def get_all_children(self, with_self=False):
+        pattern = self.get_all_children_pattern(with_self=with_self)
         children = Node.objects.filter(key__regex=pattern)
         return children
 
@@ -290,14 +298,16 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
-    def get_nodes_all_assets(cls, nodes_keys):
+    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
         from .asset import Asset
         nodes_keys = cls.clean_children_keys(nodes_keys)
-        pattern = set()
+        assets_ids = set()
         for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        return Asset.objects.filter(nodes__key__regex=pattern)
+            node_assets_ids = cls.tree().all_assets(key)
+            assets_ids.update(set(node_assets_ids))
+        if extra_assets_ids:
+            assets_ids.update(set(extra_assets_ids))
+        return Asset.objects.filter(id__in=assets_ids)
 
 
 class SomeNodesMixin:

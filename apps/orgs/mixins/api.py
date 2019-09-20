@@ -3,7 +3,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_bulk import BulkModelViewSet
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 
 from ..utils import set_to_root_org
 from ..models import Organization
@@ -20,20 +20,23 @@ class RootOrgViewMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrgModelViewSet(IDInCacheFilterMixin, ModelViewSet):
-    def get_queryset(self):
-        return super().get_queryset().all()
-
-
-class OrgBulkModelViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class OrgQuerySetMixin:
     def get_queryset(self):
         queryset = super().get_queryset().all()
+        if hasattr(self, 'swagger_fake_view'):
+            return queryset[:1]
         if hasattr(self, 'action') and self.action == 'list' and \
             hasattr(self, 'serializer_class') and \
                 hasattr(self.serializer_class, 'setup_eager_loading'):
             queryset = self.serializer_class.setup_eager_loading(queryset)
         return queryset
 
+
+class OrgModelViewSet(CommonApiMixin, OrgQuerySetMixin, ModelViewSet):
+    pass
+
+
+class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
     def allow_bulk_destroy(self, qs, filtered):
         if qs.count() <= filtered.count():
             return False

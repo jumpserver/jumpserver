@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
 #
+from common.utils import lazyproperty
+from common.tree import TreeNodeSerializer
 from ..mixin import UserPermissionMixin
 from ...utils import AssetPermissionUtilV2, ParserNode
-from ...hands import Node
-from common.tree import TreeNodeSerializer
+from ...hands import Node, Asset
 
 
 class UserAssetPermissionMixin(UserPermissionMixin):
     util = None
-    tree = None
 
-    def initial(self, *args, **kwargs):
-        super().initial(*args, *kwargs)
+    @lazyproperty
+    def util(self):
         cache_policy = self.request.query_params.get('cache_policy', '0')
         system_user_id = self.request.query_params.get("system_user")
-        self.util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
+        util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
         if system_user_id:
-            self.util.filter_permissions(system_users=system_user_id)
-        self.tree = self.util.get_user_tree()
+            util.filter_permissions(system_users=system_user_id)
+        return util
+
+    @lazyproperty
+    def tree(self):
+        return self.util.get_user_tree()
 
 
 class UserNodeTreeMixin:
@@ -41,7 +45,9 @@ class UserNodeTreeMixin:
         queryset = self.parse_nodes_to_queryset(queryset)
         return queryset
 
-    def get_serializer(self, queryset, many=True, **kwargs):
+    def get_serializer(self, queryset=None, many=True, **kwargs):
+        if queryset is None:
+            queryset = Node.objects.none()
         queryset = self.get_serializer_queryset(queryset)
         queryset.sort()
         return super().get_serializer(queryset, many=many, **kwargs)
@@ -64,7 +70,9 @@ class UserAssetTreeMixin:
         _queryset = self.parse_assets_to_queryset(queryset, None)
         return _queryset
 
-    def get_serializer(self, queryset, many=True, **kwargs):
+    def get_serializer(self, queryset=None, many=True, **kwargs):
+        if queryset is None:
+            queryset = Asset.objects.none()
         queryset = self.get_serializer_queryset(queryset)
         queryset.sort()
         return super().get_serializer(queryset, many=many, **kwargs)
