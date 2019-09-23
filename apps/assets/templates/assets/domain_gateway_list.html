@@ -119,7 +119,6 @@ $(document).ready(function(){
     var $this = $(this);
     var $data_table = $('#domain_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").html();
-    console.log(name)
     var uid = $this.data('uid');
     var the_url = '{% url "api-assets:gateway-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
