@@ -144,7 +144,7 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
     def validate_users(self, users):
         for user in users:
             if user.is_super_auditor:
-                msg = _('Auditors cannot be join in the group')
+                msg = _('Auditors cannot be join in the user group')
                 raise serializers.ValidationError(msg)
         return users
 
