@@ -103,7 +103,7 @@ $(document).ready(function(){
 .on('click', '.btn-delete', function () {
     var $this = $(this);
     var $data_table = $('#cmd_filter_rule_list_table').DataTable();
-    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var name = $(this).closest("tr").find(":nth-child(2)").html();
     var uid = $this.data('uid');
     var the_url = '{% url "api-assets:cmd-filter-rule-detail" filter_pk=object.id pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     objectDelete($this, name, the_url);
