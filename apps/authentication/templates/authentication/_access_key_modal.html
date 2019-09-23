@@ -14,10 +14,13 @@
     }
 
 </style>
-<div class="alert alert-info help-message">
+<div class="alert alert-info help-message" style="margin-left: 0px; margin-right: 0px;">
     {% trans 'Using api key sign api header, every requests header difference'%}, <a href="https://tools.ietf.org/html/draft-cavage-http-signatures-08">{% trans 'docs' %} </a>
 </div>
-<table class="table table-striped table-bordered table-hover " id="access_key_list_table" style="padding-top: 10px">
+<div class="uc pull-left m-r-0 m-t-10">
+    <button class="btn btn-primary btn-sm" id="create-btn" href="#"> {% trans "Create" %} </button>
+</div>
+<table class="table table-striped table-bordered table-hover " id="access_key_list_table">
     <thead>
     <tr>
         <th class="text-center">
@@ -34,12 +37,8 @@
     </tbody>
 </table>
 
-<div id="uc" hidden>
-    <button class="btn btn-primary btn-sm" id="create-btn" href="#"> {% trans "Create" %} </button>
-</div>
-
 <script>
-var table = null;
+var ak_table = null;
 function initAccessKeyTable() {
     var options = {
         ele: $('#access_key_list_table'),
@@ -85,14 +84,13 @@ function initAccessKeyTable() {
             {data: "date_created"},
             {data: "id", orderable: false}
         ],
-        uc_html: $('#uc').html()
     };
-    table = jumpserver.initServerSideDataTable(options);
+    ak_table = jumpserver.initServerSideDataTable(options);
 }
 
 $(document).ready(function () {
 }).on("show.bs.modal", "#access_key_modal", function () {
-    if (!table) {
+    if (!ak_table) {
         initAccessKeyTable()
     }
 }).on("click", "#create-btn", function () {
@@ -101,7 +99,7 @@ $(document).ready(function () {
         url: url,
         method: 'POST',
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
@@ -120,7 +118,7 @@ $(document).ready(function () {
         body: JSON.stringify({"is_active": true}),
         method: "PATCH",
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
@@ -132,7 +130,7 @@ $(document).ready(function () {
         body: JSON.stringify({"is_active": false}),
         method: "PATCH",
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
