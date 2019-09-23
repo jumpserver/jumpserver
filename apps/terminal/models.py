@@ -147,7 +147,8 @@ class Session(OrgModelMixin):
     PROTOCOL_CHOICES = (
         ('ssh', 'ssh'),
         ('rdp', 'rdp'),
-        ('vnc', 'vnc')
+        ('vnc', 'vnc'),
+        ('telnet', 'telnet'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
