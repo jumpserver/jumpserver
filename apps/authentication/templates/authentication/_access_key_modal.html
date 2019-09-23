@@ -37,12 +37,8 @@
     </tbody>
 </table>
 
-{#<div id="uc" hidden>#}
-{#    <button class="btn btn-primary btn-sm" id="create-btn" href="#"> {% trans "Create" %} </button>#}
-{#</div>#}
-
 <script>
-var table = null;
+var ak_table = null;
 function initAccessKeyTable() {
     var options = {
         ele: $('#access_key_list_table'),
@@ -88,14 +84,13 @@ function initAccessKeyTable() {
             {data: "date_created"},
             {data: "id", orderable: false}
         ],
-        {#uc_html: $('#uc').html()#}
     };
-    table = jumpserver.initServerSideDataTable(options);
+    ak_table = jumpserver.initServerSideDataTable(options);
 }
 
 $(document).ready(function () {
 }).on("show.bs.modal", "#access_key_modal", function () {
-    if (!table) {
+    if (!ak_table) {
         initAccessKeyTable()
     }
 }).on("click", "#create-btn", function () {
@@ -104,7 +99,7 @@ $(document).ready(function () {
         url: url,
         method: 'POST',
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
@@ -123,7 +118,7 @@ $(document).ready(function () {
         body: JSON.stringify({"is_active": true}),
         method: "PATCH",
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
@@ -135,7 +130,7 @@ $(document).ready(function () {
         body: JSON.stringify({"is_active": false}),
         method: "PATCH",
         success: function () {
-            table.ajax.reload();
+            ak_table.ajax.reload();
         }
     };
     requestApi(data)
