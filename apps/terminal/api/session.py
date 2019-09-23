@@ -8,7 +8,6 @@ from django.http import HttpResponseNotFound
 from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
 import jms_storage
 
 from common.utils import is_uuid, get_logger
@@ -35,6 +34,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
+    extra_filter_backends = [DatetimeRangeFilter]
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -42,12 +42,6 @@ class SessionViewSet(OrgBulkModelViewSet):
         if self.request.method in ('PATCH',):
             queryset = queryset.select_for_update()
         return queryset
-
-    @property
-    def filter_backends(self):
-        backends = list(GenericAPIView.filter_backends)
-        backends.append(DatetimeRangeFilter)
-        return backends
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):

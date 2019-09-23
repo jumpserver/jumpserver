@@ -16,22 +16,13 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 class DomainViewSet(OrgBulkModelViewSet):
     queryset = Domain.objects.all()
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
-
-    def get_queryset(self):
-        queryset = super().get_queryset().all()
-        return queryset
 
     def get_serializer_class(self):
         if self.request.query_params.get('gateway'):
             return serializers.DomainWithGatewaySerializer
         return super().get_serializer_class()
-
-    def get_permissions(self):
-        if self.request.query_params.get('gateway'):
-            self.permission_classes = (IsOrgAdminOrAppUser,)
-        return super().get_permissions()
 
 
 class GatewayViewSet(OrgBulkModelViewSet):

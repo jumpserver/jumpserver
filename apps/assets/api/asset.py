@@ -36,7 +36,6 @@ class AssetViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend]
-    custom_filter_fields = ['admin_user_id']
 
     def set_assets_node(self, assets):
         if not isinstance(assets, list):
@@ -52,19 +51,6 @@ class AssetViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         assets = serializer.save()
         self.set_assets_node(assets)
-
-    def filter_admin_user_id(self, queryset):
-        admin_user_id = self.request.query_params.get('admin_user_id')
-        if not admin_user_id:
-            return queryset
-        admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-        queryset = queryset.filter(admin_user=admin_user)
-        return queryset
-
-    def filter_queryset(self, queryset):
-        queryset = super().filter_queryset(queryset)
-        queryset = self.filter_admin_user_id(queryset)
-        return queryset
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):
