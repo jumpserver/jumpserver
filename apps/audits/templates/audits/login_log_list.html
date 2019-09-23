@@ -105,7 +105,7 @@
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function() {
-            jumpserver.initStaticTable('table');
+            jumpserver.initStaticTable('#login_log_table');
             $('#date .input-daterange').datepicker({
                 format: "yyyy-mm-dd",
                 todayBtn: "linked",
