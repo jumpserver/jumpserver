@@ -5,7 +5,6 @@ from django.views.generic import DetailView, View
 
 from .models import Organization
 from common.utils import UUID_PATTERN
-from orgs.utils import current_org
 
 
 class SwitchOrgView(DetailView):
