@@ -157,6 +157,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         queryset = self.filter_node(queryset)
         queryset = self.filter_system_user(queryset)
         queryset = self.filter_user_group(queryset)
+        queryset = queryset.distinct()
         return queryset
 
     def get_queryset(self):
