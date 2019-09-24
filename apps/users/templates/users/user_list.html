@@ -99,7 +99,7 @@ function initTable() {
             {targets: 7, createdCell: function (td, cellData, rowData) {
                 var name = htmlEscape(rowData.name);
                 var update_btn = "";
-                if (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin')) {
+                if (rowData.can_update === false){
                     update_btn = '<a class="btn btn-xs disabled btn-info">{% trans "Update" %}</a>';
                 }
                 else{
@@ -107,7 +107,7 @@ function initTable() {
                 }
 
                 var del_btn = "";
-                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ request.user.username }}" || (rowData.role === 'Admin' && ('{{ request.user.role }}' !== 'Admin'))) {
+                if (rowData.can_delete === false){
                     del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', name);
@@ -258,25 +258,28 @@ $(document).ready(function(){
         },function () {
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
+                function success() {
+                    var msg = "{% trans 'User Deleted.' %}";
+                    swal("{% trans 'User Delete' %}", msg, "success");
+                }
+                function fail() {
+                    var msg = "{% trans 'User Deleting failed.' %}";
+                    swal("{% trans 'User Delete' %}", msg, "error");
+                }
                 requestApi({
                     url:url,
                     method:'DELETE',
+                    flash_message:true,
                     success:reloadPage,
-                    flash_message:false,
+                    error: fail
                  });
-                var msg = "{% trans 'User Deleted.' %}";
-                swal("{% trans 'User Delete' %}", msg, "success");
-            }
-            function fail() {
-                var msg = "{% trans 'User Deleting failed.' %}";
-                swal("{% trans 'User Delete' %}", msg, "error");
             }
             requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
                 method:'POST',
                 body:JSON.stringify(data),
+                flash_message:false,
                 success:success,
-                error:fail
              })
         })
     }

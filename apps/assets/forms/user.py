@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, get_logger
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from ..models import AdminUser, SystemUser
 
 logger = get_logger(__file__)

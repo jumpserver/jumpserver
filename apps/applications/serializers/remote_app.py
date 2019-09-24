@@ -5,7 +5,7 @@
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .. import const
 from ..models import RemoteApp
@@ -73,13 +73,13 @@ class RemoteAppSerializer(BulkOrgResourceModelSerializer):
         model = RemoteApp
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'asset', 'system_user', 'type', 'path', 'params',
+            'id', 'name', 'asset', 'type', 'path', 'params',
             'comment', 'created_by', 'date_created', 'asset_info',
-            'system_user_info', 'get_type_display',
+            'get_type_display',
         ]
         read_only_fields = [
             'created_by', 'date_created', 'asset_info',
-            'system_user_info', 'get_type_display'
+            'get_type_display'
         ]
 
 
@@ -89,7 +89,7 @@ class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = RemoteApp
         fields = [
-            'id', 'name', 'asset', 'system_user', 'parameter_remote_app',
+            'id', 'name', 'asset', 'parameter_remote_app',
         ]
         read_only_fields = ['parameter_remote_app']
 

@@ -1,20 +1,22 @@
 import uuid
+import logging
 from functools import reduce
 
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import date_expired_default, set_or_append_attr_bulk
-from orgs.mixins import OrgModelMixin
+from orgs.models import Organization
+from orgs.utils import get_current_org
 from assets.models import Asset, SystemUser, Node
 
 from .base import BasePermission
 
 
 __all__ = [
-    'AssetPermission', 'NodePermission', 'Action',
+    'AssetPermission', 'Action',
 ]
+logger = logging.getLogger(__name__)
 
 
 class Action:
@@ -78,12 +80,12 @@ class AssetPermission(BasePermission):
     assets = models.ManyToManyField('assets.Asset', related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
     nodes = models.ManyToManyField('assets.Node', related_name='granted_by_permissions', blank=True, verbose_name=_("Nodes"))
     system_users = models.ManyToManyField('assets.SystemUser', related_name='granted_by_permissions', verbose_name=_("System user"))
-    # actions = models.ManyToManyField(Action, related_name='permissions', blank=True, verbose_name=_('Action'))
     actions = models.IntegerField(choices=Action.DB_CHOICES, default=Action.ALL, verbose_name=_("Actions"))
 
     class Meta:
         unique_together = [('org_id', 'name')]
         verbose_name = _("Asset permission")
+        ordering = ('name',)
 
     @classmethod
     def get_queryset_with_prefetch(cls):
@@ -94,32 +96,59 @@ class AssetPermission(BasePermission):
         )
 
     def get_all_assets(self):
-        args = [Q(granted_by_permissions=self)]
-        pattern = set()
+        from assets.models import Node
         nodes_keys = self.nodes.all().values_list('key', flat=True)
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        if pattern:
-            args.append(Q(nodes__key__regex=pattern))
-        args = reduce(lambda x, y: x | y, args)
-        assets = Asset.objects.filter(args).distinct()
+        assets_ids = set(self.assets.all().values_list('id', flat=True))
+        nodes_assets_ids = Node.get_nodes_all_assets_ids(nodes_keys)
+        assets_ids.update(nodes_assets_ids)
+        assets = Asset.objects.filter(id__in=assets_ids)
         return assets
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from ..hands import User, Node, SystemUser
+        import random
 
-class NodePermission(OrgModelMixin):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    node = models.ForeignKey('assets.Node', on_delete=models.CASCADE, verbose_name=_("Node"))
-    user_group = models.ForeignKey('users.UserGroup', on_delete=models.CASCADE, verbose_name=_("User group"))
-    system_user = models.ForeignKey('assets.SystemUser', on_delete=models.CASCADE, verbose_name=_("System user"))
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
-    comment = models.TextField(verbose_name=_('Comment'), blank=True)
+        org = get_current_org()
+        if not org or not org.is_real():
+            Organization.default().change_to()
 
-    def __str__(self):
-        return "{}:{}:{}".format(self.node.value, self.user_group.name, self.system_user.name)
+        nodes = list(Node.objects.all())
+        assets = list(Asset.objects.all())
+        system_users = list(SystemUser.objects.all())
+        users = User.objects.filter(username='admin')
 
-    class Meta:
-        verbose_name = _("Asset permission")
+        for i in range(count):
+            name = "fake_perm_to_admin_{}".format(str(uuid.uuid4())[:6])
+            perm = cls(name=name)
+            try:
+                perm.save()
+                perm.users.set(users)
+                if system_users and len(system_users) > 3:
+                    _system_users = random.sample(system_users, 3)
+                elif system_users:
+                    _system_users = [system_users[0]]
+                else:
+                    _system_users = []
+                perm.system_users.set(_system_users)
+
+                if nodes and len(nodes) > 3:
+                    _nodes = random.sample(nodes, 3)
+                else:
+                    _nodes = [Node.default_node()]
+                perm.nodes.set(_nodes)
+
+                if assets and len(assets) > 3:
+                    _assets = random.sample(assets, 3)
+                elif assets:
+                    _assets = [assets[0]]
+                else:
+                    _assets = []
+                perm.assets.set(_assets)
+
+                logger.debug('Generate fake perm: %s' % perm.name)
+
+            except Exception as e:
+                print('Error continue')
+                continue
+

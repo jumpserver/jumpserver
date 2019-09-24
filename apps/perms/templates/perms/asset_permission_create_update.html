@@ -111,39 +111,24 @@ var dateOptions = {
     }
 };
 var api_action =  "{{ api_action }}";
+
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
     });
+    var url = "{% url 'api-assets:node-list' %}";
+    nodesSelect2Init(".nodes-select2", url);
+
     $('#date_start').daterangepicker(dateOptions);
     $('#date_expired').daterangepicker(dateOptions);
+
     $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
             e.preventDefault();
             e.stopPropagation();
             $("#asset_list_modal").modal();
-            initSelectedAssets2Table();
         }
     })
-})
-.on('click', '#btn_asset_modal_confirm', function () {
-    var assets = asset_table2.selected;
-
-    var options = [];
-    $('#id_assets option').each(function (i, v) {
-        options.push(v.value)
-    });
-    asset_table2.selected_rows.forEach(function (i) {
-        var name = i.hostname + '(' + i.ip + ')';
-        var option = new Option(name, i.id, false, true);
-
-        if (options.indexOf(i.id) === -1) {
-            $('#id_assets').append(option).trigger('change');
-        }
-    });
-
-    $('#id_assets').val(assets).trigger('change');
-    $("#asset_list_modal").modal('hide');
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();

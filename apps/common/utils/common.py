@@ -8,7 +8,6 @@ import datetime
 import uuid
 from functools import wraps
 import time
-import copy
 import ipaddress
 
 
@@ -29,6 +28,10 @@ def combine_seq(s1, s2, callback=None):
 
 def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
+
+
+def get_syslogger(name=None):
+    return logging.getLogger('jms.%s' % name)
 
 
 def timesince(dt, since='', default="just now"):
@@ -195,3 +198,31 @@ def timeit(func):
         logger.debug(msg)
         return result
     return wrapper
+
+
+def group_obj_by_count(objs, count=50):
+    objs_grouped = [
+        objs[i:i + count] for i in range(0, len(objs), count)
+    ]
+    return objs_grouped
+
+
+def dict_get_any(d, keys):
+    for key in keys:
+        value = d.get(key)
+        if value:
+            return value
+    return None
+
+
+class lazyproperty:
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        else:
+            value = self.func(instance)
+            setattr(instance, self.func.__name__, value)
+            return value

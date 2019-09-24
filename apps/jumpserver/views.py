@@ -2,14 +2,13 @@ import datetime
 import re
 import time
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.conf import settings
 from django.views.generic import TemplateView, View
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.shortcuts import redirect
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -35,17 +34,13 @@ class IndexView(PermissionsMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        if request.user.is_auditor:
-            return super(IndexView, self).dispatch(request, *args, **kwargs)
-        if not request.user.is_org_admin:
+        if request.user.is_common_user:
             return redirect('assets:user-asset-list')
-        if not current_org or not current_org.can_admin_by(request.user):
-            return redirect('orgs:switch-a-org')
         return super(IndexView, self).dispatch(request, *args, **kwargs)
 
     @staticmethod
     def get_user_count():
-        return current_org.get_org_users().count()
+        return current_org.get_org_members().count()
 
     @staticmethod
     def get_asset_count():
@@ -100,7 +95,7 @@ class IndexView(PermissionsMixin, TemplateView):
         return self.session_month.values('user').distinct().count()
 
     def get_month_inactive_user_total(self):
-        count = current_org.get_org_users().count() - self.get_month_active_user_total()
+        count = current_org.get_org_members().count() - self.get_month_active_user_total()
         if count < 0:
             count = 0
         return count
@@ -116,7 +111,7 @@ class IndexView(PermissionsMixin, TemplateView):
 
     @staticmethod
     def get_user_disabled_total():
-        return current_org.get_org_users().filter(is_active=False).count()
+        return current_org.get_org_members().filter(is_active=False).count()
 
     @staticmethod
     def get_asset_disabled_total():
@@ -208,7 +203,7 @@ class I18NView(View):
         return response
 
 
-api_url_pattern = re.compile(r'^/api/(?P<version>\w+)/(?P<app>\w+)/(?P<extra>.*)$')
+api_url_pattern = re.compile(r'^/api/(?P<app>\w+)/(?P<version>v\d)/(?P<extra>.*)$')
 
 
 @csrf_exempt
@@ -216,18 +211,19 @@ def redirect_format_api(request, *args, **kwargs):
     _path, query = request.path, request.GET.urlencode()
     matched = api_url_pattern.match(_path)
     if matched:
-        version, app, extra = matched.groups()
-        _path = '/api/{app}/{version}/{extra}?{query}'.format(**{
-            "app": app, "version": version, "extra": extra,
-            "query": query
-        })
+        kwargs = matched.groupdict()
+        kwargs["query"] = query
+        _path = '/api/{version}/{app}/{extra}?{query}'.format(**kwargs).rstrip("?")
         return HttpResponseTemporaryRedirect(_path)
     else:
-        return Response({"msg": "Redirect url failed: {}".format(_path)}, status=404)
+        return JsonResponse({"msg": "Redirect url failed: {}".format(_path)}, status=404)
 
 
 class HealthCheckView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        return Response({"status": 1, "time": int(time.time())})
+        return JsonResponse({"status": 1, "time": int(time.time())})
+
+
+

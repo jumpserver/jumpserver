@@ -119,7 +119,7 @@ function autoLoginModeProtocol() {
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (protocol === 'telnet (beta)') {
+    else if (protocol === 'telnet') {
         $('.auth-fields').removeClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
@@ -165,7 +165,7 @@ function manualLoginModeProtocol() {
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (protocol === 'telnet (beta)') {
+    else if (protocol === 'telnet') {
         $('.auth-fields').addClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').addClass('hidden');

@@ -8,7 +8,7 @@ from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
 from .utils import set_current_org, get_current_org
 from .models import Organization
-from .mixins import OrgMembershipSerializerMixin
+from .mixins.serializers import OrgMembershipSerializerMixin
 
 
 class OrgSerializer(ModelSerializer):
@@ -21,6 +21,7 @@ class OrgSerializer(ModelSerializer):
 
 class OrgReadSerializer(ModelSerializer):
     admins = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
+    auditors = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     users = serializers.SlugRelatedField(slug_field='name', many=True, read_only=True)
     user_groups = serializers.SerializerMethodField()
     assets = serializers.SerializerMethodField()

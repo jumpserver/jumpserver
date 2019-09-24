@@ -5,7 +5,6 @@ import uuid
 import base64
 import string
 import random
-from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
@@ -16,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
+from orgs.utils import current_org
 from common.utils import get_signer, date_expired_default, get_logger
 from common import fields
 
@@ -132,7 +132,16 @@ class RoleMixin:
 
     @property
     def role_display(self):
-        return self.get_role_display()
+        if not current_org.is_real():
+            return self.get_role_display()
+        roles = []
+        if self in current_org.get_org_admins():
+            roles.append(str(_('Org admin')))
+        if self in current_org.get_org_auditors():
+            roles.append(str(_('Org auditor')))
+        if self in current_org.get_org_users():
+            roles.append(str(_('User')))
+        return " | ".join(roles)
 
     @property
     def is_superuser(self):
@@ -149,26 +158,14 @@ class RoleMixin:
             self.role = 'User'
 
     @property
-    def admin_orgs(self):
-        from orgs.models import Organization
-        return Organization.get_user_admin_orgs(self)
-
-    @property
-    def is_org_admin(self):
-        if self.is_superuser or self.admin_orgs.exists():
-            return True
-        else:
-            return False
-
-    @property
-    def is_auditor(self):
+    def is_super_auditor(self):
         return self.role == 'Auditor'
 
     @property
     def is_common_user(self):
         if self.is_org_admin:
             return False
-        if self.is_auditor:
+        if self.is_org_auditor:
             return False
         if self.is_app:
             return False
@@ -177,6 +174,52 @@ class RoleMixin:
     @property
     def is_app(self):
         return self.role == 'App'
+
+    @property
+    def user_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_user_orgs(self)
+
+    @property
+    def admin_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_admin_orgs(self)
+
+    @property
+    def audit_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_audit_orgs(self)
+
+    @property
+    def admin_or_audit_orgs(self):
+        from orgs.models import Organization
+        return Organization.get_user_admin_or_audit_orgs(self)
+
+    @property
+    def is_org_admin(self):
+        if self.is_superuser or self.related_admin_orgs.exists():
+            return True
+        else:
+            return False
+
+    @property
+    def is_org_auditor(self):
+        if self.is_super_auditor or self.related_audit_orgs.exists():
+            return True
+        else:
+            return False
+
+    @property
+    def can_admin_current_org(self):
+        return current_org.can_admin_by(self)
+
+    @property
+    def can_audit_current_org(self):
+        return current_org.can_audit_by(self)
+
+    @property
+    def can_admin_or_audit_current_org(self):
+        return self.can_admin_current_org or self.can_audit_current_org
 
     @property
     def is_staff(self):
@@ -207,20 +250,19 @@ class TokenMixin:
 
     @property
     def private_token(self):
-        from authentication.models import PrivateToken
-        try:
-            token = PrivateToken.objects.get(user=self)
-        except PrivateToken.DoesNotExist:
-            token = self.create_private_token()
-        return token
+        return self.create_private_token()
 
     def create_private_token(self):
         from authentication.models import PrivateToken
-        token = PrivateToken.objects.create(user=self)
+        token, created = PrivateToken.objects.get_or_create(user=self)
         return token
 
+    def delete_private_token(self):
+        from authentication.models import PrivateToken
+        PrivateToken.objects.filter(user=self).delete()
+
     def refresh_private_token(self):
-        self.private_token.delete()
+        self.delete_private_token()
         return self.create_private_token()
 
     def create_bearer_token(self, request=None):
@@ -238,7 +280,8 @@ class TokenMixin:
             token = uuid.uuid4().hex
         cache.set(token, self.id, expiration)
         cache.set('%s_%s' % (self.id, remote_addr), token, expiration)
-        return token
+        date_expired = timezone.now() + timezone.timedelta(seconds=expiration)
+        return token, date_expired
 
     def refresh_bearer_token(self, token):
         pass
@@ -368,7 +411,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         db_index=True, verbose_name=_('Date expired')
     )
     created_by = models.CharField(
-        max_length=30, default='', verbose_name=_('Created by')
+        max_length=30, default='', blank=True, verbose_name=_('Created by')
     )
     source = models.CharField(
         max_length=30, default=SOURCE_LOCAL, choices=SOURCE_CHOICES,

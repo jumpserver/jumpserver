@@ -29,6 +29,6 @@ def send_mail_async(*args, **kwargs):
         args = tuple(args)
 
     try:
-        send_mail(*args, **kwargs)
+        return send_mail(*args, **kwargs)
     except Exception as e:
         logger.error("Sending mail error: {}".format(e))

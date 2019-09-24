@@ -33,15 +33,15 @@
 
 {% block custom_foot_js %}
 <script>
-var treeUrl = "{% url 'api-perms:user-group-nodes-as-tree' pk=object.id %}?cache_policy=1";
 var assetTableUrl = "{% url 'api-perms:user-group-assets' pk=object.id %}?cache_policy=1";
-var selectUrl = '{% url "api-perms:user-group-node-assets" pk=object.id node_id=DEFAULT_PK %}?cache_policy=1&all=1';
+var selectUrl = '{% url "api-perms:user-group-node-assets" pk=object.id node_id=DEFAULT_PK %}?&cache_policy=1&all=1';
+var treeUrl = "{% url 'api-perms:user-group-nodes-children-as-tree' pk=object.id %}?cache_policy=1";
+var systemUsersUrl = "{% url 'api-perms:user-group-asset-system-users' pk=object.id asset_id=DEFAULT_PK %}?cache_policy=1";
 var showAssetHref = true; // Need input default true
 
 
 $(document).ready(function () {
     initTree();
-    initTable();
 });
 </script>
 {% endblock %}

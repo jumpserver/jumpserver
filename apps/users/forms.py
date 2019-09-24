@@ -4,7 +4,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
-from orgs.mixins import OrgModelForm
+from orgs.mixins.forms import OrgModelForm
 from orgs.utils import current_org
 from .models import User, UserGroup
 from .utils import check_password_rules
@@ -306,10 +306,6 @@ class UserBulkUpdateForm(OrgModelForm):
         return users
 
 
-def user_limit_to():
-    return {"orgs": current_org}
-
-
 class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
@@ -321,7 +317,6 @@ class UserGroupForm(OrgModelForm):
             }
         ),
         required=False,
-        limit_choices_to=user_limit_to
     )
 
     def __init__(self, **kwargs):
@@ -335,7 +330,7 @@ class UserGroupForm(OrgModelForm):
             return
         users_field = self.fields.get('users')
         if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_users()
+            users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
 
     def save(self, commit=True):
         group = super().save(commit=commit)

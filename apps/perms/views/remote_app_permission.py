@@ -12,7 +12,7 @@ from django.conf import settings
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
 
-from ..hands import RemoteApp, UserGroup
+from ..hands import RemoteApp, UserGroup, SystemUser
 from ..models import RemoteAppPermission
 from ..forms import RemoteAppPermissionCreateUpdateForm
 
@@ -80,6 +80,9 @@ class RemoteAppPermissionDetailView(PermissionsMixin, DetailView):
         context = {
             'app': _('Perms'),
             'action': _('RemoteApp permission detail'),
+            'system_users_remain': SystemUser.objects.exclude(
+                granted_by_remote_app_permissions=self.object
+            ),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -104,15 +107,15 @@ class RemoteAppPermissionUserView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
+        user_remain = current_org.get_org_members(exclude=('Auditor',)).exclude(
+            remoteapppermission=self.object)
+        user_groups_remain = UserGroup.objects.exclude(
+            remoteapppermission=self.object)
         context = {
             'app': _('Perms'),
             'action': _('RemoteApp permission user list'),
-            'users_remain': current_org.get_org_users().exclude(
-                remoteapppermission=self.object
-            ),
-            'user_groups_remain': UserGroup.objects.exclude(
-                remoteapppermission=self.object
-            )
+            'users_remain': user_remain,
+            'user_groups_remain': user_groups_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

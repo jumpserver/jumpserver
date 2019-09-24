@@ -22,7 +22,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
         instance.refresh_setting()
 
 
-@receiver(django_ready, dispatch_uid="my_unique_identifier")
+@receiver(django_ready)
 def monkey_patch_settings(sender, **kwargs):
     logger.debug("Monkey patch settings")
     cache_key_prefix = '_SETTING_'

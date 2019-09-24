@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.conf import settings
 from .ansible.inventory import BaseInventory
 
 from common.utils import get_logger
@@ -14,6 +15,7 @@ logger = get_logger(__file__)
 
 
 class JMSBaseInventory(BaseInventory):
+    windows_ssh_default_ssh = settings.WINDOWS_SSH_DEFAULT_SHELL
 
     def convert_to_ansible(self, asset, run_as_admin=False):
         info = {
@@ -30,12 +32,10 @@ class JMSBaseInventory(BaseInventory):
             info.update(asset.get_auth_info())
             if asset.is_unixlike():
                 info["become"] = asset.admin_user.become_info
-        for node in asset.nodes.all():
-            info["groups"].append(node.value)
         if asset.is_windows():
             info["vars"].update({
                 "ansible_connection": "ssh",
-                "ansible_shell_type": "cmd",
+                "ansible_shell_type": self.windows_ssh_default_ssh,
             })
         for label in asset.labels.all():
             info["vars"].update({
@@ -45,14 +45,13 @@ class JMSBaseInventory(BaseInventory):
             info["vars"].update({
                 "domain": asset.domain.name,
             })
-            info["groups"].append("domain_"+asset.domain.name)
         return info
 
     @staticmethod
     def make_proxy_command(asset):
         gateway = asset.domain.random_gateway()
         proxy_command_list = [
-            "ssh", "-p", str(gateway.port),
+            "ssh", "-o", "Port={}".format(gateway.port),
             "-o", "StrictHostKeyChecking=no",
             "{}@{}".format(gateway.username, gateway.ip),
             "-W", "%h:%p", "-q",

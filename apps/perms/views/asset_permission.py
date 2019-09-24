@@ -10,7 +10,6 @@ from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from orgs.utils import current_org
-from assets.utils import NodeUtil
 from perms.hands import Node, Asset, SystemUser, UserGroup
 from perms.models import AssetPermission
 from perms.forms import AssetPermissionForm
@@ -52,12 +51,13 @@ class AssetPermissionCreateView(PermissionsMixin, CreateView):
 
         if nodes_id:
             nodes_id = nodes_id.split(",")
-            nodes = Node.objects.filter(id__in=nodes_id).exclude(id=Node.root().id)
-            form['nodes'].initial = nodes
+            nodes = Node.objects.filter(id__in=nodes_id)\
+                .exclude(id=Node.org_root().id)
+            form.set_nodes_initial(nodes)
         if assets_id:
             assets_id = assets_id.split(",")
             assets = Asset.objects.filter(id__in=assets_id)
-            form['assets'].initial = assets
+            form.set_assets_initial(assets)
         return form
 
     def get_context_data(self, **kwargs):
@@ -131,16 +131,15 @@ class AssetPermissionUserView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-
+        user_remain = current_org.get_org_members(exclude=('Auditor',)).exclude(
+            assetpermission=self.object)
+        user_groups_remain = UserGroup.objects.exclude(
+            assetpermission=self.object)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': current_org.get_org_users().exclude(
-                assetpermission=self.object
-            ),
-            'user_groups_remain': UserGroup.objects.exclude(
-                assetpermission=self.object
-            )
+            'users_remain': user_remain,
+            'user_groups_remain': user_groups_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -167,8 +166,6 @@ class AssetPermissionAssetView(PermissionsMixin,
         nodes_remain = Node.objects.exclude(
             id__in=self.object.nodes.all().values_list('id', flat=True)
         ).only('key')
-        util = NodeUtil()
-        nodes_remain = util.get_nodes_by_queryset(nodes_remain)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission asset list'),

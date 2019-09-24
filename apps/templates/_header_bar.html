@@ -1,30 +1,11 @@
 {% load i18n %}
+{% include 'authentication/_access_key_modal.html' %}
 <div class="row border-bottom">
     <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            <!--<form role="search" class="navbar-form-custom" method="get" action="">-->
-                <!--<div class="form-group">-->
-                    <!--<input type="text" placeholder="{% trans 'Search' %}..." class="form-control" name="search" id="top-search">-->
-                <!--</div>-->
-            <!--</form>-->
         </div>
         <ul class="nav navbar-top-links navbar-right">
-{#            <li>#}
-{#                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>#}
-{#            </li>#}
-
-{#            <li class="dropdown">#}
-{#                <a class="count-info" href="https://market.aliyun.com/products/53690006/cmgj026011.html?spm=5176.730005.0.0.cY2io1" target="_blank">#}
-{#                    <span class="m-r-sm text-muted welcome-message">{% trans 'Supports' %}</span>#}
-{#                </a>#}
-{#            </li>#}
-{#            <li class="dropdown">#}
-{#                <a class="count-info"  href="http://docs.jumpserver.org/" target="_blank">#}
-{#                     <span class="m-r-sm text-muted welcome-message">{% trans 'Docs' %}</span>#}
-{#                </a>#}
-{#            </li>#}
-
             <li class="dropdown">
                 <a class="count-info dropdown-toggle" data-toggle="dropdown" href="#" target="_blank">
                     <i class="fa fa-handshake-o"></i>
@@ -87,13 +68,14 @@
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs profile-dropdown">
                     <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs"> </i><span> {% trans 'Profile' %}</span></a></li>
-                    {% if request.user.is_org_admin %}
+                    {% if request.user.can_admin_or_audit_current_org %}
                         {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
                             <li><a id="switch_admin"><i class="fa fa-exchange"></i><span> {% trans 'Admin page' %}</span></a></li>
                         {% else %}
                             <li><a id="switch_user"><i class="fa fa-exchange"></i><span> {% trans 'User page' %}</span></a></li>
                         {% endif %}
                     {% endif %}
+                    <li><a href="#" data-toggle="modal" data-target="#access_key_modal" tabindex="0"><i class="fa fa-key"></i> {% trans 'API Key' %}</a></li>
                     <li><a href="{% url 'authentication:logout' %}"><i class="fa fa-sign-out"></i> {% trans 'Logout' %}</a></li>
                 </ul>
                 {% else %}
@@ -125,3 +107,23 @@
     <div class="col-sm-2">
     </div>
 </div>
+<script>
+$(document).ready(function () {
+})
+.on('click', '#switch_admin', function () {
+    var cookieName = "IN_ADMIN_PAGE";
+    setTimeout(function () {
+        delCookie(cookieName);
+        setCookie(cookieName, "Yes");
+        window.location = "/"
+    }, 100)
+})
+.on('click', '#switch_user', function () {
+    var cookieName = "IN_ADMIN_PAGE";
+    setTimeout(function () {
+        delCookie(cookieName);
+        setCookie(cookieName, "No");
+        window.location = "{% url 'assets:user-asset-list' %}"
+    }, 100);
+})
+</script>

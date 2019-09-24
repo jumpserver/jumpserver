@@ -12,10 +12,13 @@ from rest_framework import generics, serializers
 
 from .http import HttpResponseTemporaryRedirect
 from .const import KEY_CACHE_RESOURCES_ID
+from .utils import get_logger
 
 __all__ = [
     'LogTailApi', 'ResourcesIDCacheApi',
 ]
+
+logger = get_logger(__file__)
 
 
 class OutputSerializer(serializers.Serializer):
@@ -93,6 +96,7 @@ class ResourcesIDCacheApi(APIView):
 @csrf_exempt
 def redirect_plural_name_api(request, *args, **kwargs):
     resource = kwargs.get("resource", "")
-    full_path = request.get_full_path()
-    full_path = full_path.replace(resource, resource+"s", 1)
+    org_full_path = request.get_full_path()
+    full_path = org_full_path.replace(resource, resource+"s", 1)
+    logger.debug("Redirect {} => {}".format(org_full_path, full_path))
     return HttpResponseTemporaryRedirect(full_path)

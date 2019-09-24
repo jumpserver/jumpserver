@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
 from .base import ConnectivitySerializer, AuthSerializerMixin
@@ -53,6 +53,7 @@ class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         if not validated_data.get("name") and validated_data.get("username"):
             validated_data["name"] = validated_data["username"]
         instance = AssetUserManager.create(**validated_data)
+        instance.set_version_and_latest()
         return instance
 
 

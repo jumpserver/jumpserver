@@ -37,6 +37,7 @@
    <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
        <div class="file-manager" id="tree-node-id">
            <div id="{% block treeID %}nodeTree{% endblock %}" class="ztree">
+           {% trans 'Loading' %} ...
            </div>
            <div class="clearfix"></div>
        </div>
@@ -73,7 +74,6 @@ function initNodeTree(options) {
     if (options.showAssets) {
         treeUrl = setUrlParam(treeUrl, 'assets', '1')
     }
-    var asyncTreeUrl = setUrlParam(treeUrl, 'refresh', '0');
     var setting = {
         view: {
             dblClickExpand: false,
@@ -86,7 +86,7 @@ function initNodeTree(options) {
         },
         async: {
 			enable: true,
-			url: asyncTreeUrl,
+			url: treeUrl,
 			autoParam: ["id=key", "name=n", "level=lv"],
             type: 'get'
 		},
@@ -114,9 +114,15 @@ function initNodeTree(options) {
     $.get(treeUrl, function (data, status) {
         zTree = $.fn.zTree.init($("#nodeTree"), setting, data);
         rootNodeAddDom(zTree, function () {
-            treeUrl = setUrlParam(treeUrl, 'refresh', '1');
-            initNodeTree(options);
-            treeUrl = setUrlParam(treeUrl, 'refresh', '0');
+            const url = '{% url 'api-assets:refresh-nodes-cache' %}';
+            requestApi({
+                url: url,
+                method: 'GET',
+                flash_message: false,
+                success: function () {
+                    initNodeTree(options);
+                }
+            });
         });
         inited = true;
     });
@@ -236,7 +242,8 @@ function onBodyMouseDown(event){
 }
 
 function onRename(event, treeId, treeNode, isCancel){
-    var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
+    var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}"
+        .replace("{{ DEFAULT_PK }}", current_node_id);
     var data = {"value": treeNode.name};
     if (isCancel){
         return
@@ -247,10 +254,13 @@ function onRename(event, treeId, treeNode, isCancel){
         method: "PATCH",
         success_message: "{% trans 'Rename success' %}",
         success: function () {
-            treeNode.name = treeNode.name + ' (' + treeNode.meta.node.assets_amount + ')';
+            var assets_amount = treeNode.meta.node.assets_amount;
+            if (!assets_amount) {
+                assets_amount = 0;
+            }
+            treeNode.name = treeNode.name + ' (' + assets_amount + ')';
             zTree.updateNode(treeNode);
-            console.log("Success: " + treeNode.name)
-        }
+        },
     })
 }
 

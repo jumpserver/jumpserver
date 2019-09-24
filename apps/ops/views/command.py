@@ -6,9 +6,10 @@ from django.conf import settings
 from django.views.generic import ListView, TemplateView
 
 from common.permissions import (
-    PermissionsMixin, IsOrgAdmin, IsAuditor, IsValidUser
+    PermissionsMixin, IsOrgAdmin,  IsValidUser, IsOrgAuditor
 )
 from common.mixins import DatetimeSearchMixin
+from orgs.utils import tmp_to_root_org
 from ..models import CommandExecution
 from ..forms import CommandExecutionForm
 
@@ -25,7 +26,7 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     keyword = ''
-    permission_classes = [IsOrgAdmin | IsAuditor]
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
 
     def _get_queryset(self):
         self.keyword = self.request.GET.get('keyword', '')
@@ -65,10 +66,11 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
         return super().get_permissions()
 
     def get_user_system_users(self):
-        from perms.utils import AssetPermissionUtil
+        from perms.utils import AssetPermissionUtilV2
         user = self.request.user
-        util = AssetPermissionUtil(user)
-        system_users = [s for s in util.get_system_users() if s.protocol == 'ssh']
+        with tmp_to_root_org():
+            util = AssetPermissionUtilV2(user)
+            system_users = [s for s in util.get_system_users() if s.protocol == 'ssh']
         return system_users
 
     def get_context_data(self, **kwargs):

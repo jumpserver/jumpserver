@@ -15,7 +15,7 @@ from common.utils import (
 )
 from common.validators import alphanumeric
 from common import fields
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 from .utils import private_key_validator, Connectivity
 
 signer = get_signer()
@@ -26,7 +26,7 @@ logger = get_logger(__file__)
 class AssetUser(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric])
+    username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric], db_index=True)
     password = fields.EncryptCharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     private_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH private key'))
     public_key = fields.EncryptTextField(blank=True, null=True, verbose_name=_('SSH public key'))

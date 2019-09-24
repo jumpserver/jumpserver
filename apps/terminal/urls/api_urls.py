@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework_bulk.routes import BulkRouter
 
+from common import api as capi
 from .. import api
 
 app_name = 'terminal'
 
 router = BulkRouter()
 router.register(r'sessions', api.SessionViewSet, 'session')
-router.register(r'terminal/(?P<terminal>[a-zA-Z0-9\-]{36})?/?status', api.StatusViewSet, 'terminal-status')
-router.register(r'terminal/(?P<terminal>[a-zA-Z0-9\-]{36})?/?sessions', api.SessionViewSet, 'terminal-sessions')
-router.register(r'terminal', api.TerminalViewSet, 'terminal')
+router.register(r'terminals/(?P<terminal>[a-zA-Z0-9\-]{36})?/?status', api.StatusViewSet, 'terminal-status')
+router.register(r'terminals/(?P<terminal>[a-zA-Z0-9\-]{36})?/?sessions', api.SessionViewSet, 'terminal-sessions')
+router.register(r'terminals', api.TerminalViewSet, 'terminal')
 router.register(r'tasks', api.TaskViewSet, 'tasks')
-router.register(r'command', api.CommandViewSet, 'command')
+router.register(r'commands', api.CommandViewSet, 'command')
 router.register(r'status', api.StatusViewSet, 'status')
 
 urlpatterns = [
@@ -23,9 +24,9 @@ urlpatterns = [
          api.SessionReplayViewSet.as_view({'get': 'retrieve', 'post': 'create'}),
          name='session-replay'),
     path('tasks/kill-session/', api.KillSessionAPI.as_view(), name='kill-session'),
-    path('terminal/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
+    path('terminals/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
          name='terminal-access-key'),
-    path('terminal/config/', api.TerminalConfig.as_view(), name='terminal-config'),
+    path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
     path('commands/export/', api.CommandExportApi.as_view(), name="command-export")
     # v2: get session's replay
     # path('v2/sessions/<uuid:pk>/replay/',
@@ -33,7 +34,11 @@ urlpatterns = [
     #     name='session-replay-v2'),
 ]
 
-urlpatterns += router.urls
+old_version_urlpatterns = [
+    re_path('(?P<resource>terminal|command)/.*', capi.redirect_plural_name_api)
+]
+
+urlpatterns += router.urls + old_version_urlpatterns
 
 
 

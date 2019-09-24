@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
 #
+import copy
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 
-from common.utils import get_signer, validate_ssh_public_key
+from common.utils import validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from common.fields import StringManyToManyField
 from common.serializers import AdaptedBulkListSerializer
-from orgs.mixins import BulkOrgResourceModelSerializer
+from common.permissions import CanUpdateDeleteUser
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 
 
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
     'UserGroupSerializer', 'UserGroupListSerializer',
-    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer'
+    'UserGroupUpdateMemberSerializer', 'ChangeUserPasswordSerializer',
+    'ResetOTPSerializer',
 ]
 
 
-signer = get_signer()
-
-
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+
+    can_update = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -34,6 +37,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
+            'can_update', 'can_delete',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
@@ -45,8 +49,21 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
-            'created_by': {'read_only': True}, 'source': {'read_only': True}
+            'source': {'read_only': True},
+            'created_by': {'read_only': True, 'allow_blank': True},
+            'can_update': {'read_only': True},
+            'can_delete': {'read_only': True},
         }
+
+    def get_can_update(self, obj):
+        return CanUpdateDeleteUser.has_update_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
+
+    def get_can_delete(self, obj):
+        return CanUpdateDeleteUser.has_delete_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
 
     def validate_role(self, value):
         request = self.context.get('request')
@@ -68,20 +85,24 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return password
 
+    def validate_groups(self, groups):
+        role = self.initial_data.get('role')
+        if self.instance:
+            role = role or self.instance.role
+        if role == User.ROLE_AUDITOR:
+            return []
+        return groups
+
     @staticmethod
-    def change_password_to_raw(validated_data):
-        password = validated_data.pop('password', None)
+    def change_password_to_raw(attrs):
+        password = attrs.pop('password', None)
         if password:
-            validated_data['password_raw'] = password
-        return validated_data
+            attrs['password_raw'] = password
+        return attrs
 
-    def create(self, validated_data):
-        validated_data = self.change_password_to_raw(validated_data)
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        validated_data = self.change_password_to_raw(validated_data)
-        return super().update(instance, validated_data)
+    def validate(self, attrs):
+        attrs = self.change_password_to_raw(attrs)
+        return attrs
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
@@ -120,6 +141,13 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
 
+    def validate_users(self, users):
+        for user in users:
+            if user.is_super_auditor:
+                msg = _('Auditors cannot be join in the user group')
+                raise serializers.ValidationError(msg)
+        return users
+
 
 class UserGroupListSerializer(UserGroupSerializer):
     users = StringManyToManyField(many=True, read_only=True)
@@ -138,3 +166,7 @@ class ChangeUserPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
+
+class ResetOTPSerializer(serializers.Serializer):
+    msg = serializers.CharField(read_only=True)

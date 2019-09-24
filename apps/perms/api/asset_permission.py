@@ -7,7 +7,6 @@ from rest_framework.views import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework import viewsets
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import IsOrgAdmin
 from common.utils import get_object_or_none
@@ -31,7 +30,6 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
-    pagination_class = LimitOffsetPagination
     filter_fields = ['name']
     permission_classes = (IsOrgAdmin,)
 
@@ -42,24 +40,14 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def filter_valid(self, queryset):
-        valid = self.request.query_params.get('is_valid', None)
-        if valid is None:
+        valid_query = self.request.query_params.get('is_valid', None)
+        if valid_query is None:
             return queryset
-        if valid in ['0', 'N', 'false', 'False']:
-            valid = False
+        invalid = valid_query in ['0', 'N', 'false', 'False']
+        if invalid:
+            queryset = queryset.invalid()
         else:
-            valid = True
-        now = timezone.now()
-        if valid:
-            queryset = queryset.filter(is_active=True).filter(
-                date_start__lt=now, date_expired__gt=now,
-            )
-        else:
-            queryset = queryset.filter(
-                Q(is_active=False) |
-                Q(date_start__gt=now) |
-                Q(date_expired__lt=now)
-            )
+            queryset = queryset.valid()
         return queryset
 
     def filter_system_user(self, queryset):
@@ -87,7 +75,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not node:
             return queryset.none()
-        nodes = node.get_ancestor(with_self=True)
+        nodes = node.get_ancestors(with_self=True)
         queryset = queryset.filter(nodes__in=nodes)
         return queryset
 
@@ -105,11 +93,17 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not assets:
             return queryset.none()
-        inherit_nodes = set()
-        for asset in assets:
-            for node in asset.nodes.all():
-                inherit_nodes.update(set(node.get_ancestor(with_self=True)))
-        queryset = queryset.filter(Q(assets__in=assets) | Q(nodes__in=inherit_nodes))
+        inherit_all_nodes = set()
+        inherit_nodes_keys = assets.all().values_list('nodes__key', flat=True)
+
+        for key in inherit_nodes_keys:
+            if key is None:
+                continue
+            ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
+            inherit_all_nodes.update(ancestor_keys)
+        queryset = queryset.filter(
+            Q(assets__in=assets) | Q(nodes__key__in=inherit_all_nodes)
+        ).distinct()
         return queryset
 
     def filter_user(self, queryset):
@@ -163,6 +157,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         queryset = self.filter_node(queryset)
         queryset = self.filter_system_user(queryset)
         queryset = self.filter_user_group(queryset)
+        queryset = queryset.distinct()
         return queryset
 
     def get_queryset(self):
@@ -186,6 +181,7 @@ class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
             users = serializer.validated_data.get('users')
             if users:
                 perm.users.remove(*tuple(users))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -203,6 +199,7 @@ class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
             users = serializer.validated_data.get('users')
             if users:
                 perm.users.add(*tuple(users))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -223,6 +220,7 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
             assets = serializer.validated_data.get('assets')
             if assets:
                 perm.assets.remove(*tuple(assets))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -240,6 +238,7 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
             assets = serializer.validated_data.get('assets')
             if assets:
                 perm.assets.add(*tuple(assets))
+                perm.save()
             return Response({"msg": "ok"})
         else:
             return Response({"error": serializer.errors})
@@ -247,7 +246,6 @@ class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
 
 class AssetPermissionAssetsApi(ListAPIView):
     permission_classes = (IsOrgAdmin,)
-    pagination_class = LimitOffsetPagination
     serializer_class = serializers.AssetPermissionAssetsSerializer
     filter_fields = ("hostname", "ip")
     search_fields = filter_fields

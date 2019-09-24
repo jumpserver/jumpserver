@@ -8,19 +8,16 @@ from django.utils.translation import ugettext as _
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.serializers import ValidationError
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.pagination import LimitOffsetPagination
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
-    CanUpdateDeleteSuperUser,
+    CanUpdateDeleteUser,
 )
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from ..serializers import UserSerializer, UserPKUpdateSerializer, \
-    UserUpdateGroupSerializer, ChangeUserPasswordSerializer
+from .. import serializers
 from ..models import User
 from ..signals import post_user_create
 
@@ -33,13 +30,12 @@ __all__ = [
 ]
 
 
-class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class UserViewSet(CommonApiMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     queryset = User.objects.exclude(role=User.ROLE_APP)
-    serializer_class = UserSerializer
-    permission_classes = (IsOrgAdmin, CanUpdateDeleteSuperUser)
-    pagination_class = LimitOffsetPagination
+    serializer_class = serializers.UserSerializer
+    permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
     def send_created_signal(self, users):
         if not isinstance(users, list):
@@ -56,49 +52,34 @@ class UserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         self.send_created_signal(users)
 
     def get_queryset(self):
-        queryset = current_org.get_org_users().prefetch_related('groups')
+        queryset = current_org.get_org_members().prefetch_related('groups')
         return queryset
 
     def get_permissions(self):
-        if self.action == "retrieve":
+        if self.action in ["retrieve", "list"]:
             self.permission_classes = (IsOrgAdminOrAppUser,)
         return super().get_permissions()
 
-    def _deny_permission(self, instance):
-        """
-        check current user has permission to handle instance
-        (update, destroy, bulk_update, bulk destroy)
-        """
-        if instance.is_superuser and not self.request.user.is_superuser:
-            return True
-        return False
-
-    def _bulk_deny_permission(self, instances):
-        deny_instances = [i for i in instances if self._deny_permission(i)]
-        if len(deny_instances) > 0:
-            return True
-        else:
-            return False
-
-    def allow_bulk_destroy(self, qs, filtered):
-        if self._bulk_deny_permission(filtered):
-            return False
-        return qs.count() != filtered.count()
+    def perform_bulk_destroy(self, objects):
+        for obj in objects:
+            self.check_object_permissions(self.request, obj)
+            self.perform_destroy(obj)
 
     def perform_bulk_update(self, serializer):
-        users_ids = [d.get("id") or d.get("pk") for d in serializer.validated_data]
-        users = User.objects.filter(id__in=users_ids)
-        deny_instances = [str(i.id) for i in users if self._deny_permission(i)]
-        if deny_instances:
-            msg = "{} can't be update".format(deny_instances)
-            raise ValidationError({"id": msg})
+        # TODO: 需要测试
+        users_ids = [
+            d.get("id") or d.get("pk") for d in serializer.validated_data
+        ]
+        users = current_org.get_org_members().filter(id__in=users_ids)
+        for user in users:
+            self.check_object_permissions(self.request, user)
         return super().perform_bulk_update(serializer)
 
 
 class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     queryset = User.objects.all()
-    serializer_class = ChangeUserPasswordSerializer
+    serializer_class = serializers.ChangeUserPasswordSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -108,13 +89,13 @@ class UserChangePasswordApi(generics.RetrieveUpdateAPIView):
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserUpdateGroupSerializer
+    serializer_class = serializers.UserUpdateGroupSerializer
     permission_classes = (IsOrgAdmin,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     permission_classes = (IsAuthenticated,)
 
     def perform_update(self, serializer):
@@ -129,7 +110,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     permission_classes = (IsAuthenticated,)
 
     def perform_update(self, serializer):
@@ -143,7 +124,7 @@ class UserResetPKApi(generics.UpdateAPIView):
 # 废弃
 class UserUpdatePKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserPKUpdateSerializer
+    serializer_class = serializers.UserPKUpdateSerializer
     permission_classes = (IsCurrentUserOrReadOnly,)
 
     def perform_update(self, serializer):
@@ -155,7 +136,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 class UserUnblockPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     permission_classes = (IsOrgAdmin,)
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     key_prefix_limit = "_LOGIN_LIMIT_{}_{}"
     key_prefix_block = "_LOGIN_BLOCK_{}"
 
@@ -170,7 +151,7 @@ class UserUnblockPKApi(generics.UpdateAPIView):
 
 class UserProfileApi(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
 
     def get_object(self):
         return self.request.user
@@ -184,6 +165,7 @@ class UserProfileApi(generics.RetrieveAPIView):
 class UserResetOTPApi(generics.RetrieveAPIView):
     queryset = User.objects.all()
     permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.ResetOTPSerializer
 
     def retrieve(self, request, *args, **kwargs):
         user = self.get_object() if kwargs.get('pk') else request.user

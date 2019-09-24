@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from common.fields import ChoiceDisplayField
 from common.serializers import AdaptedBulkListSerializer
 from ..models import CommandFilter, CommandFilterRule, SystemUser
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 
 class CommandFilterSerializer(BulkOrgResourceModelSerializer):

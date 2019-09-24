@@ -7,6 +7,7 @@ from common.tree import TreeNode
 from orgs.utils import set_to_root_org
 
 from ..models import RemoteAppPermission
+from ..hands import RemoteApp, SystemUser
 
 
 __all__ = [
@@ -53,10 +54,20 @@ class RemoteAppPermissionUtil:
         return _permissions
 
     def get_remote_apps(self):
-        remote_apps = set()
-        for perm in self.permissions:
-            remote_apps.update(list(perm.remote_apps.all()))
+        remote_apps = RemoteApp.objects.filter(
+            granted_by_permissions__in=self.permissions
+        )
         return remote_apps
+
+    def get_remote_app_system_users(self, remote_app):
+        queryset = self.permissions
+        kwargs = {"remote_apps": remote_app}
+        queryset = queryset.filter(**kwargs)
+        system_users_ids = queryset.values_list('system_users', flat=True)
+        system_users_ids = system_users_ids.distinct()
+        system_users = SystemUser.objects.filter(id__in=system_users_ids)
+        system_users = system_users.order_by('-priority')
+        return system_users
 
 
 def construct_remote_apps_tree_root():
@@ -74,11 +85,12 @@ def construct_remote_apps_tree_root():
 
 
 def parse_remote_app_to_tree_node(parent, remote_app):
+    pid = parent.id if parent else ''
     tree_node = {
         'id': remote_app.id,
         'name': remote_app.name,
         'title': remote_app.name,
-        'pId': parent.id,
+        'pId': pid,
         'open': False,
         'isParent': False,
         'iconSkin': 'file',

@@ -2,15 +2,15 @@
 #
 
 from rest_framework.response import Response
-from rest_framework import viewsets, status, generics
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import generics
 from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from ..backends import AssetUserManager
 from ..models import Asset, Node, SystemUser, AdminUser
 from .. import serializers
@@ -49,11 +49,10 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
             if field in ("node_id", "system_user_id", "admin_user_id"):
                 continue
             _queryset |= queryset.filter(**{field: value})
-        return _queryset
+        return _queryset.distinct()
 
 
-class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
-    pagination_class = LimitOffsetPagination
+class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     serializer_class = serializers.AssetUserSerializer
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
@@ -66,6 +65,9 @@ class AssetUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
         filters.OrderingFilter,
         AssetUserFilterBackend, AssetUserSearchBackend,
     )
+
+    def allow_bulk_destroy(self, qs, filtered):
+        return False
 
     def get_queryset(self):
         # 尽可能先返回更少的数据
@@ -115,14 +117,6 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer
     permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        status_code = status.HTTP_200_OK
-        if not instance:
-            status_code = status.HTTP_400_BAD_REQUEST
-        return Response(serializer.data, status=status_code)
-
     def get_object(self):
         query_params = self.request.query_params
         username = query_params.get('username')
@@ -133,8 +127,7 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
             manger = AssetUserManager()
             instance = manger.get(username, asset, prefer=prefer)
         except Exception as e:
-            logger.error(e, exc_info=True)
-            return None
+            raise Http404("Not found")
         else:
             return instance
 

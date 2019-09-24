@@ -9,7 +9,7 @@ import paramiko
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import OrgModelMixin
+from orgs.mixins.models import OrgModelMixin
 from .base import AssetUser
 
 __all__ = ['Domain', 'Gateway']

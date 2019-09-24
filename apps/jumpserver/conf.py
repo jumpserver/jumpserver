@@ -345,7 +345,7 @@ defaults = {
     'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
     'AUTH_OPENID': False,
     'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-    'AUTH_OPENID_SHARE_SESSION': False,
+    'AUTH_OPENID_SHARE_SESSION': True,
     'OTP_VALID_WINDOW': 2,
     'OTP_ISSUER_NAME': 'Jumpserver',
     'EMAIL_SUFFIX': 'jumpserver.org',
@@ -379,7 +379,11 @@ defaults = {
     'ASSETS_PERM_CACHE_TIME': 3600*24,
     'SECURITY_MFA_VERIFY_TTL': 3600,
     'ASSETS_PERM_CACHE_ENABLE': False,
+    'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+    'SYSLOG_FACILITY': 'user',
     'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+    'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
+    'FLOWER_URL': "127.0.0.1:5555"
 }
 
 

@@ -58,10 +58,6 @@
                                             <td><b><a href="{% url 'assets:asset-detail' pk=remote_app.asset.id %}">{{ remote_app.asset.hostname }}</a></b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'System user' %}:</td>
-                                            <td><b><a href="{% url 'assets:system-user-detail' pk=remote_app.system_user.id %}">{{ remote_app.system_user.name }}</a></b></td>
-                                        </tr>
-                                        <tr>
                                             <td>{% trans 'App type' %}:</td>
                                             <td><b>{{ remote_app.get_type_display }}</b></td>
                                         </tr>

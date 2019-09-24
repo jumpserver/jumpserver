@@ -7,18 +7,14 @@ import pyotp
 import base64
 import logging
 
-import ipaddress
 from django.http import Http404
 from django.conf import settings
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 from datetime import datetime
 
 from common.tasks import send_mail_async
-from common.utils import reverse, get_object_or_none, get_ip_city
-from .models import User
+from common.utils import reverse
 
 
 logger = logging.getLogger('jumpserver')
@@ -197,37 +193,6 @@ def send_reset_ssh_key_mail(user):
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
-
-def check_user_valid(**kwargs):
-    password = kwargs.pop('password', None)
-    public_key = kwargs.pop('public_key', None)
-    email = kwargs.pop('email', None)
-    username = kwargs.pop('username', None)
-
-    if username:
-        user = get_object_or_none(User, username=username)
-    elif email:
-        user = get_object_or_none(User, email=email)
-    else:
-        user = None
-
-    if user is None:
-        return None, _('User not exist')
-    elif not user.is_valid:
-        return None, _('Disabled or expired')
-
-    if password and authenticate(username=username, password=password):
-        return user, ''
-
-    if public_key and user.public_key and user.can_use_ssh_key_login():
-        public_key_saved = user.public_key.split()
-        if len(public_key_saved) == 1:
-            if public_key == public_key_saved[0]:
-                return user, ''
-        elif len(public_key_saved) > 1:
-            if public_key == public_key_saved[1]:
-                return user, ''
-    return None, _('Password or SSH public key invalid')
 
 
 def get_user_or_tmp_user(request):

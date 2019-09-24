@@ -11,7 +11,8 @@ from ..utils import get_current_org_id_for_serializer
 
 __all__ = [
     "OrgResourceSerializerMixin", "BulkOrgResourceSerializerMixin",
-    "BulkOrgResourceModelSerializer", "OrgMembershipSerializerMixin"
+    "BulkOrgResourceModelSerializer", "OrgMembershipSerializerMixin",
+    "OrgResourceModelSerializerMixin",
 ]
 
 
@@ -42,7 +43,11 @@ class OrgResourceSerializerMixin(serializers.Serializer):
         return fields
 
 
-class BulkOrgResourceSerializerMixin(OrgResourceSerializerMixin, BulkSerializerMixin):
+class OrgResourceModelSerializerMixin(OrgResourceSerializerMixin, serializers.ModelSerializer):
+    pass
+
+
+class BulkOrgResourceSerializerMixin(BulkSerializerMixin, OrgResourceSerializerMixin):
     pass
 
 

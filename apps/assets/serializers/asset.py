@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+import re
 from rest_framework import serializers
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
-from orgs.mixins import BulkOrgResourceModelSerializer
+from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Node, Label
 from .base import ConnectivitySerializer
@@ -90,6 +91,15 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info': {'label': _('Hardware info')},
             'org_name': {'label': _('Org name')}
         }
+
+    @staticmethod
+    def validate_hostname(hostname):
+        pattern = r"^[\._@a-zA-Z0-9-]+$"
+        res = re.match(pattern, hostname)
+        if res is None:
+            msg = _("* The hostname contains characters that are not allowed")
+            raise serializers.ValidationError(msg)
+        return hostname
 
     @classmethod
     def setup_eager_loading(cls, queryset):

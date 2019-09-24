@@ -6,16 +6,14 @@ from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from django.http import HttpResponseNotFound
 from django.conf import settings
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
 import jms_storage
 
 from common.utils import is_uuid, get_logger
-from common.permissions import IsOrgAdminOrAppUser, IsAuditor
+from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.filters import DatetimeRangeFilter
-from orgs.mixins import OrgBulkModelViewSet
+from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
@@ -28,8 +26,7 @@ logger = get_logger(__name__)
 class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor, )
+    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
@@ -37,6 +34,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     date_range_filter_fields = [
         ('date_start', ('date_from', 'date_to'))
     ]
+    extra_filter_backends = [DatetimeRangeFilter]
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
@@ -44,12 +42,6 @@ class SessionViewSet(OrgBulkModelViewSet):
         if self.request.method in ('PATCH',):
             queryset = queryset.select_for_update()
         return queryset
-
-    @property
-    def filter_backends(self):
-        backends = list(GenericAPIView.filter_backends)
-        backends.append(DatetimeRangeFilter)
-        return backends
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'terminal'):
@@ -64,7 +56,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
 class SessionReplayViewSet(viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsAuditor,)
+    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
     session = None
 
     def create(self, request, *args, **kwargs):

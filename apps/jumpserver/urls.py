@@ -7,26 +7,28 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
-from .views import IndexView, LunaView, I18NView, HealthCheckView
+# from .views import IndexView, LunaView, I18NView, HealthCheckView, redirect_format_api
+from . import views
+from .celery_flower import celery_flower_view
 from .swagger import get_swagger_view
 
 api_v1 = [
-   path('users/v1/', include('users.urls.api_urls', namespace='api-users')),
-   path('assets/v1/', include('assets.urls.api_urls', namespace='api-assets')),
-   path('perms/v1/', include('perms.urls.api_urls', namespace='api-perms')),
-   path('terminal/v1/', include('terminal.urls.api_urls', namespace='api-terminal')),
-   path('ops/v1/', include('ops.urls.api_urls', namespace='api-ops')),
-   path('audits/v1/', include('audits.urls.api_urls', namespace='api-audits')),
-   path('orgs/v1/', include('orgs.urls.api_urls', namespace='api-orgs')),
-   path('settings/v1/', include('settings.urls.api_urls', namespace='api-settings')),
-   path('authentication/v1/', include('authentication.urls.api_urls', namespace='api-auth')),
-   path('common/v1/', include('common.urls.api_urls', namespace='api-common')),
-   path('applications/v1/', include('applications.urls.api_urls', namespace='api-applications')),
+   path('users/', include('users.urls.api_urls', namespace='api-users')),
+   path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
+   path('perms/', include('perms.urls.api_urls', namespace='api-perms')),
+   path('terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
+   path('ops/', include('ops.urls.api_urls', namespace='api-ops')),
+   path('audits/', include('audits.urls.api_urls', namespace='api-audits')),
+   path('orgs/', include('orgs.urls.api_urls', namespace='api-orgs')),
+   path('settings/', include('settings.urls.api_urls', namespace='api-settings')),
+   path('authentication/', include('authentication.urls.api_urls', namespace='api-auth')),
+   path('common/', include('common.urls.api_urls', namespace='api-common')),
+   path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
 ]
 
 api_v2 = [
-   path('terminal/v2/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
-   path('users/v2/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
+   path('terminal/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
+   path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
 
@@ -40,6 +42,7 @@ app_view_patterns = [
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
+    re_path(r'flower/(?P<path>.*)', celery_flower_view, name='flower-view'),
 ]
 
 
@@ -48,30 +51,23 @@ if settings.XPACK_ENABLED:
         path('xpack/', include('xpack.urls.view_urls', namespace='xpack'))
     )
     api_v1.append(
-        path('xpack/v1/', include('xpack.urls.api_urls', namespace='api-xpack'))
+        path('xpack/', include('xpack.urls.api_urls', namespace='api-xpack'))
     )
 
 js_i18n_patterns = i18n_patterns(
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 )
 
-api_v1_patterns = [
-    path('api/', include(api_v1))
-]
-
-api_v2_patterns = [
-    path('api/', include(api_v2))
-]
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
-    path('', include(api_v2_patterns)),
-    path('', include(api_v1_patterns)),
-    path('api/health/', HealthCheckView.as_view(), name="health"),
-    path('luna/', LunaView.as_view(), name='luna-view'),
-    path('i18n/<str:lang>/', I18NView.as_view(), name='i18n-switch'),
+    path('', views.IndexView.as_view(), name='index'),
+    path('api/v1/', include(api_v1)),
+    path('api/v2/', include(api_v2)),
+    re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
+    path('api/health/', views.HealthCheckView.as_view(), name="health"),
+    path('luna/', views.LunaView.as_view(), name='luna-view'),
+    path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),
-    # path('api/v2/', include(api_v2_patterns)),
 
     # External apps url
     path('captcha/', include('captcha.urls')),

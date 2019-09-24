@@ -16,7 +16,6 @@
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'App type' %}</th>
             <th class="text-center">{% trans 'Asset' %}</th>
-            <th class="text-center">{% trans 'System user' %}</th>
             <th class="text-center">{% trans 'Comment' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
@@ -49,12 +48,8 @@ function initTable() {
                     var hostname = htmlEscape(cellData.hostname);
                     $(td).html(hostname);
                 }},
-            {targets: 4, createdCell: function (td, cellData, rowData) {
-                    var name = htmlEscape(cellData.name);
-                    $(td).html(name);
-                }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
-                    var conn_btn = '<a href="{% url "luna-view" %}?login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                    var conn_btn = '<a href="{% url "luna-view" %}?type=remote_app&login_to=' +  cellData +'" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                     $(td).html(conn_btn)
                 }}
         ],
@@ -64,7 +59,6 @@ function initTable() {
             {data: "name"},
             {data: "get_type_display", orderable: false},
             {data: "asset_info", orderable: false},
-            {data: "system_user_info", orderable: false},
             {data: "comment", orderable: false},
             {data: "id", orderable: false}
         ]

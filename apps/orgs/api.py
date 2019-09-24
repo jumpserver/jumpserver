@@ -14,7 +14,7 @@ from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from perms.models import AssetPermission
 from orgs.utils import current_org
 from common.utils import get_logger
-from .mixins import OrgMembershipModelViewSetMixin
+from .mixins.api import OrgMembershipModelViewSetMixin
 
 logger = get_logger(__file__)
 
@@ -33,7 +33,7 @@ class OrgViewSet(BulkModelViewSet):
 
     def get_data_from_model(self, model):
         if model == User:
-            data = model.objects.filter(orgs__id=self.org.id)
+            data = model.objects.filter(related_user_orgs__id=self.org.id)
         else:
             data = model.objects.filter(org_id=self.org.id)
         return data

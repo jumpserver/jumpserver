@@ -20,7 +20,6 @@
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'App type' %}</th>
             <th class="text-center">{% trans 'Asset' %}</th>
-            <th class="text-center">{% trans 'System user' %}</th>
             <th class="text-center">{% trans 'Comment' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
@@ -47,12 +46,11 @@ function initTable() {
                     var detail_btn = '<a href="{% url 'assets:asset-detail' pk=DEFAULT_PK %}">' + hostname + '</a>';
                     $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', cellData.id));
                 }},
-            {targets: 4, createdCell: function (td, cellData, rowData) {
-                    var name = htmlEscape(cellData.name);
-                    var detail_btn = '<a href="{% url 'assets:system-user-detail' pk=DEFAULT_PK %}">' + name + '</a>';
-                    $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', cellData.id));
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                    var comment = htmlEscape(cellData);
+                    $(td).html(comment)
                 }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
+            {targets: 5, createdCell: function (td, cellData, rowData) {
                     var update_btn = '<a href="{% url "applications:remote-app-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                     var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-rid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                     $(td).html(update_btn + del_btn)
@@ -64,7 +62,6 @@ function initTable() {
             {data: "name" },
             {data: "get_type_display", orderable: false},
             {data: "asset_info", orderable: false},
-            {data: "system_user_info", orderable: false},
             {data: "comment"},
             {data: "id", orderable: false}
         ],

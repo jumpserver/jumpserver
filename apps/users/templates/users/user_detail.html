@@ -22,11 +22,11 @@
                                 <a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline {% if user_object.is_superuser and not request.user.is_superuser %} disabled {% else %} btn-default {% endif %}" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                                <a class="btn btn-outline {% if can_update %} btn-default {% else %} disabled {% endif %}" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
 
                             <li class="pull-right">
-                                <a class="btn btn-outline {% if request.user == user_object or user_object.username == "admin" or user_object.is_superuser and not request.user.is_superuser %} disabled  {% else %} btn-danger btn-delete-user {% endif %}">
+                                <a class="btn btn-outline {% if can_delete %} btn-danger btn-delete-user {% else %} disabled {% endif %}">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
@@ -85,7 +85,7 @@
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Role' %}:</td>
-                                            <td><b>{{ user_object.get_role_display }}</b></td>
+                                            <td><b>{{ user_object.role_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'MFA certification' %}:</td>
@@ -212,44 +212,46 @@
                                 </div>
                             </div>
 
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'User group' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit">
-                                        <tbody>
-                                        <form>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Join user groups' %}" id="groups_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for group in groups %}
-                                                        <option value="{{ group.id }}" id="opt_{{ group.id }}" >{{ group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small" id="btn_join_group">{% trans 'Join' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
+                            {% if user_object.is_current_org_admin %}
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <i class="fa fa-info-circle"></i> {% trans 'User group' %}
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table group_edit">
+                                            <tbody>
+                                                <form>
+                                                    <tr>
+                                                        <td colspan="2" class="no-borders">
+                                                            <select data-placeholder="{% trans 'Join user groups' %}" id="groups_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                                {% for group in groups %}
+                                                                    <option value="{{ group.id }}" id="opt_{{ group.id }}" >{{ group.name }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="no-borders">
+                                                            <button type="button" class="btn btn-info btn-small" id="btn_join_group">{% trans 'Join' %}</button>
+                                                        </td>
+                                                    </tr>
+                                                </form>
 
-                                        {% for group in user_object.groups.all %}
-                                        <tr>
-                                          <td >
-                                              <b class="bdg_group" data-gid={{ group.id }}>{{ group.name }}</b>
-                                          </td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
+                                                {% for group in user_object.groups.all %}
+                                                    <tr>
+                                                        <td >
+                                                            <b class="bdg_group" data-gid={{ group.id }}>{{ group.name }}</b>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

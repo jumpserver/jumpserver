@@ -19,7 +19,12 @@ class CeleryTaskSerializer(serializers.Serializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = [
+            'id', 'name', 'interval', 'crontab', 'is_periodic',
+            'is_deleted', 'comment', 'created_by', 'date_created',
+            'versions', 'is_success', 'timedelta', 'assets_amount',
+            'date_updated', 'history_summary',
+        ]
 
 
 class AdHocSerializer(serializers.ModelSerializer):

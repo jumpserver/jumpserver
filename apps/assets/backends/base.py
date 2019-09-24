@@ -81,6 +81,11 @@ class AssetUserQuerySet(list):
         queryset = self.filter_in(kwargs).filter_equal(kwargs)
         return queryset
 
+    def distinct(self):
+        items = list(set(self))
+        self[:] = items
+        return self
+
     def __or__(self, other):
         self.extend(other)
         return self

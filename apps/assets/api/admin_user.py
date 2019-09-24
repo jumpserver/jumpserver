@@ -17,10 +17,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework_bulk import BulkModelViewSet
-from rest_framework.pagination import LimitOffsetPagination
+from orgs.mixins.api import OrgBulkModelViewSet
 
-from common.mixins import IDInCacheFilterMixin
+from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
@@ -36,7 +35,7 @@ __all__ = [
 ]
 
 
-class AdminUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
+class AdminUserViewSet(OrgBulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
@@ -46,11 +45,6 @@ class AdminUserViewSet(IDInCacheFilterMixin, BulkModelViewSet):
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
-    pagination_class = LimitOffsetPagination
-
-    def get_queryset(self):
-        queryset = super().get_queryset().all()
-        return queryset
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):
@@ -98,7 +92,6 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 class AdminUserAssetsListView(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.AssetSimpleSerializer
-    pagination_class = LimitOffsetPagination
     filter_fields = ("hostname", "ip")
     http_method_names = ['get']
     search_fields = filter_fields

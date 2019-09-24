@@ -75,7 +75,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2" id="asset_select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2" id="id_assets" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -100,10 +100,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select nodes' %}" class="select2" id="node_select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for node in nodes_remain %}
-                                                        <option value="{{ node.id }}" id="opt_{{ node.id }}">{{ node }}</option>
-                                                        {% endfor %}
+                                                    <select data-placeholder="{% trans 'Select nodes' %}" class="nodes-select2" id="nodes_select2" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -116,7 +113,7 @@
 
                                         {% for node in asset_permission.nodes.all %}
                                         <tr>
-                                          <td ><b class="bdg_group" data-gid={{ node.id }}>{{ node }}</b></td>
+                                          <td ><b class="bdg_group" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn-remove-node" type="button" data-gid="{{ node.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
@@ -202,37 +199,24 @@ function initAssetTable() {
     return table
 }
 
+
 $(document).ready(function () {
     $('.select2').select2();
     table = initAssetTable();
-    $("#asset_select2").parent().find(".select2-selection").on('click', function (e) {
+
+    var nodeListUrl = "{% url 'api-assets:node-list' %}";
+    nodesSelect2Init(".nodes-select2", nodeListUrl);
+
+    $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
             e.preventDefault();
             e.stopPropagation();
             $("#asset_list_modal").modal();
-            initSelectedAssets2Table('#asset_select2');
         }
     })
 })
-.on('click', '#btn_asset_modal_confirm', function () {
-    var assets = asset_table2.selected;
-    var options = [];
-    $('#asset_select2 option').each(function (i, v) {
-        options.push(v.value)
-    });
-    asset_table2.selected_rows.forEach(function (i) {
-        var name = i.hostname + '(' + i.ip + ')';
-        var option = new Option(name, i.id, false, true);
-
-        if (options.indexOf(i.id) === -1) {
-            $('#asset_select2').append(option).trigger('change');
-        }
-    });
-    $('#asset_select2').val(assets).trigger('change');
-    $("#asset_list_modal").modal('hide');
-})
 .on('click', '.btn-add-assets', function () {
-    var assets_selected = $("#asset_select2 option:selected").map(function () {
+    var assets_selected = $("#id_assets option:selected").map(function () {
         return $(this).attr('value');
     }).get();
     if (assets_selected.length === 0) {
@@ -250,7 +234,7 @@ $(document).ready(function () {
 })
 .on('click', '#btn-add-node', function () {
     var nodes_selected = {};
-    $("#node_select2 option:selected").each(function (i, data) {
+    $("#nodes_select2 option:selected").each(function (i, data) {
         nodes_selected[$(data).attr('value')] = $(data).text();
     });
     if (Object.keys(nodes_selected).length === 0) {
