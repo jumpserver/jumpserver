@@ -94,15 +94,10 @@ class AssetPermission(BasePermission):
         )
 
     def get_all_assets(self):
-        args = [Q(granted_by_permissions=self)]
-        pattern = set()
+        from assets.models import Node
         nodes_keys = self.nodes.all().values_list('key', flat=True)
-        nodes_keys = Node.clean_children_keys(nodes_keys)
-        for key in nodes_keys:
-            pattern.add(r'^{0}$|^{0}:'.format(key))
-        pattern = '|'.join(list(pattern))
-        if pattern:
-            args.append(Q(nodes__key__regex=pattern))
-        args = reduce(lambda x, y: x | y, args)
-        assets = Asset.objects.filter(args).distinct()
+        assets_ids = set(self.assets.all().values_list('id', flat=True))
+        nodes_assets_ids = Node.get_nodes_all_assets_ids(nodes_keys)
+        assets_ids.update(nodes_assets_ids)
+        assets = Asset.objects.filter(id__in=assets_ids)
         return assets

@@ -302,13 +302,19 @@ class NodeAssetsMixin:
         return Asset.objects.filter(nodes__key__regex=pattern).distinct()
 
     @classmethod
-    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
-        from .asset import Asset
+    def get_nodes_all_assets_ids(cls, nodes_keys):
         nodes_keys = cls.clean_children_keys(nodes_keys)
         assets_ids = set()
         for key in nodes_keys:
             node_assets_ids = cls.tree().all_assets(key)
             assets_ids.update(set(node_assets_ids))
+        return assets_ids
+
+    @classmethod
+    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
+        from .asset import Asset
+        nodes_keys = cls.clean_children_keys(nodes_keys)
+        assets_ids = cls.get_nodes_all_assets_ids(nodes_keys)
         if extra_assets_ids:
             assets_ids.update(set(extra_assets_ids))
         return Asset.objects.filter(id__in=assets_ids)
