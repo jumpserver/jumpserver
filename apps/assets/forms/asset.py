@@ -116,6 +116,8 @@ class AssetUpdateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
+            'hostname': _('Only Numbers, letters, and characters ( {} ) '
+                          'are allowed').format(" ".join(['.', '_', '@'])),
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
