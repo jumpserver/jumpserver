@@ -49,7 +49,7 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
             if field in ("node_id", "system_user_id", "admin_user_id"):
                 continue
             _queryset |= queryset.filter(**{field: value})
-        return _queryset
+        return _queryset.distinct()
 
 
 class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
