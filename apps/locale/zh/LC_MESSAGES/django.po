@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-23 16:46+0800\n"
+"POT-Creation-Date: 2019-09-24 11:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -86,7 +86,7 @@ msgstr "运行参数"
 #: assets/templates/assets/system_user_list.html:55 audits/models.py:19
 #: audits/templates/audits/ftp_log_list.html:44
 #: audits/templates/audits/ftp_log_list.html:74
-#: perms/forms/asset_permission.py:79 perms/models/asset_permission.py:78
+#: perms/forms/asset_permission.py:79 perms/models/asset_permission.py:80
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:52
 #: perms/templates/perms/asset_permission_list.html:121
@@ -452,7 +452,7 @@ msgstr "更新"
 #: assets/templates/assets/label_list.html:40
 #: assets/templates/assets/system_user_detail.html:30
 #: assets/templates/assets/system_user_list.html:86 audits/models.py:34
-#: authentication/templates/authentication/_access_key_modal.html:65
+#: authentication/templates/authentication/_access_key_modal.html:64
 #: ops/templates/ops/task_list.html:69
 #: perms/templates/perms/asset_permission_detail.html:34
 #: perms/templates/perms/asset_permission_list.html:179
@@ -510,7 +510,7 @@ msgstr "创建远程应用"
 #: assets/templates/assets/system_user_list.html:60 audits/models.py:38
 #: audits/templates/audits/operate_log_list.html:47
 #: audits/templates/audits/operate_log_list.html:73
-#: authentication/templates/authentication/_access_key_modal.html:30
+#: authentication/templates/authentication/_access_key_modal.html:33
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:64
 #: ops/templates/ops/task_history.html:65 ops/templates/ops/task_list.html:18
 #: perms/forms/asset_permission.py:21
@@ -538,7 +538,7 @@ msgstr "动作"
 
 #: applications/templates/applications/user_remote_app_list.html:52
 #: assets/templates/assets/user_asset_list.html:32
-#: perms/models/asset_permission.py:30
+#: perms/models/asset_permission.py:32
 msgid "Connect"
 msgstr "连接"
 
@@ -587,7 +587,7 @@ msgstr "端口"
 #: assets/models/user.py:110 assets/templates/assets/asset_detail.html:190
 #: assets/templates/assets/asset_detail.html:198
 #: assets/templates/assets/system_user_assets.html:83
-#: perms/models/asset_permission.py:79
+#: perms/models/asset_permission.py:81
 #: xpack/plugins/change_auth_plan/models.py:74
 #: xpack/plugins/gathered_user/models.py:31
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:17
@@ -603,7 +603,7 @@ msgstr "节点"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:61 assets/forms/asset.py:109 assets/forms/asset.py:148
+#: assets/forms/asset.py:61 assets/forms/asset.py:109 assets/forms/asset.py:150
 #: assets/templates/assets/asset_create.html:48
 #: assets/templates/assets/asset_create.html:50
 #: assets/templates/assets/asset_list.html:85
@@ -620,7 +620,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:68 assets/forms/asset.py:103 assets/forms/asset.py:116
-#: assets/forms/asset.py:151 assets/models/node.py:403
+#: assets/forms/asset.py:153 assets/models/node.py:403
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:82 perms/forms/asset_permission.py:89
 #: perms/templates/perms/asset_permission_list.html:53
@@ -635,11 +635,11 @@ msgstr "网域"
 msgid "Node"
 msgstr "节点"
 
-#: assets/forms/asset.py:71
+#: assets/forms/asset.py:71 assets/forms/asset.py:119
 msgid "Only Numbers, letters, and characters ( {} ) are allowed"
-msgstr ""
+msgstr "只允许包含数字，字母，特殊字符（ {} ）"
 
-#: assets/forms/asset.py:74 assets/forms/asset.py:120
+#: assets/forms/asset.py:74 assets/forms/asset.py:122
 msgid ""
 "root or other NOPASSWD sudo privilege user existed in asset,If asset is "
 "windows or other set any one, more see admin user left menu"
@@ -647,16 +647,16 @@ msgstr ""
 "root或其他拥有NOPASSWD: ALL权限的用户, 如果是windows或其它硬件可以随意设置一"
 "个, 更多信息查看左侧 `管理用户` 菜单"
 
-#: assets/forms/asset.py:77 assets/forms/asset.py:123
+#: assets/forms/asset.py:77 assets/forms/asset.py:125
 msgid "Windows 2016 RDP protocol is different, If is window 2016, set it"
 msgstr "Windows 2016的RDP协议与之前不同，如果是请设置"
 
-#: assets/forms/asset.py:78 assets/forms/asset.py:124
+#: assets/forms/asset.py:78 assets/forms/asset.py:126
 msgid ""
 "If your have some network not connect with each other, you can set domain"
 msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，使用网域网关跳转登录"
 
-#: assets/forms/asset.py:131 assets/forms/asset.py:135
+#: assets/forms/asset.py:133 assets/forms/asset.py:137
 #: assets/forms/domain.py:17 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:78
 #: xpack/plugins/change_auth_plan/forms.py:55
@@ -1186,7 +1186,7 @@ msgstr "登录模式"
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:52
 #: audits/templates/audits/ftp_log_list.html:75
 #: perms/forms/asset_permission.py:85 perms/forms/remote_app_permission.py:40
-#: perms/models/asset_permission.py:80 perms/models/remote_app_permission.py:16
+#: perms/models/asset_permission.py:82 perms/models/remote_app_permission.py:16
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:54
 #: perms/templates/perms/asset_permission_list.html:75
@@ -1464,7 +1464,7 @@ msgstr "获取认证信息错误"
 
 #: assets/templates/assets/_asset_user_auth_view_modal.html:97
 #: assets/templates/assets/_user_asset_detail_modal.html:23
-#: authentication/templates/authentication/_access_key_modal.html:143
+#: authentication/templates/authentication/_access_key_modal.html:141
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
 #: settings/templates/settings/_ldap_list_users_modal.html:92
 #: templates/_modal.html:22
@@ -1754,7 +1754,7 @@ msgid "Date joined"
 msgstr "创建日期"
 
 #: assets/templates/assets/asset_detail.html:150 authentication/models.py:15
-#: authentication/templates/authentication/_access_key_modal.html:28
+#: authentication/templates/authentication/_access_key_modal.html:31
 #: perms/models/base.py:51
 #: perms/templates/perms/asset_permission_create_update.html:55
 #: perms/templates/perms/asset_permission_detail.html:120
@@ -2197,7 +2197,7 @@ msgid "Success"
 msgstr "成功"
 
 #: audits/models.py:32
-#: authentication/templates/authentication/_access_key_modal.html:38
+#: authentication/templates/authentication/_access_key_modal.html:21
 #: xpack/plugins/vault/templates/vault/vault.html:46
 msgid "Create"
 msgstr "创建"
@@ -2310,7 +2310,7 @@ msgid "Search"
 msgstr "搜索"
 
 #: audits/templates/audits/login_log_list.html:56
-#: authentication/templates/authentication/_access_key_modal.html:26
+#: authentication/templates/authentication/_access_key_modal.html:29
 #: ops/templates/ops/adhoc_detail.html:49
 #: ops/templates/ops/adhoc_history_detail.html:49
 #: ops/templates/ops/task_detail.html:56
@@ -2329,7 +2329,7 @@ msgid "City"
 msgstr "城市"
 
 #: audits/templates/audits/login_log_list.html:65
-#: authentication/templates/authentication/_access_key_modal.html:29
+#: authentication/templates/authentication/_access_key_modal.html:32
 #: ops/templates/ops/task_list.html:16
 msgid "Date"
 msgstr "日期"
@@ -2494,23 +2494,23 @@ msgstr "使用api key签名请求头，每个请求的头部是不一样的"
 msgid "docs"
 msgstr "文档"
 
-#: authentication/templates/authentication/_access_key_modal.html:27
+#: authentication/templates/authentication/_access_key_modal.html:30
 msgid "Secret"
 msgstr "密文"
 
-#: authentication/templates/authentication/_access_key_modal.html:48
+#: authentication/templates/authentication/_access_key_modal.html:47
 #: users/templates/users/_granted_assets.html:75
 msgid "Show"
 msgstr "显示"
 
-#: authentication/templates/authentication/_access_key_modal.html:66
+#: authentication/templates/authentication/_access_key_modal.html:65
 #: users/models/user.py:330 users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
 msgid "Disable"
 msgstr "禁用"
 
-#: authentication/templates/authentication/_access_key_modal.html:67
+#: authentication/templates/authentication/_access_key_modal.html:66
 #: users/models/user.py:331 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"
@@ -3135,27 +3135,27 @@ msgstr "用户和用户组至少选一个"
 msgid "Asset or group at least one required"
 msgstr "资产和节点至少选一个"
 
-#: perms/models/asset_permission.py:29 settings/forms.py:143
+#: perms/models/asset_permission.py:31 settings/forms.py:143
 msgid "All"
 msgstr "全部"
 
-#: perms/models/asset_permission.py:31
+#: perms/models/asset_permission.py:33
 msgid "Upload file"
 msgstr "上传文件"
 
-#: perms/models/asset_permission.py:32
+#: perms/models/asset_permission.py:34
 msgid "Download file"
 msgstr "下载文件"
 
-#: perms/models/asset_permission.py:33
+#: perms/models/asset_permission.py:35
 msgid "Upload download"
 msgstr "上传下载"
 
-#: perms/models/asset_permission.py:81
+#: perms/models/asset_permission.py:83
 msgid "Actions"
 msgstr "动作"
 
-#: perms/models/asset_permission.py:85 templates/_nav.html:72
+#: perms/models/asset_permission.py:87 templates/_nav.html:72
 msgid "Asset permission"
 msgstr "资产授权"
 
