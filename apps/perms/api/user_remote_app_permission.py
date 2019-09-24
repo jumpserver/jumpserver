@@ -14,7 +14,6 @@ from ..utils import (
     parse_remote_app_to_tree_node,
 )
 from ..hands import User, RemoteApp, RemoteAppSerializer, UserGroup, SystemUser
-from ..mixins import RemoteAppFilterMixin
 from .mixin import UserPermissionMixin
 from .. import serializers
 
@@ -26,10 +25,11 @@ __all__ = [
 ]
 
 
-class UserGrantedRemoteAppsApi(RemoteAppFilterMixin, ListAPIView):
+class UserGrantedRemoteAppsApi(ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
-    filter_fields = ['id']
+    filter_fields = ['name', 'id']
+    search_fields = ['name']
 
     def get_object(self):
         user_id = self.kwargs.get('pk', '')
@@ -54,15 +54,14 @@ class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
     serializer_class = TreeNodeSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
-    def get_serializer(self, *args, **kwargs):
+    def get_serializer(self, remote_apps=None, *args, **kwargs):
         only_remote_app = self.request.query_params.get('only', '0') == '1'
         tree_root = None
         data = []
         if not only_remote_app:
             tree_root = construct_remote_apps_tree_root()
             data.append(tree_root)
-        queryset = super().get_queryset()
-        for remote_app in queryset:
+        for remote_app in remote_apps:
             node = parse_remote_app_to_tree_node(tree_root, remote_app)
             data.append(node)
         data.sort()
