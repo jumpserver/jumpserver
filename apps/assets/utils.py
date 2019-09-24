@@ -70,10 +70,14 @@ class TreeService(Tree):
                     continue
                 self.nodes_assets_map[key].add(asset_id)
 
-    def all_children(self, nid, with_self=True, deep=False):
+    def all_children_ids(self, nid, with_self=True):
         children_ids = self.expand_tree(nid)
         if not with_self:
             next(children_ids)
+        return list(children_ids)
+
+    def all_children(self, nid, with_self=True, deep=False):
+        children_ids = self.all_children_ids(nid, with_self=with_self)
         return [self.get_node(i, deep=deep) for i in children_ids]
 
     def ancestors(self, nid, with_self=False, deep=False):

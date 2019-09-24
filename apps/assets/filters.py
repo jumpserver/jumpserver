@@ -45,7 +45,7 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
 
     @staticmethod
     def perform_query(pattern, queryset):
-        return queryset.filter(nodes__key__regex=pattern)
+        return queryset.filter(nodes__key__regex=pattern).distinct()
 
     def filter_queryset(self, request, queryset, view):
         node, has_query_arg = self.get_query_node(request)

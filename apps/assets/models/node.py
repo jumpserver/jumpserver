@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from common.utils import get_logger, timeit
+from common.utils import get_logger, timeit, lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from orgs.utils import set_current_org, get_current_org, tmp_to_org
 from orgs.models import Organization
@@ -74,10 +74,6 @@ class TreeMixin:
             t = time.time()
         cache.set(key, t, ttl)
 
-    @property
-    def _tree(self):
-        return self.__class__.tree()
-
     @staticmethod
     def refresh_user_tree_cache():
         """
@@ -108,6 +104,39 @@ class FamilyMixin:
                 nodes_keys_clean.append(key)
         return nodes_keys_clean
 
+    @classmethod
+    def get_node_all_children_key_pattern(cls, key, with_self=True):
+        pattern = r'^{0}:'.format(key)
+        if with_self:
+            pattern += r'|^{0}$'.format(key)
+        return pattern
+
+    @classmethod
+    def get_node_children_key_pattern(cls, key, with_self=True):
+        pattern = r'^{0}:[0-9]+$'.format(key)
+        if with_self:
+            pattern += r'|^{0}$'.format(key)
+        return pattern
+
+    def get_children_key_pattern(self, with_self=False):
+        return self.get_node_children_key_pattern(self.key, with_self=with_self)
+
+    def get_all_children_pattern(self, with_self=False):
+        return self.get_node_all_children_key_pattern(self.key, with_self=with_self)
+
+    def is_children(self, other):
+        children_pattern = other.get_children_key_pattern(with_self=False)
+        return re.match(children_pattern, self.key)
+
+    def get_children(self, with_self=False):
+        pattern = self.get_children_key_pattern(with_self=with_self)
+        return Node.objects.filter(key__regex=pattern)
+
+    def get_all_children(self, with_self=False):
+        pattern = self.get_all_children_pattern(with_self=with_self)
+        children = Node.objects.filter(key__regex=pattern)
+        return children
+
     @property
     def children(self):
         return self.get_children(with_self=False)
@@ -116,34 +145,63 @@ class FamilyMixin:
     def all_children(self):
         return self.get_all_children(with_self=False)
 
-    def get_children_key_pattern(self, with_self=False):
-        pattern = r'^{0}:[0-9]+$'.format(self.key)
-        if with_self:
-            pattern += r'|^{0}$'.format(self.key)
-        return pattern
+    def create_child(self, value, _id=None):
+        with transaction.atomic():
+            child_key = self.get_next_child_key()
+            child = self.__class__.objects.create(
+                id=_id, key=child_key, value=value
+            )
+            return child
 
-    def get_children(self, with_self=False):
-        pattern = self.get_children_key_pattern(with_self=with_self)
-        return Node.objects.filter(key__regex=pattern)
+    def get_next_child_key(self):
+        mark = self.child_mark
+        self.child_mark += 1
+        self.save()
+        return "{}:{}".format(self.key, mark)
 
-    def get_all_children_pattern(self, with_self=False):
-        pattern = r'^{0}:'.format(self.key)
-        if with_self:
-            pattern += r'|^{0}$'.format(self.key)
-        return pattern
+    def get_next_child_preset_name(self):
+        name = ugettext("New node")
+        values = [
+            child.value[child.value.rfind(' '):]
+            for child in self.get_children()
+            if child.value.startswith(name)
+        ]
+        values = [int(value) for value in values if value.strip().isdigit()]
+        count = max(values) + 1 if values else 1
+        return '{} {}'.format(name, count)
 
-    def get_all_children(self, with_self=False):
-        pattern = self.get_all_children_pattern(with_self=with_self)
-        children = Node.objects.filter(key__regex=pattern)
-        return children
+    # Parents
+    @classmethod
+    def get_node_ancestor_keys(cls, key, with_self=False):
+        parent_keys = []
+        key_list = key.split(":")
+        if not with_self:
+            key_list.pop()
+        for i in range(len(key_list)):
+            parent_keys.append(":".join(key_list))
+            key_list.pop()
+        return parent_keys
+
+    def get_ancestor_keys(self, with_self=False):
+        return self.get_node_ancestor_keys(
+            self.key, with_self=with_self
+        )
 
     @property
-    def parents(self):
-        return self.get_ancestor(with_self=False)
+    def ancestors(self):
+        return self.get_ancestors(with_self=False)
 
-    def get_ancestor(self, with_self=False):
+    def get_ancestors(self, with_self=False):
         ancestor_keys = self.get_ancestor_keys(with_self=with_self)
         return self.__class__.objects.filter(key__in=ancestor_keys)
+
+    @property
+    def parent_key(self):
+        parent_key = ":".join(self.key.split(":")[:-1])
+        return parent_key
+
+    def is_parent(self, other):
+        return other.is_children(self)
 
     @property
     def parent(self):
@@ -177,103 +235,33 @@ class FamilyMixin:
         return sibling
 
     def get_family(self):
-        ancestor = self.get_ancestor()
+        ancestors = self.get_ancestors()
         children = self.get_all_children()
-        return [*tuple(ancestor), self, *tuple(children)]
-
-    @classmethod
-    def get_nodes_ancestor_keys_by_key(cls, key, with_self=False):
-        parent_keys = []
-        key_list = key.split(":")
-        if not with_self:
-            key_list.pop()
-        for i in range(len(key_list)):
-            parent_keys.append(":".join(key_list))
-            key_list.pop()
-        return parent_keys
-
-    def get_ancestor_keys(self, with_self=False):
-        return self.__class__.get_nodes_ancestor_keys_by_key(
-            self.key, with_self=with_self
-        )
-
-    def is_children(self, other):
-        pattern = r'^{0}:[0-9]+$'.format(self.key)
-        return re.match(pattern, other.key)
-
-    def is_parent(self, other):
-        return other.is_children(self)
-
-    @property
-    def parent_key(self):
-        parent_key = ":".join(self.key.split(":")[:-1])
-        return parent_key
-
-    @property
-    def parents_keys(self, with_self=False):
-        keys = []
-        key_list = self.key.split(":")
-        if not with_self:
-            key_list.pop()
-        for i in range(len(key_list)):
-            keys.append(':'.join(key_list))
-            key_list.pop()
-        return keys
-
-    def get_next_child_key(self):
-        mark = self.child_mark
-        self.child_mark += 1
-        self.save()
-        return "{}:{}".format(self.key, mark)
-
-    def get_next_child_preset_name(self):
-        name = ugettext("New node")
-        values = [
-            child.value[child.value.rfind(' '):]
-            for child in self.get_children()
-            if child.value.startswith(name)
-        ]
-        values = [int(value) for value in values if value.strip().isdigit()]
-        count = max(values) + 1 if values else 1
-        return '{} {}'.format(name, count)
-
-    def create_child(self, value, _id=None):
-        with transaction.atomic():
-            child_key = self.get_next_child_key()
-            child = self.__class__.objects.create(
-                id=_id, key=child_key, value=value
-            )
-            return child
+        return [*tuple(ancestors), self, *tuple(children)]
 
 
 class FullValueMixin:
-    _full_value = None
     key = ''
 
-    @property
+    @lazyproperty
     def full_value(self):
         if self.is_org_root():
             return self.value
-        if self._full_value is not None:
-            return self._full_value
-        value = self._tree.get_node_full_tag(self.key)
+        value = self.tree().get_node_full_tag(self.key)
         return value
 
 
 class NodeAssetsMixin:
-    _assets_amount = None
     key = ''
     id = None
 
-    @property
+    @lazyproperty
     def assets_amount(self):
         """
         获取节点下所有资产数量速度太慢，所以需要重写，使用cache等方案
         :return:
         """
-        if self._assets_amount is not None:
-            return self._assets_amount
-        amount = self._tree.assets_amount(self.key)
+        amount = self.tree().assets_amount(self.key)
         return amount
 
     def get_all_assets(self):
@@ -298,13 +286,35 @@ class NodeAssetsMixin:
         return self.get_all_assets().valid()
 
     @classmethod
-    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
+    def _get_nodes_all_assets(cls, nodes_keys):
+        """
+        当节点比较多的时候，这种正则方式性能差极了
+        :param nodes_keys:
+        :return:
+        """
         from .asset import Asset
+        nodes_keys = cls.clean_children_keys(nodes_keys)
+        nodes_children_pattern = set()
+        for key in nodes_keys:
+            children_pattern = cls.get_node_all_children_key_pattern(key)
+            nodes_children_pattern.add(children_pattern)
+        pattern = '|'.join(nodes_children_pattern)
+        return Asset.objects.filter(nodes__key__regex=pattern).distinct()
+
+    @classmethod
+    def get_nodes_all_assets_ids(cls, nodes_keys):
         nodes_keys = cls.clean_children_keys(nodes_keys)
         assets_ids = set()
         for key in nodes_keys:
             node_assets_ids = cls.tree().all_assets(key)
             assets_ids.update(set(node_assets_ids))
+        return assets_ids
+
+    @classmethod
+    def get_nodes_all_assets(cls, nodes_keys, extra_assets_ids=None):
+        from .asset import Asset
+        nodes_keys = cls.clean_children_keys(nodes_keys)
+        assets_ids = cls.get_nodes_all_assets_ids(nodes_keys)
         if extra_assets_ids:
             assets_ids.update(set(extra_assets_ids))
         return Asset.objects.filter(id__in=assets_ids)

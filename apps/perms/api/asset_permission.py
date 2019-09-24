@@ -75,7 +75,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             return queryset
         if not node:
             return queryset.none()
-        nodes = node.get_ancestor(with_self=True)
+        nodes = node.get_ancestors(with_self=True)
         queryset = queryset.filter(nodes__in=nodes)
         return queryset
 
@@ -99,11 +99,11 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         for key in inherit_nodes_keys:
             if key is None:
                 continue
-            ancestor_keys = Node.get_nodes_ancestor_keys_by_key(key, with_self=True)
+            ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
             inherit_all_nodes.update(ancestor_keys)
         queryset = queryset.filter(
             Q(assets__in=assets) | Q(nodes__key__in=inherit_all_nodes)
-        )
+        ).distinct()
         return queryset
 
     def filter_user(self, queryset):

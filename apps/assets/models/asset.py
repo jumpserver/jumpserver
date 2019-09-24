@@ -112,7 +112,7 @@ class NodesRelationMixin:
     def get_all_nodes(self, flat=False):
         nodes = []
         for node in self.get_nodes():
-            _nodes = node.get_ancestor(with_self=True)
+            _nodes = node.get_ancestors(with_self=True)
             nodes.append(_nodes)
         if flat:
             nodes = list(reduce(lambda x, y: set(x) | set(y), nodes))
