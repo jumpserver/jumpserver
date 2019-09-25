@@ -17,7 +17,7 @@ class SwitchOrgView(DetailView):
         oid = str(self.object.id)
         request.session['oid'] = oid
         host = request.get_host()
-        referer = request.META.get('HTTP_REFERER')
+        referer = request.META.get('HTTP_REFERER', '')
         if referer.find(host) == -1:
             return redirect(reverse('index'))
         if UUID_PATTERN.search(referer):

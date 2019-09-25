@@ -54,10 +54,6 @@ class TreeService(Tree):
             tree.init_assets()
         return tree
 
-    def init_assets_async(self):
-        t = threading.Thread(target=self.init_assets)
-        t.start()
-
     def init_assets(self):
         from orgs.utils import tmp_to_root_org
         self.all_nodes_assets_map = {}
