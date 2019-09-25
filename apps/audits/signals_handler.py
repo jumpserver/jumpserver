@@ -9,7 +9,8 @@ from rest_framework.renderers import JSONRenderer
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
-from terminal.models import Session
+from terminal.models import Session, Command
+from terminal.backends.command.serializers import SessionCommandSerializer
 from . import models
 from . import serializers
 
@@ -88,6 +89,9 @@ def on_audits_log_create(sender, instance=None, **kwargs):
     elif sender == Session:
         category = "host_session_log"
         serializer = serializers.SessionAuditSerializer
+    elif sender == Command:
+        category = "session_command_log"
+        serializer = SessionCommandSerializer
     else:
         return
 
