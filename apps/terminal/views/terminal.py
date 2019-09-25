@@ -135,4 +135,4 @@ class WebTerminalView(View):
 
 class WebSFTPView(View):
     def get(self, request, *args, **kwargs):
-        return redirect('/coco/elfinder/sftp/?' + request.GET.urlencode())
+        return redirect('/koko/elfinder/sftp/?' + request.GET.urlencode())

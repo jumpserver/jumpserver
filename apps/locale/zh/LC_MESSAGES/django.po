@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-24 11:11+0800\n"
+"POT-Creation-Date: 2019-09-25 14:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -620,7 +620,7 @@ msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:68 assets/forms/asset.py:103 assets/forms/asset.py:116
-#: assets/forms/asset.py:153 assets/models/node.py:403
+#: assets/forms/asset.py:153 assets/models/node.py:413
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:82 perms/forms/asset_permission.py:89
 #: perms/templates/perms/asset_permission_list.html:53
@@ -1107,7 +1107,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:394
+#: assets/models/label.py:19 assets/models/node.py:404
 #: assets/templates/assets/label_list.html:15 settings/models.py:30
 msgid "Value"
 msgstr "值"
@@ -1116,19 +1116,19 @@ msgstr "值"
 msgid "Category"
 msgstr "分类"
 
-#: assets/models/node.py:230
+#: assets/models/node.py:163
 msgid "New node"
 msgstr "新节点"
 
-#: assets/models/node.py:318
+#: assets/models/node.py:328
 msgid "ungrouped"
 msgstr "未分组"
 
-#: assets/models/node.py:320
+#: assets/models/node.py:330
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:393
+#: assets/models/node.py:403
 msgid "Key"
 msgstr "键"
 
@@ -1182,7 +1182,7 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:168 assets/templates/assets/user_asset_list.html:52
+#: assets/models/user.py:162 assets/templates/assets/user_asset_list.html:52
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:52
 #: audits/templates/audits/ftp_log_list.html:75
 #: perms/forms/asset_permission.py:85 perms/forms/remote_app_permission.py:40
@@ -2733,13 +2733,12 @@ msgstr "仪表盘"
 
 #: jumpserver/views.py:193
 msgid ""
-"<div>Luna is a separately deployed program, you need to deploy Luna, coco, "
+"<div>Luna is a separately deployed program, you need to deploy Luna, koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Luna是单独部署的一个程序，你需要部署luna，coco，配置nginx做url分发, </"
-"div><div>如果你看到了这个页面，证明你访问的不是nginx监听的端口，祝你好运</"
-"div>"
+"<div>Luna是单独部署的一个程序，你需要部署luna，koko, </div><div>如果你看到了"
+"这个页面，证明你访问的不是nginx监听的端口，祝你好运</div>"
 
 #: ops/api/celery.py:54
 msgid "Waiting task start"

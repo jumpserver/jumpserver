@@ -15,7 +15,7 @@ logger = get_logger(__file__)
 
 
 class JMSBaseInventory(BaseInventory):
-    windows_ssh_default_ssh = settings.WINDOWS_SSH_DEFAULT_SHELL
+    windows_ssh_default_shell = settings.WINDOWS_SSH_DEFAULT_SHELL
 
     def convert_to_ansible(self, asset, run_as_admin=False):
         info = {
@@ -35,7 +35,7 @@ class JMSBaseInventory(BaseInventory):
         if asset.is_windows():
             info["vars"].update({
                 "ansible_connection": "ssh",
-                "ansible_shell_type": self.windows_ssh_default_ssh,
+                "ansible_shell_type": self.windows_ssh_default_shell,
             })
         for label in asset.labels.all():
             info["vars"].update({
