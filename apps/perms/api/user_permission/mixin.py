@@ -36,7 +36,7 @@ class UserNodeTreeMixin:
             assets_amount = self.tree.assets_amount(node.key)
             if assets_amount == 0 and node.key != Node.empty_key:
                 continue
-            node._assets_amount = assets_amount
+            node.assets_amount = assets_amount
             data = ParserNode.parse_node_to_tree_node(node)
             _queryset.append(data)
         return _queryset
