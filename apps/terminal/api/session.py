@@ -27,7 +27,6 @@ class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
-    permission_classes_get = (IsOrgAdminOrAppUser | IsOrgAuditor, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
@@ -56,7 +55,7 @@ class SessionViewSet(OrgBulkModelViewSet):
 
     def get_permissions(self):
         if self.request.method.lower() in ['get']:
-            self.permission_classes = self.permission_classes_get
+            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
         return super().get_permissions()
 
 
