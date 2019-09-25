@@ -26,10 +26,6 @@ def get_system_user_by_id(id):
 
 class TreeService(Tree):
     tag_sep = ' / '
-    cache_key = '_NODE_FULL_TREE'
-    cache_time = 3600
-    has_empty_node = False
-    has_ungrouped_node = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -43,13 +39,17 @@ class TreeService(Tree):
         from orgs.utils import tmp_to_root_org
 
         with tmp_to_root_org():
-            all_nodes = Node.objects.all()
+            all_nodes = list(Node.objects.all().values("key", "value"))
+            all_nodes.sort(key=lambda x: len(x["key"].split(":")))
             tree = cls()
             tree.create_node(tag='', identifier='')
             for node in all_nodes:
+                key = node["key"]
+                value = node["value"]
+                parent_key = ":".join(key.split(":")[:-1])
                 tree.create_node(
-                    tag=node.value, identifier=node.key,
-                    parent=node.parent_key,
+                    tag=value, identifier=key,
+                    parent=parent_key,
                 )
             tree.init_assets()
         return tree
