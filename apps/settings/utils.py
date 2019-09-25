@@ -93,6 +93,8 @@ class LDAPUtil:
                 user_item = self._ldap_entry_to_user_item(entry)
                 user = self.get_user_by_username(user_item['username'])
                 user_item['existing'] = bool(user)
+                if user_item in user_items:
+                    continue
                 user_items.append(user_item)
         return user_items
 
