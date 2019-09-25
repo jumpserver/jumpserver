@@ -254,13 +254,17 @@ class FullValueMixin:
 class NodeAssetsMixin:
     key = ''
     id = None
+    _assets_amount = None
 
-    @lazyproperty
+    @property
     def assets_amount(self):
         """
-        获取节点下所有资产数量速度太慢，所以需要重写，使用cache等方案
+        获取节点下所有资产数量速度太慢，所以需要重写，使用cache等方案,
+        这里不能用lazyproperty, 因为用户树，会设置 _assets_amount的值
         :return:
         """
+        if self._assets_amount:
+            return self._assets_amount
         amount = self.tree().assets_amount(self.key)
         return amount
 
