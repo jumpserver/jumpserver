@@ -41,7 +41,7 @@
     </table>
 
     <div id="actions" class="hide">
-        {% if type == "online" %}
+        {% if type == "online" and request.user.can_admin_current_org %}
         <div class="input-group">
             <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
                 <option value="terminate">{% trans 'Terminate selected' %}</option>
@@ -140,7 +140,7 @@ function initTable() {
                     replayBtn = replayBtn.replace("disabled", "")
                 }
                 var termBtn = '<a class="btn btn-xs btn-danger btn-term" disabled value="sessionID" terminal="terminalID" >{% trans "Terminate" %}</a>';
-                if ("{{ request.user.is_org_admin }}" === "True") {
+                if ("{{ request.user.can_admin_current_org }}" === "True") {
                     termBtn = termBtn.replace("disabled", "")
                         .replace("sessionID", cellData)
                         .replace("terminalID", rowData.terminal)

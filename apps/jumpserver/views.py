@@ -190,7 +190,7 @@ class IndexView(PermissionsMixin, TemplateView):
 
 class LunaView(View):
     def get(self, request):
-        msg = _("<div>Luna is a separately deployed program, you need to deploy Luna, coco, configure nginx for url distribution,</div> "
+        msg = _("<div>Luna is a separately deployed program, you need to deploy Luna, koko, configure nginx for url distribution,</div> "
                 "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
         return HttpResponse(msg)
 

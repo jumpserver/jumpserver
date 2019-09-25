@@ -286,7 +286,7 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': "INFO",
         },
-        'jms_audits': {
+        'jms.audits': {
             'handlers': ['syslog'],
             'level': 'INFO'
         },

@@ -94,7 +94,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def validate_hostname(hostname):
-        pattern = r"^[\._@a-zA-Z0-9-]+$"
+        pattern = r"^[\._@\w-]+$"
         res = re.match(pattern, hostname)
         if res is None:
             msg = _("* The hostname contains characters that are not allowed")

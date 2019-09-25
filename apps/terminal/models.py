@@ -4,6 +4,7 @@ import os
 import uuid
 
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
@@ -267,7 +268,16 @@ class Task(models.Model):
         db_table = "terminal_task"
 
 
+class CommandManager(models.Manager):
+    def bulk_create(self, objs, **kwargs):
+        resp = super().bulk_create(objs, **kwargs)
+        for i in objs:
+            post_save.send(i.__class__, instance=i, created=True)
+        return resp
+
+
 class Command(AbstractSessionCommand):
+    objects = CommandManager()
 
     class Meta:
         db_table = "terminal_command"

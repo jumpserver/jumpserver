@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
-    permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
+    permission_classes = (IsOrgAdminOrAppUser, )
     filter_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
@@ -52,6 +52,11 @@ class SessionViewSet(OrgBulkModelViewSet):
             _system_user = get_object_or_404(SystemUser, id=sid)
             serializer.validated_data["system_user"] = _system_user.name
         return super().perform_create(serializer)
+
+    def get_permissions(self):
+        if self.request.method.lower() in ['get']:
+            self.permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor, )
+        return super().get_permissions()
 
 
 class SessionReplayViewSet(viewsets.ViewSet):

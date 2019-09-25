@@ -257,10 +257,6 @@ class NodeAssetsMixin:
 
     @lazyproperty
     def assets_amount(self):
-        """
-        获取节点下所有资产数量速度太慢，所以需要重写，使用cache等方案
-        :return:
-        """
         amount = self.tree().assets_amount(self.key)
         return amount
 
