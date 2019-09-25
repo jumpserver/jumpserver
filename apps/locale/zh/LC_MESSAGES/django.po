@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 14:29+0800\n"
+"POT-Creation-Date: 2019-09-25 15:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -112,7 +112,7 @@ msgstr "资产"
 #: applications/templates/applications/remote_app_detail.html:53
 #: applications/templates/applications/remote_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:16
-#: assets/forms/asset.py:20 assets/forms/domain.py:73 assets/forms/user.py:74
+#: assets/forms/asset.py:24 assets/forms/domain.py:73 assets/forms/user.py:74
 #: assets/forms/user.py:94 assets/models/base.py:28 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:20 assets/models/domain.py:20
 #: assets/models/group.py:20 assets/models/label.py:18
@@ -576,14 +576,18 @@ msgstr "更新节点资产硬件信息: {}"
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
-#: assets/forms/asset.py:24 assets/models/asset.py:140
+#: assets/forms/asset.py:18
+msgid "Only Numbers、letters、 chinese and characters ( {} ) are allowed"
+msgstr "只允许包含数字、字母、中文和特殊字符（ {} ）"
+
+#: assets/forms/asset.py:28 assets/models/asset.py:140
 #: assets/models/domain.py:50
 #: assets/templates/assets/domain_gateway_list.html:69
 #: settings/templates/settings/replay_storage_create.html:59
 msgid "Port"
 msgstr "端口"
 
-#: assets/forms/asset.py:55 assets/models/asset.py:145
+#: assets/forms/asset.py:59 assets/models/asset.py:145
 #: assets/models/user.py:110 assets/templates/assets/asset_detail.html:190
 #: assets/templates/assets/asset_detail.html:198
 #: assets/templates/assets/system_user_assets.html:83
@@ -594,7 +598,7 @@ msgstr "端口"
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/forms/asset.py:58 assets/forms/asset.py:106
+#: assets/forms/asset.py:62 assets/forms/asset.py:109
 #: assets/models/asset.py:149 assets/models/cluster.py:19
 #: assets/models/user.py:68 assets/templates/assets/asset_detail.html:76
 #: templates/_nav.html:44 xpack/plugins/cloud/models.py:161
@@ -603,7 +607,7 @@ msgstr "节点"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/forms/asset.py:61 assets/forms/asset.py:109 assets/forms/asset.py:150
+#: assets/forms/asset.py:65 assets/forms/asset.py:112 assets/forms/asset.py:152
 #: assets/templates/assets/asset_create.html:48
 #: assets/templates/assets/asset_create.html:50
 #: assets/templates/assets/asset_list.html:85
@@ -611,7 +615,7 @@ msgstr "管理用户"
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:64 assets/forms/asset.py:112
+#: assets/forms/asset.py:68 assets/forms/asset.py:115
 #: assets/models/asset.py:144 assets/models/domain.py:26
 #: assets/models/domain.py:52 assets/templates/assets/asset_detail.html:80
 #: assets/templates/assets/user_asset_list.html:53
@@ -619,8 +623,8 @@ msgstr "标签"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/forms/asset.py:68 assets/forms/asset.py:103 assets/forms/asset.py:116
-#: assets/forms/asset.py:153 assets/models/node.py:413
+#: assets/forms/asset.py:72 assets/forms/asset.py:106 assets/forms/asset.py:119
+#: assets/forms/asset.py:155 assets/models/node.py:413
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:82 perms/forms/asset_permission.py:89
 #: perms/templates/perms/asset_permission_list.html:53
@@ -635,11 +639,7 @@ msgstr "网域"
 msgid "Node"
 msgstr "节点"
 
-#: assets/forms/asset.py:71 assets/forms/asset.py:119
-msgid "Only Numbers, letters, and characters ( {} ) are allowed"
-msgstr "只允许包含数字，字母，特殊字符（ {} ）"
-
-#: assets/forms/asset.py:74 assets/forms/asset.py:122
+#: assets/forms/asset.py:77 assets/forms/asset.py:124
 msgid ""
 "root or other NOPASSWD sudo privilege user existed in asset,If asset is "
 "windows or other set any one, more see admin user left menu"
@@ -647,16 +647,16 @@ msgstr ""
 "root或其他拥有NOPASSWD: ALL权限的用户, 如果是windows或其它硬件可以随意设置一"
 "个, 更多信息查看左侧 `管理用户` 菜单"
 
-#: assets/forms/asset.py:77 assets/forms/asset.py:125
+#: assets/forms/asset.py:80 assets/forms/asset.py:127
 msgid "Windows 2016 RDP protocol is different, If is window 2016, set it"
 msgstr "Windows 2016的RDP协议与之前不同，如果是请设置"
 
-#: assets/forms/asset.py:78 assets/forms/asset.py:126
+#: assets/forms/asset.py:81 assets/forms/asset.py:128
 msgid ""
 "If your have some network not connect with each other, you can set domain"
 msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，使用网域网关跳转登录"
 
-#: assets/forms/asset.py:133 assets/forms/asset.py:137
+#: assets/forms/asset.py:135 assets/forms/asset.py:139
 #: assets/forms/domain.py:17 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:78
 #: xpack/plugins/change_auth_plan/forms.py:55
@@ -3915,7 +3915,7 @@ msgstr "您确定删除吗?"
 msgid "Search no entry matched in ou {}"
 msgstr "在ou:{}中没有匹配条目"
 
-#: settings/utils.py:120
+#: settings/utils.py:122
 msgid "The user source is not LDAP"
 msgstr "用户来源不是LDAP"
 

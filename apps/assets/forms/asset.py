@@ -14,6 +14,10 @@ __all__ = [
     'AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm', 'ProtocolForm',
 ]
 
+HELP_TEXTS_ASSET_HOSTNAME = _(
+    'Only Numbers、letters、 chinese and characters ( {} ) are allowed'
+).format(" ".join(['.', '_', '@']))
+
 
 class ProtocolForm(forms.Form):
     name = forms.ChoiceField(
@@ -68,8 +72,7 @@ class AssetCreateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': _('Only Numbers, letters, and characters ( {} ) '
-                          'are allowed').format(" ".join(['.', '_', '@'])),
+            'hostname': HELP_TEXTS_ASSET_HOSTNAME,
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -116,8 +119,7 @@ class AssetUpdateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': _('Only Numbers, letters, and characters ( {} ) '
-                          'are allowed').format(" ".join(['.', '_', '@'])),
+            'hostname': HELP_TEXTS_ASSET_HOSTNAME,
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
