@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 HELP_TEXTS_ASSET_HOSTNAME = _(
-    'Only Numbers, letters, chinese and characters ( {} ) are allowed'
+    'Only Numbers、letters、 chinese and characters ( {} ) are allowed'
 ).format(" ".join(['.', '_', '@']))
 
 
