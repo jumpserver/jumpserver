@@ -1,9 +1,14 @@
 {% load i18n %}
 <style>
-.btn-group>.btn+.dropdown-toggle {
-    padding-right: 4px;
-    padding-left: 4px;
-}
+    .btn-group>.btn+.dropdown-toggle {
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    table.dataTable tbody tr.selected a {
+        color: rgb(103, 106, 108);;
+    }
+
 </style>
 <table class="table table-striped table-bordered table-hover" id="asset_user_list_table" style="width: 100%">
   <thead>
