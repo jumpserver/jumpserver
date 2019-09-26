@@ -226,4 +226,11 @@ class HealthCheckView(APIView):
         return JsonResponse({"status": 1, "time": int(time.time())})
 
 
+class WsView(APIView):
+    ws_port = settings.CONFIG.HTTP_LISTEN_PORT + 1
+
+    def get(self, request):
+        msg = _("Websocket server run on port: {}, you should proxy it on nginx"
+                .format(self.ws_port))
+        return JsonResponse({"msg": msg})
 

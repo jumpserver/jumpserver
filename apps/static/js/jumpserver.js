@@ -1201,3 +1201,7 @@ function nodesSelect2Init(selector, url) {
     })
 }
 
+function showCeleryTaskLog(taskId) {
+    var url = '/ops/celery/task/taskId/log/'.replace('taskId', taskId);
+    window.open(url, '', 'width=900,height=600')
+}

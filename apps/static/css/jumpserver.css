@@ -88,7 +88,7 @@ table.dataTable tbody td.selected a,
 table.dataTable tbody tr.selected td i.text-navy,
 table.dataTable tbody th.selected td i.text-navy,
 table.dataTable tbody td.selected td i.text-navy {
-    color: white !important;
+    color: white;
 }
 
 .m-0 {
