@@ -141,7 +141,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'jumpserver.wsgi.applications'
+WSGI_APPLICATION = 'jumpserver.wsgi.application'
 ASGI_APPLICATION = 'jumpserver.routing.application'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
