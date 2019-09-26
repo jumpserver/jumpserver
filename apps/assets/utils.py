@@ -1,14 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 #
-from functools import reduce
 from treelib import Tree
+from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
 from copy import deepcopy
-import threading
-from django.db.models import Q
 
 from common.utils import get_object_or_none, get_logger, timeit
-from .models import SystemUser, Label, Asset
+from .models import SystemUser, Asset
 
 
 logger = get_logger(__file__)
@@ -31,7 +29,7 @@ class TreeService(Tree):
         super().__init__(*args, **kwargs)
         self.nodes_assets_map = defaultdict(set)
         self.all_nodes_assets_map = {}
-        self._invalid_assets = set()
+        self._invalid_assets = frozenset()
 
     @classmethod
     @timeit
@@ -48,26 +46,33 @@ class TreeService(Tree):
                 key = node["key"]
                 value = node["value"]
                 parent_key = ":".join(key.split(":")[:-1])
-                tree.create_node(
+                tree.safe_create_node(
                     tag=value, identifier=key,
                     parent=parent_key,
                 )
             tree.init_assets()
         return tree
 
+    @timeit
     def init_assets(self):
         from orgs.utils import tmp_to_root_org
         self.all_nodes_assets_map = {}
         self.nodes_assets_map = defaultdict(set)
-        logger.debug('Init tree assets')
         with tmp_to_root_org():
             queryset = Asset.objects.all().values_list('id', 'nodes__key')
-            self._invalid_assets = Asset.objects.filter(is_active=False)\
+            invalid_assets = Asset.objects.filter(is_active=False)\
                 .values_list('id', flat=True)
+            self._invalid_assets = frozenset(invalid_assets)
             for asset_id, key in queryset:
                 if not key:
                     continue
                 self.nodes_assets_map[key].add(asset_id)
+
+    def safe_create_node(self, **kwargs):
+        parent = kwargs.get("parent")
+        if not self.contains(parent):
+            kwargs['parent'] = self.root
+        self.create_node(**kwargs)
 
     def all_children_ids(self, nid, with_self=True):
         children_ids = self.expand_tree(nid)
@@ -184,5 +189,5 @@ class TreeService(Tree):
     def __setstate__(self, state):
         self.__dict__ = state
         if '_invalid_assets' not in state:
-            self._invalid_assets = set()
+            self._invalid_assets = frozenset()
         # self.mutex = threading.Lock()
