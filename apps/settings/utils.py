@@ -47,6 +47,7 @@ class LDAPUtil:
         self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
         self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
         self.auth_ldap = settings.AUTH_LDAP
+        self.paged_size = settings.AUTH_LDAP_SEARCH_PAGED_SIZE
 
     @property
     def connection(self):
@@ -79,23 +80,45 @@ class LDAPUtil:
             user_item[attr] = value
         return user_item
 
+    def _search_user_items_ou(self, search_ou, cookie=None):
+        ok = self.connection.search(
+            search_ou, self.search_filter % ({"user": "*"}),
+            attributes=list(self.attr_map.values()),
+            paged_size=self.paged_size, paged_cookie=cookie
+        )
+        if not ok:
+            error = _("Search no entry matched in ou {}".format(search_ou))
+            raise LDAPOUGroupException(error)
+
+        user_items = []
+        for entry in self.connection.entries:
+            user_item = self._ldap_entry_to_user_item(entry)
+            user = self.get_user_by_username(user_item['username'])
+            user_item['existing'] = bool(user)
+            if user_item in user_items:
+                continue
+            user_items.append(user_item)
+        return user_items
+
+    def _cookie(self):
+        if self.paged_size is None:
+            cookie = None
+        else:
+            cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
+        return cookie
+
     def search_user_items(self):
         user_items = []
+        logger.info("Search user items")
         for search_ou in str(self.search_ougroup).split("|"):
-            ok = self.connection.search(
-                search_ou, self.search_filter % ({"user": "*"}),
-                attributes=list(self.attr_map.values())
-            )
-            if not ok:
-                error = _("Search no entry matched in ou {}".format(search_ou))
-                raise LDAPOUGroupException(error)
-            for entry in self.connection.entries:
-                user_item = self._ldap_entry_to_user_item(entry)
-                user = self.get_user_by_username(user_item['username'])
-                user_item['existing'] = bool(user)
-                if user_item in user_items:
-                    continue
-                user_items.append(user_item)
+            logger.info("Search user search ou: {}".format(search_ou))
+            _user_items = self._search_user_items_ou(search_ou)
+            user_items.extend(_user_items)
+            while self._cookie():
+                logger.info("Page Search user search ou: {}".format(search_ou))
+                _user_items = self._search_user_items_ou(search_ou, self._cookie())
+                user_items.extend(_user_items)
+        logger.info("Search user items end")
         return user_items
 
     def search_filter_user_items(self, username_list):
