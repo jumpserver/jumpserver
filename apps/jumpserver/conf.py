@@ -335,6 +335,7 @@ defaults = {
     'REDIS_DB_CELERY': 3,
     'REDIS_DB_CACHE': 4,
     'REDIS_DB_SESSION': 5,
+    'REDIS_DB_WS': 6,
     'CAPTCHA_TEST_MODE': None,
     'TOKEN_EXPIRATION': 3600 * 24,
     'DISPLAY_PER_PAGE': 25,
