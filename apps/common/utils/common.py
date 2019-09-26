@@ -194,7 +194,7 @@ def timeit(func):
         now = time.time()
         result = func(*args, **kwargs)
         using = (time.time() - now) * 1000
-        msg = "Call {} end, using: {:.1f}ms".format(func.__name__, using)
+        msg = "End call {}, using: {:.1f}ms".format(func.__name__, using)
         logger.debug(msg)
         return result
     return wrapper

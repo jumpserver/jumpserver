@@ -103,6 +103,7 @@ function onSelected(event, treeNode) {
 
 
 function initTree(refresh) {
+    var asyncUrl = setUrlParam(treeUrl, 'cache_policy', '1');
     var setting = {
         view: {
             dblClickExpand: false,
@@ -115,7 +116,7 @@ function initTree(refresh) {
         },
         async: {
 			enable: true,
-			url: treeUrl,
+			url: asyncUrl,
 			autoParam: ["id=key", "name=n", "level=lv"],
             type: 'get'
 		},
