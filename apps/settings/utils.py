@@ -26,6 +26,8 @@ class LDAPUtil:
                  password=None, use_ssl=None, search_ougroup=None,
                  search_filter=None, attr_map=None, auth_ldap=None):
         # config
+        self.paged_size = settings.AUTH_LDAP_SEARCH_PAGED_SIZE
+
         if use_settings_config:
             self._load_config_from_settings()
         else:
@@ -47,7 +49,6 @@ class LDAPUtil:
         self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
         self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
         self.auth_ldap = settings.AUTH_LDAP
-        self.paged_size = settings.AUTH_LDAP_SEARCH_PAGED_SIZE
 
     @property
     def connection(self):
