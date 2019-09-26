@@ -145,8 +145,8 @@
 <script>
 $(document).ready(function () {
 }).on('click', '.celery-task-log', function () {
-    var url = '{% url 'ops:celery-task-log' pk=object.pk %}';
-    window.open(url, '', 'width=800,height=600,left=400,top=400')
+    var taskId = "{{ object.pk }}";
+    showCeleryTaskLog(taskId);
 })
 
 </script>

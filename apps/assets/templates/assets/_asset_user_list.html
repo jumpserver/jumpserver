@@ -1,9 +1,14 @@
 {% load i18n %}
 <style>
-.btn-group>.btn+.dropdown-toggle {
-    padding-right: 4px;
-    padding-left: 4px;
-}
+    .btn-group>.btn+.dropdown-toggle {
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+
+    table.dataTable tbody tr.selected a {
+        color: rgb(103, 106, 108);;
+    }
+
 </style>
 <table class="table table-striped table-bordered table-hover" id="asset_user_list_table" style="width: 100%">
   <thead>
@@ -137,8 +142,7 @@ $(document).ready(function(){
     }
     var success = function (data) {
         var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600,left=400,top=400')
+        showCeleryTaskLog(task_id);
     };
     requestApi({
         url: the_url,
