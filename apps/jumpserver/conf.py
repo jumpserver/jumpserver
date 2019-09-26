@@ -383,7 +383,8 @@ defaults = {
     'SYSLOG_FACILITY': 'user',
     'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
     'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
-    'FLOWER_URL': "127.0.0.1:5555"
+    'FLOWER_URL': "127.0.0.1:5555",
+    'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
 }
 
 
