@@ -31,6 +31,7 @@ class TreeService(Tree):
         super().__init__(*args, **kwargs)
         self.nodes_assets_map = defaultdict(set)
         self.all_nodes_assets_map = {}
+        self._invalid_assets = set()
 
     @classmethod
     @timeit
@@ -61,6 +62,8 @@ class TreeService(Tree):
         logger.debug('Init tree assets')
         with tmp_to_root_org():
             queryset = Asset.objects.all().values_list('id', 'nodes__key')
+            self._invalid_assets = Asset.objects.filter(is_active=False)\
+                .values_list('id', flat=True)
             for asset_id, key in queryset:
                 if not key:
                     continue
@@ -93,6 +96,11 @@ class TreeService(Tree):
         children = self.all_children(nid, with_self=False)
         return ancestors + [self[nid]] + children
 
+    @staticmethod
+    def is_parent(child, parent):
+        parent_id = child.bpointer
+        return parent_id == parent.identifier
+
     def root_node(self):
         return self.get_node(self.root)
 
@@ -108,12 +116,15 @@ class TreeService(Tree):
             parent = self.copy_node(parent)
         return parent
 
+    def set_assets(self, nid, assets):
+        self.nodes_assets_map[nid] = set(assets)
+
     def assets(self, nid):
         assets = self.nodes_assets_map[nid]
         return assets
 
-    def set_assets(self, nid, assets):
-        self.nodes_assets_map[nid] = assets
+    def valid_assets(self, nid):
+        return set(self.assets(nid)) - set(self._invalid_assets)
 
     def all_assets(self, nid):
         assets = self.all_nodes_assets_map.get(nid)
@@ -123,10 +134,17 @@ class TreeService(Tree):
         children = self.children(nid)
         for child in children:
             assets.update(self.all_assets(child.identifier))
+        self.all_nodes_assets_map[nid] = assets
         return assets
+
+    def all_valid_assets(self, nid):
+        return set(self.all_assets(nid)) - set(self._invalid_assets)
 
     def assets_amount(self, nid):
         return len(self.all_assets(nid))
+
+    def valid_assets_amount(self, nid):
+        return len(self.all_valid_assets(nid))
 
     @staticmethod
     def copy_node(node):
@@ -134,30 +152,37 @@ class TreeService(Tree):
         new_node.fpointer = None
         return new_node
 
-    def safe_add_ancestors(self, ancestors):
-        # 如果祖先节点为1个，那么添加该节点, 父节点是root node
-        if len(ancestors) == 1:
-            node = ancestors[0]
+    def safe_add_ancestors(self, node, ancestors):
+        # 如果没有祖先节点，那么添加该节点, 父节点是root node
+        if len(ancestors) == 0:
             parent = self.root_node()
         else:
-            node, ancestors = ancestors[0], ancestors[1:]
-            parent_id = ancestors[0].identifier
-            # 如果父节点不存在, 则先添加父节点
-            if not self.contains(parent_id):
-                self.safe_add_ancestors(ancestors)
-            parent = self.get_node(parent_id)
+            parent = ancestors[0]
 
         # 如果当前节点已再树中，则移动当前节点到父节点中
         # 这个是由于 当前节点放到了二级节点中
+        if not self.contains(parent.identifier):
+            # logger.debug('Add parent: {}'.format(parent.identifier))
+            self.safe_add_ancestors(parent, ancestors[1:])
+
         if self.contains(node.identifier):
+            # msg = 'Move node to parent: {} => {}'.format(
+            #     node.identifier, parent.identifier
+            # )
+            # logger.debug(msg)
             self.move_node(node.identifier, parent.identifier)
         else:
+            # logger.debug('Add node: {}'.format(node.identifier))
             self.add_node(node, parent)
+
     #
     # def __getstate__(self):
     #     self.mutex = None
     #     return self.__dict__
     #
-    # def __setstate__(self, state):
-    #     self.__dict__ = state
-    #     self.mutex = threading.Lock()
+
+    def __setstate__(self, state):
+        self.__dict__ = state
+        if '_invalid_assets' not in state:
+            self._invalid_assets = set()
+        # self.mutex = threading.Lock()

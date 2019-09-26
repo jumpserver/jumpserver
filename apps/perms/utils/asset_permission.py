@@ -1,11 +1,8 @@
 # coding: utf-8
 
-import time
 import pickle
 from collections import defaultdict
 from functools import reduce
-from hashlib import md5
-import json
 
 from django.core.cache import cache
 from django.db.models import Q
@@ -94,6 +91,7 @@ class AssetPermissionUtilCacheMixin:
         user_tree = pickle.loads(data)
         return user_tree
 
+    @timeit
     def get_user_tree_from_cache_if_need(self):
         if not self.user_tree_cache_enable:
             return None
@@ -278,9 +276,9 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             )
             if not ancestors:
                 continue
-            parent_id = ancestors[0].identifier
-            user_tree.safe_add_ancestors(ancestors)
-            user_tree.move_node(child.identifier, parent_id)
+            user_tree.safe_add_ancestors(child, ancestors)
+            # parent_id = ancestors[0].identifier
+            # user_tree.move_node(child.identifier, parent_id)
 
     @staticmethod
     def add_empty_node_if_need(user_tree):
@@ -315,6 +313,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             self.set_user_tree_to_local(user_tree)
             return user_tree
         user_tree = TreeService()
+        user_tree._invalid_assets = self.full_tree._invalid_assets
         full_tree_root = self.full_tree.root_node()
         user_tree.create_node(
             tag=full_tree_root.tag,
