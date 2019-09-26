@@ -158,9 +158,10 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
 
     @timeit
     def filter_permissions(self, **filters):
-        filters_json = json.dumps(filters, sort_keys=True)
+        self.cache_policy = '0'
+        # filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
-        self._filter_id = md5(filters_json.encode()).hexdigest()
+        # self._filter_id = md5(filters_json.encode()).hexdigest()
 
     @lazyproperty
     def user_tree(self):

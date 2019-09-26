@@ -29,7 +29,7 @@ var showAssetHref = false; // Need input default true
 var actions = {
     targets: 4, createdCell: function (td, cellData) {
        var conn_btn = '<a href="{% url "luna-view" %}?login_to=' + cellData +
-           '" class="btn btn-xs btn-primary">{% trans "Connect" %}</a>';
+           '" class="btn btn-xs btn-primary" target="_blank">{% trans "Connect" %}</a>';
        $(td).html(conn_btn)
 }};
 $(document).ready(function () {
