@@ -66,6 +66,7 @@ urlpatterns = [
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
     path('api/health/', views.HealthCheckView.as_view(), name="health"),
     path('luna/', views.LunaView.as_view(), name='luna-view'),
+    re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),
 

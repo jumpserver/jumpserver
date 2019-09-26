@@ -20,50 +20,13 @@
 </div>
 
 <script>
-    var rowHeight = 18;
-    var colWidth = 10;
-    var mark = '';
-    var url = "{% url 'api-ops:celery-task-log' pk=task_id %}";
+    var scheme = document.location.protocol === "https:" ? "wss" : "ws";
+    var port = document.location.port ? ":" + document.location.port : "";
+    var url = "/ws/ops/tasks/" + "{{ task_id }}" + "/log/";
+    var wsURL = scheme + "://" + document.location.hostname + port + url;
     var term;
-    var end = false;
-    var error = false;
-    var interval = 200;
-    var success = true;
+    var ws;
 
-    function calWinSize() {
-        var t = $('#marker');
-        {#rowHeight = 1.00 * t.height();#}
-        {#colWidth = 1.00 * t.width() / 6;#}
-    }
-    function resize() {
-       {#var rows = Math.floor(window.innerHeight / rowHeight) - 1;#}
-       {#var cols = Math.floor(window.innerWidth / colWidth) - 2;#}
-       {#term.resize(cols, rows);#}
-    }
-    function requestAndWrite() {
-        if (!end && success) {
-            success = false;
-            $.ajax({
-                url: url + '?mark=' + mark,
-                method: "GET",
-                contentType: "application/json; charset=utf-8"
-            }).done(function(data, textStatue, jqXHR) {
-                success = true;
-                if (jqXHR.status === 203) {
-                    error = true;
-                    term.write('.');
-                    interval = 500;
-                }
-                if (jqXHR.status === 200){
-                    term.write(data.data);
-                    mark = data.mark;
-                    if (data.end){
-                        end = true
-                    }
-                }
-            })
-        }
-    }
     $(document).ready(function () {
         term = new Terminal({
             cursorBlink: false,
@@ -74,18 +37,14 @@
             disableStdin: true
         });
         term.open(document.getElementById('term'));
-        term.resize(90, 32);
-        resize();
-        term.on('data', function (data) {
-            {#term.write(data.replace('\r', '\r\n'))#}
-            term.write(data);
-        });
-        window.onresize = function () {
-            resize()
+        term.resize(120, 30);
+        ws = new WebSocket(wsURL);
+        ws.onmessage = function(e) {
+            var data = JSON.parse(e.data);
+            term.write(data.message);
         };
-        {#$('.terminal').detach().appendTo('#term');#}
-        setInterval(function () {
-            requestAndWrite()
-        }, interval)
+        ws.onerror = function (e) {
+            term.write("Connect websocket server error")
+        }
     });
 </script>
