@@ -186,7 +186,7 @@ class LDAPUtil:
         result = {'total': len(user_items), 'succeed': succeed, 'failed': failed}
         return result
 
-    def sync_users(self, username_list):
+    def sync_users(self, username_list=None):
         user_items = self.search_filter_user_items(username_list)
         result = self.create_or_update_users(user_items)
         return result

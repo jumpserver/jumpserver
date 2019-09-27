@@ -10,6 +10,8 @@ from .models import User
 from .utils import (
     send_password_expiration_reminder_mail, send_user_expiration_reminder_mail
 )
+from settings.utils import LDAPUtil
+from django.conf import settings
 
 
 logger = get_logger(__file__)
@@ -66,3 +68,26 @@ def check_user_expired_periodic():
     }
     create_or_update_celery_periodic_tasks(tasks)
 
+
+@shared_task
+def sync_ldap_user():
+    logger.info("Start sync ldap user periodic task")
+    util = LDAPUtil()
+    result = util.sync_users()
+    logger.info("Result: {}".format(result))
+
+
+@shared_task
+@after_app_ready_start
+def sync_ldap_user_periodic():
+    if not settings.AUTH_LDAP:
+        return
+    tasks = {
+        'sync_ldap_user_periodic': {
+            'task': sync_ldap_user.name,
+            'interval': None,
+            'crontab': '* * * * *',
+            'enabled': True,
+        }
+    }
+    create_or_update_celery_periodic_tasks(tasks)
