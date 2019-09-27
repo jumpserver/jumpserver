@@ -287,8 +287,7 @@ function refreshAssetHardware() {
 
 
 $(document).ready(function () {
-    var url = "{% url 'api-assets:node-list' %}";
-    nodesSelect2Init(".nodes-select2", url)
+    nodesSelect2Init(".nodes-select2")
     .on('select2:select', function(evt) {
         var data = evt.params.data;
         jumpserver.nodes_selected[data.id] = data.text;

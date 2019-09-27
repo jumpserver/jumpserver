@@ -204,8 +204,7 @@ $(document).ready(function () {
     $('.select2').select2();
     table = initAssetTable();
 
-    var nodeListUrl = "{% url 'api-assets:node-list' %}";
-    nodesSelect2Init(".nodes-select2", nodeListUrl);
+    nodesSelect2Init(".nodes-select2");
 
     $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
