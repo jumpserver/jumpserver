@@ -2,6 +2,7 @@
 #
 
 from celery import shared_task
+from django.conf import settings
 
 from ops.celery.utils import create_or_update_celery_periodic_tasks
 from ops.celery.decorator import after_app_ready_start
@@ -11,7 +12,6 @@ from .utils import (
     send_password_expiration_reminder_mail, send_user_expiration_reminder_mail
 )
 from settings.utils import LDAPUtil
-from django.conf import settings
 
 
 logger = get_logger(__file__)
