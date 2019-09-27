@@ -308,11 +308,11 @@ class UserBulkUpdateForm(OrgModelForm):
 
 class UserGroupForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.none(),
         label=_("User"),
         widget=forms.SelectMultiple(
             attrs={
-                'class': 'select2',
+                'class': 'users-select2',
                 'data-placeholder': _('Select users')
             }
         ),
@@ -329,8 +329,10 @@ class UserGroupForm(OrgModelForm):
         if 'initial' not in kwargs:
             return
         users_field = self.fields.get('users')
-        if hasattr(users_field, 'queryset'):
-            users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
+        if instance:
+            users_field.queryset = instance.users.all()
+        else:
+            users_field.queryset = User.objects.none()
 
     def save(self, commit=True):
         group = super().save(commit=commit)

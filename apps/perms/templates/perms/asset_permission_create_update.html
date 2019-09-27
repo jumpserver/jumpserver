@@ -116,8 +116,8 @@ $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
     });
-    var url = "{% url 'api-assets:node-list' %}";
-    nodesSelect2Init(".nodes-select2", url);
+    nodesSelect2Init(".nodes-select2");
+    usersSelect2Init(".users-select2");
 
     $('#date_start').daterangepicker(dateOptions);
     $('#date_expired').daterangepicker(dateOptions);
