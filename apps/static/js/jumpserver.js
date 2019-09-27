@@ -1177,6 +1177,9 @@ function readFile(ref) {
 }
 
 function nodesSelect2Init(selector, url) {
+    if (!url) {
+        url = '/api/v1/assets/nodes/'
+    }
     return $(selector).select2({
         closeOnSelect: false,
         ajax: {
@@ -1199,6 +1202,36 @@ function nodesSelect2Init(selector, url) {
             }
         },
     })
+}
+
+function usersSelect2Init(selector, url) {
+    if (!url) {
+        url = '/api/v1/users/users/'
+    }
+    return $(selector).select2({
+        closeOnSelect: false,
+        ajax: {
+            url: url,
+            data: function (params) {
+                var page = params.page || 1;
+                var query = {
+                    search: params.term,
+                    offset: (page - 1) * 10,
+                    limit: 10
+                };
+                return query
+            },
+            processResults: function (data) {
+                var results = $.map(data.results, function (v, i) {
+                    var display = v.name + '(' + v.username +')';
+                    return {id: v.id, text: display}
+                });
+                var more = !!data.next;
+                return {results: results, pagination: {"more": more}}
+            }
+        },
+    })
+
 }
 
 function showCeleryTaskLog(taskId) {

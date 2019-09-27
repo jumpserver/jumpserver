@@ -11,8 +11,17 @@ def get_org_from_request(request):
     oid = request.session.get("oid")
     if not oid:
         oid = request.META.get("HTTP_X_JMS_ORG")
+
+    request_params_oid = request.GET.get("oid")
+    if request_params_oid:
+        oid = request.GET.get("oid")
+
     if not oid:
         oid = Organization.DEFAULT_ID
+    if oid.lower() == "default":
+        oid = Organization.DEFAULT_ID
+    elif oid.lower() == "root":
+        oid = Organization.ROOT_ID
     org = Organization.get_instance(oid)
     return org
 
