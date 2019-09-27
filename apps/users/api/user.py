@@ -12,7 +12,7 @@ from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import (
     IsOrgAdmin, IsCurrentUserOrReadOnly, IsOrgAdminOrAppUser,
-    CanUpdateDeleteUser,
+    CanUpdateDeleteUser, IsSuperUser
 )
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
@@ -52,12 +52,15 @@ class UserViewSet(CommonApiMixin, BulkModelViewSet):
         self.send_created_signal(users)
 
     def get_queryset(self):
-        queryset = current_org.get_org_members().prefetch_related('groups')
+        queryset = current_org.get_org_members()\
+            .prefetch_related('groups')
         return queryset
 
     def get_permissions(self):
         if self.action in ["retrieve", "list"]:
             self.permission_classes = (IsOrgAdminOrAppUser,)
+        if self.request.query_params.get('all'):
+            self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
 
     def perform_bulk_destroy(self, objects):

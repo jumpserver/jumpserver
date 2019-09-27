@@ -38,20 +38,21 @@ class AssetPermissionForm(OrgModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        users_field = self.fields.get('users')
-        users_field.queryset = current_org.get_org_members(exclude=('Auditor',))
 
         if self.data:
             return
         # 前端渲染优化, 防止过多资产
+        users_field = self.fields.get('users')
         assets_field = self.fields['assets']
         nodes_field = self.fields['nodes']
         if self.instance:
             assets_field.queryset = self.instance.assets.all()
             nodes_field.queryset = self.instance.nodes.all()
+            users_field.queryset = self.instance.users.all()
         else:
             assets_field.queryset = Asset.objects.none()
             nodes_field.queryset = Node.objects.none()
+            users_field.queryset = []
 
     def set_nodes_initial(self, nodes):
         field = self.fields['nodes']
@@ -70,7 +71,7 @@ class AssetPermissionForm(OrgModelForm):
         )
         widgets = {
             'users': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _("User")}
+                attrs={'class': 'users-select2', 'data-placeholder': _("User")}
             ),
             'user_groups': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _("User group")}

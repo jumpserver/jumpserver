@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -75,7 +76,10 @@ class Organization(models.Model):
         from users.models import User
         if self.is_real():
             return self.users.all()
-        return User.objects.filter(role=User.ROLE_USER)
+        users = User.objects.filter(role=User.ROLE_USER)
+        if self.is_default() and not settings.DEFAULT_ORG_SHOW_ALL_USERS:
+            users = users.filter(related_user_orgs__isnull=True)
+        return users
 
     def get_org_admins(self):
         from users.models import User
@@ -130,7 +134,7 @@ class Organization(models.Model):
         return admin_orgs
 
     @classmethod
-    def get_user_user_orgs(self, user):
+    def get_user_user_orgs(cls, user):
         user_orgs = []
         if user.is_anonymous:
             return user_orgs

@@ -47,6 +47,7 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 TMP_DIR = os.path.join(BASE_DIR, 'tmp')
 HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
 HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
+WS_PORT = CONFIG.WS_LISTEN_PORT or 8082
 DEBUG = CONFIG.DEBUG or False
 LOG_LEVEL = CONFIG.LOG_LEVEL or 'INFO'
 
@@ -201,12 +202,15 @@ def is_running(s, unlink=True):
 
 def parse_service(s):
     all_services = [
-        'gunicorn', 'celery_ansible', 'celery_default', 'beat', 'flower'
+        'gunicorn', 'celery_ansible', 'celery_default',
+        'beat', 'flower', 'daphne',
     ]
     if s == 'all':
         return all_services
     elif s == "web":
-        return ['gunicorn', 'flower']
+        return ['gunicorn', 'flower', 'daphne']
+    elif s == 'ws':
+        return ['daphne']
     elif s == "task":
         return ["celery_ansible", "celery_default", "beat"]
     elif s == 'gunicorn':
@@ -225,10 +229,8 @@ def parse_service(s):
 def get_start_gunicorn_kwargs():
     print("\n- Start Gunicorn WSGI HTTP Server")
     prepare()
-    service = 'gunicorn'
     bind = '{}:{}'.format(HTTP_HOST, HTTP_PORT)
     log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
-    pid_file = get_pid_file_path(service)
 
     cmd = [
         'gunicorn', 'jumpserver.wsgi',
@@ -238,12 +240,21 @@ def get_start_gunicorn_kwargs():
         '-w', str(WORKERS),
         '--max-requests', '4096',
         '--access-logformat', log_format,
-        '-p', pid_file,
         '--access-logfile', '-'
     ]
 
     if DEBUG:
         cmd.append('--reload')
+    return {'cmd': cmd, 'cwd': APPS_DIR}
+
+
+def get_start_daphne_kwargs():
+    print("\n- Start Daphne ASGI WS Server")
+    cmd = [
+        'daphne', 'jumpserver.asgi:application',
+        '-b', HTTP_HOST,
+        '-p', str(WS_PORT),
+    ]
     return {'cmd': cmd, 'cwd': APPS_DIR}
 
 
@@ -362,6 +373,7 @@ def start_service(s):
         "celery_default": get_start_celery_default_kwargs,
         "beat": get_start_beat_kwargs,
         "flower": get_start_flower_kwargs,
+        "daphne": get_start_daphne_kwargs,
     }
 
     kwargs = services_kwargs.get(s)()

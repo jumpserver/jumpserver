@@ -276,8 +276,7 @@ function refreshAssetHardware() {
     var success = function(data) {
         console.log(data);
         var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
+        showCeleryTaskLog(task_id);
     };
     requestApi({
         url: the_url,
@@ -288,8 +287,7 @@ function refreshAssetHardware() {
 
 
 $(document).ready(function () {
-    var url = "{% url 'api-assets:node-list' %}";
-    nodesSelect2Init(".nodes-select2", url)
+    nodesSelect2Init(".nodes-select2")
     .on('select2:select', function(evt) {
         var data = evt.params.data;
         jumpserver.nodes_selected[data.id] = data.text;
@@ -355,8 +353,7 @@ $(document).ready(function () {
 
     var success = function(data) {
         var task_id = data.task;
-        var url = '{% url "ops:celery-task-log" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", task_id);
-        window.open(url, '', 'width=800,height=600')
+        showCeleryTaskLog(task_id);
     };
 
     requestApi({

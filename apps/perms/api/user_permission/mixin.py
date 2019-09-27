@@ -33,7 +33,7 @@ class UserNodeTreeMixin:
         _queryset = []
 
         for node in nodes:
-            assets_amount = self.tree.assets_amount(node.key)
+            assets_amount = self.tree.valid_assets_amount(node.key)
             if assets_amount == 0 and node.key != Node.empty_key:
                 continue
             node.assets_amount = assets_amount

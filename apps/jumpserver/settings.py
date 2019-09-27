@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
+    'channels',
     'django_filters',
     'bootstrap3',
     'captcha',
@@ -140,7 +141,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'jumpserver.wsgi.applications'
+WSGI_APPLICATION = 'jumpserver.wsgi.application'
+ASGI_APPLICATION = 'jumpserver.routing.application'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('authentication:login')
@@ -422,6 +424,7 @@ OTP_VALID_WINDOW = CONFIG.OTP_VALID_WINDOW
 
 # Auth LDAP settings
 AUTH_LDAP = False
+AUTH_LDAP_SEARCH_PAGED_SIZE = CONFIG.AUTH_LDAP_SEARCH_PAGED_SIZE
 AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
 AUTH_LDAP_BIND_DN = 'cn=admin,dc=jumpserver,dc=org'
 AUTH_LDAP_BIND_PASSWORD = ''
@@ -621,6 +624,24 @@ ASSETS_PERM_CACHE_TIME = CONFIG.ASSETS_PERM_CACHE_TIME
 # Asset user auth external backend, default AuthBook backend
 BACKEND_ASSET_USER_AUTH_VAULT = False
 
+DEFAULT_ORG_SHOW_ALL_USERS = CONFIG.DEFAULT_ORG_SHOW_ALL_USERS
+
 PERM_SINGLE_ASSET_TO_UNGROUP_NODE = CONFIG.PERM_SINGLE_ASSET_TO_UNGROUP_NODE
 WINDOWS_SSH_DEFAULT_SHELL = CONFIG.WINDOWS_SSH_DEFAULT_SHELL
 FLOWER_URL = CONFIG.FLOWER_URL
+
+
+# Django channels support websocket
+CHANNEL_REDIS = "redis://:{}@{}:{}/{}".format(
+    CONFIG.REDIS_PASSWORD, CONFIG.REDIS_HOST, CONFIG.REDIS_PORT,
+    CONFIG.REDIS_DB_WS,
+)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [CHANNEL_REDIS],
+        },
+    },
+}
