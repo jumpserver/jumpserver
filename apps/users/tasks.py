@@ -82,11 +82,21 @@ def sync_ldap_user():
 def sync_ldap_user_periodic():
     if not settings.AUTH_LDAP:
         return
+    if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
+        return
+
+    interval = settings.AUTH_LDAP_SYNC_INTERVAL
+    if isinstance(interval, int):
+        interval = interval * 3600
+    else:
+        interval = None
+    crontab = settings.AUTH_LDAP_SYNC_CRONTAB
+
     tasks = {
         'sync_ldap_user_periodic': {
             'task': sync_ldap_user.name,
-            'interval': None,
-            'crontab': '* * * * *',
+            'interval': interval,
+            'crontab': crontab,
             'enabled': True,
         }
     }
