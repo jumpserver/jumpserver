@@ -170,7 +170,7 @@ class LDAPUtil:
         email = construct_user_email(username, email)
         return email
 
-    def create_or_update_users(self, user_items, force_update=True):
+    def create_or_update_users(self, user_items):
         succeed = failed = 0
         for user_item in user_items:
             exist = user_item.pop('existing', False)
@@ -180,13 +180,14 @@ class LDAPUtil:
             else:
                 ok, error = self.update_user(user_item)
             if not ok:
+                logger.info("Failed User: {}".format(user_item))
                 failed += 1
             else:
                 succeed += 1
         result = {'total': len(user_items), 'succeed': succeed, 'failed': failed}
         return result
 
-    def sync_users(self, username_list):
+    def sync_users(self, username_list=None):
         user_items = self.search_filter_user_items(username_list)
         result = self.create_or_update_users(user_items)
         return result

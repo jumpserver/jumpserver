@@ -72,6 +72,13 @@ REDIS_PORT: 6379
 # RADIUS_PORT: 1812
 # RADIUS_SECRET: 
 
+# LDAP/AD 设置定时同步参数
+# 启用/禁用
+# AUTH_LDAP_SYNC_IS_PERIODIC: True
+# 单位: 时
+# AUTH_LDAP_SYNC_INTERVAL: 12
+# Crontab 表达式
+# AUTH_LDAP_SYNC_CRONTAB: * 6 * * *
 
 # OTP settings
 # OTP/MFA 配置
