@@ -100,7 +100,7 @@ def collect_static():
     os.chdir(os.path.join(BASE_DIR, 'apps'))
     command = 'python3 manage.py collectstatic --no-input -c &> /dev/null '
     subprocess.call(command, shell=True)
-    logging.info("Collect static file done")
+    logging.info("Collect static files done")
 
 
 def prepare():
@@ -292,11 +292,12 @@ def watch_services():
                 p.wait(timeout=1)
             except subprocess.TimeoutExpired:
                 pass
-            if p.returncode is not None:
+            ok = is_running(s)
+            if not ok:
                 stopped_services[s] = ''
-                print("stopped")
+                print("stopped with code: {}({})".format(p.returncode, p.pid))
             else:
-                print("running")
+                print("running at {}".format(p.pid))
                 stopped_services.pop(s, None)
                 services_retry.pop(s, None)
 
@@ -320,7 +321,10 @@ def watch_services():
         if tm != '23:59':
             return
         suffix = now.strftime('%Y-%m-%d')
-        for s in processes:
+        services = list(processes.keys())
+        services.append('jms')
+
+        for s in services:
             log_path = get_log_file_path(s)
             log_dir = os.path.dirname(log_path)
             filename = os.path.basename(log_path)
