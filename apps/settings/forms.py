@@ -89,6 +89,10 @@ class EmailSettingForm(BaseForm):
             "Tips: Send mail account, default SMTP account as the send account"
         )
     )
+    EMAIL_RECIPIENT = forms.CharField(
+        max_length=128, label=_("Test recipient"), initial='', required=False,
+        help_text=_("Tips: Used only as a test mail recipient")
+    )
     EMAIL_USE_SSL = forms.BooleanField(
         label=_("Use SSL"), initial=False, required=False,
         help_text=_("If SMTP port is 465, may be select")
