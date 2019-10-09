@@ -22,6 +22,9 @@ class LDAPOUGroupException(Exception):
 class LDAPUtil:
     _conn = None
 
+    SEARCH_FIELD_ALL = 'all'
+    SEARCH_FIELD_USERNAME = 'username'
+
     def __init__(self, use_settings_config=True, server_uri=None, bind_dn=None,
                  password=None, use_ssl=None, search_ougroup=None,
                  search_filter=None, attr_map=None, auth_ldap=None):
@@ -84,7 +87,8 @@ class LDAPUtil:
     def _search_user_items_ou(self, search_ou, extra_filter=None, cookie=None):
         search_filter = self.search_filter % {"user": "*"}
         if extra_filter:
-            search_filter = '(&({})({}))'.format(search_filter, extra_filter)
+            search_filter = '(&{}{})'.format(search_filter, extra_filter)
+
         ok = self.connection.search(
             search_ou, search_filter,
             attributes=list(self.attr_map.values()),
@@ -111,14 +115,10 @@ class LDAPUtil:
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
         return cookie
 
-    def search_user_items(self, q=None):
+    def search_user_items(self, extra_filter=None):
         user_items = []
         logger.info("Search user items")
-        extra_filter = ''
-        if q:
-            for attr in self.attr_map.values():
-                extra_filter += '({}={})'.format(attr, q)
-            extra_filter = '(|{})'.format(extra_filter)
+
         for search_ou in str(self.search_ougroup).split("|"):
             logger.info("Search user search ou: {}".format(search_ou))
             _user_items = self._search_user_items_ou(search_ou, extra_filter=extra_filter)
@@ -130,10 +130,28 @@ class LDAPUtil:
         logger.info("Search user items end")
         return user_items
 
+    def construct_extra_filter(self, field, q):
+        if not q:
+            return None
+        extra_filter = ''
+        if field == self.SEARCH_FIELD_ALL:
+            for attr in self.attr_map.values():
+                extra_filter += '({}={})'.format(attr, q)
+            extra_filter = '(|{})'.format(extra_filter)
+            return extra_filter
+
+        if field == self.SEARCH_FIELD_USERNAME and isinstance(q, list):
+            attr = self.attr_map.get('username')
+            for username in q:
+                extra_filter += '({}={})'.format(attr, username)
+            extra_filter = '(|{})'.format(extra_filter)
+            return extra_filter
+
     def search_filter_user_items(self, username_list):
-        user_items = self.search_user_items()
-        if username_list:
-            user_items = [u for u in user_items if u['username'] in username_list]
+        extra_filter = self.construct_extra_filter(
+            self.SEARCH_FIELD_USERNAME, username_list
+        )
+        user_items = self.search_user_items(extra_filter)
         return user_items
 
     @staticmethod

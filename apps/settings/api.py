@@ -101,10 +101,11 @@ class LDAPUserListApi(generics.ListAPIView):
     def get_queryset(self):
         if hasattr(self, 'swagger_fake_view'):
             return []
-        util = LDAPUtil()
-
+        q = self.request.query_params.get('search')
         try:
-            users = util.search_user_items()
+            util = LDAPUtil()
+            extra_filter = util.construct_extra_filter(util.SEARCH_FIELD_ALL, q)
+            users = util.search_user_items(extra_filter)
         except Exception as e:
             users = []
             logger.error(e)
