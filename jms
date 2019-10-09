@@ -415,6 +415,10 @@ def get_daemon_context():
     files_preserve.append(daemon_log_f)
     context = daemon.DaemonContext(
         pidfile=pidfile.TimeoutPIDLockFile(daemon_pid_file),
+        signal_map={
+            signal.SIGTERM: lambda x, y: clean_up(),
+            signal.SIGHUP: 'terminate',
+        },
         stdout=daemon_log_f,
         stderr=daemon_log_f,
         files_preserve=files_preserve,

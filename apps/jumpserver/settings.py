@@ -650,3 +650,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Enable internal period task
+PERIOD_TASK_ENABLED = CONFIG.PERIOD_TASK_ENABLED
