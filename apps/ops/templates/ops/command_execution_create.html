@@ -140,6 +140,7 @@
         }
 
         function initTree() {
+            $('#assetTree').html("{% trans 'Loading' %}" + '..');
             if (systemUserId) {
                 url = treeUrl + '&system_user=' + systemUserId
             } else {
