@@ -54,8 +54,12 @@
                                         {% for command in object_list %}
                                             <tr>
                                                 <td>{{ forloop.counter }}</td>
-                                                <td>{{ command.input }}</td>
-                                                <td><pre style="border: none;background: none">{{ command.output }}</pre></td>
+                                                <td>{{ command.input | truncatechars:40 }}</td>
+                                                <td><pre style="border: none;background: none">
+$ {{ command.input }}
+
+{{ command.output }}
+                                                </pre></td>
                                                 <td>{{ command.timestamp|ts_to_date}}</td>
                                             </tr>
                                         {% empty %}
