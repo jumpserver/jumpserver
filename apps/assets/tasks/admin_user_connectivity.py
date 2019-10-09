@@ -42,7 +42,7 @@ def test_admin_user_connectivity_period():
     """
     A period task that update the ansible task period
     """
-    if const.PERIOD_TASK_ENABLED:
+    if not const.PERIOD_TASK_ENABLED:
         logger.debug('Period task off, skip')
         return
     key = '_JMS_TEST_ADMIN_USER_CONNECTIVITY_PERIOD'
