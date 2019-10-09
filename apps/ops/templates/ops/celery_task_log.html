@@ -24,6 +24,8 @@
     var port = document.location.port ? ":" + document.location.port : "";
     var url = "/ws/ops/tasks/" + "{{ task_id }}" + "/log/";
     var wsURL = scheme + "://" + document.location.hostname + port + url;
+    var failOverPort = "{{ ws_port }}";
+    var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
     var term;
     var ws;
 
@@ -38,13 +40,21 @@
         });
         term.open(document.getElementById('term'));
         term.resize(120, 30);
+
         ws = new WebSocket(wsURL);
         ws.onmessage = function(e) {
             var data = JSON.parse(e.data);
             term.write(data.message);
         };
         ws.onerror = function (e) {
-            term.write("Connect websocket server error")
+            ws = new WebSocket(failOverWsURL);
+            ws.onmessage = function(e) {
+                var data = JSON.parse(e.data);
+                term.write(data.message);
+            };
+            ws.onerror = function (e) {
+                term.write("Connect websocket server error")
+            }
         }
     });
 </script>

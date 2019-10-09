@@ -25,10 +25,12 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         read_only_fields = ['key', 'org_id']
 
     def validate_value(self, data):
-        if not self.instance and not data:
-            return data
-        instance = self.instance
-        siblings = instance.get_siblings()
+        if self.instance:
+            instance = self.instance
+            siblings = instance.get_siblings()
+        else:
+            instance = Node.org_root()
+            siblings = instance.get_children()
         if siblings.filter(value=data):
             raise serializers.ValidationError(
                 _('The same level node name cannot be the same')

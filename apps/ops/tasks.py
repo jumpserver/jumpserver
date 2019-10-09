@@ -114,8 +114,6 @@ def hello(name, callback=None):
 # @after_app_shutdown_clean_periodic
 # @register_as_period_task(interval=30)
 def hello123():
-    p = subprocess.Popen('ls /tmp', shell=True)
-    print("{} Hello world".format(datetime.datetime.now().strftime("%H:%M:%S")))
     return None
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.views.generic import TemplateView
+from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
 
@@ -14,5 +15,8 @@ class CeleryTaskLogView(PermissionsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({'task_id': self.kwargs.get('pk')})
+        context.update({
+            'task_id': self.kwargs.get('pk'),
+            'ws_port': settings.CONFIG.WS_LISTEN_PORT
+        })
         return context
