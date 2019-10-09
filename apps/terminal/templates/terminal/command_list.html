@@ -164,11 +164,14 @@ $(document).ready(function () {
             detailRows.push(tr.attr('id'));
         }
     }
-})
+});
 
 
 function format(d) {
     var output = $("<pre style='border: none; background: none'></pre>");
+
+    output.append('$ ', d.input);
+    output.append('\r\n\r\n');
     output.append(d.output);
     return output
 }
@@ -187,6 +190,17 @@ function initTable() {
                 $(td).addClass("toggle");
                 $(td).html("<i class='fa fa-angle-right'></i>");
             }},
+            {targets: 1, createdCell: function (td, cellData) {
+                var data = htmlEscape(cellData);
+                var interHtml = $("<span></span>");
+                if (data.length > 40) {
+                    interHtml.attr('title', data);
+                    data = data.slice(0, 40);
+                    data += ' ...';
+                }
+                interHtml.html(data);
+                $(td).html(interHtml);
+            }},
             {targets: 5, createdCell: function (td, cellData) {
                 var data = '<a href="{% url "terminal:session-detail" pk=DEFAULT_PK %}">{% trans "Goto" %}</a>'
                         .replace('{{ DEFAULT_PK }}', cellData);
@@ -200,7 +214,7 @@ function initTable() {
         toggle: true,
         ajax_url: commandListUrl,
         columns: [
-            {data: "id"}, {data: "input", orderable: false}, {data: "user", orderable: false},
+            {data: "id"}, {data: "input", orderable: false, width: "40%"}, {data: "user", orderable: false},
             {data: "asset", orderable: false}, {data: "system_user", orderable: false},
             {data: "session", orderable: false}, {data: "timestamp", width: "160px", orderable: false},
         ],

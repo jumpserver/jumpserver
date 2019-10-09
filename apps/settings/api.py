@@ -102,6 +102,7 @@ class LDAPUserListApi(generics.ListAPIView):
         if hasattr(self, 'swagger_fake_view'):
             return []
         util = LDAPUtil()
+
         try:
             users = util.search_user_items()
         except Exception as e:
@@ -111,20 +112,6 @@ class LDAPUserListApi(generics.ListAPIView):
         for user in users:
             user['id'] = user['username']
         return users
-
-    def filter_queryset(self, queryset):
-        search = self.request.query_params.get('search')
-        if not search:
-            return queryset
-        search = search.lower()
-        queryset = [
-            q for q in queryset
-            if
-            search in q['username'].lower()
-            or search in q['name'].lower()
-            or search in q['email'].lower()
-        ]
-        return queryset
 
     def sort_queryset(self, queryset):
         order_by = self.request.query_params.get('order')
@@ -139,7 +126,7 @@ class LDAPUserListApi(generics.ListAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
         queryset = self.sort_queryset(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:

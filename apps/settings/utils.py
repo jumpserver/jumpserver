@@ -81,9 +81,12 @@ class LDAPUtil:
             user_item[attr] = value
         return user_item
 
-    def _search_user_items_ou(self, search_ou, cookie=None):
+    def _search_user_items_ou(self, search_ou, extra_filter=None, cookie=None):
+        search_filter = self.search_filter % {"user": "*"}
+        if extra_filter:
+            search_filter = '(&({})({}))'.format(search_filter, extra_filter)
         ok = self.connection.search(
-            search_ou, self.search_filter % ({"user": "*"}),
+            search_ou, search_filter,
             attributes=list(self.attr_map.values()),
             paged_size=self.paged_size, paged_cookie=cookie
         )
@@ -108,16 +111,21 @@ class LDAPUtil:
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
         return cookie
 
-    def search_user_items(self):
+    def search_user_items(self, q=None):
         user_items = []
         logger.info("Search user items")
+        extra_filter = ''
+        if q:
+            for attr in self.attr_map.values():
+                extra_filter += '({}={})'.format(attr, q)
+            extra_filter = '(|{})'.format(extra_filter)
         for search_ou in str(self.search_ougroup).split("|"):
             logger.info("Search user search ou: {}".format(search_ou))
-            _user_items = self._search_user_items_ou(search_ou)
+            _user_items = self._search_user_items_ou(search_ou, extra_filter=extra_filter)
             user_items.extend(_user_items)
             while self._cookie():
                 logger.info("Page Search user search ou: {}".format(search_ou))
-                _user_items = self._search_user_items_ou(search_ou, self._cookie())
+                _user_items = self._search_user_items_ou(search_ou, extra_filter, self._cookie())
                 user_items.extend(_user_items)
         logger.info("Search user items end")
         return user_items
