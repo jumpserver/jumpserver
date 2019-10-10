@@ -22,7 +22,8 @@
 <script>
     var scheme = document.location.protocol === "https:" ? "wss" : "ws";
     var port = document.location.port ? ":" + document.location.port : "";
-    var url = "/ws/ops/tasks/" + "{{ task_id }}" + "/log/";
+    var taskId = "{{ task_id }}";
+    var url = "/ws/ops/tasks/log/";
     var wsURL = scheme + "://" + document.location.hostname + port + url;
     var failOverPort = "{{ ws_port }}";
     var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
@@ -45,6 +46,10 @@
         ws.onmessage = function(e) {
             var data = JSON.parse(e.data);
             term.write(data.message);
+        };
+        ws.onopen = function() {
+            var msg = {"task": taskId};
+            ws.send(JSON.stringify(msg))
         };
         ws.onerror = function (e) {
             ws = new WebSocket(failOverWsURL);
