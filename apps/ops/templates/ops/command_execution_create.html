@@ -237,6 +237,7 @@
         }
 
         var term = null;
+        var ws = null;
 
         function initResultTerminal() {
             term = new Terminal({
@@ -254,7 +255,29 @@
             term.open(document.getElementById('term'));
             var msg = "{% trans 'Select the left asset, select the running system user, execute command in batch' %}" + "\r\n";
             fit(term);
-            term.write(msg)
+            term.write(msg);
+
+            var scheme = document.location.protocol === "https:" ? "wss" : "ws";
+            var port = document.location.port ? ":" + document.location.port : "";
+            var url = "/ws/ops/tasks/log/";
+            var wsURL = scheme + "://" + document.location.hostname + port + url;
+            var failOverPort = "{{ ws_port }}";
+            var failOverWsURL = scheme + "://" + document.location.hostname + ':' + failOverPort + url;
+            ws = new WebSocket(wsURL);
+            ws.onerror = function (e) {
+                ws = new WebSocket(failOverWsURL);
+                ws.onmessage = function(e) {
+                    var data = JSON.parse(e.data);
+                    term.write(data.message);
+                };
+                ws.onerror = function (e) {
+                    term.write("Connect websocket server error")
+                }
+            };
+            ws.onmessage = function(e) {
+                var data = JSON.parse(e.data);
+                term.write(data.message);
+            };
         }
 
         function wrapperError(msg) {
@@ -289,35 +312,12 @@
                 run_as: run_as,
                 command: command
             };
-            var mark = '';
-            var log_url = null;
-            var end = false;
-            var error = false;
-            var int = null;
-            var interval = 200;
 
-            function writeExecutionOutput() {
-                if (!end) {
-                    $.ajax({
-                        url: log_url + '?mark=' + mark,
-                        method: "GET",
-                        contentType: "application/json; charset=utf-8"
-                    }).done(function (data, textStatue, jqXHR) {
-                        if (jqXHR.status === 203) {
-                            error = true;
-                            term.write('.');
-                            interval = 500;
-                        }
-                        if (jqXHR.status === 200) {
-                            term.write(data.data);
-                            mark = data.mark;
-                            if (data.end) {
-                                end = true;
-                                window.clearInterval(int)
-                            }
-                        }
-                    })
-                }
+            function writeExecutionOutput(taskId) {
+                var msg = "{% trans 'Pending' %} ";
+                term.write(msg);
+                msg = JSON.stringify({task: taskId});
+                ws.send(msg);
             }
 
             requestApi({
@@ -326,12 +326,8 @@
                 method: 'POST',
                 flash_message: false,
                 success: function (resp) {
-                    var msg = "{% trans 'Pending' %}";
-                    term.write(msg + "...\r\n");
-                    log_url = resp.log_url;
-                    int = setInterval(function () {
-                        writeExecutionOutput()
-                    }, interval);
+                    {#log_url = resp.log_url;#}
+                    writeExecutionOutput(resp.id)
                 }
             });
             return false;
@@ -340,6 +336,8 @@
         var editor;
         $(document).ready(function () {
             systemUserId = $('#system-users-select').val();
+
+
             $(".select2").select2({
                 dropdownAutoWidth: true,
             }).on('select2:select', function (evt) {

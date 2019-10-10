@@ -79,7 +79,8 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
             'app': _('Ops'),
             'action': _('Command execution'),
             'form': self.get_form(),
-            'system_users': system_users
+            'system_users': system_users,
+            'ws_port': settings.CONFIG.WS_LISTEN_PORT
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
