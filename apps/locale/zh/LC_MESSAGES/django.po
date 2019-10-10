@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-08 17:09+0800\n"
+"POT-Creation-Date: 2019-10-10 16:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -114,7 +114,7 @@ msgstr "资产"
 #: applications/templates/applications/user_remote_app_list.html:16
 #: assets/forms/asset.py:24 assets/forms/domain.py:73 assets/forms/user.py:74
 #: assets/forms/user.py:94 assets/models/base.py:28 assets/models/cluster.py:18
-#: assets/models/cmd_filter.py:20 assets/models/domain.py:20
+#: assets/models/cmd_filter.py:21 assets/models/domain.py:20
 #: assets/models/group.py:20 assets/models/label.py:18
 #: assets/templates/assets/admin_user_detail.html:56
 #: assets/templates/assets/admin_user_list.html:44
@@ -186,8 +186,8 @@ msgstr "参数"
 #: applications/models/remote_app.py:39
 #: applications/templates/applications/remote_app_detail.html:73
 #: assets/models/asset.py:174 assets/models/base.py:36
-#: assets/models/cluster.py:28 assets/models/cmd_filter.py:25
-#: assets/models/cmd_filter.py:58 assets/models/group.py:21
+#: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
+#: assets/models/cmd_filter.py:59 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:124
 #: assets/templates/assets/cmd_filter_detail.html:77
@@ -238,8 +238,8 @@ msgstr "创建日期"
 #: applications/templates/applications/remote_app_list.html:23
 #: applications/templates/applications/user_remote_app_list.html:19
 #: assets/models/asset.py:176 assets/models/base.py:33
-#: assets/models/cluster.py:29 assets/models/cmd_filter.py:22
-#: assets/models/cmd_filter.py:55 assets/models/domain.py:21
+#: assets/models/cluster.py:29 assets/models/cmd_filter.py:23
+#: assets/models/cmd_filter.py:56 assets/models/domain.py:21
 #: assets/models/domain.py:53 assets/models/group.py:23
 #: assets/models/label.py:23 assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:50
@@ -498,7 +498,7 @@ msgstr "创建远程应用"
 
 #: applications/templates/applications/remote_app_list.html:24
 #: applications/templates/applications/user_remote_app_list.html:20
-#: assets/models/cmd_filter.py:54
+#: assets/models/cmd_filter.py:55
 #: assets/templates/assets/_asset_user_list.html:25
 #: assets/templates/assets/admin_user_list.html:51
 #: assets/templates/assets/asset_list.html:100
@@ -568,11 +568,15 @@ msgstr "我的远程应用"
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:266
+#: assets/api/node.py:65
+msgid "Deletion failed and the node contains children or assets"
+msgstr "删除失败，节点包含子节点或资产"
+
+#: assets/api/node.py:276
 msgid "Update node asset hardware information: {}"
 msgstr "更新节点资产硬件信息: {}"
 
-#: assets/api/node.py:280
+#: assets/api/node.py:290
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
@@ -745,7 +749,7 @@ msgstr "不合法的密钥，仅支持RSA/DSA格式的密钥"
 msgid "Password and private key file must be input one"
 msgstr "密码和私钥, 必须输入一个"
 
-#: assets/forms/user.py:97 assets/models/cmd_filter.py:31
+#: assets/forms/user.py:97 assets/models/cmd_filter.py:32
 #: assets/models/user.py:118 assets/templates/assets/_system_user.html:66
 #: assets/templates/assets/system_user_detail.html:165
 msgid "Command filter"
@@ -828,7 +832,7 @@ msgid "Platform"
 msgstr "系统平台"
 
 #: assets/models/asset.py:146 assets/models/authbook.py:27
-#: assets/models/cmd_filter.py:21 assets/models/domain.py:54
+#: assets/models/cmd_filter.py:22 assets/models/domain.py:54
 #: assets/models/label.py:22 assets/templates/assets/asset_detail.html:112
 msgid "Is active"
 msgstr "激活"
@@ -994,11 +998,11 @@ msgstr "北京电信"
 msgid "BGP full netcom"
 msgstr "BGP全网通"
 
-#: assets/models/cmd_filter.py:38
+#: assets/models/cmd_filter.py:39
 msgid "Regex"
 msgstr "正则表达式"
 
-#: assets/models/cmd_filter.py:39 ops/models/command.py:21
+#: assets/models/cmd_filter.py:40 ops/models/command.py:21
 #: ops/templates/ops/command_execution_list.html:64 terminal/models.py:163
 #: terminal/templates/terminal/command_list.html:28
 #: terminal/templates/terminal/command_list.html:68
@@ -1007,19 +1011,19 @@ msgstr "正则表达式"
 msgid "Command"
 msgstr "命令"
 
-#: assets/models/cmd_filter.py:44
+#: assets/models/cmd_filter.py:45
 msgid "Deny"
 msgstr "拒绝"
 
-#: assets/models/cmd_filter.py:45
+#: assets/models/cmd_filter.py:46
 msgid "Allow"
 msgstr "允许"
 
-#: assets/models/cmd_filter.py:49
+#: assets/models/cmd_filter.py:50
 msgid "Filter"
 msgstr "过滤器"
 
-#: assets/models/cmd_filter.py:50
+#: assets/models/cmd_filter.py:51
 #: assets/templates/assets/cmd_filter_rule_list.html:58
 #: audits/templates/audits/login_log_list.html:58
 #: perms/templates/perms/remote_app_permission_remote_app.html:54
@@ -1030,26 +1034,26 @@ msgstr "过滤器"
 msgid "Type"
 msgstr "类型"
 
-#: assets/models/cmd_filter.py:51 assets/models/user.py:112
+#: assets/models/cmd_filter.py:52 assets/models/user.py:112
 #: assets/templates/assets/cmd_filter_rule_list.html:60
 msgid "Priority"
 msgstr "优先级"
 
-#: assets/models/cmd_filter.py:51
+#: assets/models/cmd_filter.py:52
 msgid "1-100, the higher will be match first"
 msgstr "优先级可选范围为1-100，1最低优先级，100最高优先级"
 
-#: assets/models/cmd_filter.py:53
+#: assets/models/cmd_filter.py:54
 #: assets/templates/assets/cmd_filter_rule_list.html:59
 #: xpack/plugins/license/models.py:29
 msgid "Content"
 msgstr "内容"
 
-#: assets/models/cmd_filter.py:53
+#: assets/models/cmd_filter.py:54
 msgid "One line one command"
 msgstr "每行一个命令"
 
-#: assets/models/cmd_filter.py:64
+#: assets/models/cmd_filter.py:63
 msgid "Command filter rule"
 msgstr "命令过滤规则"
 
@@ -1208,16 +1212,16 @@ msgstr "系统用户"
 msgid "%(value)s is not an even number"
 msgstr "%(value)s is not an even number"
 
-#: assets/models/utils.py:43 assets/tasks/const.py:81
+#: assets/models/utils.py:43 assets/tasks/const.py:84
 msgid "Unreachable"
 msgstr "不可达"
 
-#: assets/models/utils.py:44 assets/tasks/const.py:82
+#: assets/models/utils.py:44 assets/tasks/const.py:85
 #: assets/templates/assets/asset_list.html:99
 msgid "Reachable"
 msgstr "可连接"
 
-#: assets/models/utils.py:45 assets/tasks/const.py:83
+#: assets/models/utils.py:45 assets/tasks/const.py:86
 #: authentication/utils.py:13 xpack/plugins/license/models.py:78
 msgid "Unknown"
 msgstr "未知"
@@ -1424,6 +1428,7 @@ msgstr "资产列表"
 #: assets/templates/assets/_asset_list_modal.html:33
 #: assets/templates/assets/_node_tree.html:40
 #: ops/templates/ops/command_execution_create.html:49
+#: ops/templates/ops/command_execution_create.html:143
 #: users/templates/users/_granted_assets.html:7
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:66
 msgid "Loading"
@@ -1639,7 +1644,7 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_list.html:139
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: settings/templates/settings/terminal_setting.html:168
-#: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:108
+#: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:112
 #: users/templates/users/user_detail.html:394
 #: users/templates/users/user_detail.html:420
 #: users/templates/users/user_detail.html:443
@@ -1720,7 +1725,7 @@ msgstr "资产用户"
 
 #: assets/templates/assets/asset_asset_user_list.html:47
 #: assets/templates/assets/asset_detail.html:144
-#: terminal/templates/terminal/session_detail.html:81
+#: terminal/templates/terminal/session_detail.html:85
 #: users/templates/users/user_detail.html:140
 #: users/templates/users/user_profile.html:150
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:128
@@ -2984,38 +2989,38 @@ msgid "Task log"
 msgstr "任务列表"
 
 #: ops/templates/ops/command_execution_create.html:90
-#: terminal/templates/terminal/session_detail.html:91
-#: terminal/templates/terminal/session_detail.html:100
+#: terminal/templates/terminal/session_detail.html:95
+#: terminal/templates/terminal/session_detail.html:104
 msgid "Go"
 msgstr ""
 
-#: ops/templates/ops/command_execution_create.html:215
+#: ops/templates/ops/command_execution_create.html:216
 msgid "Selected assets"
 msgstr "已选择资产"
 
-#: ops/templates/ops/command_execution_create.html:218
+#: ops/templates/ops/command_execution_create.html:219
 msgid "In total"
 msgstr "总共"
 
-#: ops/templates/ops/command_execution_create.html:254
+#: ops/templates/ops/command_execution_create.html:256
 msgid ""
 "Select the left asset, select the running system user, execute command in "
 "batch"
 msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
 
-#: ops/templates/ops/command_execution_create.html:275
+#: ops/templates/ops/command_execution_create.html:299
 msgid "Unselected assets"
 msgstr "没有选中资产"
 
-#: ops/templates/ops/command_execution_create.html:279
+#: ops/templates/ops/command_execution_create.html:303
 msgid "No input command"
 msgstr "没有输入命令"
 
-#: ops/templates/ops/command_execution_create.html:283
+#: ops/templates/ops/command_execution_create.html:307
 msgid "No system user was selected"
 msgstr "没有选择系统用户"
 
-#: ops/templates/ops/command_execution_create.html:328
+#: ops/templates/ops/command_execution_create.html:317
 msgid "Pending"
 msgstr "等待"
 
@@ -3394,21 +3399,21 @@ msgstr "连接LDAP成功"
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:163
+#: settings/api.py:151
 msgid "succeed: {} failed: {} total: {}"
 msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:185 settings/api.py:221
+#: settings/api.py:173 settings/api.py:209
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:191 settings/api.py:227
+#: settings/api.py:179 settings/api.py:215
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:209 settings/api.py:247
+#: settings/api.py:197 settings/api.py:235
 #: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -3923,11 +3928,11 @@ msgstr "删除失败"
 msgid "Are you sure about deleting it?"
 msgstr "您确定删除吗?"
 
-#: settings/utils.py:91
+#: settings/utils.py:98
 msgid "Search no entry matched in ou {}"
 msgstr "在ou:{}中没有匹配条目"
 
-#: settings/utils.py:146
+#: settings/utils.py:172
 msgid "The user source is not LDAP"
 msgstr "用户来源不是LDAP"
 
@@ -4404,7 +4409,7 @@ msgstr "参数"
 msgid "Export command"
 msgstr "导出命令"
 
-#: terminal/templates/terminal/command_list.html:191
+#: terminal/templates/terminal/command_list.html:205
 msgid "Goto"
 msgstr "转到"
 
@@ -4418,19 +4423,19 @@ msgstr "会话详情"
 msgid "Command list"
 msgstr "命令记录列表"
 
-#: terminal/templates/terminal/session_detail.html:63
+#: terminal/templates/terminal/session_detail.html:67
 msgid "There is no command about this session"
 msgstr "该会话没有命令记录"
 
-#: terminal/templates/terminal/session_detail.html:88
+#: terminal/templates/terminal/session_detail.html:92
 msgid "Replay session"
 msgstr "回放会话"
 
-#: terminal/templates/terminal/session_detail.html:97
+#: terminal/templates/terminal/session_detail.html:101
 msgid "Monitor session"
 msgstr "监控"
 
-#: terminal/templates/terminal/session_detail.html:105
+#: terminal/templates/terminal/session_detail.html:109
 msgid "Terminate session"
 msgstr "终止会话"
 

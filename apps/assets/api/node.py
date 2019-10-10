@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -58,6 +58,16 @@ class NodeViewSet(OrgModelViewSet):
             msg = _("You can't update the root node name")
             raise ValidationError({"error": msg})
         return super().perform_update(serializer)
+
+    def destroy(self, request, *args, **kwargs):
+        node = self.get_object()
+        if node.has_children_or_contains_assets():
+            msg = _("Deletion failed "
+                    "and the node contains children or assets")
+            return Response(
+                data={'msg': msg}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        return super().destroy(request, *args, **kwargs)
 
 
 class NodeListAsTreeApi(generics.ListAPIView):
