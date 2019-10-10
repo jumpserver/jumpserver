@@ -32,6 +32,13 @@ class LDAPAuthorizationBackend(LDAPBackend):
         if not username:
             logger.info('Authenticate failed: username is None')
             return None
+        if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
+            user_model = self.get_user_model()
+            exist = user_model.objects.filter(username=username).exists()
+            if not exist:
+                msg = 'Authentication failed: user ({}) is not in the user list'
+                logger.info(msg.format(username))
+                return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))
