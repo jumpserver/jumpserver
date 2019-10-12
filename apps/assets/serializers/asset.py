@@ -140,6 +140,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):
+    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
     class Meta:
         model = Asset
