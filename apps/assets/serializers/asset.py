@@ -8,6 +8,10 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Node, Label
+from ..const import (
+    GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN,
+    GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+)
 from .base import ConnectivitySerializer
 
 __all__ = [
@@ -94,10 +98,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def validate_hostname(hostname):
-        pattern = r"^[\._@\w-]+$"
+        pattern = GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN
         res = re.match(pattern, hostname)
         if res is None:
-            msg = _("* The hostname contains characters that are not allowed")
+            msg = GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
             raise serializers.ValidationError(msg)
         return hostname
 
