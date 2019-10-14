@@ -470,8 +470,13 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
         tree_node = TreeNode(**data)
         return tree_node
 
-    def delete(self, using=None, keep_parents=False):
+    def has_children_or_contains_assets(self):
         if self.children or self.get_assets():
+            return True
+        return False
+
+    def delete(self, using=None, keep_parents=False):
+        if self.has_children_or_contains_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
 

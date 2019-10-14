@@ -7,16 +7,13 @@ from common.utils import get_logger
 from orgs.mixins.forms import OrgModelForm
 
 from ..models import Asset, Node
+from ..const import GENERAL_LIMIT_SPECIAL_CHARACTERS_HELP_TEXT
 
 
 logger = get_logger(__file__)
 __all__ = [
     'AssetCreateForm', 'AssetUpdateForm', 'AssetBulkUpdateForm', 'ProtocolForm',
 ]
-
-HELP_TEXTS_ASSET_HOSTNAME = _(
-    'Only Numbers、letters、 chinese and characters ( {} ) are allowed'
-).format(" ".join(['.', '_', '@']))
 
 
 class ProtocolForm(forms.Form):
@@ -72,7 +69,7 @@ class AssetCreateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': HELP_TEXTS_ASSET_HOSTNAME,
+            'hostname': GENERAL_LIMIT_SPECIAL_CHARACTERS_HELP_TEXT,
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
@@ -119,7 +116,7 @@ class AssetUpdateForm(OrgModelForm):
             'nodes': _("Node"),
         }
         help_texts = {
-            'hostname': HELP_TEXTS_ASSET_HOSTNAME,
+            'hostname': GENERAL_LIMIT_SPECIAL_CHARACTERS_HELP_TEXT,
             'admin_user': _(
                 'root or other NOPASSWD sudo privilege user existed in asset,'
                 'If asset is windows or other set any one, more see admin user left menu'
