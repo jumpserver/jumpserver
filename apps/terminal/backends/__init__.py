@@ -6,6 +6,7 @@ from common import utils
 
 TYPE_ENGINE_MAPPING = {
     'elasticsearch': 'terminal.backends.command.es',
+    'es': 'terminal.backends.command.es',
 }
 
 
