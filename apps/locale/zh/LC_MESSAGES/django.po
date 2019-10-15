@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 17:06+0800\n"
+"POT-Creation-Date: 2019-10-15 17:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -310,6 +310,7 @@ msgstr "远程应用"
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_detail.html:178
+#: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_password_update.html:75
 #: users/templates/users/user_profile.html:209
 #: users/templates/users/user_profile_update.html:67
@@ -320,6 +321,7 @@ msgstr "远程应用"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:53
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:44
 #: xpack/plugins/interface/templates/interface/interface.html:72
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 #: xpack/plugins/vault/templates/vault/vault_create.html:45
 msgid "Reset"
 msgstr "重置"
@@ -1238,7 +1240,8 @@ msgstr "协议格式 {}/{}"
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:69 assets/serializers/asset_user.py:29
+#: assets/serializers/asset.py:69 assets/serializers/asset.py:143
+#: assets/serializers/asset_user.py:29
 #: assets/templates/assets/_asset_user_list.html:23
 msgid "Connectivity"
 msgstr "连接"
@@ -1866,11 +1869,9 @@ msgstr "删除选择资产"
 #: users/templates/users/user_detail.html:392
 #: users/templates/users/user_detail.html:418
 #: users/templates/users/user_detail.html:486
-#: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:118
 #: users/templates/users/user_list.html:254
 #: xpack/plugins/interface/templates/interface/interface.html:101
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 msgid "Cancel"
 msgstr "取消"
 
