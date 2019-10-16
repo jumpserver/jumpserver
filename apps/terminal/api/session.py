@@ -27,7 +27,7 @@ class SessionViewSet(OrgBulkModelViewSet):
     queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
-    filter_fields = [
+    filterset_fields = [
         "user", "asset", "system_user", "remote_addr",
         "protocol", "terminal", "is_finished",
     ]
