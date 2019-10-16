@@ -579,7 +579,7 @@ jumpserver.initServerSideDataTable = function (options) {
         ajax: {
             url: options.ajax_url,
             error: function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.responseText && jqXHR.responseText.indexOf("%(value)s") ) {
+                if (jqXHR.responseText && jqXHR.responseText.indexOf("%(value)s") !== -1 ) {
                     return
                 }
                 var msg = gettext("Unknown error occur");
