@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import traceback
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -9,6 +8,7 @@ from django.core.exceptions import ValidationError
 from common.utils import get_logger
 from ..utils import (
     set_current_org, get_current_org, current_org,
+    filter_org_queryset,
 )
 from ..models import Organization
 
@@ -23,24 +23,7 @@ class OrgManager(models.Manager):
 
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()
-        kwargs = {}
-
-        _current_org = get_current_org()
-        if _current_org is None:
-            kwargs['id'] = None
-        elif _current_org.is_real():
-            kwargs['org_id'] = _current_org.id
-        elif _current_org.is_default():
-            queryset = queryset.filter(org_id="")
-        #
-        # lines = traceback.format_stack()
-        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        # for line in lines[-10:-1]:
-        #     print(line)
-        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-
-        queryset = queryset.filter(**kwargs)
-        return queryset
+        return filter_org_queryset(queryset)
 
     def all(self):
         if not current_org:

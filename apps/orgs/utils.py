@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import traceback
 from werkzeug.local import LocalProxy
 from contextlib import contextmanager
 
@@ -80,6 +81,27 @@ def tmp_to_org(org):
     yield
     if ori_org is not None:
         set_current_org(ori_org)
+
+
+def filter_org_queryset(queryset):
+    kwargs = {}
+
+    _current_org = get_current_org()
+    if _current_org is None:
+        return queryset.none()
+
+    if _current_org.is_real():
+        kwargs['org_id'] = _current_org.id
+    elif _current_org.is_default():
+        kwargs["org_id"] = ''
+    #
+    # lines = traceback.format_stack()
+    # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    # for line in lines[-10:-1]:
+    #     print(line)
+    # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+    queryset = queryset.filter(**kwargs)
+    return queryset
 
 
 current_org = LocalProxy(get_current_org)

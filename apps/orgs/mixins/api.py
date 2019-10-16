@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 
-from ..utils import set_to_root_org
+from ..utils import set_to_root_org, filter_org_queryset
 from ..models import Organization
 
 __all__ = [
@@ -22,7 +22,9 @@ class RootOrgViewMixin:
 
 class OrgQuerySetMixin:
     def get_queryset(self):
-        queryset = super().get_queryset().all()
+        queryset = super().get_queryset()
+        queryset = filter_org_queryset(queryset)
+
         if hasattr(self, 'swagger_fake_view'):
             return queryset[:1]
         if hasattr(self, 'action') and self.action == 'list' and \
