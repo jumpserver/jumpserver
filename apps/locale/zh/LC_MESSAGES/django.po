@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 20:03+0800\n"
+"POT-Creation-Date: 2019-10-17 16:09+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -197,7 +197,7 @@ msgstr "参数"
 #: orgs/models.py:16 perms/models/base.py:54
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
-#: users/models/user.py:414 users/serializers/v1.py:141
+#: users/models/user.py:414 users/serializers/v1.py:143
 #: users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:108
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
@@ -311,6 +311,7 @@ msgstr "远程应用"
 #: users/templates/users/_user.html:50
 #: users/templates/users/user_bulk_update.html:23
 #: users/templates/users/user_detail.html:178
+#: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_password_update.html:75
 #: users/templates/users/user_profile.html:209
 #: users/templates/users/user_profile_update.html:67
@@ -564,11 +565,11 @@ msgstr "远程应用详情"
 msgid "My RemoteApp"
 msgstr "我的远程应用"
 
-#: assets/api/node.py:58
+#: assets/api/node.py:61
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
 
-#: assets/api/node.py:65
+#: assets/api/node.py:68
 msgid "Deletion failed and the node contains children or assets"
 msgstr "删除失败，节点包含子节点或资产"
 
@@ -700,7 +701,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: ops/models/adhoc.py:189 perms/templates/perms/asset_permission_list.html:70
 #: perms/templates/perms/asset_permission_user.html:55
 #: perms/templates/perms/remote_app_permission_user.html:54
-#: settings/templates/settings/_ldap_list_users_modal.html:30 users/forms.py:14
+#: settings/templates/settings/_ldap_list_users_modal.html:30 users/forms.py:13
 #: users/models/user.py:371 users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:36
@@ -727,7 +728,7 @@ msgstr "密码或密钥密码"
 #: authentication/forms.py:15
 #: authentication/templates/authentication/login.html:68
 #: authentication/templates/authentication/new_login.html:95
-#: settings/forms.py:114 users/forms.py:16 users/forms.py:28
+#: settings/forms.py:114 users/forms.py:15 users/forms.py:27
 #: users/templates/users/reset_password.html:53
 #: users/templates/users/user_password_authentication.html:18
 #: users/templates/users/user_password_update.html:44
@@ -1107,9 +1108,9 @@ msgstr "默认资产组"
 #: terminal/models.py:156 terminal/templates/terminal/command_list.html:29
 #: terminal/templates/terminal/command_list.html:65
 #: terminal/templates/terminal/session_list.html:27
-#: terminal/templates/terminal/session_list.html:71 users/forms.py:312
+#: terminal/templates/terminal/session_list.html:71 users/forms.py:319
 #: users/models/user.py:127 users/models/user.py:143 users/models/user.py:500
-#: users/serializers/v1.py:130 users/templates/users/user_group_detail.html:78
+#: users/serializers/v1.py:132 users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:36 users/views/user.py:250
 #: xpack/plugins/orgs/forms.py:28
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:113
@@ -1262,7 +1263,7 @@ msgstr "组织名称"
 msgid "Backend"
 msgstr "后端"
 
-#: assets/serializers/asset_user.py:67 users/forms.py:263
+#: assets/serializers/asset_user.py:67 users/forms.py:262
 #: users/models/user.py:403 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:49
 #: users/templates/users/user_profile.html:69
@@ -1873,7 +1874,6 @@ msgstr "删除选择资产"
 #: users/templates/users/user_detail.html:392
 #: users/templates/users/user_detail.html:418
 #: users/templates/users/user_detail.html:486
-#: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_group_list.html:118
 #: users/templates/users/user_list.html:254
 #: xpack/plugins/interface/templates/interface/interface.html:101
@@ -2263,7 +2263,7 @@ msgstr "Agent"
 
 #: audits/models.py:85 audits/templates/audits/login_log_list.html:62
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms.py:175 users/models/user.py:395
+#: users/forms.py:174 users/models/user.py:395
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2486,7 +2486,7 @@ msgid ""
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/forms.py:66 users/forms.py:22
+#: authentication/forms.py:66 users/forms.py:21
 msgid "MFA code"
 msgstr "MFA 验证码"
 
@@ -3111,7 +3111,7 @@ msgstr "命令执行列表"
 msgid "Command execution"
 msgstr "命令执行"
 
-#: orgs/mixins/models.py:44 orgs/mixins/serializers.py:26 orgs/models.py:31
+#: orgs/mixins/models.py:58 orgs/mixins/serializers.py:26 orgs/models.py:31
 msgid "Organization"
 msgstr "组织"
 
@@ -3128,7 +3128,7 @@ msgstr "空"
 #: perms/templates/perms/asset_permission_list.html:71
 #: perms/templates/perms/asset_permission_list.html:118
 #: perms/templates/perms/remote_app_permission_list.html:16
-#: templates/_nav.html:21 users/forms.py:286 users/models/group.py:26
+#: templates/_nav.html:21 users/forms.py:293 users/models/group.py:26
 #: users/models/user.py:379 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_detail.html:218
 #: users/templates/users/user_list.html:38
@@ -3975,7 +3975,7 @@ msgid "Commercial support"
 msgstr "商业支持"
 
 #: templates/_header_bar.html:70 templates/_nav.html:30
-#: templates/_nav_user.html:32 users/forms.py:154
+#: templates/_nav_user.html:32 users/forms.py:153
 #: users/templates/users/_user.html:43
 #: users/templates/users/first_login.html:39
 #: users/templates/users/user_password_update.html:40
@@ -4540,7 +4540,7 @@ msgstr "你可以使用ssh客户端工具连接终端"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:33 users/models/user.py:383
+#: users/forms.py:32 users/models/user.py:383
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:37
@@ -4548,44 +4548,44 @@ msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:36 users/forms.py:233
+#: users/forms.py:35 users/forms.py:232
 #: users/templates/users/user_update.html:30
 msgid "ssh public key"
 msgstr "ssh公钥"
 
-#: users/forms.py:37 users/forms.py:234
+#: users/forms.py:36 users/forms.py:233
 msgid "ssh-rsa AAAA..."
 msgstr ""
 
-#: users/forms.py:38
+#: users/forms.py:37
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:52 users/templates/users/user_detail.html:226
+#: users/forms.py:51 users/templates/users/user_detail.html:226
 msgid "Join user groups"
 msgstr "添加到用户组"
 
-#: users/forms.py:87 users/forms.py:248
+#: users/forms.py:86 users/forms.py:247
 msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
-#: users/forms.py:91 users/forms.py:252 users/serializers/v1.py:116
+#: users/forms.py:90 users/forms.py:251 users/serializers/v1.py:116
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms.py:104 users/views/login.py:114 users/views/user.py:287
+#: users/forms.py:103 users/views/login.py:114 users/views/user.py:287
 msgid "* Your password does not meet the requirements"
 msgstr "* 您的密码不符合要求"
 
-#: users/forms.py:125
+#: users/forms.py:124
 msgid "Reset link will be generated and sent to the user"
 msgstr "生成重置密码链接，通过邮件发送给用户"
 
-#: users/forms.py:126
+#: users/forms.py:125
 msgid "Set password"
 msgstr "设置密码"
 
-#: users/forms.py:133 xpack/plugins/change_auth_plan/models.py:88
+#: users/forms.py:132 xpack/plugins/change_auth_plan/models.py:88
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:51
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:69
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:57
@@ -4593,7 +4593,7 @@ msgstr "设置密码"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/forms.py:160
+#: users/forms.py:159
 msgid ""
 "When enabled, you will enter the MFA binding process the next time you log "
 "in. you can also directly bind in \"personal information -> quick "
@@ -4602,11 +4602,11 @@ msgstr ""
 "启用之后您将会在下次登录时进入MFA绑定流程；您也可以在（个人信息->快速修改->更"
 "改MFA设置）中直接绑定！"
 
-#: users/forms.py:170
+#: users/forms.py:169
 msgid "* Enable MFA authentication to make the account more secure."
 msgstr "* 启用MFA认证，使账号更加安全。"
 
-#: users/forms.py:180
+#: users/forms.py:179
 msgid ""
 "In order to protect you and your company, please keep your account, password "
 "and key sensitive information properly. (for example: setting complex "
@@ -4615,41 +4615,41 @@ msgstr ""
 "为了保护您和公司的安全，请妥善保管您的账户、密码和密钥等重要敏感信息；（如："
 "设置复杂密码，启用MFA认证）"
 
-#: users/forms.py:187 users/templates/users/first_login.html:48
+#: users/forms.py:186 users/templates/users/first_login.html:48
 #: users/templates/users/first_login.html:110
 #: users/templates/users/first_login.html:139
 msgid "Finish"
 msgstr "完成"
 
-#: users/forms.py:193
+#: users/forms.py:192
 msgid "Old password"
 msgstr "原来密码"
 
-#: users/forms.py:198
+#: users/forms.py:197
 msgid "New password"
 msgstr "新密码"
 
-#: users/forms.py:203
+#: users/forms.py:202
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: users/forms.py:213
+#: users/forms.py:212
 msgid "Old password error"
 msgstr "原来密码错误"
 
-#: users/forms.py:221
+#: users/forms.py:220
 msgid "Password does not match"
 msgstr "密码不一致"
 
-#: users/forms.py:231
+#: users/forms.py:230
 msgid "Automatically configure and download the SSH key"
 msgstr "自动配置并下载SSH密钥"
 
-#: users/forms.py:235
+#: users/forms.py:234
 msgid "Paste your id_rsa.pub here."
 msgstr "复制你的公钥到这里"
 
-#: users/forms.py:269 users/forms.py:274 users/forms.py:316
+#: users/forms.py:268 users/forms.py:273 users/forms.py:323
 #: xpack/plugins/orgs/forms.py:18
 msgid "Select users"
 msgstr "选择用户"
@@ -4742,7 +4742,7 @@ msgstr "角色只能为 {}"
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
-#: users/serializers/v1.py:147
+#: users/serializers/v1.py:157
 msgid "Auditors cannot be join in the user group"
 msgstr "审计员不能被加入到用户组"
 
@@ -5939,7 +5939,7 @@ msgstr "更新同步实例任务"
 #: xpack/plugins/gathered_user/views.py:21
 #: xpack/plugins/gathered_user/views.py:34
 #: xpack/plugins/gathered_user/views.py:49
-#: xpack/plugins/gathered_user/views.py:66
+#: xpack/plugins/gathered_user/views.py:69
 msgid "Gathered user"
 msgstr "收集用户"
 
@@ -5974,7 +5974,7 @@ msgstr "创建任务"
 msgid "Gathered user list"
 msgstr "收集用户列表"
 
-#: xpack/plugins/gathered_user/views.py:67
+#: xpack/plugins/gathered_user/views.py:70
 msgid "Update task"
 msgstr "更新任务"
 
