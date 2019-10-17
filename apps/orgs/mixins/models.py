@@ -62,7 +62,7 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if self.pk or org is None:
+        if org is None:
             return super().save(*args, **kwargs)
 
         if org.is_real() or org.is_system():

@@ -22,6 +22,12 @@ class UserGroupViewSet(OrgBulkModelViewSet):
     serializer_class = UserGroupSerializer
     permission_classes = (IsOrgAdmin,)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        print(">>>>>>>>>>.")
+        print(queryset)
+        return queryset
+
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve') and \
                 self.request.query_params.get("display"):

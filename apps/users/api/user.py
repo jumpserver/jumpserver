@@ -17,7 +17,7 @@ from common.permissions import (
 from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from orgs.utils import current_org
-from .. import serializers
+from .. import serializers, utils
 from ..models import User
 from ..signals import post_user_create
 
@@ -32,8 +32,7 @@ __all__ = [
 
 class UserQuerysetMixin:
     def get_queryset(self):
-        queryset = current_org.get_org_members()\
-            .prefetch_related('groups')
+        queryset = utils.get_current_org_members()
         return queryset
 
 
@@ -42,6 +41,9 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     search_fields = filter_fields
     serializer_class = serializers.UserSerializer
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('groups')
 
     def send_created_signal(self, users):
         if not isinstance(users, list):

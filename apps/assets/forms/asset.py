@@ -129,7 +129,7 @@ class AssetUpdateForm(OrgModelForm):
 class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
         required=True,
-        label=_('Select assets'), queryset=Asset.objects.none(),
+        label=_('Select assets'), queryset=Asset.objects,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
