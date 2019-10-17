@@ -19,11 +19,17 @@ class RemoteAppViewSet(OrgBulkModelViewSet):
     filter_fields = ('name',)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
-    queryset = RemoteApp.objects.all()
     serializer_class = RemoteAppSerializer
+
+    def get_queryset(self):
+        queryset = RemoteApp.objects.all()
+        return queryset
 
 
 class RemoteAppConnectionInfoApi(generics.RetrieveAPIView):
-    queryset = RemoteApp.objects.all()
     permission_classes = (IsAppUser, )
     serializer_class = RemoteAppConnectionInfoSerializer
+
+    def get_queryset(self):
+        queryset = RemoteApp.objects.all()
+        return queryset

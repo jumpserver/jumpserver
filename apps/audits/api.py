@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import viewsets
-
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
+from orgs.mixins.api import OrgModelViewSet
 from .models import FTPLog
 from .serializers import FTPLogSerializer
 
 
-class FTPLogViewSet(viewsets.ModelViewSet):
-    queryset = FTPLog.objects.all()
+class FTPLogViewSet(OrgModelViewSet):
+    model = FTPLog
     serializer_class = FTPLogSerializer
     permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
+

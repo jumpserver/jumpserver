@@ -20,18 +20,22 @@ __all__ = [
 ]
 
 
-class RemoteAppPermissionViewSet(viewsets.ModelViewSet):
+class QuerySetMixin:
+    def get_queryset(self):
+        queryset = RemoteAppPermission.objects.all()
+        return queryset
+
+
+class RemoteAppPermissionViewSet(QuerySetMixin, viewsets.ModelViewSet):
     filter_fields = ('name', )
     search_fields = filter_fields
-    queryset = RemoteAppPermission.objects.all()
     serializer_class = RemoteAppPermissionSerializer
     permission_classes = (IsOrgAdmin,)
 
 
-class RemoteAppPermissionAddUserApi(generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionAddUserApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateUserSerializer
-    queryset = RemoteAppPermission.objects.all()
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -45,10 +49,9 @@ class RemoteAppPermissionAddUserApi(generics.RetrieveUpdateAPIView):
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionRemoveUserApi(generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionRemoveUserApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateUserSerializer
-    queryset = RemoteAppPermission.objects.all()
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -62,10 +65,9 @@ class RemoteAppPermissionRemoveUserApi(generics.RetrieveUpdateAPIView):
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionAddRemoteAppApi(generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionAddRemoteAppApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateRemoteAppSerializer
-    queryset = RemoteAppPermission.objects.all()
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()
@@ -79,10 +81,9 @@ class RemoteAppPermissionAddRemoteAppApi(generics.RetrieveUpdateAPIView):
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionRemoveRemoteAppApi(generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionRemoveRemoteAppApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateRemoteAppSerializer
-    queryset = RemoteAppPermission.objects.all()
 
     def update(self, request, *args, **kwargs):
         perm = self.get_object()

@@ -12,7 +12,7 @@ __all__ = ['DomainForm', 'GatewayForm']
 
 class DomainForm(forms.ModelForm):
     assets = forms.ModelMultipleChoiceField(
-        queryset=Asset.objects.all(), label=_('Asset'), required=False,
+        queryset=Asset.objects.none(), label=_('Asset'), required=False,
         widget=forms.SelectMultiple(
             attrs={'class': 'select2', 'data-placeholder': _('Select assets')}
         )

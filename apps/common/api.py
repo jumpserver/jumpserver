@@ -83,8 +83,6 @@ class LogTailApi(generics.RetrieveAPIView):
         return Response({"data": data, 'end': end, 'mark': new_mark})
 
 
-
-
 class ResourcesIDCacheApi(APIView):
     def post(self, request, *args, **kwargs):
         spm = str(uuid.uuid4())

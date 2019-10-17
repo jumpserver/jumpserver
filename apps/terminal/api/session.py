@@ -24,7 +24,6 @@ logger = get_logger(__name__)
 
 
 class SessionViewSet(OrgBulkModelViewSet):
-    queryset = Session.objects.all()
     serializer_class = serializers.SessionSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
     filterset_fields = [
@@ -35,6 +34,10 @@ class SessionViewSet(OrgBulkModelViewSet):
         ('date_start', ('date_from', 'date_to'))
     ]
     extra_filter_backends = [DatetimeRangeFilter]
+
+    def get_queryset(self):
+        queryset = Session.objects.all()
+        return queryset
 
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)

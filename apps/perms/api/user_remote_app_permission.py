@@ -3,12 +3,10 @@
 import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.generics import (
-    ListAPIView, get_object_or_404,
-)
 
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.tree import TreeNodeSerializer
+from orgs.mixins import generics
 from ..utils import (
     RemoteAppPermissionUtil, construct_remote_apps_tree_root,
     parse_remote_app_to_tree_node,
@@ -25,7 +23,7 @@ __all__ = [
 ]
 
 
-class UserGrantedRemoteAppsApi(ListAPIView):
+class UserGrantedRemoteAppsApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = RemoteAppSerializer
     filter_fields = ['name', 'id']
@@ -68,7 +66,7 @@ class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
         return super().get_serializer(data, many=True)
 
 
-class UserGrantedRemoteAppSystemUsersApi(UserPermissionMixin, ListAPIView):
+class UserGrantedRemoteAppSystemUsersApi(UserPermissionMixin, generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.RemoteAppSystemUserSerializer
     only_fields = serializers.RemoteAppSystemUserSerializer.Meta.only_fields
@@ -110,7 +108,7 @@ class ValidateUserRemoteAppPermissionApi(APIView):
 
 # RemoteApp permission
 
-class UserGroupGrantedRemoteAppsApi(ListAPIView):
+class UserGroupGrantedRemoteAppsApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser, )
     serializer_class = RemoteAppSerializer
 

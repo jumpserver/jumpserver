@@ -10,7 +10,7 @@ from ..models import Organization
 
 __all__ = [
     'RootOrgViewMixin', 'OrgMembershipModelViewSetMixin', 'OrgModelViewSet',
-    'OrgBulkModelViewSet',
+    'OrgBulkModelViewSet', 'OrgQuerySetMixin',
 ]
 
 
@@ -22,8 +22,14 @@ class RootOrgViewMixin:
 
 class OrgQuerySetMixin:
     def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = filter_org_queryset(queryset)
+        if hasattr(self, 'model'):
+            queryset = self.model.objects.all()
+        else:
+            assert self.queryset is None, (
+                    "'%s' should not include a `queryset` attribute"
+                    % self.__class__.__name__
+            )
+            queryset = super().get_queryset()
 
         if hasattr(self, 'swagger_fake_view'):
             return queryset[:1]

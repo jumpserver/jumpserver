@@ -267,7 +267,7 @@ class UserBulkUpdateForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         required=True,
         label=_('Select users'),
-        queryset=User.objects.all(),
+        queryset=User.objects.none(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -275,6 +275,10 @@ class UserBulkUpdateForm(OrgModelForm):
             }
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['users'].queryset = User.objects.all()
 
     class Meta:
         model = User

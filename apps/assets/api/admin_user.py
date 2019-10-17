@@ -15,11 +15,10 @@
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
 from rest_framework.response import Response
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.mixins import generics
 
-from common.mixins import CommonApiMixin
 from common.utils import get_logger
 from ..hands import IsOrgAdmin
 from ..models import AdminUser, Asset
@@ -39,22 +38,21 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
     """
-
+    model = AdminUser
     filter_fields = ("name", "username")
     search_fields = filter_fields
-    queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):
-    queryset = AdminUser.objects.all()
+    model = AdminUser
     serializer_class = serializers.AdminUserAuthSerializer
     permission_classes = (IsOrgAdmin,)
 
 
 class ReplaceNodesAdminUserApi(generics.UpdateAPIView):
-    queryset = AdminUser.objects.all()
+    model = AdminUser
     serializer_class = serializers.ReplaceNodeAdminUserSerializer
     permission_classes = (IsOrgAdmin,)
 
@@ -79,7 +77,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
     """
     Test asset admin user assets_connectivity
     """
-    queryset = AdminUser.objects.all()
+    model = AdminUser
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.TaskIDSerializer
 
