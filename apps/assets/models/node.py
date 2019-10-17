@@ -324,6 +324,8 @@ class SomeNodesMixin:
     ungrouped_value = _('ungrouped')
     empty_key = '-11'
     empty_value = _("empty")
+    favorite_key = '-12'
+    favorite_value = _("favorite")
 
     def is_default_node(self):
         return self.key == self.default_key
@@ -388,10 +390,20 @@ class SomeNodesMixin:
             return obj
 
     @classmethod
+    def favorite_node(cls):
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.favorite_value}
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.favorite_key
+            )
+            return obj
+
+    @classmethod
     def initial_some_nodes(cls):
         cls.default_node()
         cls.empty_node()
         cls.ungrouped_node()
+        cls.favorite_node()
 
 
 class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):

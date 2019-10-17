@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 #
-
+import uuid
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 
-__all__ = ["NoDeleteManager", "NoDeleteModelMixin", "NoDeleteQuerySet"]
+__all__ = [
+    "NoDeleteManager", "NoDeleteModelMixin", "NoDeleteQuerySet",
+    "CommonModelMixin"
+]
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
@@ -40,3 +43,13 @@ class NoDeleteModelMixin(models.Model):
         self.is_discard = True
         self.discard_time = timezone.now()
         return self.save()
+
+
+class CommonModelMixin(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
+    date_updated = models.DateTimeField(auto_now=True, verbose_name=_('Date updated'))
+
+    class Meta:
+        abstract = True

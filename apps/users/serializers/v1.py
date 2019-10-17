@@ -118,7 +118,7 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateGroupSerializer(serializers.ModelSerializer):
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects)
 
     class Meta:
         model = User

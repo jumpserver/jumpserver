@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-12 17:06+0800\n"
+"POT-Creation-Date: 2019-10-16 20:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -193,8 +193,8 @@ msgstr "参数"
 #: assets/templates/assets/cmd_filter_detail.html:77
 #: assets/templates/assets/domain_detail.html:72
 #: assets/templates/assets/system_user_detail.html:100
-#: ops/templates/ops/adhoc_detail.html:86 orgs/models.py:16
-#: perms/models/base.py:54
+#: common/mixins/models.py:50 ops/templates/ops/adhoc_detail.html:86
+#: orgs/models.py:16 perms/models/base.py:54
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
 #: users/models/user.py:414 users/serializers/v1.py:141
@@ -216,7 +216,8 @@ msgstr "创建者"
 #: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/cmd_filter_detail.html:69
 #: assets/templates/assets/domain_detail.html:68
-#: assets/templates/assets/system_user_detail.html:96 ops/models/adhoc.py:45
+#: assets/templates/assets/system_user_detail.html:96
+#: common/mixins/models.py:51 ops/models/adhoc.py:45
 #: ops/templates/ops/adhoc_detail.html:90 ops/templates/ops/task_detail.html:64
 #: orgs/models.py:17 perms/models/base.py:55
 #: perms/templates/perms/asset_permission_detail.html:94
@@ -522,7 +523,7 @@ msgstr "创建远程应用"
 #: settings/templates/settings/terminal_setting.html:107
 #: terminal/templates/terminal/session_list.html:36
 #: terminal/templates/terminal/terminal_list.html:36
-#: users/templates/users/_granted_assets.html:29
+#: users/templates/users/_granted_assets.html:34
 #: users/templates/users/user_group_list.html:38
 #: users/templates/users/user_list.html:41
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:60
@@ -537,7 +538,6 @@ msgid "Action"
 msgstr "动作"
 
 #: applications/templates/applications/user_remote_app_list.html:52
-#: assets/templates/assets/user_asset_list.html:32
 #: perms/models/asset_permission.py:32
 msgid "Connect"
 msgstr "连接"
@@ -626,13 +626,13 @@ msgstr "标签"
 #: assets/forms/asset.py:65 assets/forms/asset.py:112
 #: assets/models/asset.py:144 assets/models/domain.py:26
 #: assets/models/domain.py:52 assets/templates/assets/asset_detail.html:78
-#: assets/templates/assets/user_asset_list.html:53
+#: assets/templates/assets/user_asset_list.html:80
 #: xpack/plugins/orgs/templates/orgs/org_list.html:18
 msgid "Domain"
 msgstr "网域"
 
 #: assets/forms/asset.py:69 assets/forms/asset.py:103 assets/forms/asset.py:116
-#: assets/forms/asset.py:152 assets/models/node.py:409
+#: assets/forms/asset.py:152 assets/models/node.py:421
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:83 perms/forms/asset_permission.py:90
 #: perms/templates/perms/asset_permission_list.html:53
@@ -788,10 +788,10 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/asset_detail.html:62
 #: assets/templates/assets/asset_list.html:97
 #: assets/templates/assets/domain_gateway_list.html:68
-#: assets/templates/assets/user_asset_list.html:49
+#: assets/templates/assets/user_asset_list.html:76
 #: audits/templates/audits/login_log_list.html:60
 #: perms/templates/perms/asset_permission_asset.html:58 settings/forms.py:144
-#: users/templates/users/_granted_assets.html:26
+#: users/templates/users/_granted_assets.html:31
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:54
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:73
 msgid "IP"
@@ -805,10 +805,10 @@ msgstr "IP"
 #: assets/templates/assets/_asset_user_list.html:19
 #: assets/templates/assets/asset_detail.html:58
 #: assets/templates/assets/asset_list.html:96
-#: assets/templates/assets/user_asset_list.html:48
+#: assets/templates/assets/user_asset_list.html:75
 #: perms/templates/perms/asset_permission_asset.html:57
 #: perms/templates/perms/asset_permission_list.html:73 settings/forms.py:143
-#: users/templates/users/_granted_assets.html:25
+#: users/templates/users/_granted_assets.html:30
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:53
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:72
 msgid "Hostname"
@@ -820,18 +820,19 @@ msgstr "主机名"
 #: assets/templates/assets/system_user_detail.html:70
 #: assets/templates/assets/system_user_list.html:53
 #: terminal/templates/terminal/session_list.html:31
+#: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
 msgstr "协议"
 
 #: assets/models/asset.py:142 assets/serializers/asset.py:68
 #: assets/templates/assets/asset_create.html:24
-#: assets/templates/assets/user_asset_list.html:50
+#: assets/templates/assets/user_asset_list.html:77
 #: perms/serializers/user_permission.py:48
 msgid "Protocols"
 msgstr "协议组"
 
 #: assets/models/asset.py:143 assets/templates/assets/asset_detail.html:102
-#: assets/templates/assets/user_asset_list.html:51
+#: assets/templates/assets/user_asset_list.html:78
 msgid "Platform"
 msgstr "系统平台"
 
@@ -938,7 +939,8 @@ msgid "SSH public key"
 msgstr "ssh公钥"
 
 #: assets/models/base.py:35 assets/models/gathered_user.py:21
-#: assets/templates/assets/cmd_filter_detail.html:73 ops/models/adhoc.py:46
+#: assets/templates/assets/cmd_filter_detail.html:73 common/mixins/models.py:52
+#: ops/models/adhoc.py:46
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:109
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:76
 msgid "Date updated"
@@ -1115,7 +1117,7 @@ msgstr "默认资产组"
 msgid "User"
 msgstr "用户"
 
-#: assets/models/label.py:19 assets/models/node.py:400
+#: assets/models/label.py:19 assets/models/node.py:412
 #: assets/templates/assets/label_list.html:15 settings/models.py:30
 msgid "Value"
 msgstr "值"
@@ -1136,7 +1138,11 @@ msgstr "未分组"
 msgid "empty"
 msgstr "空"
 
-#: assets/models/node.py:399
+#: assets/models/node.py:328
+msgid "favorite"
+msgstr "收藏夹"
+
+#: assets/models/node.py:411
 msgid "Key"
 msgstr "键"
 
@@ -1190,7 +1196,7 @@ msgstr "Shell"
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:162 assets/templates/assets/user_asset_list.html:52
+#: assets/models/user.py:162 assets/templates/assets/user_asset_list.html:79
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:52
 #: audits/templates/audits/ftp_log_list.html:75
 #: perms/forms/asset_permission.py:86 perms/forms/remote_app_permission.py:43
@@ -1206,7 +1212,7 @@ msgstr "登录模式"
 #: terminal/templates/terminal/command_list.html:67
 #: terminal/templates/terminal/session_list.html:29
 #: terminal/templates/terminal/session_list.html:73
-#: users/templates/users/_granted_assets.html:27
+#: users/templates/users/_granted_assets.html:32
 #: xpack/plugins/orgs/templates/orgs/org_list.html:20
 msgid "System user"
 msgstr "系统用户"
@@ -1238,7 +1244,8 @@ msgstr "协议格式 {}/{}"
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:69 assets/serializers/asset_user.py:29
+#: assets/serializers/asset.py:69 assets/serializers/asset.py:143
+#: assets/serializers/asset_user.py:29
 #: assets/templates/assets/_asset_user_list.html:23
 msgid "Connectivity"
 msgstr "连接"
@@ -2504,7 +2511,7 @@ msgid "Secret"
 msgstr "密文"
 
 #: authentication/templates/authentication/_access_key_modal.html:48
-#: users/templates/users/_granted_assets.html:75
+#: users/templates/users/_granted_assets.html:80
 msgid "Show"
 msgstr "显示"
 
@@ -2712,11 +2719,11 @@ msgstr ""
 msgid "Encrypt field using Secret Key"
 msgstr ""
 
-#: common/mixins/models.py:31
+#: common/mixins/models.py:34
 msgid "is discard"
 msgstr ""
 
-#: common/mixins/models.py:32
+#: common/mixins/models.py:35
 msgid "discard time"
 msgstr ""
 
@@ -3104,7 +3111,7 @@ msgstr "命令执行列表"
 msgid "Command execution"
 msgstr "命令执行"
 
-#: orgs/mixins/models.py:61 orgs/mixins/serializers.py:26 orgs/models.py:31
+#: orgs/mixins/models.py:44 orgs/mixins/serializers.py:26 orgs/models.py:31
 msgid "Organization"
 msgstr "组织"
 
@@ -4389,7 +4396,7 @@ msgstr "线程数"
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models.py:162 terminal/templates/terminal/session_list.html:136
+#: terminal/models.py:162 terminal/templates/terminal/session_list.html:137
 msgid "Replay"
 msgstr "回放"
 
@@ -4455,15 +4462,15 @@ msgstr "终断所选"
 msgid "Confirm finished"
 msgstr "确认已完成"
 
-#: terminal/templates/terminal/session_list.html:91
+#: terminal/templates/terminal/session_list.html:92
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
 
-#: terminal/templates/terminal/session_list.html:142
+#: terminal/templates/terminal/session_list.html:143
 msgid "Terminate"
 msgstr "终断"
 
-#: terminal/templates/terminal/session_list.html:173
+#: terminal/templates/terminal/session_list.html:174
 msgid "Finish session success"
 msgstr "标记会话完成成功"
 

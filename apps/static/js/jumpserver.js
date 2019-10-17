@@ -267,7 +267,7 @@ function requestApi(props) {
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
-        data: props.body,
+        data: props.body || props.data,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {

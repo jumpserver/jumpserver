@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
+import traceback
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -19,6 +20,10 @@ __all__ = [
 ]
 
 
+class OrgQuerySet(models.QuerySet):
+    pass
+
+
 class OrgManager(models.Manager):
 
     def get_queryset(self):
@@ -26,8 +31,17 @@ class OrgManager(models.Manager):
         return filter_org_queryset(queryset)
 
     def all(self):
+        if current_org.id:
+            print("Call all: {}".format(current_org.id))
+
+            # lines = traceback.format_stack()
+            # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            # for line in lines[-10:-1]:
+            #     print(line)
+            # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         if not current_org:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
+            print(msg)
             return self
         else:
             return super(OrgManager, self).all()
