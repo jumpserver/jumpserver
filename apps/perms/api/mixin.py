@@ -23,9 +23,9 @@ class UserPermissionMixin:
         super().initial(*args, *kwargs)
         self.obj = self.get_obj()
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         with tmp_to_root_org():
-            return super().get(request, *args, **kwargs)
+            return super().dispatch(*args, **kwargs)
 
     def get_obj(self):
         user_id = self.kwargs.get('pk', '')

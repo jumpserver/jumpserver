@@ -39,13 +39,13 @@ class OrgManager(models.Manager):
         return self
 
     def all(self):
-        print("Call all: {}".format(current_org))
-            #
-            # lines = traceback.format_stack()
-            # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-            # for line in lines[-10:-1]:
-            #     print(line)
-            # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        # print("Call all: {}".format(current_org))
+        #
+        # lines = traceback.format_stack()
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        # for line in lines[-10:-1]:
+        #     print(line)
+        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         if not current_org:
             msg = 'You can `objects.set_current_org(org).all()` then run it'
             return self
