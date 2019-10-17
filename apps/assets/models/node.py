@@ -365,7 +365,7 @@ class SomeNodesMixin:
     @classmethod
     def ungrouped_node(cls):
         with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.ungrouped_key}
+            defaults = {'value': cls.ungrouped_value}
             obj, created = cls.objects.get_or_create(
                 defaults=defaults, key=cls.ungrouped_key
             )
@@ -424,11 +424,11 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     def __str__(self):
         return self.value
 
-    def __eq__(self, other):
-        if not other:
-            return False
-        return self.id == other.id
-
+    # def __eq__(self, other):
+    #     if not other:
+    #         return False
+    #     return self.id == other.id
+    #
     def __gt__(self, other):
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]

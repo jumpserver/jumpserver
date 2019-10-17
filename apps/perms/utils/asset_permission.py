@@ -302,7 +302,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             identifier=node_key, tag=node_value,
             parent=user_tree.root,
         )
-        assets_id = FavoriteAsset.get_user_favorite_assets(self.object)
+        assets_id = FavoriteAsset.get_user_favorite_assets_id(self.object)
         all_valid_assets = user_tree.all_valid_assets(user_tree.root)
         valid_assets_id = set(assets_id) & all_valid_assets
         user_tree.set_assets(node_key, valid_assets_id)

@@ -21,7 +21,3 @@ class FavoriteAssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         model = FavoriteAsset
         fields = ['user', 'asset']
-
-    def to_internal_value(self, data):
-        with tmp_to_root_org():
-            return super().to_internal_value(data)

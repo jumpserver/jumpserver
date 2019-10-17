@@ -956,7 +956,11 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
 function rootNodeAddDom(ztree, callback) {
     var refreshIcon = "<a id='tree-refresh'><i class='fa fa-refresh'></i></a>";
     var rootNode = ztree.getNodes()[0];
-    var $rootNodeRef = $("#" + rootNode.tId + "_a");
+    if (rootNode) {
+        var $rootNodeRef = $("#" + rootNode.tId + "_a");
+    } else {
+        $rootNodeRef = $('#' + ztree.setting.treeId)
+    }
     $rootNodeRef.after(refreshIcon);
     var refreshIconRef = $('#tree-refresh');
     refreshIconRef.bind('click', function () {
