@@ -68,18 +68,18 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
         node_id = self.request.query_params.get('node_id')
         node_name = self.request.query_params.get('node')
         if node_id:
-            nodes = Node.objects.filter(pk=node_id)
+            _nodes = Node.objects.filter(pk=node_id)
         elif node_name:
-            nodes = Node.objects.filter(value=node_name)
+            _nodes = Node.objects.filter(value=node_name)
         else:
             return queryset
-        if not nodes:
+        if not _nodes:
             return queryset.none()
 
-        related_nodes = []
-        for node in nodes:
-            [related_nodes.append(item) for item in node.get_ancestors(with_self=True)]
-        queryset = queryset.filter(nodes__in=related_nodes)
+        nodes = set()
+        for node in _nodes:
+            nodes |= set(node.get_ancestors(with_self=True))
+        queryset = queryset.filter(nodes__in=nodes)
         return queryset
 
     def filter_asset(self, queryset):
