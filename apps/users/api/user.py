@@ -96,9 +96,6 @@ class UserUpdateGroupApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
     serializer_class = serializers.UserUpdateGroupSerializer
     permission_classes = (IsOrgAdmin,)
 
-    def get_queryset(self):
-        pass
-
 
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):
     queryset = User.objects.all()
