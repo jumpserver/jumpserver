@@ -25,12 +25,20 @@
         </div>
     </div>
 </form>
+{% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
 <script>
     $(document).ready(function () {
         $('.select2').select2();
+        $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
+            if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
+                e.preventDefault();
+                e.stopPropagation();
+                $("#asset_list_modal").modal();
+            }
+        })
     }).on('click', '.field-tag', function() {
         changeField(this);
     }).on('click', '#change_all', function () {

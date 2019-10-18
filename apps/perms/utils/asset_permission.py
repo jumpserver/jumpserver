@@ -13,7 +13,7 @@ from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
-from ..hands import Node, Asset, SystemUser
+from ..hands import Node, Asset, SystemUser, User, FavoriteAsset
 
 logger = get_logger(__file__)
 
@@ -293,6 +293,20 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
                 parent=user_tree.root,
             )
 
+    def add_favorite_node_if_need(self, user_tree):
+        if not isinstance(self.object, User):
+            return
+        node_key = Node.favorite_key
+        node_value = Node.favorite_value
+        user_tree.create_node(
+            identifier=node_key, tag=node_value,
+            parent=user_tree.root,
+        )
+        assets_id = FavoriteAsset.get_user_favorite_assets_id(self.object)
+        all_valid_assets = user_tree.all_valid_assets(user_tree.root)
+        valid_assets_id = set(assets_id) & all_valid_assets
+        user_tree.set_assets(node_key, valid_assets_id)
+
     def set_user_tree_to_local(self, user_tree):
         self._user_tree = user_tree
         self._user_tree_filter_id = self._filter_id
@@ -323,6 +337,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
         self.add_empty_node_if_need(user_tree)
+        self.add_favorite_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
         return user_tree

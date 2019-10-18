@@ -27,6 +27,7 @@ __all__ = ['LabelViewSet']
 
 
 class LabelViewSet(OrgBulkModelViewSet):
+    model = Label
     filter_fields = ("name", "value")
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

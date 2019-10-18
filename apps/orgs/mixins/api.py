@@ -5,12 +5,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_bulk import BulkModelViewSet
 from common.mixins import CommonApiMixin
 
-from ..utils import set_to_root_org
+from ..utils import set_to_root_org, filter_org_queryset
 from ..models import Organization
 
 __all__ = [
     'RootOrgViewMixin', 'OrgMembershipModelViewSetMixin', 'OrgModelViewSet',
-    'OrgBulkModelViewSet',
+    'OrgBulkModelViewSet', 'OrgQuerySetMixin',
 ]
 
 
@@ -22,7 +22,15 @@ class RootOrgViewMixin:
 
 class OrgQuerySetMixin:
     def get_queryset(self):
-        queryset = super().get_queryset().all()
+        if hasattr(self, 'model'):
+            queryset = self.model.objects.all()
+        else:
+            assert self.queryset is None, (
+                    "'%s' should not include a `queryset` attribute"
+                    % self.__class__.__name__
+            )
+            queryset = super().get_queryset()
+
         if hasattr(self, 'swagger_fake_view'):
             return queryset[:1]
         if hasattr(self, 'action') and self.action == 'list' and \

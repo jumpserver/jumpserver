@@ -15,7 +15,7 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 
 class DomainViewSet(OrgBulkModelViewSet):
-    queryset = Domain.objects.all()
+    model = Domain
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
 
@@ -26,16 +26,15 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 
 class GatewayViewSet(OrgBulkModelViewSet):
+    model = Gateway
     filter_fields = ("domain__name", "name", "username", "ip", "domain")
     search_fields = filter_fields
-    queryset = Gateway.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.GatewaySerializer
 
 
 class GatewayTestConnectionApi(SingleObjectMixin, APIView):
     permission_classes = (IsOrgAdmin,)
-    model = Gateway
     object = None
 
     def post(self, request, *args, **kwargs):
