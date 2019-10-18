@@ -1,10 +1,11 @@
 #  coding: utf-8
 #
 
-from rest_framework import viewsets, generics
 from rest_framework.views import Response
 
 from common.permissions import IsOrgAdmin
+from orgs.mixins.api import OrgModelViewSet
+from orgs.mixins import generics
 from ..models import RemoteAppPermission
 from ..serializers import (
     RemoteAppPermissionSerializer,
@@ -20,20 +21,16 @@ __all__ = [
 ]
 
 
-class QuerySetMixin:
-    def get_queryset(self):
-        queryset = RemoteAppPermission.objects.all()
-        return queryset
-
-
-class RemoteAppPermissionViewSet(QuerySetMixin, viewsets.ModelViewSet):
+class RemoteAppPermissionViewSet(OrgModelViewSet):
+    model = RemoteAppPermission
     filter_fields = ('name', )
     search_fields = filter_fields
     serializer_class = RemoteAppPermissionSerializer
     permission_classes = (IsOrgAdmin,)
 
 
-class RemoteAppPermissionAddUserApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionAddUserApi(generics.RetrieveUpdateAPIView):
+    model = RemoteAppPermission
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateUserSerializer
 
@@ -49,7 +46,8 @@ class RemoteAppPermissionAddUserApi(QuerySetMixin, generics.RetrieveUpdateAPIVie
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionRemoveUserApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionRemoveUserApi(generics.RetrieveUpdateAPIView):
+    model = RemoteAppPermission
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateUserSerializer
 
@@ -65,7 +63,8 @@ class RemoteAppPermissionRemoveUserApi(QuerySetMixin, generics.RetrieveUpdateAPI
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionAddRemoteAppApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionAddRemoteAppApi(generics.RetrieveUpdateAPIView):
+    model = RemoteAppPermission
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateRemoteAppSerializer
 
@@ -81,7 +80,8 @@ class RemoteAppPermissionAddRemoteAppApi(QuerySetMixin, generics.RetrieveUpdateA
             return Response({"error": serializer.errors})
 
 
-class RemoteAppPermissionRemoveRemoteAppApi(QuerySetMixin, generics.RetrieveUpdateAPIView):
+class RemoteAppPermissionRemoveRemoteAppApi(generics.RetrieveUpdateAPIView):
+    model = RemoteAppPermission
     permission_classes = (IsOrgAdmin,)
     serializer_class = RemoteAppPermissionUpdateRemoteAppSerializer
 
