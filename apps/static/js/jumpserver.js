@@ -958,10 +958,11 @@ function rootNodeAddDom(ztree, callback) {
     var rootNode = ztree.getNodes()[0];
     if (rootNode) {
         var $rootNodeRef = $("#" + rootNode.tId + "_a");
+        $rootNodeRef.after(refreshIcon);
     } else {
-        $rootNodeRef = $('#' + ztree.setting.treeId)
+        $rootNodeRef = $('#' + ztree.setting.treeId);
+        $rootNodeRef.html(refreshIcon);
     }
-    $rootNodeRef.after(refreshIcon);
     var refreshIconRef = $('#tree-refresh');
     refreshIconRef.bind('click', function () {
         ztree.destroy();
