@@ -292,7 +292,8 @@ $(document).ready(function(){
         format: 'csv',
         params: {
             search: search,
-            node_id: current_node_id || ''
+            node_id: current_node_id || '',
+            show_current_asset: getCookie('show_current_asset')
         }
     };
     APIExportData(props);

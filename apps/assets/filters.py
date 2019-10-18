@@ -53,7 +53,7 @@ class AssetByNodeFilterBackend(filters.BaseFilterBackend):
             return queryset
 
         if node is None:
-            return queryset.none()
+            return queryset
         query_all = self.is_query_all(request)
         if query_all:
             pattern = node.get_all_children_pattern(with_self=True)
