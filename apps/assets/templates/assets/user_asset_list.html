@@ -104,6 +104,7 @@ $(document).ready(function () {
         body: JSON.stringify({asset: assetId}),
         flash_message: false,
         success: function (data) {
+            favoriteAssets.push(assetId);
             var btn = disfavorBtnTmpl.replace("ID", assetId);
             $this.replaceWith(btn)
         }
@@ -117,6 +118,10 @@ $(document).ready(function () {
         method: "DELETE",
         flash_message: false,
         success: function (data) {
+            var index = favoriteAssets.indexOf(assetId);
+            if (index !== '-1'){
+                favoriteAssets.splice(index, 1);
+            }
             var btn = favorBtnTmpl.replace("ID", assetId);
             $this.replaceWith(btn)
         }
