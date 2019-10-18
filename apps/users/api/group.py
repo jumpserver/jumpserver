@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework import generics
-
 from ..serializers import (
     UserGroupSerializer,
     UserGroupListSerializer,
@@ -10,6 +8,7 @@ from ..serializers import (
 )
 from ..models import UserGroup
 from orgs.mixins.api import OrgBulkModelViewSet
+from orgs.mixins import generics
 from common.permissions import IsOrgAdmin
 
 
@@ -17,9 +16,9 @@ __all__ = ['UserGroupViewSet', 'UserGroupUpdateUserApi']
 
 
 class UserGroupViewSet(OrgBulkModelViewSet):
+    model = UserGroup
     filter_fields = ("name",)
     search_fields = filter_fields
-    queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
     permission_classes = (IsOrgAdmin,)
 
@@ -31,6 +30,6 @@ class UserGroupViewSet(OrgBulkModelViewSet):
 
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
-    queryset = UserGroup.objects.all()
+    model = UserGroup
     serializer_class = UserGroupUpdateMemberSerializer
     permission_classes = (IsOrgAdmin,)

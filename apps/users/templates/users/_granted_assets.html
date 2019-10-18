@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="col-lg-3" style="padding-left: 0px">
+<div class="col-lg-3" style="padding-left: 0" id="split-left">
    <div class="ibox float-e-margins">
        <div class="ibox-content mailbox-content" style="padding-top: 0">
            <div class="file-manager ">
@@ -11,7 +11,12 @@
        </div>
    </div>
 </div>
-<div class="col-lg-9 animated fadeInRight">
+<div class="col-lg-9 animated fadeInRight" id="split-right">
+    <div class="tree-toggle">
+       <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+           <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
+       </div>
+    </div>
     <div class="mail-box-header">
 {#        <div class="btn-group" style="float: right">#}
 {#            <button data-toggle="dropdown" class="btn btn-default btn-sm labels dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>#}
@@ -172,6 +177,27 @@ function loadLabels() {
         requesting = true;
         requestApi(data)
     }
+}
+
+var show = 0;
+
+function toggle() {
+    if (show === 0) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+    setTimeout(function () {
+        $(".table").css("width", "100%");
+        {#assetTable.columns.adjust();#}
+    }, 500)
 }
 
 $(document).ready(function () {

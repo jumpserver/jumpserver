@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from common.utils import get_logger
 from ..utils import (
     set_current_org, get_current_org, current_org,
+    get_org_filters
 )
 from ..models import Organization
 
@@ -19,41 +20,37 @@ __all__ = [
 ]
 
 
+class OrgQuerySet(models.QuerySet):
+    pass
+
+
 class OrgManager(models.Manager):
-
     def get_queryset(self):
-        queryset = super(OrgManager, self).get_queryset()
-        kwargs = {}
-
-        _current_org = get_current_org()
-        if _current_org is None:
-            kwargs['id'] = None
-        elif _current_org.is_real():
-            kwargs['org_id'] = _current_org.id
-        elif _current_org.is_default():
-            queryset = queryset.filter(org_id="")
-        #
-        # lines = traceback.format_stack()
-        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        # for line in lines[-10:-1]:
-        #     print(line)
-        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-
-        queryset = queryset.filter(**kwargs)
+        queryset = super().get_queryset()
+        kwargs = get_org_filters()
+        if kwargs:
+            return queryset.filter(**kwargs)
         return queryset
-
-    def all(self):
-        if not current_org:
-            msg = 'You can `objects.set_current_org(org).all()` then run it'
-            return self
-        else:
-            return super(OrgManager, self).all()
 
     def set_current_org(self, org):
         if isinstance(org, str):
             org = Organization.get_instance(org)
         set_current_org(org)
         return self
+
+    def all(self):
+        # print("Call all: {}".format(current_org))
+        #
+        # lines = traceback.format_stack()
+        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        # for line in lines[-10:-1]:
+        #     print(line)
+        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        if not current_org:
+            msg = 'You can `objects.set_current_org(org).all()` then run it'
+            return self
+        else:
+            return super().all()
 
 
 class OrgModelMixin(models.Model):
@@ -65,9 +62,12 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if org is not None and (org.is_real() or org.is_system()):
+        if org is None:
+            return super().save(*args, **kwargs)
+
+        if org.is_real() or org.is_system():
             self.org_id = org.id
-        elif org is not None and org.is_default():
+        elif org.is_default():
             self.org_id = ''
         return super().save(*args, **kwargs)
 
