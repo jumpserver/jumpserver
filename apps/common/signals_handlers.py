@@ -36,7 +36,7 @@ def on_request_finished_logging_db_query(sender, **kwargs):
     queries = connection.queries
     counters = defaultdict(Counter)
     for query in queries:
-        if not query['sql'].startswith('SELECT'):
+        if not query['sql'] or not query['sql'].startswith('SELECT'):
             continue
         tables = pattern.findall(query['sql'])
         table_name = ''.join(tables)
