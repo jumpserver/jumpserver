@@ -21,19 +21,46 @@
 
 {% block custom_foot_js %}
 <script>
-var treeUrl = "{% url 'api-perms:my-nodes-children-as-tree' %}?&cache_policy=1";
+var treeUrl = "{% url 'api-perms:my-nodes-children-as-tree' %}?cache_policy=1";
 var assetTableUrl = "{% url 'api-perms:my-assets' %}?cache_policy=1";
 var selectUrl = '{% url "api-perms:my-node-assets" node_id=DEFAULT_PK %}?cache_policy=1&all=1';
 var systemUsersUrl = "{% url 'api-perms:my-asset-system-users' asset_id=DEFAULT_PK %}?cache_policy=1";
 var showAssetHref = false; // Need input default true
+
+var favoriteAssets = [];
+var favorBtnTmpl = '<a class="btn btn-xs btn-default btn-favor" data-id="ID"><i class="fa fa-star-o"></i></a>';
+var disfavorBtnTmpl = '<a class="btn btn-xs btn-default btn-disfavor" data-id="ID"><i class="fa fa-star"></i></a>';
 var actions = {
     targets: 4, createdCell: function (td, cellData) {
-       var conn_btn = '<a href="{% url "luna-view" %}?login_to=' + cellData +
-           '" class="btn btn-xs btn-primary" target="_blank">{% trans "Connect" %}</a>';
-       $(td).html(conn_btn)
+       var connBtn = '<a href="{% url "luna-view" %}?login_to=' + cellData +
+           '" class="btn btn-xs btn-primary" target="_blank"><i class="fa fa-terminal"></i></a> ';
+       var favorBtn = favorBtnTmpl.replace("ID", cellData);
+       var disfavorBtn = disfavorBtnTmpl.replace("ID", cellData);
+
+       var btn = connBtn;
+       if (favoriteAssets.indexOf(cellData) === -1) {
+           btn += favorBtn
+       } else {
+           btn += disfavorBtn;
+       }
+
+       $(td).html(btn)
 }};
 $(document).ready(function () {
-    initTree();
+    requestApi({
+        method: "GET",
+        url: "{% url 'api-assets:favorite-asset-list' %}",
+        success: function (data) {
+            favoriteAssets = data.map(function (i) {
+                return i.asset;
+            });
+            initTree();
+        },
+        error: function () {
+            initTree();
+        },
+        flash_message: false
+     })
 }).on('click', '.labels li', function () {
     var val = $(this).text();
     $("#user_assets_table_filter input").val(val);
@@ -67,22 +94,38 @@ $(document).ready(function () {
     };
     $('#asset_detail_tbody').html(trs)
     $('#user_asset_detail_modal').modal();
+})
+.on('click', '.btn-favor', function () {
+    var $this = $(this);
+    var assetId = $(this).data("id");
+    requestApi({
+        url: "{% url 'api-assets:favorite-asset-list' %}",
+        method: "POST",
+        body: JSON.stringify({asset: assetId}),
+        flash_message: false,
+        success: function (data) {
+            favoriteAssets.push(assetId);
+            var btn = disfavorBtnTmpl.replace("ID", assetId);
+            $this.replaceWith(btn)
+        }
+    });
+})
+.on('click', '.btn-disfavor', function () {
+    var $this = $(this);
+    var assetId = $(this).data("id");
+    requestApi({
+        url: "{% url 'api-assets:favorite-asset-list' %}?asset=" + assetId,
+        method: "DELETE",
+        flash_message: false,
+        success: function (data) {
+            var index = favoriteAssets.indexOf(assetId);
+            if (index !== '-1'){
+                favoriteAssets.splice(index, 1);
+            }
+            var btn = favorBtnTmpl.replace("ID", assetId);
+            $this.replaceWith(btn)
+        }
+    });
 });
-
-function toggle() {
-    if (show === 0) {
-        $("#split-left").hide(500, function () {
-            $("#split-right").attr("class", "col-lg-12");
-            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
-            show = 1;
-        });
-    } else {
-        $("#split-right").attr("class", "col-lg-9");
-        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
-        $("#split-left").show(500);
-        show = 0;
-    }
-}
-
 </script>
 {% endblock %}

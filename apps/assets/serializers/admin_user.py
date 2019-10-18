@@ -45,7 +45,7 @@ class ReplaceNodeAdminUserSerializer(serializers.ModelSerializer):
     管理用户更新关联到的集群
     """
     nodes = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Node.objects.all()
+        many=True, queryset=Node.objects
     )
 
     class Meta:

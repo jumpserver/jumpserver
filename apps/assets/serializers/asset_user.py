@@ -79,7 +79,7 @@ class AssetUserAuthInfoSerializer(serializers.ModelSerializer):
 
 
 class AssetUserPushSerializer(serializers.Serializer):
-    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.all(), label=_("Asset"))
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects, label=_("Asset"))
     username = serializers.CharField(max_length=1024)
 
     def create(self, validated_data):

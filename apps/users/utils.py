@@ -325,3 +325,7 @@ def construct_user_email(username, email):
             email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
     return email
 
+
+def get_current_org_members(exclude=()):
+    from orgs.utils import current_org
+    return current_org.get_org_members(exclude=exclude)

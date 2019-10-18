@@ -267,7 +267,7 @@ function requestApi(props) {
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
-        data: props.body,
+        data: props.body || props.data,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {
@@ -579,6 +579,9 @@ jumpserver.initServerSideDataTable = function (options) {
         ajax: {
             url: options.ajax_url,
             error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseText && jqXHR.responseText.indexOf("%(value)s") !== -1 ) {
+                    return
+                }
                 var msg = gettext("Unknown error occur");
                 if (jqXHR.responseJSON) {
                     if (jqXHR.responseJSON.error) {
@@ -953,8 +956,13 @@ function initPopover($container, $progress, $idPassword, $el, password_check_rul
 function rootNodeAddDom(ztree, callback) {
     var refreshIcon = "<a id='tree-refresh'><i class='fa fa-refresh'></i></a>";
     var rootNode = ztree.getNodes()[0];
-    var $rootNodeRef = $("#" + rootNode.tId + "_a");
-    $rootNodeRef.after(refreshIcon);
+    if (rootNode) {
+        var $rootNodeRef = $("#" + rootNode.tId + "_a");
+        $rootNodeRef.after(refreshIcon);
+    } else {
+        $rootNodeRef = $('#' + ztree.setting.treeId);
+        $rootNodeRef.html(refreshIcon);
+    }
     var refreshIconRef = $('#tree-refresh');
     refreshIconRef.bind('click', function () {
         ztree.destroy();

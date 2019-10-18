@@ -22,7 +22,6 @@
                             <li>
                                 <a href="{% url 'assets:asset-user-list' pk=asset.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset user list' %} </a>
                             </li>
-                            {% if user.is_superuser %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
@@ -31,7 +30,6 @@
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
-                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content">

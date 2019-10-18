@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import copy
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -12,6 +11,7 @@ from common.serializers import AdaptedBulkListSerializer
 from common.permissions import CanUpdateDeleteUser
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
+from .. import utils
 
 
 __all__ = [
@@ -118,7 +118,9 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateGroupSerializer(serializers.ModelSerializer):
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
+    groups = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=UserGroup.objects
+    )
 
     class Meta:
         model = User
@@ -127,7 +129,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 class UserGroupSerializer(BulkOrgResourceModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
-        required=False, many=True, queryset=User.objects.all(), label=_('User')
+        required=False, many=True, queryset=User.objects, label=_('User')
     )
 
     class Meta:
@@ -140,6 +142,14 @@ class UserGroupSerializer(BulkOrgResourceModelSerializer):
         extra_kwargs = {
             'created_by': {'label': _('Created by'), 'read_only': True}
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_fields_queryset()
+
+    def set_fields_queryset(self):
+        users_field = self.fields['users']
+        users_field.child_relation.queryset = utils.get_current_org_members()
 
     def validate_users(self, users):
         for user in users:
@@ -154,11 +164,19 @@ class UserGroupListSerializer(UserGroupSerializer):
 
 
 class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):
-    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects)
 
     class Meta:
         model = UserGroup
         fields = ['id', 'users']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_fields_queryset()
+
+    def set_fields_queryset(self):
+        users_field = self.fields['users']
+        users_field.child_relation.queryset = utils.get_current_org_members()
 
 
 class ChangeUserPasswordSerializer(serializers.ModelSerializer):

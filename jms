@@ -445,8 +445,7 @@ def stop_service(srv, sig=15):
 
 def stop_daemon_service():
     pid = get_pid('jms')
-    logging.info("Daemon pid is: {}".format(pid))
-    if pid:
+    if pid and check_pid(pid):
         os.kill(pid, 15)
 
 

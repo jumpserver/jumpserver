@@ -5,9 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins.forms import OrgModelForm
-from orgs.utils import current_org
 from .models import User, UserGroup
-from .utils import check_password_rules
+from .utils import check_password_rules, get_current_org_members
 
 
 class UserCheckPasswordForm(forms.Form):
@@ -267,14 +266,22 @@ class UserBulkUpdateForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         required=True,
         label=_('Select users'),
-        queryset=User.objects.all(),
+        queryset=User.objects.none(),
         widget=forms.SelectMultiple(
             attrs={
-                'class': 'select2',
+                'class': 'users-select2',
                 'data-placeholder': _('Select users')
             }
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_fields_queryset()
+
+    def set_fields_queryset(self):
+        users_field = self.fields['users']
+        users_field.queryset = get_current_org_members()
 
     class Meta:
         model = User
@@ -320,25 +327,19 @@ class UserGroupForm(OrgModelForm):
     )
 
     def __init__(self, **kwargs):
-        instance = kwargs.get('instance')
-        if instance:
-            initial = kwargs.get('initial', {})
-            initial.update({'users': instance.users.all()})
-            kwargs['initial'] = initial
         super().__init__(**kwargs)
-        if 'initial' not in kwargs:
-            return
+        self.set_fields_queryset()
+
+    def set_fields_queryset(self):
         users_field = self.fields.get('users')
-        if instance:
-            users_field.queryset = instance.users.all()
+        if self.instance:
+            users_field.initial = self.instance.users.all()
+            users_field.queryset = self.instance.users.all()
         else:
             users_field.queryset = User.objects.none()
 
     def save(self, commit=True):
-        group = super().save(commit=commit)
-        users = self.cleaned_data['users']
-        group.users.set(users)
-        return group
+        raise Exception("Save by restful api")
 
     class Meta:
         model = UserGroup

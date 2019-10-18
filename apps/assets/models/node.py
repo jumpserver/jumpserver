@@ -324,6 +324,8 @@ class SomeNodesMixin:
     ungrouped_value = _('ungrouped')
     empty_key = '-11'
     empty_value = _("empty")
+    favorite_key = '-12'
+    favorite_value = _("favorite")
 
     def is_default_node(self):
         return self.key == self.default_key
@@ -363,7 +365,7 @@ class SomeNodesMixin:
     @classmethod
     def ungrouped_node(cls):
         with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.ungrouped_key}
+            defaults = {'value': cls.ungrouped_value}
             obj, created = cls.objects.get_or_create(
                 defaults=defaults, key=cls.ungrouped_key
             )
@@ -388,10 +390,20 @@ class SomeNodesMixin:
             return obj
 
     @classmethod
+    def favorite_node(cls):
+        with tmp_to_org(Organization.system()):
+            defaults = {'value': cls.favorite_value}
+            obj, created = cls.objects.get_or_create(
+                defaults=defaults, key=cls.favorite_key
+            )
+            return obj
+
+    @classmethod
     def initial_some_nodes(cls):
         cls.default_node()
         cls.empty_node()
         cls.ungrouped_node()
+        cls.favorite_node()
 
 
 class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
@@ -412,11 +424,11 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
     def __str__(self):
         return self.value
 
-    def __eq__(self, other):
-        if not other:
-            return False
-        return self.id == other.id
-
+    # def __eq__(self, other):
+    #     if not other:
+    #         return False
+    #     return self.id == other.id
+    #
     def __gt__(self, other):
         self_key = [int(k) for k in self.key.split(':')]
         other_key = [int(k) for k in other.key.split(':')]
@@ -470,8 +482,13 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
         tree_node = TreeNode(**data)
         return tree_node
 
-    def delete(self, using=None, keep_parents=False):
+    def has_children_or_contains_assets(self):
         if self.children or self.get_assets():
+            return True
+        return False
+
+    def delete(self, using=None, keep_parents=False):
+        if self.has_children_or_contains_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
 
