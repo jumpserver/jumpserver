@@ -84,9 +84,6 @@
                                             <tr>
                                                 <td colspan="2" class="no-borders">
                                                     <select data-placeholder="{% trans 'Add user' %}" id="slct_users" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for user in users %}
-                                                        <option value="{{ user.id }}" id="opt_{{ user.id }}">{{ user.name }}</option>
-                                                        {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
@@ -157,7 +154,8 @@ $(document).ready(function () {
         }).on('select2:unselect', function(evt) {
             var data = evt.params.data;
             delete jumpserver.users_selected[data.id]
-        })
+        });
+    usersSelect2Init('#slct_users')
 }).on('click', '.btn_remove_user', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
