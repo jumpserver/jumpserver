@@ -34,7 +34,7 @@ class UserNodeTreeMixin:
 
         for node in nodes:
             assets_amount = self.tree.valid_assets_amount(node.key)
-            if assets_amount == 0 and node.key != Node.empty_key:
+            if assets_amount == 0 and not node.key.startswith('-'):
                 continue
             node.assets_amount = assets_amount
             data = ParserNode.parse_node_to_tree_node(node)

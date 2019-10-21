@@ -51,6 +51,8 @@ class TreeNode:
             result = True
         elif self.pId != other.pId:
             result = self.pId > other.pId
+        elif self.id.startswith('-') and not other.id.startswith('-'):
+            result = False
         else:
             result = self.name > other.name
         return result

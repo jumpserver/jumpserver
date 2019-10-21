@@ -13,14 +13,15 @@ __all__ = ['CommandFilterViewSet', 'CommandFilterRuleViewSet']
 
 
 class CommandFilterViewSet(OrgBulkModelViewSet):
+    model = CommandFilter
     filter_fields = ("name",)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
-    queryset = CommandFilter.objects.all()
     serializer_class = serializers.CommandFilterSerializer
 
 
 class CommandFilterRuleViewSet(OrgBulkModelViewSet):
+    model = CommandFilterRule
     filter_fields = ("content",)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

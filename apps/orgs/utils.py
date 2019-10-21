@@ -83,17 +83,23 @@ def tmp_to_org(org):
         set_current_org(ori_org)
 
 
-def filter_org_queryset(queryset):
+def get_org_filters():
     kwargs = {}
 
     _current_org = get_current_org()
     if _current_org is None:
-        return queryset.none()
+        return kwargs
 
     if _current_org.is_real():
         kwargs['org_id'] = _current_org.id
     elif _current_org.is_default():
         kwargs["org_id"] = ''
+    return kwargs
+
+
+def filter_org_queryset(queryset):
+    kwargs = get_org_filters()
+
     #
     # lines = traceback.format_stack()
     # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")

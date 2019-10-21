@@ -10,3 +10,4 @@ from .authbook import *
 from .utils import *
 from .authbook import *
 from .gathered_user import *
+from .favorite_asset import *

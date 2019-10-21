@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 
 
 class SessionViewSet(OrgBulkModelViewSet):
-    queryset = Session.objects.all()
+    model = Session
     serializer_class = serializers.SessionSerializer
     permission_classes = (IsOrgAdminOrAppUser, )
     filterset_fields = [

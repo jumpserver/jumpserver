@@ -38,8 +38,10 @@ class NodeSerializer(BulkOrgResourceModelSerializer):
         return data
 
 
-class NodeAssetsSerializer(serializers.ModelSerializer):
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+class NodeAssetsSerializer(BulkOrgResourceModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Asset.objects
+    )
 
     class Meta:
         model = Node

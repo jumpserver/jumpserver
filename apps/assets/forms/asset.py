@@ -129,7 +129,7 @@ class AssetUpdateForm(OrgModelForm):
 class AssetBulkUpdateForm(OrgModelForm):
     assets = forms.ModelMultipleChoiceField(
         required=True,
-        label=_('Select assets'), queryset=Asset.objects.all(),
+        label=_('Select assets'), queryset=Asset.objects,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -155,10 +155,17 @@ class AssetBulkUpdateForm(OrgModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.set_fields_queryset()
+
         # 重写其他字段为不再required
         for name, field in self.fields.items():
             if name != 'assets':
                 field.required = False
+
+    def set_fields_queryset(self):
+        assets_field = self.fields['assets']
+        if hasattr(self, 'data'):
+            assets_field.queryset = Asset.objects.all()
 
     def save(self, commit=True):
         changed_fields = []

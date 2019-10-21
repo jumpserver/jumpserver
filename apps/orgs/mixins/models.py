@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from common.utils import get_logger
 from ..utils import (
     set_current_org, get_current_org, current_org,
-    filter_org_queryset,
+    filter_org_queryset
 )
 from ..models import Organization
 
@@ -48,9 +48,12 @@ class OrgModelMixin(models.Model):
 
     def save(self, *args, **kwargs):
         org = get_current_org()
-        if org is not None and (org.is_real() or org.is_system()):
+        if org is None:
+            return super().save(*args, **kwargs)
+
+        if org.is_real() or org.is_system():
             self.org_id = org.id
-        elif org is not None and org.is_default():
+        elif org.is_default():
             self.org_id = ''
         return super().save(*args, **kwargs)
 

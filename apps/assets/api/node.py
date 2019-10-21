@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,9 +23,12 @@ from django.shortcuts import get_object_or_404
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
 from orgs.mixins.api import OrgModelViewSet
+from orgs.mixins import generics
 from ..hands import IsOrgAdmin
 from ..models import Node
-from ..tasks import update_assets_hardware_info_util, test_asset_connectivity_util
+from ..tasks import (
+    update_assets_hardware_info_util, test_asset_connectivity_util
+)
 from .. import serializers
 
 
@@ -40,9 +43,9 @@ __all__ = [
 
 
 class NodeViewSet(OrgModelViewSet):
+    model = Node
     filter_fields = ('value', 'key', 'id')
     search_fields = ('value', )
-    queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
 
@@ -79,16 +82,13 @@ class NodeListAsTreeApi(generics.ListAPIView):
       }
     ]
     """
+    model = Node
     permission_classes = (IsOrgAdmin,)
     serializer_class = TreeNodeSerializer
 
     @staticmethod
     def to_tree_queryset(queryset):
         queryset = [node.as_tree_node() for node in queryset]
-        return queryset
-
-    def get_queryset(self):
-        queryset = Node.objects.all()
         return queryset
 
     def filter_queryset(self, queryset):
@@ -98,7 +98,6 @@ class NodeListAsTreeApi(generics.ListAPIView):
 
 
 class NodeChildrenApi(generics.ListCreateAPIView):
-    queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeSerializer
     instance = None
@@ -162,6 +161,7 @@ class NodeChildrenAsTreeApi(NodeChildrenApi):
     ]
 
     """
+    model = Node
     serializer_class = TreeNodeSerializer
     http_method_names = ['get']
 
@@ -204,7 +204,7 @@ class NodeAssetsApi(generics.ListAPIView):
 
 
 class NodeAddChildrenApi(generics.UpdateAPIView):
-    queryset = Node.objects.all()
+    model = Node
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.NodeAddChildrenSerializer
     instance = None
@@ -221,8 +221,8 @@ class NodeAddChildrenApi(generics.UpdateAPIView):
 
 
 class NodeAddAssetsApi(generics.UpdateAPIView):
+    model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     instance = None
 
@@ -233,8 +233,8 @@ class NodeAddAssetsApi(generics.UpdateAPIView):
 
 
 class NodeRemoveAssetsApi(generics.UpdateAPIView):
+    model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     instance = None
 
@@ -249,8 +249,8 @@ class NodeRemoveAssetsApi(generics.UpdateAPIView):
 
 
 class NodeReplaceAssetsApi(generics.UpdateAPIView):
+    model = Node
     serializer_class = serializers.NodeAssetsSerializer
-    queryset = Node.objects.all()
     permission_classes = (IsOrgAdmin,)
     instance = None
 
@@ -262,8 +262,8 @@ class NodeReplaceAssetsApi(generics.UpdateAPIView):
 
 
 class RefreshNodeHardwareInfoApi(APIView):
-    permission_classes = (IsOrgAdmin,)
     model = Node
+    permission_classes = (IsOrgAdmin,)
 
     def get(self, request, *args, **kwargs):
         node_id = kwargs.get('pk')
