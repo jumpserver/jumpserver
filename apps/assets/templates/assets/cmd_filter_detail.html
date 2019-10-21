@@ -144,7 +144,9 @@ function updateCMDFilterSystemUsers(system_users) {
     });
 }
 $(document).ready(function () {
-    $(".select2").select2();
+    $(".select2").select2({
+        closeOnSelect: false
+    });
 }).on('click', '#btn-binding-system-users', function () {
     var origin_system_users = $.map($(".bdg-system-users"), function (s) {
         return $(s).data('gid')
