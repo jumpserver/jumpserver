@@ -141,6 +141,7 @@ function activeNav(prefix) {
     var path = document.location.pathname;
     if (prefix) {
         path = path.replace(prefix, '');
+        console.log(path);
     }
     var urlArray = path.split("/");
     var app = urlArray[1];
