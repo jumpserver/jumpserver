@@ -137,14 +137,18 @@ function setAjaxCSRFToken() {
     });
 }
 
-function activeNav() {
-    var url_array = document.location.pathname.split("/");
-    var app = url_array[1];
-    var resource = url_array[2];
+function activeNav(prefix) {
+    var path = document.location.pathname;
+    if (prefix) {
+        path = path.replace(prefix, '');
+    }
+    var urlArray = path.split("/");
+    var app = urlArray[1];
+    var resource = urlArray[2];
     if (app === '') {
         $('#index').addClass('active');
     } else if (app === 'xpack' && resource === 'cloud') {
-        var item = url_array[3];
+        var item = urlArray[3];
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
         $('#' + app + ' #' + resource + ' #' + item + ' a').css('color', '#ffffff');

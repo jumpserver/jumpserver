@@ -9,7 +9,7 @@
 <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static "js/jumpserver.js" %}?v=4"></script>
 <script>
-activeNav();
+activeNav("{{ FORCE_SCRIPT_NAME }}");
 $(document).ready(function(){
     setAjaxCSRFToken();
     $('textarea').attr('rows', 5);
