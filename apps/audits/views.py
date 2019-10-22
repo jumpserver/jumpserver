@@ -282,7 +282,7 @@ class LoginLogExportView(PermissionsMixin, View):
 
             login_logs = UserLoginLog.get_login_logs(
                 date_from=date_from, date_to=date_to, user=user,
-                keyword=keyword, date_format=self.date_format
+                keyword=keyword,
             )
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
