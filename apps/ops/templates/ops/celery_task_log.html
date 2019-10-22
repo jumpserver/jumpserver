@@ -8,35 +8,35 @@
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
     <style>
-        {#body {#}
-        {#    background-color: black;#}
-        {#}#}
+        body {
+            background-color: black;
+        }
 
-        {#.xterm-rows {#}
-        {#    font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;#}
-        {#    font-size: 13px;#}
-        {#}#}
+        .xterm-rows {
+            font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;
+            font-size: 13px;
+        }
 
-        {#.terminal .xterm-viewport {#}
-        {#    background-color: #1f1b1b;#}
-        {#    overflow: auto;#}
-        {#}#}
+        .terminal .xterm-viewport {
+            background-color: #1f1b1b;
+            overflow: auto;
+        }
 
-        {#body ::-webkit-scrollbar-track {#}
-        {#    -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);#}
-        {#    background-color: #272323;#}
-        {#    border-radius: 6px;#}
-        {#}#}
-        {##}
-        {#body ::-webkit-scrollbar {#}
-        {#    width: 8px;#}
-        {#    height: 8px;#}
-        {#}#}
-        {##}
-        {#body ::-webkit-scrollbar-thumb {#}
-        {#    background-color: #494141;#}
-        {#    border-radius: 6px;#}
-        {#}#}
+        body ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+            background-color: #272323;
+            border-radius: 6px;
+        }
+
+        body ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        body ::-webkit-scrollbar-thumb {
+            background-color: #494141;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <div id="term" style="height: 100%;width: 100%">
