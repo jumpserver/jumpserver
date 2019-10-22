@@ -490,6 +490,7 @@ class ParserNode:
                     'ip': asset.ip,
                     'protocols': asset.protocols_as_list,
                     'platform': asset.platform,
+                    "org_name": asset.org_name,
                 },
             }
         }
