@@ -67,6 +67,8 @@ class AssetUserManager:
         return AssetUserQuerySet(instances)
 
     def get(self, username, asset, **kwargs):
+        print(username)
+        print(asset)
         instances = self.filter(username, assets=[asset], **kwargs)
         if len(instances) == 1:
             return instances[0]

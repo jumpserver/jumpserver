@@ -62,10 +62,10 @@ asset_permission_urlpatterns = [
     path('user-groups/<uuid:pk>/assets/<uuid:asset_id>/system-users/', api.UserGroupGrantedAssetSystemUsersApi.as_view(), name='user-group-asset-system-users'),
 
     # 用户和资产授权变更
-    path('asset-permissions/<uuid:pk>/user/remove/', api.AssetPermissionRemoveUserApi.as_view(), name='asset-permission-remove-user'),
-    path('asset-permissions/<uuid:pk>/user/add/', api.AssetPermissionAddUserApi.as_view(), name='asset-permission-add-user'),
-    path('asset-permissions/<uuid:pk>/asset/remove/', api.AssetPermissionRemoveAssetApi.as_view(), name='asset-permission-remove-asset'),
-    path('asset-permissions/<uuid:pk>/asset/add/', api.AssetPermissionAddAssetApi.as_view(), name='asset-permission-add-asset'),
+    path('asset-permissions/<uuid:pk>/users/remove/', api.AssetPermissionRemoveUserApi.as_view(), name='asset-permission-remove-user'),
+    path('asset-permissions/<uuid:pk>/users/add/', api.AssetPermissionAddUserApi.as_view(), name='asset-permission-add-user'),
+    path('asset-permissions/<uuid:pk>/assets/remove/', api.AssetPermissionRemoveAssetApi.as_view(), name='asset-permission-remove-asset'),
+    path('asset-permissions/<uuid:pk>/assets/add/', api.AssetPermissionAddAssetApi.as_view(), name='asset-permission-add-asset'),
 
     # 授权规则中授权的资产
     path('asset-permissions/<uuid:pk>/assets/', api.AssetPermissionAssetsApi.as_view(), name='asset-permission-assets'),
@@ -75,7 +75,7 @@ asset_permission_urlpatterns = [
     path('asset-permissions/user/actions/', api.GetUserAssetPermissionActionsApi.as_view(), name='get-user-asset-permission-actions'),
 
     # 刷新缓存
-    path('asset-permissions/user/cache/refresh/', api.RefreshAssetPermissionCacheApi.as_view(), name='refresh-asset-permission-cache'),
+    path('asset-permissions/cache/refresh/', api.RefreshAssetPermissionCacheApi.as_view(), name='refresh-asset-permission-cache'),
 ]
 
 
@@ -99,10 +99,10 @@ remote_app_permission_urlpatterns = [
     path('remote-app-permissions/user/validate/', api.ValidateUserRemoteAppPermissionApi.as_view(), name='validate-user-remote-app-permission'),
 
     # 用户和RemoteApp变更
-    path('remote-app-permissions/<uuid:pk>/user/add/', api.RemoteAppPermissionAddUserApi.as_view(), name='remote-app-permission-add-user'),
-    path('remote-app-permissions/<uuid:pk>/user/remove/', api.RemoteAppPermissionRemoveUserApi.as_view(), name='remote-app-permission-remove-user'),
-    path('remote-app-permissions/<uuid:pk>/remote-app/remove/', api.RemoteAppPermissionRemoveRemoteAppApi.as_view(), name='remote-app-permission-remove-remote-app'),
-    path('remote-app-permissions/<uuid:pk>/remote-app/add/', api.RemoteAppPermissionAddRemoteAppApi.as_view(), name='remote-app-permission-add-remote-app'),
+    path('remote-app-permissions/<uuid:pk>/users/add/', api.RemoteAppPermissionAddUserApi.as_view(), name='remote-app-permission-add-user'),
+    path('remote-app-permissions/<uuid:pk>/users/remove/', api.RemoteAppPermissionRemoveUserApi.as_view(), name='remote-app-permission-remove-user'),
+    path('remote-app-permissions/<uuid:pk>/remote-apps/remove/', api.RemoteAppPermissionRemoveRemoteAppApi.as_view(), name='remote-app-permission-remove-remote-app'),
+    path('remote-app-permissions/<uuid:pk>/remote-apps/add/', api.RemoteAppPermissionAddRemoteAppApi.as_view(), name='remote-app-permission-add-remote-app'),
 ]
 
 old_version_urlpatterns = [
