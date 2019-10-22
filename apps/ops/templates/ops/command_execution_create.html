@@ -80,9 +80,7 @@
                                 <select class="select2 form-control"
                                         id="system-users-select">
                                     {% for s in system_users %}
-                                        {% if s.protocol == 'ssh' and s.login_mode == 'auto' %}
-                                            <option value="{{ s.id }}">{{ s }}</option>
-                                        {% endif %}
+                                        <option value="{{ s.id }}" {% if s.protocol != 'ssh' or s.login_mode != 'auto' %}disabled{% endif %}>{{ s }}</option>
                                     {% endfor %}
                                 </select>
                                 <button type="button"
@@ -104,41 +102,6 @@
         var url = null;
         var treeUrl = "{% url 'api-perms:my-nodes-with-assets-as-tree' %}?cache_policy=1";
 
-        function proposeGeometry(term) {
-            if (!term.element.parentElement) {
-                return null;
-            }
-            var parentElementStyle = window.getComputedStyle(term.element.parentElement);
-            var parentElementHeight = parseInt(parentElementStyle.getPropertyValue('height'));
-            var parentElementWidth = Math.max(0, parseInt(parentElementStyle.getPropertyValue('width')));
-            var elementStyle = window.getComputedStyle(term.element);
-            var elementPadding = {
-                top: parseInt(elementStyle.getPropertyValue('padding-top')),
-                bottom: parseInt(elementStyle.getPropertyValue('padding-bottom')),
-                right: parseInt(elementStyle.getPropertyValue('padding-right')),
-                left: parseInt(elementStyle.getPropertyValue('padding-left'))
-            };
-            var elementPaddingVer = elementPadding.top + elementPadding.bottom;
-            var elementPaddingHor = elementPadding.right + elementPadding.left;
-            var availableHeight = parentElementHeight - elementPaddingVer;
-            var availableWidth = parentElementWidth - elementPaddingHor - term._core.viewport.scrollBarWidth;
-            var geometry = {
-                cols: Math.floor(availableWidth / term._core.renderer.dimensions.actualCellWidth),
-                rows: Math.floor(availableHeight / term._core.renderer.dimensions.actualCellHeight)
-            };
-            return geometry;
-        }
-
-        function fit(term) {
-            var geometry = proposeGeometry(term);
-            if (geometry) {
-                if (term.rows !== geometry.rows || term.cols !== geometry.cols) {
-                    term._core.renderer.clear();
-                    term.resize(geometry.cols, geometry.rows);
-                }
-            }
-        }
-
         function initTree() {
             $('#assetTree').html("{% trans 'Loading' %}" + '..');
             if (systemUserId) {
@@ -159,12 +122,6 @@
                         enable: true
                     }
                 },
-                async: {
-                    enable: true,
-                    url: url,
-                    autoParam: ["id=key", "name=n", "level=lv"],
-                    type: 'get'
-                 },
                 edit: {
                     enable: true,
                     showRemoveBtn: false,
@@ -248,13 +205,15 @@
                 lineHeight: 1,
                 rightClickSelectsWord: true,
                 disableStdin: true,
+                cursorBlink: false,
                 theme: {
                     background: '#1f1b1b'
                 }
             });
             term.open(document.getElementById('term'));
             var msg = "{% trans 'Select the left asset, select the running system user, execute command in batch' %}" + "\r\n";
-            fit(term);
+            window.fit.fit(term);
+            {#fit(term);#}
             term.write(msg);
 
             var scheme = document.location.protocol === "https:" ? "wss" : "ws";

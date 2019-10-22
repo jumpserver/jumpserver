@@ -4,6 +4,7 @@
     <title>{% trans 'Task log' %}</title>
     <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
+    <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
     <style>
         body {
@@ -40,7 +41,7 @@
             disableStdin: true
         });
         term.open(document.getElementById('term'));
-        term.resize(120, 30);
+        window.fit.fit(term);
 
         ws = new WebSocket(wsURL);
         ws.onmessage = function(e) {
@@ -61,5 +62,7 @@
                 term.write("Connect websocket server error")
             }
         }
+    }).on('resize', window, function () {
+        window.fit.fit(term);
     });
 </script>

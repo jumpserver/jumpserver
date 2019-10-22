@@ -234,6 +234,9 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             if user_tree.contains(key):
                 nodes_single_assets.pop(key)
 
+        if not nodes_single_assets:
+            return
+
         # 如果要设置到ungroup中
         if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             node_key = Node.ungrouped_key
@@ -336,8 +339,8 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         self.add_direct_nodes_to_user_tree(user_tree)
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
-        self.add_empty_node_if_need(user_tree)
         self.add_favorite_node_if_need(user_tree)
+        self.add_empty_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
         return user_tree
@@ -487,6 +490,7 @@ class ParserNode:
                     'ip': asset.ip,
                     'protocols': asset.protocols_as_list,
                     'platform': asset.platform,
+                    "org_name": asset.org_name,
                 },
             }
         }
