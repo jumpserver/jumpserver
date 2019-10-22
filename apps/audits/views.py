@@ -255,6 +255,7 @@ class CommandExecutionListView(UserCommandExecutionListView):
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginLogExportView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
+    date_format = '%Y-%m-%d'
 
     def get(self, request):
         fields = [
@@ -273,13 +274,14 @@ class LoginLogExportView(PermissionsMixin, View):
 
     def post(self, request):
         try:
-            date_form = json.loads(request.body).get('date_form', [])
+            date_from = json.loads(request.body).get('date_from', [])
             date_to = json.loads(request.body).get('date_to', [])
             user = json.loads(request.body).get('user', [])
             keyword = json.loads(request.body).get('keyword', [])
 
             login_logs = UserLoginLog.get_login_logs(
-                date_form=date_form, date_to=date_to, user=user, keyword=keyword)
+                date_from=date_from, date_to=date_to, user=user,
+                keyword=keyword, date_format=self.date_format)
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
         spm = uuid.uuid4().hex
