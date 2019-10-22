@@ -41,8 +41,8 @@ class AssetUserManager:
         instances_map = {}
         instances = []
         for name, backend in self.backends:
-            if name != "db" and self._prefer != name:
-                continue
+            # if name != "db":
+            #     continue
             _instances = backend.filter(
                 username=username, assets=assets, latest=latest,
                 prefer=self._prefer, prefer_id=prefer_id,

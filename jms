@@ -65,6 +65,7 @@ logging.basicConfig(
 EXIT_EVENT = threading.Event()
 LOCK = threading.Lock()
 files_preserve = []
+STOP_TIMEOUT = 10
 
 logger = logging.getLogger()
 
@@ -120,7 +121,7 @@ def check_pid(pid):
 
 
 def get_pid_file_path(s):
-    return os.path.join('/tmp', '{}.pid'.format(s))
+    return os.path.join(TMP_DIR, '{}.pid'.format(s))
 
 
 def get_log_file_path(s):
@@ -433,9 +434,19 @@ def stop_service(srv, sig=15):
         if not is_running(s):
             show_service_status(s)
             continue
-        logging.info("Stop service: {}".format(s))
+        print("Stop service: {}".format(s), end='')
         pid = get_pid(s)
         os.kill(pid, sig)
+        for i in range(STOP_TIMEOUT):
+            if i == STOP_TIMEOUT - 1:
+                print("\033[31m Error\033[0m")
+            if not is_running(s):
+                print("\033[32m Ok\033[0m")
+                break
+            else:
+                time.sleep(1)
+                continue
+
         with LOCK:
             processes.pop(s, None)
 
@@ -472,9 +483,9 @@ def show_service_status(s):
     for ns in services_set:
         if is_running(ns):
             pid = get_pid(ns)
-            logging.info("{} is running: {}".format(ns, pid))
+            print("{} is running: {}".format(ns, pid))
         else:
-            logging.info("{} is stopped".format(ns))
+            print("{} is stopped".format(ns))
 
 
 if __name__ == '__main__':
@@ -499,6 +510,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('-d', '--daemon', nargs="?", const=1)
     parser.add_argument('-w', '--worker', type=int, nargs="?", const=4)
+    parser.add_argument('-f', '--force', nargs="?", const=1)
     args = parser.parse_args()
     if args.daemon:
         DAEMON = True
@@ -513,7 +525,10 @@ if __name__ == '__main__':
         start_services_and_watch(srv)
         os._exit(0)
     elif action == "stop":
-        stop_service(srv)
+        if args.force:
+            stop_service_force(srv)
+        else:
+            stop_service(srv)
     elif action == "restart":
         DAEMON = True
         stop_service(srv)

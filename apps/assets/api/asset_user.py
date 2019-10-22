@@ -7,6 +7,7 @@ from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
 from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.conf import settings
 
 from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
@@ -110,12 +111,22 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
 class AssetUserExportViewSet(AssetUserViewSet):
     serializer_class = serializers.AssetUserExportSerializer
     http_method_names = ['get']
-    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
+    permission_classes = [IsOrgAdminOrAppUser]
+
+    def get_permissions(self):
+        if settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA:
+            self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
+        return super().get_permissions()
 
 
 class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     serializer_class = serializers.AssetUserAuthInfoSerializer
-    permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
+    permission_classes = [IsOrgAdminOrAppUser]
+
+    def get_permissions(self):
+        if settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA:
+            self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
+        return super().get_permissions()
 
     def get_object(self):
         query_params = self.request.query_params

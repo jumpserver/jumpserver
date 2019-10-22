@@ -201,7 +201,7 @@ function formSubmit(props) {
             var errors = jqXHR.responseJSON;
             var noneFieldErrorRef = props.form.children('.alert-danger');
             if (noneFieldErrorRef.length !== 1) {
-                props.form.prepend('<div class="alert alert-danger" style="display: none"></div>');
+                props.form.prepend('<div class="alert alert-danger has-error" style="display: none"></div>');
                 noneFieldErrorRef = props.form.children('.alert-danger');
             }
             var noneFieldErrorMsg = "";
@@ -247,6 +247,7 @@ function formSubmit(props) {
                 noneFieldErrorRef.css('display', 'block');
                 noneFieldErrorRef.html(noneFieldErrorMsg);
             }
+            $('.has-error').get(0).scrollIntoView();
         }
 
     })
@@ -453,6 +454,7 @@ jumpserver.initDataTable = function (options) {
         {
             targets: 0,
             orderable: false,
+            width: "20px",
             createdCell: function (td, cellData) {
                 $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
             }
@@ -550,6 +552,7 @@ jumpserver.initServerSideDataTable = function (options) {
         {
             targets: 0,
             orderable: false,
+            width: "20px",
             createdCell: function (td, cellData) {
                 $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
             }

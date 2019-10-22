@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 16:09+0800\n"
+"POT-Creation-Date: 2019-10-21 17:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -95,7 +95,7 @@ msgstr "运行参数"
 #: terminal/templates/terminal/command_list.html:66
 #: terminal/templates/terminal/session_list.html:28
 #: terminal/templates/terminal/session_list.html:72
-#: xpack/plugins/change_auth_plan/forms.py:64
+#: xpack/plugins/change_auth_plan/forms.py:73
 #: xpack/plugins/change_auth_plan/models.py:412
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:46
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:54
@@ -112,7 +112,7 @@ msgstr "资产"
 #: applications/templates/applications/remote_app_detail.html:53
 #: applications/templates/applications/remote_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:16
-#: assets/forms/asset.py:21 assets/forms/domain.py:73 assets/forms/user.py:75
+#: assets/forms/asset.py:21 assets/forms/domain.py:77 assets/forms/user.py:75
 #: assets/forms/user.py:95 assets/models/base.py:28 assets/models/cluster.py:18
 #: assets/models/cmd_filter.py:21 assets/models/domain.py:20
 #: assets/models/group.py:20 assets/models/label.py:18
@@ -151,7 +151,7 @@ msgstr "资产"
 #: users/templates/users/user_list.html:35
 #: users/templates/users/user_profile.html:51
 #: users/templates/users/user_pubkey_update.html:57
-#: xpack/plugins/change_auth_plan/forms.py:47
+#: xpack/plugins/change_auth_plan/forms.py:56
 #: xpack/plugins/change_auth_plan/models.py:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:61
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
@@ -322,6 +322,7 @@ msgstr "远程应用"
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:53
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:44
 #: xpack/plugins/interface/templates/interface/interface.html:72
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 #: xpack/plugins/vault/templates/vault/vault_create.html:45
 msgid "Reset"
 msgstr "重置"
@@ -639,7 +640,7 @@ msgstr "网域"
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_list.html:124
-#: xpack/plugins/change_auth_plan/forms.py:65
+#: xpack/plugins/change_auth_plan/forms.py:74
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:55
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:15
 #: xpack/plugins/cloud/models.py:157
@@ -668,7 +669,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 #: assets/forms/asset.py:132 assets/forms/asset.py:136
 #: assets/forms/domain.py:17 assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:78
-#: xpack/plugins/change_auth_plan/forms.py:55
+#: xpack/plugins/change_auth_plan/forms.py:64
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:74
 msgid "Select assets"
 msgstr "选择资产"
@@ -677,15 +678,15 @@ msgstr "选择资产"
 msgid "Content should not be contain: {}"
 msgstr "内容不能包含: {}"
 
-#: assets/forms/domain.py:51
+#: assets/forms/domain.py:55
 msgid "Password should not contain special characters"
 msgstr "不能包含特殊字符"
 
-#: assets/forms/domain.py:70
+#: assets/forms/domain.py:74
 msgid "SSH gateway support proxy SSH,RDP,VNC"
 msgstr "SSH网关，支持代理SSH,RDP和VNC"
 
-#: assets/forms/domain.py:74 assets/forms/user.py:76 assets/forms/user.py:96
+#: assets/forms/domain.py:78 assets/forms/user.py:76 assets/forms/user.py:96
 #: assets/models/base.py:29 assets/models/gathered_user.py:16
 #: assets/templates/assets/_asset_user_auth_update_modal.html:15
 #: assets/templates/assets/_asset_user_auth_view_modal.html:21
@@ -706,7 +707,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:36
 #: users/templates/users/user_profile.html:47
-#: xpack/plugins/change_auth_plan/forms.py:49
+#: xpack/plugins/change_auth_plan/forms.py:58
 #: xpack/plugins/change_auth_plan/models.py:65
 #: xpack/plugins/change_auth_plan/models.py:408
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:65
@@ -1451,7 +1452,7 @@ msgid "Update asset user auth"
 msgstr "更新资产用户认证信息"
 
 #: assets/templates/assets/_asset_user_auth_update_modal.html:23
-#: xpack/plugins/change_auth_plan/forms.py:51
+#: xpack/plugins/change_auth_plan/forms.py:60
 msgid "Please input password"
 msgstr "请输入密码"
 
@@ -1637,7 +1638,7 @@ msgstr "替换资产的管理员"
 
 #: assets/templates/assets/admin_user_detail.html:91
 #: perms/templates/perms/asset_permission_asset.html:103
-#: xpack/plugins/change_auth_plan/forms.py:59
+#: xpack/plugins/change_auth_plan/forms.py:68
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:99
 #: xpack/plugins/gathered_user/forms.py:36
 msgid "Select nodes"
@@ -1877,7 +1878,6 @@ msgstr "删除选择资产"
 #: users/templates/users/user_group_list.html:118
 #: users/templates/users/user_list.html:254
 #: xpack/plugins/interface/templates/interface/interface.html:101
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
 msgid "Cancel"
 msgstr "取消"
 
@@ -3394,33 +3394,33 @@ msgstr "远程应用授权用户列表"
 msgid "RemoteApp permission RemoteApp list"
 msgstr "远程应用授权远程应用列表"
 
-#: settings/api.py:27
+#: settings/api.py:28
 msgid "Test mail sent to {}, please check"
 msgstr "邮件已经发送{}, 请检查"
 
-#: settings/api.py:55
+#: settings/api.py:67
 msgid "Test ldap success"
 msgstr "连接LDAP成功"
 
-#: settings/api.py:92
+#: settings/api.py:104
 msgid "Match {} s users"
 msgstr "匹配 {} 个用户"
 
-#: settings/api.py:151
+#: settings/api.py:163
 msgid "succeed: {} failed: {} total: {}"
 msgstr "成功：{} 失败：{} 总数：{}"
 
-#: settings/api.py:173 settings/api.py:209
+#: settings/api.py:185 settings/api.py:221
 msgid ""
 "Error: Account invalid (Please make sure the information such as Access key "
 "or Secret key is correct)"
 msgstr "错误：账户无效 （请确保 Access key 或 Secret key 等信息正确）"
 
-#: settings/api.py:179 settings/api.py:215
+#: settings/api.py:191 settings/api.py:227
 msgid "Create succeed"
 msgstr "创建成功"
 
-#: settings/api.py:197 settings/api.py:235
+#: settings/api.py:209 settings/api.py:247
 #: settings/templates/settings/terminal_setting.html:154
 msgid "Delete succeed"
 msgstr "删除成功"
@@ -4536,7 +4536,7 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: users/api/user.py:176
+#: users/api/user.py:173
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
@@ -4874,7 +4874,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:379 users/utils.py:84
+#: users/templates/users/user_detail.html:379 users/utils.py:83
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -5190,61 +5190,57 @@ msgid ""
 "corresponding private key."
 msgstr "新的公钥已设置成功，请下载对应的私钥"
 
+# msgid "Update user"
+# msgstr "更新用户"
 #: users/utils.py:24
 #, python-format
 msgid ""
 "\n"
-"        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
-"bootstrap/3.2.0/css/bootstrap.min.css\">\n"
-"        <p style=\"text-indent:2em;\">\n"
-"            <span>\n"
-"                Username: %(username)s.\n"
-"            </span>\n"
-"            <span>\n"
-"                <a href=\"%(rest_password_url)s?token=%(rest_password_token)s"
-"\">click here to set your password</a>\n"
-"            </span>    \n"
-"            <span>\n"
-"                This link is valid for 1 hour. After it expires, <a href="
-"\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-"            </span> \n"
-"            <span>\n"
+"        <div>\n"
+"            <p>Your account has been created successfully</p>\n"
+"            <div>\n"
+"                Username: %(username)s\n"
+"                <br/>\n"
+"                Password: <a href=\"%(rest_password_url)s?token="
+"%(rest_password_token)s\">\n"
+"                click here to set your password</a> \n"
+"                (This link is valid for 1 hour. After it expires, <a href="
+"\"%(forget_password_url)s?email=%(email)s\">request new one</a>)\n"
+"            </div>\n"
+"            <div>\n"
+"                <p>---</p>\n"
 "                <a href=\"%(login_url)s\">Login direct</a>\n"
-"            </span>\n"
-"        </p>\n"
+"            </div>\n"
+"        </div>\n"
 "        "
 msgstr ""
 "\n"
-"    <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
-"bootstrap/3.2.0/css/bootstrap.min.css\">\n"
-"    <p style=\"text-indent:2em;\">\n"
-"        <span>\n"
-"            用户名: %(username)s.\n"
-"        </span>\n"
-"        <span>\n"
-"            <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">"
-"请点击这里设置密码</a>\n"
-"        </span>    \n"
-"        <span>\n"
-"            这个链接有效期1小时, 超过时间您可以 <a href="
-"\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
-"        </span> \n"
-"        <span>\n"
-"            <a href=\"%(login_url)s\">---登录页面</a>\n"
-"        </span>\n"
-"    </p>\n"
-"    "
+"        <div>\n"
+"            <p>您的账户已创建成功</p>\n"
+"            <div>\n"
+"                用户名: %(username)s\n"
+"                <br/>\n"
+"                密码: <a href=\"%(rest_password_url)s?token="
+"%(rest_password_token)s\">请点击这里设置密码</a> (这个链接有效期1小时, 超过时"
+"间您可以 <a href=\"%(forget_password_url)s?email=%(email)s\">重新申请</a>)\n"
+"            </div>\n"
+"            <div>\n"
+"                <p>---</p>\n"
+"                <a href=\"%(login_url)s\">直接登录</a>\n"
+"            </div>\n"
+"        </div>\n"
+"        "
 
-#: users/utils.py:59
+#: users/utils.py:58
 msgid "Create account successfully"
 msgstr "创建账户成功"
 
-#: users/utils.py:63
+#: users/utils.py:62
 #, python-format
 msgid "Hello %(name)s"
 msgstr "您好 %(name)s"
 
-#: users/utils.py:86
+#: users/utils.py:85
 #, python-format
 msgid ""
 "\n"
@@ -5288,11 +5284,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:117
+#: users/utils.py:116
 msgid "Security notice"
 msgstr "安全通知"
 
-#: users/utils.py:119
+#: users/utils.py:118
 #, python-format
 msgid ""
 "\n"
@@ -5341,11 +5337,11 @@ msgstr ""
 "    <br>\n"
 "    "
 
-#: users/utils.py:155
+#: users/utils.py:154
 msgid "Expiration notice"
 msgstr "过期通知"
 
-#: users/utils.py:157
+#: users/utils.py:156
 #, python-format
 msgid ""
 "\n"
@@ -5367,11 +5363,11 @@ msgstr ""
 "       <br>\n"
 "       "
 
-#: users/utils.py:176
+#: users/utils.py:175
 msgid "SSH Key Reset"
 msgstr "重置ssh密钥"
 
-#: users/utils.py:178
+#: users/utils.py:177
 #, python-format
 msgid ""
 "\n"
@@ -5485,7 +5481,7 @@ msgstr "MFA 解绑成功，返回登录页面"
 msgid "Password length"
 msgstr "密码长度"
 
-#: xpack/plugins/change_auth_plan/forms.py:66
+#: xpack/plugins/change_auth_plan/forms.py:75
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:60
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:81
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:17
@@ -5499,7 +5495,7 @@ msgstr "密码长度"
 msgid "Periodic perform"
 msgstr "定时执行"
 
-#: xpack/plugins/change_auth_plan/forms.py:70
+#: xpack/plugins/change_auth_plan/forms.py:79
 msgid ""
 "Tips: The username of the user on the asset to be modified. if the user "
 "exists, change the password; If the user does not exist, create the user."
@@ -5507,12 +5503,12 @@ msgstr ""
 "提示：用户名为将要修改的资产上的用户的用户名。如果用户存在，则修改密码；如果"
 "用户不存在，则创建用户。"
 
-#: xpack/plugins/change_auth_plan/forms.py:74 xpack/plugins/cloud/forms.py:90
+#: xpack/plugins/change_auth_plan/forms.py:83 xpack/plugins/cloud/forms.py:90
 #: xpack/plugins/gathered_user/forms.py:44
 msgid "Tips: (Units: hour)"
 msgstr "提示：（单位： 时）"
 
-#: xpack/plugins/change_auth_plan/forms.py:75 xpack/plugins/cloud/forms.py:91
+#: xpack/plugins/change_auth_plan/forms.py:84 xpack/plugins/cloud/forms.py:91
 #: xpack/plugins/gathered_user/forms.py:45
 msgid ""
 "eg: Every Sunday 03:05 run <5 3 * * 0> <br> Tips: Using 5 digits linux "
@@ -6306,45 +6302,6 @@ msgstr "创建"
 
 #~ msgid "Update user groups"
 #~ msgstr "更新用户组"
-
-# msgid "Update user"
-# msgstr "更新用户"
-#~ msgid ""
-#~ "\n"
-#~ "        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
-#~ "bootstrap/3.2.0/css/bootstrap.min.css\">\n"
-#~ "        <p style=\"text-indent:2em;\">\n"
-#~ "            <span>\n"
-#~ "                <a href=\"%(rest_password_url)s?token="
-#~ "%(rest_password_token)s\">click here to set your password</a>\n"
-#~ "            </span>    \n"
-#~ "            <span>\n"
-#~ "                This link is valid for 1 hour. After it expires, <a href="
-#~ "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
-#~ "            </span> \n"
-#~ "            <span>\n"
-#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
-#~ "            </span>\n"
-#~ "        </p>\n"
-#~ "        "
-#~ msgstr ""
-#~ "\n"
-#~ "        <link rel=\"stylesheet\" href=\"//maxcdn.bootstrapcdn.com/"
-#~ "bootstrap/3.2.0/css/bootstrap.min.css\">\n"
-#~ "        <p style=\"text-indent:2em;\">\n"
-#~ "            <span>\n"
-#~ "                <a href=\"%(rest_password_url)s?token="
-#~ "%(rest_password_token)s\">请点击这里设置密码</a>\n"
-#~ "            </span>    \n"
-#~ "            <span>\n"
-#~ "                这个链接有效期1小时, 超过时间您可以, <a href="
-#~ "\"%(forget_password_url)s?email=%(email)s\">重新申请</a>\n"
-#~ "            </span> \n"
-#~ "            <span>\n"
-#~ "                <a href=\"%(login_url)s\">Login direct</a>\n"
-#~ "            </span>\n"
-#~ "        </p>\n"
-#~ "        "
 
 #~ msgid "Template"
 #~ msgstr "模板"

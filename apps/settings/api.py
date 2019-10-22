@@ -5,6 +5,7 @@ import os
 import json
 import jms_storage
 
+from smtplib import SMTPSenderRefused
 from rest_framework import generics
 from rest_framework.views import Response, APIView
 from django.conf import settings
@@ -41,9 +42,20 @@ class MailTestingAPI(APIView):
                 email_from = email_from or email_host_user
                 email_recipient = email_recipient or email_from
                 send_mail(subject, message,  email_from, [email_recipient])
+            except SMTPSenderRefused as e:
+                resp = e.smtp_error
+                if isinstance(resp, bytes):
+                    for coding in ('gbk', 'utf8'):
+                        try:
+                            resp = resp.decode(coding)
+                        except UnicodeDecodeError:
+                            continue
+                        else:
+                            break
+                return Response({"error": str(resp)}, status=401)
             except Exception as e:
+                print(e)
                 return Response({"error": str(e)}, status=401)
-
             return Response({"msg": self.success_message.format(email_recipient)})
         else:
             return Response({"error": str(serializer.errors)}, status=401)

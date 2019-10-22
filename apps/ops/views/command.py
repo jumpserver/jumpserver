@@ -70,7 +70,7 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
         user = self.request.user
         with tmp_to_root_org():
             util = AssetPermissionUtilV2(user)
-            system_users = [s for s in util.get_system_users() if s.protocol == 'ssh']
+            system_users = util.get_system_users()
         return system_users
 
     def get_context_data(self, **kwargs):

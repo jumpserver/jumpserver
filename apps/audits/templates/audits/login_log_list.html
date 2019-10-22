@@ -121,7 +121,7 @@
             });
         })
         .on('click', '.btn_export', function () {
-            var date_form = $('#id_date_from').val();
+            var date_from = $('#id_date_from').val();
             var date_to = $('#id_date_to').val();
             var user = $('.select2 option:selected').val();
             var keyword = $('#search').val();
@@ -129,7 +129,7 @@
                 url: "{% url "audits:login-log-export" %}",
                 method: 'POST',
                 data: JSON.stringify({
-                    'date_form':date_form,
+                    'date_from':date_from,
                     'date_to':date_to,
                     'user':user,
                     'keyword':keyword
