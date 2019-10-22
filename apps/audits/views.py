@@ -255,7 +255,6 @@ class CommandExecutionListView(UserCommandExecutionListView):
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginLogExportView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
-    date_format = '%Y-%m-%d'
 
     def get(self, request):
         fields = [
