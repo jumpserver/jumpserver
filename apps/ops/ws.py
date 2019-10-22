@@ -46,13 +46,20 @@ class CeleryLogWebsocket(JsonWebsocketConsumer):
             if not task_log_f:
                 return
 
+            task_end_mark = []
+
             while not self.disconnected:
-                data = task_log_f.readline()
+                data = task_log_f.read(4096)
 
                 if data:
                     data = data.replace(b'\n', b'\r\n')
                     self.send_json({'message': data.decode(errors='ignore'), 'task': task_id})
-                    if data.startswith(b'Task') and data.find(b'succeeded'):
+                    if data.find(b'succeeded in') != -1:
+                        task_end_mark.append(1)
+                    if data.find(bytes(task_id, 'utf8')) != -1:
+                        task_end_mark.append(1)
+                    if len(task_end_mark) == 2:
+                        logger.debug('Task log end: {}'.format(task_id))
                         break
                 time.sleep(0.1)
             task_log_f.close()
