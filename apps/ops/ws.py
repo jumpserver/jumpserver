@@ -41,6 +41,7 @@ class CeleryLogWebsocket(JsonWebsocketConsumer):
     def read_log_file(self, task_id):
         task_log_f = self.wait_util_log_path_exist(task_id)
         if not task_log_f:
+            logger.debug('Task log file is None: {}'.format(task_id))
             return
 
         task_end_mark = []
@@ -49,7 +50,8 @@ class CeleryLogWebsocket(JsonWebsocketConsumer):
             if data:
                 data = data.replace(b'\n', b'\r\n')
                 self.send_json(
-                    {'message': data.decode(errors='ignore'), 'task': task_id})
+                    {'message': data.decode(errors='ignore'), 'task': task_id}
+                )
                 if data.find(b'succeeded in') != -1:
                     task_end_mark.append(1)
                 if data.find(bytes(task_id, 'utf8')) != -1:
