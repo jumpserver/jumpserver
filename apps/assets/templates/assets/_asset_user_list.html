@@ -40,6 +40,7 @@ var prefer = null;
 var lastMFATime = "{{ request.session.MFA_VERIFY_TIME }}";
 var testDatetime = "{% trans 'Test datetime: ' %}";
 var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
+var mfaNeedCheck = "{{ SECURITY_VIEW_AUTH_NEED_MFA }}" === "True";
 
 function initAssetUserTable() {
     var options = {
@@ -112,6 +113,10 @@ $(document).ready(function(){
     authAssetId = $(this).data("asset") ;
     authHostname = $(this).data("hostname");
     authUsername = $(this).data('user');
+    if (!mfaNeedCheck){
+        $("#asset_user_auth_view").modal('show');
+        return
+    }
     var now = new Date();
     var nowTime = now.getTime() / 1000;
     if ( !lastMFATime || nowTime - lastMFATime > mfaVerifyTTL ) {

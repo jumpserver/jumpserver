@@ -26,13 +26,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         fields = [
             'id', 'name', 'username', 'password', 'public_key', 'private_key',
             'login_mode', 'login_mode_display', 'priority', 'protocol',
-            'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment', 'nodes',
-            'assets_amount', 'auto_generate_key'
+            'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
+            'assets_amount', 'nodes_amount', 'auto_generate_key'
         ]
         extra_kwargs = {
             'password': {"write_only": True},
             'public_key': {"write_only": True},
             'private_key': {"write_only": True},
+            'nodes_amount': {'label': _('Node')},
             'assets_amount': {'label': _('Asset')},
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},

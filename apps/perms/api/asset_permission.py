@@ -73,14 +73,17 @@ class AssetPermissionViewSet(OrgModelViewSet):
         node_id = self.request.query_params.get('node_id')
         node_name = self.request.query_params.get('node')
         if node_id:
-            node = get_object_or_none(Node, pk=node_id)
+            _nodes = Node.objects.filter(pk=node_id)
         elif node_name:
-            node = get_object_or_none(Node, name=node_name)
+            _nodes = Node.objects.filter(value=node_name)
         else:
             return queryset
-        if not node:
+        if not _nodes:
             return queryset.none()
-        nodes = node.get_ancestors(with_self=True)
+
+        nodes = set()
+        for node in _nodes:
+            nodes |= set(node.get_ancestors(with_self=True))
         queryset = queryset.filter(nodes__in=nodes)
         return queryset
 

@@ -29,7 +29,7 @@ class BasePermissionQuerySet(models.QuerySet):
         return self.filter(is_active=False)
 
     def invalid(self):
-        now = timezone.now
+        now = timezone.now()
         q = (
             Q(is_active=False) |
             Q(date_start__gt=now) |

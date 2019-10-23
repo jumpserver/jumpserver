@@ -88,11 +88,13 @@ class UserLoginLog(models.Model):
     datetime = models.DateTimeField(default=timezone.now, verbose_name=_('Date login'))
 
     @classmethod
-    def get_login_logs(cls, date_form=None, date_to=None, user=None, keyword=None):
+    def get_login_logs(cls, date_from=None, date_to=None, user=None, keyword=None):
         login_logs = cls.objects.all()
-        if date_form and date_to:
+        if date_from and date_to:
+            date_from = "{} {}".format(date_from, '00:00:00')
+            date_to = "{} {}".format(date_to, '23:59:59')
             login_logs = login_logs.filter(
-                datetime__gt=date_form, datetime__lt=date_to
+                datetime__gte=date_from, datetime__lte=date_to
             )
         if user:
             login_logs = login_logs.filter(username=user)

@@ -121,6 +121,10 @@ class SystemUser(AssetUser):
         return '{0.name}({0.username})'.format(self)
 
     @property
+    def nodes_amount(self):
+        return self.nodes.all().count()
+
+    @property
     def login_mode_display(self):
         return self.get_login_mode_display()
 

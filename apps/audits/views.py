@@ -267,19 +267,22 @@ class LoginLogExportView(PermissionsMixin, View):
         header = [field.verbose_name for field in fields]
         login_logs = cache.get(request.GET.get('spm', ''), [])
 
-        response = write_content_to_excel(excel_response, login_logs=login_logs,
-                                          header=header, fields=fields)
+        response = write_content_to_excel(
+            excel_response, login_logs=login_logs, header=header, fields=fields
+        )
         return response
 
     def post(self, request):
         try:
-            date_form = json.loads(request.body).get('date_form', [])
+            date_from = json.loads(request.body).get('date_from', [])
             date_to = json.loads(request.body).get('date_to', [])
             user = json.loads(request.body).get('user', [])
             keyword = json.loads(request.body).get('keyword', [])
 
             login_logs = UserLoginLog.get_login_logs(
-                date_form=date_form, date_to=date_to, user=user, keyword=keyword)
+                date_from=date_from, date_to=date_to, user=user,
+                keyword=keyword,
+            )
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
         spm = uuid.uuid4().hex

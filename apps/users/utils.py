@@ -22,21 +22,20 @@ logger = logging.getLogger('jumpserver')
 
 def construct_user_created_email_body(user):
     default_body = _("""
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <p style="text-indent:2em;">
-            <span>
-                Username: %(username)s.
-            </span>
-            <span>
-                <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
-            </span>    
-            <span>
-                This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
-            </span> 
-            <span>
+        <div>
+            <p>Your account has been created successfully</p>
+            <div>
+                Username: %(username)s
+                <br/>
+                Password: <a href="%(rest_password_url)s?token=%(rest_password_token)s">
+                click here to set your password</a> 
+                (This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>)
+            </div>
+            <div>
+                <p>---</p>
                 <a href="%(login_url)s">Login direct</a>
-            </span>
-        </p>
+            </div>
+        </div>
         """) % {
         'username': user.username,
         'rest_password_url': reverse('users:reset-password', external=True),
