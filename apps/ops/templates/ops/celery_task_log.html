@@ -6,14 +6,36 @@
     <script src="{% static 'js/plugins/xterm/xterm.js' %}"></script>
     <script src="{% static 'js/plugins/xterm/addons/fit/fit.js' %}"></script>
     <link rel="stylesheet" href="{% static 'js/plugins/xterm/xterm.css' %}" />
+    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
     <style>
         body {
             background-color: black;
         }
+
         .xterm-rows {
-            {#padding: 15px;#}
             font-family: "Bitstream Vera Sans Mono", Monaco, "Consolas", Courier, monospace;
             font-size: 13px;
+        }
+
+        .terminal .xterm-viewport {
+            background-color: #1f1b1b;
+            overflow: auto;
+        }
+
+        body ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.3);
+            background-color: #272323;
+            border-radius: 6px;
+        }
+
+        body ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        body ::-webkit-scrollbar-thumb {
+            background-color: #494141;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -36,7 +58,8 @@
             cursorBlink: false,
             screenKeys: false,
             fontFamily: '"Monaco", "Consolas", "monospace"',
-            fontSize: 12,
+            fontSize: 13,
+            lineHeight: 1.2,
             rightClickSelectsWord: true,
             disableStdin: true
         });
