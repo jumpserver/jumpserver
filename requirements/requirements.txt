@@ -1,5 +1,5 @@
 amqp==2.1.4
-ansible==2.8.0
+ansible==2.8.2
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.5.0.3
@@ -14,7 +14,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==2.3.1
 decorator==4.1.2
-Django==2.1.7
+Django==2.1.11
 django-auth-ldap==1.7.0
 django-bootstrap3==9.1.0
 django-celery-beat==1.4.0
@@ -27,7 +27,7 @@ django-simple-captcha==0.5.6
 djangorestframework==3.9.4
 djangorestframework-bulk==0.2.1
 docutils==0.14
-ecdsa==0.13
+ecdsa==0.13.3
 enum-compat==0.0.2
 ephem==3.7.6.0
 eventlet==0.24.1
