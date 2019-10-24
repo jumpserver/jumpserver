@@ -14,6 +14,7 @@ app_name = 'users'
 router = BulkRouter()
 router.register(r'users', api.UserViewSet, 'user')
 router.register(r'groups', api.UserGroupViewSet, 'user-group')
+router.register(r'users-groups-relations', api.UserUserGroupRelationViewSet, 'user-group-relation')
 
 
 urlpatterns = [
