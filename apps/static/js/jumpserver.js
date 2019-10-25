@@ -443,7 +443,6 @@ function parseTableFilter(value) {
             filter[key] = value
         }
     }
-    console.log(filter);
     return filter;
 }
 
