@@ -448,7 +448,6 @@ function parseTableFilter(value) {
             filter[key] = value
         }
     }
-    console.log(filter);
     return filter;
 }
 
@@ -651,9 +650,14 @@ jumpserver.initServerSideDataTable = function (options) {
                 if (data.search !== null) {
                     var searchValue = data.search.value;
                     var searchFilter = parseTableFilter(searchValue);
-                    $.each(searchFilter, function (k, v) {
-                        data[k] = v
-                    })
+                    if (Object.keys(searchFilter).length === 0) {
+                        data.search = searchValue;
+                    } else {
+                        data.search = '';
+                        $.each(searchFilter, function (k, v) {
+                            data[k] = v
+                        })
+                    }
                 }
                 if (data.order !== null && data.order.length === 1) {
                     var col = data.order[0].column;
