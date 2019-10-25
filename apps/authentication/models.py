@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
+from common.mixins.models import CommonModelMixin
+
 
 class AccessKey(models.Model):
     id = models.UUIDField(verbose_name='AccessKeyID', primary_key=True,
@@ -33,3 +35,10 @@ class PrivateToken(Token):
 
     class Meta:
         verbose_name = _('Private Token')
+
+
+class LoginConfirmSetting(CommonModelMixin):
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name=_("User"), related_name=_("login_confirmation_setting"))
+    reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name=_("review_login_confirmation_settings"))
+    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
+
