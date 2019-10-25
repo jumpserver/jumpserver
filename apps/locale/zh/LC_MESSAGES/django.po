@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 17:00+0800\n"
+"POT-Creation-Date: 2019-10-25 10:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -78,15 +78,15 @@ msgstr "运行参数"
 #: assets/forms/domain.py:15 assets/forms/label.py:13
 #: assets/models/asset.py:295 assets/models/authbook.py:24
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
-#: assets/serializers/asset_user.py:82 assets/serializers/system_user.py:36
+#: assets/serializers/asset_user.py:82 assets/serializers/system_user.py:37
 #: assets/templates/assets/admin_user_list.html:46
 #: assets/templates/assets/domain_detail.html:60
 #: assets/templates/assets/domain_list.html:26
 #: assets/templates/assets/label_list.html:16
-#: assets/templates/assets/system_user_list.html:55 audits/models.py:19
+#: assets/templates/assets/system_user_list.html:51 audits/models.py:19
 #: audits/templates/audits/ftp_log_list.html:44
 #: audits/templates/audits/ftp_log_list.html:74
-#: perms/forms/asset_permission.py:80 perms/models/asset_permission.py:80
+#: perms/forms/asset_permission.py:84 perms/models/asset_permission.py:80
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:52
 #: perms/templates/perms/asset_permission_list.html:121
@@ -125,7 +125,7 @@ msgstr "资产"
 #: assets/templates/assets/domain_list.html:25
 #: assets/templates/assets/label_list.html:14
 #: assets/templates/assets/system_user_detail.html:58
-#: assets/templates/assets/system_user_list.html:51 ops/models/adhoc.py:37
+#: assets/templates/assets/system_user_list.html:47 ops/models/adhoc.py:37
 #: ops/templates/ops/task_detail.html:60 ops/templates/ops/task_list.html:11
 #: orgs/models.py:12 perms/models/base.py:48
 #: perms/templates/perms/asset_permission_detail.html:62
@@ -252,7 +252,7 @@ msgstr "创建日期"
 #: assets/templates/assets/domain_gateway_list.html:72
 #: assets/templates/assets/domain_list.html:28
 #: assets/templates/assets/system_user_detail.html:104
-#: assets/templates/assets/system_user_list.html:59 ops/models/adhoc.py:43
+#: assets/templates/assets/system_user_list.html:55 ops/models/adhoc.py:43
 #: orgs/models.py:18 perms/models/base.py:56
 #: perms/templates/perms/asset_permission_detail.html:102
 #: perms/templates/perms/remote_app_permission_detail.html:94
@@ -393,10 +393,10 @@ msgstr "详情"
 
 #: applications/templates/applications/remote_app_detail.html:21
 #: applications/templates/applications/remote_app_list.html:54
-#: assets/templates/assets/_asset_user_list.html:74
+#: assets/templates/assets/_asset_user_list.html:75
 #: assets/templates/assets/admin_user_detail.html:24
 #: assets/templates/assets/admin_user_list.html:26
-#: assets/templates/assets/admin_user_list.html:111
+#: assets/templates/assets/admin_user_list.html:74
 #: assets/templates/assets/asset_detail.html:26
 #: assets/templates/assets/asset_list.html:78
 #: assets/templates/assets/asset_list.html:167
@@ -409,8 +409,8 @@ msgstr "详情"
 #: assets/templates/assets/domain_list.html:54
 #: assets/templates/assets/label_list.html:39
 #: assets/templates/assets/system_user_detail.html:26
-#: assets/templates/assets/system_user_list.html:33
-#: assets/templates/assets/system_user_list.html:85 audits/models.py:33
+#: assets/templates/assets/system_user_list.html:29
+#: assets/templates/assets/system_user_list.html:81 audits/models.py:33
 #: perms/templates/perms/asset_permission_detail.html:30
 #: perms/templates/perms/asset_permission_list.html:178
 #: perms/templates/perms/remote_app_permission_detail.html:30
@@ -442,7 +442,7 @@ msgstr "更新"
 #: applications/templates/applications/remote_app_detail.html:25
 #: applications/templates/applications/remote_app_list.html:55
 #: assets/templates/assets/admin_user_detail.html:28
-#: assets/templates/assets/admin_user_list.html:112
+#: assets/templates/assets/admin_user_list.html:75
 #: assets/templates/assets/asset_detail.html:30
 #: assets/templates/assets/asset_list.html:168
 #: assets/templates/assets/cmd_filter_detail.html:33
@@ -454,7 +454,7 @@ msgstr "更新"
 #: assets/templates/assets/domain_list.html:55
 #: assets/templates/assets/label_list.html:40
 #: assets/templates/assets/system_user_detail.html:30
-#: assets/templates/assets/system_user_list.html:86 audits/models.py:34
+#: assets/templates/assets/system_user_list.html:82 audits/models.py:34
 #: authentication/templates/authentication/_access_key_modal.html:65
 #: ops/templates/ops/task_list.html:69
 #: perms/templates/perms/asset_permission_detail.html:34
@@ -510,7 +510,7 @@ msgstr "创建远程应用"
 #: assets/templates/assets/domain_gateway_list.html:73
 #: assets/templates/assets/domain_list.html:29
 #: assets/templates/assets/label_list.html:17
-#: assets/templates/assets/system_user_list.html:60 audits/models.py:38
+#: assets/templates/assets/system_user_list.html:56 audits/models.py:38
 #: audits/templates/audits/operate_log_list.html:47
 #: audits/templates/audits/operate_log_list.html:73
 #: authentication/templates/authentication/_access_key_modal.html:34
@@ -583,8 +583,8 @@ msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
 #: assets/const.py:8
-msgid "Only Numbers、letters、 chinese and characters ( {} ) are allowed"
-msgstr "只允许包含数字、字母、中文和特殊字符（ {} ）"
+msgid "Cannot contain special characters: [ {} ]"
+msgstr "不能包含特殊字符：[ {} ]"
 
 #: assets/const.py:14
 msgid "* The contains characters that are not allowed"
@@ -635,8 +635,9 @@ msgstr "网域"
 
 #: assets/forms/asset.py:69 assets/forms/asset.py:103 assets/forms/asset.py:116
 #: assets/forms/asset.py:152 assets/models/node.py:421
+#: assets/serializers/system_user.py:36
 #: assets/templates/assets/asset_create.html:42
-#: perms/forms/asset_permission.py:83 perms/forms/asset_permission.py:90
+#: perms/forms/asset_permission.py:87 perms/forms/asset_permission.py:94
 #: perms/templates/perms/asset_permission_list.html:53
 #: perms/templates/perms/asset_permission_list.html:74
 #: perms/templates/perms/asset_permission_list.html:124
@@ -695,7 +696,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: assets/templates/assets/admin_user_list.html:45
 #: assets/templates/assets/domain_gateway_list.html:71
 #: assets/templates/assets/system_user_detail.html:62
-#: assets/templates/assets/system_user_list.html:52 audits/models.py:80
+#: assets/templates/assets/system_user_list.html:48 audits/models.py:80
 #: audits/templates/audits/login_log_list.html:57 authentication/forms.py:13
 #: authentication/templates/authentication/login.html:65
 #: authentication/templates/authentication/new_login.html:92
@@ -820,7 +821,7 @@ msgstr "主机名"
 #: assets/models/user.py:113 assets/templates/assets/asset_detail.html:70
 #: assets/templates/assets/domain_gateway_list.html:70
 #: assets/templates/assets/system_user_detail.html:70
-#: assets/templates/assets/system_user_list.html:53
+#: assets/templates/assets/system_user_list.html:49
 #: terminal/templates/terminal/session_list.html:31
 #: terminal/templates/terminal/session_list.html:75
 msgid "Protocol"
@@ -1098,7 +1099,7 @@ msgstr "默认资产组"
 #: audits/templates/audits/password_change_log_list.html:56
 #: ops/templates/ops/command_execution_list.html:38
 #: ops/templates/ops/command_execution_list.html:63
-#: perms/forms/asset_permission.py:74 perms/forms/remote_app_permission.py:34
+#: perms/forms/asset_permission.py:78 perms/forms/remote_app_permission.py:34
 #: perms/models/base.py:49
 #: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:50
@@ -1194,14 +1195,14 @@ msgid "Shell"
 msgstr "Shell"
 
 #: assets/models/user.py:117 assets/templates/assets/system_user_detail.html:66
-#: assets/templates/assets/system_user_list.html:54
+#: assets/templates/assets/system_user_list.html:50
 msgid "Login mode"
 msgstr "登录模式"
 
-#: assets/models/user.py:162 assets/templates/assets/user_asset_list.html:79
+#: assets/models/user.py:166 assets/templates/assets/user_asset_list.html:79
 #: audits/models.py:20 audits/templates/audits/ftp_log_list.html:52
 #: audits/templates/audits/ftp_log_list.html:75
-#: perms/forms/asset_permission.py:86 perms/forms/remote_app_permission.py:43
+#: perms/forms/asset_permission.py:90 perms/forms/remote_app_permission.py:43
 #: perms/models/asset_permission.py:82 perms/models/remote_app_permission.py:16
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:54
@@ -1290,15 +1291,15 @@ msgstr "值"
 msgid "The same level node name cannot be the same"
 msgstr "同级别节点名字不能重复"
 
-#: assets/serializers/system_user.py:37
+#: assets/serializers/system_user.py:38
 msgid "Login mode display"
 msgstr "登录模式显示"
 
-#: assets/serializers/system_user.py:81
+#: assets/serializers/system_user.py:82
 msgid "* Automatic login mode must fill in the username."
 msgstr "自动登录模式，必须填写用户名"
 
-#: assets/serializers/system_user.py:92
+#: assets/serializers/system_user.py:93
 msgid "Password or private key required"
 msgstr "密码或密钥密码需要一个"
 
@@ -1436,8 +1437,8 @@ msgstr "资产列表"
 
 #: assets/templates/assets/_asset_list_modal.html:33
 #: assets/templates/assets/_node_tree.html:40
-#: ops/templates/ops/command_execution_create.html:49
-#: ops/templates/ops/command_execution_create.html:143
+#: ops/templates/ops/command_execution_create.html:70
+#: ops/templates/ops/command_execution_create.html:127
 #: users/templates/users/_granted_assets.html:7
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:66
 msgid "Loading"
@@ -1499,11 +1500,11 @@ msgstr "日期"
 msgid "Test datetime: "
 msgstr "测试日期: "
 
-#: assets/templates/assets/_asset_user_list.html:73
+#: assets/templates/assets/_asset_user_list.html:74
 msgid "View"
 msgstr "查看"
 
-#: assets/templates/assets/_asset_user_list.html:75
+#: assets/templates/assets/_asset_user_list.html:76
 #: assets/templates/assets/admin_user_assets.html:61
 #: assets/templates/assets/asset_asset_user_list.html:57
 #: assets/templates/assets/asset_detail.html:176
@@ -1512,7 +1513,7 @@ msgstr "查看"
 msgid "Test"
 msgstr "测试"
 
-#: assets/templates/assets/_asset_user_list.html:76
+#: assets/templates/assets/_asset_user_list.html:77
 #: assets/templates/assets/system_user_assets.html:72
 #: assets/templates/assets/system_user_detail.html:142
 msgid "Push"
@@ -1646,11 +1647,11 @@ msgstr "选择节点"
 
 #: assets/templates/assets/admin_user_detail.html:100
 #: assets/templates/assets/asset_detail.html:202
-#: assets/templates/assets/asset_list.html:422
+#: assets/templates/assets/asset_list.html:423
 #: assets/templates/assets/cmd_filter_detail.html:106
 #: assets/templates/assets/system_user_assets.html:97
 #: assets/templates/assets/system_user_detail.html:182
-#: assets/templates/assets/system_user_list.html:139
+#: assets/templates/assets/system_user_list.html:135
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:112
@@ -1684,7 +1685,7 @@ msgstr "Jumpserver 使用该用户来 `推送系统用户`、`获取资产硬件
 
 #: assets/templates/assets/admin_user_list.html:16
 #: assets/templates/assets/asset_list.html:68
-#: assets/templates/assets/system_user_list.html:23
+#: assets/templates/assets/system_user_list.html:19
 #: audits/templates/audits/login_log_list.html:91
 #: users/templates/users/user_group_list.html:10
 #: users/templates/users/user_list.html:10
@@ -1695,7 +1696,7 @@ msgstr "导出"
 
 #: assets/templates/assets/admin_user_list.html:21
 #: assets/templates/assets/asset_list.html:73
-#: assets/templates/assets/system_user_list.html:28
+#: assets/templates/assets/system_user_list.html:24
 #: settings/templates/settings/_ldap_list_users_modal.html:93
 #: users/templates/users/user_group_list.html:15
 #: users/templates/users/user_list.html:15
@@ -1709,12 +1710,12 @@ msgstr "导入"
 msgid "Create admin user"
 msgstr "创建管理用户"
 
-#: assets/templates/assets/admin_user_list.html:162
-#: assets/templates/assets/admin_user_list.html:193
-#: assets/templates/assets/asset_list.html:303
-#: assets/templates/assets/asset_list.html:340
-#: assets/templates/assets/system_user_list.html:192
-#: assets/templates/assets/system_user_list.html:223
+#: assets/templates/assets/admin_user_list.html:125
+#: assets/templates/assets/admin_user_list.html:156
+#: assets/templates/assets/asset_list.html:304
+#: assets/templates/assets/asset_list.html:341
+#: assets/templates/assets/system_user_list.html:188
+#: assets/templates/assets/system_user_list.html:219
 #: users/templates/users/user_group_list.html:164
 #: users/templates/users/user_group_list.html:195
 #: users/templates/users/user_list.html:165
@@ -1854,8 +1855,8 @@ msgstr "仅显示当前节点资产"
 msgid "Displays all child node assets"
 msgstr "显示所有子节点资产"
 
-#: assets/templates/assets/asset_list.html:416
-#: assets/templates/assets/system_user_list.html:133
+#: assets/templates/assets/asset_list.html:417
+#: assets/templates/assets/system_user_list.html:129
 #: users/templates/users/user_detail.html:388
 #: users/templates/users/user_detail.html:414
 #: users/templates/users/user_detail.html:482
@@ -1865,12 +1866,12 @@ msgstr "显示所有子节点资产"
 msgid "Are you sure?"
 msgstr "你确认吗?"
 
-#: assets/templates/assets/asset_list.html:417
+#: assets/templates/assets/asset_list.html:418
 msgid "This will delete the selected assets !!!"
 msgstr "删除选择资产"
 
-#: assets/templates/assets/asset_list.html:420
-#: assets/templates/assets/system_user_list.html:137
+#: assets/templates/assets/asset_list.html:421
+#: assets/templates/assets/system_user_list.html:133
 #: settings/templates/settings/terminal_setting.html:166
 #: users/templates/users/user_detail.html:392
 #: users/templates/users/user_detail.html:418
@@ -1881,16 +1882,16 @@ msgstr "删除选择资产"
 msgid "Cancel"
 msgstr "取消"
 
-#: assets/templates/assets/asset_list.html:433
+#: assets/templates/assets/asset_list.html:434
 msgid "Asset Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/asset_list.html:434
-#: assets/templates/assets/asset_list.html:438
+#: assets/templates/assets/asset_list.html:435
+#: assets/templates/assets/asset_list.html:439
 msgid "Asset Delete"
 msgstr "删除"
 
-#: assets/templates/assets/asset_list.html:437
+#: assets/templates/assets/asset_list.html:438
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
@@ -2037,7 +2038,7 @@ msgstr "Uid"
 msgid "Binding command filters"
 msgstr "绑定命令过滤器"
 
-#: assets/templates/assets/system_user_list.html:10
+#: assets/templates/assets/system_user_list.html:6
 msgid ""
 "System user is Jumpserver jump login assets used by the users, can be "
 "understood as the user login assets, such as web, sa, the dba (` ssh "
@@ -2048,7 +2049,7 @@ msgstr ""
 "web，sa，dba（`ssh web@some-host`），而不是使用某个用户的用户名跳转登录服务器"
 "（`ssh xiaoming@some-host`）；"
 
-#: assets/templates/assets/system_user_list.html:11
+#: assets/templates/assets/system_user_list.html:7
 msgid ""
 "In simple terms, users log into Jumpserver using their own username, and "
 "Jumpserver uses system users to log into assets. "
@@ -2056,7 +2057,7 @@ msgstr ""
 "简单来说是用户使用自己的用户名登录 Jumpserver，Jumpserver 使用系统用户登录资"
 "产。"
 
-#: assets/templates/assets/system_user_list.html:12
+#: assets/templates/assets/system_user_list.html:8
 msgid ""
 "When system users are created, if you choose auto push Jumpserver to use "
 "Ansible push system users into the asset, if the asset (Switch) does not "
@@ -2065,25 +2066,25 @@ msgstr ""
 "系统用户创建时，如果选择了自动推送，Jumpserver 会使用 Ansible 自动推送系统用"
 "户到资产中，如果资产（交换机）不支持 Ansible，请手动填写账号密码。"
 
-#: assets/templates/assets/system_user_list.html:43
+#: assets/templates/assets/system_user_list.html:39
 #: assets/views/system_user.py:47
 msgid "Create system user"
 msgstr "创建系统用户"
 
-#: assets/templates/assets/system_user_list.html:134
+#: assets/templates/assets/system_user_list.html:130
 msgid "This will delete the selected System Users !!!"
 msgstr "删除选择系统用户"
 
-#: assets/templates/assets/system_user_list.html:143
+#: assets/templates/assets/system_user_list.html:139
 msgid "System Users Deleted."
 msgstr "已被删除"
 
-#: assets/templates/assets/system_user_list.html:144
-#: assets/templates/assets/system_user_list.html:149
+#: assets/templates/assets/system_user_list.html:140
+#: assets/templates/assets/system_user_list.html:145
 msgid "System Users Delete"
 msgstr "删除系统用户"
 
-#: assets/templates/assets/system_user_list.html:148
+#: assets/templates/assets/system_user_list.html:144
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
@@ -2995,39 +2996,39 @@ msgstr "成功资产"
 msgid "Task log"
 msgstr "任务列表"
 
-#: ops/templates/ops/command_execution_create.html:90
+#: ops/templates/ops/command_execution_create.html:109
 #: terminal/templates/terminal/session_detail.html:95
 #: terminal/templates/terminal/session_detail.html:104
 msgid "Go"
 msgstr ""
 
-#: ops/templates/ops/command_execution_create.html:216
+#: ops/templates/ops/command_execution_create.html:194
 msgid "Selected assets"
 msgstr "已选择资产"
 
-#: ops/templates/ops/command_execution_create.html:219
+#: ops/templates/ops/command_execution_create.html:197
 msgid "In total"
 msgstr "总共"
 
-#: ops/templates/ops/command_execution_create.html:256
+#: ops/templates/ops/command_execution_create.html:234
 msgid ""
 "Select the left asset, select the running system user, execute command in "
 "batch"
 msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
 
-#: ops/templates/ops/command_execution_create.html:299
+#: ops/templates/ops/command_execution_create.html:278
 msgid "Unselected assets"
 msgstr "没有选中资产"
 
-#: ops/templates/ops/command_execution_create.html:303
+#: ops/templates/ops/command_execution_create.html:282
 msgid "No input command"
 msgstr "没有输入命令"
 
-#: ops/templates/ops/command_execution_create.html:307
+#: ops/templates/ops/command_execution_create.html:286
 msgid "No system user was selected"
 msgstr "没有选择系统用户"
 
-#: ops/templates/ops/command_execution_create.html:317
+#: ops/templates/ops/command_execution_create.html:296
 msgid "Pending"
 msgstr "等待"
 
@@ -3123,7 +3124,13 @@ msgstr "未分组"
 msgid "Empty"
 msgstr "空"
 
-#: perms/forms/asset_permission.py:77 perms/forms/remote_app_permission.py:37
+#: perms/forms/asset_permission.py:24
+msgid ""
+"Tips: The RDP protocol does not support separate controls for uploading or "
+"downloading files"
+msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
+
+#: perms/forms/asset_permission.py:81 perms/forms/remote_app_permission.py:37
 #: perms/models/base.py:50 perms/templates/perms/asset_permission_list.html:51
 #: perms/templates/perms/asset_permission_list.html:71
 #: perms/templates/perms/asset_permission_list.html:118
@@ -3135,12 +3142,6 @@ msgstr "空"
 #: xpack/plugins/orgs/templates/orgs/org_list.html:16
 msgid "User group"
 msgstr "用户组"
-
-#: perms/forms/asset_permission.py:93
-msgid ""
-"Tips: The RDP protocol does not support separate controls for uploading or "
-"downloading files"
-msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
 
 #: perms/forms/asset_permission.py:103 perms/forms/remote_app_permission.py:53
 msgid "User or group at least one required"
@@ -3218,7 +3219,7 @@ msgstr "添加资产"
 #: perms/templates/perms/remote_app_permission_user.html:124
 #: settings/templates/settings/terminal_setting.html:98
 #: settings/templates/settings/terminal_setting.html:120
-#: users/templates/users/user_group_detail.html:95
+#: users/templates/users/user_group_detail.html:92
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:80
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:93
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:130
