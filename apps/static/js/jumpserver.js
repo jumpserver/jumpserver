@@ -409,6 +409,46 @@ function makeLabel(data) {
     return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
 }
 
+function parseTableFilter(value) {
+    var cleanValues = [];
+    var valuesArray = value.split(':');
+    console.log(valuesArray);
+    for (var i=0; i<valuesArray.length; i++) {
+        var v = valuesArray[i].trim();
+        if (!v) {
+            continue
+        }
+        // 如果是最后一个元素，直接push，不需要再处理了, 因为最后一个肯定不是key
+        if (i === valuesArray.length -1) {
+            cleanValues.push(v);
+            continue
+        }
+        v = v.split(' ');
+        console.log(cleanValues);
+        // 如果长度是1，直接push上
+        // 如果长度不是1，根据空格分隔后，最后面的是key
+        if (v.length === 1) {
+            cleanValues.push(v[0]);
+        } else {
+            var leaveData = v.slice(0, -1).join(' ').trim();
+            cleanValues.push(leaveData);
+            cleanValues.push(v.slice(-1)[0]);
+        }
+    }
+    var filter = {};
+    var key = '';
+    for (i=0; i<cleanValues.length; i++) {
+        if (i%2 === 0) {
+            key = cleanValues[i]
+        } else {
+            value = cleanValues[i];
+            filter[key] = value
+        }
+    }
+    console.log(filter);
+    return filter;
+}
+
 
 var jumpserver = {};
 jumpserver.checked = false;
@@ -606,24 +646,26 @@ jumpserver.initServerSideDataTable = function (options) {
                     delete data.start;
                 }
                 if (data.search !== null) {
-                    var search_val = data.search.value;
-                    var search_list = search_val.split(" ");
-                    var search_attr = {};
-                    var search_raw = [];
-
-                    search_list.map(function (val, index) {
-                        var kv = val.split(":");
-                        if (kv.length === 2) {
-                            var value = kv[1];
-                            var key = kv[0].trim();
-                            value = value.replace("+", " ").trim();
-                            search_attr[key] = value
-                        } else {
-                            search_raw.push(kv)
-                        }
-                    });
-                    data.search = search_raw.join("");
-                    $.each(search_attr, function (k, v) {
+                    var searchValue = data.search.value;
+                    var searchFilter = parseTableFilter(searchValue);
+                    // var search_list = search_val.split(" ");
+                    // var search_attr = {};
+                    // var search_raw = [];
+                    //
+                    // search_list.map(function (val, index) {
+                    //     var kv = val.split(":");
+                    //     if (kv.length === 2) {
+                    //         var value = kv[1];
+                    //         var key = kv[0].trim();
+                    //         value = value.replace("+", " ").trim();
+                    //         search_attr[key] = value
+                    //     } else {
+                    //         search_raw.push(kv)
+                    //     }
+                    // });
+                    // data.search = search_raw.join("");
+                    console.log(searchFilter);
+                    $.each(searchFilter, function (k, v) {
                         data[k] = v
                     })
                 }
