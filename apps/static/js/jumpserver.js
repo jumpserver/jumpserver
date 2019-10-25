@@ -648,6 +648,7 @@ jumpserver.initServerSideDataTable = function (options) {
                     if (Object.keys(searchFilter).length === 0) {
                         data.search = searchValue;
                     } else {
+                        data.search = '';
                         $.each(searchFilter, function (k, v) {
                             data[k] = v
                         })
