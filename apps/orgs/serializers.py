@@ -5,8 +5,8 @@ from rest_framework import serializers
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
 from assets.const import (
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
 )
 from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
@@ -24,10 +24,10 @@ class OrgSerializer(ModelSerializer):
 
     @staticmethod
     def validate_name(name):
-        pattern = GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN
-        res = re.match(pattern, name)
-        if res is None:
-            msg = GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
+        res = re.search(pattern, name)
+        if res is not None:
+            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
             raise serializers.ValidationError(msg)
         return name
 
