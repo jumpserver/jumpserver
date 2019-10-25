@@ -12,13 +12,12 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View, RedirectView
 from django.views.generic.edit import FormView
 from django.conf import settings
 
 from common.utils import get_request_ip
 from users.models import User
-from audits.models import UserLoginLog as LoginLog
 from users.utils import (
     check_otp_code, is_block_login, clean_failed_count, get_user_or_tmp_user,
     set_tmp_user_to_cache, increase_login_failed_count,
@@ -31,6 +30,7 @@ from .. import const
 
 __all__ = [
     'UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
+    'UserLoginContinueView', 'UserLoginWaitConfirmView',
 ]
 
 
@@ -40,7 +40,6 @@ __all__ = [
 class UserLoginView(FormView):
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
-    redirect_field_name = 'next'
     key_prefix_captcha = "_LOGIN_INVALID_{}"
 
     def get_template_names(self):
@@ -52,7 +51,7 @@ class UserLoginView(FormView):
         if not License.has_valid_license():
             return template_name
 
-        template_name = 'authentication/new_login.html'
+        template_name = 'authentication/xpack_login.html'
         return template_name
 
     def get(self, request, *args, **kwargs):
@@ -91,7 +90,8 @@ class UserLoginView(FormView):
         ip = get_request_ip(self.request)
         # 登陆成功，清除缓存计数
         clean_failed_count(username, ip)
-        return redirect(self.get_success_url())
+        self.request.session['auth_password'] = '1'
+        return self.redirect_to_continue_view()
 
     def form_invalid(self, form):
         # write login failed log
@@ -111,27 +111,17 @@ class UserLoginView(FormView):
         form._errors = old_form.errors
         return super().form_invalid(form)
 
+    @staticmethod
+    def redirect_to_continue_view():
+        continue_url = reverse('authentication:login-continue')
+        return redirect(continue_url)
+
     def get_form_class(self):
         ip = get_request_ip(self.request)
         if cache.get(self.key_prefix_captcha.format(ip)):
             return self.form_class_captcha
         else:
             return self.form_class
-
-    def get_success_url(self):
-        user = get_user_or_tmp_user(self.request)
-
-        if user.otp_enabled and user.otp_secret_key:
-            # 1,2,mfa_setting & T
-            return reverse('authentication:login-otp')
-        elif user.otp_enabled and not user.otp_secret_key:
-            # 1,2,mfa_setting & F
-            return reverse('users:user-otp-enable-authentication')
-        elif not user.otp_enabled:
-            # 0 & T,F
-            auth_login(self.request, user)
-            self.send_auth_signal(success=True, user=user)
-            return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -140,15 +130,6 @@ class UserLoginView(FormView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
-        else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
-            )
 
 
 class UserLoginOtpView(FormView):
@@ -162,9 +143,8 @@ class UserLoginOtpView(FormView):
         otp_secret_key = user.otp_secret_key
 
         if check_otp_code(otp_secret_key, otp_code):
-            auth_login(self.request, user)
-            self.send_auth_signal(success=True, user=user)
-            return redirect(self.get_success_url())
+            self.request.session['auth_otp'] = '1'
+            return UserLoginView.redirect_to_continue_view()
         else:
             self.send_auth_signal(
                 success=False, username=user.username,
@@ -175,8 +155,40 @@ class UserLoginOtpView(FormView):
             )
             return super().form_invalid(form)
 
-    def get_success_url(self):
-        return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
+    def send_auth_signal(self, success=True, user=None, username='', reason=''):
+        if success:
+            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+        else:
+            post_auth_failed.send(
+                sender=self.__class__, username=username,
+                request=self.request, reason=reason
+            )
+
+
+class UserLoginContinueView(RedirectView):
+    redirect_field_name = 'next'
+
+    def get_redirect_url(self, *args, **kwargs):
+        if not self.request.session.get('auth_password'):
+            return reverse('authentication:login')
+
+        user = get_user_or_tmp_user(self.request)
+        if user.otp_enabled and user.otp_secret_key and \
+                not self.request.session.get('auth_otp'):
+            return reverse('authentication:login-otp')
+
+        self.login_success(user)
+        if user.otp_enabled and not user.otp_secret_key:
+            # 1,2,mfa_setting & F
+            return reverse('users:user-otp-enable-authentication')
+        url = redirect_user_first_login_or_index(
+            self.request, self.redirect_field_name
+        )
+        return url
+
+    def login_success(self, user):
+        auth_login(self.request, user)
+        self.send_auth_signal(success=True, user=user)
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
         if success:
@@ -186,6 +198,13 @@ class UserLoginOtpView(FormView):
                 sender=self.__class__, username=username,
                 request=self.request, reason=reason
             )
+
+
+class UserLoginWaitConfirmView(TemplateView):
+    template_name = 'authentication/login_wait_confirm.html'
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
 
 
 @method_decorator(never_cache, name='dispatch')

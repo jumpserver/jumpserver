@@ -10,8 +10,9 @@ class Order(CommonModelMixin):
         ('rejected', _("Rejected")),
         ('pending', _("Pending"))
     )
+    TYPE_LOGIN_REQUEST = 'login_request'
     TYPE_CHOICES = (
-        ('login_request', _("Login request")),
+        (TYPE_LOGIN_REQUEST, _("Login request")),
     )
     user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='orders', verbose_name=_("User"))
     user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
@@ -22,7 +23,10 @@ class Order(CommonModelMixin):
     assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
 
     type = models.CharField(choices=TYPE_CHOICES, max_length=64)
-    status = models.CharField(choices=STATUS_CHOICES, max_length=16)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=16, default='pending')
+
+    def __str__(self):
+        return '{}: {}'.format(self.user_display, self.title)
 
     class Meta:
         ordering = ('date_created',)

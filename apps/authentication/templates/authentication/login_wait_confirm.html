@@ -1,0 +1,88 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }}</title>
+
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script type="text/javascript"
+            src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}"></script>
+
+</head>
+
+<body class="gray-bg">
+<div class="passwordBox2 animated fadeInDown">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox-content">
+                <div>
+                    <img src="{{ LOGO_URL }}" style="margin: auto" width="82" height="82">
+                    <h2 style="display: inline">
+                        {{ JMS_TITLE }}
+                    </h2>
+                </div>
+                <p></p>
+                <div class="alert alert-success" id="messages">
+                Wait for Guanghongwei confirm, You also can copy link to her/his <br/>
+                Don't close ....
+                </div>
+                <div class="progress progress-bar-default">
+                    <div style="width: 43%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="43" role="progressbar" class="progress-bar">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
+                            {% trans 'Refresh' %}
+                        </a>
+                    </div>
+                    <div class="col-lg-3">
+                        <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">
+                            {% trans 'Copy link' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-6">
+            {% include '_copyright.html' %}
+        </div>
+        <div class="col-md-6 text-right">
+            <small>2014-2019</small>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var time = '{{ interval }}';
+    if (!time) {
+        time = 5;
+    } else {
+        time = parseInt(time);
+    }
+
+    function redirect_page() {
+        if (time >= 0) {
+            var messages = '{{ messages|safe }}， <b>' + time + '</b> ...';
+            $('#messages').html(messages);
+            time--;
+            setTimeout(redirect_page, 1000);
+        } else {
+            window.location.href = "{{ redirect_url }}";
+        }
+    }
+    {% if auto_redirect %}
+        window.onload = redirect_page;
+    {% endif %}
+</script>
+</html>

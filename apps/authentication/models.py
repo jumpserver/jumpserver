@@ -1,10 +1,12 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
 from common.mixins.models import CommonModelMixin
+from common.utils import get_object_or_none, get_request_ip, get_ip_city
 
 
 class AccessKey(models.Model):
@@ -41,4 +43,33 @@ class LoginConfirmSetting(CommonModelMixin):
     user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name=_("User"), related_name=_("login_confirmation_setting"))
     reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name=_("review_login_confirmation_settings"))
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
+
+    @classmethod
+    def get_user_confirm_setting(cls, user):
+        return get_object_or_none(cls, user=user)
+
+    def create_confirm_order(self, request=None):
+        from orders.models import Order
+        title = _('User login request confirm: {}'.format(self.user))
+        if request:
+            remote_addr = get_request_ip(request)
+            city = get_ip_city(remote_addr)
+            body = _("User: {}\nIP: {}\nCity: {}\nDate: {}\n").format(
+                self.user, remote_addr, city, timezone.now()
+            )
+        else:
+            body = ''
+        reviewer = self.reviewers.all()
+        reviewer_names = ','.join([u.name for u in reviewer])
+        order = Order.objects.create(
+            user=self.user, user_display=str(self.user),
+            title=title, body=body,
+            assignees_display=reviewer_names,
+            type=Order.TYPE_LOGIN_REQUEST,
+        )
+        order.assignees.set(reviewer)
+        return order
+
+    def __str__(self):
+        return '{} confirm'.format(self.user.username)
 

@@ -10,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
