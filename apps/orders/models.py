@@ -13,11 +13,17 @@ class Order(CommonModelMixin):
     TYPE_CHOICES = (
         ('login_request', _("Login request")),
     )
-    requester = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='orders')
-    user_name = models.CharField(max_length=128, verbose_name=_("User"))
+    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='orders', verbose_name=_("User"))
+    user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
+
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     body = models.TextField(verbose_name=_("Body"))
+    assignees = models.ManyToManyField('users.User', related_name='assign_orders', verbose_name=_("Assignees"))
+    assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
 
     type = models.CharField(choices=TYPE_CHOICES, max_length=64)
     status = models.CharField(choices=STATUS_CHOICES, max_length=16)
+
+    class Meta:
+        ordering = ('date_created',)
 
