@@ -412,7 +412,6 @@ function makeLabel(data) {
 function parseTableFilter(value) {
     var cleanValues = [];
     var valuesArray = value.split(':');
-    console.log(valuesArray);
     for (var i=0; i<valuesArray.length; i++) {
         var v = valuesArray[i].trim();
         if (!v) {
@@ -424,7 +423,6 @@ function parseTableFilter(value) {
             continue
         }
         v = v.split(' ');
-        console.log(cleanValues);
         // 如果长度是1，直接push上
         // 如果长度不是1，根据空格分隔后，最后面的是key
         if (v.length === 1) {
@@ -648,23 +646,6 @@ jumpserver.initServerSideDataTable = function (options) {
                 if (data.search !== null) {
                     var searchValue = data.search.value;
                     var searchFilter = parseTableFilter(searchValue);
-                    // var search_list = search_val.split(" ");
-                    // var search_attr = {};
-                    // var search_raw = [];
-                    //
-                    // search_list.map(function (val, index) {
-                    //     var kv = val.split(":");
-                    //     if (kv.length === 2) {
-                    //         var value = kv[1];
-                    //         var key = kv[0].trim();
-                    //         value = value.replace("+", " ").trim();
-                    //         search_attr[key] = value
-                    //     } else {
-                    //         search_raw.push(kv)
-                    //     }
-                    // });
-                    // data.search = search_raw.join("");
-                    console.log(searchFilter);
                     $.each(searchFilter, function (k, v) {
                         data[k] = v
                     })
