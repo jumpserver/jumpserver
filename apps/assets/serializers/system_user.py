@@ -8,8 +8,8 @@ from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import SystemUser
 from ..const import (
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
 )
 from .base import AuthSerializer, AuthSerializerMixin
 
@@ -41,10 +41,10 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     @staticmethod
     def validate_name(name):
-        pattern = GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN
-        res = re.match(pattern, name)
-        if res is None:
-            msg = GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
+        res = re.search(pattern, name)
+        if res is not None:
+            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
             raise serializers.ValidationError(msg)
         return name
 

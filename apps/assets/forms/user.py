@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, get_logger
 from orgs.mixins.forms import OrgModelForm
 from ..models import AdminUser, SystemUser
-from ..const import GENERAL_LIMIT_SPECIAL_CHARACTERS_HELP_TEXT
+from ..const import GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_HELP_TEXT
 
 logger = get_logger(__file__)
 __all__ = [
@@ -99,7 +99,7 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             }),
         }
         help_texts = {
-            'name': GENERAL_LIMIT_SPECIAL_CHARACTERS_HELP_TEXT,
+            'name': GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_HELP_TEXT,
             'auto_push': _('Auto push system user to asset'),
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),

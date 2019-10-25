@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-24 18:31+0800\n"
+"POT-Creation-Date: 2019-10-25 10:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -583,8 +583,8 @@ msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
 #: assets/const.py:8
-msgid "Only Numbers、letters、 chinese and characters ( {} ) are allowed"
-msgstr "只允许包含数字、字母、中文和特殊字符（ {} ）"
+msgid "Cannot contain special characters: [ {} ]"
+msgstr "不能包含特殊字符：[ {} ]"
 
 #: assets/const.py:14
 msgid "* The contains characters that are not allowed"
