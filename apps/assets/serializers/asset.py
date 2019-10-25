@@ -9,8 +9,8 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Node, Label
 from ..const import (
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
+    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
 )
 from .base import ConnectivitySerializer
 
@@ -98,10 +98,10 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
     @staticmethod
     def validate_hostname(hostname):
-        pattern = GENERAL_LIMIT_SPECIAL_CHARACTERS_PATTERN
-        res = re.match(pattern, hostname)
-        if res is None:
-            msg = GENERAL_LIMIT_SPECIAL_CHARACTERS_ERROR_MSG
+        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
+        res = re.search(pattern, hostname)
+        if res is not None:
+            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
             raise serializers.ValidationError(msg)
         return hostname
 
