@@ -283,6 +283,11 @@ class LoginLogExportView(PermissionsMixin, View):
                 date_from=date_from, date_to=date_to, user=user,
                 keyword=keyword,
             )
+            if current_org.is_default():
+                login_logs = login_logs
+            else:
+                users = current_org.get_org_members().values_list('username', flat=True)
+                login_logs = login_logs.filter(username__in=users)
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
         spm = uuid.uuid4().hex
