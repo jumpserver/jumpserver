@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 from orgs.mixins.models import OrgModelMixin
+from orgs.utils import current_org
 
 __all__ = [
     'FTPLog', 'OperateLog', 'PasswordChangeLog', 'UserLoginLog',
@@ -104,6 +105,9 @@ class UserLoginLog(models.Model):
                 Q(city__contains=keyword) |
                 Q(username__contains=keyword)
             )
+        if not current_org.is_root():
+            username_list = current_org.get_org_members().values_list('username', flat=True)
+            login_logs = login_logs.filter(username__in=username_list)
         return login_logs
 
     class Meta:
