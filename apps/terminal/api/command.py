@@ -29,6 +29,9 @@ class CommandQueryMixin:
     default_days_ago = 5
 
     def get_queryset(self):
+        # 解决访问 /docs/ 问题
+        if hasattr(self, 'swagger_fake_view'):
+            return self.command_store.model.objects.none()
         date_from, date_to = self.get_date_range()
         q = self.request.query_params
         multi_command_storage = get_multi_command_storage()
