@@ -136,7 +136,10 @@ class TreeService(Tree):
         if assets:
             return assets
         assets = set(self.assets(nid))
-        children = self.children(nid)
+        try:
+            children = self.children(nid)
+        except NodeIDAbsentError:
+            children = []
         for child in children:
             assets.update(self.all_assets(child.identifier))
         self.all_nodes_assets_map[nid] = assets
