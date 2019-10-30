@@ -12,6 +12,7 @@ from .models import LoginConfirmOrder
 class LoginConfirmOrderViewSet(CommonApiMixin, viewsets.ModelViewSet):
     serializer_class = serializers.LoginConfirmOrderSerializer
     permission_classes = (IsValidUser,)
+    filter_fields = ['status', 'title']
     search_fields = ['user_display', 'title', 'ip', 'city']
 
     def get_queryset(self):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-30 11:52+0800\n"
+"POT-Creation-Date: 2019-10-30 14:51+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -2534,8 +2534,8 @@ msgid "review_login_confirmation_settings"
 msgstr ""
 
 #: authentication/models.py:53
-msgid "User login request: {}"
-msgstr "用户登录请求: {}"
+msgid "User login confirm: {}"
+msgstr "用户登录复核: {}"
 
 #: authentication/models.py:57
 msgid ""
@@ -2833,18 +2833,12 @@ msgid "Websocket server run on port: {}, you should proxy it on nginx"
 msgstr ""
 
 #: jumpserver/views.py:241
-#, fuzzy
-#| msgid ""
-#| "<div>Luna is a separately deployed program, you need to deploy Luna, "
-#| "koko, configure nginx for url distribution,</div> </div>If you see this "
-#| "page, prove that you are not accessing the nginx listening port. Good "
-#| "luck.</div>"
 msgid ""
 "<div>Koko is a separately deployed program, you need to deploy Koko, "
 "configure nginx for url distribution,</div> </div>If you see this page, "
 "prove that you are not accessing the nginx listening port. Good luck.</div>"
 msgstr ""
-"<div>Luna是单独部署的一个程序，你需要部署luna，koko, </div><div>如果你看到了"
+"<div>Koko是单独部署的一个程序，你需要部署Koko, 并确保nginx配置转发, </div><div>如果你看到了"
 "这个页面，证明你访问的不是nginx监听的端口，祝你好运</div>"
 
 #: ops/api/celery.py:54
@@ -2853,7 +2847,7 @@ msgstr "等待任务开始"
 
 #: ops/api/command.py:35
 msgid "Not has host {} permission"
-msgstr ""
+msgstr "没有该主机 {} 权限"
 
 #: ops/models/adhoc.py:38
 msgid "Interval"
@@ -3261,6 +3255,51 @@ msgstr "拒绝"
 #: orders/serializers.py:43
 msgid "this order"
 msgstr "这个工单"
+
+#: orders/signals_handler.py:21
+#, fuzzy
+#| msgid "New node"
+msgid "New order"
+msgstr "新节点"
+
+# msgid "Update user"
+# msgstr "更新用户"
+#: orders/signals_handler.py:24
+#, fuzzy, python-brace-format
+msgid ""
+"\n"
+"        <div>\n"
+"            <p>Your has a new order</p>\n"
+"            <div>\n"
+"                <b>Title:</b> {order.title}\n"
+"                <br/>\n"
+"                <b>User:</b> {user}\n"
+"                <br/>\n"
+"                <b>City:</b> {order.city}\n"
+"                <br/>\n"
+"                <b>IP:</b> {order.ip}\n"
+"                <br/>\n"
+"                <a href={url}>click here to review</a> \n"
+"            </div>\n"
+"        </div>\n"
+"    "
+msgstr ""
+"\n"
+"        <div>\n"
+"            <p>您有一个新工单</p>\n"
+"            <div>\n"
+"                <b>标题:</b> {order.title}\n"
+"                <br/>\n"
+"                <b>用户:</b> {user}\n"
+"                <br/>\n"
+"                <b>城市:</b> {order.city}\n"
+"                <br/>\n"
+"                <b>IP:</b> {order.ip}\n"
+"                <br/>\n"
+"                <a href={url}>点我查看</a> \n"
+"            </div>\n"
+"        </div>\n"
+"    "
 
 #: orders/templates/orders/login_confirm_order_detail.html:75
 msgid "ago"

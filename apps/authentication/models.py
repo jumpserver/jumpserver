@@ -50,7 +50,7 @@ class LoginConfirmSetting(CommonModelMixin):
 
     def create_confirm_order(self, request=None):
         from orders.models import LoginConfirmOrder
-        title = _('User login request: {}'.format(self.user))
+        title = _('User login confirm: {}'.format(self.user))
         if request:
             remote_addr = get_request_ip(request)
             city = get_ip_city(remote_addr)
