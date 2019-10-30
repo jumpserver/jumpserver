@@ -193,7 +193,6 @@ def send_reset_ssh_key_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
-
 def get_user_or_tmp_user(request):
     user = request.user
     tmp_user = get_tmp_user_from_cache(request)
@@ -212,8 +211,8 @@ def get_tmp_user_from_cache(request):
     return user
 
 
-def set_tmp_user_to_cache(request, user):
-    cache.set(request.session.session_key+'user', user, 600)
+def set_tmp_user_to_cache(request, user, ttl=3600):
+    cache.set(request.session.session_key+'user', user, ttl)
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):

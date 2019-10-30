@@ -121,6 +121,16 @@
     </li>
 {% endif %}
 
+{% if request.user.can_admin_current_org %}
+    <li id="orders">
+        <a>
+            <i class="fa fa-check-square-o" style="width: 14px"></i> <span class="nav-label">{% trans 'Orders' %}</span><span class="fa arrow"></span>
+        </a>
+        <ul class="nav nav-second-level">
+            <li id="login-confirm-orders"><a href="{% url 'orders:login-confirm-order-list' %}">{% trans 'Login confirm' %}</a></li>
+        </ul>
+    </li>
+{% endif %}
 
 {# Audits #}
 {% if request.user.can_admin_or_audit_current_org %}

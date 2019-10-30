@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import os
+import datetime
 from django.core.cache import cache
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
@@ -12,17 +13,18 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic.base import TemplateView, View, RedirectView
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.conf import settings
 
-from common.utils import get_request_ip
+from common.utils import get_request_ip, get_object_or_none
 from users.models import User
 from users.utils import (
     check_otp_code, is_block_login, clean_failed_count, get_user_or_tmp_user,
     set_tmp_user_to_cache, increase_login_failed_count,
-    redirect_user_first_login_or_index,
+    redirect_user_first_login_or_index
 )
+from ..models import LoginConfirmSetting
 from ..signals import post_auth_success, post_auth_failed
 from .. import forms
 from .. import const
@@ -30,7 +32,7 @@ from .. import const
 
 __all__ = [
     'UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
-    'UserLoginContinueView', 'UserLoginWaitConfirmView',
+    'UserLoginGuardView', 'UserLoginWaitConfirmView',
 ]
 
 
@@ -91,7 +93,7 @@ class UserLoginView(FormView):
         # 登陆成功，清除缓存计数
         clean_failed_count(username, ip)
         self.request.session['auth_password'] = '1'
-        return self.redirect_to_continue_view()
+        return self.redirect_to_guard_view()
 
     def form_invalid(self, form):
         # write login failed log
@@ -112,8 +114,8 @@ class UserLoginView(FormView):
         return super().form_invalid(form)
 
     @staticmethod
-    def redirect_to_continue_view():
-        continue_url = reverse('authentication:login-continue')
+    def redirect_to_guard_view():
+        continue_url = reverse('authentication:login-guard')
         return redirect(continue_url)
 
     def get_form_class(self):
@@ -144,7 +146,7 @@ class UserLoginOtpView(FormView):
 
         if check_otp_code(otp_secret_key, otp_code):
             self.request.session['auth_otp'] = '1'
-            return UserLoginView.redirect_to_continue_view()
+            return UserLoginView.redirect_to_guard_view()
         else:
             self.send_auth_signal(
                 success=False, username=user.username,
@@ -165,7 +167,7 @@ class UserLoginOtpView(FormView):
             )
 
 
-class UserLoginContinueView(RedirectView):
+class UserLoginGuardView(RedirectView):
     redirect_field_name = 'next'
 
     def get_redirect_url(self, *args, **kwargs):
@@ -173,11 +175,18 @@ class UserLoginContinueView(RedirectView):
             return reverse('authentication:login')
 
         user = get_user_or_tmp_user(self.request)
+        # 启用并设置了otp
         if user.otp_enabled and user.otp_secret_key and \
                 not self.request.session.get('auth_otp'):
             return reverse('authentication:login-otp')
-
+        confirm_setting = LoginConfirmSetting.get_user_confirm_setting(user)
+        if confirm_setting and not self.request.session.get('auth_confirm'):
+            order = confirm_setting.create_confirm_order(self.request)
+            self.request.session['auth_order_id'] = str(order.id)
+            url = reverse('authentication:login-wait-confirm')
+            return url
         self.login_success(user)
+        # 启用但是没有设置otp
         if user.otp_enabled and not user.otp_secret_key:
             # 1,2,mfa_setting & F
             return reverse('users:user-otp-enable-authentication')
@@ -204,7 +213,28 @@ class UserLoginWaitConfirmView(TemplateView):
     template_name = 'authentication/login_wait_confirm.html'
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs)
+        from orders.models import LoginConfirmOrder
+        order_id = self.request.session.get("auth_order_id")
+        if not order_id:
+            order = None
+        else:
+            order = get_object_or_none(LoginConfirmOrder, pk=order_id)
+        context = super().get_context_data(**kwargs)
+        if order:
+            order_detail_url = reverse('orders:login-confirm-order-detail', kwargs={'pk': order_id})
+            timestamp_created = datetime.datetime.timestamp(order.date_created)
+            msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
+                  Don't close this page""").format(order.assignees_display)
+        else:
+            timestamp_created = 0
+            order_detail_url = ''
+            msg = _("No order found")
+        context.update({
+            "msg": msg,
+            "timestamp": timestamp_created,
+            "order_detail_url": order_detail_url
+        })
+        return context
 
 
 @method_decorator(never_cache, name='dispatch')

@@ -1,18 +1,13 @@
 # coding:utf-8
 #
-
-from __future__ import absolute_import
-
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .. import api
 
+app_name = 'authentication'
 router = DefaultRouter()
 router.register('access-keys', api.AccessKeyViewSet, 'access-key')
-
-
-app_name = 'authentication'
 
 
 urlpatterns = [
@@ -24,6 +19,7 @@ urlpatterns = [
          api.UserConnectionTokenApi.as_view(), name='connection-token'),
     path('otp/auth/', api.UserOtpAuthApi.as_view(), name='user-otp-auth'),
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
+    path('order/auth/', api.UserOrderAcceptAuthApi.as_view(), name='user-order-auth')
 ]
 
 urlpatterns += router.urls

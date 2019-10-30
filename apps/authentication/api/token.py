@@ -71,7 +71,8 @@ class TokenCreateApi(CreateAPIView):
                 raise MFARequiredError()
             self.send_auth_signal(success=True, user=user)
             clean_failed_count(username, ip)
-            return super().create(request, *args, **kwargs)
+            resp = super().create(request, *args, **kwargs)
+            return resp
         except AuthFailedError as e:
             increase_login_failed_count(username, ip)
             self.send_auth_signal(success=False, user=user, username=username, reason=str(e))
@@ -80,8 +81,8 @@ class TokenCreateApi(CreateAPIView):
             msg = _("MFA required")
             seed = uuid.uuid4().hex
             cache.set(seed, user.username, 300)
-            resp = {'msg': msg, "choices": ["otp"], "req": seed}
-            return Response(resp, status=300)
+            data = {'msg': msg, "choices": ["otp"], "req": seed}
+            return Response(data, status=300)
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
         if success:

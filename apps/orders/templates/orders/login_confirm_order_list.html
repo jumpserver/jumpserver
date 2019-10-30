@@ -1,0 +1,91 @@
+{% extends '_base_list.html' %}
+{% load i18n static %}
+{% block table_search %}
+
+{% endblock %}
+{% block table_container %}
+<table class="table table-striped table-bordered table-hover " id="login_confirm_order_list_table" >
+    <thead>
+        <tr>
+            <th class="text-center">
+                <input id="" type="checkbox" class="ipt_check_all">
+            </th>
+            <th class="text-center">{% trans 'Title' %}</th>
+            <th class="text-center">{% trans 'User' %}</th>
+            <th class="text-center">{% trans 'IP' %}</th>
+            <th class="text-center">{% trans 'City' %}</th>
+            <th class="text-center">{% trans 'Status' %}</th>
+            <th class="text-center">{% trans 'Datetime' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+{% endblock %}
+{% block content_bottom_left %}{% endblock %}
+{% block custom_foot_js %}
+<script>
+var orderTable = 0;
+function initTable() {
+     var options = {
+        ele: $('#login_confirm_order_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                cellData = htmlEscape(cellData);
+                var detailBtn = '<a href="{% url "orders:login-confirm-order-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detailBtn.replace("{{ DEFAULT_PK }}", rowData.id));
+             }},
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                if (cellData === "accepted") {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                } else if (cellData === "rejected") {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else if (cellData === "pending") {
+                    $(td).html('<i class="fa fa-spinner text-info"></i>')
+                }
+             }},
+            {targets: 6, createdCell: function (td, cellData) {
+                var d = toSafeLocalDateStr(cellData);
+                $(td).html(d)
+             }},
+            {targets: 7, createdCell: function (td, cellData, rowData) {
+                var acceptBtn = '<a class="btn btn-xs btn-info" data-uid="{{ DEFAULT_PK }}" >{% trans "Accept" %}</a> ';
+                var rejectBtn = '<a class="btn btn-xs btn-danger " data-uid="{{ DEFAULT_PK }}" >{% trans "Reject" %}</a>';
+                    acceptBtn = acceptBtn.replace('{{ DEFAULT_PK }}', cellData);
+                    rejectBtn = rejectBtn.replace('{{ DEFAULT_PK }}', cellData);
+                var acceptBtnRef = $(acceptBtn);
+                var rejectBtnRef = $(rejectBtn);
+                if (rowData.status !== "pending") {
+                    acceptBtnRef.attr('disabled', 'disabled');
+                    rejectBtnRef.attr('disabled', 'disabled');
+                }
+                var btn = acceptBtnRef.prop('outerHTML') + ' ' + rejectBtnRef.prop('outerHTML');
+                $(td).html(btn)
+             }}],
+        ajax_url: '{% url "api-orders:login-confirm-order-list" %}',
+        columns: [
+            {data: "id"}, {data: "title", className: "text-left"}, {data: "user_display"},
+            {data: "ip"},  {data: "city"},
+            {data: "status", orderable: false},
+            {data: "date_created"},
+            {data: "id", orderable: false, width: "100px"}
+        ],
+        op_html: $('#actions').html()
+    };
+    orderTable = jumpserver.initServerSideDataTable(options);
+    return orderTable
+}
+
+$(document).ready(function(){
+    initTable();
+}).on('click', '.expired', function () {
+    var msg = '{% trans "User is expired" %}';
+    toastr.error(msg)
+}).on('click', '.inactive', function () {
+    var msg = '{% trans 'User is inactive' %}';
+    toastr.error(msg)
+})
+</script>
+{% endblock %}
+

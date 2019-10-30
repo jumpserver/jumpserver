@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        {{ object.title }}
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-11">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <dl class="dl-horizontal">
+                                        <dt>{% trans 'User' %}:</dt> <dd>{{ object.user_display }}</dd>
+                                        <dt>{% trans 'IP' %}:</dt> <dd>{{ object.ip }}</dd>
+                                        <dt>{% trans 'Assignees' %}:</dt> <dd> {{ object.assignees_display }}</dd>
+                                        <dt>{% trans 'Status' %}:</dt>
+                                        <dd>
+                                        {% if object.status == "accpeted" %}
+                                        <span class="label label-primary">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        {% endif %}
+                                        {% if object.status == "rejected" %}
+                                        <span class="label label-danger">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        {% endif %}
+                                        {% if object.status == "pending" %}
+                                        <span class="label label-info">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-lg-6">
+                                    <dl class="dl-horizontal">
+                                        <dt><br></dt><dd></dd>
+                                        <dt>{% trans 'City' %}:</dt> <dd>{{ object.city }}</dd>
+                                        <dt>{% trans 'Assignee' %}:</dt> <dd>{{ object.assignee_display | default_if_none:"" }}</dd>
+                                        <dt>{% trans 'Date created' %}:</dt> <dd> {{ object.date_created }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="row m-t-sm">
+                                <div class="col-lg-12">
+                                    <div class="panel blank-panel">
+                                        <div class="panel-body">
+                                            <div class="feed-activity-list">
+                                                {% for comment in object.comments %}
+                                                <div class="feed-element">
+                                                    <a href="#" class="pull-left">
+                                                        <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
+                                                    </a>
+                                                    <div class="media-body ">
+                                                        <strong>{{ comment.user_display }}</strong> <small class="text-muted"> {{ comment.date_created|timesince}} {% trans 'ago' %}</small>
+                                                        <br/>
+                                                        <small class="text-muted">{{ comment.date_created }} </small>
+                                                        <div style="padding-top: 10px">
+                                                            {{ comment.body }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="feed-element">
+                                                <a href="" class="pull-left">
+                                                    <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
+                                                </a>
+                                                <div class="media-body">
+                                                     <textarea class="form-control" placeholder="" id="comment"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <a class="btn btn-sm btn-primary btn-action btn-update" data-action="accept"><i class="fa fa-check"></i> {% trans 'Accept' %}</a>
+                                                <a class="btn btn-sm btn-danger btn-action btn-update" data-action="reject"><i class="fa fa-times"></i> {% trans 'Reject' %}</a>
+                                                <a class="btn btn-sm btn-info btn-action" data-action="comment"><i class="fa fa-pencil"></i> {% trans 'Comment' %}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+var orderId = "{{ object.id }}";
+var status = "{{ object.status }}";
+var actionCreateUrl = "{% url 'api-orders:login-confirm-order-create-action' pk=object.id %}";
+$(document).ready(function () {
+    if (status !== "pending") {
+        $('.btn-update').attr('disabled', '1')
+    }
+})
+.on('click', '.btn-action', function () {
+    var action = $(this).data('action');
+    var comment = $("#comment").val();
+    var data = {
+        url: actionCreateUrl,
+        method: 'POST',
+        body: JSON.stringify({action: action, comment: comment}),
+        success: function () {
+            window.location.reload();
+        }
+    };
+    requestApi(data);
+})
+</script>
+{% endblock %}

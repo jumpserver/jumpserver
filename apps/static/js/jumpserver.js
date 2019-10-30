@@ -307,7 +307,7 @@ function requestApi(props) {
             toastr.error(msg);
         }
         if (typeof props.error === 'function') {
-            return props.error(jqXHR.responseText, jqXHR.status);
+            return props.error(jqXHR.responseText, jqXHR.responseJSON, jqXHR.status);
         }
     });
     // return true;

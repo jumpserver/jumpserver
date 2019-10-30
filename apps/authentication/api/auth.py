@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 import uuid
 import time
 
@@ -8,19 +7,17 @@ from django.core.cache import cache
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
-
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 
-from common.utils import get_logger, get_request_ip
+from common.utils import get_logger, get_request_ip, get_object_or_none
 from common.permissions import IsOrgAdminOrAppUser, IsValidUser
 from orgs.mixins.api import RootOrgViewMixin
 from users.serializers import UserSerializer
 from users.models import User
 from assets.models import Asset, SystemUser
-from audits.models import UserLoginLog as LoginLog
 from users.utils import (
     check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
@@ -33,7 +30,7 @@ from ..signals import post_auth_success, post_auth_failed
 logger = get_logger(__name__)
 __all__ = [
     'UserAuthApi', 'UserConnectionTokenApi', 'UserOtpAuthApi',
-    'UserOtpVerifyApi',
+    'UserOtpVerifyApi', 'UserOrderAcceptAuthApi',
 ]
 
 
@@ -209,3 +206,26 @@ class UserOtpVerifyApi(CreateAPIView):
         else:
             return Response({"error": "Code not valid"}, status=400)
 
+
+class UserOrderAcceptAuthApi(APIView):
+    permission_classes = ()
+
+    def get(self, request, *args, **kwargs):
+        from orders.models import LoginConfirmOrder
+        order_id = self.request.session.get("auth_order_id")
+        logger.debug('Login confirm order id: {}'.format(order_id))
+        if not order_id:
+            order = None
+        else:
+            order = get_object_or_none(LoginConfirmOrder, pk=order_id)
+        if not order:
+            error = _("No order found or order expired")
+            return Response({"error": error, "status": "not found"}, status=404)
+        if order.status == order.STATUS_ACCEPTED:
+            self.request.session["auth_confirm"] = "1"
+            return Response({"msg": "ok"})
+        elif order.status == order.STATUS_REJECTED:
+            error = _("Order was rejected by {}").format(order.assignee_display)
+        else:
+            error = "Order status: {}".format(order.status)
+        return Response({"error": error, "status": order.status}, status=400)
