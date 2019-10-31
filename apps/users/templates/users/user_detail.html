@@ -212,7 +212,6 @@
                                     </table>
                                 </div>
                             </div>
-
                             {% if user_object.is_current_org_admin or user_object.is_superuser %}
                             <div class="panel panel-info">
                                 <div class="panel-heading">
@@ -252,7 +251,7 @@
                                     </table>
                                 </div>
                             </div>
-                            {% endif %}
+                            {% if LOGIN_CONFIRM_ENABLE %}
                             <div class="panel panel-warning">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Login confirm' %}
@@ -289,6 +288,8 @@
                                     </table>
                                 </div>
                             </div>
+                            {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>

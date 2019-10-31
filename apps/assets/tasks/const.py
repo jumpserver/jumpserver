@@ -7,7 +7,10 @@ from django.utils.translation import ugettext_lazy as _
 
 
 ENV_PERIOD_TASK = os.environ.get("PERIOD_TASK", "on") == 'on'
-PERIOD_TASK_ENABLED = settings.PERIOD_TASK_ENABLED and ENV_PERIOD_TASK
+ENV_PERIOD_TASK_ENABLED = os.environ.get("PERIOD_TASK_ENABLED", "on") == "on"
+PERIOD_TASK_ENABLED = settings.CONFIG.PERIOD_TASK_ENABLE \
+                      and ENV_PERIOD_TASK \
+                      and ENV_PERIOD_TASK_ENABLED
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {

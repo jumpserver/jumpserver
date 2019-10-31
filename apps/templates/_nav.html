@@ -121,7 +121,7 @@
     </li>
 {% endif %}
 
-{% if request.user.can_admin_current_org %}
+{% if request.user.can_admin_current_org and LOGIN_CONFIRM_ENABLE %}
     <li id="orders">
         <a>
             <i class="fa fa-check-square-o" style="width: 14px"></i> <span class="nav-label">{% trans 'Orders' %}</span><span class="fa arrow"></span>
