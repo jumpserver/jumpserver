@@ -53,6 +53,8 @@ class UserGrantedRemoteAppsAsTreeApi(UserGrantedRemoteAppsApi):
     permission_classes = (IsOrgAdminOrAppUser,)
 
     def get_serializer(self, remote_apps=None, *args, **kwargs):
+        if remote_apps is None:
+            remote_apps = []
         only_remote_app = self.request.query_params.get('only', '0') == '1'
         tree_root = None
         data = []
