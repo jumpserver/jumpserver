@@ -48,6 +48,14 @@ class BaseOrder(CommonModelMixin):
     def comments(self):
         return Comment.objects.filter(order_id=self.id)
 
+    @property
+    def body_as_html(self):
+        return self.body.replace('\n', '<br/>')
+
+    @property
+    def status_display(self):
+        return self.get_status_display()
+
     class Meta:
         abstract = True
         ordering = ('-date_created',)

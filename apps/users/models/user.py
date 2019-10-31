@@ -117,6 +117,13 @@ class AuthMixin:
             return True
         return False
 
+    def get_login_confirm_setting(self):
+        if hasattr(self, 'login_confirm_setting'):
+            s = self.login_confirm_setting
+            if s.reviewers.all().count() and s.is_active:
+                return s
+        return False
+
 
 class RoleMixin:
     ROLE_ADMIN = 'Admin'

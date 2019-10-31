@@ -14,7 +14,6 @@
             <th class="text-center">{% trans 'Title' %}</th>
             <th class="text-center">{% trans 'User' %}</th>
             <th class="text-center">{% trans 'IP' %}</th>
-            <th class="text-center">{% trans 'City' %}</th>
             <th class="text-center">{% trans 'Status' %}</th>
             <th class="text-center">{% trans 'Datetime' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
@@ -38,8 +37,12 @@ function initTable() {
                 cellData = htmlEscape(cellData);
                 var detailBtn = '<a href="{% url "orders:login-confirm-order-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detailBtn.replace("{{ DEFAULT_PK }}", rowData.id));
-             }},
-            {targets: 5, createdCell: function (td, cellData, rowData) {
+            }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                var d = cellData + "(" + rowData.city + ")";
+                $(td).html(d)
+            }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
                 if (cellData === "accepted") {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 } else if (cellData === "rejected") {
@@ -48,13 +51,13 @@ function initTable() {
                     $(td).html('<i class="fa fa-spinner text-info"></i>')
                 }
              }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 5, createdCell: function (td, cellData) {
                 var d = toSafeLocalDateStr(cellData);
                 $(td).html(d)
              }},
-            {targets: 7, createdCell: function (td, cellData, rowData) {
-                var acceptBtn = '<a class="btn btn-xs btn-info" data-uid="{{ DEFAULT_PK }}" >{% trans "Accept" %}</a> ';
-                var rejectBtn = '<a class="btn btn-xs btn-danger " data-uid="{{ DEFAULT_PK }}" >{% trans "Reject" %}</a>';
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                var acceptBtn = '<a class="btn btn-xs btn-info btn-action" data-action="accept" data-uid="{{ DEFAULT_PK }}" >{% trans "Accept" %}</a> ';
+                var rejectBtn = '<a class="btn btn-xs btn-danger btn-action" data-action="reject" data-uid="{{ DEFAULT_PK }}" >{% trans "Reject" %}</a>';
                     acceptBtn = acceptBtn.replace('{{ DEFAULT_PK }}', cellData);
                     rejectBtn = rejectBtn.replace('{{ DEFAULT_PK }}', cellData);
                 var acceptBtnRef = $(acceptBtn);
@@ -68,10 +71,10 @@ function initTable() {
              }}],
         ajax_url: '{% url "api-orders:login-confirm-order-list" %}',
         columns: [
-            {data: "id"}, {data: "title", className: "text-left"}, {data: "user_display"},
-            {data: "ip"},  {data: "city"},
-            {data: "status", orderable: false},
-            {data: "date_created"},
+            {data: "id"}, {data: "title", className: "text-left"},
+            {data: "user_display"}, {data: "ip"},
+            {data: "status", orderable: false, width: "30px"},
+            {data: "date_created", width: "120px"},
             {data: "id", orderable: false, width: "100px"}
         ],
         op_html: $('#actions').html()
@@ -82,7 +85,6 @@ function initTable() {
 
 $(document).ready(function(){
     initTable();
-    $('')
     var menu = [
         {title: "IP", value: "ip"},
         {title: "{% trans 'Title' %}", value: "title"},
@@ -93,12 +95,21 @@ $(document).ready(function(){
         ]}
     ];
     initTableFilterDropdown('#login_confirm_order_list_table_filter input', menu)
-}).on('click', '.expired', function () {
-    var msg = '{% trans "User is expired" %}';
-    toastr.error(msg)
-}).on('click', '.inactive', function () {
-    var msg = '{% trans 'User is inactive' %}';
-    toastr.error(msg)
+}).on('click', '.btn-action', function () {
+    var actionCreateUrl = "{% url 'api-orders:login-confirm-order-create-action' pk=DEFAULT_PK %}";
+    var orderId = $(this).data('uid');
+    actionCreateUrl = actionCreateUrl.replace("{{ DEFAULT_PK }}", orderId);
+    var action = $(this).data('action');
+    var comment = '';
+    var data = {
+        url: actionCreateUrl,
+        method: 'POST',
+        body: JSON.stringify({action: action, comment: comment}),
+        success: function () {
+            window.location.reload();
+        }
+    };
+    requestApi(data);
 })
 </script>
 {% endblock %}

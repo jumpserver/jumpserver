@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext as __
 from rest_framework.authtoken.models import Token
 from django.conf import settings
 
@@ -40,8 +40,8 @@ class PrivateToken(Token):
 
 
 class LoginConfirmSetting(CommonModelMixin):
-    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name=_("User"), related_name=_("login_confirmation_setting"))
-    reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name=_("review_login_confirmation_settings"))
+    user = models.OneToOneField('users.User', on_delete=models.CASCADE, verbose_name=_("User"), related_name="login_confirm_setting")
+    reviewers = models.ManyToManyField('users.User', verbose_name=_("Reviewers"), related_name="review_login_confirm_settings", blank=True)
     is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
     @classmethod
@@ -50,7 +50,7 @@ class LoginConfirmSetting(CommonModelMixin):
 
     def create_confirm_order(self, request=None):
         from orders.models import LoginConfirmOrder
-        title = _('User login confirm: {}'.format(self.user))
+        title = _('User login confirm: {}').format(self.user)
         if request:
             remote_addr = get_request_ip(request)
             city = get_ip_city(remote_addr)

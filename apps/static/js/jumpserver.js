@@ -416,6 +416,9 @@ function makeLabel(data) {
 
 function parseTableFilter(value) {
     var cleanValues = [];
+    if (!value) {
+        return {}
+    }
     var valuesArray = value.split(':');
     for (var i=0; i<valuesArray.length; i++) {
         var v = valuesArray[i].trim();

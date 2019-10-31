@@ -4,17 +4,16 @@ from django.core.cache import cache
 from rest_framework import serializers
 
 from users.models import User
-from .models import AccessKey
+from .models import AccessKey, LoginConfirmSetting
 
 
 __all__ = [
     'AccessKeySerializer', 'OtpVerifySerializer', 'BearerTokenSerializer',
-    'MFAChallengeSerializer',
+    'MFAChallengeSerializer', 'LoginConfirmSettingSerializer',
 ]
 
 
 class AccessKeySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = AccessKey
         fields = ['id', 'secret', 'is_active', 'date_created']
@@ -87,3 +86,9 @@ class MFAChallengeSerializer(BearerTokenMixin, serializers.Serializer):
         username = self.context["username"]
         return self.create_response(username)
 
+
+class LoginConfirmSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LoginConfirmSetting
+        fields = ['id', 'user', 'reviewers', 'date_created', 'date_updated']
+        read_only_fields = ['date_created', 'date_updated']

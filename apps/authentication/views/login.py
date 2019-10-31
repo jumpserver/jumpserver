@@ -179,7 +179,7 @@ class UserLoginGuardView(RedirectView):
         if user.otp_enabled and user.otp_secret_key and \
                 not self.request.session.get('auth_otp'):
             return reverse('authentication:login-otp')
-        confirm_setting = LoginConfirmSetting.get_user_confirm_setting(user)
+        confirm_setting = user.get_login_confirm_setting()
         if confirm_setting and not self.request.session.get('auth_confirm'):
             order = confirm_setting.create_confirm_order(self.request)
             self.request.session['auth_order_id'] = str(order.id)
