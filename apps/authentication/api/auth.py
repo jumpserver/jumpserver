@@ -22,7 +22,7 @@ from users.utils import (
     check_otp_code, increase_login_failed_count,
     is_block_login, clean_failed_count
 )
-from .. import const
+from .. import errors
 from ..utils import check_user_valid
 from ..serializers import OtpVerifySerializer
 from ..signals import post_auth_success, post_auth_failed
@@ -174,7 +174,7 @@ class UserOtpAuthApi(RootOrgViewMixin, APIView):
                 status=401
             )
         if not check_otp_code(user.otp_secret_key, otp_code):
-            self.send_auth_signal(success=False, username=user.username, reason=const.mfa_failed)
+            self.send_auth_signal(success=False, username=user.username, reason=errors.mfa_failed)
             return Response({'msg': _('MFA certification failed')}, status=401)
         self.send_auth_signal(success=True, user=user)
         token, expired_at = user.create_bearer_token(request)

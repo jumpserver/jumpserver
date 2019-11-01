@@ -8,7 +8,7 @@ from common.utils import (
     get_ip_city, get_object_or_none, validate_ip, get_request_ip
 )
 from users.models import User
-from . import const
+from . import errors
 
 
 def write_login_log(*args, **kwargs):
@@ -38,11 +38,11 @@ def check_user_valid(**kwargs):
         user = None
 
     if user is None:
-        return None, const.user_not_exist
+        return None, errors.user_not_exist
     elif not user.is_valid:
-        return None, const.user_invalid
+        return None, errors.user_invalid
     elif user.password_has_expired:
-        return None, const.password_expired
+        return None, errors.password_expired
 
     if password and authenticate(username=username, password=password):
         return user, ''
@@ -55,4 +55,4 @@ def check_user_valid(**kwargs):
         elif len(public_key_saved) > 1:
             if public_key == public_key_saved[1]:
                 return user, ''
-    return None, const.password_failed
+    return None, errors.password_failed
