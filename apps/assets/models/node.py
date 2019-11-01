@@ -355,9 +355,7 @@ class SomeNodesMixin:
         with transaction.atomic():
             if not ori_org.is_real():
                 return cls.default_node()
-            set_current_org(Organization.root())
             key = cls.get_next_org_root_node_key()
-            set_current_org(ori_org)
             root = cls.objects.create(key=key, value=ori_org.name)
             return root
 
