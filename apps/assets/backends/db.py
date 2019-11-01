@@ -26,4 +26,5 @@ class AuthBookBackend(BaseBackend):
         }
         obj = AuthBook.objects.create(**kwargs)
         obj.set_auth(**auth_info)
+        obj.set_version_and_latest()
         return obj
