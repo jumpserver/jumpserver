@@ -60,10 +60,6 @@ class AuthBook(AssetUser):
             self.version = 1
         self.save()
 
-    def set_version_and_latest(self):
-        self.set_version()
-        self.set_to_latest()
-
     def get_related_assets(self):
         return [self.asset]
 
