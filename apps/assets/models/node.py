@@ -6,6 +6,7 @@ import time
 
 from django.db import models, transaction
 from django.db.models import Q
+from django.db.utils import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
@@ -337,20 +338,24 @@ class SomeNodesMixin:
             return False
 
     @classmethod
+    def get_next_org_root_node_key(cls):
+        with tmp_to_org(Organization.root()):
+            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
+            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
+            if not org_nodes_roots_keys:
+                org_nodes_roots_keys = ['1']
+            max_key = max([int(k) for k in org_nodes_roots_keys])
+            key = str(max_key + 1) if max_key != 0 else '2'
+            return key
+
+    @classmethod
     def create_org_root_node(cls):
         # 如果使用current_org 在set_current_org时会死循环
         ori_org = get_current_org()
         with transaction.atomic():
             if not ori_org.is_real():
                 return cls.default_node()
-            set_current_org(Organization.root())
-            org_nodes_roots = cls.objects.filter(key__regex=r'^[0-9]+$')
-            org_nodes_roots_keys = org_nodes_roots.values_list('key', flat=True)
-            if not org_nodes_roots_keys:
-                org_nodes_roots_keys = ['1']
-            key = max([int(k) for k in org_nodes_roots_keys])
-            key = str(key + 1) if key != 0 else '2'
-            set_current_org(ori_org)
+            key = cls.get_next_org_root_node_key()
             root = cls.objects.create(key=key, value=ori_org.name)
             return root
 
@@ -384,9 +389,16 @@ class SomeNodesMixin:
     def default_node(cls):
         with tmp_to_org(Organization.default()):
             defaults = {'value': cls.default_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.default_key,
-            )
+            try:
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            except IntegrityError as e:
+                logger.error("Create default node failed: {}".format(e))
+                cls.modify_other_org_root_node_key()
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
             return obj
 
     @classmethod
@@ -404,6 +416,35 @@ class SomeNodesMixin:
         cls.empty_node()
         cls.ungrouped_node()
         cls.favorite_node()
+
+    @classmethod
+    def modify_other_org_root_node_key(cls):
+        """
+        解决创建 default 节点失败的问题，
+        因为在其他组织下存在 default 节点，故在 DEFAULT 组织下 get 不到 create 失败
+        """
+        logger.info("Modify other org root node key")
+
+        with tmp_to_org(Organization.root()):
+            node_key1 = cls.objects.filter(key='1').first()
+            if not node_key1:
+                logger.info("Not found node that `key` = 1")
+                return
+            if not node_key1.org.is_real():
+                logger.info("Org is not real for node that `key` = 1")
+                return
+
+        with transaction.atomic():
+            with tmp_to_org(node_key1.org):
+                org_root_node_new_key = cls.get_next_org_root_node_key()
+                for n in cls.objects.all():
+                    old_key = n.key
+                    key_list = n.key.split(':')
+                    key_list[0] = org_root_node_new_key
+                    new_key = ':'.join(key_list)
+                    n.key = new_key
+                    n.save()
+                    logger.info('Modify key ( {} > {} )'.format(old_key, new_key))
 
 
 class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin, NodeAssetsMixin):
