@@ -426,7 +426,13 @@ class SomeNodesMixin:
         logger.info("Modify other org root node key")
         with transaction.atomic():
             with tmp_to_org(Organization.root()):
-                node = cls.objects.get(key='1')
+                node = cls.objects.filter(key='1').first()
+            if not node:
+                logger.info("Not found node that `key` = 1")
+                return
+            if not node.org.is_real():
+                logger.info("Org is not real for node that `key` = 1")
+                return
             with tmp_to_org(node.org):
                 for n in cls.objects.all():
                     old_key = n.key
