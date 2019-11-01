@@ -410,7 +410,7 @@ class SomeNodesMixin:
         try:
             cls.default_node()
         except IntegrityError as e:
-            logger.error("Create default node failed")
+            logger.error("Create default node failed: {}".format(e))
             cls.modify_other_org_root_node_key()
             cls.default_node()
         cls.empty_node()
