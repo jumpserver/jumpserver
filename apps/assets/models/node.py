@@ -391,9 +391,16 @@ class SomeNodesMixin:
     def default_node(cls):
         with tmp_to_org(Organization.default()):
             defaults = {'value': cls.default_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.default_key,
-            )
+            try:
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
+            except IntegrityError as e:
+                logger.error("Create default node failed: {}".format(e))
+                cls.modify_other_org_root_node_key()
+                obj, created = cls.objects.get_or_create(
+                    defaults=defaults, key=cls.default_key,
+                )
             return obj
 
     @classmethod
@@ -407,12 +414,7 @@ class SomeNodesMixin:
 
     @classmethod
     def initial_some_nodes(cls):
-        try:
-            cls.default_node()
-        except IntegrityError as e:
-            logger.error("Create default node failed: {}".format(e))
-            cls.modify_other_org_root_node_key()
-            cls.default_node()
+        cls.default_node()
         cls.empty_node()
         cls.ungrouped_node()
         cls.favorite_node()
@@ -424,20 +426,22 @@ class SomeNodesMixin:
         因为在其他组织下存在 default 节点，故在 DEFAULT 组织下 get 不到 create 失败
         """
         logger.info("Modify other org root node key")
-        with transaction.atomic():
-            with tmp_to_org(Organization.root()):
-                node = cls.objects.filter(key='1').first()
-            if not node:
+
+        with tmp_to_org(Organization.root()):
+            node_key1 = cls.objects.filter(key='1').first()
+            if not node_key1:
                 logger.info("Not found node that `key` = 1")
                 return
-            if not node.org.is_real():
+            if not node_key1.org.is_real():
                 logger.info("Org is not real for node that `key` = 1")
                 return
-            with tmp_to_org(node.org):
+
+        with transaction.atomic():
+            with tmp_to_org(node_key1.org):
+                org_root_node_new_key = cls.get_next_org_root_node_key()
                 for n in cls.objects.all():
                     old_key = n.key
                     key_list = n.key.split(':')
-                    org_root_node_new_key = cls.get_next_org_root_node_key()
                     key_list[0] = org_root_node_new_key
                     new_key = ':'.join(key_list)
                     n.key = new_key
