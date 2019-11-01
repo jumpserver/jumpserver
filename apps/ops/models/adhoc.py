@@ -242,6 +242,7 @@ class AdHoc(models.Model):
         except AttributeError:
             hid = str(uuid.uuid4())
         history = AdHocRunHistory(id=hid, adhoc=self, task=self.task)
+        history.save()
         time_start = time.time()
         date_start = timezone.now()
         is_success = False
