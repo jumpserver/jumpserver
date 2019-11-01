@@ -9,7 +9,7 @@ from django.dispatch import receiver
 
 from common.utils import get_logger, timeit
 from common.decorator import on_transaction_commit
-from .models import Asset, SystemUser, Node
+from .models import Asset, SystemUser, Node, AuthBook
 from .tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
@@ -189,3 +189,9 @@ def on_asset_nodes_remove(sender, instance=None, action='', model=None,
 def on_node_update_or_created(sender, **kwargs):
     # 刷新节点
     Node.refresh_nodes()
+
+
+@receiver(post_save, sender=AuthBook)
+def on_authbook_created(sender, instance=None, created=True, **kwargs):
+    if created and instance:
+        instance.set_version()

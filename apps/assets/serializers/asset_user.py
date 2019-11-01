@@ -53,7 +53,7 @@ class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         if not validated_data.get("name") and validated_data.get("username"):
             validated_data["name"] = validated_data["username"]
         instance = AssetUserManager.create(**validated_data)
-        instance.set_version_and_latest()
+        instance.set_to_latest()
         return instance
 
 
