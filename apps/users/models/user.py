@@ -62,10 +62,6 @@ class AuthMixin:
     def can_use_ssh_key_login(self):
         return settings.TERMINAL_PUBLIC_KEY_AUTH
 
-    def check_otp(self, code):
-        from ..utils import check_otp_code
-        return check_otp_code(self.otp_secret_key, code)
-
     def is_public_key_valid(self):
         """
             Check if the user's ssh public key is valid.
@@ -361,6 +357,10 @@ class MFAMixin:
     def disable_otp(self):
         self.otp_level = 0
         self.otp_secret_key = None
+
+    def check_otp(self, code):
+        from ..utils import check_otp_code
+        return check_otp_code(self.otp_secret_key, code)
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):

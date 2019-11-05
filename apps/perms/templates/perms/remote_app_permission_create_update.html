@@ -115,8 +115,8 @@ $(document).ready(function () {
         closeOnSelect: false
     });
     usersSelect2Init('.users-select2');
-    $('#date_start').daterangepicker(dateOptions);
-    $('#date_expired').daterangepicker(dateOptions);
+    initDateRangePicker('#date_start');
+    initDateRangePicker('#date_expired');
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();

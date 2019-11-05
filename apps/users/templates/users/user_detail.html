@@ -212,7 +212,7 @@
                                     </table>
                                 </div>
                             </div>
-                            {% if user_object.is_current_org_admin or user_object.is_superuser %}
+                            {% if user.is_current_org_admin or user.is_superuser %}
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'User group' %}

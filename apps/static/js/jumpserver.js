@@ -1289,3 +1289,31 @@ function showCeleryTaskLog(taskId) {
     var url = '/ops/celery/task/taskId/log/'.replace('taskId', taskId);
     window.open(url, '', 'width=900,height=600')
 }
+
+function initDateRangePicker(selector, options) {
+    if (!options) {
+        options = {}
+    }
+    var zhLocale = {
+        format: 'YYYY-MM-DD HH:mm',
+        separator: ' ~ ',
+        applyLabel: "应用",
+        cancelLabel: "取消",
+        resetLabel: "重置",
+        daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],//汉化处理
+        monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+    };
+    var defaultOption = {
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        autoApply: true,
+    };
+    var userLang = navigator.language || navigator.userLanguage;;
+    if (userLang.indexOf('zh') !== -1) {
+        defaultOption.locale = zhLocale;
+    }
+    options = Object.assign(defaultOption, options);
+    return $(selector).daterangepicker(options);
+}

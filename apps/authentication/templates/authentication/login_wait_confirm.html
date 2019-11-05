@@ -86,7 +86,7 @@ function doRequestAuth() {
             window.location = successUrl;
         },
         error: function (text, data) {
-            if (data.status !== "pending") {
+            if (data.error !== "login_confirm_wait") {
                 if (!errorMsgShow) {
                     infoMsgRef.hide();
                     errorMsgRef.show();
@@ -97,7 +97,7 @@ function doRequestAuth() {
                 clearInterval(checkInterval);
                 $(".copy-btn").attr('disabled', 'disabled')
             }
-            errorMsgRef.html(data.error)
+            errorMsgRef.html(data.msg)
         },
         flash_message: false
     })
