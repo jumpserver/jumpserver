@@ -1276,3 +1276,20 @@ function showCeleryTaskLog(taskId) {
     var url = '/ops/celery/task/taskId/log/'.replace('taskId', taskId);
     window.open(url, '', 'width=900,height=600')
 }
+
+function getElementTop(element){
+    var actualTop = element.offsetTop;
+    var current = element.offsetParent;
+    while (current !== null){
+        actualTop += current.offsetTop;
+        current = current.offsetParent;
+    }
+    return actualTop ;
+}
+
+function setTreeScrollBar(tree_id){
+    var tree_offset_top = getElementTop(document.getElementById(tree_id));
+    var client_height =  document.body.clientHeight ;
+    var tree_height = client_height - tree_offset_top + "px";
+    $("#" + tree_id).css({"height": tree_height, "overflow": "scroll"});
+}
