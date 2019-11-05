@@ -27,7 +27,7 @@ def check_user_valid(**kwargs):
     if user is None:
         return None, errors.reason_user_not_exist
     elif user.is_expired:
-        return None, errors.reason_password_expired
+        return None, errors.reason_user_inactive
     elif not user.is_active:
         return None, errors.reason_user_inactive
     elif user.password_has_expired:
