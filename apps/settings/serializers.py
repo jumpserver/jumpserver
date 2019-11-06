@@ -28,3 +28,6 @@ class LDAPUserSerializer(serializers.Serializer):
     email = serializers.CharField()
     existing = serializers.BooleanField(read_only=True)
 
+
+class PublicSettingSerializer(serializers.Serializer):
+    data = serializers.DictField(read_only=True)

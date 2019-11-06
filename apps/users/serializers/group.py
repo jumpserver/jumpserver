@@ -66,3 +66,4 @@ class UserGroupUpdateMemberSerializer(serializers.ModelSerializer):
     def set_fields_queryset(self):
         users_field = self.fields['users']
         users_field.child_relation.queryset = utils.get_current_org_members()
+

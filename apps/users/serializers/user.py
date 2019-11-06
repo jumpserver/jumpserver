@@ -43,7 +43,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
-            'source': {'read_only': True},
             'created_by': {'read_only': True, 'allow_blank': True},
             'can_update': {'read_only': True},
             'can_delete': {'read_only': True},
