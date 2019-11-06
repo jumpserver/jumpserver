@@ -114,6 +114,7 @@ class AuthMixin:
         self.request.session['auth_password'] = ''
         self.request.session['auth_mfa'] = ''
         self.request.session['auth_confirm'] = ''
+        self.request.session['auth_order_id'] = ''
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
         if success:

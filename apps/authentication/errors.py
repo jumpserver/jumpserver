@@ -139,8 +139,10 @@ class MFARequiredError(AuthFailedError):
         return {
             'error': self.error,
             'msg': self.msg,
-            'choices': ['otp'],
-            'url': reverse('api-auth:mfa-challenge')
+            'data': {
+                'choices': ['otp'],
+                'url': reverse('api-auth:mfa-challenge')
+            }
         }
 
 
@@ -161,7 +163,9 @@ class LoginConfirmError(AuthFailedError):
         return {
             "error": self.error,
             "msg": self.msg,
-            "order_id": self.order_id
+            "data": {
+                "order_id": self.order_id
+            }
         }
 
 

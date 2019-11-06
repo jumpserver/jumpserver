@@ -50,7 +50,7 @@ class UserOrderAcceptAuthApi(APIView):
             elif order.status == order.STATUS_REJECTED:
                 raise errors.LoginConfirmRejectedError(order_id)
             else:
-                return errors.LoginConfirmWaitError(order_id)
+                raise errors.LoginConfirmWaitError(order_id)
         except errors.AuthFailedError as e:
             data = e.as_data()
             return Response(data, status=400)

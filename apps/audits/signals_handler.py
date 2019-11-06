@@ -108,10 +108,10 @@ def generate_data(username, request):
     user_agent = request.META.get('HTTP_USER_AGENT', '')
 
     if isinstance(request, Request):
-        login_ip = request.data.get('remote_addr', None)
+        login_ip = request.data.get('remote_addr', '0.0.0.0')
         login_type = request.data.get('login_type', '')
     else:
-        login_ip = get_request_ip(request)
+        login_ip = get_request_ip(request) or '0.0.0.0'
         login_type = 'W'
 
     data = {

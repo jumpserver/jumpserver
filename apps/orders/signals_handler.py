@@ -20,7 +20,6 @@ def on_login_confirm_order_assignees_set(sender, instance=None, action=None,
     if action == 'post_add':
         logger.debug('New order create, send mail: {}'.format(instance.id))
         assignees = model.objects.filter(pk__in=pk_set)
-        print(assignees)
         send_login_confirm_order_mail_to_assignees(instance, assignees)
 
 

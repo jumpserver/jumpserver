@@ -36,4 +36,4 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
             resp = super().create(request, *args, **kwargs)
             return resp
         except errors.AuthFailedError as e:
-            return Response(e.as_data(), status=401)
+            return Response(e.as_data(), status=400)
