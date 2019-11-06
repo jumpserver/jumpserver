@@ -84,7 +84,7 @@ class UserLoginView(mixins.AuthMixin, FormView):
     def redirect_to_guard_view(self):
         guard_url = reverse('authentication:login-guard')
         args = self.request.META.get('QUERY_STRING', '')
-        if args and self.query_string:
+        if args:
             guard_url = "%s?%s" % (guard_url, args)
         return redirect(guard_url)
 
