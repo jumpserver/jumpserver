@@ -60,7 +60,7 @@ class BearerTokenSerializer(serializers.Serializer):
 
 
 class MFAChallengeSerializer(serializers.Serializer):
-    auth_type = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    type = serializers.CharField(write_only=True, required=False, allow_blank=True)
     code = serializers.CharField(write_only=True)
 
     def create(self, validated_data):

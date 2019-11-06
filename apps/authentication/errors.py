@@ -128,12 +128,12 @@ class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
 
 class SessionEmptyError(AuthFailedError):
     msg = session_empty_msg
-    error = 'session_empty_msg'
+    error = 'session_empty'
 
 
 class MFARequiredError(AuthFailedError):
     msg = mfa_required_msg
-    error = 'mfa_required_msg'
+    error = 'mfa_required'
 
     def as_data(self):
         return {
@@ -146,12 +146,12 @@ class MFARequiredError(AuthFailedError):
 
 class LoginConfirmRequiredError(AuthFailedError):
     msg = login_confirm_required_msg
-    error = 'login_confirm_required_msg'
+    error = 'login_confirm_required'
 
 
 class LoginConfirmError(AuthFailedError):
     msg = login_confirm_wait_msg
-    error = 'login_confirm_wait_msg'
+    error = 'login_confirm_wait'
 
     def __init__(self, order_id, **kwargs):
         self.order_id = order_id
@@ -167,14 +167,14 @@ class LoginConfirmError(AuthFailedError):
 
 class LoginConfirmWaitError(LoginConfirmError):
     msg = login_confirm_wait_msg
-    error = 'login_confirm_wait_msg'
+    error = 'login_confirm_wait'
 
 
 class LoginConfirmRejectedError(LoginConfirmError):
     msg = login_confirm_rejected_msg
-    error = 'login_confirm_rejected_msg'
+    error = 'login_confirm_rejected'
 
 
 class LoginConfirmOrderNotFound(LoginConfirmError):
     msg = login_confirm_order_not_found_msg
-    error = 'login_confirm_order_not_found_msg'
+    error = 'login_confirm_order_not_found'

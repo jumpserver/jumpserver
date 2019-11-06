@@ -30,9 +30,10 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
                 raise errors.MFAFailedError(
                     username=user.username, request=self.request
                 )
-
+            else:
+                self.request.session['auth_mfa'] = '1'
         except errors.AuthFailedError as e:
-            data = {"error": e.error, "msg": e.reason}
+            data = {"error": e.error, "msg": e.msg}
             raise ValidationError(data)
 
     def create(self, request, *args, **kwargs):
