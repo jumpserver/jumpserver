@@ -21,6 +21,7 @@
         <h3>{% trans 'Auth' %}</h3>
         {% block password %}{% endblock %}
         {% bootstrap_field form.otp_level layout="horizontal" %}
+        {% bootstrap_field form.source layout="horizontal" %}
 
         <div class="hr-line-dashed"></div>
         <h3>{% trans 'Security and Role' %}</h3>

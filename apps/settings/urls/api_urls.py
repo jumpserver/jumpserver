@@ -15,4 +15,5 @@ urlpatterns = [
     path('terminal/replay-storage/delete/', api.ReplayStorageDeleteAPI.as_view(), name='replay-storage-delete'),
     path('terminal/command-storage/create/', api.CommandStorageCreateAPI.as_view(), name='command-storage-create'),
     path('terminal/command-storage/delete/', api.CommandStorageDeleteAPI.as_view(), name='command-storage-delete'),
+    path('public/', api.PublicSettingApi.as_view(), name='public-setting'),
 ]
