@@ -13,10 +13,11 @@ from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 
 from .models import Setting
-from .utils import LDAPUtil
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer
+from .utils import LDAPServerUtil, LDAPUtil, LDAPSyncUtil
+from .tasks import fetch_ldap_users_from_server_to_cache
 
 
 logger = get_logger(__file__)
@@ -67,63 +68,71 @@ class LDAPTestingAPI(APIView):
     success_message = _("Test ldap success")
 
     @staticmethod
-    def get_ldap_util(serializer):
-        host = serializer.validated_data["AUTH_LDAP_SERVER_URI"]
-        bind_dn = serializer.validated_data["AUTH_LDAP_BIND_DN"]
-        password = serializer.validated_data["AUTH_LDAP_BIND_PASSWORD"]
-        use_ssl = serializer.validated_data.get("AUTH_LDAP_START_TLS", False)
-        search_ougroup = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
-        search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
+    def construct_ldap_config(serializer):
         attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
-        try:
-            attr_map = json.loads(attr_map)
-        except json.JSONDecodeError:
-            return Response({"error": "AUTH_LDAP_USER_ATTR_MAP not valid"}, status=401)
-
-        util = LDAPUtil(
-            use_settings_config=False, server_uri=host, bind_dn=bind_dn,
-            password=password, use_ssl=use_ssl,
-            search_ougroup=search_ougroup, search_filter=search_filter,
-            attr_map=attr_map
-        )
-        return util
+        config = {
+            'server_uri': serializer.validated_data["AUTH_LDAP_SERVER_URI"],
+            'bind_dn': serializer.validated_data["AUTH_LDAP_BIND_DN"],
+            'password': serializer.validated_data["AUTH_LDAP_BIND_PASSWORD"],
+            'use_ssl': serializer.validated_data.get("AUTH_LDAP_START_TLS", False),
+            'search_ougroup': serializer.validated_data["AUTH_LDAP_SEARCH_OU"],
+            'search_filter': serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"],
+            'attr_map': json.loads(attr_map),
+        }
+        return config
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=401)
-
-        util = self.get_ldap_util(serializer)
-
         try:
-            users = util.search_user_items()
+            attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
+            json.loads(attr_map)
+        except json.JSONDecodeError:
+            return Response({"error": "User attr map invalid"}, status=401)
+
+        ldap_config = self.construct_ldap_config(serializer)
+        util = LDAPServerUtil(config=ldap_config)
+        try:
+            entries = util.test()
         except Exception as e:
             return Response({"error": str(e)}, status=401)
 
-        if len(users) > 0:
-            return Response({"msg": _("Match {} s users").format(len(users))})
+        if len(entries) > 0:
+            return Response({"msg": _("Match {} s users").format(len(entries))})
         else:
             return Response({"error": "Have user but attr mapping error"}, status=401)
+
+
+class LDAPUserFetchApi(generics.RetrieveAPIView):
+    permission_classes = (IsOrgAdmin,)
+
+    def retrieve(self, request, *args, **kwargs):
+        task = fetch_ldap_users_from_server_to_cache.delay()
+        return Response({"task": task.id})
 
 
 class LDAPUserListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = LDAPUserSerializer
+    ldap_util = None
+
+    def init_ldap_util(self):
+        enable_cache = settings.AUTH_LDAP_ENABLE_CACHE
+        search_value = self.request.query_params.get('search')
+        self.ldap_util = LDAPUtil(
+            use_cache=enable_cache, search_value=search_value
+        )
 
     def get_queryset(self):
         if hasattr(self, 'swagger_fake_view'):
             return []
-        q = self.request.query_params.get('search')
+        self.init_ldap_util()
         try:
-            util = LDAPUtil()
-            extra_filter = util.construct_extra_filter(util.SEARCH_FIELD_ALL, q)
-            users = util.search_user_items(extra_filter)
+            users = self.ldap_util.get_users_format_dict()
         except Exception as e:
             users = []
             logger.error(e)
-        # 前端data_table会根据row.id对table.selected值进行操作
-        for user in users:
-            user['id'] = user['username']
         return users
 
     def sort_queryset(self, queryset):
@@ -149,21 +158,26 @@ class LDAPUserListApi(generics.ListAPIView):
 
 class LDAPUserSyncAPI(APIView):
     permission_classes = (IsOrgAdmin,)
+    ldap_sync_util = None
+
+    def init_ldap_sync_util(self):
+        enable_cache = settings.AUTH_LDAP_ENABLE_CACHE
+        username_list = self.request.data.get('username_list', None)
+        self.ldap_sync_util = LDAPSyncUtil(
+            use_cache=enable_cache, username_list=username_list
+        )
 
     def post(self, request):
-        username_list = request.data.get('username_list', [])
-
-        util = LDAPUtil()
+        self.init_ldap_sync_util()
         try:
-            result = util.sync_users(username_list)
+            result = self.ldap_sync_util.sync()
         except Exception as e:
             logger.error(e, exc_info=True)
             return Response({'error': str(e)}, status=401)
-        else:
-            msg = _("succeed: {} failed: {} total: {}").format(
-                result['succeed'], result['failed'], result['total']
-            )
-            return Response({'msg': msg})
+        msg = _("succeed: {} failed: {} total: {}").format(
+            result['succeed'], result['failed'], result['total']
+        )
+        return Response({'msg': msg})
 
 
 class ReplayStorageCreateAPI(APIView):

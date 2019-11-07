@@ -375,6 +375,7 @@ defaults = {
     'RADIUS_SERVER': 'localhost',
     'RADIUS_PORT': 1812,
     'RADIUS_SECRET': '',
+    'AUTH_LDAP_ENABLE_CACHE': True,
     'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
     'AUTH_LDAP_SYNC_IS_PERIODIC': False,
     'AUTH_LDAP_SYNC_INTERVAL': None,

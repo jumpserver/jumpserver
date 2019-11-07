@@ -11,7 +11,7 @@ from .models import User
 from .utils import (
     send_password_expiration_reminder_mail, send_user_expiration_reminder_mail
 )
-from settings.utils import LDAPUtil
+from settings.utils import LDAPSyncUtil
 
 
 logger = get_logger(__file__)
@@ -72,8 +72,7 @@ def check_user_expired_periodic():
 @shared_task
 def sync_ldap_user():
     logger.info("Start sync ldap user periodic task")
-    util = LDAPUtil()
-    result = util.sync_users()
+    result = LDAPSyncUtil().sync()
     logger.info("Result: {}".format(result))
 
 
