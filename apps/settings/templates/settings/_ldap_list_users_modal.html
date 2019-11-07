@@ -55,6 +55,10 @@ function refreshLdapUserCache(){
     })
 }
 function timingReloadLdapUserTable(){
+    {# 处理频繁刷新 setInterval 导致 clearInterval 失败的问题#}
+    if (idIntervalLdapUser !== undefined){
+        return
+    }
     var times = 0;
     idIntervalLdapUser = setInterval(function (){
         console.log('Timing reload Ldap user table');
@@ -62,6 +66,7 @@ function timingReloadLdapUserTable(){
             if (json['count'] !== 0 || ++times === 5){
                 console.log('Clear timing reload Ldap user table');
                 clearInterval(idIntervalLdapUser);
+                idIntervalLdapUser = undefined;
             }
         }, false);
     }, 2000)
