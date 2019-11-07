@@ -48,9 +48,15 @@ var idIntervalLdapUser;
 function refreshLdapUserCache(){
     console.log('Refresh LDAP user cache');
     var url = "{% url 'api-settings:ldap-user-fetch' %}";
+    var success = function (data) {
+        var taskId = data.task;
+        var url = '/ops/celery/task/taskId/log/'.replace('taskId', taskId);
+        console.log('Refresh Ldap user cache task log url: ', url)
+    };
     requestApi({
         url: url,
         method: 'GET',
+        success: success,
         flash_message: false
     })
 }

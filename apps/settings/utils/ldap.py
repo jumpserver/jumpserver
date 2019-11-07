@@ -229,8 +229,6 @@ class LDAPCacheUtil(object):
 
     def get_users_format_dict(self):
         users = self.get_users()
-        # if not users:
-        #     users = self.set_users()
         users = self.filter_users(users)
         return users
 

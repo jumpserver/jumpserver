@@ -81,6 +81,11 @@ class LDAPTestingAPI(APIView):
         }
         return config
 
+    def init_ldap_server_util(self, serializer):
+        ldap_config = self.construct_ldap_config(serializer)
+        util = LDAPServerUtil(config=ldap_config)
+        return util
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
@@ -91,9 +96,8 @@ class LDAPTestingAPI(APIView):
         except json.JSONDecodeError:
             return Response({"error": "User attr map invalid"}, status=401)
 
-        ldap_config = self.construct_ldap_config(serializer)
-        util = LDAPServerUtil(config=ldap_config)
         try:
+            util = self.init_ldap_server_util(serializer)
             entries = util.test()
         except Exception as e:
             return Response({"error": str(e)}, status=401)
@@ -115,22 +119,21 @@ class LDAPUserFetchApi(generics.RetrieveAPIView):
 class LDAPUserListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdmin,)
     serializer_class = LDAPUserSerializer
-    ldap_util = None
 
     def init_ldap_util(self):
         enable_cache = settings.AUTH_LDAP_ENABLE_CACHE
-        # enable_cache = False
         search_value = self.request.query_params.get('search')
-        self.ldap_util = LDAPUtil(
+        ldap_util = LDAPUtil(
             use_cache=enable_cache, search_value=search_value
         )
+        return ldap_util
 
     def get_queryset(self):
         if hasattr(self, 'swagger_fake_view'):
             return []
-        self.init_ldap_util()
         try:
-            users = self.ldap_util.get_users_format_dict()
+            util = self.init_ldap_util()
+            users = util.get_users_format_dict()
         except Exception as e:
             users = []
             logger.error(e)
@@ -159,19 +162,19 @@ class LDAPUserListApi(generics.ListAPIView):
 
 class LDAPUserSyncAPI(APIView):
     permission_classes = (IsOrgAdmin,)
-    ldap_sync_util = None
 
     def init_ldap_sync_util(self):
         enable_cache = settings.AUTH_LDAP_ENABLE_CACHE
         username_list = self.request.data.get('username_list', None)
-        self.ldap_sync_util = LDAPSyncUtil(
+        ldap_sync_util = LDAPSyncUtil(
             use_cache=enable_cache, username_list=username_list
         )
+        return ldap_sync_util
 
     def post(self, request):
-        self.init_ldap_sync_util()
         try:
-            result = self.ldap_sync_util.sync()
+            util = self.init_ldap_sync_util()
+            result = util.sync()
         except Exception as e:
             logger.error(e, exc_info=True)
             return Response({'error': str(e)}, status=401)
