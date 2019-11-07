@@ -71,7 +71,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'authentication.apps.AuthenticationConfig',  # authentication
     'applications.apps.ApplicationsConfig',
-    'orders.apps.OrdersConfig',
+    'tickets.apps.TicketsConfig',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',

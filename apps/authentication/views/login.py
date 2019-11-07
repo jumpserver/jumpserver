@@ -126,8 +126,8 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             return self.format_redirect_url(self.login_otp_url)
         confirm_setting = user.get_login_confirm_setting()
         if confirm_setting and not self.request.session.get('auth_confirm'):
-            order = confirm_setting.create_confirm_order(self.request)
-            self.request.session['auth_order_id'] = str(order.id)
+            ticket = confirm_setting.create_confirm_ticket(self.request)
+            self.request.session['auth_ticket_id'] = str(ticket.id)
             url = self.format_redirect_url(self.login_confirm_url)
             return url
         self.login_success(user)
@@ -159,26 +159,26 @@ class UserLoginWaitConfirmView(TemplateView):
     template_name = 'authentication/login_wait_confirm.html'
 
     def get_context_data(self, **kwargs):
-        from orders.models import LoginConfirmOrder
-        order_id = self.request.session.get("auth_order_id")
-        if not order_id:
-            order = None
+        from tickets.models import LoginConfirmTicket
+        ticket_id = self.request.session.get("auth_ticket_id")
+        if not ticket_id:
+            ticket = None
         else:
-            order = get_object_or_none(LoginConfirmOrder, pk=order_id)
+            ticket = get_object_or_none(LoginConfirmTicket, pk=ticket_id)
         context = super().get_context_data(**kwargs)
-        if order:
-            order_detail_url = reverse('orders:login-confirm-order-detail', kwargs={'pk': order_id})
-            timestamp_created = datetime.datetime.timestamp(order.date_created)
+        if ticket:
+            ticket_detail_url = reverse('tickets:login-confirm-ticket-detail', kwargs={'pk': ticket_id})
+            timestamp_created = datetime.datetime.timestamp(ticket.date_created)
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
-                  Don't close this page""").format(order.assignees_display)
+                  Don't close this page""").format(ticket.assignees_display)
         else:
             timestamp_created = 0
-            order_detail_url = ''
-            msg = _("No order found")
+            ticket_detail_url = ''
+            msg = _("No ticket found")
         context.update({
             "msg": msg,
             "timestamp": timestamp_created,
-            "order_detail_url": order_detail_url
+            "ticket_detail_url": ticket_detail_url
         })
         return context
 

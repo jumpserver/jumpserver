@@ -91,30 +91,30 @@ class AuthMixin:
         raise errors.MFAFailedError(username=user.username, request=self.request)
 
     def check_user_login_confirm_if_need(self, user):
-        from orders.models import LoginConfirmOrder
+        from tickets.models import LoginConfirmTicket
         confirm_setting = user.get_login_confirm_setting()
         if self.request.session.get('auth_confirm') or not confirm_setting:
             return
-        order = None
-        if self.request.session.get('auth_order_id'):
-            order_id = self.request.session['auth_order_id']
-            order = get_object_or_none(LoginConfirmOrder, pk=order_id)
-        if not order:
-            order = confirm_setting.create_confirm_order(self.request)
-            self.request.session['auth_order_id'] = str(order.id)
+        ticket = None
+        if self.request.session.get('auth_ticket_id'):
+            ticket_id = self.request.session['auth_ticket_id']
+            ticket = get_object_or_none(LoginConfirmTicket, pk=ticket_id)
+        if not ticket:
+            ticket = confirm_setting.create_confirm_ticket(self.request)
+            self.request.session['auth_ticket_id'] = str(ticket.id)
 
-        if order.status == "accepted":
+        if ticket.status == "accepted":
             return
-        elif order.status == "rejected":
-            raise errors.LoginConfirmRejectedError(order.id)
+        elif ticket.status == "rejected":
+            raise errors.LoginConfirmRejectedError(ticket.id)
         else:
-            raise errors.LoginConfirmWaitError(order.id)
+            raise errors.LoginConfirmWaitError(ticket.id)
 
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''
         self.request.session['auth_mfa'] = ''
         self.request.session['auth_confirm'] = ''
-        self.request.session['auth_order_id'] = ''
+        self.request.session['auth_ticket_id'] = ''
 
     def send_auth_signal(self, success=True, user=None, username='', reason=''):
         if success:

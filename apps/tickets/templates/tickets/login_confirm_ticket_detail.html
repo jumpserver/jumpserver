@@ -112,9 +112,9 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-var orderId = "{{ object.id }}";
+var ticketId = "{{ object.id }}";
 var status = "{{ object.status }}";
-var actionCreateUrl = "{% url 'api-orders:login-confirm-order-create-action' pk=object.id %}";
+var actionCreateUrl = "{% url 'api-tickets:login-confirm-ticket-create-action' pk=object.id %}";
 $(document).ready(function () {
     if (status !== "pending") {
         $('.btn-update').attr('disabled', '1')

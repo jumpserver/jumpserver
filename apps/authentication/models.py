@@ -48,8 +48,8 @@ class LoginConfirmSetting(CommonModelMixin):
     def get_user_confirm_setting(cls, user):
         return get_object_or_none(cls, user=user)
 
-    def create_confirm_order(self, request=None):
-        from orders.models import LoginConfirmOrder
+    def create_confirm_ticket(self, request=None):
+        from tickets.models import LoginConfirmTicket
         title = _('User login confirm: {}').format(self.user)
         if request:
             remote_addr = get_request_ip(request)
@@ -58,20 +58,20 @@ class LoginConfirmSetting(CommonModelMixin):
                 self.user, remote_addr, city, timezone.now()
             )
         else:
-            city = ''
-            remote_addr = ''
+            city = 'Localhost'
+            remote_addr = '127.0.0.1'
             body = ''
         reviewer = self.reviewers.all()
         reviewer_names = ','.join([u.name for u in reviewer])
-        order = LoginConfirmOrder.objects.create(
+        ticket = LoginConfirmTicket.objects.create(
             user=self.user, user_display=str(self.user),
             title=title, body=body,
             city=city, ip=remote_addr,
             assignees_display=reviewer_names,
-            type=LoginConfirmOrder.TYPE_LOGIN_CONFIRM,
+            type=LoginConfirmTicket.TYPE_LOGIN_CONFIRM,
         )
-        order.assignees.set(reviewer)
-        return order
+        ticket.assignees.set(reviewer)
+        return ticket
 
     def __str__(self):
         return '{} confirm'.format(self.user.username)

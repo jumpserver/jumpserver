@@ -554,3 +554,7 @@ span.select2-selection__placeholder {
     height: 22px;
     max-width: inherit;
 }
+
+table.table-striped.table-bordered {
+    width: 100% !important;
+}
