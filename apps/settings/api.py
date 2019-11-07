@@ -119,6 +119,7 @@ class LDAPUserListApi(generics.ListAPIView):
 
     def init_ldap_util(self):
         enable_cache = settings.AUTH_LDAP_ENABLE_CACHE
+        # enable_cache = False
         search_value = self.request.query_params.get('search')
         self.ldap_util = LDAPUtil(
             use_cache=enable_cache, search_value=search_value

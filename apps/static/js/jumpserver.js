@@ -616,6 +616,7 @@ jumpserver.initServerSideDataTable = function (options) {
         serverSide: true,
         processing: true,
         searchDelay: 800,
+        initComplete: options.initComplete,
         ajax: {
             url: options.ajax_url,
             error: function (jqXHR, textStatus, errorThrown) {
