@@ -63,8 +63,8 @@ class LoginConfirmTicketStatusApi(APIView):
                 raise errors.LoginConfirmOtherError(
                     ticket_id, ticket.get_status_display()
                 )
-        except errors.AuthFailedError as e:
-            return Response(e.as_data(), status=400)
+        except errors.NeedMoreInfoError as e:
+            return Response(e.as_data(), status=200)
 
     def delete(self, request, *args, **kwargs):
         ticket = self.get_ticket()

@@ -37,3 +37,5 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
             return resp
         except errors.AuthFailedError as e:
             return Response(e.as_data(), status=400)
+        except errors.NeedMoreInfoError as e:
+            return Response(e.as_data(), status=200)

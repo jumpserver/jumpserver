@@ -130,7 +130,24 @@ class SessionEmptyError(AuthFailedError):
     error = 'session_empty'
 
 
-class MFARequiredError(AuthFailedError):
+class NeedMoreInfoError(Exception):
+    error = ''
+    msg = ''
+
+    def __init__(self, error='', msg=''):
+        if error:
+            self.error = error
+        if msg:
+            self.msg = ''
+
+    def as_data(self):
+        return {
+            'error': self.error,
+            'msg': self.msg,
+        }
+
+
+class MFARequiredError(NeedMoreInfoError):
     msg = mfa_required_msg
     error = 'mfa_required'
 
@@ -145,15 +162,7 @@ class MFARequiredError(AuthFailedError):
         }
 
 
-class LoginConfirmRequiredError(AuthFailedError):
-    msg = login_confirm_required_msg
-    error = 'login_confirm_required'
-
-
-class LoginConfirmError(AuthFailedError):
-    msg = login_confirm_wait_msg
-    error = 'login_confirm_wait'
-
+class LoginConfirmBaseError(NeedMoreInfoError):
     def __init__(self, ticket_id, **kwargs):
         self.ticket_id = ticket_id
         super().__init__(**kwargs)
@@ -168,12 +177,12 @@ class LoginConfirmError(AuthFailedError):
         }
 
 
-class LoginConfirmWaitError(LoginConfirmError):
+class LoginConfirmWaitError(LoginConfirmBaseError):
     msg = login_confirm_wait_msg
     error = 'login_confirm_wait'
 
 
-class LoginConfirmOtherError(LoginConfirmError):
+class LoginConfirmOtherError(LoginConfirmBaseError):
     error = 'login_confirm_error'
 
     def __init__(self, ticket_id, status):

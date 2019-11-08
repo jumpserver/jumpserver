@@ -35,6 +35,8 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
         except errors.AuthFailedError as e:
             data = {"error": e.error, "msg": e.msg}
             raise ValidationError(data)
+        except errors.NeedMoreInfoError as e:
+            return Response(e.as_data(), status=200)
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

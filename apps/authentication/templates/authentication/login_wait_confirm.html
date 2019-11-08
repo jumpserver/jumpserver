@@ -80,12 +80,7 @@ function doRequestAuth() {
      requestApi({
         url: url,
         method: "GET",
-        success: function () {
-            clearInterval(interval);
-            clearInterval(checkInterval);
-            window.location = successUrl;
-        },
-        error: function (text, data) {
+        success: function (data) {
             if (data.error !== "login_confirm_wait") {
                 if (!errorMsgShow) {
                     infoMsgRef.hide();
@@ -97,7 +92,13 @@ function doRequestAuth() {
                 clearInterval(checkInterval);
                 $(".copy-btn").attr('disabled', 'disabled')
             }
-            errorMsgRef.html(data.msg)
+            if (data.msg === 'ok' && !data.error) {
+                window.location = "{% url 'authentication:login-guard' %}"
+            } else {
+                errorMsgRef.html(data.msg)
+            }
+        },
+        error: function (text, data) {
         },
         flash_message: false
     })
