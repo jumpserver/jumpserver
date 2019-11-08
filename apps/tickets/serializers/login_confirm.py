@@ -17,13 +17,28 @@ class LoginConfirmTicketSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = TicketSerializer.Meta.read_only_fields
 
+    def create(self, validated_data):
+        validated_data.pop('action')
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        action = validated_data.get("action")
+        user = self.context["request"].user
+        if action and user not in instance.assignees.all():
+            error = {"action": "Only assignees can update"}
+            raise serializers.ValidationError(error)
+        instance = super().update(instance, validated_data)
+        if action:
+            instance.perform_action(action, user)
+        return instance
+
 
 class LoginConfirmTicketActionSerializer(serializers.ModelSerializer):
     comment = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = LoginConfirmTicket
-        fields = ['action', 'comment']
+        fields = ['action']
 
     def update(self, instance, validated_data):
         pass

@@ -18,3 +18,16 @@ class LoginConfirmTicket(Ticket):
     ip = models.GenericIPAddressField(blank=True, null=True)
     city = models.CharField(max_length=16, blank=True, default='')
     action = models.CharField(choices=ACTION_CHOICES, max_length=16, default='', blank=True)
+
+    def create_action_comment(self, action, user):
+        action_display = dict(self.ACTION_CHOICES).get(action)
+        body = '{} {} {}'.format(user, action_display, _("this order"))
+        self.comments.create(body=body, user=user, user_display=str(user))
+
+    def perform_action(self, action, user):
+        self.create_action_comment(action, user)
+        self.action = action
+        self.status = self.STATUS_CLOSED
+        self.assignee = user
+        self.assignees_display = str(user)
+        self.save()

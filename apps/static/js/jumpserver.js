@@ -1317,3 +1317,7 @@ function initDateRangePicker(selector, options) {
     options = Object.assign(defaultOption, options);
     return $(selector).daterangepicker(options);
 }
+
+function reloadPage() {
+    window.location.reload();
+}

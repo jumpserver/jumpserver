@@ -21,7 +21,24 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
 
 
+class CurrentTicket(object):
+    ticket = None
+
+    def set_context(self, serializer_field):
+        self.ticket = serializer_field.context['ticket']
+
+    def __call__(self):
+        return self.ticket
+
+
 class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(),
+    )
+    ticket = serializers.HiddenField(
+        default=CurrentTicket()
+    )
+
     class Meta:
         model = models.Comment
         fields = [

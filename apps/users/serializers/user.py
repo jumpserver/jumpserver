@@ -13,11 +13,11 @@ from ..models import User, UserGroup
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
+    'UserProfileSerializer',
 ]
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-
     can_update = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
 
@@ -135,3 +135,11 @@ class ResetOTPSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'name', 'role', 'email'
+        ]

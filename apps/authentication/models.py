@@ -62,12 +62,9 @@ class LoginConfirmSetting(CommonModelMixin):
             remote_addr = '127.0.0.1'
             body = ''
         reviewer = self.reviewers.all()
-        reviewer_names = ','.join([u.name for u in reviewer])
         ticket = LoginConfirmTicket.objects.create(
-            user=self.user, user_display=str(self.user),
-            title=title, body=body,
+            user=self.user, title=title, body=body,
             city=city, ip=remote_addr,
-            assignees_display=reviewer_names,
             type=LoginConfirmTicket.TYPE_LOGIN_CONFIRM,
         )
         ticket.assignees.set(reviewer)

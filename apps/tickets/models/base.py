@@ -31,15 +31,11 @@ class Ticket(CommonModelMixin):
     assignee_display = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Assignee display name"))
     assignees = models.ManyToManyField('users.User', related_name='%(class)s_assigned', verbose_name=_("Assignees"))
     assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
-    type = models.CharField(max_length=16, default='general', verbose_name=_("Type"))
+    type = models.CharField(max_length=16, choices=TYPE_CHOICES, default=TYPE_GENERAL, verbose_name=_("Type"))
     status = models.CharField(choices=STATUS_CHOICES, max_length=16, default='open')
 
     def __str__(self):
         return '{}: {}'.format(self.user_display, self.title)
-
-    @property
-    def comments(self):
-        return Comment.objects.filter(order_id=self.id)
 
     @property
     def body_as_html(self):
@@ -49,17 +45,29 @@ class Ticket(CommonModelMixin):
     def status_display(self):
         return self.get_status_display()
 
+    def create_status_comment(self, status, user):
+        if status == self.STATUS_CLOSED:
+            action = _("Close")
+        else:
+            action = _("Open")
+        body = _('{} {} this ticket').format(self.user, action)
+        self.comments.create(user=user, body=body)
+
+    def perform_status(self, status, user):
+        if self.status == status:
+            return
+        self.status = status
+        self.save()
+
     class Meta:
         ordering = ('-date_created',)
 
 
 class Comment(CommonModelMixin):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='comments')
     user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
     body = models.TextField(verbose_name=_("Body"))
 
     class Meta:
         ordering = ('date_created', )
-
-

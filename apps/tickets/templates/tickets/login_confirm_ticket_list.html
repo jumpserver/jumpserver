@@ -13,7 +13,6 @@
             </th>
             <th class="text-center">{% trans 'Title' %}</th>
             <th class="text-center">{% trans 'User' %}</th>
-            <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'Status' %}</th>
             <th class="text-center">{% trans 'Datetime' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
@@ -39,10 +38,6 @@ function initTable() {
                 $(td).html(detailBtn.replace("{{ DEFAULT_PK }}", rowData.id));
             }},
             {targets: 3, createdCell: function (td, cellData, rowData) {
-                var d = cellData + "(" + rowData.city + ")";
-                $(td).html(d)
-            }},
-            {targets: 4, createdCell: function (td, cellData, rowData) {
                 if (cellData === "approval") {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 } else if (cellData === "rejected") {
@@ -53,12 +48,12 @@ function initTable() {
                     $(td).html('<i class="fa fa-circle text-info"></i>')
                 }
              }},
-            {targets: 5, createdCell: function (td, cellData) {
+            {targets: 4, createdCell: function (td, cellData) {
                 var d = toSafeLocalDateStr(cellData);
                 $(td).html(d)
              }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
-                var acceptBtn = '<a class="btn btn-xs btn-info btn-action" data-action="accept" data-uid="{{ DEFAULT_PK }}" >{% trans "Accept" %}</a> ';
+            {targets: 5, createdCell: function (td, cellData, rowData) {
+                var acceptBtn = '<a class="btn btn-xs btn-info btn-action" data-action="approve" data-uid="{{ DEFAULT_PK }}" >{% trans "Approve" %}</a> ';
                 var rejectBtn = '<a class="btn btn-xs btn-danger btn-action" data-action="reject" data-uid="{{ DEFAULT_PK }}" >{% trans "Reject" %}</a>';
                     acceptBtn = acceptBtn.replace('{{ DEFAULT_PK }}', cellData);
                     rejectBtn = rejectBtn.replace('{{ DEFAULT_PK }}', cellData);
@@ -74,7 +69,7 @@ function initTable() {
         ajax_url: '{% url "api-tickets:login-confirm-ticket-list" %}',
         columns: [
             {data: "id"}, {data: "title"},
-            {data: "user_display"}, {data: "ip"},
+            {data: "user_display"},
             {data: "status", ticketable: false},
             {data: "date_created", width: "120px"},
             {data: "id", ticketable: false}
@@ -101,18 +96,15 @@ $(document).ready(function(){
     ];
     initTableFilterDropdown('#login_confirm_ticket_list_table_filter input', menu)
 }).on('click', '.btn-action', function () {
-    var actionCreateUrl = "{% url 'api-tickets:login-confirm-ticket-create-action' pk=DEFAULT_PK %}";
-    var ticketId = $(this).data('uid');
-    actionCreateUrl = actionCreateUrl.replace("{{ DEFAULT_PK }}", ticketId);
+    var ticketId = $(this).data("uid");
     var action = $(this).data('action');
-    var comment = '';
+    var ticketDetailUrl = "{% url 'api-tickets:login-confirm-ticket-detail' pk=DEFAULT_PK %}";
+        ticketDetailUrl = ticketDetailUrl.replace("{{ DEFAULT_PK }}", ticketId);
     var data = {
-        url: actionCreateUrl,
-        method: 'POST',
-        body: JSON.stringify({action: action, comment: comment}),
-        success: function () {
-            window.location.reload();
-        }
+            url: ticketDetailUrl,
+            body: JSON.stringify({action: action}),
+            method: "PATCH",
+            success: reloadPage
     };
     requestApi(data);
 })

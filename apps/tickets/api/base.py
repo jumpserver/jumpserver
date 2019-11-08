@@ -1,21 +1,38 @@
 # -*- coding: utf-8 -*-
 #
-from rest_framework import viewsets, generics
 
-from .. import serializers, models
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+
+from common.utils import lazyproperty
+from .. import serializers, models, mixins
 
 
-class TicketViewSet(viewsets.ModelViewSet):
+class TicketViewSet(mixins.TicketMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketSerializer
-
-    def get_queryset(self):
-        queryset = models.Ticket.objects.all().none()
-        return queryset
+    queryset = models.Ticket.objects.all()
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class TicketCommentViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CommentSerializer
 
+    def check_permissions(self, request):
+        ticket = self.ticket
+        if request.user == ticket.user or request.user in ticket.assignees.all():
+            return True
+        return False
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['ticket'] = self.ticket
+        return context
+
+    @lazyproperty
+    def ticket(self):
+        ticket_id = self.kwargs.get('ticket_id')
+        ticket = get_object_or_404(models.Ticket, pk=ticket_id)
+        return ticket
+
     def get_queryset(self):
-        queryset = models.Comment.objects.none()
+        queryset = self.ticket.comments.all()
         return queryset

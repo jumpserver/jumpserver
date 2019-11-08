@@ -106,7 +106,7 @@ class AuthMixin:
         if ticket.status == "accepted":
             return
         elif ticket.status == "rejected":
-            raise errors.LoginConfirmRejectedError(ticket.id)
+            raise errors.LoginConfirmOtherError(ticket.id)
         else:
             raise errors.LoginConfirmWaitError(ticket.id)
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-from django.core.cache import cache
 from rest_framework import serializers
 
 from common.utils import get_object_or_none
 from users.models import User
+from users.serializers import UserProfileSerializer
 from .models import AccessKey, LoginConfirmSetting
 
 
@@ -26,14 +26,15 @@ class OtpVerifySerializer(serializers.Serializer):
 
 
 class BearerTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(allow_null=True, required=False)
+    username = serializers.CharField(allow_null=True, required=False, write_only=True)
     password = serializers.CharField(write_only=True, allow_null=True,
-                                     required=False)
+                                     required=False, allow_blank=True)
     public_key = serializers.CharField(write_only=True, allow_null=True,
-                                       required=False)
+                                       allow_blank=True, required=False)
     token = serializers.CharField(read_only=True)
     keyword = serializers.SerializerMethodField()
     date_expired = serializers.DateTimeField(read_only=True)
+    user = UserProfileSerializer(read_only=True)
 
     @staticmethod
     def get_keyword(obj):
@@ -52,9 +53,9 @@ class BearerTokenSerializer(serializers.Serializer):
                 )
         token, date_expired = user.create_bearer_token(request)
         instance = {
-            "username": user.username,
             "token": token,
             "date_expired": date_expired,
+            "user": user
         }
         return instance
 

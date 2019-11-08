@@ -48,8 +48,7 @@ mfa_failed_msg = _("MFA code invalid, or ntp sync server time")
 mfa_required_msg = _("MFA required")
 login_confirm_required_msg = _("Login confirm required")
 login_confirm_wait_msg = _("Wait login confirm ticket for accept")
-login_confirm_rejected_msg = _("Login confirm ticket was rejected")
-login_confirm_ticket_not_found_msg = _("Ticket not found")
+login_confirm_error_msg = _("Login confirm ticket was {}")
 
 
 class AuthFailedNeedLogMixin:
@@ -174,11 +173,9 @@ class LoginConfirmWaitError(LoginConfirmError):
     error = 'login_confirm_wait'
 
 
-class LoginConfirmRejectedError(LoginConfirmError):
-    msg = login_confirm_rejected_msg
-    error = 'login_confirm_rejected'
+class LoginConfirmOtherError(LoginConfirmError):
+    error = 'login_confirm_error'
 
-
-class LoginConfirmTicketNotFound(LoginConfirmError):
-    msg = login_confirm_ticket_not_found_msg
-    error = 'login_confirm_ticket_not_found'
+    def __init__(self, ticket_id, status):
+        msg = login_confirm_error_msg.format(status)
+        super().__init__(ticket_id=ticket_id, msg=msg)

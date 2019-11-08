@@ -73,7 +73,7 @@ var infoMsgRef = $(".info-messages");
 var timestamp = '{{ timestamp }}';
 var progressBarRef = $(".progress-bar");
 var interval, checkInterval;
-var url = "{% url 'api-auth:user-order-auth' %}";
+var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
 var successUrl = "{% url 'authentication:login-guard' %}";
 
 function doRequestAuth() {
