@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-08 15:42+0800\n"
+"POT-Creation-Date: 2019-11-08 17:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -354,6 +354,7 @@ msgstr "重置"
 #: terminal/templates/terminal/command_list.html:47
 #: terminal/templates/terminal/session_list.html:52
 #: terminal/templates/terminal/terminal_update.html:46
+#: tickets/templates/tickets/login_confirm_ticket_list.html:32
 #: users/templates/users/_user.html:52
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/user_bulk_update.html:24
@@ -528,7 +529,7 @@ msgstr "创建远程应用"
 #: terminal/templates/terminal/session_list.html:36
 #: terminal/templates/terminal/terminal_list.html:36
 #: tickets/templates/tickets/login_confirm_ticket_list.html:18
-#: tickets/templates/tickets/login_confirm_ticket_list.html:92
+#: tickets/templates/tickets/login_confirm_ticket_list.html:105
 #: users/templates/users/_granted_assets.html:34
 #: users/templates/users/user_group_list.html:38
 #: users/templates/users/user_list.html:41
@@ -1480,7 +1481,7 @@ msgid "Asset user auth"
 msgstr "资产用户信息"
 
 #: assets/templates/assets/_asset_user_auth_view_modal.html:54
-#: authentication/templates/authentication/login_wait_confirm.html:114
+#: authentication/templates/authentication/login_wait_confirm.html:115
 msgid "Copy success"
 msgstr "复制成功"
 
@@ -1666,6 +1667,7 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:182
 #: assets/templates/assets/system_user_list.html:135
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
+#: authentication/templates/authentication/login_wait_confirm.html:136
 #: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:112
 #: users/templates/users/user_detail.html:271
@@ -2294,7 +2296,7 @@ msgstr "原因"
 
 #: audits/models.py:88 audits/templates/audits/login_log_list.html:64
 #: tickets/templates/tickets/login_confirm_ticket_list.html:16
-#: tickets/templates/tickets/login_confirm_ticket_list.html:88
+#: tickets/templates/tickets/login_confirm_ticket_list.html:101
 #: tickets/templates/tickets/ticket_detail.html:34
 #: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/models.py:310
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
@@ -2389,10 +2391,6 @@ msgstr "登录日志"
 #: audits/views.py:245
 msgid "Command execution log"
 msgstr "命令执行"
-
-#: authentication/api/login_confirm.py:52
-msgid "not found"
-msgstr "没有发现"
 
 #: authentication/backends/api.py:53
 msgid "Invalid signature header. No credentials provided."
@@ -2703,11 +2701,11 @@ msgstr "返回"
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/views/login.py:73
+#: authentication/views/login.py:71
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:172
+#: authentication/views/login.py:170
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2715,15 +2713,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:177
+#: authentication/views/login.py:175
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:200
+#: authentication/views/login.py:198
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:201
+#: authentication/views/login.py:199
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -4571,8 +4569,8 @@ msgstr "接受"
 #: terminal/templates/terminal/terminal_list.html:80
 #: tickets/models/login_confirm.py:16
 #: tickets/templates/tickets/login_confirm_ticket_detail.html:10
-#: tickets/templates/tickets/login_confirm_ticket_list.html:57
-#: tickets/templates/tickets/login_confirm_ticket_list.html:94
+#: tickets/templates/tickets/login_confirm_ticket_list.html:70
+#: tickets/templates/tickets/login_confirm_ticket_list.html:107
 msgid "Reject"
 msgstr "拒绝"
 
@@ -4610,12 +4608,12 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: tickets/models/base.py:16 tickets/models/base.py:52
-#: tickets/templates/tickets/login_confirm_ticket_list.html:89
+#: tickets/templates/tickets/login_confirm_ticket_list.html:102
 msgid "Open"
-msgstr ""
+msgstr "开启"
 
 #: tickets/models/base.py:17
-#: tickets/templates/tickets/login_confirm_ticket_list.html:90
+#: tickets/templates/tickets/login_confirm_ticket_list.html:103
 msgid "Closed"
 msgstr "关闭"
 
@@ -4629,7 +4627,7 @@ msgstr "用户显示名称"
 
 #: tickets/models/base.py:28
 #: tickets/templates/tickets/login_confirm_ticket_list.html:14
-#: tickets/templates/tickets/login_confirm_ticket_list.html:87
+#: tickets/templates/tickets/login_confirm_ticket_list.html:100
 msgid "Title"
 msgstr "标题"
 
@@ -4659,14 +4657,22 @@ msgstr "{} {} 这个工单"
 
 #: tickets/models/login_confirm.py:15
 #: tickets/templates/tickets/login_confirm_ticket_detail.html:9
-#: tickets/templates/tickets/login_confirm_ticket_list.html:56
-#: tickets/templates/tickets/login_confirm_ticket_list.html:93
+#: tickets/templates/tickets/login_confirm_ticket_list.html:69
+#: tickets/templates/tickets/login_confirm_ticket_list.html:106
 msgid "Approve"
 msgstr "同意"
 
 #: tickets/models/login_confirm.py:24
 msgid "this order"
 msgstr "这个工单"
+
+#: tickets/templates/tickets/login_confirm_ticket_list.html:27
+msgid "Approve selected"
+msgstr "同意所选"
+
+#: tickets/templates/tickets/login_confirm_ticket_list.html:28
+msgid "Reject selected"
+msgstr "拒绝所选"
 
 #: tickets/templates/tickets/ticket_detail.html:66
 #: tickets/templates/tickets/ticket_detail.html:81
@@ -6431,6 +6437,12 @@ msgstr "密码匣子"
 msgid "vault create"
 msgstr "创建"
 
+#~ msgid "selected"
+#~ msgstr "所选"
+
+#~ msgid "not found"
+#~ msgstr "没有发现"
+
 #~ msgid "Log in frequently and try again later"
 #~ msgstr "登录频繁, 稍后重试"
 
@@ -6445,9 +6457,6 @@ msgstr "创建"
 
 #~ msgid "Accepted"
 #~ msgstr "已接受"
-
-#~ msgid "Rejected"
-#~ msgstr "已拒绝"
 
 #~ msgid "New order"
 #~ msgstr "新工单"

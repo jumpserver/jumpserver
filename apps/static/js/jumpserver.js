@@ -1319,5 +1319,5 @@ function initDateRangePicker(selector, options) {
 }
 
 function reloadPage() {
-    window.location.reload();
+    setTimeout( function () {window.location.reload();}, 300);
 }

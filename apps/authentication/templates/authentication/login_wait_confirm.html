@@ -43,7 +43,7 @@
                         </a>
                     </div>
                     <div class="col-lg-3">
-                        <a class="btn btn-primary btn-sm block btn-copy" data-link="{{ order_detail_url }}">
+                        <a class="btn btn-primary btn-sm block btn-copy" data-link="{{ ticket_detail_url }}">
                             <i class="fa fa-clipboard"></i> {% trans 'Copy link' %}
                         </a>
                     </div>
@@ -132,7 +132,11 @@ $(document).ready(function () {
     checkInterval = setInterval(doRequestAuth, 5000);
     doRequestAuth();
     initClipboard();
+    window.onbeforeunload = function (e) {
+      return "{% trans "Confirm" %}";
+    };
 }).on('click', '.btn-refresh', function () {
+    window.onbeforeunload = function() {};
     window.location.reload();
 })
 

@@ -19,9 +19,7 @@ from django.conf import settings
 from django.urls import reverse_lazy
 
 from common.utils import get_request_ip, get_object_or_none
-from users.models import User
 from users.utils import (
-    get_user_or_tmp_user, increase_login_failed_count,
     redirect_user_first_login_or_index
 )
 from ..signals import post_auth_success, post_auth_failed
@@ -117,42 +115,28 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         return url
 
     def get_redirect_url(self, *args, **kwargs):
-        if not self.request.session.get('auth_password'):
+        try:
+            user = self.check_user_auth_if_need()
+            self.check_user_mfa_if_need(user)
+            self.check_user_login_confirm_if_need(user)
+        except errors.CredentialError:
             return self.format_redirect_url(self.login_url)
-        user = self.get_user_from_session()
-        # 启用并设置了otp
-        if user.otp_enabled and user.otp_secret_key and \
-                not self.request.session.get('auth_mfa'):
+        except errors.MFARequiredError:
             return self.format_redirect_url(self.login_otp_url)
-        confirm_setting = user.get_login_confirm_setting()
-        if confirm_setting and not self.request.session.get('auth_confirm'):
-            ticket = confirm_setting.create_confirm_ticket(self.request)
-            self.request.session['auth_ticket_id'] = str(ticket.id)
-            url = self.format_redirect_url(self.login_confirm_url)
-            return url
-        self.login_success(user)
-        self.clear_auth_mark()
-        # 启用但是没有设置otp
-        if user.otp_enabled and not user.otp_secret_key:
-            # 1,2,mfa_setting & F
-            return reverse('users:user-otp-enable-authentication')
-        url = redirect_user_first_login_or_index(
-            self.request, self.redirect_field_name
-        )
-        return url
-
-    def login_success(self, user):
-        auth_login(self.request, user)
-        self.send_auth_signal(success=True, user=user)
-
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+        except errors.LoginConfirmBaseError:
+            return self.format_redirect_url(self.login_confirm_url)
         else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
+            auth_login(self.request, user)
+            self.send_auth_signal(success=True, user=user)
+            self.clear_auth_mark()
+            # 启用但是没有设置otp
+            if user.otp_enabled and not user.otp_secret_key:
+                # 1,2,mfa_setting & F
+                return reverse('users:user-otp-enable-authentication')
+            url = redirect_user_first_login_or_index(
+                self.request, self.redirect_field_name
             )
+            return url
 
 
 class UserLoginWaitConfirmView(TemplateView):

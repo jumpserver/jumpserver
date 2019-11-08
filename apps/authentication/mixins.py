@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import time
+from django.conf import settings
 
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
@@ -49,8 +50,8 @@ class AuthMixin:
             raise errors.BlockLoginError(username=username, ip=ip)
 
     def check_user_auth(self):
-        request = self.request
         self.check_is_block()
+        request = self.request
         if hasattr(request, 'data'):
             username = request.data.get('username', '')
             password = request.data.get('password', '')
@@ -73,11 +74,20 @@ class AuthMixin:
         request.session['user_id'] = str(user.id)
         return user
 
+    def check_user_auth_if_need(self):
+        request = self.request
+        if request.session.get('auth_password') and \
+                request.session.get('user_id'):
+            user = self.get_user_from_session()
+            if user:
+                return user
+        return self.check_user_auth()
+
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
-            return True
+            return
         if not user.otp_enabled or not user.otp_secret_key:
-            return True
+            return
         raise errors.MFARequiredError()
 
     def check_user_mfa(self, code):
@@ -90,28 +100,53 @@ class AuthMixin:
             return
         raise errors.MFAFailedError(username=user.username, request=self.request)
 
-    def check_user_login_confirm_if_need(self, user):
+    def get_ticket(self):
         from tickets.models import LoginConfirmTicket
-        confirm_setting = user.get_login_confirm_setting()
-        if self.request.session.get('auth_confirm') or not confirm_setting:
-            return
-        ticket = None
-        if self.request.session.get('auth_ticket_id'):
-            ticket_id = self.request.session['auth_ticket_id']
+        ticket_id = self.request.session.get("auth_ticket_id")
+        logger.debug('Login confirm ticket id: {}'.format(ticket_id))
+        if not ticket_id:
+            ticket = None
+        else:
             ticket = get_object_or_none(LoginConfirmTicket, pk=ticket_id)
+        return ticket
+
+    def get_ticket_or_create(self, confirm_setting):
+        ticket = self.get_ticket()
         if not ticket:
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
+        return ticket
 
-        if ticket.status == "accepted":
-            return
-        elif ticket.status == "rejected":
-            raise errors.LoginConfirmOtherError(ticket.id)
-        else:
+    def check_user_login_confirm(self):
+        ticket = self.get_ticket()
+        if not ticket:
+            raise errors.LoginConfirmOtherError('', "Not found")
+        if ticket.status == ticket.STATUS_OPEN:
             raise errors.LoginConfirmWaitError(ticket.id)
+        elif ticket.action == ticket.ACTION_APPROVE:
+            self.request.session["auth_confirm"] = "1"
+            return
+        elif ticket.action == ticket.ACTION_REJECT:
+            raise errors.LoginConfirmOtherError(
+                ticket.id, ticket.get_action_display()
+            )
+        else:
+            raise errors.LoginConfirmOtherError(
+                ticket.id, ticket.get_status_display()
+            )
+
+    def check_user_login_confirm_if_need(self, user):
+        if not settings.CONFIG.LOGIN_CONFIRM_ENABLE:
+            return
+        confirm_setting = user.get_login_confirm_setting()
+        if self.request.session.get('auth_confirm') or not confirm_setting:
+            return
+        self.get_ticket_or_create(confirm_setting)
+        self.check_user_login_confirm()
 
     def clear_auth_mark(self):
         self.request.session['auth_password'] = ''
+        self.request.session['auth_user_id'] = ''
         self.request.session['auth_mfa'] = ''
         self.request.session['auth_confirm'] = ''
         self.request.session['auth_ticket_id'] = ''

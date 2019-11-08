@@ -28,7 +28,7 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
         self.create_session_if_need()
         # 如果认证没有过，检查账号密码
         try:
-            user = self.check_user_auth()
+            user = self.check_user_auth_if_need()
             self.check_user_mfa_if_need(user)
             self.check_user_login_confirm_if_need(user)
             self.send_auth_signal(success=True, user=user)

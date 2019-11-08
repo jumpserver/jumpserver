@@ -21,6 +21,19 @@
     <tbody>
     </tbody>
 </table>
+<div id="actions" class="hide">
+   <div class="input-group">
+       <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+           <option value="approve">{% trans 'Approve selected' %}</option>
+           <option value="reject">{% trans 'Reject selected' %}</option>
+       </select>
+       <div class="input-group-btn pull-left" style="padding-left: 5px;">
+           <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+            {% trans 'Submit' %}
+           </button>
+       </div>
+   </div>
+</div>
 {% include '_filter_dropdown.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
@@ -38,9 +51,9 @@ function initTable() {
                 $(td).html(detailBtn.replace("{{ DEFAULT_PK }}", rowData.id));
             }},
             {targets: 3, createdCell: function (td, cellData, rowData) {
-                if (cellData === "approval") {
+                if (cellData === "approve") {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
-                } else if (cellData === "rejected") {
+                } else if (cellData === "reject") {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else if (cellData === "open") {
                     $(td).html('<i class="fa fa-spinner text-info"></i>')
@@ -70,9 +83,9 @@ function initTable() {
         columns: [
             {data: "id"}, {data: "title"},
             {data: "user_display"},
-            {data: "status", ticketable: false},
+            {data: "action", width: "40px"},
             {data: "date_created", width: "120px"},
-            {data: "id", ticketable: false}
+            {data: "id", orderable: false}
         ],
         op_html: $('#actions').html()
     };
@@ -85,6 +98,7 @@ $(document).ready(function(){
     var menu = [
         {title: "IP", value: "ip"},
         {title: "{% trans 'Title' %}", value: "title"},
+        {title: "{% trans 'User' %}", value: "user_display"},
         {title: "{% trans 'Status' %}", value: "status", submenu: [
                 {title: "{% trans 'Open' %}", value: "open"},
                 {title: "{% trans 'Closed' %}", value: "closed"},
@@ -107,6 +121,33 @@ $(document).ready(function(){
             success: reloadPage
     };
     requestApi(data);
+}).on('click', '#btn_bulk_update', function () {
+    var action = $('#slct_bulk_update').val();
+    var idList = ticketTable.selected;
+    if (idList.length === 0) {
+        return false;
+    }
+    var theUrl = "{% url 'api-tickets:login-confirm-ticket-list' %}";
+
+    function doAction(action) {
+        var data = [];
+        $.each(idList, function(index, object_id) {
+            var obj = {
+                "pk": object_id, "action": action
+            };
+            data.push(obj);
+        });
+        requestApi({
+            url: theUrl,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: function (){
+                $(".ipt_check_all").prop("checked", false)
+                ticketTable.ajax.reload();
+            }
+        });
+    }
+    doAction(action)
 })
 </script>
 {% endblock %}

@@ -10,7 +10,7 @@ from common.utils import get_logger, get_object_or_none
 from common.permissions import IsOrgAdmin
 from ..models import LoginConfirmSetting
 from ..serializers import LoginConfirmSettingSerializer
-from .. import errors
+from .. import errors, mixins
 
 __all__ = ['LoginConfirmSettingUpdateApi', 'LoginConfirmTicketStatusApi']
 logger = get_logger(__name__)
@@ -31,7 +31,7 @@ class LoginConfirmSettingUpdateApi(UpdateAPIView):
         return s
 
 
-class LoginConfirmTicketStatusApi(APIView):
+class LoginConfirmTicketStatusApi(mixins.AuthMixin, APIView):
     permission_classes = ()
 
     def get_ticket(self):
@@ -45,24 +45,9 @@ class LoginConfirmTicketStatusApi(APIView):
         return ticket
 
     def get(self, request, *args, **kwargs):
-        ticket_id = self.request.session.get("auth_ticket_id")
-        ticket = self.get_ticket()
         try:
-            if not ticket:
-                raise errors.LoginConfirmOtherError(ticket_id, _("not found"))
-            if ticket.status == 'open':
-                raise errors.LoginConfirmWaitError(ticket_id)
-            elif ticket.action == ticket.ACTION_APPROVE:
-                self.request.session["auth_confirm"] = "1"
-                return Response({"msg": "ok"})
-            elif ticket.action == ticket.ACTION_REJECT:
-                raise errors.LoginConfirmOtherError(
-                    ticket_id, ticket.get_action_display()
-                )
-            else:
-                raise errors.LoginConfirmOtherError(
-                    ticket_id, ticket.get_status_display()
-                )
+            self.check_user_login_confirm()
+            return Response({"msg": "ok"})
         except errors.NeedMoreInfoError as e:
             return Response(e.as_data(), status=200)
 
