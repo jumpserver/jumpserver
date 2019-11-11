@@ -67,7 +67,7 @@ class TreeMixin:
 
     @classmethod
     def refresh_node_assets(cls, t=None):
-        logger.debug("Refresh node tree assets")
+        logger.debug("Refresh node assets")
         key = cls.tree_assets_cache_key
         ttl = cls.tree_cache_time
         if not t:
