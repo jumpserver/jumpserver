@@ -30,6 +30,7 @@ class AuthMixin:
             user = get_object_or_none(User, pk=user_id)
         if not user:
             raise errors.SessionEmptyError()
+        user.backend = self.request.session.get("auth_backend")
         return user
 
     def get_request_ip(self):
@@ -72,6 +73,8 @@ class AuthMixin:
         clean_failed_count(username, ip)
         request.session['auth_password'] = 1
         request.session['user_id'] = str(user.id)
+        auth_backend = getattr(user, 'backend', 'django.contrib.auth.backends.ModelBackend')
+        request.session['auth_backend'] = auth_backend
         return user
 
     def check_user_auth_if_need(self):
