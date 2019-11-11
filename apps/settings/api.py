@@ -12,11 +12,14 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Setting
-from .utils import LDAPUtil
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
-from .serializers import MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer
+from .models import Setting
+from .utils import LDAPUtil
+from .serializers import (
+    MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer,
+    PublicSettingSerializer,
+)
 
 
 logger = get_logger(__file__)
@@ -245,3 +248,19 @@ class CommandStorageDeleteAPI(APIView):
         storage_name = str(request.data.get('name'))
         Setting.delete_storage('TERMINAL_COMMAND_STORAGE', storage_name)
         return Response({"msg": _('Delete succeed')}, status=200)
+
+
+class PublicSettingApi(generics.RetrieveAPIView):
+    permission_classes = ()
+    serializer_class = PublicSettingSerializer
+
+    def get_object(self):
+        c = settings.CONFIG
+        instance = {
+            "data": {
+                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD
+            }
+        }
+        return instance
+
+

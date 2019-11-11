@@ -32,8 +32,7 @@
     }
 </style>
 
-
-<div class="ibox float-e-margins">
+<div class="ibox treebox float-e-margins" style="overflow:auto;">
    <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
        <div class="file-manager" id="tree-node-id">
            <div id="{% block treeID %}nodeTree{% endblock %}" class="ztree">
@@ -306,6 +305,7 @@ function defaultCallback(action) {
 
 
 $(document).ready(function () {
+    $('.treebox').css('height', window.innerHeight - 180);
 })
 .on('click', '.btn-show-current-asset', function(){
     hideRMenu();

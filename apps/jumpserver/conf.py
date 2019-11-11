@@ -395,6 +395,7 @@ defaults = {
     'FLOWER_URL': "127.0.0.1:5555",
     'DEFAULT_ORG_SHOW_ALL_USERS': True,
     'PERIOD_TASK_ENABLED': True,
+    'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
 }
 
 

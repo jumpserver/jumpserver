@@ -426,13 +426,15 @@ $(document).ready(function(){
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
                 requestApi({
-                    url:url,
-                    method:'DELETE',
-                    success:refreshPage,
-                    flash_message:false,
+                    url: url,
+                    method: 'DELETE',
+                    success: function () {
+                        var msg = "{% trans 'Asset Deleted.' %}";
+                        swal("{% trans 'Asset Delete' %}", msg, "success");
+                        refreshPage();
+                    },
+                    flash_message: false,
                 });
-                var msg = "{% trans 'Asset Deleted.' %}";
-                swal("{% trans 'Asset Delete' %}", msg, "success");
             }
             function fail() {
                 var msg = "{% trans 'Asset Deleting failed.' %}";
@@ -440,10 +442,11 @@ $(document).ready(function(){
             }
             requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
-                method:'POST',
-                body:JSON.stringify(data),
-                success:success,
-                error:fail
+                method: 'POST',
+                body: JSON.stringify(data),
+                success: success,
+                error: fail,
+                flash_message: false
              })
         })
     }
