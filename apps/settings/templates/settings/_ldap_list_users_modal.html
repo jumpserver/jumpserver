@@ -89,6 +89,7 @@ function testRequestLdapUser(){
         }
         if (status === 400){
             toastr.error(data);
+            $("#fake_datatable_wrapper_loading").css('display', 'none');
             clearInterval(interval);
             interval = undefined;
             return
