@@ -137,35 +137,6 @@ class LDAPUserListApi(generics.ListAPIView):
             users = self.get_queryset_from_server()
         return users
 
-    def list(self, request, *args, **kwargs):
-        cache_police = self.request.query_params.get('cache_police', True)
-        # 不是用缓存
-        if cache_police not in LDAP_USE_CACHE_FLAGS:
-            return super().list(request, *args, **kwargs)
-
-        queryset = self.get_queryset()
-        # 缓存有数据
-        if queryset is not None:
-            return super().list(request, *args, **kwargs)
-
-        sync_util = LDAPSyncUtil()
-        # 还没有同步任务
-        if sync_util.task_no_start:
-            task = sync_ldap_user_task.delay()
-            data = {'msg': 'Cache no data, sync task {} started.'.format(task.id)}
-            return Response(data=data, status=409)
-        # 同步任务正在执行
-        if sync_util.task_is_running:
-            data = {'msg': 'synchronization is running.'}
-            return Response(data=data, status=409)
-        # 同步任务执行结束
-        if sync_util.task_is_over:
-            msg = sync_util.get_task_error_msg()
-            data = {'msg': 'Synchronization task report error: {}'.format(msg)}
-            return Response(data=data, status=400)
-
-        return super().list(request, *args, **kwargs)
-
     @staticmethod
     def processing_queryset(queryset):
         db_username_list = User.objects.all().values_list('username', flat=True)
@@ -187,9 +158,45 @@ class LDAPUserListApi(generics.ListAPIView):
         return queryset
 
     def filter_queryset(self, queryset):
+        if queryset is None:
+            return queryset
         queryset = self.processing_queryset(queryset)
         queryset = self.sort_queryset(queryset)
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        cache_police = self.request.query_params.get('cache_police', True)
+        # 不是用缓存
+        if cache_police not in LDAP_USE_CACHE_FLAGS:
+            return super().list(request, *args, **kwargs)
+
+        try:
+            queryset = self.get_queryset()
+        except Exception as e:
+            data = {'error': str(e)}
+            return Response(data=data, status=400)
+
+        # 缓存有数据
+        if queryset is not None:
+            return super().list(request, *args, **kwargs)
+
+        sync_util = LDAPSyncUtil()
+        # 还没有同步任务
+        if sync_util.task_no_start:
+            task = sync_ldap_user_task.delay()
+            data = {'msg': 'Cache no data, sync task {} started.'.format(task.id)}
+            return Response(data=data, status=409)
+        # 同步任务正在执行
+        if sync_util.task_is_running:
+            data = {'msg': 'synchronization is running.'}
+            return Response(data=data, status=409)
+        # 同步任务执行结束
+        if sync_util.task_is_over:
+            msg = sync_util.get_task_error_msg()
+            data = {'error': 'Synchronization task report error: {}'.format(msg)}
+            return Response(data=data, status=400)
+
+        return super().list(request, *args, **kwargs)
 
 
 class LDAPUserImportAPI(APIView):
@@ -205,11 +212,20 @@ class LDAPUserImportAPI(APIView):
         return users
 
     def post(self, request):
-        users = self.get_ldap_users()
+        try:
+            users = self.get_ldap_users()
+        except Exception as e:
+            return Response({'error': str(e)}, status=401)
+
+        if users is None:
+            return Response({'msg': 'Get ldap users is None'}, status=401)
+
         errors = LDAPImportUtil().perform_import(users)
         if errors:
-            return Response({'Error': errors}, status=401)
-        return Response({'msg': 'Imported {} users successfully'.format(len(users))})
+            return Response({'errors': errors}, status=401)
+
+        count = users if users is None else len(users)
+        return Response({'msg': 'Imported {} users successfully'.format(count)})
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):

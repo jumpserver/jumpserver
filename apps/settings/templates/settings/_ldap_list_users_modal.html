@@ -37,6 +37,9 @@
                    <tbody>
                    </tbody>
                </table>
+               <div id="fake_datatable_wrapper_loading" class="dataTables_wrapper" style="display: block;">
+                   <div id="ldap_list_users_table_processing" class="dataTables_processing panel panel-default">{% trans 'Loading' %}...</div>
+               </div>
            </div>
        </div>
    </div>
@@ -48,7 +51,7 @@ var interval;
 
 function initLdapUsersTable() {
     if(ldap_users_table){
-        ldap_users_table.ajax.reload();
+        ldap_users_table.ajax.reload(null, false);
         return ldap_users_table
     }
     var options = {
@@ -77,6 +80,7 @@ function initLdapUsersTable() {
 }
 
 function testRequestLdapUser(){
+    $("#fake_datatable_wrapper_loading").css('display', 'block');
     var the_url = "{% url 'api-settings:ldap-user-list' %}";
     var error = function (data, status) {
         if (status === 409){
@@ -92,6 +96,7 @@ function testRequestLdapUser(){
         console.log(data, status)
     };
     var success = function() {
+        $("#fake_datatable_wrapper_loading").css('display', 'none');
         initLdapUsersTable();
         clearInterval(interval);
         interval = undefined
@@ -145,6 +150,7 @@ $(document).ready(function(){
     }
     function success(message) {
         toastr.success(message.msg);
+        ldap_users_table.selected = [];
         timingTestRequestLdapUser();
     }
     requestApi({

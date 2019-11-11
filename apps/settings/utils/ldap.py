@@ -187,7 +187,8 @@ class LDAPCacheUtil(object):
 
     def get_users(self):
         users = cache.get(self.CACHE_KEY_USERS)
-        logger.info('Get ldap users from cache, count: {}'.format(len(users)))
+        count = users if users is None else len(users)
+        logger.info('Get ldap users from cache, count: {}'.format(count))
         return users
 
     def delete_users(self):
@@ -195,6 +196,8 @@ class LDAPCacheUtil(object):
         cache.delete(self.CACHE_KEY_USERS)
 
     def filter_users(self, users):
+        if users is None:
+            return users
         if self.search_users:
             filter_users = [
                 user for user in users
