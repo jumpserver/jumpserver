@@ -81,7 +81,9 @@ function doRequestAuth() {
         url: url,
         method: "GET",
         success: function (data) {
-            if (data.error !== "login_confirm_wait") {
+            if (!data.error && data.msg === 'ok') {
+                window.location = "{% url 'authentication:login-guard' %}"
+            } else if (data.error !== "login_confirm_wait") {
                 if (!errorMsgShow) {
                     infoMsgRef.hide();
                     errorMsgRef.show();
@@ -90,11 +92,7 @@ function doRequestAuth() {
                 }
                 clearInterval(interval);
                 clearInterval(checkInterval);
-                $(".copy-btn").attr('disabled', 'disabled')
-            }
-            if (data.msg === 'ok' && !data.error) {
-                window.location = "{% url 'authentication:login-guard' %}"
-            } else {
+                $(".copy-btn").attr('disabled', 'disabled');
                 errorMsgRef.html(data.msg)
             }
         },

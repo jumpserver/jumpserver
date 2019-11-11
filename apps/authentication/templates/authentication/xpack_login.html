@@ -85,6 +85,8 @@
                                     </div>
                                     {% elif form.errors.captcha %}
                                         <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
+                                    {% else %}
+                                        <div style="height: 50px"></div>
                                     {% endif %}
 
                                     <div class="form-group">

@@ -22,7 +22,6 @@ from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
     redirect_user_first_login_or_index
 )
-from ..signals import post_auth_success, post_auth_failed
 from .. import forms, mixins, errors
 
 
@@ -75,7 +74,9 @@ class UserLoginView(mixins.AuthMixin, FormView):
             form.add_error(None, e.msg)
             ip = self.get_request_ip()
             cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
-            context = self.get_context_data(form=form)
+            new_form = self.form_class_captcha(data=form.data)
+            new_form._errors = form.errors
+            context = self.get_context_data(form=new_form)
             return self.render_to_response(context)
         return self.redirect_to_guard_view()
 
