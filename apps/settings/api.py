@@ -104,7 +104,7 @@ class LDAPTestingAPI(APIView):
         try:
             json.loads(attr_map)
         except json.JSONDecodeError:
-            return Response({"error": "AUTH_LDAP_USER_ATTR_MAP not valid"}, status=401)
+            return Response({"error": _("LDAP attr map not valid")}, status=401)
 
         config = self.get_ldap_config(serializer)
         util = LDAPServerUtil(config=config)
@@ -221,14 +221,14 @@ class LDAPUserImportAPI(APIView):
             return Response({'error': str(e)}, status=401)
 
         if users is None:
-            return Response({'msg': 'Get ldap users is None'}, status=401)
+            return Response({'msg': _('Get ldap users is None')}, status=401)
 
         errors = LDAPImportUtil().perform_import(users)
         if errors:
             return Response({'errors': errors}, status=401)
 
         count = users if users is None else len(users)
-        return Response({'msg': 'Imported {} users successfully'.format(count)})
+        return Response({'msg': _('Imported {} users successfully').format(count)})
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
