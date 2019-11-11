@@ -375,9 +375,20 @@ class MFAMixin:
         self.otp_level = 0
         self.otp_secret_key = None
 
+    def check_otp_on_radius(self, code):
+        from authentication.backends.radius import RadiusBackend
+        backend = RadiusBackend()
+        user = backend.authenticate(None, username=self.username, password=code)
+        if user:
+            return True
+        return False
+
     def check_otp(self, code):
         from ..utils import check_otp_code
-        return check_otp_code(self.otp_secret_key, code)
+        if settings.CONFIG.OTP_IN_RADIUS:
+            return self.check_otp_on_radius(code)
+        else:
+            return check_otp_code(self.otp_secret_key, code)
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):

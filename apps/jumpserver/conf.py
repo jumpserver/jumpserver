@@ -375,6 +375,7 @@ defaults = {
     'RADIUS_SERVER': 'localhost',
     'RADIUS_PORT': 1812,
     'RADIUS_SECRET': '',
+    'RADIUS_ENCRYPT_PASSWORD': True,
     'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
     'AUTH_LDAP_SYNC_IS_PERIODIC': False,
     'AUTH_LDAP_SYNC_INTERVAL': None,
@@ -398,6 +399,7 @@ defaults = {
     'FORCE_SCRIPT_NAME': '',
     'LOGIN_CONFIRM_ENABLE': False,
     'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
+    'OTP_IN_RADIUS': False,
 }
 
 
