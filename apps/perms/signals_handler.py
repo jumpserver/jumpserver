@@ -11,13 +11,6 @@ from .utils.asset_permission import AssetPermissionUtilV2
 
 logger = get_logger(__file__)
 
-permission_m2m_senders = (
-    AssetPermission.nodes.through,
-    AssetPermission.assets.through,
-    AssetPermission.users.through,
-    AssetPermission.user_groups.through,
-)
-
 
 @receiver([post_save, post_delete], sender=AssetPermission)
 @on_transaction_commit

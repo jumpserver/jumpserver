@@ -21,7 +21,10 @@ from .utils import (
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
-from .serializers import MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer
+from .serializers import (
+    MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer,
+    PublicSettingSerializer,
+)
 from users.models import User
 
 
@@ -29,7 +32,7 @@ logger = get_logger(__file__)
 
 
 class MailTestingAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
     serializer_class = MailTestSerializer
     success_message = _("Test mail sent to {}, please check")
 
@@ -68,7 +71,7 @@ class MailTestingAPI(APIView):
 
 
 class LDAPTestingAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestSerializer
     success_message = _("Test ldap success")
 
@@ -114,7 +117,7 @@ class LDAPTestingAPI(APIView):
 
 
 class LDAPUserListApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
     serializer_class = LDAPUserSerializer
 
     def get_queryset_from_cache(self):
@@ -200,7 +203,7 @@ class LDAPUserListApi(generics.ListAPIView):
 
 
 class LDAPUserImportAPI(APIView):
-    permission_classes = (IsOrgAdmin,)
+    permission_classes = (IsSuperUser,)
 
     def get_ldap_users(self):
         username_list = self.request.data.get('username_list', [])
@@ -229,6 +232,7 @@ class LDAPUserImportAPI(APIView):
 
 
 class LDAPCacheRefreshAPI(generics.RetrieveAPIView):
+    permission_classes = (IsSuperUser,)
 
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -318,3 +322,19 @@ class CommandStorageDeleteAPI(APIView):
         storage_name = str(request.data.get('name'))
         Setting.delete_storage('TERMINAL_COMMAND_STORAGE', storage_name)
         return Response({"msg": _('Delete succeed')}, status=200)
+
+
+class PublicSettingApi(generics.RetrieveAPIView):
+    permission_classes = ()
+    serializer_class = PublicSettingSerializer
+
+    def get_object(self):
+        c = settings.CONFIG
+        instance = {
+            "data": {
+                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD
+            }
+        }
+        return instance
+
+

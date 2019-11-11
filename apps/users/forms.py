@@ -2,6 +2,7 @@
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins.forms import OrgModelForm
@@ -21,6 +22,20 @@ class UserCheckOtpCodeForm(forms.Form):
     otp_code = forms.CharField(label=_('MFA code'), max_length=6)
 
 
+def get_source_choices():
+    choices_all = dict(User.SOURCE_CHOICES)
+    choices = [
+        (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
+    ]
+    if settings.AUTH_LDAP:
+        choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
+    if settings.AUTH_OPENID:
+        choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
+    if settings.AUTH_RADIUS:
+        choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
+    return choices
+
+
 class UserCreateUpdateFormMixin(OrgModelForm):
     role_choices = ((i, n) for i, n in User.ROLE_CHOICES if i != User.ROLE_APP)
     password = forms.CharField(
@@ -30,6 +45,10 @@ class UserCreateUpdateFormMixin(OrgModelForm):
     role = forms.ChoiceField(
         choices=role_choices, required=True,
         initial=User.ROLE_USER, label=_("Role")
+    )
+    source = forms.ChoiceField(
+        choices=get_source_choices, required=True,
+        initial=User.SOURCE_LOCAL, label=_("Source")
     )
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000, required=False,
@@ -41,7 +60,8 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'role', 'date_expired', 'comment', 'otp_level'
+            'source', 'phone', 'role', 'date_expired',
+            'comment', 'otp_level'
         ]
         widgets = {
             'otp_level': forms.RadioSelect(),
