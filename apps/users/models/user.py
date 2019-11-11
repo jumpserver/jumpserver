@@ -120,6 +120,23 @@ class AuthMixin:
                 return s
         return False
 
+    @staticmethod
+    def get_public_key_body(key):
+        for i in key.split():
+            if len(i) > 256:
+                return i
+        return key
+
+    def check_public_key(self, key):
+        if not self.public_key:
+            return False
+        key = self.get_public_key_body(key)
+        key_saved = self.get_public_key_body(self.public_key)
+        if key == key_saved:
+            return True
+        else:
+            return False
+
 
 class RoleMixin:
     ROLE_ADMIN = 'Admin'

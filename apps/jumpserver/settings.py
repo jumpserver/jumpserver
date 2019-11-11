@@ -411,6 +411,7 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'authentication.backends.pubkey.PublicKeyAuthBackend',
 ]
 
 # Custom User Auth model

@@ -33,17 +33,9 @@ def check_user_valid(**kwargs):
     elif user.password_has_expired:
         return None, errors.reason_password_expired
 
-    if password:
-        user = authenticate(request, username=username, password=password)
+    if password or public_key:
+        user = authenticate(request, username=username,
+                            password=password, public_key=public_key)
         if user:
-            return user, ''
-
-    if public_key and user.public_key:
-        public_key_saved = user.public_key.split()
-        if len(public_key_saved) == 1:
-            public_key_saved = public_key_saved[0]
-        else:
-            public_key_saved = public_key_saved[1]
-        if public_key == public_key_saved:
             return user, ''
     return None, errors.reason_password_failed
