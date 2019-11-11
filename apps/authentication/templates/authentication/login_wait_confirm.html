@@ -37,18 +37,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-sm-3">
                         <a class="btn btn-primary btn-sm block btn-refresh">
                             <i class="fa fa-refresh"></i> {% trans 'Refresh' %}
                         </a>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-sm-3">
                         <a class="btn btn-primary btn-sm block btn-copy" data-link="{{ ticket_detail_url }}">
                             <i class="fa fa-clipboard"></i> {% trans 'Copy link' %}
                         </a>
                     </div>
-                    <div class="col-lg-3">
-                        <a class="btn btn-default btn-sm block btn-return" href="{% url 'authentication:login' %}">
+                    <div class="col-sm-3">
+                        <a class="btn btn-default btn-sm block btn-return">
                             <i class="fa fa-reply"></i> {% trans 'Return' %}
                         </a>
                     </div>
@@ -82,6 +82,7 @@ function doRequestAuth() {
         method: "GET",
         success: function (data) {
             if (!data.error && data.msg === 'ok') {
+                window.onbeforeunload = function(){};
                 window.location = "{% url 'authentication:login-guard' %}"
             } else if (data.error !== "login_confirm_wait") {
                 if (!errorMsgShow) {
@@ -125,17 +126,40 @@ function handleProgressBar() {
     progressBarRef.attr('aria-valuenow', offset);
 }
 
+function cancelLoginConfirmTicket() {
+    requestApi({
+        url: url,
+        method: "DELETE",
+        flash_message: false
+    })
+}
+
+function cancelCloseConfirm() {
+    window.onbeforeunload = function() {};
+    window.onunload = function(){};
+}
+
+function setCloseConfirm() {
+    window.onbeforeunload = function (e) {
+        return 'Confirm';
+    };
+    window.onunload = function (e) {
+        cancelLoginConfirmTicket();
+    }
+}
+
 $(document).ready(function () {
     interval = setInterval(handleProgressBar, 1000);
     checkInterval = setInterval(doRequestAuth, 5000);
     doRequestAuth();
     initClipboard();
-    window.onbeforeunload = function (e) {
-      return "{% trans "Confirm" %}";
-    };
+    setCloseConfirm();
 }).on('click', '.btn-refresh', function () {
-    window.onbeforeunload = function() {};
+    cancelCloseConfirm();
     window.location.reload();
+}).on('click', '.btn-return', function () {
+    cancelCloseConfirm();
+    window.location = "{% url 'authentication:login' %}"
 })
 
 </script>

@@ -138,7 +138,7 @@ class NeedMoreInfoError(Exception):
         if error:
             self.error = error
         if msg:
-            self.msg = ''
+            self.msg = msg
 
     def as_data(self):
         return {

@@ -54,5 +54,6 @@ class LoginConfirmTicketStatusApi(mixins.AuthMixin, APIView):
     def delete(self, request, *args, **kwargs):
         ticket = self.get_ticket()
         if ticket:
+            request.session.pop('auth_ticket_id', '')
             ticket.perform_status('closed', request.user)
         return Response('', status=200)

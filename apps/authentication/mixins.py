@@ -115,7 +115,7 @@ class AuthMixin:
 
     def get_ticket_or_create(self, confirm_setting):
         ticket = self.get_ticket()
-        if not ticket:
+        if not ticket or ticket.status == ticket.STATUS_CLOSED:
             ticket = confirm_setting.create_confirm_ticket(self.request)
             self.request.session['auth_ticket_id'] = str(ticket.id)
         return ticket
