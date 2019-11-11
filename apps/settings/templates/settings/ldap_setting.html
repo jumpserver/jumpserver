@@ -109,33 +109,6 @@ $(document).ready(function () {
         error: error
     });
 })
-.on("click","#btn_ldap_modal_confirm",function () {
-    var username_list = ldap_users_table.selected;
-
-    if (username_list.length === 0){
-        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}";
-        toastr.error(msg);
-        return
-     }
-
-    var the_url =  "{% url "api-settings:ldap-user-sync" %}";
-
-    function error(message) {
-        toastr.error(message)
-    }
-
-    function success(message) {
-        toastr.success(message.msg)
-    }
-    requestApi({
-        url: the_url,
-        body: JSON.stringify({'username_list':username_list}),
-        method: "POST",
-        flash_message: false,
-        success: success,
-        error: error
-    });
- })
 
 </script>
 {% endblock %}

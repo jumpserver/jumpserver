@@ -25,6 +25,7 @@ class LDAPTestSerializer(serializers.Serializer):
 class LDAPUserSerializer(serializers.Serializer):
     id = serializers.CharField()
     username = serializers.CharField()
+    name = serializers.CharField()
     email = serializers.CharField()
     existing = serializers.BooleanField(read_only=True)
 

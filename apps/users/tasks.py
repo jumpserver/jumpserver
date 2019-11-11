@@ -11,7 +11,7 @@ from .models import User
 from .utils import (
     send_password_expiration_reminder_mail, send_user_expiration_reminder_mail
 )
-from settings.utils import LDAPUtil
+from settings.utils import LDAPServerUtil, LDAPImportUtil
 
 
 logger = get_logger(__file__)
@@ -70,16 +70,21 @@ def check_user_expired_periodic():
 
 
 @shared_task
-def sync_ldap_user():
-    logger.info("Start sync ldap user periodic task")
-    util = LDAPUtil()
-    result = util.sync_users()
-    logger.info("Result: {}".format(result))
+def import_ldap_user():
+    logger.info("Start import ldap user task")
+    util_server = LDAPServerUtil()
+    util_import = LDAPImportUtil()
+    users = util_server.search()
+    errors = util_import.perform_import(users)
+    if errors:
+        logger.error("Imported LDAP users errors: {}".format(errors))
+    else:
+        logger.info('Imported {} users successfully'.format(len(users)))
 
 
 @shared_task
 @after_app_ready_start
-def sync_ldap_user_periodic():
+def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
         return
     if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
@@ -91,10 +96,9 @@ def sync_ldap_user_periodic():
     else:
         interval = None
     crontab = settings.AUTH_LDAP_SYNC_CRONTAB
-
     tasks = {
-        'sync_ldap_user_periodic': {
-            'task': sync_ldap_user.name,
+        'import_ldap_user_periodic': {
+            'task': import_ldap_user.name,
             'interval': interval,
             'crontab': crontab,
             'enabled': True,
