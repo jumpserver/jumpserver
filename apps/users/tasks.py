@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 
+import sys
 from celery import shared_task
 from django.conf import settings
 
-from ops.celery.utils import create_or_update_celery_periodic_tasks
+from ops.celery.utils import (
+    create_or_update_celery_periodic_tasks, disable_celery_periodic_task
+)
 from ops.celery.decorator import after_app_ready_start
 from common.utils import get_logger
 from .models import User
@@ -88,6 +91,8 @@ def import_ldap_user_periodic():
     if not settings.AUTH_LDAP:
         return
     if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
+        task_name = sys._getframe().f_code.co_name
+        disable_celery_periodic_task(task_name)
         return
 
     interval = settings.AUTH_LDAP_SYNC_INTERVAL

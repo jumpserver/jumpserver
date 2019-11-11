@@ -117,8 +117,6 @@ class LDAPServerUtil(object):
         return search_filter
 
     def search_user_entries_ou(self, search_ou, paged_cookie=None):
-        logger.info("Search user entries ou: {}, paged_cookie: {}".
-                    format(search_ou, paged_cookie))
         search_filter = self.get_search_filter()
         attributes = list(self.config.attr_map.values())
         ok = self.connection.search(
@@ -136,6 +134,7 @@ class LDAPServerUtil(object):
         user_entries = list()
         search_ous = str(self.config.search_ougroup).split('|')
         for search_ou in search_ous:
+            logger.info("Search user entries ou: {}".format(search_ou))
             self.search_user_entries_ou(search_ou)
             user_entries.extend(self.connection.entries)
             while self.paged_cookie():
