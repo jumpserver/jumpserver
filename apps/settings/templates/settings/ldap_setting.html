@@ -63,9 +63,8 @@
                                         <div class="col-sm-4 col-sm-offset-2">
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
                                             <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
-{#                                            <button class="btn btn-primary sync_button " data-toggle="modal" data-target="#sync_users_modal" type="button">{% trans 'Synchronization' %}</button>#}
-                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                             <button class="btn btn-default sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Bulk import' %}</button>
+                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                         </div>
                                     </div>
                                     </form>
@@ -109,33 +108,6 @@ $(document).ready(function () {
         error: error
     });
 })
-.on("click","#btn_ldap_modal_confirm",function () {
-    var username_list = ldap_users_table.selected;
-
-    if (username_list.length === 0){
-        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}";
-        toastr.error(msg);
-        return
-     }
-
-    var the_url =  "{% url "api-settings:ldap-user-sync" %}";
-
-    function error(message) {
-        toastr.error(message)
-    }
-
-    function success(message) {
-        toastr.success(message.msg)
-    }
-    requestApi({
-        url: the_url,
-        body: JSON.stringify({'username_list':username_list}),
-        method: "POST",
-        flash_message: false,
-        success: success,
-        error: error
-    });
- })
 
 </script>
 {% endblock %}

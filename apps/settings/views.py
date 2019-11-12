@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 
 from common.permissions import PermissionsMixin, IsSuperUser
 from common import utils
+from .utils import LDAPSyncUtil
 from .forms import EmailSettingForm, LDAPSettingForm, BasicSettingForm, \
     TerminalSettingForm, SecuritySettingForm, EmailContentSettingForm
 
@@ -83,6 +84,7 @@ class LDAPSettingView(PermissionsMixin, TemplateView):
             form.save()
             msg = _("Update setting successfully")
             messages.success(request, msg)
+            LDAPSyncUtil().clear_cache()
             return redirect('settings:ldap-setting')
         else:
             context = self.get_context_data()
