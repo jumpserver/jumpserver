@@ -47,7 +47,7 @@ def on_openid_login_success(sender, user=None, request=None, **kwargs):
 
 @receiver(populate_user)
 def on_ldap_create_user(sender, user, ldap_user, **kwargs):
-    if user and user.username != 'admin':
+    if user and user.username not in ['admin']:
         user.source = user.SOURCE_LDAP
         user.save()
 

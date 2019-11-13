@@ -23,6 +23,7 @@
    <div class="row">
        <div class="col-lg-12 animated fadeInRight" id="split-right">
            <div class="mail-box-header">
+               <div class="uc pull-left m-r-5"><a  id="id_refresh_cache" class="btn btn-sm btn-primary"> {% trans "Refresh cache" %} </a></div>
                <table class="table table-striped table-bordered table-hover " id="ldap_list_users_table" style="width: 100%">
                    <thead>
                        <tr>
@@ -36,6 +37,9 @@
                    <tbody>
                    </tbody>
                </table>
+               <div id="fake_datatable_wrapper_loading" class="dataTables_wrapper" style="display: block;">
+                   <div id="ldap_list_users_table_processing" class="dataTables_processing panel panel-default">{% trans 'Loading' %}...</div>
+               </div>
            </div>
        </div>
    </div>
@@ -43,8 +47,11 @@
 
 <script>
 var ldap_users_table = 0;
+var interval;
+
 function initLdapUsersTable() {
     if(ldap_users_table){
+        ldap_users_table.ajax.reload(null, false);
         return ldap_users_table
     }
     var options = {
@@ -68,21 +75,93 @@ function initLdapUsersTable() {
         ],
         pageLength: 15
     };
-
     ldap_users_table = jumpserver.initServerSideDataTable(options);
     return ldap_users_table
 }
 
+function testRequestLdapUser(){
+    $("#fake_datatable_wrapper_loading").css('display', 'block');
+    var the_url = "{% url 'api-settings:ldap-user-list' %}";
+    var error = function (data, status) {
+        if (status === 409){
+            console.log(data);
+            return
+        }
+        if (status === 400){
+            toastr.error(data);
+            $("#fake_datatable_wrapper_loading").css('display', 'none');
+            clearInterval(interval);
+            interval = undefined;
+            return
+        }
+        console.log(data, status)
+    };
+    var success = function() {
+        $("#fake_datatable_wrapper_loading").css('display', 'none');
+        initLdapUsersTable();
+        clearInterval(interval);
+        interval = undefined
+    };
+    requestApi({
+        url: the_url,
+        method: 'GET',
+        flash_message: false,
+        error: error,
+        success: success
+    });
+}
+
+function timingTestRequestLdapUser(){
+    if (interval !== undefined){
+        return
+    }
+    interval = setInterval(testRequestLdapUser, 2000);
+}
 
 $(document).ready(function(){
+
 }).on('show.bs.modal', function () {
-    initLdapUsersTable();
+    timingTestRequestLdapUser()
 })
-.on('click','.close_btn1',function () {
-    window.location.reload()
+.on('click', '#id_refresh_cache', function () {
+    var the_url = "{% url "api-settings:ldap-cache-refresh" %}";
+    function error(data) {
+        toastr.error(data)
+    }
+    function success(){
+        timingTestRequestLdapUser();
+    }
+    requestApi({
+        url: the_url,
+        method: 'GET',
+        error: error,
+        success: success
+    })
 })
-.on('click','.close_btn2',function () {
-    window.location.reload()
+.on("click","#btn_ldap_modal_confirm",function () {
+    var username_list = ldap_users_table.selected;
+    if (username_list.length === 0){
+        var msg = "{% trans 'User is not currently selected, please check the user you want to import'%}";
+        toastr.error(msg);
+        return
+    }
+    var the_url =  "{% url "api-settings:ldap-user-import" %}";
+    function error(message) {
+        toastr.error(message)
+    }
+    function success(message) {
+        toastr.success(message.msg);
+        ldap_users_table.selected = [];
+        timingTestRequestLdapUser();
+    }
+    requestApi({
+        url: the_url,
+        body: JSON.stringify({'username_list':username_list}),
+        method: "POST",
+        flash_message: false,
+        success: success,
+        error: error
+    });
 })
 
 </script>
