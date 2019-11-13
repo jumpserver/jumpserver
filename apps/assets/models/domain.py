@@ -3,9 +3,9 @@
 
 import uuid
 import random
+import re
 
 import paramiko
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -63,6 +63,9 @@ class Gateway(AssetUser):
     def test_connective(self, local_port=None):
         if local_port is None:
             local_port = self.port
+        if not re.match(r'\w+$', self.password):
+            return False, _("Password should not contain special characters")
+
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         proxy = paramiko.SSHClient()
