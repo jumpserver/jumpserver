@@ -19,7 +19,7 @@ from rest_framework.response import Response
 
 from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, NeedMFAVerify
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from ..models import SystemUser, Asset
@@ -70,13 +70,8 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
-
-    def get_permissions(self):
-        if settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA:
-            self.permission_classes = (IsOrgAdminOrAppUser, NeedMFAVerify)
-        return super().get_permissions()
 
     def get_object(self):
         instance = super().get_object()
