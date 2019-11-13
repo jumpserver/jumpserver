@@ -14,11 +14,12 @@
 # limitations under the License.
 
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from rest_framework.response import Response
 
 from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
 from ..models import SystemUser, Asset
@@ -69,7 +70,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    permission_classes = (IsOrgAdminOrAppUser,)
+    permission_classes = (IsAppUser,)
     serializer_class = serializers.SystemUserAuthSerializer
 
     def get_object(self):
