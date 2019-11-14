@@ -186,6 +186,8 @@ class LDAPUserListApi(generics.ListAPIView):
         sync_util = LDAPSyncUtil()
         # 还没有同步任务
         if sync_util.task_no_start:
+            # 任务外部设置 task running 状态
+            sync_util.set_task_status(sync_util.TASK_STATUS_IS_RUNNING)
             task = sync_ldap_user_task.delay()
             data = {'msg': 'Cache no data, sync task {} started.'.format(task.id)}
             return Response(data=data, status=409)
