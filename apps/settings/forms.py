@@ -219,7 +219,7 @@ class SecuritySettingForm(BaseForm):
         min_value=1, max_value=99999, required=False,
         label=_("Connection max idle time"),
         help_text=_(
-            'If idle time more than it, disconnect connection(only ssh now) '
+            'If idle time more than it, disconnect connection '
             'Unit: minute'
         ),
     )
