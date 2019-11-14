@@ -89,4 +89,3 @@ flower==0.9.3
 channels-redis==2.4.0
 channels==2.3.0
 daphne==2.3.0
-py-radius==2.0.2.post1

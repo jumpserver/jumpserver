@@ -51,34 +51,3 @@ class RadiusBackend(CreateUserMixin, RADIUSBackend):
 
 class RadiusRealmBackend(CreateUserMixin, RADIUSRealmBackend):
     pass
-
-
-class TestRadiusPyRadius(object):
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-        self.secret = settings.CONFIG.RADIUS_SECRET
-        self.host = settings.CONFIG.RADIUS_SERVER
-        self.port = settings.CONFIG.RADIUS_PORT
-
-    def attr_to_json(self):
-        attr_json = {
-            'username': self.username,
-            'password': self.password,
-            'secret': self.secret,
-            'host': self.host,
-            'port': self.port
-        }
-        return attr_json
-
-    def authenticate(self):
-        import radius
-        print('Authenticate Radius start: ')
-        params = self.attr_to_json()
-        print("Params: {}".format(params))
-        r = radius.authenticate(
-            self.username, self.password,
-            self.secret, host=self.host, port=int(self.port)
-        )
-        print("Result: {}".format(r))
