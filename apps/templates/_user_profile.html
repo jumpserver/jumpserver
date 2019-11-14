@@ -19,7 +19,8 @@
                     </span>
                     <span class="fa fa-sort-desc pull-right"></span>
                 </a>
-                <ul class="dropdown-menu" style="min-width: 220px">
+                <ul class="dropdown-menu" style="min-width: 220px;max-width: 400px;max-height: 400px; overflow: auto">
+                    <input type="text" id="left-side-org-filter" placeholder="{% trans 'Search' %}" class="form-control">
                     {% for org in ADMIN_OR_AUDIT_ORGS %}
                         <li>
                             <a class="org-dropdown" href="{% url 'orgs:org-switch' pk=org.id %}" data-id="{{ org.id }}">
@@ -35,3 +36,29 @@
         {% endif %}
     {% endif %}
 </li>
+<script>
+var orgsRef;
+$(document).ready(function () {
+    orgsRef = $(".org-dropdown");
+}).on('click', '#left-side-org-filter', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+}).on('keyup', '#left-side-org-filter', function () {
+    var input = $("#left-side-org-filter").val();
+    if (!input) {
+        orgsRef.show();
+        return
+    }
+    orgsRef.each(function (i, v) {
+        var itemRef = $(v);
+        var orgItemText = itemRef.text().trim();
+        var findIndex = orgItemText.indexOf(input);
+        if (findIndex === -1) {
+            itemRef.hide();
+        } else {
+            itemRef.show();
+        }
+    });
+    console.log(input)
+})
+</script>
