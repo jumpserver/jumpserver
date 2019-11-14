@@ -480,6 +480,11 @@ jumpserver.language = {
         last: "»"
     }
 };
+
+function setDataTablePagerLength(num) {
+    $.fn.DataTable.ext.pager.numbers_length = num;
+}
+
 jumpserver.initDataTable = function (options) {
     // options = {
     //    ele *: $('#dataTable_id'),
@@ -494,6 +499,7 @@ jumpserver.initDataTable = function (options) {
     //    op_html: 'div.btn-group?',
     //    paging: true
     // }
+    setDataTablePagerLength(5);
     var ele = options.ele || $('.dataTable');
     var columnDefs = [
         {
@@ -590,8 +596,14 @@ jumpserver.initServerSideDataTable = function (options) {
     //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
     //    uc_html: '<a>header button</a>',
     //    op_html: 'div.btn-group?',
-    //    paging: true
+    //    paging: true,
+    //    paging_numbers_length: 5;
     // }
+    var pagingNumbersLength = 5;
+    if (options.paging_numbers_length){
+        pagingNumbersLength = options.paging_numbers_length;
+    }
+    setDataTablePagerLength(pagingNumbersLength);
     var ele = options.ele || $('.dataTable');
     var columnDefs = [
         {

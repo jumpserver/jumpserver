@@ -386,6 +386,10 @@ $(document).ready(function(){
         setTimeout( function () {window.location.reload();}, 300);
     }
 
+    function reloadTable() {
+        asset_table.ajax.reload();
+    }
+
     function doDeactive() {
         var data = [];
         $.each(id_list, function(index, object_id) {
@@ -396,7 +400,7 @@ $(document).ready(function(){
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: refreshPage
+            success: reloadTable
         });
     }
     function doActive() {
@@ -409,7 +413,7 @@ $(document).ready(function(){
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: refreshPage
+            success: reloadTable
         });
     }
     function doDelete() {
@@ -431,7 +435,7 @@ $(document).ready(function(){
                     success: function () {
                         var msg = "{% trans 'Asset Deleted.' %}";
                         swal("{% trans 'Asset Delete' %}", msg, "success");
-                        refreshPage();
+                        reloadTable();
                     },
                     flash_message: false,
                 });
@@ -478,16 +482,12 @@ $(document).ready(function(){
            'assets': id_list
        };
 
-       var success = function () {
-           asset_table.ajax.reload()
-       };
        var url = "{% url 'api-assets:node-remove-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-
        requestApi({
            'url': url,
            'method': 'PUT',
            'body': JSON.stringify(data),
-           'success': success
+           'success': reloadTable
        })
     }
 
