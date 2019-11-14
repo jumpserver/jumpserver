@@ -7,10 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 ENV_PERIOD_TASK = os.environ.get("PERIOD_TASK", "on") == 'on'
-ENV_PERIOD_TASK_ENABLED = os.environ.get("PERIOD_TASK_ENABLED", "on") == "on"
-PERIOD_TASK_ENABLED = settings.CONFIG.PERIOD_TASK_ENABLE \
-                      and ENV_PERIOD_TASK \
-                      and ENV_PERIOD_TASK_ENABLED
+PERIOD_TASK_ENABLED = settings.PERIOD_TASK_ENABLED and ENV_PERIOD_TASK
 
 UPDATE_ASSETS_HARDWARE_TASKS = [
    {
@@ -97,6 +94,13 @@ GATHER_ASSET_USERS_TASKS = [
             "args": "database=passwd"
         },
     },
+    {
+        "name": "get last login",
+        "action": {
+            "module": "shell",
+            "args": "users=$(getent passwd | grep -v 'nologin' | grep -v 'shudown' | awk -F: '{ print $1 }');for i in $users;do last -F $i -1 |  head -1 | grep -v '^$'  | awk '{ print $1\"@\"$3\"@\"$5,$6,$7,$8 }';done"
+        }
+    }
 ]
 
 GATHER_ASSET_USERS_TASKS_WINDOWS = [

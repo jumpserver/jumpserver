@@ -48,12 +48,12 @@
 {% block content %}
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
+       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
            {% include 'assets/_node_tree.html' %}
        </div>
        <div class="col-lg-9 animated fadeInRight" id="split-right">
-           <div class="tree-toggle">
-               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+           <div class="tree-toggle" style="z-index: 9999">
+               <div class="btn btn-sm btn-primary tree-toggle-btn">
                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
                </div>
            </div>

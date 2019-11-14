@@ -12,6 +12,7 @@ class GatheredUserSerializer(OrgResourceModelSerializerMixin):
         model = GatheredUser
         fields = [
             'id', 'asset', 'hostname', 'ip', 'username',
+            'date_last_login', 'ip_last_login',
             'present', 'date_created', 'date_updated'
         ]
         read_only_fields = fields

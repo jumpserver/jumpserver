@@ -23,12 +23,12 @@
 {% block content %}
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
+       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
            {% include 'assets/_node_tree.html' %}
        </div>
        <div class="col-lg-9 animated fadeInRight" id="split-right">
            <div class="tree-toggle">
-               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+               <div class="btn btn-sm btn-primary tree-toggle-btn">
                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
                </div>
            </div>
@@ -209,20 +209,6 @@ function initTree() {
     })
 }
 
-function toggle() {
-    if (show === 0) {
-        $("#split-left").hide(500, function () {
-            $("#split-right").attr("class", "col-lg-12");
-            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
-            show = 1;
-        });
-    } else {
-        $("#split-right").attr("class", "col-lg-9");
-        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
-        $("#split-left").show(500);
-        show = 0;
-    }
-}
 
 $(document).ready(function(){
     initTable();
