@@ -3,16 +3,16 @@
 {% load i18n %}
 
 {% block help_message %}
-    <div class="alert alert-info help-message">
+{#    <div class="alert alert-info help-message">#}
+{#    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>#}
 {#    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产#}
     {% trans 'The left side is the asset tree, right click to create, delete, and change the tree node, authorization asset is also organized as a node, and the right side is the asset under that node' %}
-    </div>
+{#    </div>#}
 {% endblock %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
-{#    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">#}
-    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+{#    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">#}
+{#    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>#}
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
 	<style type="text/css">
         div#rMenu {
