@@ -3,6 +3,7 @@
 from rest_framework import viewsets, generics
 from rest_framework import status
 from rest_framework.response import Response
+from django.conf import settings
 
 from common.permissions import IsSuperUser, WithBootstrapToken
 
@@ -29,6 +30,9 @@ class TerminalRegistrationApi(generics.CreateAPIView):
         serializer = serializers.TerminalSerializer(
             data=data, context={'request': request}
         )
+        if not settings.SECURITY_SERVICE_ACCOUNT_REGISTRATION:
+            data = {"error": "service account registration disabled"}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         serializer.is_valid(raise_exception=True)
         terminal = serializer.save()
         sa_serializer = serializer.sa_serializer_class(instance=terminal.user)
