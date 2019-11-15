@@ -18,6 +18,9 @@ class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = serializers.TerminalSerializer
     permission_classes = [IsSuperUser]
+    http_method_names = [
+        'get', 'put', 'patch', 'delete', 'head', 'options', 'trace'
+    ]
 
 
 class TerminalRegistrationApi(generics.CreateAPIView):
