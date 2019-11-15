@@ -123,12 +123,10 @@
 
 {% if request.user.can_admin_current_org and LOGIN_CONFIRM_ENABLE %}
     <li id="tickets">
-        <a>
-            <i class="fa fa-check-square-o" style="width: 14px"></i> <span class="nav-label">{% trans 'Tickets' %}</span><span class="fa arrow"></span>
+        <a href="{% url 'tickets:ticket-list' %}">
+            <i class="fa fa-check-square-o" style="width: 14px"></i>
+            <span class="nav-label">{% trans 'Tickets' %}</span>
         </a>
-        <ul class="nav nav-second-level">
-            <li id="login-confirm-tickets"><a href="{% url 'tickets:login-confirm-ticket-list' %}">{% trans 'Login confirm' %}</a></li>
-        </ul>
     </li>
 {% endif %}
 

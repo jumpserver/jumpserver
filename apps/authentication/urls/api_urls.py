@@ -18,7 +18,7 @@ urlpatterns = [
     path('connection-token/',
          api.UserConnectionTokenApi.as_view(), name='connection-token'),
     path('otp/verify/', api.UserOtpVerifyApi.as_view(), name='user-otp-verify'),
-    path('login-confirm-ticket/status/', api.LoginConfirmTicketStatusApi.as_view(), name='login-confirm-ticket-status'),
+    path('login-confirm-ticket/status/', api.TicketStatusApi.as_view(), name='login-confirm-ticket-status'),
     path('login-confirm-settings/<uuid:user_id>/', api.LoginConfirmSettingUpdateApi.as_view(), name='login-confirm-setting-update')
 ]
 

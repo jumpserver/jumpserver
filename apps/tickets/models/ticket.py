@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.mixins.models import CommonModelMixin
+from common.fields.model import JsonDictTextField
 
 __all__ = ['Ticket', 'Comment']
 
@@ -22,17 +23,25 @@ class Ticket(CommonModelMixin):
         (TYPE_GENERAL, _("General")),
         (TYPE_LOGIN_CONFIRM, _("Login confirm"))
     )
+    ACTION_APPROVE = 'approve'
+    ACTION_REJECT = 'reject'
+    ACTION_CHOICES = (
+        (ACTION_APPROVE, _('Approve')),
+        (ACTION_REJECT, _('Reject')),
+    )
     user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_requested', verbose_name=_("User"))
     user_display = models.CharField(max_length=128, verbose_name=_("User display name"))
 
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     body = models.TextField(verbose_name=_("Body"))
+    meta = JsonDictTextField(verbose_name=_("Meta"), default='{}')
     assignee = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, related_name='%(class)s_handled', verbose_name=_("Assignee"))
     assignee_display = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Assignee display name"))
     assignees = models.ManyToManyField('users.User', related_name='%(class)s_assigned', verbose_name=_("Assignees"))
     assignees_display = models.CharField(max_length=128, verbose_name=_("Assignees display name"), blank=True)
     type = models.CharField(max_length=16, choices=TYPE_CHOICES, default=TYPE_GENERAL, verbose_name=_("Type"))
     status = models.CharField(choices=STATUS_CHOICES, max_length=16, default='open')
+    action = models.CharField(choices=ACTION_CHOICES, max_length=16, default='', blank=True)
 
     def __str__(self):
         return '{}: {}'.format(self.user_display, self.title)
@@ -44,6 +53,14 @@ class Ticket(CommonModelMixin):
     @property
     def status_display(self):
         return self.get_status_display()
+
+    @property
+    def type_display(self):
+        return self.get_type_display()
+
+    @property
+    def action_display(self):
+        return self.get_action_display()
 
     def create_status_comment(self, status, user):
         if status == self.STATUS_CLOSED:
@@ -57,6 +74,19 @@ class Ticket(CommonModelMixin):
         if self.status == status:
             return
         self.status = status
+        self.save()
+
+    def create_action_comment(self, action, user):
+        action_display = dict(self.ACTION_CHOICES).get(action)
+        body = '{} {} {}'.format(user, action_display, _("this order"))
+        self.comments.create(body=body, user=user, user_display=str(user))
+
+    def perform_action(self, action, user):
+        self.create_action_comment(action, user)
+        self.action = action
+        self.status = self.STATUS_CLOSED
+        self.assignee = user
+        self.assignees_display = str(user)
         self.save()
 
     class Meta:

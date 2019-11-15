@@ -12,7 +12,7 @@ from ..models import LoginConfirmSetting
 from ..serializers import LoginConfirmSettingSerializer
 from .. import errors, mixins
 
-__all__ = ['LoginConfirmSettingUpdateApi', 'LoginConfirmTicketStatusApi']
+__all__ = ['LoginConfirmSettingUpdateApi', 'TicketStatusApi']
 logger = get_logger(__name__)
 
 
@@ -31,17 +31,17 @@ class LoginConfirmSettingUpdateApi(UpdateAPIView):
         return s
 
 
-class LoginConfirmTicketStatusApi(mixins.AuthMixin, APIView):
+class TicketStatusApi(mixins.AuthMixin, APIView):
     permission_classes = ()
 
     def get_ticket(self):
-        from tickets.models import LoginConfirmTicket
+        from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
         logger.debug('Login confirm ticket id: {}'.format(ticket_id))
         if not ticket_id:
             ticket = None
         else:
-            ticket = get_object_or_none(LoginConfirmTicket, pk=ticket_id)
+            ticket = get_object_or_none(Ticket, pk=ticket_id)
         return ticket
 
     def get(self, request, *args, **kwargs):

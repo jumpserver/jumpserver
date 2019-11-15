@@ -126,7 +126,7 @@ function handleProgressBar() {
     progressBarRef.attr('aria-valuenow', offset);
 }
 
-function cancelLoginConfirmTicket() {
+function cancelTicket() {
     requestApi({
         url: url,
         method: "DELETE",
@@ -144,7 +144,7 @@ function setCloseConfirm() {
         return 'Confirm';
     };
     window.onunload = function (e) {
-        cancelLoginConfirmTicket();
+        cancelTicket();
     }
 }
 

@@ -72,7 +72,6 @@
                                                     </div>
                                                 </div>
                                                 {% for comment in object.comments.all %}
-
                                                 <div class="feed-element">
                                                     <a href="#" class="pull-left">
                                                         <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
@@ -97,14 +96,12 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                            {% block action %}
-                                            {% endblock %}
-                                            {% block status %}
-                                                <a class="btn btn-sm btn-danger btn-update btn-status" data-uid="close"><i class="fa fa-times"></i> {% trans 'Close' %}</a>
-                                            {% endblock %}
-                                            {% block comment %}
+                                                {% if object.type == object.TYPE_LOGIN_CONFIRM %}
+                                                    <a class="btn btn-sm btn-primary btn-update btn-action" data-action="approve"><i class="fa fa-check"></i> {% trans 'Approve' %}</a>
+                                                    <a class="btn btn-sm btn-warning btn-update btn-action" data-action="reject"><i class="fa fa-ban"></i> {% trans 'Reject' %}</a>
+                                                {% endif %}
+                                                <a class="btn btn-sm btn-danger btn-update btn-status" data-uid="closed"><i class="fa fa-times"></i> {% trans 'Close' %}</a>
                                                 <a class="btn btn-sm btn-info btn-update btn-comment" data-uid="comment"><i class="fa fa-pencil"></i> {% trans 'Comment' %}</a>
-                                            {% endblock %}
                                             </div>
                                         </div>
                                     </div>
@@ -127,6 +124,7 @@ var ticketId = "{{ object.id }}";
 var status = "{{ object.status }}";
 
 var commentUrl = "{% url 'api-tickets:ticket-comment-list' ticket_id=object.id %}";
+var ticketDetailUrl = "{% url 'api-tickets:ticket-detail' pk=object.id %}";
 
 function createComment(successCallback) {
     var commentText = $("#comment").val();
@@ -157,6 +155,27 @@ $(document).ready(function () {
 })
 .on('click', '.btn-comment', function () {
     createComment();
+})
+.on('click', '.btn-action', function () {
+    createComment(function () {});
+    var action = $(this).data('action');
+    var data = {
+        url: ticketDetailUrl,
+        body: JSON.stringify({action: action}),
+        method: "PATCH",
+        success: reloadPage
+    };
+    requestApi(data);
+})
+.on('click', '.btn-status', function () {
+    var status = $(this).data('uid');
+    var data = {
+        url: ticketDetailUrl,
+        body: JSON.stringify({status: status}),
+        method: "PATCH",
+        success: reloadPage
+    };
+    requestApi(data);
 })
 </script>
 {% endblock %}

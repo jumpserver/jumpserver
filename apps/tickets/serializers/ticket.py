@@ -14,11 +14,30 @@ class TicketSerializer(serializers.ModelSerializer):
             'id', 'user', 'user_display', 'title', 'body',
             'assignees', 'assignees_display',
             'status', 'date_created', 'date_updated',
+            'type_display', 'action_display',
         ]
         read_only_fields = [
             'user_display', 'assignees_display',
             'date_created', 'date_updated',
         ]
+
+    def create(self, validated_data):
+        validated_data.pop('action')
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        action = validated_data.get("action")
+        user = self.context["request"].user
+
+        if action and user not in instance.assignees.all():
+            error = {"action": "Only assignees can update"}
+            raise serializers.ValidationError(error)
+        if instance.status == instance.STATUS_CLOSED:
+            validated_data.pop('action')
+        instance = super().update(instance, validated_data)
+        if not instance.status == instance.STATUS_CLOSED and action:
+            instance.perform_action(action, user)
+        return instance
 
 
 class CurrentTicket(object):

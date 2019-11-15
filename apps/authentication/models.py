@@ -49,23 +49,25 @@ class LoginConfirmSetting(CommonModelMixin):
         return get_object_or_none(cls, user=user)
 
     def create_confirm_ticket(self, request=None):
-        from tickets.models import LoginConfirmTicket
-        title = _('User login confirm: {}').format(self.user)
+        from tickets.models import Ticket
+        title = '[' + __('Login confirm') + ']: {}'.format(self.user)
         if request:
             remote_addr = get_request_ip(request)
             city = get_ip_city(remote_addr)
-            body = _("User: {}\nIP: {}\nCity: {}\nDate: {}\n").format(
-                self.user, remote_addr, city, timezone.now()
+            body = __("{user_key}: {username}<br>"
+                      "IP: {ip}<br>"
+                      "{city_key}: {city}<br>"
+                      "{date_key}: {date}<br>").format(
+                user_key=__("User"), username=self.user,
+                ip=remote_addr, city_key=_("City"), city=city,
+                date_key=__("Datetime"), date=timezone.now()
             )
         else:
-            city = 'Localhost'
-            remote_addr = '127.0.0.1'
             body = ''
         reviewer = self.reviewers.all()
-        ticket = LoginConfirmTicket.objects.create(
+        ticket = Ticket.objects.create(
             user=self.user, title=title, body=body,
-            city=city, ip=remote_addr,
-            type=LoginConfirmTicket.TYPE_LOGIN_CONFIRM,
+            type=Ticket.TYPE_LOGIN_CONFIRM,
         )
         ticket.assignees.set(reviewer)
         return ticket

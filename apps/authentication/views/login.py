@@ -144,16 +144,16 @@ class UserLoginWaitConfirmView(TemplateView):
     template_name = 'authentication/login_wait_confirm.html'
 
     def get_context_data(self, **kwargs):
-        from tickets.models import LoginConfirmTicket
+        from tickets.models import Ticket
         ticket_id = self.request.session.get("auth_ticket_id")
         if not ticket_id:
             ticket = None
         else:
-            ticket = get_object_or_none(LoginConfirmTicket, pk=ticket_id)
+            ticket = get_object_or_none(Ticket, pk=ticket_id)
         context = super().get_context_data(**kwargs)
         if ticket:
             timestamp_created = datetime.datetime.timestamp(ticket.date_created)
-            ticket_detail_url = reverse('tickets:login-confirm-ticket-detail', kwargs={'pk': ticket_id})
+            ticket_detail_url = reverse('tickets:ticket-detail', kwargs={'pk': ticket_id})
             msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
                   Don't close this page""").format(ticket.assignees_display)
         else:

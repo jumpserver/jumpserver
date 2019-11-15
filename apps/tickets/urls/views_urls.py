@@ -6,6 +6,6 @@ from .. import views
 app_name = 'tickets'
 
 urlpatterns = [
-    path('login-confirm-tickets/', views.LoginConfirmTicketListView.as_view(), name='login-confirm-ticket-list'),
-    path('login-confirm-tickets/<uuid:pk>/', views.LoginConfirmTicketDetailView.as_view(), name='login-confirm-ticket-detail')
+    path('tickets/', views.TicketListView.as_view(), name='ticket-list'),
+    path('tickets/<uuid:pk>/', views.TicketDetailView.as_view(), name='ticket-detail'),
 ]
