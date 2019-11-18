@@ -96,7 +96,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                {% if object.type == object.TYPE_LOGIN_CONFIRM %}
+                                                {% if has_action_perm %}
                                                     <a class="btn btn-sm btn-primary btn-update btn-action" data-action="approve"><i class="fa fa-check"></i> {% trans 'Approve' %}</a>
                                                     <a class="btn btn-sm btn-warning btn-update btn-action" data-action="reject"><i class="fa fa-ban"></i> {% trans 'Reject' %}</a>
                                                 {% endif %}

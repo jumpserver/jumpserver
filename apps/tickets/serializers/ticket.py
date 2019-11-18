@@ -13,7 +13,7 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'user_display', 'title', 'body',
             'assignees', 'assignees_display',
-            'status', 'date_created', 'date_updated',
+            'status', 'action', 'date_created', 'date_updated',
             'type_display', 'action_display',
         ]
         read_only_fields = [
@@ -32,6 +32,8 @@ class TicketSerializer(serializers.ModelSerializer):
         if action and user not in instance.assignees.all():
             error = {"action": "Only assignees can update"}
             raise serializers.ValidationError(error)
+        print(validated_data)
+        print(instance.status)
         if instance.status == instance.STATUS_CLOSED:
             validated_data.pop('action')
         instance = super().update(instance, validated_data)

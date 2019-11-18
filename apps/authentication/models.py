@@ -54,13 +54,14 @@ class LoginConfirmSetting(CommonModelMixin):
         if request:
             remote_addr = get_request_ip(request)
             city = get_ip_city(remote_addr)
+            datetime = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
             body = __("{user_key}: {username}<br>"
                       "IP: {ip}<br>"
                       "{city_key}: {city}<br>"
                       "{date_key}: {date}<br>").format(
                 user_key=__("User"), username=self.user,
                 ip=remote_addr, city_key=_("City"), city=city,
-                date_key=__("Datetime"), date=timezone.now()
+                date_key=__("Datetime"), date=datetime
             )
         else:
             body = ''

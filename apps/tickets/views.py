@@ -27,9 +27,12 @@ class TicketDetailView(PermissionsMixin, mixins.TicketMixin, DetailView):
     queryset = Ticket.objects.all()
 
     def get_context_data(self, **kwargs):
+        ticket = self.get_object()
+        has_action_perm = ticket.is_assignee(self.request.user)
         context = super().get_context_data(**kwargs)
         context.update({
             'app': _("Tickets"),
-            'action': _("Ticket detail")
+            'action': _("Ticket detail"),
+            'has_action_perm': has_action_perm,
         })
         return context

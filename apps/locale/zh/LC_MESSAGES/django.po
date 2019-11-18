@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 17:39+0800\n"
+"POT-Creation-Date: 2019-11-18 11:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -259,7 +259,7 @@ msgstr "创建日期"
 #: perms/templates/perms/remote_app_permission_detail.html:94
 #: settings/models.py:34 terminal/models.py:33
 #: terminal/templates/terminal/terminal_detail.html:63
-#: tickets/templates/tickets/ticket_detail.html:106 users/models/group.py:15
+#: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:15
 #: users/models/user.py:443 users/templates/users/user_detail.html:130
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:37
@@ -527,7 +527,7 @@ msgstr "创建远程应用"
 #: settings/templates/settings/terminal_setting.html:107
 #: terminal/templates/terminal/session_list.html:36
 #: terminal/templates/terminal/terminal_list.html:36
-#: tickets/templates/tickets/ticket_list.html:93
+#: tickets/templates/tickets/ticket_list.html:94
 #: users/templates/users/_granted_assets.html:34
 #: users/templates/users/user_group_list.html:38
 #: users/templates/users/user_list.html:41
@@ -1127,9 +1127,9 @@ msgstr "默认资产组"
 #: terminal/templates/terminal/command_list.html:65
 #: terminal/templates/terminal/session_list.html:27
 #: terminal/templates/terminal/session_list.html:71 tickets/models/ticket.py:32
-#: tickets/models/ticket.py:85 tickets/templates/tickets/ticket_detail.html:32
+#: tickets/models/ticket.py:104 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:22
-#: tickets/templates/tickets/ticket_list.html:88 users/forms.py:339
+#: tickets/templates/tickets/ticket_list.html:89 users/forms.py:339
 #: users/models/user.py:149 users/models/user.py:165 users/models/user.py:537
 #: users/serializers/group.py:21
 #: users/templates/users/user_group_detail.html:78
@@ -2306,7 +2306,7 @@ msgstr "原因"
 #: audits/models.py:88 audits/templates/audits/login_log_list.html:64
 #: tickets/templates/tickets/ticket_detail.html:34
 #: tickets/templates/tickets/ticket_list.html:24
-#: tickets/templates/tickets/ticket_list.html:89
+#: tickets/templates/tickets/ticket_list.html:90
 #: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/models.py:310
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
@@ -2366,7 +2366,7 @@ msgstr "ID"
 msgid "UA"
 msgstr "Agent"
 
-#: audits/templates/audits/login_log_list.html:61 authentication/models.py:62
+#: audits/templates/audits/login_log_list.html:61 authentication/models.py:63
 msgid "City"
 msgstr "城市"
 
@@ -4208,7 +4208,7 @@ msgstr "批量命令"
 msgid "Task monitor"
 msgstr "任务监控"
 
-#: templates/_nav.html:128 tickets/views.py:17 tickets/views.py:32
+#: templates/_nav.html:128 tickets/views.py:17 tickets/views.py:34
 msgid "Tickets"
 msgstr "工单管理"
 
@@ -4562,7 +4562,8 @@ msgid "Accept"
 msgstr "接受"
 
 #: terminal/templates/terminal/terminal_list.html:80
-#: tickets/models/ticket.py:30 tickets/templates/tickets/ticket_list.html:95
+#: tickets/models/ticket.py:30 tickets/templates/tickets/ticket_detail.html:101
+#: tickets/templates/tickets/ticket_list.html:96
 msgid "Reject"
 msgstr "拒绝"
 
@@ -4600,11 +4601,11 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: tickets/models/ticket.py:17 tickets/models/ticket.py:69
-#: tickets/templates/tickets/ticket_list.html:90
+#: tickets/templates/tickets/ticket_list.html:91
 msgid "Open"
 msgstr "开启"
 
-#: tickets/models/ticket.py:18 tickets/templates/tickets/ticket_list.html:91
+#: tickets/models/ticket.py:18 tickets/templates/tickets/ticket_list.html:92
 msgid "Closed"
 msgstr "关闭"
 
@@ -4616,20 +4617,21 @@ msgstr "一般"
 msgid "Login confirm"
 msgstr "登录复核"
 
-#: tickets/models/ticket.py:29 tickets/templates/tickets/ticket_list.html:94
+#: tickets/models/ticket.py:29 tickets/templates/tickets/ticket_detail.html:100
+#: tickets/templates/tickets/ticket_list.html:95
 msgid "Approve"
 msgstr "同意"
 
-#: tickets/models/ticket.py:33 tickets/models/ticket.py:86
+#: tickets/models/ticket.py:33 tickets/models/ticket.py:105
 msgid "User display name"
 msgstr "用户显示名称"
 
 #: tickets/models/ticket.py:35 tickets/templates/tickets/ticket_list.html:21
-#: tickets/templates/tickets/ticket_list.html:87
+#: tickets/templates/tickets/ticket_list.html:88
 msgid "Title"
 msgstr "标题"
 
-#: tickets/models/ticket.py:36 tickets/models/ticket.py:87
+#: tickets/models/ticket.py:36 tickets/models/ticket.py:106
 msgid "Body"
 msgstr "内容"
 
@@ -4657,8 +4659,12 @@ msgstr "待处理人名称"
 msgid "{} {} this ticket"
 msgstr "{} {} 这个工单"
 
+#: tickets/models/ticket.py:81
+msgid "this ticket"
+msgstr "这个工单"
+
 #: tickets/templates/tickets/ticket_detail.html:66
-#: tickets/templates/tickets/ticket_detail.html:81
+#: tickets/templates/tickets/ticket_detail.html:80
 msgid "ago"
 msgstr "前"
 
@@ -4738,7 +4744,7 @@ msgstr ""
 msgid "Ticket list"
 msgstr "工单列表"
 
-#: tickets/views.py:33
+#: tickets/views.py:35
 msgid "Ticket detail"
 msgstr "工单详情"
 

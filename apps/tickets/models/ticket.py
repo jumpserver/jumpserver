@@ -78,7 +78,7 @@ class Ticket(CommonModelMixin):
 
     def create_action_comment(self, action, user):
         action_display = dict(self.ACTION_CHOICES).get(action)
-        body = '{} {} {}'.format(user, action_display, _("this order"))
+        body = '{} {} {}'.format(user, action_display, _("this ticket"))
         self.comments.create(body=body, user=user, user_display=str(user))
 
     def perform_action(self, action, user):
@@ -88,6 +88,12 @@ class Ticket(CommonModelMixin):
         self.assignee = user
         self.assignees_display = str(user)
         self.save()
+
+    def is_assignee(self, user):
+        return self.assignees.filter(id=user.id).exists()
+
+    def is_user(self, user):
+        return self.user == user
 
     class Meta:
         ordering = ('-date_created',)
