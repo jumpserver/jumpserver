@@ -64,16 +64,7 @@
    </div>
 </div>
 
-<ul class="dropdown-menu search-help">
-    <li><a class="search-item" data-value="name">{% trans 'Name' %}</a></li>
-    <li><a class="search-item" data-value="is_valid">{% trans 'Validity' %}</a></li>
-    <li><a class="search-item" data-value="username">{% trans 'Username' %}</a></li>
-    <li><a class="search-item" data-value="user_group">{% trans 'User group' %}</a></li>
-    <li><a class="search-item" data-value="ip">IP</a></li>
-    <li><a class="search-item" data-value="hostname">{% trans 'Hostname' %}</a></li>
-    <li><a class="search-item" data-value="node">{% trans 'Node' %}</a></li>
-    <li><a class="search-item" data-value="system_user">{% trans 'System user' %}</a></li>
-</ul>
+{% include '_filter_dropdown.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -213,6 +204,17 @@ function initTree() {
 $(document).ready(function(){
     initTable();
     initTree();
+    var filterMenu = [
+        {title: "{% trans 'Name' %}", value: "name"},
+        {title: "{% trans 'Validity' %}", value: "is_valid"},
+        {title: "{% trans 'Username' %}", value: "username"},
+        {title: "{% trans 'User group' %}", value: "user_group"},
+        {title: "{% trans 'IP' %}", value: "ip"},
+        {title: "{% trans 'Hostname' %}", value: "hostname"},
+        {title: "{% trans 'Node' %}", value: "node"},
+        {title: "{% trans 'System user' %}", value: "system_user"},
+    ];
+    initTableFilterDropdown('#permission_list_table_filter input', filterMenu)
 })
 .on('click', '.btn-del', function () {
     var $this = $(this);
@@ -270,27 +272,8 @@ $(document).ready(function(){
             detailRows.push(tr.attr('id'));
         }
     }
-}).on('click', '#permission_list_table_filter input', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var position = $('#permission_list_table_filter input').offset();
-    var y = position['top'];
-    var x = position['left'];
-    x -= 220;
-    y += 30;
-
-    $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
-    $('.dropdown-menu.search-help').show();
-}).on('click', '.search-item', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var value = $(this).data('value');
-    var old_value = $('#permission_list_table_filter input').val();
-    var new_value = old_value + ' ' + value + ':';
-    $('#permission_list_table_filter input').val(new_value.trim());
-    $('.dropdown-menu.search-help').hide();
-    $('#permission_list_table_filter input').focus()
-}).on('click', 'body', function (e) {
+})
+.on('click', 'body', function (e) {
     $('.dropdown-menu.search-help').hide()
 })
 

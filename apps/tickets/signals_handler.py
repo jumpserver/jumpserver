@@ -15,9 +15,9 @@ logger = get_logger(__name__)
 
 
 @receiver(m2m_changed, sender=Ticket.assignees.through)
-def on_login_confirm_ticket_assignees_set(sender, instance=None, action=None,
-                                          reverse=False, model=None,
-                                          pk_set=None, **kwargs):
+def on_ticket_assignees_set(sender, instance=None, action=None,
+                            reverse=False, model=None,
+                            pk_set=None, **kwargs):
     if action == 'post_add':
         logger.debug('New ticket create, send mail: {}'.format(instance.id))
         assignees = model.objects.filter(pk__in=pk_set)
@@ -30,7 +30,7 @@ def on_login_confirm_ticket_assignees_set(sender, instance=None, action=None,
 
 
 @receiver(post_save, sender=Ticket)
-def on_login_confirm_ticket_status_change(sender, instance=None, created=False, **kwargs):
+def on_ticket_status_change(sender, instance=None, created=False, **kwargs):
     if created or instance.status == "open":
         return
     logger.debug('Ticket changed, send mail: {}'.format(instance.id))

@@ -12,7 +12,7 @@
             <div class="tab-content">
                 <div id="my-tickets" class="tab-pane active">
                     <div class="panel-body">
-                        {% if not assign %}
+                        {% if False %}
                         <div class="uc pull-left m-r-5">
                             <div class="btn-group">
                                 <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle" aria-expanded="false">
@@ -37,6 +37,7 @@
                                     <th class="text-center">{% trans 'Datetime' %}</th>
                                 </tr>
                             </thead>
+                            {% include '_filter_dropdown.html' %}
                             <tbody>
                             </tbody>
                         </table>
@@ -46,7 +47,6 @@
         </div>
     </div>
 </div>
-{% include '_filter_dropdown.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
@@ -96,7 +96,6 @@ function initTable() {
 $(document).ready(function(){
     initTable();
     var menu = [
-        {title: "IP", value: "ip"},
         {title: "{% trans 'Title' %}", value: "title"},
         {title: "{% trans 'User' %}", value: "user_display"},
         {title: "{% trans 'Status' %}", value: "status", submenu: [
@@ -108,19 +107,7 @@ $(document).ready(function(){
                 {title: "{% trans 'Reject' %}", value: "reject"},
         ]},
     ];
-    initTableFilterDropdown('#assigned-ticket-list-table input', menu)
-}).on('click', '.btn-action', function () {
-    var ticketId = $(this).data("uid");
-    var action = $(this).data('action');
-    var ticketDetailUrl = "{% url 'api-tickets:ticket-detail' pk=DEFAULT_PK %}";
-        ticketDetailUrl = ticketDetailUrl.replace("{{ DEFAULT_PK }}", ticketId);
-    var data = {
-            url: ticketDetailUrl,
-            body: JSON.stringify({action: action}),
-            method: "PATCH",
-            success: reloadPage
-    };
-    requestApi(data);
+    initTableFilterDropdown('#ticket-list-table_filter input', menu)
 })
 </script>
 {% endblock %}

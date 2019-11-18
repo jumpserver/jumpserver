@@ -50,8 +50,8 @@ function initTableFilterDropdown(selector, menu) {
         var offset = $(".search-help").parent().offset();
         x -= offset.left;
         y -= offset.top;
-        x += 18;
-        y += 80;
+        {#x += 18;#}
+        y += 30;
         $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
         $('.dropdown-menu.search-help').show();
     });
