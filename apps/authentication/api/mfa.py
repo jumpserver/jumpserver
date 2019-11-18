@@ -24,7 +24,7 @@ class MFAChallengeApi(AuthMixin, CreateAPIView):
         try:
             user = self.get_user_from_session()
             code = serializer.validated_data.get('code')
-            valid = user.check_otp(code)
+            valid = user.check_mfa(code)
             if not valid:
                 self.request.session['auth_mfa'] = ''
                 raise errors.MFAFailedError(
@@ -52,7 +52,7 @@ class UserOtpVerifyApi(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         code = serializer.validated_data["code"]
 
-        if request.user.check_otp(code):
+        if request.user.check_mfa(code):
             request.session["MFA_VERIFY_TIME"] = int(time.time())
             return Response({"ok": "1"})
         else:

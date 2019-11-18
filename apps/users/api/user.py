@@ -172,8 +172,8 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=401)
-        if user.mfa_enabled and user.otp_secret_key:
-            user.otp_secret_key = ''
+        if user.mfa_enabled:
+            user.reset_mfa()
             user.save()
             logout(request)
         return Response({"msg": "success"})

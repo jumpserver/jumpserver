@@ -97,7 +97,7 @@ class AuthMixin:
 
     def check_user_mfa(self, code):
         user = self.get_user_from_session()
-        ok = user.check_otp(code)
+        ok = user.check_mfa(code)
         if ok:
             self.request.session['auth_mfa'] = 1
             self.request.session['auth_mfa_time'] = time.time()

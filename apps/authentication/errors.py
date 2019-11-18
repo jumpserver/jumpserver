@@ -109,8 +109,7 @@ class CredentialError(AuthFailedNeedLogMixin, AuthFailedNeedBlockMixin, AuthFail
 
 
 class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
-    reason = reason_mfa_failed
-    error = 'mfa_failed'
+    error = reason_mfa_failed
     msg = mfa_failed_msg
 
     def __init__(self, username, request):

@@ -158,7 +158,7 @@
                                             <span class="pull-right">
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
                                                    href="
-                                                        {% if request.user.mfa_enabled and request.user.otp_secret_key %}
+                                                        {% if request.user.mfa_enabled %}
                                                             {% if request.user.mfa_force_enabled %}
                                                                 " disabled >{% trans 'Disable' %}
                                                             {% else %}
@@ -183,7 +183,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
-                                    {% if request.user.mfa_enabled and request.user.otp_secret_key %}
+                                    {% if request.user.mfa_enabled %}
                                     <tr>
                                         <td>{% trans 'Update MFA' %}:</td>
                                         <td>

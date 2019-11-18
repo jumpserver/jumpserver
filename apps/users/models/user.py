@@ -375,13 +375,17 @@ class MFAMixin:
         self.mfa_level = 0
         self.otp_secret_key = None
 
+    def reset_mfa(self):
+        if self.mfa_is_otp():
+            self.otp_secret_key = ''
+
     @staticmethod
     def mfa_is_otp():
         if settings.CONFIG.OTP_IN_RADIUS:
             return False
         return True
 
-    def check_otp_on_radius(self, code):
+    def check_radius(self, code):
         from authentication.backends.radius import RadiusBackend
         backend = RadiusBackend()
         user = backend.authenticate(None, username=self.username, password=code)
@@ -391,13 +395,17 @@ class MFAMixin:
 
     def check_otp(self, code):
         from ..utils import check_otp_code
+        return check_otp_code(self.otp_secret_key, code)
+
+    def check_mfa(self, code):
         if settings.CONFIG.OTP_IN_RADIUS:
-            return self.check_otp_on_radius(code)
+            return self.check_radius(code)
         else:
-            return check_otp_code(self.otp_secret_key, code)
+            return self.check_otp(code)
 
     def mfa_enabled_but_not_set(self):
-        if self.mfa_enabled and self.mfa_is_otp() and not self.otp_secret_key:
+        if self.mfa_enabled and \
+                self.mfa_is_otp() and not self.otp_secret_key:
             return True
         return False
 

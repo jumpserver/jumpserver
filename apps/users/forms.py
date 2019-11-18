@@ -158,8 +158,8 @@ class UserUpdateForm(UserCreateUpdateFormMixin):
 
 
 class UserProfileForm(forms.ModelForm):
-    username = forms.CharField(disabled=True)
-    name = forms.CharField(disabled=True)
+    username = forms.CharField(disabled=True, label=_("Username"))
+    name = forms.CharField(disabled=True, label=_("Name"))
     email = forms.CharField(disabled=True)
 
     class Meta:

@@ -50,7 +50,7 @@ class LoginConfirmSetting(CommonModelMixin):
 
     def create_confirm_ticket(self, request=None):
         from tickets.models import Ticket
-        title = '[' + __('Login confirm') + ']: {}'.format(self.user)
+        title = _('Login confirm') + '{}'.format(self.user)
         if request:
             remote_addr = get_request_ip(request)
             city = get_ip_city(remote_addr)

@@ -7,7 +7,6 @@
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
     <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
-    <script src="{% static "js/vue.min.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -158,8 +157,9 @@
                                             </span></td>
                                         </tr>
                                         <tr>
-                                          <td>{% trans 'Force enabled MFA' %}:</td>
-                                            <td><span class="pull-right">
+                                            <td>{% trans 'Force enabled MFA' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
                                                         <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.mfa_force_enabled %} checked {% endif %}
@@ -170,7 +170,8 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                            </span></td>
+                                                </span>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Reset MFA' %}:</td>
