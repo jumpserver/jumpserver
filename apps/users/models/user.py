@@ -346,34 +346,40 @@ class TokenMixin:
 
 
 class MFAMixin:
-    otp_level = 0
+    mfa_level = 0
     otp_secret_key = ''
-    OTP_LEVEL_CHOICES = (
+    MFA_LEVEL_CHOICES = (
         (0, _('Disable')),
         (1, _('Enable')),
         (2, _("Force enable")),
     )
 
     @property
-    def otp_enabled(self):
-        return self.otp_force_enabled or self.otp_level > 0
+    def mfa_enabled(self):
+        return self.mfa_force_enabled or self.mfa_level > 0
 
     @property
-    def otp_force_enabled(self):
+    def mfa_force_enabled(self):
         if settings.SECURITY_MFA_AUTH:
             return True
-        return self.otp_level == 2
+        return self.mfa_level == 2
 
-    def enable_otp(self):
-        if not self.otp_level == 2:
-            self.otp_level = 1
+    def enable_mfa(self):
+        if not self.mfa_level == 2:
+            self.mfa_level = 1
 
-    def force_enable_otp(self):
-        self.otp_level = 2
+    def force_enable_mfa(self):
+        self.mfa_level = 2
 
-    def disable_otp(self):
-        self.otp_level = 0
+    def disable_mfa(self):
+        self.mfa_level = 0
         self.otp_secret_key = None
+
+    @staticmethod
+    def mfa_is_otp():
+        if settings.CONFIG.OTP_IN_RADIUS:
+            return False
+        return True
 
     def check_otp_on_radius(self, code):
         from authentication.backends.radius import RadiusBackend
@@ -389,6 +395,11 @@ class MFAMixin:
             return self.check_otp_on_radius(code)
         else:
             return check_otp_code(self.otp_secret_key, code)
+
+    def mfa_enabled_but_not_set(self):
+        if self.mfa_enabled and self.mfa_is_otp() and not self.otp_secret_key:
+            return True
+        return False
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
@@ -428,8 +439,8 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     phone = models.CharField(
         max_length=20, blank=True, null=True, verbose_name=_('Phone')
     )
-    otp_level = models.SmallIntegerField(
-        default=0, choices=MFAMixin.OTP_LEVEL_CHOICES, verbose_name=_('MFA')
+    mfa_level = models.SmallIntegerField(
+        default=0, choices=MFAMixin.MFA_LEVEL_CHOICES, verbose_name=_('MFA')
     )
     otp_secret_key = fields.EncryptCharField(max_length=128, blank=True, null=True)
     # Todo: Auto generate key, let user download

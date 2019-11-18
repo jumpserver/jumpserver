@@ -27,7 +27,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         fields = [
             'id', 'name', 'username', 'password', 'email', 'public_key',
             'groups',  'groups_display',
-            'role', 'role_display',  'wechat', 'phone', 'otp_level',
+            'role', 'role_display',  'wechat', 'phone', 'mfa_level',
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',

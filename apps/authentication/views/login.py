@@ -130,8 +130,8 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
             auth_login(self.request, user)
             self.send_auth_signal(success=True, user=user)
             self.clear_auth_mark()
-            # 启用但是没有设置otp
-            if user.otp_enabled and not user.otp_secret_key:
+            # 启用但是没有设置otp, 排除radius
+            if user.mfa_enabled_but_not_set():
                 # 1,2,mfa_setting & F
                 return reverse('users:user-otp-enable-authentication')
             url = redirect_user_first_login_or_index(

@@ -347,7 +347,12 @@ class UserOtpEnableAuthenticationView(FormView):
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
-        return redirect(self.get_success_url())
+        if user.mfa_is_otp():
+            return redirect(self.get_success_url())
+        else:
+            user.enable_mfa()
+            user.save()
+            return redirect('users:user-otp-settings-success')
 
     def get_success_url(self):
         return reverse('users:user-otp-enable-install-app')
@@ -395,7 +400,7 @@ class UserOtpEnableBindView(TemplateView, FormView):
 
     def save_otp(self, otp_secret_key):
         user = get_user_or_tmp_user(self.request)
-        user.enable_otp()
+        user.enable_mfa()
         user.otp_secret_key = otp_secret_key
         user.save()
 
@@ -411,7 +416,7 @@ class UserOtpDisableAuthenticationView(FormView):
         otp_secret_key = user.otp_secret_key
 
         if check_otp_code(otp_secret_key, otp_code):
-            user.disable_otp()
+            user.disable_mfa()
             user.save()
             return super().form_valid(form)
         else:
@@ -447,7 +452,7 @@ class UserOtpSettingsSuccessView(TemplateView):
             auth_logout(self.request)
         title = _('MFA enable success')
         describe = _('MFA enable success, return login page')
-        if not user.otp_enabled:
+        if not user.mfa_enabled:
             title = _('MFA disable success')
             describe = _('MFA disable success, return login page')
 

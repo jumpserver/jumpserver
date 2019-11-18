@@ -128,7 +128,7 @@ def generate_data(username, request):
 def on_user_auth_success(sender, user, request, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     data = generate_data(user.username, request)
-    data.update({'mfa': int(user.otp_enabled), 'status': True})
+    data.update({'mfa': int(user.mfa_enabled), 'status': True})
     write_login_log_async.delay(**data)
 
 

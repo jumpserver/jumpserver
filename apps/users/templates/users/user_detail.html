@@ -91,9 +91,9 @@
                                         <tr>
                                             <td>{% trans 'MFA certification' %}:</td>
                                             <td><b>
-                                                {% if user_object.otp_force_enabled %}
+                                                {% if user_object.mfa_force_enabled %}
                                                     {% trans 'Force enabled' %}
-                                                {% elif  user_object.otp_enabled%}
+                                                {% elif  user_object.mfa_enabled%}
                                                     {% trans 'Enabled' %}
                                                 {% else %}
                                                     {% trans 'Disabled' %}
@@ -162,9 +162,9 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.otp_force_enabled %} checked {% endif %}
-                                                               id="force_enable_otp">
-                                                        <label class="onoffswitch-label" for="force_enable_otp">
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.mfa_force_enabled %} checked {% endif %}
+                                                               id="force_enable_mfa">
+                                                        <label class="onoffswitch-label" for="force_enable_mfa">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
                                                         </label>
@@ -370,7 +370,7 @@ $(document).ready(function() {
         success_message: success
     });
 })
-.on('click', '#force_enable_otp', function() {
+.on('click', '#force_enable_mfa', function() {
     {% if request.user == user_object %}
         toastr.error("{% trans 'Goto profile page enable MFA' %}");
         return;
@@ -378,16 +378,16 @@ $(document).ready(function() {
 
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
     var checked = $(this).prop('checked');
-    var otp_level;
+    var mfa_level;
     var otp_secret_key;
     if(checked){
-        otp_level = 2
+        mfa_level = 2
     }else{
-        otp_level = 0;
+        mfa_level = 0;
         otp_secret_key = '';
     }
     var body = {
-        'otp_level': otp_level,
+        'mfa_level': mfa_level,
         'otp_secret_key': otp_secret_key
     };
     var success = '{% trans "Update successfully!" %}';

@@ -86,9 +86,9 @@
                                             <tr>
                                                 <td class="text-navy">{% trans 'MFA certification' %}</td>
                                                 <td>
-                                                    {% if user.otp_force_enabled %}
+                                                    {% if user.mfa_force_enabled %}
                                                         {% trans 'Force enable' %}
-                                                    {% elif  user.otp_enabled%}
+                                                    {% elif  user.mfa_enabled%}
                                                         {% trans 'Enable' %}
                                                     {% else %}
                                                         {% trans 'Disable' %}
@@ -158,8 +158,8 @@
                                             <span class="pull-right">
                                                 <a type="button" class="btn btn-primary btn-xs" style="width: 54px" id=""
                                                    href="
-                                                        {% if request.user.otp_enabled and request.user.otp_secret_key %}
-                                                            {% if request.user.otp_force_enabled %}
+                                                        {% if request.user.mfa_enabled and request.user.otp_secret_key %}
+                                                            {% if request.user.mfa_force_enabled %}
                                                                 " disabled >{% trans 'Disable' %}
                                                             {% else %}
                                                                 {% url 'users:user-otp-disable-authentication' %}
@@ -183,7 +183,7 @@
                                         </td>
                                     </tr>
                                     {% endif %}
-                                    {% if request.user.otp_enabled and request.user.otp_secret_key %}
+                                    {% if request.user.mfa_enabled and request.user.otp_secret_key %}
                                     <tr>
                                         <td>{% trans 'Update MFA' %}:</td>
                                         <td>

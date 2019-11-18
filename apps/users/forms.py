@@ -61,10 +61,10 @@ class UserCreateUpdateFormMixin(OrgModelForm):
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
             'source', 'phone', 'role', 'date_expired',
-            'comment', 'otp_level'
+            'comment', 'mfa_level'
         ]
         widgets = {
-            'otp_level': forms.RadioSelect(),
+            'mfa_level': forms.RadioSelect(),
             'groups': forms.SelectMultiple(
                 attrs={
                     'class': 'select2',
@@ -126,13 +126,13 @@ class UserCreateUpdateFormMixin(OrgModelForm):
 
     def save(self, commit=True):
         password = self.cleaned_data.get('password')
-        otp_level = self.cleaned_data.get('otp_level')
+        mfa_level = self.cleaned_data.get('mfa_level')
         public_key = self.cleaned_data.get('public_key')
         user = super().save(commit=commit)
         if password:
             user.reset_password(password)
-        if otp_level:
-            user.otp_level = otp_level
+        if mfa_level:
+            user.mfa_level = mfa_level
             user.save()
         if public_key:
             user.public_key = public_key
@@ -183,10 +183,10 @@ class UserMFAForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['otp_level']
-        widgets = {'otp_level': forms.RadioSelect()}
+        fields = ['mfa_level']
+        widgets = {'mfa_level': forms.RadioSelect()}
         help_texts = {
-            'otp_level': _('* Enable MFA authentication '
+            'mfa_level': _('* Enable MFA authentication '
                            'to make the account more secure.'),
         }
 

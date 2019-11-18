@@ -89,7 +89,9 @@ class AuthMixin:
     def check_user_mfa_if_need(self, user):
         if self.request.session.get('auth_mfa'):
             return
-        if not user.otp_enabled or not user.otp_secret_key:
+        if not user.mfa_enabled:
+            return
+        if not user.otp_secret_key and user.mfa_is_otp():
             return
         raise errors.MFARequiredError()
 
