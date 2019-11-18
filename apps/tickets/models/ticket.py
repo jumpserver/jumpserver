@@ -2,6 +2,7 @@
 #
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from common.mixins.models import CommonModelMixin
@@ -94,6 +95,29 @@ class Ticket(CommonModelMixin):
 
     def is_user(self, user):
         return self.user == user
+
+    @classmethod
+    def get_related_tickets(cls, user, queryset=None):
+        if queryset is None:
+            queryset = cls.objects.all()
+        queryset = queryset.filter(
+            Q(assignees=user) | Q(user=user)
+        ).distinct()
+        return queryset
+
+    @classmethod
+    def get_assigned_tickets(cls, user, queryset=None):
+        if queryset is None:
+            queryset = cls.objects.all()
+        queryset = queryset.filter(assignees=user)
+        return queryset
+
+    @classmethod
+    def get_my_tickets(cls, user, queryset=None):
+        if queryset is None:
+            queryset = cls.objects.all()
+        queryset = queryset.filter(user=user)
+        return queryset
 
     class Meta:
         ordering = ('-date_created',)

@@ -13,10 +13,13 @@ class TicketListView(PermissionsMixin, TemplateView):
     def get_context_data(self, **kwargs):
         assign = self.request.GET.get('assign', '0') == '1'
         context = super().get_context_data(**kwargs)
+        assigned_open_count = Ticket.get_assigned_tickets(self.request.user)\
+            .filter(status=Ticket.STATUS_OPEN).count()
         context.update({
             'app': _("Tickets"),
             'action': _("Ticket list"),
             'assign': assign,
+            'assigned_open_count': assigned_open_count
         })
         return context
 

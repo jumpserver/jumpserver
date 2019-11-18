@@ -7,7 +7,7 @@
         <div class="tabs-container">
             <ul class="nav nav-tabs">
                 <li {% if not assign %} class="active" {% endif %}><a href="{% url 'tickets:ticket-list' %}"> {% trans 'My tickets' %}</a></li>
-                <li {% if assign %}class="active" {% endif %}><a href="{% url 'tickets:ticket-list' %}?assign=1">{% trans 'Assigned me' %}</a></li>
+                <li {% if assign %}class="active" {% endif %}><a href="{% url 'tickets:ticket-list' %}?assign=1" >{% trans 'Assigned me' %} <span class="label label-primary">{{ assigned_open_count }}</span></a></li>
             </ul>
             <div class="tab-content">
                 <div id="my-tickets" class="tab-pane active">
