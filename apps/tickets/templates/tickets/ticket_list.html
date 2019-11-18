@@ -12,6 +12,18 @@
             <div class="tab-content">
                 <div id="my-tickets" class="tab-pane active">
                     <div class="panel-body">
+                        {% if not assign %}
+                        <div class="uc pull-left m-r-5">
+                            <div class="btn-group">
+                                <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle" aria-expanded="false">
+                                    {% trans 'Create ticket' %} <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">{% trans 'Asset permission' %}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
                         <table class="table table-striped table-bordered table-hover" id="ticket-list-table" >
                             <thead>
                                 <tr>
