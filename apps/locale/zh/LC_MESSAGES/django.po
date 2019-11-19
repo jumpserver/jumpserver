@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-18 12:04+0800\n"
+"POT-Creation-Date: 2019-11-19 10:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -89,7 +89,7 @@ msgstr "运行参数"
 #: perms/forms/asset_permission.py:84 perms/models/asset_permission.py:80
 #: perms/templates/perms/asset_permission_create_update.html:45
 #: perms/templates/perms/asset_permission_list.html:52
-#: perms/templates/perms/asset_permission_list.html:121
+#: perms/templates/perms/asset_permission_list.html:112
 #: terminal/backends/command/models.py:13 terminal/models.py:157
 #: terminal/templates/terminal/command_list.html:30
 #: terminal/templates/terminal/command_list.html:66
@@ -130,7 +130,7 @@ msgstr "资产"
 #: orgs/models.py:12 perms/models/base.py:48
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:49
-#: perms/templates/perms/asset_permission_list.html:68
+#: perms/templates/perms/asset_permission_list.html:208
 #: perms/templates/perms/asset_permission_user.html:54
 #: perms/templates/perms/remote_app_permission_detail.html:62
 #: perms/templates/perms/remote_app_permission_list.html:14
@@ -143,9 +143,10 @@ msgstr "资产"
 #: settings/templates/settings/terminal_setting.html:83
 #: settings/templates/settings/terminal_setting.html:105 terminal/models.py:23
 #: terminal/models.py:260 terminal/templates/terminal/terminal_detail.html:43
-#: terminal/templates/terminal/terminal_list.html:29 users/models/group.py:14
-#: users/models/user.py:410 users/templates/users/_select_user_modal.html:13
-#: users/templates/users/user_detail.html:64
+#: terminal/templates/terminal/terminal_list.html:29 users/forms.py:162
+#: users/models/group.py:14 users/models/user.py:428
+#: users/templates/users/_select_user_modal.html:13
+#: users/templates/users/user_detail.html:63
 #: users/templates/users/user_group_detail.html:55
 #: users/templates/users/user_group_list.html:35
 #: users/templates/users/user_list.html:35
@@ -197,8 +198,8 @@ msgstr "参数"
 #: orgs/models.py:16 perms/models/base.py:54
 #: perms/templates/perms/asset_permission_detail.html:98
 #: perms/templates/perms/remote_app_permission_detail.html:90
-#: users/models/user.py:451 users/serializers/group.py:32
-#: users/templates/users/user_detail.html:112
+#: users/models/user.py:469 users/serializers/group.py:32
+#: users/templates/users/user_detail.html:111
 #: xpack/plugins/change_auth_plan/models.py:109
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
 #: xpack/plugins/cloud/models.py:80 xpack/plugins/cloud/models.py:179
@@ -260,7 +261,7 @@ msgstr "创建日期"
 #: settings/models.py:34 terminal/models.py:33
 #: terminal/templates/terminal/terminal_detail.html:63
 #: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:15
-#: users/models/user.py:443 users/templates/users/user_detail.html:130
+#: users/models/user.py:461 users/templates/users/user_detail.html:129
 #: users/templates/users/user_group_detail.html:67
 #: users/templates/users/user_group_list.html:37
 #: users/templates/users/user_profile.html:138
@@ -312,7 +313,7 @@ msgstr "远程应用"
 #: terminal/templates/terminal/terminal_update.html:45
 #: users/templates/users/_user.html:51
 #: users/templates/users/user_bulk_update.html:23
-#: users/templates/users/user_detail.html:179
+#: users/templates/users/user_detail.html:180
 #: users/templates/users/user_group_create_update.html:31
 #: users/templates/users/user_password_update.html:75
 #: users/templates/users/user_profile.html:209
@@ -414,12 +415,12 @@ msgstr "详情"
 #: assets/templates/assets/system_user_list.html:27
 #: assets/templates/assets/system_user_list.html:79 audits/models.py:34
 #: perms/templates/perms/asset_permission_detail.html:30
-#: perms/templates/perms/asset_permission_list.html:178
+#: perms/templates/perms/asset_permission_list.html:169
 #: perms/templates/perms/remote_app_permission_detail.html:30
 #: perms/templates/perms/remote_app_permission_list.html:64
 #: terminal/templates/terminal/terminal_detail.html:16
 #: terminal/templates/terminal/terminal_list.html:73
-#: users/templates/users/user_detail.html:26
+#: users/templates/users/user_detail.html:25
 #: users/templates/users/user_group_detail.html:28
 #: users/templates/users/user_group_list.html:20
 #: users/templates/users/user_group_list.html:71
@@ -460,13 +461,13 @@ msgstr "更新"
 #: authentication/templates/authentication/_access_key_modal.html:65
 #: ops/templates/ops/task_list.html:69
 #: perms/templates/perms/asset_permission_detail.html:34
-#: perms/templates/perms/asset_permission_list.html:179
+#: perms/templates/perms/asset_permission_list.html:170
 #: perms/templates/perms/remote_app_permission_detail.html:34
 #: perms/templates/perms/remote_app_permission_list.html:65
 #: settings/templates/settings/terminal_setting.html:93
 #: settings/templates/settings/terminal_setting.html:115
 #: terminal/templates/terminal/terminal_list.html:75
-#: users/templates/users/user_detail.html:31
+#: users/templates/users/user_detail.html:30
 #: users/templates/users/user_group_detail.html:32
 #: users/templates/users/user_group_list.html:73
 #: users/templates/users/user_list.html:111
@@ -521,13 +522,13 @@ msgstr "创建远程应用"
 #: perms/forms/asset_permission.py:21
 #: perms/templates/perms/asset_permission_create_update.html:50
 #: perms/templates/perms/asset_permission_list.html:56
-#: perms/templates/perms/asset_permission_list.html:130
+#: perms/templates/perms/asset_permission_list.html:121
 #: perms/templates/perms/remote_app_permission_list.html:20
 #: settings/templates/settings/terminal_setting.html:85
 #: settings/templates/settings/terminal_setting.html:107
 #: terminal/templates/terminal/session_list.html:36
 #: terminal/templates/terminal/terminal_list.html:36
-#: tickets/templates/tickets/ticket_list.html:106
+#: tickets/templates/tickets/ticket_list.html:105
 #: users/templates/users/_granted_assets.html:34
 #: users/templates/users/user_group_list.html:38
 #: users/templates/users/user_list.html:41
@@ -642,8 +643,8 @@ msgstr "网域"
 #: assets/templates/assets/asset_create.html:42
 #: perms/forms/asset_permission.py:87 perms/forms/asset_permission.py:94
 #: perms/templates/perms/asset_permission_list.html:53
-#: perms/templates/perms/asset_permission_list.html:74
-#: perms/templates/perms/asset_permission_list.html:124
+#: perms/templates/perms/asset_permission_list.html:115
+#: perms/templates/perms/asset_permission_list.html:214
 #: xpack/plugins/change_auth_plan/forms.py:74
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:55
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:15
@@ -703,12 +704,13 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: audits/templates/audits/login_log_list.html:57 authentication/forms.py:13
 #: authentication/templates/authentication/login.html:58
 #: authentication/templates/authentication/xpack_login.html:93
-#: ops/models/adhoc.py:189 perms/templates/perms/asset_permission_list.html:70
+#: ops/models/adhoc.py:189 perms/templates/perms/asset_permission_list.html:210
 #: perms/templates/perms/asset_permission_user.html:55
 #: perms/templates/perms/remote_app_permission_user.html:54
 #: settings/templates/settings/_ldap_list_users_modal.html:31 users/forms.py:14
-#: users/models/user.py:408 users/templates/users/_select_user_modal.html:14
-#: users/templates/users/user_detail.html:68
+#: users/forms.py:161 users/models/user.py:426
+#: users/templates/users/_select_user_modal.html:14
+#: users/templates/users/user_detail.html:67
 #: users/templates/users/user_list.html:36
 #: users/templates/users/user_profile.html:47
 #: xpack/plugins/change_auth_plan/forms.py:58
@@ -747,7 +749,7 @@ msgstr "密码"
 
 #: assets/forms/user.py:30 assets/serializers/asset_user.py:71
 #: assets/templates/assets/_asset_user_auth_update_modal.html:27
-#: users/models/user.py:437
+#: users/models/user.py:455
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -796,7 +798,8 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 #: assets/templates/assets/domain_gateway_list.html:68
 #: assets/templates/assets/user_asset_list.html:76
 #: audits/templates/audits/login_log_list.html:60
-#: perms/templates/perms/asset_permission_asset.html:58 settings/forms.py:144
+#: perms/templates/perms/asset_permission_asset.html:58
+#: perms/templates/perms/asset_permission_list.html:212 settings/forms.py:144
 #: users/templates/users/_granted_assets.html:31
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:54
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:63
@@ -813,7 +816,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:96
 #: assets/templates/assets/user_asset_list.html:75
 #: perms/templates/perms/asset_permission_asset.html:57
-#: perms/templates/perms/asset_permission_list.html:73 settings/forms.py:143
+#: perms/templates/perms/asset_permission_list.html:213 settings/forms.py:143
 #: users/templates/users/_granted_assets.html:30
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:53
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:62
@@ -961,8 +964,8 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:429
-#: users/templates/users/user_detail.html:77
+#: assets/models/cluster.py:22 users/models/user.py:447
+#: users/templates/users/user_detail.html:76
 msgid "Phone"
 msgstr "手机"
 
@@ -987,7 +990,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:549
+#: users/models/user.py:567
 msgid "System"
 msgstr "系统"
 
@@ -1044,7 +1047,7 @@ msgstr "过滤器"
 #: settings/templates/settings/replay_storage_create.html:31
 #: settings/templates/settings/terminal_setting.html:84
 #: settings/templates/settings/terminal_setting.html:106
-#: tickets/models/ticket.py:42 tickets/templates/tickets/ticket_detail.html:33
+#: tickets/models/ticket.py:43 tickets/templates/tickets/ticket_detail.html:33
 #: tickets/templates/tickets/ticket_list.html:35
 msgid "Type"
 msgstr "类型"
@@ -1119,18 +1122,18 @@ msgstr "默认资产组"
 #: perms/models/base.py:49
 #: perms/templates/perms/asset_permission_create_update.html:41
 #: perms/templates/perms/asset_permission_list.html:50
-#: perms/templates/perms/asset_permission_list.html:115
+#: perms/templates/perms/asset_permission_list.html:106
 #: perms/templates/perms/remote_app_permission_create_update.html:43
 #: perms/templates/perms/remote_app_permission_list.html:15
 #: templates/index.html:87 terminal/backends/command/models.py:12
 #: terminal/models.py:156 terminal/templates/terminal/command_list.html:29
 #: terminal/templates/terminal/command_list.html:65
 #: terminal/templates/terminal/session_list.html:27
-#: terminal/templates/terminal/session_list.html:71 tickets/models/ticket.py:32
-#: tickets/models/ticket.py:104 tickets/templates/tickets/ticket_detail.html:32
+#: terminal/templates/terminal/session_list.html:71 tickets/models/ticket.py:33
+#: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:34
-#: tickets/templates/tickets/ticket_list.html:101 users/forms.py:339
-#: users/models/user.py:149 users/models/user.py:165 users/models/user.py:537
+#: tickets/templates/tickets/ticket_list.html:100 users/forms.py:339
+#: users/models/user.py:148 users/models/user.py:164 users/models/user.py:555
 #: users/serializers/group.py:21
 #: users/templates/users/user_group_detail.html:78
 #: users/templates/users/user_group_list.html:36 users/views/user.py:250
@@ -1226,8 +1229,8 @@ msgstr "登录模式"
 #: perms/models/asset_permission.py:82 perms/models/remote_app_permission.py:16
 #: perms/templates/perms/asset_permission_detail.html:140
 #: perms/templates/perms/asset_permission_list.html:54
-#: perms/templates/perms/asset_permission_list.html:75
-#: perms/templates/perms/asset_permission_list.html:127
+#: perms/templates/perms/asset_permission_list.html:118
+#: perms/templates/perms/asset_permission_list.html:215
 #: perms/templates/perms/remote_app_permission_detail.html:131
 #: perms/templates/perms/remote_app_permission_list.html:18
 #: templates/_nav.html:45 terminal/backends/command/models.py:14
@@ -1286,7 +1289,7 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:67 users/forms.py:282
-#: users/models/user.py:440 users/templates/users/first_login.html:42
+#: users/models/user.py:458 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:49
 #: users/templates/users/user_profile.html:69
 #: users/templates/users/user_profile_update.html:46
@@ -1480,8 +1483,8 @@ msgstr "请输入密码"
 
 #: assets/templates/assets/_asset_user_auth_update_modal.html:68
 #: assets/templates/assets/asset_detail.html:302
-#: users/templates/users/user_detail.html:366
-#: users/templates/users/user_detail.html:393
+#: users/templates/users/user_detail.html:367
+#: users/templates/users/user_detail.html:394
 #: xpack/plugins/interface/views.py:35
 msgid "Update successfully!"
 msgstr "更新成功"
@@ -1504,7 +1507,7 @@ msgstr "获取认证信息错误"
 #: authentication/templates/authentication/_access_key_modal.html:142
 #: authentication/templates/authentication/_mfa_confirm_modal.html:53
 #: settings/templates/settings/_ldap_list_users_modal.html:171
-#: templates/_modal.html:22 tickets/models/ticket.py:67
+#: templates/_modal.html:22 tickets/models/ticket.py:68
 #: tickets/templates/tickets/ticket_detail.html:103
 msgid "Close"
 msgstr "关闭"
@@ -1679,11 +1682,11 @@ msgstr "选择节点"
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
 #: settings/templates/settings/terminal_setting.html:168
 #: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:112
-#: users/templates/users/user_detail.html:271
-#: users/templates/users/user_detail.html:447
-#: users/templates/users/user_detail.html:473
-#: users/templates/users/user_detail.html:496
-#: users/templates/users/user_detail.html:541
+#: users/templates/users/user_detail.html:272
+#: users/templates/users/user_detail.html:448
+#: users/templates/users/user_detail.html:474
+#: users/templates/users/user_detail.html:497
+#: users/templates/users/user_detail.html:542
 #: users/templates/users/user_group_create_update.html:32
 #: users/templates/users/user_group_list.html:120
 #: users/templates/users/user_list.html:256
@@ -1761,7 +1764,7 @@ msgstr "资产用户"
 #: assets/templates/assets/asset_asset_user_list.html:47
 #: assets/templates/assets/asset_detail.html:142
 #: terminal/templates/terminal/session_detail.html:85
-#: users/templates/users/user_detail.html:141
+#: users/templates/users/user_detail.html:140
 #: users/templates/users/user_profile.html:150
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:128
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:132
@@ -1788,7 +1791,7 @@ msgid "Disk"
 msgstr "硬盘"
 
 #: assets/templates/assets/asset_detail.html:126
-#: users/templates/users/user_detail.html:116
+#: users/templates/users/user_detail.html:115
 #: users/templates/users/user_profile.html:106
 msgid "Date joined"
 msgstr "创建日期"
@@ -1802,7 +1805,7 @@ msgstr "创建日期"
 #: perms/templates/perms/remote_app_permission_detail.html:112
 #: terminal/templates/terminal/terminal_list.html:34
 #: users/templates/users/_select_user_modal.html:18
-#: users/templates/users/user_detail.html:147
+#: users/templates/users/user_detail.html:146
 #: users/templates/users/user_profile.html:63
 msgid "Active"
 msgstr "激活中"
@@ -1883,9 +1886,9 @@ msgstr "显示所有子节点资产"
 
 #: assets/templates/assets/asset_list.html:421
 #: assets/templates/assets/system_user_list.html:127
-#: users/templates/users/user_detail.html:441
-#: users/templates/users/user_detail.html:467
-#: users/templates/users/user_detail.html:535
+#: users/templates/users/user_detail.html:442
+#: users/templates/users/user_detail.html:468
+#: users/templates/users/user_detail.html:536
 #: users/templates/users/user_group_list.html:114
 #: users/templates/users/user_list.html:250
 #: xpack/plugins/interface/templates/interface/interface.html:97
@@ -1899,9 +1902,9 @@ msgstr "删除选择资产"
 #: assets/templates/assets/asset_list.html:425
 #: assets/templates/assets/system_user_list.html:131
 #: settings/templates/settings/terminal_setting.html:166
-#: users/templates/users/user_detail.html:445
-#: users/templates/users/user_detail.html:471
-#: users/templates/users/user_detail.html:539
+#: users/templates/users/user_detail.html:446
+#: users/templates/users/user_detail.html:472
+#: users/templates/users/user_detail.html:540
 #: users/templates/users/user_group_list.html:118
 #: users/templates/users/user_list.html:254
 #: xpack/plugins/interface/templates/interface/interface.html:101
@@ -2229,7 +2232,7 @@ msgstr "文件名"
 #: audits/templates/audits/ftp_log_list.html:79
 #: ops/templates/ops/command_execution_list.html:68
 #: ops/templates/ops/task_list.html:15
-#: users/templates/users/user_detail.html:517
+#: users/templates/users/user_detail.html:518
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:14
 #: xpack/plugins/cloud/api.py:61
 msgid "Success"
@@ -2254,12 +2257,12 @@ msgstr "资源"
 msgid "Change by"
 msgstr "修改者"
 
-#: audits/models.py:71 users/templates/users/user_detail.html:99
+#: audits/models.py:71 users/templates/users/user_detail.html:98
 msgid "Disabled"
 msgstr "禁用"
 
 #: audits/models.py:72 settings/models.py:33
-#: users/templates/users/user_detail.html:97
+#: users/templates/users/user_detail.html:96
 msgid "Enabled"
 msgstr "启用"
 
@@ -2290,7 +2293,7 @@ msgstr "Agent"
 
 #: audits/models.py:86 audits/templates/audits/login_log_list.html:62
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms.py:194 users/models/user.py:432
+#: users/forms.py:194 users/models/user.py:450
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2306,7 +2309,7 @@ msgstr "原因"
 #: audits/models.py:88 audits/templates/audits/login_log_list.html:64
 #: tickets/templates/tickets/ticket_detail.html:34
 #: tickets/templates/tickets/ticket_list.html:36
-#: tickets/templates/tickets/ticket_list.html:102
+#: tickets/templates/tickets/ticket_list.html:101
 #: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/models.py:310
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
@@ -2496,7 +2499,7 @@ msgid ""
 "after {} minutes)"
 msgstr "账号已被锁定（请联系管理员解锁 或 {}分钟后重试）"
 
-#: authentication/errors.py:46 users/views/user.py:393 users/views/user.py:418
+#: authentication/errors.py:46 users/views/user.py:398 users/views/user.py:423
 msgid "MFA code invalid, or ntp sync server time"
 msgstr "MFA验证码不正确，或者服务器端时间不对"
 
@@ -2524,9 +2527,14 @@ msgstr "MFA 验证码"
 msgid "Private Token"
 msgstr "ssh密钥"
 
-#: authentication/models.py:44 users/templates/users/user_detail.html:265
+#: authentication/models.py:44 users/templates/users/user_detail.html:266
 msgid "Reviewers"
 msgstr "审批人"
+
+#: authentication/models.py:53 tickets/models/ticket.py:25
+#: users/templates/users/user_detail.html:258
+msgid "Login confirm"
+msgstr "登录复核"
 
 #: authentication/templates/authentication/_access_key_modal.html:6
 msgid "API key list"
@@ -2550,14 +2558,14 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:352 users/templates/users/user_profile.html:94
+#: users/models/user.py:351 users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:353 users/templates/users/user_profile.html:92
+#: users/models/user.py:352 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"
 msgstr "启用"
@@ -2645,7 +2653,7 @@ msgid "Keycloak"
 msgstr ""
 
 #: authentication/templates/authentication/login_otp.html:46
-#: users/templates/users/user_detail.html:92
+#: users/templates/users/user_detail.html:91
 #: users/templates/users/user_profile.html:87
 msgid "MFA certification"
 msgstr "MFA认证"
@@ -3186,12 +3194,12 @@ msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
 
 #: perms/forms/asset_permission.py:81 perms/forms/remote_app_permission.py:37
 #: perms/models/base.py:50 perms/templates/perms/asset_permission_list.html:51
-#: perms/templates/perms/asset_permission_list.html:71
-#: perms/templates/perms/asset_permission_list.html:118
+#: perms/templates/perms/asset_permission_list.html:109
+#: perms/templates/perms/asset_permission_list.html:211
 #: perms/templates/perms/remote_app_permission_list.html:16
 #: templates/_nav.html:21 users/forms.py:313 users/models/group.py:26
-#: users/models/user.py:416 users/templates/users/_select_user_modal.html:16
-#: users/templates/users/user_detail.html:218
+#: users/models/user.py:434 users/templates/users/_select_user_modal.html:16
+#: users/templates/users/user_detail.html:219
 #: users/templates/users/user_list.html:38
 #: xpack/plugins/orgs/templates/orgs/org_list.html:16
 msgid "User group"
@@ -3233,7 +3241,7 @@ msgstr "资产授权"
 #: perms/models/base.py:53
 #: perms/templates/perms/asset_permission_detail.html:90
 #: perms/templates/perms/remote_app_permission_detail.html:82
-#: users/models/user.py:448 users/templates/users/user_detail.html:108
+#: users/models/user.py:466 users/templates/users/user_detail.html:107
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
 msgstr "失效日期"
@@ -3286,7 +3294,7 @@ msgid "Add node to this permission"
 msgstr "添加节点"
 
 #: perms/templates/perms/asset_permission_asset.html:109
-#: users/templates/users/user_detail.html:235
+#: users/templates/users/user_detail.html:236
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:105
 msgid "Join"
 msgstr "加入"
@@ -3335,7 +3343,7 @@ msgid "Refresh permission cache"
 msgstr "刷新授权缓存"
 
 #: perms/templates/perms/asset_permission_list.html:55
-#: perms/templates/perms/asset_permission_list.html:69
+#: perms/templates/perms/asset_permission_list.html:209
 #: perms/templates/perms/remote_app_permission_list.html:19
 #: users/templates/users/user_list.html:40 xpack/plugins/cloud/models.py:74
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:58
@@ -3343,7 +3351,7 @@ msgstr "刷新授权缓存"
 msgid "Validity"
 msgstr "有效"
 
-#: perms/templates/perms/asset_permission_list.html:230
+#: perms/templates/perms/asset_permission_list.html:232
 msgid "Refresh success"
 msgstr "刷新成功"
 
@@ -3808,7 +3816,7 @@ msgid "Refresh cache"
 msgstr "刷新缓存"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:33
-#: users/models/user.py:412 users/templates/users/user_detail.html:72
+#: users/models/user.py:430 users/templates/users/user_detail.html:71
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
@@ -4209,7 +4217,7 @@ msgstr "批量命令"
 msgid "Task monitor"
 msgstr "任务监控"
 
-#: templates/_nav.html:128 tickets/views.py:17 tickets/views.py:34
+#: templates/_nav.html:128 tickets/views.py:19 tickets/views.py:37
 msgid "Tickets"
 msgstr "工单管理"
 
@@ -4563,8 +4571,8 @@ msgid "Accept"
 msgstr "接受"
 
 #: terminal/templates/terminal/terminal_list.html:80
-#: tickets/models/ticket.py:30 tickets/templates/tickets/ticket_detail.html:101
-#: tickets/templates/tickets/ticket_list.html:108
+#: tickets/models/ticket.py:31 tickets/templates/tickets/ticket_detail.html:101
+#: tickets/templates/tickets/ticket_list.html:107
 msgid "Reject"
 msgstr "拒绝"
 
@@ -4601,66 +4609,62 @@ msgid ""
 "You should use your ssh client tools connect terminal: {} <br /> <br />{}"
 msgstr "你可以使用ssh客户端工具连接终端"
 
-#: tickets/models/ticket.py:17 tickets/models/ticket.py:69
-#: tickets/templates/tickets/ticket_list.html:103
+#: tickets/models/ticket.py:18 tickets/models/ticket.py:70
+#: tickets/templates/tickets/ticket_list.html:102
 msgid "Open"
 msgstr "开启"
 
-#: tickets/models/ticket.py:18 tickets/templates/tickets/ticket_list.html:104
+#: tickets/models/ticket.py:19 tickets/templates/tickets/ticket_list.html:103
 msgid "Closed"
 msgstr "关闭"
 
-#: tickets/models/ticket.py:23
+#: tickets/models/ticket.py:24
 msgid "General"
 msgstr "一般"
 
-#: tickets/models/ticket.py:24 users/templates/users/user_detail.html:257
-msgid "Login confirm"
-msgstr "登录复核"
-
-#: tickets/models/ticket.py:29 tickets/templates/tickets/ticket_detail.html:100
-#: tickets/templates/tickets/ticket_list.html:107
+#: tickets/models/ticket.py:30 tickets/templates/tickets/ticket_detail.html:100
+#: tickets/templates/tickets/ticket_list.html:106
 msgid "Approve"
 msgstr "同意"
 
-#: tickets/models/ticket.py:33 tickets/models/ticket.py:105
+#: tickets/models/ticket.py:34 tickets/models/ticket.py:129
 msgid "User display name"
 msgstr "用户显示名称"
 
-#: tickets/models/ticket.py:35 tickets/templates/tickets/ticket_list.html:33
-#: tickets/templates/tickets/ticket_list.html:100
+#: tickets/models/ticket.py:36 tickets/templates/tickets/ticket_list.html:33
+#: tickets/templates/tickets/ticket_list.html:99
 msgid "Title"
 msgstr "标题"
 
-#: tickets/models/ticket.py:36 tickets/models/ticket.py:106
+#: tickets/models/ticket.py:37 tickets/models/ticket.py:130
 msgid "Body"
 msgstr "内容"
 
-#: tickets/models/ticket.py:37
+#: tickets/models/ticket.py:38
 msgid "Meta"
 msgstr ""
 
-#: tickets/models/ticket.py:38 tickets/templates/tickets/ticket_detail.html:51
+#: tickets/models/ticket.py:39 tickets/templates/tickets/ticket_detail.html:51
 msgid "Assignee"
 msgstr "处理人"
 
-#: tickets/models/ticket.py:39
+#: tickets/models/ticket.py:40
 msgid "Assignee display name"
 msgstr "处理人名称"
 
-#: tickets/models/ticket.py:40 tickets/templates/tickets/ticket_detail.html:50
+#: tickets/models/ticket.py:41 tickets/templates/tickets/ticket_detail.html:50
 msgid "Assignees"
 msgstr "待处理人"
 
-#: tickets/models/ticket.py:41
+#: tickets/models/ticket.py:42
 msgid "Assignees display name"
 msgstr "待处理人名称"
 
-#: tickets/models/ticket.py:70
+#: tickets/models/ticket.py:71
 msgid "{} {} this ticket"
 msgstr "{} {} 这个工单"
 
-#: tickets/models/ticket.py:81
+#: tickets/models/ticket.py:82
 msgid "this ticket"
 msgstr "这个工单"
 
@@ -4745,11 +4749,11 @@ msgstr ""
 "        </div>\n"
 "     "
 
-#: tickets/views.py:18
+#: tickets/views.py:20
 msgid "Ticket list"
 msgstr "工单列表"
 
-#: tickets/views.py:35
+#: tickets/views.py:38
 msgid "Ticket detail"
 msgstr "工单详情"
 
@@ -4757,16 +4761,16 @@ msgstr "工单详情"
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:47 users/models/user.py:420
+#: users/forms.py:47 users/models/user.py:438
 #: users/templates/users/_select_user_modal.html:15
-#: users/templates/users/user_detail.html:88
+#: users/templates/users/user_detail.html:87
 #: users/templates/users/user_list.html:37
 #: users/templates/users/user_profile.html:55
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:51 users/models/user.py:455
-#: users/templates/users/user_detail.html:104
+#: users/forms.py:51 users/models/user.py:473
+#: users/templates/users/user_detail.html:103
 #: users/templates/users/user_list.html:39
 #: users/templates/users/user_profile.html:102
 msgid "Source"
@@ -4785,7 +4789,7 @@ msgstr ""
 msgid "Paste user id_rsa.pub here."
 msgstr "复制用户公钥到这里"
 
-#: users/forms.py:71 users/templates/users/user_detail.html:226
+#: users/forms.py:71 users/templates/users/user_detail.html:227
 msgid "Join user groups"
 msgstr "添加到用户组"
 
@@ -4878,49 +4882,53 @@ msgstr "复制你的公钥到这里"
 msgid "Select users"
 msgstr "选择用户"
 
-#: users/models/user.py:52 users/templates/users/user_update.html:22
+#: users/models/user.py:51 users/templates/users/user_update.html:22
 #: users/views/login.py:46 users/views/login.py:107
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:148 users/models/user.py:545
+#: users/models/user.py:147 users/models/user.py:563
 msgid "Administrator"
 msgstr "管理员"
 
-#: users/models/user.py:150
+#: users/models/user.py:149
 msgid "Application"
 msgstr "应用程序"
 
-#: users/models/user.py:151 xpack/plugins/orgs/forms.py:30
+#: users/models/user.py:150 xpack/plugins/orgs/forms.py:30
 #: xpack/plugins/orgs/templates/orgs/org_list.html:14
 msgid "Auditor"
 msgstr "审计员"
 
-#: users/models/user.py:161
+#: users/models/user.py:160
 msgid "Org admin"
 msgstr "组织管理员"
 
-#: users/models/user.py:163
+#: users/models/user.py:162
 msgid "Org auditor"
 msgstr "组织审计员"
 
-#: users/models/user.py:354 users/templates/users/user_profile.html:90
+#: users/models/user.py:353 users/templates/users/user_profile.html:90
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:423
+#: users/models/user.py:418
+msgid "Local"
+msgstr "数据库"
+
+#: users/models/user.py:441
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:426 users/templates/users/user_detail.html:83
+#: users/models/user.py:444 users/templates/users/user_detail.html:82
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:459
+#: users/models/user.py:477
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:548
+#: users/models/user.py:566
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -5092,7 +5100,7 @@ msgid "Always young, always with tears in my eyes. Stay foolish Stay hungry"
 msgstr "永远年轻，永远热泪盈眶 stay foolish stay hungry"
 
 #: users/templates/users/reset_password.html:46
-#: users/templates/users/user_detail.html:432 users/utils.py:83
+#: users/templates/users/user_detail.html:433 users/utils.py:83
 msgid "Reset password"
 msgstr "重置密码"
 
@@ -5161,102 +5169,102 @@ msgstr "很强"
 msgid "Create user"
 msgstr "创建用户"
 
-#: users/templates/users/user_detail.html:20
+#: users/templates/users/user_detail.html:19
 #: users/templates/users/user_granted_asset.html:18 users/views/user.py:190
 msgid "User detail"
 msgstr "用户详情"
 
-#: users/templates/users/user_detail.html:23
+#: users/templates/users/user_detail.html:22
 #: users/templates/users/user_granted_asset.html:21
 #: users/templates/users/user_group_detail.html:25
 #: users/templates/users/user_group_granted_asset.html:21
 msgid "Asset granted"
 msgstr "授权的资产"
 
-#: users/templates/users/user_detail.html:95
+#: users/templates/users/user_detail.html:94
 msgid "Force enabled"
 msgstr "强制启用"
 
-#: users/templates/users/user_detail.html:120
+#: users/templates/users/user_detail.html:119
 #: users/templates/users/user_profile.html:110
 msgid "Last login"
 msgstr "最后登录"
 
-#: users/templates/users/user_detail.html:125
+#: users/templates/users/user_detail.html:124
 #: users/templates/users/user_profile.html:115
 msgid "Last password updated"
 msgstr "最后更新密码"
 
-#: users/templates/users/user_detail.html:161
+#: users/templates/users/user_detail.html:160
 msgid "Force enabled MFA"
 msgstr "强制启用MFA"
 
-#: users/templates/users/user_detail.html:176
+#: users/templates/users/user_detail.html:177
 msgid "Reset MFA"
 msgstr "重置MFA"
 
-#: users/templates/users/user_detail.html:185
+#: users/templates/users/user_detail.html:186
 msgid "Send reset password mail"
 msgstr "发送重置密码邮件"
 
-#: users/templates/users/user_detail.html:188
-#: users/templates/users/user_detail.html:198
+#: users/templates/users/user_detail.html:189
+#: users/templates/users/user_detail.html:199
 msgid "Send"
 msgstr "发送"
 
-#: users/templates/users/user_detail.html:195
+#: users/templates/users/user_detail.html:196
 msgid "Send reset ssh key mail"
 msgstr "发送重置密钥邮件"
 
-#: users/templates/users/user_detail.html:204
-#: users/templates/users/user_detail.html:520
+#: users/templates/users/user_detail.html:205
+#: users/templates/users/user_detail.html:521
 msgid "Unblock user"
 msgstr "解除登录限制"
 
-#: users/templates/users/user_detail.html:207
+#: users/templates/users/user_detail.html:208
 msgid "Unblock"
 msgstr "解除"
 
-#: users/templates/users/user_detail.html:375
+#: users/templates/users/user_detail.html:376
 msgid "Goto profile page enable MFA"
 msgstr "请去个人信息页面启用自己的MFA"
 
-#: users/templates/users/user_detail.html:431
+#: users/templates/users/user_detail.html:432
 msgid "An e-mail has been sent to the user`s mailbox."
 msgstr "已发送邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:442
+#: users/templates/users/user_detail.html:443
 msgid "This will reset the user password and send a reset mail"
 msgstr "将失效用户当前密码，并发送重设密码邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:457
+#: users/templates/users/user_detail.html:458
 msgid ""
 "The reset-ssh-public-key E-mail has been sent successfully. Please inform "
 "the user to update his new ssh public key."
 msgstr "重设密钥邮件将会发送到用户邮箱"
 
-#: users/templates/users/user_detail.html:458
+#: users/templates/users/user_detail.html:459
 msgid "Reset SSH public key"
 msgstr "重置SSH密钥"
 
-#: users/templates/users/user_detail.html:468
+#: users/templates/users/user_detail.html:469
 msgid "This will reset the user public key and send a reset mail"
 msgstr "将会失效用户当前密钥，并发送重置邮件到用户邮箱"
 
-#: users/templates/users/user_detail.html:486
+#: users/templates/users/user_detail.html:487
 msgid "Successfully updated the SSH public key."
 msgstr "更新ssh密钥成功"
 
-#: users/templates/users/user_detail.html:487
-#: users/templates/users/user_detail.html:491
+#: users/templates/users/user_detail.html:488
+#: users/templates/users/user_detail.html:492
 msgid "User SSH public key update"
 msgstr "ssh密钥"
 
-#: users/templates/users/user_detail.html:536
+#: users/templates/users/user_detail.html:537
 msgid "After unlocking the user, the user can log in normally."
 msgstr "解除用户登录限制后，此用户即可正常登录"
 
-#: users/templates/users/user_detail.html:550
+#: users/templates/users/user_detail.html:551
 msgid "Reset user MFA success"
 msgstr "重置用户MFA成功"
 
@@ -5371,12 +5379,12 @@ msgid "Set MFA"
 msgstr "设置MFA"
 
 #: users/templates/users/user_profile.html:178
-msgid "Update password"
-msgstr "更改密码"
-
-#: users/templates/users/user_profile.html:188
 msgid "Update MFA"
 msgstr "更改MFA"
+
+#: users/templates/users/user_profile.html:188
+msgid "Update password"
+msgstr "更改密码"
 
 #: users/templates/users/user_profile.html:198
 msgid "Update SSH public key"
@@ -5679,19 +5687,19 @@ msgstr "密钥更新"
 msgid "Password invalid"
 msgstr "用户名或密码无效"
 
-#: users/views/user.py:448
+#: users/views/user.py:453
 msgid "MFA enable success"
 msgstr "MFA 绑定成功"
 
-#: users/views/user.py:449
+#: users/views/user.py:454
 msgid "MFA enable success, return login page"
 msgstr "MFA 绑定成功，返回到登录页面"
 
-#: users/views/user.py:451
+#: users/views/user.py:456
 msgid "MFA disable success"
 msgstr "MFA 解绑成功"
 
-#: users/views/user.py:452
+#: users/views/user.py:457
 msgid "MFA disable success, return login page"
 msgstr "MFA 解绑成功，返回登录页面"
 

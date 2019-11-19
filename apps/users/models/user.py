@@ -415,7 +415,7 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     SOURCE_OPENID = 'openid'
     SOURCE_RADIUS = 'radius'
     SOURCE_CHOICES = (
-        (SOURCE_LOCAL, 'Local'),
+        (SOURCE_LOCAL, _('Local')),
         (SOURCE_LDAP, 'LDAP/AD'),
         (SOURCE_OPENID, 'OpenID'),
         (SOURCE_RADIUS, 'Radius'),
