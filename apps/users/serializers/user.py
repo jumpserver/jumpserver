@@ -13,35 +13,30 @@ from ..models import User, UserGroup
 __all__ = [
     'UserSerializer', 'UserPKUpdateSerializer', 'UserUpdateGroupSerializer',
     'ChangeUserPasswordSerializer', 'ResetOTPSerializer',
-    'UserProfileSerializer',
+    'UserProfileSerializer', 'UserDisplaySerializer',
 ]
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+
     class Meta:
         model = User
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'username', 'password', 'email', 'public_key',
-            'groups',  'groups_display',
-            'role', 'role_display',  'wechat', 'phone', 'mfa_level',
-            'comment', 'source', 'source_display', 'is_valid', 'is_expired',
+            'groups', 'role', 'wechat', 'phone', 'mfa_level',
+            'comment', 'source', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
             'public_key': {'write_only': True},
-            'groups_display': {'label': _('Groups name')},
-            'source_display': {'label': _('Source name')},
             'is_first_login': {'label': _('Is first login'), 'read_only': True},
-            'role_display': {'label': _('Role name')},
             'is_valid': {'label': _('Is valid')},
             'is_expired': {'label': _('Is expired')},
             'avatar_url': {'label': _('Avatar url')},
             'created_by': {'read_only': True, 'allow_blank': True},
-            'can_update': {'read_only': True},
-            'can_delete': {'read_only': True},
         }
 
     def validate_role(self, value):
@@ -82,6 +77,38 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = self.change_password_to_raw(attrs)
         return attrs
+
+
+class UserDisplaySerializer(UserSerializer):
+    can_update = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + [
+            'groups_display', 'role_display', 'source_display',
+            'can_update', 'can_delete',
+        ]
+
+    def get_can_update(self, obj):
+        return CanUpdateDeleteUser.has_update_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
+
+    def get_can_delete(self, obj):
+        return CanUpdateDeleteUser.has_delete_object_permission(
+            self.context['request'], self.context['view'], obj
+        )
+
+    def get_extra_kwargs(self):
+        kwargs = super().get_extra_kwargs()
+        kwargs.update({
+            'can_update': {'read_only': True},
+            'can_delete': {'read_only': True},
+            'groups_display': {'label': _('Groups name')},
+            'source_display': {'label': _('Source name')},
+            'role_display': {'label': _('Role name')},
+        })
+        return kwargs
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

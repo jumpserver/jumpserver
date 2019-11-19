@@ -25,6 +25,14 @@ class IDSpmFilterMixin:
         return backends
 
 
+class SerializerMixin:
+    def get_serializer_class(self):
+        if self.request.query_params.get('draw') \
+                and hasattr(self, 'serializer_display_class'):
+            return self.serializer_display_class
+        return super().get_serializer_class()
+
+
 class ExtraFilterFieldsMixin:
     default_added_filters = [CustomFilter, IDSpmFilter]
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS
@@ -44,5 +52,5 @@ class ExtraFilterFieldsMixin:
         return queryset
 
 
-class CommonApiMixin(ExtraFilterFieldsMixin):
+class CommonApiMixin(SerializerMixin, ExtraFilterFieldsMixin):
     pass
