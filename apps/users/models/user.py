@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +17,7 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
-from common.utils import get_signer, date_expired_default, get_logger
+from common.utils import get_signer, date_expired_default, get_logger, lazyproperty
 from common import fields
 
 
@@ -217,7 +216,7 @@ class RoleMixin:
         from orgs.models import Organization
         return Organization.get_user_admin_or_audit_orgs(self)
 
-    @property
+    @lazyproperty
     def is_org_admin(self):
         if self.is_superuser or self.related_admin_orgs.exists():
             return True
