@@ -151,9 +151,9 @@ function initTable() {
             }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                   var innerHtml = "";
-                  if (cellData.status == 1) {
+                  if (cellData.status === 1) {
                       innerHtml = '<i class="fa fa-circle text-navy"></i>'
-                  } else if (cellData.status == 0) {
+                  } else if (cellData.status === 0) {
                       innerHtml = '<i class="fa fa-circle text-danger"></i>'
                   } else {
                       innerHtml = '<i class="fa fa-circle text-warning"></i>'
