@@ -299,6 +299,8 @@ function requestApi(props) {
                     msg = jqXHR.responseJSON.error
                 } else if (jqXHR.responseJSON.msg) {
                     msg = jqXHR.responseJSON.msg
+                } else if (jqXHR.responseJSON.detail) {
+                    msg = jqXHR.responseJSON.detail
                 }
             }
             if (msg === "") {

@@ -404,7 +404,8 @@ class MFAMixin:
 
     def mfa_enabled_but_not_set(self):
         if self.mfa_enabled and \
-                self.mfa_is_otp() and not self.otp_secret_key:
+                self.mfa_is_otp() and \
+                not self.otp_secret_key:
             return True
         return False
 

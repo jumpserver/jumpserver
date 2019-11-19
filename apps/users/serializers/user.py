@@ -18,9 +18,6 @@ __all__ = [
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    can_update = serializers.SerializerMethodField()
-    can_delete = serializers.SerializerMethodField()
-
     class Meta:
         model = User
         list_serializer_class = AdaptedBulkListSerializer
@@ -31,7 +28,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'comment', 'source', 'source_display', 'is_valid', 'is_expired',
             'is_active', 'created_by', 'is_first_login',
             'date_password_last_updated', 'date_expired', 'avatar_url',
-            'can_update', 'can_delete',
         ]
         extra_kwargs = {
             'password': {'write_only': True, 'required': False, 'allow_null': True, 'allow_blank': True},
@@ -47,16 +43,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             'can_update': {'read_only': True},
             'can_delete': {'read_only': True},
         }
-
-    def get_can_update(self, obj):
-        return CanUpdateDeleteUser.has_update_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
-
-    def get_can_delete(self, obj):
-        return CanUpdateDeleteUser.has_delete_object_permission(
-            self.context['request'], self.context['view'], obj
-        )
 
     def validate_role(self, value):
         request = self.context.get('request')
