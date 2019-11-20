@@ -212,7 +212,7 @@
                                 </div>
                             </div>
 
-                            {% if user_object.is_current_org_admin %}
+                            {% if request.user.can_admin_current_org  and not user_object.can_audit_current_org%}
                                 <div class="panel panel-info">
                                     <div class="panel-heading">
                                         <i class="fa fa-info-circle"></i> {% trans 'User group' %}
