@@ -44,4 +44,4 @@ class GatewayTestConnectionApi(SingleObjectMixin, APIView):
         if ok:
             return Response("ok")
         else:
-            return Response({"failed": e}, status=404)
+            return Response({"error": e}, status=400)

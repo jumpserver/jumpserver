@@ -139,7 +139,7 @@ $(document).ready(function(){
         method: "POST",
         body: JSON.stringify({'port': parseInt(data.port)}),
         success_message: "{% trans 'Can be connected' %}",
-        fail_message: "{% trans 'The connection fails' %}"
+        {#fail_message: "{% trans 'The connection fails' %}"#}
      })
 });
 </script>

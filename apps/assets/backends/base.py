@@ -38,6 +38,9 @@ class AssetUserQuerySet(list):
             if len(v) == 0:
                 return self
             if k.find("__in") >= 0:
+                _k = k.split('__')[0]
+                in_kwargs[_k] = v
+            else:
                 in_kwargs[k] = v
         for k in in_kwargs:
             kwargs.pop(k)
@@ -45,17 +48,16 @@ class AssetUserQuerySet(list):
         if len(in_kwargs) == 0:
             return self
         for i in self:
-            matched = True
+            matched = False
             for k, v in in_kwargs.items():
-                key = k.split('__')[0]
-                attr = getattr(i, key, None)
+                attr = getattr(i, k, None)
                 # 如果属性或者value中是uuid,则转换成string
                 if isinstance(v[0], uuid.UUID):
                     v = [str(i) for i in v]
                 if isinstance(attr, uuid.UUID):
                     attr = str(attr)
-                if attr not in v:
-                    matched = False
+                if v in attr:
+                    matched = True
             if matched:
                 queryset.append(i)
         return AssetUserQuerySet(queryset)
