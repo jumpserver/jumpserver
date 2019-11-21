@@ -1,7 +1,6 @@
 import json
 
 from django.db import models
-from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -9,20 +8,6 @@ from django.conf import settings
 from common.utils import get_signer
 
 signer = get_signer()
-
-
-class SettingQuerySet(models.QuerySet):
-    def __getattr__(self, item):
-        instances = self.filter(name=item)
-        if len(instances) == 1:
-            return instances[0]
-        else:
-            return Setting()
-
-
-class SettingManager(models.Manager):
-    def get_queryset(self):
-        return SettingQuerySet(self.model, using=self._db)
 
 
 class Setting(models.Model):
@@ -33,13 +18,15 @@ class Setting(models.Model):
     enabled = models.BooleanField(verbose_name=_("Enabled"), default=True)
     comment = models.TextField(verbose_name=_("Comment"))
 
-    objects = SettingManager()
-
     def __str__(self):
         return self.name
 
-    def __getattr__(self, item):
-        return cache.get(item)
+    @classmethod
+    def get(cls, item):
+        instances = cls.objects.filter(name=item)
+        if len(instances) == 1:
+            return instances[0].cleaned_value
+        return None
 
     @property
     def cleaned_value(self):

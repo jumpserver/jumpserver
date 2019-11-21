@@ -27,11 +27,11 @@ def get_source_choices():
     choices = [
         (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
     ]
-    if settings.AUTH_LDAP:
+    if settings.CONFIG.AUTH_LDAP:
         choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
-    if settings.AUTH_OPENID:
+    if settings.CONFIG.AUTH_OPENID:
         choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
-    if settings.AUTH_RADIUS:
+    if settings.CONFIG.AUTH_RADIUS:
         choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
     return choices
 

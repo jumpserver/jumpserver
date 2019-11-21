@@ -22,7 +22,7 @@ def refresh_settings_on_changed(sender, instance=None, **kwargs):
         instance.refresh_setting()
 
 
-@receiver(django_ready)
+# @receiver(django_ready)
 def monkey_patch_settings(sender, **kwargs):
     logger.debug("Monkey patch settings")
     cache_key_prefix = '_SETTING_'
@@ -73,6 +73,12 @@ def monkey_patch_settings(sender, **kwargs):
         Setting.refresh_all_settings()
     except (ProgrammingError, OperationalError):
         pass
+
+
+@receiver(django_ready)
+def on_django_ready_add_db_config(sender, **kwargs):
+    from django.conf import settings
+    settings.CONFIG.db_setting = Setting
 
 
 @receiver(django_ready)

@@ -226,7 +226,7 @@ class UserProfileView(PermissionsMixin, TemplateView):
     permission_classes = [IsValidUser]
 
     def get_context_data(self, **kwargs):
-        mfa_setting = settings.SECURITY_MFA_AUTH
+        mfa_setting = settings.CONFIG.SECURITY_MFA_AUTH
         context = {
             'action': _('Profile'),
             'mfa_setting': mfa_setting if mfa_setting is not None else False,

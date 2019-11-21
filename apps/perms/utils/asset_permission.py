@@ -60,8 +60,8 @@ def get_system_user_permissions(system_user):
 
 class AssetPermissionUtilCacheMixin:
     user_tree_cache_key = 'USER_PERM_TREE_{}_{}'
-    user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
-    user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
+    user_tree_cache_ttl = settings.CONFIG.ASSETS_PERM_CACHE_TIME
+    user_tree_cache_enable = settings.CONFIG.ASSETS_PERM_CACHE_ENABLE
     cache_policy = '0'
     obj_id = ''
     _filter_id = 'None'
@@ -238,7 +238,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             return
 
         # 如果要设置到ungroup中
-        if settings.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
+        if settings.CONFIG.PERM_SINGLE_ASSET_TO_UNGROUP_NODE:
             node_key = Node.ungrouped_key
             node_value = Node.ungrouped_value
             user_tree.create_node(

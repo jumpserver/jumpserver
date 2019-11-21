@@ -59,7 +59,7 @@ class AuthMixin:
         return self.can_use_ssh_key_login()
 
     def can_use_ssh_key_login(self):
-        return settings.TERMINAL_PUBLIC_KEY_AUTH
+        return settings.CONFIG.TERMINAL_PUBLIC_KEY_AUTH
 
     def is_public_key_valid(self):
         """
@@ -90,7 +90,7 @@ class AuthMixin:
 
     @property
     def date_password_expired(self):
-        interval = settings.SECURITY_PASSWORD_EXPIRATION_TIME
+        interval = settings.CONFIG.SECURITY_PASSWORD_EXPIRATION_TIME
         date_expired = self.date_password_last_updated + timezone.timedelta(
             days=int(interval))
         return date_expired
@@ -287,7 +287,7 @@ class TokenMixin:
         return self.create_private_token()
 
     def create_bearer_token(self, request=None):
-        expiration = settings.TOKEN_EXPIRATION or 3600
+        expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
         if request:
             remote_addr = request.META.get('REMOTE_ADDR', '')
         else:
@@ -359,7 +359,7 @@ class MFAMixin:
 
     @property
     def mfa_force_enabled(self):
-        if settings.SECURITY_MFA_AUTH:
+        if settings.CONFIG.SECURITY_MFA_AUTH:
             return True
         return self.mfa_level == 2
 

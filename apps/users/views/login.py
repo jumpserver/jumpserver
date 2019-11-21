@@ -145,7 +145,7 @@ class UserFirstLoginView(PermissionsMixin, SessionWizardView):
         user.is_public_key_valid = True
         user.save()
         context = {
-            'user_guide_url': settings.USER_GUIDE_URL
+            'user_guide_url': settings.CONFIG.USER_GUIDE_URL
         }
         return render(self.request, 'users/first_login_done.html', context)
 

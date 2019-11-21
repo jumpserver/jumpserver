@@ -23,9 +23,9 @@ try:
     from apps.jumpserver import const
     __version__ = const.VERSION
 except ImportError as e:
-    logging.info("Not found __version__: {}".format(e))
-    logging.info("Sys path: {}".format(sys.path))
-    logging.info("Python is: ")
+    print("Not found __version__: {}".format(e))
+    print("Sys path: {}".format(sys.path))
+    print("Python is: ")
     logging.info(subprocess.call('which python', shell=True))
     __version__ = 'Unknown'
     try:
@@ -36,11 +36,10 @@ except ImportError as e:
         pass
 
 try:
-    from apps.jumpserver.conf import load_user_config
-    CONFIG = load_user_config()
+    from apps.jumpserver.const import CONFIG
 except ImportError as e:
-    logging.info("Import error: {}".format(e))
-    logging.info("Could not find config file, `cp config_example.yml config.yml`")
+    print("Import error: {}".format(e))
+    print("Could not find config file, `cp config_example.yml config.yml`")
     sys.exit(1)
 
 os.environ["PYTHONIOENCODING"] = "UTF-8"

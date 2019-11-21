@@ -78,7 +78,7 @@ class Organization(models.Model):
         if self.is_real():
             return self.users.all()
         users = User.objects.filter(role=User.ROLE_USER)
-        if self.is_default() and not settings.DEFAULT_ORG_SHOW_ALL_USERS:
+        if self.is_default() and not settings.CONFIG.DEFAULT_ORG_SHOW_ALL_USERS:
             users = users.filter(related_user_orgs__isnull=True)
         return users
 

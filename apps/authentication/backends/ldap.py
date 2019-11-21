@@ -1,10 +1,11 @@
 # coding:utf-8
 #
 
+import warnings
 import ldap
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django_auth_ldap.backend import _LDAPUser, LDAPBackend
+from django_auth_ldap.backend import _LDAPUser, LDAPBackend, LDAPSettings
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
 from users.utils import construct_user_email
@@ -13,10 +14,51 @@ from common.const import LDAP_AD_ACCOUNT_DISABLE
 logger = _LDAPConfig.get_logger()
 
 
+class LDAPCustomSettings(LDAPSettings):
+    def __init__(self, prefix='AUTH_LDAP_', defaults=None):
+        """
+        Loads our settings from django.conf.settings, applying defaults for any
+        that are omitted.
+        """
+        if defaults is None:
+            defaults = {}
+        self._prefix = prefix
+
+        defaults = dict(self.defaults, **defaults)
+
+        for name, default in defaults.items():
+            value = getattr(settings.CONFIG, prefix + name, default)
+            setattr(self, name, value)
+
+        # Compatibility with old caching settings.
+        if getattr(settings.CONFIG, self._name('CACHE_GROUPS'),
+                   defaults.get('CACHE_GROUPS')):
+            warnings.warn(
+                'Found deprecated setting AUTH_LDAP_CACHE_GROUP. Use '
+                'AUTH_LDAP_CACHE_TIMEOUT instead.',
+                DeprecationWarning,
+            )
+            self.CACHE_TIMEOUT = getattr(
+                settings.CONFIG,
+                self._name('GROUP_CACHE_TIMEOUT'),
+                defaults.get('GROUP_CACHE_TIMEOUT', 3600),
+            )
+
+
 class LDAPAuthorizationBackend(LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
+
+    @property
+    def settings(self):
+        if self._settings is None:
+            self._settings = LDAPCustomSettings(
+                self.settings_prefix,
+                self.default_settings
+            )
+
+        return self._settings
 
     @staticmethod
     def user_can_authenticate(user):
@@ -28,6 +70,8 @@ class LDAPAuthorizationBackend(LDAPBackend):
         return is_valid or is_valid is None
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
+        if not settings.CONFIG.AUTH_LDAP:
+            return None
         logger.info('Authentication LDAP backend')
         if not username:
             logger.info('Authenticate failed: username is None')

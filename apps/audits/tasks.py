@@ -15,7 +15,7 @@ from .utils import write_login_log
 def clean_login_log_period():
     now = timezone.now()
     try:
-        days = int(settings.LOGIN_LOG_KEEP_DAYS)
+        days = int(settings.CONFIG.LOGIN_LOG_KEEP_DAYS)
     except ValueError:
         days = 90
     expired_day = now - datetime.timedelta(days=days)

@@ -10,5 +10,5 @@ class PermsConfig(AppConfig):
     def ready(self):
         from . import signals_handler
         if not settings.XPACK_ENABLED:
-            settings.ASSETS_PERM_CACHE_ENABLE = False
+            settings.CONFIG.ASSETS_PERM_CACHE_ENABLE = False
         return super().ready()

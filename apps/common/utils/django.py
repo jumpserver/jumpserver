@@ -15,7 +15,7 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
                      kwargs=kwargs, current_app=current_app)
 
     if external:
-        site_url = settings.SITE_URL
+        site_url = settings.CONFIG.SITE_URL
         url = site_url.strip('/') + url
     return url
 
@@ -37,8 +37,8 @@ def date_expired_default():
 
 
 def get_command_storage_setting():
-    default = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
-    value = settings.TERMINAL_COMMAND_STORAGE
+    default = settings.CONFIG.DEFAULT_TERMINAL_COMMAND_STORAGE
+    value = settings.CONFIG.TERMINAL_COMMAND_STORAGE
     if not value:
         return default
     value.update(default)
@@ -46,8 +46,8 @@ def get_command_storage_setting():
 
 
 def get_replay_storage_setting():
-    default = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
-    value = settings.TERMINAL_REPLAY_STORAGE
+    default = settings.CONFIG.DEFAULT_TERMINAL_REPLAY_STORAGE
+    value = settings.CONFIG.TERMINAL_REPLAY_STORAGE
     if not value:
         return default
     value.update(default)

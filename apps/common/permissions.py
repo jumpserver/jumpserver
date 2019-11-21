@@ -93,7 +93,7 @@ class WithBootstrapToken(permissions.BasePermission):
         if not authorization:
             return False
         request_bootstrap_token = authorization.split()[-1]
-        return settings.BOOTSTRAP_TOKEN == request_bootstrap_token
+        return settings.CONFIG.BOOTSTRAP_TOKEN == request_bootstrap_token
 
 
 class PermissionsMixin(UserPassesTestMixin):
@@ -123,7 +123,7 @@ class UserCanUpdateSSHKey:
 class NeedMFAVerify(permissions.BasePermission):
     def has_permission(self, request, view):
         mfa_verify_time = request.session.get('MFA_VERIFY_TIME', 0)
-        if time.time() - mfa_verify_time < settings.SECURITY_MFA_VERIFY_TTL:
+        if time.time() - mfa_verify_time < settings.CONFIG.SECURITY_MFA_VERIFY_TTL:
             return True
         return False
 

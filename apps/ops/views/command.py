@@ -22,7 +22,7 @@ __all__ = [
 class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
     template_name = 'ops/command_execution_list.html'
     model = CommandExecution
-    paginate_by = settings.DISPLAY_PER_PAGE
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     keyword = ''
@@ -61,7 +61,7 @@ class CommandExecutionStartView(PermissionsMixin, TemplateView):
     permission_classes = [IsValidUser]
 
     def get_permissions(self):
-        if not settings.SECURITY_COMMAND_EXECUTION:
+        if not settings.CONFIG.SECURITY_COMMAND_EXECUTION:
             return [IsOrgAdmin]
         return super().get_permissions()
 

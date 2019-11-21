@@ -7,10 +7,13 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.core.signals import request_finished
 from django.db import connection
+from django.conf import LazySettings
+from django.db.utils import ProgrammingError, OperationalError
 
 
 from common.utils import get_logger
 from .local import thread_local
+from .signals import django_ready
 
 pattern = re.compile(r'FROM `(\w+)`')
 logger = get_logger(__name__)
@@ -62,7 +65,15 @@ if settings.DEBUG and DEBUG_DB:
     request_finished.connect(on_request_finished_logging_db_query)
 
 
+@receiver(django_ready)
+def monkey_patch_settings(sender, **kwargs):
+    def monkey_patch_getattr(self, name):
+        val = getattr(self._wrapped, name)
+        if callable(val):
+            val = val()
+        return val
 
-
-
-
+    try:
+        LazySettings.__getattr__ = monkey_patch_getattr
+    except (ProgrammingError, OperationalError):
+        pass

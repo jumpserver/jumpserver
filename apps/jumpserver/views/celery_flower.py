@@ -9,6 +9,8 @@ from proxy.views import proxy_view
 
 flower_url = settings.FLOWER_URL
 
+__all__ = ['celery_flower_view']
+
 
 @csrf_exempt
 def celery_flower_view(request, path):
