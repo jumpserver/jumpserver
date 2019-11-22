@@ -142,7 +142,6 @@ class UserFirstLoginView(PermissionsMixin, SessionWizardView):
                 if field.value():
                     setattr(user, field.name, field.value())
         user.is_first_login = False
-        user.is_public_key_valid = True
         user.save()
         context = {
             'user_guide_url': settings.USER_GUIDE_URL
