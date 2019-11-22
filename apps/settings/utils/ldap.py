@@ -89,8 +89,12 @@ class LDAPServerUtil(object):
     def paged_cookie(self):
         if self._paged_size is None:
             return None
-        cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
-        return cookie
+        try:
+            cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
+            return cookie
+        except Exception as e:
+            logger.error(e)
+            return None
 
     def get_search_filter_extra(self):
         extra = ''
