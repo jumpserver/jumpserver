@@ -67,24 +67,27 @@ function initTable() {
                  var detailBtn = '<a href="{% url "tickets:ticket-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                  $(td).html(detailBtn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
+             {targets: 3, createdCell: function (td, cellData, rowData) {
+                 $(td).html(rowData.type_display)
+             }},
              {targets: 4, createdCell: function (td, cellData) {
                  if (cellData === "open") {
                      $(td).html('<i class="fa fa-check-circle-o text-navy"></i>');
                  } else {
                      $(td).html('<i class="fa fa-times-circle-o text-danger"></i>')
                  }
-              }},
-             {targets: 4, createdCell: function (td, cellData) {
+             }},
+             {targets: 5, createdCell: function (td, cellData) {
                  var d = toSafeLocalDateStr(cellData);
                  $(td).html(d)
-              }},
+              }}
              ],
          ajax_url: listUrl,
          columns: [
              {data: "id"}, {data: "title"},
-             {data: "user_display"}, {data: "type_display"},
+             {data: "user_display"}, {data: "type"},
              {data: "status", width: "40px"},
-             {data: "date_created"},
+             {data: "date_created"}
          ],
          op_html: $('#actions').html()
     };
