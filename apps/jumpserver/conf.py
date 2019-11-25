@@ -14,6 +14,7 @@ import errno
 import json
 import yaml
 from importlib import import_module
+from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -87,7 +88,7 @@ class Config(dict):
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
         'DEBUG': True,
-        'SITE_URL': 'http://localhost',
+        'SITE_URL': 'http://localhost:8080',
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
@@ -111,14 +112,46 @@ class Config(dict):
         'CSRF_COOKIE_DOMAIN': None,
         'SESSION_COOKIE_AGE': 3600 * 24,
         'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
+        'LOGIN_URL': reverse_lazy('authentication:login'),
 
         # Custom Config
+        # Auth LDAP settings
+        'AUTH_LDAP': False,
+        'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
+        'AUTH_LDAP_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
+        'AUTH_LDAP_BIND_PASSWORD': '',
+        'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
+        'AUTH_LDAP_SEARCH_FILTER': '(cn=%(user)s)',
+        'AUTH_LDAP_START_TLS': False,
+        'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
+        'AUTH_LDAP_CONNECT_TIMEOUT': 30,
+        'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
+        'AUTH_LDAP_SYNC_IS_PERIODIC': False,
+        'AUTH_LDAP_SYNC_INTERVAL': None,
+        'AUTH_LDAP_SYNC_CRONTAB': None,
+        'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
+        'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
+
         'AUTH_OPENID': False,
+        'BASE_SITE_URL': 'http://localhost:8080',
+        'AUTH_OPENID_SERVER_URL': 'http://openid',
+        'AUTH_OPENID_REALM_NAME': 'jumpserver',
+        'AUTH_OPENID_CLIENT_ID': 'jumpserver',
+        'AUTH_OPENID_CLIENT_SECRET': '',
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
         'AUTH_OPENID_SHARE_SESSION': True,
+
+        'AUTH_RADIUS': False,
+        'RADIUS_SERVER': 'localhost',
+        'RADIUS_PORT': 1812,
+        'RADIUS_SECRET': '',
+        'RADIUS_ENCRYPT_PASSWORD': True,
+        'OTP_IN_RADIUS': False,
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'Jumpserver',
         'EMAIL_SUFFIX': 'jumpserver.org',
+
         'TERMINAL_PASSWORD_AUTH': True,
         'TERMINAL_PUBLIC_KEY_AUTH': True,
         'TERMINAL_HEARTBEAT_INTERVAL': 20,
@@ -128,6 +161,7 @@ class Config(dict):
         'TERMINAL_HOST_KEY': '',
         'TERMINAL_TELNET_REGEX': '',
         'TERMINAL_COMMAND_STORAGE': {},
+
         'SECURITY_MFA_AUTH': False,
         'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
         'SECURITY_VIEW_AUTH_NEED_MFA': True,
@@ -140,17 +174,7 @@ class Config(dict):
         'SECURITY_PASSWORD_LOWER_CASE': False,
         'SECURITY_PASSWORD_NUMBER': False,
         'SECURITY_PASSWORD_SPECIAL_CHAR': False,
-        'AUTH_RADIUS': False,
-        'RADIUS_SERVER': 'localhost',
-        'RADIUS_PORT': 1812,
-        'RADIUS_SECRET': '',
-        'RADIUS_ENCRYPT_PASSWORD': True,
-        'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
-        'AUTH_LDAP_SYNC_IS_PERIODIC': False,
-        'AUTH_LDAP_SYNC_INTERVAL': None,
-        'AUTH_LDAP_SYNC_CRONTAB': None,
-        'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
-        'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
+
         'HTTP_BIND_HOST': '0.0.0.0',
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
@@ -168,7 +192,6 @@ class Config(dict):
         'FORCE_SCRIPT_NAME': '',
         'LOGIN_CONFIRM_ENABLE': False,
         'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
-        'OTP_IN_RADIUS': False,
     }
 
     def convert_type(self, k, v):
@@ -245,6 +268,27 @@ class DynamicConfig:
 
     def dynamic(self, item):
         return lambda: self.get(item)
+
+    def LOGIN_URL(self):
+        auth_openid = self.get('AUTH_OPENID')
+        print("Open id is: ", auth_openid)
+        if auth_openid:
+            return reverse_lazy("authentication:openid:openid-login")
+        return self.get('LOGIN_URL')
+
+    def AUTHENTICATION_BACKENDS(self):
+        backends = [
+            'authentication.backends.pubkey.PublicKeyAuthBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        ]
+        if self.get('AUTH_LDAP'):
+            backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
+        if self.get('AUTH_OPENID'):
+            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
+            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
+        if self.get('AUTH_RADIUS'):
+            backends.insert(0, 'authentication.backends.radius.RadiusBackend')
+        return backends
 
     def get_from_db(self, item):
         if self.db_setting is not None:

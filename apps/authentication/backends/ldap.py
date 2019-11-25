@@ -14,52 +14,10 @@ from common.const import LDAP_AD_ACCOUNT_DISABLE
 logger = _LDAPConfig.get_logger()
 
 
-class LDAPCustomSettings(LDAPSettings):
-    def __init__(self, prefix='AUTH_LDAP_', defaults=None):
-        """
-        Loads our settings from django.conf.settings, applying defaults for any
-        that are omitted.
-        """
-        if defaults is None:
-            defaults = {}
-        self._prefix = prefix
-
-        defaults = dict(self.defaults, **defaults)
-
-        for name, default in defaults.items():
-            value = getattr(settings.CONFIG, prefix + name, default)
-            setattr(self, name, value)
-
-        # Compatibility with old caching settings.
-        if getattr(settings.CONFIG, self._name('CACHE_GROUPS'),
-                   defaults.get('CACHE_GROUPS')):
-            warnings.warn(
-                'Found deprecated setting AUTH_LDAP_CACHE_GROUP. Use '
-                'AUTH_LDAP_CACHE_TIMEOUT instead.',
-                DeprecationWarning,
-            )
-            self.CACHE_TIMEOUT = getattr(
-                settings.CONFIG,
-                self._name('GROUP_CACHE_TIMEOUT'),
-                defaults.get('GROUP_CACHE_TIMEOUT', 3600),
-            )
-
-
 class LDAPAuthorizationBackend(LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
-
-    @property
-    def settings(self):
-        if self._settings is None:
-            self._settings = LDAPCustomSettings(
-                self.settings_prefix,
-                self.default_settings
-            )
-
-        return self._settings
-
     @staticmethod
     def user_can_authenticate(user):
         """
@@ -69,20 +27,26 @@ class LDAPAuthorizationBackend(LDAPBackend):
         is_valid = getattr(user, 'is_valid', None)
         return is_valid or is_valid is None
 
-    def authenticate(self, request=None, username=None, password=None, **kwargs):
-        if not settings.CONFIG.AUTH_LDAP:
-            return None
+    def pre_check(self, username):
+        if not settings.AUTH_LDAP:
+            return False
         logger.info('Authentication LDAP backend')
         if not username:
             logger.info('Authenticate failed: username is None')
-            return None
+            return False
         if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
             user_model = self.get_user_model()
             exist = user_model.objects.filter(username=username).exists()
             if not exist:
                 msg = 'Authentication failed: user ({}) is not in the user list'
                 logger.info(msg.format(username))
-                return None
+                return False
+        return True
+
+    def authenticate(self, request=None, username=None, password=None, **kwargs):
+        match = self.pre_check(username)
+        if not match:
+            return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))

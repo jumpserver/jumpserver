@@ -233,14 +233,7 @@ EMAIL_USE_SSL = DYNAMIC.EMAIL_USE_SSL
 EMAIL_USE_TLS = DYNAMIC.EMAIL_USE_TLS
 
 
-AUTHENTICATION_BACKENDS = [
-    'authentication.backends.ldap.LDAPAuthorizationBackend',
-    # 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
-    # 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
-    # 'authentication.backends.radius.RadiusBackend',
-    'authentication.backends.pubkey.PublicKeyAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+AUTHENTICATION_BACKENDS = DYNAMIC.AUTHENTICATION_BACKENDS
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
@@ -262,51 +255,6 @@ CACHES = {
     }
 }
 
-
-EMAIL_SUBJECT_PREFIX = DYNAMIC.EMAIL_SUBJECT_PREFIX
-EMAIL_SUFFIX = DYNAMIC.EMAIL_SUFFIX
-
-# Email custom content
-EMAIL_CUSTOM_USER_CREATED_SUBJECT = ''
-EMAIL_CUSTOM_USER_CREATED_HONORIFIC = ''
-EMAIL_CUSTOM_USER_CREATED_BODY = ''
-EMAIL_CUSTOM_USER_CREATED_SIGNATURE = ''
-
-# Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (80, 33)
-CAPTCHA_FOREGROUND_COLOR = '#001100'
-CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
-CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
-
-# Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
-BOOTSTRAP3 = {
-    'horizontal_label_class': 'col-md-2',
-    # Field class to use in horizontal forms
-    'horizontal_field_class': 'col-md-9',
-    # Set placeholder attributes to label if no placeholder is provided
-    'set_placeholder': False,
-    'success_css_class': '',
-    'required_css_class': 'required',
-}
-
-DISPLAY_PER_PAGE = CONFIG.DISPLAY_PER_PAGE
-DEFAULT_EXPIRED_YEARS = 70
-USER_GUIDE_URL = ""
-
-# Django channels support websocket
-CHANNEL_REDIS = "redis://:{}@{}:{}/{}".format(
-    CONFIG.REDIS_PASSWORD, CONFIG.REDIS_HOST, CONFIG.REDIS_PORT,
-    CONFIG.REDIS_DB_WS,
-)
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [CHANNEL_REDIS],
-        },
-    },
-}
 
 FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME
 

@@ -14,6 +14,8 @@ from django.core.cache import cache
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
 from common.utils import get_command_storage_setting, get_replay_storage_setting
+from common.mixins import CommonModelMixin
+from common.fields.model import EncryptJsonDictTextField
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
 
@@ -282,3 +284,31 @@ class Command(AbstractSessionCommand):
     class Meta:
         db_table = "terminal_command"
         ordering = ('-timestamp',)
+
+
+class CommandStorage(CommonModelMixin):
+    TYPE_CHOICES = [
+        ('server', 'Server'),
+        ('es', "Elasticsearch"),
+    ]
+    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    type = models.CharField(max_length=16, choices=TYPE_CHOICES, default='server')
+    meta = EncryptJsonDictTextField()
+
+    def __str__(self):
+        return self.name
+
+
+class ReplayStorage(CommonModelMixin):
+    TYPE_CHOICES = [
+        ('server', 'Server'),
+        ('s3', "S3"),
+        ('oss', "OSS"),
+        ('azure', 'Azure'),
+    ]
+    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    type = models.CharField(max_length=16, choices=TYPE_CHOICES, default='server')
+    meta = EncryptJsonDictTextField()
+
+    def __str__(self):
+        return self.name

@@ -17,6 +17,6 @@ class CeleryTaskLogView(PermissionsMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({
             'task_id': self.kwargs.get('pk'),
-            'ws_port': settings.CONFIG.WS_LISTEN_PORT
+            'ws_port': settings.WS_LISTEN_PORT
         })
         return context

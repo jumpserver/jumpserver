@@ -45,8 +45,8 @@ def construct_user_created_email_body(user):
         'login_url': reverse('authentication:login', external=True),
     }
 
-    if settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_BODY:
-        custom_body = '<p style="text-indent:2em">' + settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_BODY:
+        custom_body = '<p style="text-indent:2em">' + settings.EMAIL_CUSTOM_USER_CREATED_BODY + '</p>'
     else:
         custom_body = ''
     body = custom_body + default_body
@@ -56,18 +56,18 @@ def construct_user_created_email_body(user):
 def send_user_created_mail(user):
     recipient_list = [user.email]
     subject = _('Create account successfully')
-    if settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
-        subject = settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_SUBJECT
+    if settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT:
+        subject = settings.EMAIL_CUSTOM_USER_CREATED_SUBJECT
 
     honorific = '<p>' + _('Hello %(name)s') % {'name': user.name} + ':</p>'
-    if settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
-        honorific = '<p>' + settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC:
+        honorific = '<p>' + settings.EMAIL_CUSTOM_USER_CREATED_HONORIFIC + ':</p>'
 
     body = construct_user_created_email_body(user)
 
     signature = '<p style="float:right">jumpserver</p>'
-    if settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
-        signature = '<p style="float:right">' + settings.CONFIG.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
+    if settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE:
+        signature = '<p style="float:right">' + settings.EMAIL_CUSTOM_USER_CREATED_SIGNATURE + '</p>'
 
     message = honorific + body + signature
     if settings.DEBUG:
@@ -232,7 +232,7 @@ def generate_otp_uri(request, issuer="Jumpserver"):
         otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
     cache.set(request.session.session_key+'otp_key', otp_secret_key, 600)
     totp = pyotp.TOTP(otp_secret_key)
-    otp_issuer_name = settings.CONFIG.OTP_ISSUER_NAME or issuer
+    otp_issuer_name = settings.OTP_ISSUER_NAME or issuer
     return totp.provisioning_uri(name=user.username, issuer_name=otp_issuer_name), otp_secret_key
 
 
@@ -240,13 +240,13 @@ def check_otp_code(otp_secret_key, otp_code):
     if not otp_secret_key or not otp_code:
         return False
     totp = pyotp.TOTP(otp_secret_key)
-    otp_valid_window = settings.CONFIG.OTP_VALID_WINDOW or 0
+    otp_valid_window = settings.OTP_VALID_WINDOW or 0
     return totp.verify(otp=otp_code, valid_window=otp_valid_window)
 
 
 def get_password_check_rules():
     check_rules = []
-    for rule in settings.CONFIG.SECURITY_PASSWORD_RULES:
+    for rule in settings.SECURITY_PASSWORD_RULES:
         key = "id_{}".format(rule.lower())
         value = getattr(settings, rule)
         if not value:
@@ -257,16 +257,16 @@ def get_password_check_rules():
 
 def check_password_rules(password):
     pattern = r"^"
-    if settings.CONFIG.SECURITY_PASSWORD_UPPER_CASE:
+    if settings.SECURITY_PASSWORD_UPPER_CASE:
         pattern += '(?=.*[A-Z])'
-    if settings.CONFIG.SECURITY_PASSWORD_LOWER_CASE:
+    if settings.SECURITY_PASSWORD_LOWER_CASE:
         pattern += '(?=.*[a-z])'
-    if settings.CONFIG.SECURITY_PASSWORD_NUMBER:
+    if settings.SECURITY_PASSWORD_NUMBER:
         pattern += '(?=.*\d)'
-    if settings.CONFIG.SECURITY_PASSWORD_SPECIAL_CHAR:
+    if settings.SECURITY_PASSWORD_SPECIAL_CHAR:
         pattern += '(?=.*[`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?])'
     pattern += '[a-zA-Z\d`~!@#\$%\^&\*\(\)-=_\+\[\]\{\}\|;:\'\",\.<>\/\?]'
-    pattern += '.{' + str(settings.CONFIG.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
+    pattern += '.{' + str(settings.SECURITY_PASSWORD_MIN_LENGTH-1) + ',}$'
     match_obj = re.match(pattern, password)
     return bool(match_obj)
 
@@ -281,7 +281,7 @@ def increase_login_failed_count(username, ip):
     count = cache.get(key_limit)
     count = count + 1 if count else 1
 
-    limit_time = settings.CONFIG.SECURITY_LOGIN_LIMIT_TIME
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
     cache.set(key_limit, count, int(limit_time)*60)
 
 
@@ -302,8 +302,8 @@ def is_block_login(username, ip):
     count = get_login_failed_count(username, ip)
     key_block = key_prefix_block.format(username)
 
-    limit_count = settings.CONFIG.SECURITY_LOGIN_LIMIT_COUNT
-    limit_time = settings.CONFIG.SECURITY_LOGIN_LIMIT_TIME
+    limit_count = settings.SECURITY_LOGIN_LIMIT_COUNT
+    limit_time = settings.SECURITY_LOGIN_LIMIT_TIME
 
     if count >= limit_count:
         cache.set(key_block, 1, int(limit_time)*60)
@@ -322,7 +322,7 @@ def construct_user_email(username, email):
         if '@' in username:
             email = username
         else:
-            email = '{}@{}'.format(username, settings.CONFIG.EMAIL_SUFFIX)
+            email = '{}@{}'.format(username, settings.EMAIL_SUFFIX)
     return email
 
 

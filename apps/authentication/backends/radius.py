@@ -20,7 +20,7 @@ class CreateUserMixin:
             if '@' in username:
                 email = username
             else:
-                email_suffix = settings.CONFIG.EMAIL_SUFFIX
+                email_suffix = settings.EMAIL_SUFFIX
                 email = '{}@{}'.format(username, email_suffix)
             user = User(username=username, name=username, email=email)
             user.source = user.SOURCE_RADIUS

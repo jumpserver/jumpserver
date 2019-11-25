@@ -114,7 +114,7 @@ class AssetUserExportViewSet(AssetUserViewSet):
     permission_classes = [IsOrgAdminOrAppUser]
 
     def get_permissions(self):
-        if settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA:
+        if settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
         return super().get_permissions()
 
@@ -124,7 +124,7 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
     permission_classes = [IsOrgAdminOrAppUser]
 
     def get_permissions(self):
-        if settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA:
+        if settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
         return super().get_permissions()
 

@@ -59,7 +59,7 @@ class HealthCheckView(APIView):
 
 
 class WsView(APIView):
-    ws_port = settings.CONFIG.HTTP_LISTEN_PORT + 1
+    ws_port = settings.HTTP_LISTEN_PORT + 1
 
     def get(self, request):
         msg = _("Websocket server run on port: {}, you should proxy it on nginx"

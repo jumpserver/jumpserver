@@ -88,19 +88,19 @@ def import_ldap_user():
 @shared_task
 @after_app_ready_start
 def import_ldap_user_periodic():
-    if not settings.CONFIG.AUTH_LDAP:
+    if not settings.AUTH_LDAP:
         return
-    if not settings.CONFIG.AUTH_LDAP_SYNC_IS_PERIODIC:
+    if not settings.AUTH_LDAP_SYNC_IS_PERIODIC:
         task_name = sys._getframe().f_code.co_name
         disable_celery_periodic_task(task_name)
         return
 
-    interval = settings.CONFIG.AUTH_LDAP_SYNC_INTERVAL
+    interval = settings.AUTH_LDAP_SYNC_INTERVAL
     if isinstance(interval, int):
         interval = interval * 3600
     else:
         interval = None
-    crontab = settings.CONFIG.AUTH_LDAP_SYNC_CRONTAB
+    crontab = settings.AUTH_LDAP_SYNC_CRONTAB
     tasks = {
         'import_ldap_user_periodic': {
             'task': import_ldap_user.name,

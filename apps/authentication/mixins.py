@@ -141,7 +141,7 @@ class AuthMixin:
             )
 
     def check_user_login_confirm_if_need(self, user):
-        if not settings.CONFIG.LOGIN_CONFIRM_ENABLE:
+        if not settings.LOGIN_CONFIRM_ENABLE:
             return
         confirm_setting = user.get_login_confirm_setting()
         if self.request.session.get('auth_confirm') or not confirm_setting:

@@ -60,7 +60,8 @@ class UserLoginView(mixins.AuthMixin, FormView):
         # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
         if settings.AUTH_OPENID and not self.request.GET.get('admin', 0):
             query_string = request.GET.urlencode()
-            login_url = "{}?{}".format(settings.LOGIN_URL, query_string)
+            openid_login_url = reverse_lazy("authentication:openid:openid-login")
+            login_url = "{}?{}".format(openid_login_url, query_string)
             return redirect(login_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
