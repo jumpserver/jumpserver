@@ -218,6 +218,10 @@ class RoleMixin:
         return current_org.can_audit_by(self)
 
     @property
+    def can_user_current_org(self):
+        return current_org.can_user_by(self)
+
+    @property
     def can_admin_or_audit_current_org(self):
         return self.can_admin_current_org or self.can_audit_current_org
 
