@@ -7,6 +7,7 @@ from celery import shared_task
 
 from ops.celery.decorator import register_as_period_task
 from .models import UserLoginLog
+from .utils import write_login_log
 
 
 @register_as_period_task(interval=3600*24)
@@ -19,3 +20,8 @@ def clean_login_log_period():
         days = 90
     expired_day = now - datetime.timedelta(days=days)
     UserLoginLog.objects.filter(datetime__lt=expired_day).delete()
+
+
+@shared_task
+def write_login_log_async(*args, **kwargs):
+    write_login_log(*args, **kwargs)

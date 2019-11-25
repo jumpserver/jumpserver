@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 
-import traceback
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -9,7 +8,7 @@ from django.core.exceptions import ValidationError
 from common.utils import get_logger
 from ..utils import (
     set_current_org, get_current_org, current_org,
-    get_org_filters
+    filter_org_queryset
 )
 from ..models import Organization
 
@@ -20,37 +19,24 @@ __all__ = [
 ]
 
 
-class OrgQuerySet(models.QuerySet):
-    pass
-
-
 class OrgManager(models.Manager):
+
     def get_queryset(self):
-        queryset = super().get_queryset()
-        kwargs = get_org_filters()
-        if kwargs:
-            return queryset.filter(**kwargs)
-        return queryset
+        queryset = super(OrgManager, self).get_queryset()
+        return filter_org_queryset(queryset)
+
+    def all(self):
+        if not current_org:
+            msg = 'You can `objects.set_current_org(org).all()` then run it'
+            return self
+        else:
+            return super(OrgManager, self).all()
 
     def set_current_org(self, org):
         if isinstance(org, str):
             org = Organization.get_instance(org)
         set_current_org(org)
         return self
-
-    def all(self):
-        # print("Call all: {}".format(current_org))
-        #
-        # lines = traceback.format_stack()
-        # print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        # for line in lines[-10:-1]:
-        #     print(line)
-        # print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        if not current_org:
-            msg = 'You can `objects.set_current_org(org).all()` then run it'
-            return self
-        else:
-            return super().all()
 
 
 class OrgModelMixin(models.Model):

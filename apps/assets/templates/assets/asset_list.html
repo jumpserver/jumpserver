@@ -3,16 +3,16 @@
 {% load i18n %}
 
 {% block help_message %}
-    <div class="alert alert-info help-message">
+{#    <div class="alert alert-info help-message">#}
+{#    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>#}
 {#    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产#}
     {% trans 'The left side is the asset tree, right click to create, delete, and change the tree node, authorization asset is also organized as a node, and the right side is the asset under that node' %}
-    </div>
+{#    </div>#}
 {% endblock %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
-{#    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">#}
-    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
+{#    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">#}
+{#    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>#}
     <script src="{% static 'js/jquery.form.min.js' %}"></script>
 	<style type="text/css">
         div#rMenu {
@@ -48,12 +48,12 @@
 {% block content %}
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px">
+       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
            {% include 'assets/_node_tree.html' %}
        </div>
        <div class="col-lg-9 animated fadeInRight" id="split-right">
-           <div class="tree-toggle">
-               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggle()">
+           <div class="tree-toggle" style="z-index: 9999">
+               <div class="btn btn-sm btn-primary tree-toggle-btn">
                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
                </div>
            </div>
@@ -151,9 +151,9 @@ function initTable() {
             }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                   var innerHtml = "";
-                  if (cellData.status == 1) {
+                  if (cellData.status === 1) {
                       innerHtml = '<i class="fa fa-circle text-navy"></i>'
-                  } else if (cellData.status == 0) {
+                  } else if (cellData.status === 0) {
                       innerHtml = '<i class="fa fa-circle text-danger"></i>'
                   } else {
                       innerHtml = '<i class="fa fa-circle text-warning"></i>'
@@ -386,6 +386,10 @@ $(document).ready(function(){
         setTimeout( function () {window.location.reload();}, 300);
     }
 
+    function reloadTable() {
+        asset_table.ajax.reload();
+    }
+
     function doDeactive() {
         var data = [];
         $.each(id_list, function(index, object_id) {
@@ -396,7 +400,7 @@ $(document).ready(function(){
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: refreshPage
+            success: reloadTable
         });
     }
     function doActive() {
@@ -409,7 +413,7 @@ $(document).ready(function(){
             url: the_url,
             method: 'PATCH',
             body: JSON.stringify(data),
-            success: refreshPage
+            success: reloadTable
         });
     }
     function doDelete() {
@@ -431,7 +435,7 @@ $(document).ready(function(){
                     success: function () {
                         var msg = "{% trans 'Asset Deleted.' %}";
                         swal("{% trans 'Asset Delete' %}", msg, "success");
-                        refreshPage();
+                        reloadTable();
                     },
                     flash_message: false,
                 });
@@ -478,16 +482,12 @@ $(document).ready(function(){
            'assets': id_list
        };
 
-       var success = function () {
-           asset_table.ajax.reload()
-       };
        var url = "{% url 'api-assets:node-remove-assets' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-
        requestApi({
            'url': url,
            'method': 'PUT',
            'body': JSON.stringify(data),
-           'success': success
+           'success': reloadTable
        })
     }
 

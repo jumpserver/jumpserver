@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import os
+import datetime
 from django.core.cache import cache
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.http import HttpResponse
@@ -12,36 +13,32 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.conf import settings
+from django.urls import reverse_lazy
 
-from common.utils import get_request_ip
-from users.models import User
-from audits.models import UserLoginLog as LoginLog
+from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
-    check_otp_code, is_block_login, clean_failed_count, get_user_or_tmp_user,
-    set_tmp_user_to_cache, increase_login_failed_count,
-    redirect_user_first_login_or_index,
+    redirect_user_first_login_or_index
 )
-from ..signals import post_auth_success, post_auth_failed
-from .. import forms
-from .. import const
+from .. import forms, mixins, errors
 
 
 __all__ = [
-    'UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
+    'UserLoginView', 'UserLogoutView',
+    'UserLoginGuardView', 'UserLoginWaitConfirmView',
 ]
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class UserLoginView(FormView):
+class UserLoginView(mixins.AuthMixin, FormView):
     form_class = forms.UserLoginForm
     form_class_captcha = forms.UserLoginCaptchaForm
-    redirect_field_name = 'next'
     key_prefix_captcha = "_LOGIN_INVALID_{}"
+    redirect_field_name = 'next'
 
     def get_template_names(self):
         template_name = 'authentication/login.html'
@@ -52,7 +49,7 @@ class UserLoginView(FormView):
         if not License.has_valid_license():
             return template_name
 
-        template_name = 'authentication/new_login.html'
+        template_name = 'authentication/xpack_login.html'
         return template_name
 
     def get(self, request, *args, **kwargs):
@@ -68,48 +65,27 @@ class UserLoginView(FormView):
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        # limit login authentication
-        ip = get_request_ip(request)
-        username = self.request.POST.get('username')
-        if is_block_login(username, ip):
-            return self.render_to_response(self.get_context_data(block_login=True))
-        return super().post(request, *args, **kwargs)
-
     def form_valid(self, form):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
-        user = form.get_user()
-        # user password expired
-        if user.password_has_expired:
-            reason = const.password_expired
-            self.send_auth_signal(success=False, username=user.username, reason=reason)
-            return self.render_to_response(self.get_context_data(password_expired=True))
+        try:
+            self.check_user_auth()
+        except errors.AuthFailedError as e:
+            form.add_error(None, e.msg)
+            ip = self.get_request_ip()
+            cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
+            new_form = self.form_class_captcha(data=form.data)
+            new_form._errors = form.errors
+            context = self.get_context_data(form=new_form)
+            return self.render_to_response(context)
+        return self.redirect_to_guard_view()
 
-        set_tmp_user_to_cache(self.request, user)
-        username = form.cleaned_data.get('username')
-        ip = get_request_ip(self.request)
-        # 登陆成功，清除缓存计数
-        clean_failed_count(username, ip)
-        return redirect(self.get_success_url())
-
-    def form_invalid(self, form):
-        # write login failed log
-        username = form.cleaned_data.get('username')
-        exist = User.objects.filter(username=username).first()
-        reason = const.password_failed if exist else const.user_not_exist
-        # limit user login failed count
-        ip = get_request_ip(self.request)
-        increase_login_failed_count(username, ip)
-        form.add_limit_login_error(username, ip)
-        # show captcha
-        cache.set(self.key_prefix_captcha.format(ip), 1, 3600)
-        self.send_auth_signal(success=False, username=username, reason=reason)
-
-        old_form = form
-        form = self.form_class_captcha(data=form.data)
-        form._errors = old_form.errors
-        return super().form_invalid(form)
+    def redirect_to_guard_view(self):
+        guard_url = reverse('authentication:login-guard')
+        args = self.request.META.get('QUERY_STRING', '')
+        if args:
+            guard_url = "%s?%s" % (guard_url, args)
+        return redirect(guard_url)
 
     def get_form_class(self):
         ip = get_request_ip(self.request)
@@ -117,21 +93,6 @@ class UserLoginView(FormView):
             return self.form_class_captcha
         else:
             return self.form_class
-
-    def get_success_url(self):
-        user = get_user_or_tmp_user(self.request)
-
-        if user.otp_enabled and user.otp_secret_key:
-            # 1,2,mfa_setting & T
-            return reverse('authentication:login-otp')
-        elif user.otp_enabled and not user.otp_secret_key:
-            # 1,2,mfa_setting & F
-            return reverse('users:user-otp-enable-authentication')
-        elif not user.otp_enabled:
-            # 0 & T,F
-            auth_login(self.request, user)
-            self.send_auth_signal(success=True, user=user)
-            return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -141,51 +102,70 @@ class UserLoginView(FormView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
-        else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
-            )
 
-
-class UserLoginOtpView(FormView):
-    template_name = 'authentication/login_otp.html'
-    form_class = forms.UserCheckOtpCodeForm
+class UserLoginGuardView(mixins.AuthMixin, RedirectView):
     redirect_field_name = 'next'
+    login_url = reverse_lazy('authentication:login')
+    login_otp_url = reverse_lazy('authentication:login-otp')
+    login_confirm_url = reverse_lazy('authentication:login-wait-confirm')
 
-    def form_valid(self, form):
-        user = get_user_or_tmp_user(self.request)
-        otp_code = form.cleaned_data.get('otp_code')
-        otp_secret_key = user.otp_secret_key
+    def format_redirect_url(self, url):
+        args = self.request.META.get('QUERY_STRING', '')
+        if args and self.query_string:
+            url = "%s?%s" % (url, args)
+        return url
 
-        if check_otp_code(otp_secret_key, otp_code):
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            user = self.check_user_auth_if_need()
+            self.check_user_mfa_if_need(user)
+            self.check_user_login_confirm_if_need(user)
+        except errors.CredentialError:
+            return self.format_redirect_url(self.login_url)
+        except errors.MFARequiredError:
+            return self.format_redirect_url(self.login_otp_url)
+        except errors.LoginConfirmBaseError:
+            return self.format_redirect_url(self.login_confirm_url)
+        else:
             auth_login(self.request, user)
             self.send_auth_signal(success=True, user=user)
-            return redirect(self.get_success_url())
-        else:
-            self.send_auth_signal(
-                success=False, username=user.username,
-                reason=const.mfa_failed
+            self.clear_auth_mark()
+            # 启用但是没有设置otp, 排除radius
+            if user.mfa_enabled_but_not_set():
+                # 1,2,mfa_setting & F
+                return reverse('users:user-otp-enable-authentication')
+            url = redirect_user_first_login_or_index(
+                self.request, self.redirect_field_name
             )
-            form.add_error(
-                'otp_code', _('MFA code invalid, or ntp sync server time')
-            )
-            return super().form_invalid(form)
+            return url
 
-    def get_success_url(self):
-        return redirect_user_first_login_or_index(self.request, self.redirect_field_name)
 
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
+class UserLoginWaitConfirmView(TemplateView):
+    template_name = 'authentication/login_wait_confirm.html'
+
+    def get_context_data(self, **kwargs):
+        from tickets.models import Ticket
+        ticket_id = self.request.session.get("auth_ticket_id")
+        if not ticket_id:
+            ticket = None
         else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
-            )
+            ticket = get_object_or_none(Ticket, pk=ticket_id)
+        context = super().get_context_data(**kwargs)
+        if ticket:
+            timestamp_created = datetime.datetime.timestamp(ticket.date_created)
+            ticket_detail_url = reverse('tickets:ticket-detail', kwargs={'pk': ticket_id})
+            msg = _("""Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>
+                  Don't close this page""").format(ticket.assignees_display)
+        else:
+            timestamp_created = 0
+            ticket_detail_url = ''
+            msg = _("No ticket found")
+        context.update({
+            "msg": msg,
+            "timestamp": timestamp_created,
+            "ticket_detail_url": ticket_detail_url
+        })
+        return context
 
 
 @method_decorator(never_cache, name='dispatch')

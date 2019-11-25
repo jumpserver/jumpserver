@@ -121,6 +121,14 @@
     </li>
 {% endif %}
 
+{% if request.user.can_admin_current_org and LOGIN_CONFIRM_ENABLE and LICENSE_VALID %}
+    <li id="tickets">
+        <a href="{% url 'tickets:ticket-list' %}">
+            <i class="fa fa-check-square-o" style="width: 14px"></i>
+            <span class="nav-label">{% trans 'Tickets' %}</span>
+        </a>
+    </li>
+{% endif %}
 
 {# Audits #}
 {% if request.user.can_admin_or_audit_current_org %}

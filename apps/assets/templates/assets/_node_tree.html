@@ -303,9 +303,24 @@ function defaultCallback(action) {
     return logging
 }
 
+function toggle() {
+    if (show === 0) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-lg-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            show = 1;
+        });
+    } else {
+        $("#split-right").attr("class", "col-lg-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        show = 0;
+    }
+}
+
 
 $(document).ready(function () {
-    $('.treebox').css('height', window.innerHeight - 180);
+    $('.treebox').css('height', window.innerHeight - 60);
 })
 .on('click', '.btn-show-current-asset', function(){
     hideRMenu();
@@ -320,6 +335,9 @@ $(document).ready(function () {
     $('#show_current_asset').css('display', 'inline-block');
     setCookie('show_current_asset', '');
     location.reload();
+}).on('click', '.tree-toggle-btn', function (e) {
+    e.preventDefault();
+    toggle();
 })
 
 </script>

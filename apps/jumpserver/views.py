@@ -234,3 +234,10 @@ class WsView(APIView):
                 .format(self.ws_port))
         return JsonResponse({"msg": msg})
 
+
+class KokoView(View):
+    def get(self, request):
+        msg = _(
+            "<div>Koko is a separately deployed program, you need to deploy Koko, configure nginx for url distribution,</div> "
+            "</div>If you see this page, prove that you are not accessing the nginx listening port. Good luck.</div>")
+        return HttpResponse(msg)

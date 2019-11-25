@@ -135,7 +135,8 @@ function initAssetModalTable() {
         ],
         lengthMenu: [[10, 25, 50], [10, 25, 50]],
         pageLength: 10,
-        select_style: assetModalOption.selectStyle
+        select_style: assetModalOption.selectStyle,
+        paging_numbers_length: 3
     };
     assetModalTable = jumpserver.initServerSideDataTable(options);
     if (assetModalOption.onModalTableDone) {

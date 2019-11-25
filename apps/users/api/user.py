@@ -40,6 +40,7 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
     serializer_class = serializers.UserSerializer
+    serializer_display_class = serializers.UserDisplaySerializer
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
     def get_queryset(self):
@@ -172,8 +173,8 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user == request.user:
             msg = _("Could not reset self otp, use profile reset instead")
             return Response({"error": msg}, status=401)
-        if user.otp_enabled and user.otp_secret_key:
-            user.otp_secret_key = ''
+        if user.mfa_enabled:
+            user.reset_mfa()
             user.save()
             logout(request)
         return Response({"msg": "success"})

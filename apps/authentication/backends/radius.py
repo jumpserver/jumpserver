@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from radiusauth.backends import RADIUSBackend, RADIUSRealmBackend
 from django.conf import settings
 
+from pyrad.packet import AccessRequest
+
 User = get_user_model()
 
 

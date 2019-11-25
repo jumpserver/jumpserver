@@ -2,9 +2,10 @@
 
 import re
 from collections import defaultdict
-from celery import shared_task
 
+from celery import shared_task
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 
 from orgs.utils import tmp_to_org
 from common.utils import get_logger
@@ -19,19 +20,25 @@ ignore_login_shell = re.compile(r'nologin$|sync$|shutdown$|halt$')
 
 
 def parse_linux_result_to_users(result):
-    task_result = {}
-    for task_name, raw in result.items():
-        res = raw.get('ansible_facts', {}).get('getent_passwd')
-        if res:
-            task_result = res
-            break
-    if not task_result or not isinstance(task_result, dict):
-        return []
-    users = []
-    for username, attr in task_result.items():
+    users = defaultdict(dict)
+    users_result = result.get('gather host users', {})\
+        .get('ansible_facts', {})\
+        .get('getent_passwd')
+    if not isinstance(users_result, dict):
+        users_result = {}
+    for username, attr in users_result.items():
         if ignore_login_shell.search(attr[-1]):
             continue
-        users.append(username)
+        users[username] = {}
+    last_login_result = result.get('get last login', {}).get('stdout_lines', [])
+    for line in last_login_result:
+        data = line.split('@')
+        if len(data) != 3:
+            continue
+        username, ip, dt = data
+        dt += ' +0800'
+        date = timezone.datetime.strptime(dt, '%b %d %H:%M:%S %Y %z')
+        users[username] = {"ip": ip, "date": date}
     return users
 
 
@@ -45,7 +52,7 @@ def parse_windows_result_to_users(result):
     if not task_result:
         return []
 
-    users = []
+    users = {}
 
     for i in range(4):
         task_result.pop(0)
@@ -55,7 +62,7 @@ def parse_windows_result_to_users(result):
     for line in task_result:
         user = space.split(line)
         if user[0]:
-            users.append(user[0])
+            users[user[0]] = {}
     return users
 
 
@@ -82,8 +89,12 @@ def add_asset_users(assets, results):
         with tmp_to_org(asset.org_id):
             GatheredUser.objects.filter(asset=asset, present=True)\
                 .update(present=False)
-            for username in users:
+            for username, data in users.items():
                 defaults = {'asset': asset, 'username': username, 'present': True}
+                if data.get("ip"):
+                    defaults["ip_last_login"] = data["ip"]
+                if data.get("date"):
+                    defaults["date_last_login"] = data["date"]
                 GatheredUser.objects.update_or_create(
                     defaults=defaults, asset=asset, username=username,
                 )
