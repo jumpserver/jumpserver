@@ -2,4 +2,5 @@
 
 from .login import *
 from .user import *
+from .profile import *
 from .group import *

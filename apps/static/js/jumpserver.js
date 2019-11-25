@@ -406,7 +406,7 @@ $.fn.serializeObject = function () {
 };
 
 function makeLabel(data) {
-    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
+    return "<label class='detail-key'><b>" + data[0] + ": </b></label> " + data[1] + "</br>"
 }
 
 function parseTableFilter(value) {

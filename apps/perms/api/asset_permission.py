@@ -29,6 +29,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
     """
     model = AssetPermission
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
+    serializer_display_class = serializers.AssetPermissionListSerializer
     filter_fields = ['name']
     permission_classes = (IsOrgAdmin,)
 
@@ -40,7 +41,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ("list", 'retrieve') and \
-                self.request.query_params.get("display"):
+                self.request.query_params.get("draw"):
             return serializers.AssetPermissionListSerializer
         return self.serializer_class
 
@@ -71,6 +72,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
 
     def filter_node(self, queryset):
         node_id = self.request.query_params.get('node_id')
+        query_all = self.request.query_params.get('all', '1') == '1'
         node_name = self.request.query_params.get('node')
         if node_id:
             _nodes = Node.objects.filter(pk=node_id)
@@ -81,15 +83,20 @@ class AssetPermissionViewSet(OrgModelViewSet):
         if not _nodes:
             return queryset.none()
 
-        nodes = set()
-        for node in _nodes:
-            nodes |= set(node.get_ancestors(with_self=True))
+        if not query_all:
+            queryset = queryset.filter(nodes__in=_nodes)
+            return queryset
+        nodes = set(_nodes)
+        if query_all:
+            for node in _nodes:
+                nodes |= set(node.get_ancestors(with_self=True))
         queryset = queryset.filter(nodes__in=nodes)
         return queryset
 
     def filter_asset(self, queryset):
         asset_id = self.request.query_params.get('asset_id')
         hostname = self.request.query_params.get('hostname')
+        query_all = self.request.query_params.get('all', '1') == '1'
         ip = self.request.query_params.get('ip')
         if asset_id:
             assets = Asset.objects.filter(pk=asset_id)
@@ -101,6 +108,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
             return queryset
         if not assets:
             return queryset.none()
+        if not query_all:
+            queryset = queryset.filter(assets__in=assets)
+            return queryset
         inherit_all_nodes = set()
         inherit_nodes_keys = assets.all().values_list('nodes__key', flat=True)
 
