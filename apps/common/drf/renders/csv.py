@@ -9,7 +9,7 @@ from six import BytesIO
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import encoders, json
 
-from ..utils import get_logger
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 

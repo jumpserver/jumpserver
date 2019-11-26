@@ -39,11 +39,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
         )
         return queryset
 
-    def get_serializer_class(self):
-        if self.action in ("list", 'retrieve') and \
-                self.request.query_params.get("draw"):
-            return serializers.AssetPermissionListSerializer
-        return self.serializer_class
+    def is_query_all(self):
+        query_all = self.request.query_params.get('all', '1') == '1'
+        return query_all
 
     def filter_valid(self, queryset):
         valid_query = self.request.query_params.get('is_valid', None)
@@ -72,7 +70,6 @@ class AssetPermissionViewSet(OrgModelViewSet):
 
     def filter_node(self, queryset):
         node_id = self.request.query_params.get('node_id')
-        query_all = self.request.query_params.get('all', '1') == '1'
         node_name = self.request.query_params.get('node')
         if node_id:
             _nodes = Node.objects.filter(pk=node_id)
@@ -83,20 +80,18 @@ class AssetPermissionViewSet(OrgModelViewSet):
         if not _nodes:
             return queryset.none()
 
-        if not query_all:
+        if not self.is_query_all():
             queryset = queryset.filter(nodes__in=_nodes)
             return queryset
         nodes = set(_nodes)
-        if query_all:
-            for node in _nodes:
-                nodes |= set(node.get_ancestors(with_self=True))
+        for node in _nodes:
+            nodes |= set(node.get_ancestors(with_self=True))
         queryset = queryset.filter(nodes__in=nodes)
         return queryset
 
     def filter_asset(self, queryset):
         asset_id = self.request.query_params.get('asset_id')
         hostname = self.request.query_params.get('hostname')
-        query_all = self.request.query_params.get('all', '1') == '1'
         ip = self.request.query_params.get('ip')
         if asset_id:
             assets = Asset.objects.filter(pk=asset_id)
@@ -108,7 +103,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
             return queryset
         if not assets:
             return queryset.none()
-        if not query_all:
+        if not self.is_query_all():
             queryset = queryset.filter(assets__in=assets)
             return queryset
         inherit_all_nodes = set()
@@ -127,7 +122,6 @@ class AssetPermissionViewSet(OrgModelViewSet):
     def filter_user(self, queryset):
         user_id = self.request.query_params.get('user_id')
         username = self.request.query_params.get('username')
-        query_group = self.request.query_params.get('all')
         if user_id:
             user = get_object_or_none(User, pk=user_id)
         elif username:
@@ -136,14 +130,14 @@ class AssetPermissionViewSet(OrgModelViewSet):
             return queryset
         if not user:
             return queryset.none()
-        kwargs = {}
-        args = []
-        if query_group:
-            groups = user.groups.all()
-            args.append(Q(users=user) | Q(user_groups__in=groups))
-        else:
-            kwargs["users"] = user
-        return queryset.filter(*args, **kwargs).distinct()
+        if not self.is_query_all():
+            queryset = queryset.filter(users=user)
+            return queryset
+        groups = user.groups.all()
+        queryset = queryset.filter(
+            Q(users=user) | Q(user_groups__in=groups)
+        ).distinct()
+        return queryset
 
     def filter_user_group(self, queryset):
         user_group_id = self.request.query_params.get('user_group_id')

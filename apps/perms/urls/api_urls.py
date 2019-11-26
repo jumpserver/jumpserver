@@ -2,6 +2,7 @@
 
 from django.urls import path, re_path
 from rest_framework import routers
+from rest_framework_nested.routers import NestedDefaultRouter
 from common import api as capi
 from .. import api
 
@@ -10,6 +11,7 @@ app_name = 'perms'
 router = routers.DefaultRouter()
 router.register('asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 router.register('remote-app-permissions', api.RemoteAppPermissionViewSet, 'remote-app-permission')
+router.register('asset-permissions/(?P<permission_pk>[a-zA-Z0-9\-]{36})/users', api.AssetPermissionUserViewSet, 'asset-permission-user')
 
 
 asset_permission_urlpatterns = [

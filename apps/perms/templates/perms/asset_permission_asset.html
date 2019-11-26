@@ -112,10 +112,46 @@
                                         </form>
 
                                         {% for node in asset_permission.nodes.all %}
-                                        <tr>
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
                                           <td ><b class="bdg_group" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn-remove-node" type="button" data-gid="{{ node.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="system-user-table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-users" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm" id="btn-add-system-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for system_user in object.system_users.all %}
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
+                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger btn-xs btn-remove-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -134,6 +170,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+jumpserver.system_users_selected = {};
 function addAssets(assets) {
     var the_url = "{% url 'api-perms:asset-permission-add-asset' pk=asset_permission.id %}";
     var body = {
@@ -199,13 +236,31 @@ function initAssetTable() {
     return table
 }
 
+function updateSystemUser(system_users) {
+    var the_url = "{% url 'api-perms:asset-permission-detail' pk=object.id %}";
+    var body = {
+        system_users: Object.assign([], system_users)
+    };
+    requestApi({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: function () {window.location.reload()}
+    });
+}
 
 $(document).ready(function () {
     $('.select2').select2();
+    $('.select2.system-users').select2()
+        .on('select2:select', function(evt) {
+             var data = evt.params.data;
+             jumpserver.system_users_selected[data.id] = data.text;
+        })
+        .on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.system_users_selected[data.id]
+        });
     table = initAssetTable();
-
     nodesSelect2Init(".nodes-select2");
-
     $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
             e.preventDefault();
@@ -269,6 +324,36 @@ $(document).ready(function () {
         $tr.remove()
     };
     updateNodes(nodes, success);
+})
+.on('click', '#btn-add-system-user', function () {
+    if (Object.keys(jumpserver.system_users_selected).length === 0) {
+		return false;
+	}
+    var system_users = $('.bdg-system-user').map(function() {
+        return $(this).data('uid');
+    }).get();
+
+    $.map(jumpserver.system_users_selected, function(name, index) {
+        system_users.push(index);
+        $('#opt_' + index).remove();
+        $('.group_edit tbody').append(
+           '<tr>' +
+           '<td><b class="bdg-system-user" data-gid="' + index + '">' + name + '</b></td>' +
+           '<td><button class="btn btn-danger btn-xs pull-right btn-remove-user" type="button"><i class="fa fa-minus"></i></button></td>' +
+           '</tr>'
+        )
+    });
+    updateSystemUser(system_users);
+}).on('click', '.btn-remove-user', function () {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var system_users = $('.bdg-system-user').map(function() {
+        if ($(this).data('uid') !== $this.data('uid')){
+            return $(this).data('uid');
+        }
+    }).get();
+    updateSystemUser(system_users);
+    $tr.remove()
 })
 </script>
 {% endblock %}

@@ -210,6 +210,10 @@ $(document).ready(function(){
         {title: "{% trans 'Hostname' %}", value: "hostname"},
         {title: "{% trans 'Node' %}", value: "node"},
         {title: "{% trans 'System user' %}", value: "system_user"},
+        {title: "{% trans 'Inherit' %}", value: "all", submenu: [
+            {title: "{% trans 'Include' %}", value: "1"},
+            {title: "{% trans 'Exclude' %}", value: "0"},
+        ]},
     ];
     initTableFilterDropdown('#permission_list_table_filter input', filterMenu)
 })

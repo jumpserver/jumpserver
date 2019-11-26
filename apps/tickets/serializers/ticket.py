@@ -32,8 +32,6 @@ class TicketSerializer(serializers.ModelSerializer):
         if action and user not in instance.assignees.all():
             error = {"action": "Only assignees can update"}
             raise serializers.ValidationError(error)
-        print(validated_data)
-        print(instance.status)
         if instance.status == instance.STATUS_CLOSED:
             validated_data.pop('action')
         instance = super().update(instance, validated_data)

@@ -98,9 +98,7 @@ class AssetPermissionDetailView(PermissionsMixin, DetailView):
         context = {
             'app': _('Perms'),
             'action': _('Asset permission detail'),
-            'system_users_remain': SystemUser.objects.exclude(
-                granted_by_permissions=self.object
-            ),
+
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -163,13 +161,12 @@ class AssetPermissionAssetView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-        nodes_remain = Node.objects.exclude(
-            id__in=self.object.nodes.all().values_list('id', flat=True)
-        ).only('key')
         context = {
             'app': _('Perms'),
             'action': _('Asset permission asset list'),
-            'nodes_remain': nodes_remain,
+            'system_users_remain': SystemUser.objects.exclude(
+                granted_by_permissions=self.object
+            ),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
