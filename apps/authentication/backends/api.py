@@ -109,7 +109,7 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
     keyword = 'Bearer'
-    expiration = settings.TOKEN_EXPIRATION or 3600
+    # expiration = settings.TOKEN_EXPIRATION or 3600
     model = get_user_model()
 
     def authenticate(self, request):

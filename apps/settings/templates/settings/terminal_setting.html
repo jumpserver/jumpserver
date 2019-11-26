@@ -86,11 +86,16 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {% for name, setting in command_storage.items %}
+                                         <tr>
+                                            <td>{% trans 'Default' %}</td>
+                                            <td>server</td>
+                                            <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" disabled="disabled" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                        </tr>
+                                        {% for s in command_storage %}
                                             <tr>
-                                                <td>{{ name }}</td>
-                                                <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command"  {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td>{{ s.name }}</td>
+                                                <td>{{ s.type}}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-command" >{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -108,17 +113,21 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {% for name, setting in replay_storage.items %}
+                                        <tr>
+                                            <td>{% trans 'Default' %}</td>
+                                            <td>server</td>
+                                            <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" disabled>{% trans 'Delete' %}</a></td>
+                                        </tr>
+                                        {% for s in replay_storage %}
                                             <tr>
-                                                <td>{{ name }}</td>
-                                                <td>{{ setting.TYPE }}</td>
-                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" {% if setting.TYPE == 'server' and name == 'default' %} disabled {% endif %} data-name="{{ name }}">{% trans 'Delete' %}</a></td>
+                                                <td>{{ s.name }}</td>
+                                                <td>{{ s.type }}</td>
+                                                <td><a class="btn btn-xs btn-danger m-l-xs btn-del-replay" data-name="{{ name }}">{% trans 'Delete' %}</a></td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
                                     <a href="{% url 'settings:replay-storage-create' %}" class="btn btn-primary btn-xs">{% trans 'Add' %}</a>
-
                                     <div class="hr-line-dashed"></div>
                                 </form>
                             </div>

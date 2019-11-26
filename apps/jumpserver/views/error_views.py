@@ -3,6 +3,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 
+__all__ = ['handler404', 'handler500']
+
 
 def handler404(request, *args, **argv):
     if request.content_type.find('application/json') > -1:

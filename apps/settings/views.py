@@ -98,8 +98,9 @@ class TerminalSettingView(PermissionsMixin, TemplateView):
     permission_classes = [IsSuperUser]
 
     def get_context_data(self, **kwargs):
-        command_storage = utils.get_command_storage_setting()
-        replay_storage = utils.get_replay_storage_setting()
+        from terminal.models import CommandStorage, ReplayStorage
+        command_storage = CommandStorage.objects.all()
+        replay_storage = ReplayStorage.objects.all()
 
         context = {
             'app': _('Settings'),

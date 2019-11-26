@@ -380,7 +380,7 @@ class MFAMixin:
 
     @staticmethod
     def mfa_is_otp():
-        if settings.CONFIG.OTP_IN_RADIUS:
+        if settings.OTP_IN_RADIUS:
             return False
         return True
 
@@ -397,7 +397,7 @@ class MFAMixin:
         return check_otp_code(self.otp_secret_key, code)
 
     def check_mfa(self, code):
-        if settings.CONFIG.OTP_IN_RADIUS:
+        if settings.OTP_IN_RADIUS:
             return self.check_radius(code)
         else:
             return self.check_otp(code)

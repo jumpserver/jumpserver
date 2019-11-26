@@ -50,7 +50,7 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
 
 
 def get_swagger_view(version='v1'):
-    from .urls import api_v1, api_v2
+    from ..urls import api_v1, api_v2
     from django.urls import path, include
     api_v1_patterns = [
         path('api/v1/', include(api_v1))
