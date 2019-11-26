@@ -307,7 +307,10 @@ class ReplayStorage(CommonModelMixin):
         ('azure', 'Azure'),
     ]
     name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
-    type = models.CharField(max_length=16, choices=TYPE_CHOICES, default='server')
+    type = models.CharField(
+        max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
+        default='server'
+    )
     meta = EncryptJsonDictTextField()
 
     def __str__(self):

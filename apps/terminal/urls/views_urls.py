@@ -26,4 +26,9 @@ urlpatterns = [
     # Command view
     path('command/', views.CommandListView.as_view(), name='command-list'),
 
+    # replay-storage
+    path('terminal/replay-storage/', views.ReplayStorageListView.as_view(), name='replay-storage-list'),
+    path('terminal/replay-storage/create/', views.ReplayStorageCreateView.as_view(), name='replay-storage-create'),
+    path('terminal/replay-storage/<uuid:pk>/update/', views.ReplayStorageUpdateView.as_view(), name='replay-storage-update'),
+
 ]

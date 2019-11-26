@@ -18,6 +18,7 @@ router.register(r'terminals', api.TerminalViewSet, 'terminal')
 router.register(r'tasks', api.TaskViewSet, 'tasks')
 router.register(r'commands', api.CommandViewSet, 'command')
 router.register(r'status', api.StatusViewSet, 'status')
+router.register(r'replay-storage', api.ReplayStorageViewSet, 'replay-storage')
 
 urlpatterns = [
     path('sessions/<uuid:pk>/replay/',

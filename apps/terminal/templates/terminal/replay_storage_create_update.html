@@ -1,0 +1,104 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+    <form id="appForm" method="post" class="form-horizontal">
+        {% bootstrap_field form.name layout="horizontal" %}
+        {% bootstrap_field form.type layout="horizontal" %}
+
+        {# s3 #}
+        <div class="s3-fields">
+            {% bootstrap_field form.s3_bucket layout="horizontal" %}
+            {% bootstrap_field form.s3_access_key layout="horizontal" %}
+            {% bootstrap_field form.s3_secret_key layout="horizontal" %}
+            {% bootstrap_field form.s3_endpoint layout="horizontal" %}
+        </div>
+
+        {# oss #}
+        <div class="oss-fields">
+            {% bootstrap_field form.oss_bucket layout="horizontal" %}
+            {% bootstrap_field form.oss_access_key layout="horizontal" %}
+            {% bootstrap_field form.oss_secret_key layout="horizontal" %}
+            {% bootstrap_field form.oss_endpoint layout="horizontal" %}
+        </div>
+
+        {# azure #}
+        <div class="azure-fields">
+            {% bootstrap_field form.azure_container_name layout="horizontal" %}
+            {% bootstrap_field form.azure_account_name layout="horizontal" %}
+            {% bootstrap_field form.azure_account_key layout="horizontal" %}
+            {% bootstrap_field form.azure_endpoint_suffix layout="horizontal" %}
+        </div>
+
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+
+                <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script type="text/javascript">
+var type_id = '#' + '{{ form.type.id_for_label }}';
+var all_type_fields = [
+    '.s3-fields', '.oss-fields', '.azure-fields'
+];
+var api_action = "{{ api_action }}";
+
+function getReplayStorageType(){
+    return $(type_id+ " option:selected").val();
+}
+function hiddenFields(){
+    var type = getReplayStorageType();
+    $.each(all_type_fields, function(index, value){
+        $(value).addClass('hidden')
+    });
+    $('.' + type + '-fields').removeClass('hidden');
+}
+function constructMeta(data){
+    var meta = {};
+    var type = data.type;
+    for (var k in data){
+        if (k.startsWith(type)){
+            meta[k] = data[k]
+        }
+    }
+    return meta
+}
+
+$(document).ready(function () {
+    hiddenFields();
+})
+.on('change', type_id, function(){
+    hiddenFields();
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = '{% url 'api-terminal:replay-storage-list' %}';
+    var method = "POST";
+    {% if api_action == "update" %}
+        the_url = '{% url 'api-terminal:replay-storage-detail' pk=object.id %}';
+        method = "PUT";
+    {% endif %}
+    var redirect_to = '{% url "terminal:replay-storage-list" %}';
+    var form = $("form");
+    var data = form.serializeObject();
+    data['meta'] = constructMeta(data);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+})
+</script>
+{% endblock %}

@@ -5,7 +5,8 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
-from ..models import Terminal, Status, Session, Task
+from ..models import Terminal, Status, Session, Task, ReplayStorage
+from .. import const
 
 
 class TerminalSerializer(serializers.ModelSerializer):
@@ -58,3 +59,45 @@ class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
 
 
+class ReplayStorageMetaDictField(serializers.DictField):
+
+    @staticmethod
+    def filter_attribute(attribute, instance):
+        for field in const.REPLAY_STORAGE_TYPE_MAP_FIELDS[instance.type]:
+            if field.get('write_only', False):
+                attribute.pop(field['name'], None)
+        return attribute
+
+    def get_attribute(self, instance):
+        """
+        序列化时调用
+        """
+        attribute = super().get_attribute(instance)
+        attribute = self.filter_attribute(attribute, instance)
+        return attribute
+
+    @staticmethod
+    def filter_value(dictionary, value):
+        app_type = dictionary.get('type', const.REPLAY_STORAGE_TYPE_SERVER)
+        fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS[app_type]
+        fields_names = [field['name'] for field in fields]
+        no_need_keys = [k for k in value.keys() if k not in fields_names]
+        for k in no_need_keys:
+            value.pop(k)
+        return value
+
+    def get_value(self, dictionary):
+        """
+        反序列化时调用
+        """
+        value = super().get_value(dictionary)
+        value = self.filter_value(dictionary, value)
+        return value
+
+
+class ReplayStorageSerializer(serializers.ModelSerializer):
+    meta = ReplayStorageMetaDictField()
+
+    class Meta:
+        model = ReplayStorage
+        fields = ['id', 'name', 'type', 'meta']
