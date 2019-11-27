@@ -52,7 +52,11 @@ class CommandStorageUpdateView(PermissionsMixin, UpdateView):
     permission_classes = [IsSuperUser]
 
     def get_initial(self):
-        return {k: v for k, v in self.object.meta.items()}
+        initial_data = {}
+        for k, v in self.object.meta.items():
+            _k = "{}_{}".format(self.object.type, k.lower())
+            initial_data[_k] = v
+        return initial_data
 
     def get_context_data(self, **kwargs):
         context = {

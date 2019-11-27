@@ -303,14 +303,7 @@ class CommandStorage(CommonModelMixin):
         return self.name
 
     def construct_config(self):
-        if self.type == 'es':
-            config = {
-                'HOSTS': self.meta.get('es_hosts'),
-                'INDEX': self.meta.get('es_index'),
-                'DOC_TYPE': self.meta.get('es_doc_type')
-            }
-        else:
-            config = {}
+        config = self.meta
         config.update({'TYPE': self.type})
         return config
 
@@ -340,30 +333,7 @@ class ReplayStorage(CommonModelMixin):
         return self.name
 
     def construct_config(self):
-        if self.type == 's3':
-            config = {
-                'BUCKET': self.meta.get('s3_bucket'),
-                'ACCESS_KEY': self.meta.get('s3_access_key'),
-                'SECRET_KEY': self.meta.get('s3_secret_key'),
-                'ENDPOINT': self.meta.get('s3_endpoint')
-            }
-        elif self.type == 'oss':
-            config = {
-                'BUCKET': self.meta.get('oss_bucket'),
-                'ACCESS_KEY': self.meta.get('oss_access_key'),
-                'SECRET_KEY': self.meta.get('oss_secret_key'),
-                'ENDPOINT': self.meta.get('oss_endpoint')
-            }
-        elif self.type == 'azure':
-            config = {
-                "CONTAINER_NAME": self.meta.get('azure_container_name'),
-                "ACCOUNT_NAME": self.meta.get('azure_account_name'),
-                "ACCOUNT_KEY": self.meta.get('azure_account_key'),
-                "ENDPOINT_SUFFIX": self.meta.get('azure_endpoint_suffix')
-            }
-        else:
-            config = {}
-
+        config = self.meta
         config.update({'TYPE': self.type})
         return config
 

@@ -79,9 +79,22 @@ class ReplayStorageMetaDictField(serializers.DictField):
         return attribute
 
     @staticmethod
+    def convert_value(dictionary, value):
+        tp = dictionary.get('type')
+        _value = {}
+        for k, v in value.items():
+            prefix = '{}_'.format(tp)
+            _k = k
+            if k.lower().startswith(prefix):
+                _k = k.lower().split(prefix, 1)[1]
+            _k = _k.upper()
+            _value[_k] = value[k]
+        return _value
+
+    @staticmethod
     def filter_value(dictionary, value):
-        app_type = dictionary.get('type', const.REPLAY_STORAGE_TYPE_SERVER)
-        fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS.get(app_type, [])
+        tp = dictionary.get('type', const.REPLAY_STORAGE_TYPE_SERVER)
+        fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
         fields_names = [field['name'] for field in fields]
         no_need_keys = [k for k in value.keys() if k not in fields_names]
         for k in no_need_keys:
@@ -93,6 +106,7 @@ class ReplayStorageMetaDictField(serializers.DictField):
         反序列化时调用
         """
         value = super().get_value(dictionary)
+        value = self.convert_value(dictionary, value)
         value = self.filter_value(dictionary, value)
         return value
 
@@ -123,9 +137,22 @@ class CommandStorageMetaDictField(serializers.DictField):
         return attribute
 
     @staticmethod
+    def convert_value(dictionary, value):
+        tp = dictionary.get('type')
+        _value = {}
+        for k, v in value.items():
+            prefix = '{}_'.format(tp)
+            _k = k
+            if k.lower().startswith(prefix):
+                _k = k.lower().split(prefix, 1)[1]
+            _k = _k.upper()
+            _value[_k] = value[k]
+        return _value
+
+    @staticmethod
     def filter_value(dictionary, value):
-        app_type = dictionary.get('type', const.COMMAND_STORAGE_TYPE_SERVER)
-        fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS.get(app_type, [])
+        tp = dictionary.get('type', const.COMMAND_STORAGE_TYPE_SERVER)
+        fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
         fields_names = [field['name'] for field in fields]
         no_need_keys = [k for k in value.keys() if k not in fields_names]
         for k in no_need_keys:
@@ -137,6 +164,7 @@ class CommandStorageMetaDictField(serializers.DictField):
         反序列化时调用
         """
         value = super().get_value(dictionary)
+        value = self.convert_value(dictionary, value)
         value = self.filter_value(dictionary, value)
         return value
 

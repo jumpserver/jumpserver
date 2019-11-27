@@ -15,22 +15,22 @@ REPLAY_STORAGE_TYPE_AZURE = 'azure'
 
 REPLAY_STORAGE_TYPE_SERVER_FIELDS = []
 REPLAY_STORAGE_TYPE_S3_FIELDS = [
-    {'name': 's3_bucket'},
-    {'name': 's3_access_key', 'write_only': True},
-    {'name': 's3_secret_key', 'write_only': True},
-    {'name': 's3_endpoint'}
+    {'name': 'BUCKET'},
+    {'name': 'ACCESS_KEY', 'write_only': True},
+    {'name': 'SECRET_KEY', 'write_only': True},
+    {'name': 'ENDPOINT'}
 ]
 REPLAY_STORAGE_TYPE_OSS_FIELDS = [
-    {'name': 'oss_bucket'},
-    {'name': 'oss_access_key', 'write_only': True},
-    {'name': 'oss_secret_key', 'write_only': True},
-    {'name': 'oss_endpoint'}
+    {'name': 'BUCKET'},
+    {'name': 'ACCESS_KEY', 'write_only': True},
+    {'name': 'SECRET_KEY', 'write_only': True},
+    {'name': 'ENDPOINT'}
 ]
 REPLAY_STORAGE_TYPE_AZURE_FIELDS = [
-    {'name': 'azure_container_name'},
-    {'name': 'azure_account_name'},
-    {'name': 'azure_account_key', 'write_only': True},
-    {'name': 'azure_endpoint_suffix'}
+    {'name': 'CONTAINER_NAME'},
+    {'name': 'ACCOUNT_NAME'},
+    {'name': 'ACCOUNT_KEY', 'write_only': True},
+    {'name': 'ENDPOINT_SUFFIX'}
 ]
 
 REPLAY_STORAGE_TYPE_MAP_FIELDS = {
@@ -48,9 +48,9 @@ COMMAND_STORAGE_TYPE_ES = 'es'
 
 COMMAND_STORAGE_TYPE_SERVER_FIELDS = []
 COMMAND_STORAGE_TYPE_ES_FIELDS = [
-    {'name': 'es_hosts'},
-    {'name': 'es_index'},
-    {'name': 'es_doc_type'}
+    {'name': 'HOSTS'},
+    {'name': 'INDEX'},
+    {'name': 'DOC_TYPE'}
 ]
 
 COMMAND_STORAGE_TYPE_MAP_FIELDS = {
