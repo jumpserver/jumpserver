@@ -38,6 +38,10 @@ def migrate_command_storage(apps, schema_editor):
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
+    model.objects.update_or_create(
+        name='default', type='server',
+        defaults={'name': 'default', 'type': 'server'}
+    )
 
 
 def migrate_replay_storage(apps, schema_editor):
@@ -51,6 +55,10 @@ def migrate_replay_storage(apps, schema_editor):
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
+    model.objects.update_or_create(
+        name='default', type='server',
+        defaults={'name': 'default', 'type': 'server'}
+    )
 
 
 class Migration(migrations.Migration):
