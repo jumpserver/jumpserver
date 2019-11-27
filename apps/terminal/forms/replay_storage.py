@@ -20,8 +20,12 @@ class ReplayStorageTypeAzureForm(forms.ModelForm):
     azure_account_key = forms.CharField(
         max_length=128, label=_('Account key'), required=False
     )
-    azure_endpoint_suffix = forms.CharField(
-        max_length=128, label=_('Endpoint suffix'), required=False
+    azure_endpoint_suffix = forms.ChoiceField(
+        choices=(
+            ('core.chinacloudapi.cn', 'core.chinacloudapi.cn'),
+            ('core.windows.net', 'core.windows.net')
+        ),
+        label=_('Endpoint suffix'), required=False,
     )
 
 
@@ -36,7 +40,13 @@ class ReplayStorageTypeOSSForm(forms.ModelForm):
         max_length=128, label=_('Secret key'), required=False
     )
     oss_endpoint = forms.CharField(
-        max_length=128, label=_('Endpoint'), required=False
+        max_length=128, label=_('Endpoint'), required=False,
+        help_text=_(
+            """
+            OSS: http://{REGION_NAME}.aliyuncs.com <br>
+            Example: http://oss-cn-hangzhou.aliyuncs.com
+            """
+        )
     )
 
 
@@ -51,7 +61,14 @@ class ReplayStorageTypeS3Form(forms.ModelForm):
         max_length=128, label=_('Secret key'), required=False
     )
     s3_endpoint = forms.CharField(
-        max_length=128, label=_('Endpoint'), required=False
+        max_length=128, label=_('Endpoint'), required=False,
+        help_text=_(
+            """
+            S3: http://s3.{REGION_NAME}.amazonaws.com <br>
+            S3(China): http://s3.{REGION_NAME}.amazonaws.com.cn <br>
+            Example: http://s3.cn-north-1.amazonaws.com.cn
+            """
+        )
     )
 
 

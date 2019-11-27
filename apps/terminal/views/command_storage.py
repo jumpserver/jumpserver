@@ -55,6 +55,8 @@ class CommandStorageUpdateView(PermissionsMixin, UpdateView):
         initial_data = {}
         for k, v in self.object.meta.items():
             _k = "{}_{}".format(self.object.type, k.lower())
+            if k == 'HOSTS':
+                v = ','.join(v)
             initial_data[_k] = v
         return initial_data
 

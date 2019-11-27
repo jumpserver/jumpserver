@@ -48,7 +48,11 @@ function constructMeta(data){
     var type = data.type;
     for (var k in data){
         if (k.startsWith(type)){
-            meta[k] = data[k]
+            var v = data[k];
+            if (k === 'es_hosts'){
+                v = v.split(',');
+            }
+            meta[k] = v
         }
     }
     return meta

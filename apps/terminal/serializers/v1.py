@@ -79,7 +79,7 @@ class ReplayStorageMetaDictField(serializers.DictField):
         return attribute
 
     @staticmethod
-    def convert_value(dictionary, value):
+    def convert_value_key(dictionary, value):
         tp = dictionary.get('type')
         _value = {}
         for k, v in value.items():
@@ -92,7 +92,7 @@ class ReplayStorageMetaDictField(serializers.DictField):
         return _value
 
     @staticmethod
-    def filter_value(dictionary, value):
+    def filter_value_key(dictionary, value):
         tp = dictionary.get('type', const.REPLAY_STORAGE_TYPE_SERVER)
         fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
         fields_names = [field['name'] for field in fields]
@@ -106,8 +106,8 @@ class ReplayStorageMetaDictField(serializers.DictField):
         反序列化时调用
         """
         value = super().get_value(dictionary)
-        value = self.convert_value(dictionary, value)
-        value = self.filter_value(dictionary, value)
+        value = self.convert_value_key(dictionary, value)
+        value = self.filter_value_key(dictionary, value)
         return value
 
 
@@ -137,7 +137,7 @@ class CommandStorageMetaDictField(serializers.DictField):
         return attribute
 
     @staticmethod
-    def convert_value(dictionary, value):
+    def convert_value_key(dictionary, value):
         tp = dictionary.get('type')
         _value = {}
         for k, v in value.items():
@@ -150,7 +150,7 @@ class CommandStorageMetaDictField(serializers.DictField):
         return _value
 
     @staticmethod
-    def filter_value(dictionary, value):
+    def filter_value_key(dictionary, value):
         tp = dictionary.get('type', const.COMMAND_STORAGE_TYPE_SERVER)
         fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
         fields_names = [field['name'] for field in fields]
@@ -164,8 +164,8 @@ class CommandStorageMetaDictField(serializers.DictField):
         反序列化时调用
         """
         value = super().get_value(dictionary)
-        value = self.convert_value(dictionary, value)
-        value = self.filter_value(dictionary, value)
+        value = self.convert_value_key(dictionary, value)
+        value = self.filter_value_key(dictionary, value)
         return value
 
 

@@ -13,7 +13,14 @@ __all__ = ['CommandStorageCreateUpdateForm']
 
 class CommandStorageTypeESForm(forms.ModelForm):
     es_hosts = forms.CharField(
-        max_length=128, label=_('Hosts'), required=False
+        max_length=128, label=_('Hosts'), required=False,
+        help_text=_(
+            """
+            Tips: If there are multiple hosts, separate them with a comma (,) 
+            <br>
+            eg: http://www.jumpserver.a.com,http://www.jumpserver.b.com
+            """
+        )
     )
     es_index = forms.CharField(
         max_length=128, label=_('Index'), required=False
