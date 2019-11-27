@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import uuid
+import jms_storage
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -301,6 +302,25 @@ class CommandStorage(CommonModelMixin):
     def __str__(self):
         return self.name
 
+    def construct_config(self):
+        if self.type == 'es':
+            config = {
+                'HOSTS': self.meta.get('es_hosts'),
+                'INDEX': self.meta.get('es_index'),
+                'DOC_TYPE': self.meta.get('es_doc_type')
+            }
+        else:
+            config = {}
+        config.update({'TYPE': self.type})
+        return config
+
+    def is_valid(self):
+        if self.type == 'server':
+            return True
+        config = self.construct_config()
+        storage = jms_storage.get_log_storage(config)
+        return storage.ping()
+
 
 class ReplayStorage(CommonModelMixin):
     TYPE_CHOICES = [
@@ -318,3 +338,40 @@ class ReplayStorage(CommonModelMixin):
 
     def __str__(self):
         return self.name
+
+    def construct_config(self):
+        if self.type == 's3':
+            config = {
+                'BUCKET': self.meta.get('s3_bucket'),
+                'ACCESS_KEY': self.meta.get('s3_access_key'),
+                'SECRET_KEY': self.meta.get('s3_secret_key'),
+                'ENDPOINT': self.meta.get('s3_endpoint')
+            }
+        elif self.type == 'oss':
+            config = {
+                'BUCKET': self.meta.get('oss_bucket'),
+                'ACCESS_KEY': self.meta.get('oss_access_key'),
+                'SECRET_KEY': self.meta.get('oss_secret_key'),
+                'ENDPOINT': self.meta.get('oss_endpoint')
+            }
+        elif self.type == 'azure':
+            config = {
+                "CONTAINER_NAME": self.meta.get('azure_container_name'),
+                "ACCOUNT_NAME": self.meta.get('azure_account_name'),
+                "ACCOUNT_KEY": self.meta.get('azure_account_key'),
+                "ENDPOINT_SUFFIX": self.meta.get('azure_endpoint_suffix')
+            }
+        else:
+            config = {}
+
+        config.update({'TYPE': self.type})
+        return config
+
+    def is_valid(self):
+        if self.type == 'server':
+            return True
+        config = self.construct_config()
+        storage = jms_storage.get_object_storage(config)
+        target = 'test.py'
+        src = os.path.join(settings.BASE_DIR, 'common', target)
+        return storage.is_valid(src, target)

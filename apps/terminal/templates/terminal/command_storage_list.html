@@ -36,44 +36,68 @@
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
-    <script>
-        var replay_storage_table;
-        function initTable() {
-            var options = {
-                ele: $('#command_storage_list_table'),
-                columnDefs: [
-                    {targets: 3, createdCell: function (td, cellData, rowData) {
-                            var name = htmlEscape(rowData.name);
-                            var update_btn = '<a href="{% url "terminal:command-storage-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
-                            var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
-                                .replace('{{ DEFAULT_PK }}', cellData)
-                                .replace('99991938', name);
+<script>
+var replay_storage_table;
+function initTable() {
+    var options = {
+        ele: $('#command_storage_list_table'),
+        columnDefs: [
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                    var name = htmlEscape(rowData.name);
+                    var update_btn = '<a href="{% url "terminal:command-storage-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
+                        .replace('99991938', name);
+                    var test_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-test-connective" data-uid="{{ DEFAULT_PK }}">{% trans 'Test' %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    $(td).html(update_btn + test_btn + del_btn)
+                }
+            }
+        ],
+        ajax_url: '{% url "api-terminal:command-storage-list" %}',
+        columns: [
+            {data: "id"}, {data: "name" }, {data: "type"}, {data: "id"}
+        ],
+        op_html: $('#actions').html()
+    };
+    replay_storage_table = jumpserver.initServerSideDataTable(options);
+    return replay_storage_table
+}
 
-                            $(td).html(update_btn + del_btn)
-                        }
-                    }
-                ],
-                ajax_url: '{% url "api-terminal:command-storage-list" %}',
-                columns: [
-                    {data: "id"}, {data: "name" }, {data: "type"}, {data: "id"}
-                ],
-                op_html: $('#actions').html()
-            };
-            replay_storage_table = jumpserver.initServerSideDataTable(options);
-            return replay_storage_table
+$(document).ready(function(){
+    initTable()
+})
+.on('click', '.btn-del', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var name = $this.data('name');
+    var the_url = '{% url "api-terminal:command-storage-detail" pk=DEFAULT_PK %}'
+        .replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+})
+.on('click', '.btn-test-connective', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-terminal:command-storage-test-connective" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var error = function (data) {
+        toastr.error(data)
+    };
+    var success = function(data) {
+        var isValid = data.is_valid;
+        if (isValid){
+            toastr.success(data.msg)
         }
-
-        $(document).ready(function(){
-            initTable()
-        })
-            .on('click', '.btn-del', function () {
-                var $this = $(this);
-                var uid = $this.data('uid');
-                var name = $this.data('name');
-                var the_url = '{% url "api-terminal:command-storage-detail" pk=DEFAULT_PK %}'
-                    .replace('{{ DEFAULT_PK }}', uid);
-                objectDelete($this, name, the_url);
-            })
-    </script>
+        else{
+            toastr.error(data.msg)
+        }
+    };
+    requestApi({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+</script>
 {% endblock %}
 

@@ -29,7 +29,9 @@ urlpatterns = [
     path('terminals/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
          name='terminal-access-key'),
     path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
-    path('commands/export/', api.CommandExportApi.as_view(), name="command-export")
+    path('commands/export/', api.CommandExportApi.as_view(), name="command-export"),
+    path('replay-storage/<uuid:pk>/test-connective/', api.ReplayStorageTestConnectiveApi.as_view(), name='replay-storage-test-connective'),
+    path('command-storage/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective')
     # v2: get session's replay
     # path('v2/sessions/<uuid:pk>/replay/',
     #     api.SessionReplayV2ViewSet.as_view({'get': 'retrieve'}),
