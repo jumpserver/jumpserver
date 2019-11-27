@@ -52,44 +52,6 @@ class Setting(models.Model):
             raise ValueError("Json dump error: {}".format(str(e)))
 
     @classmethod
-    def save_storage(cls, name, data):
-        """
-        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
-        :param data: {}
-        :return: Setting object
-        """
-        obj = cls.objects.filter(name=name).first()
-        if not obj:
-            obj = cls()
-            obj.name = name
-            obj.encrypted = True
-            obj.cleaned_value = data
-        else:
-            value = obj.cleaned_value
-            if value is None:
-                value = {}
-            value.update(data)
-            obj.cleaned_value = value
-        obj.save()
-        return obj
-
-    @classmethod
-    def delete_storage(cls, name, storage_name):
-        """
-        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
-        :param storage_name: ""
-        :return: bool
-        """
-        obj = cls.objects.filter(name=name).first()
-        if not obj:
-            return False
-        value = obj.cleaned_value
-        value.pop(storage_name, '')
-        obj.cleaned_value = value
-        obj.save()
-        return True
-
-    @classmethod
     def refresh_all_settings(cls):
         try:
             settings_list = cls.objects.all()
