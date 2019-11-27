@@ -59,20 +59,20 @@ class Terminal(models.Model):
             self.user.save()
 
     def get_command_storage_setting(self):
-        storage_all = get_command_storage_setting()
-        if self.command_storage in storage_all:
-            storage = storage_all.get(self.command_storage)
+        s = CommandStorage.objects.filter(name=self.command_storage).first()
+        if s:
+            config = s.config
         else:
-            storage = storage_all.get('default')
-        return {"TERMINAL_COMMAND_STORAGE": storage}
+            config = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
+        return {"TERMINAL_COMMAND_STORAGE": config}
 
     def get_replay_storage_setting(self):
-        storage_all = get_replay_storage_setting()
-        if self.replay_storage in storage_all:
-            storage = storage_all.get(self.replay_storage)
+        s = ReplayStorage.objects.filter(name=self.replay_storage).first()
+        if s:
+            config = s.config
         else:
-            storage = storage_all.get('default')
-        return {"TERMINAL_REPLAY_STORAGE": storage}
+            config = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
+        return {"TERMINAL_REPLAY_STORAGE": config}
 
     @property
     def config(self):
