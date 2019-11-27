@@ -14,7 +14,6 @@ from django.core.cache import cache
 
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.utils import get_command_storage_setting, get_replay_storage_setting
 from common.mixins import CommonModelMixin
 from common.fields.model import EncryptJsonDictTextField
 from .backends import get_multi_command_storage
@@ -58,7 +57,7 @@ class Terminal(models.Model):
             self.user.is_active = active
             self.user.save()
 
-    def get_command_storage_setting(self):
+    def get_command_storage_config(self):
         s = CommandStorage.objects.filter(name=self.command_storage).first()
         if s:
             config = s.config
@@ -66,7 +65,7 @@ class Terminal(models.Model):
             config = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
         return {"TERMINAL_COMMAND_STORAGE": config}
 
-    def get_replay_storage_setting(self):
+    def get_replay_storage_config(self):
         s = ReplayStorage.objects.filter(name=self.replay_storage).first()
         if s:
             config = s.config
@@ -81,8 +80,8 @@ class Terminal(models.Model):
             if not k.startswith('TERMINAL'):
                 continue
             configs[k] = getattr(settings, k)
-        configs.update(self.get_command_storage_setting())
-        configs.update(self.get_replay_storage_setting())
+        configs.update(self.get_command_storage_config())
+        configs.update(self.get_replay_storage_config())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
@@ -302,7 +301,8 @@ class CommandStorage(CommonModelMixin):
     def __str__(self):
         return self.name
 
-    def construct_config(self):
+    @property
+    def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
         return config
@@ -310,8 +310,7 @@ class CommandStorage(CommonModelMixin):
     def is_valid(self):
         if self.type == 'server':
             return True
-        config = self.construct_config()
-        storage = jms_storage.get_log_storage(config)
+        storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
 
@@ -332,7 +331,8 @@ class ReplayStorage(CommonModelMixin):
     def __str__(self):
         return self.name
 
-    def construct_config(self):
+    @property
+    def config(self):
         config = self.meta
         config.update({'TYPE': self.type})
         return config
@@ -340,8 +340,7 @@ class ReplayStorage(CommonModelMixin):
     def is_valid(self):
         if self.type == 'server':
             return True
-        config = self.construct_config()
-        storage = jms_storage.get_object_storage(config)
+        storage = jms_storage.get_object_storage(self.config)
         target = 'test.py'
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
