@@ -341,6 +341,6 @@ class ReplayStorage(CommonModelMixin):
         if self.type == 'server':
             return True
         storage = jms_storage.get_object_storage(self.config)
-        target = 'test.py'
+        target = 'tests.py'
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
