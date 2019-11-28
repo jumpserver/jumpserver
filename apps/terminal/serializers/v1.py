@@ -5,6 +5,7 @@ from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
+from common.fields.serializer import CustomMetaDictField
 from ..models import (
     Terminal, Status, Session, Task, ReplayStorage, CommandStorage
 )
@@ -61,54 +62,10 @@ class ReplaySerializer(serializers.Serializer):
     file = serializers.FileField(allow_empty_file=True)
 
 
-class ReplayStorageMetaDictField(serializers.DictField):
-
-    @staticmethod
-    def filter_attribute(attribute, instance):
-        for field in const.REPLAY_STORAGE_TYPE_MAP_FIELDS[instance.type]:
-            if field.get('write_only', False):
-                attribute.pop(field['name'], None)
-        return attribute
-
-    def get_attribute(self, instance):
-        """
-        序列化时调用
-        """
-        attribute = super().get_attribute(instance)
-        attribute = self.filter_attribute(attribute, instance)
-        return attribute
-
-    @staticmethod
-    def convert_value_key(dictionary, value):
-        tp = dictionary.get('type')
-        _value = {}
-        for k, v in value.items():
-            prefix = '{}_'.format(tp)
-            _k = k
-            if k.lower().startswith(prefix):
-                _k = k.lower().split(prefix, 1)[1]
-            _k = _k.upper()
-            _value[_k] = value[k]
-        return _value
-
-    @staticmethod
-    def filter_value_key(dictionary, value):
-        tp = dictionary.get('type', const.REPLAY_STORAGE_TYPE_SERVER)
-        fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
-        fields_names = [field['name'] for field in fields]
-        no_need_keys = [k for k in value.keys() if k not in fields_names]
-        for k in no_need_keys:
-            value.pop(k)
-        return value
-
-    def get_value(self, dictionary):
-        """
-        反序列化时调用
-        """
-        value = super().get_value(dictionary)
-        value = self.convert_value_key(dictionary, value)
-        value = self.filter_value_key(dictionary, value)
-        return value
+class ReplayStorageMetaDictField(CustomMetaDictField):
+    type_map_fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS
+    default_type = const.REPLAY_STORAGE_TYPE_SERVER
+    need_convert_key = True
 
 
 class ReplayStorageSerializer(serializers.ModelSerializer):
@@ -119,54 +76,10 @@ class ReplayStorageSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'type', 'meta']
 
 
-class CommandStorageMetaDictField(serializers.DictField):
-
-    @staticmethod
-    def filter_attribute(attribute, instance):
-        for field in const.COMMAND_STORAGE_TYPE_MAP_FIELDS[instance.type]:
-            if field.get('write_only', False):
-                attribute.pop(field['name'], None)
-        return attribute
-
-    def get_attribute(self, instance):
-        """
-        序列化时调用
-        """
-        attribute = super().get_attribute(instance)
-        attribute = self.filter_attribute(attribute, instance)
-        return attribute
-
-    @staticmethod
-    def convert_value_key(dictionary, value):
-        tp = dictionary.get('type')
-        _value = {}
-        for k, v in value.items():
-            prefix = '{}_'.format(tp)
-            _k = k
-            if k.lower().startswith(prefix):
-                _k = k.lower().split(prefix, 1)[1]
-            _k = _k.upper()
-            _value[_k] = value[k]
-        return _value
-
-    @staticmethod
-    def filter_value_key(dictionary, value):
-        tp = dictionary.get('type', const.COMMAND_STORAGE_TYPE_SERVER)
-        fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS.get(tp, [])
-        fields_names = [field['name'] for field in fields]
-        no_need_keys = [k for k in value.keys() if k not in fields_names]
-        for k in no_need_keys:
-            value.pop(k)
-        return value
-
-    def get_value(self, dictionary):
-        """
-        反序列化时调用
-        """
-        value = super().get_value(dictionary)
-        value = self.convert_value_key(dictionary, value)
-        value = self.filter_value_key(dictionary, value)
-        return value
+class CommandStorageMetaDictField(CustomMetaDictField):
+    type_map_fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS
+    default_type = const.COMMAND_STORAGE_TYPE_SERVER
+    need_convert_key = True
 
 
 class CommandStorageSerializer(serializers.ModelSerializer):
