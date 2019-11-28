@@ -16,6 +16,22 @@ __all__ = [
 ]
 
 
+class CommandStorageViewSet(viewsets.ModelViewSet):
+    filter_fields = ('name', 'type',)
+    search_fields = filter_fields
+    queryset = CommandStorage.objects.all()
+    serializer_class = CommandStorageSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class ReplayStorageViewSet(viewsets.ModelViewSet):
+    filter_fields = ('name', 'type',)
+    search_fields = filter_fields
+    queryset = ReplayStorage.objects.all()
+    serializer_class = ReplayStorageSerializer
+    permission_classes = (IsSuperUser,)
+
+
 class BaseStorageTestConnectiveMixin:
     permission_classes = (IsSuperUser,)
 
@@ -38,25 +54,9 @@ class BaseStorageTestConnectiveMixin:
         return Response(data)
 
 
-class CommandStorageViewSet(viewsets.ModelViewSet):
-    filter_fields = ('name', 'type',)
-    search_fields = filter_fields
-    queryset = CommandStorage.objects.all()
-    serializer_class = CommandStorageSerializer
-    permission_classes = (IsSuperUser,)
-
-
 class CommandStorageTestConnectiveApi(BaseStorageTestConnectiveMixin,
                                       generics.RetrieveAPIView):
     queryset = CommandStorage.objects.all()
-
-
-class ReplayStorageViewSet(viewsets.ModelViewSet):
-    filter_fields = ('name', 'type',)
-    search_fields = filter_fields
-    queryset = ReplayStorage.objects.all()
-    serializer_class = ReplayStorageSerializer
-    permission_classes = (IsSuperUser,)
 
 
 class ReplayStorageTestConnectiveApi(BaseStorageTestConnectiveMixin,
