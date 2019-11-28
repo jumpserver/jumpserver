@@ -73,7 +73,7 @@ class CustomMetaDictField(serializers.DictField):
     def convert_value_key(self, dictionary, value):
         if not self.need_convert_key:
             # remote app
-            return
+            return value
         tp = dictionary.get('type')
         _value = {}
         for k, v in value.items():
