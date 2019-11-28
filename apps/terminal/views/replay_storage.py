@@ -24,6 +24,7 @@ class ReplayStorageListView(PermissionsMixin, TemplateView):
         context = {
             'app': _('Terminal'),
             'action': _('Replay storage list'),
+            'is_replay': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

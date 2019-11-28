@@ -9,7 +9,7 @@
         {% bootstrap_field form.type layout="horizontal" %}
 
         {# s3 #}
-        <div class="s3-fields">
+        <div class="s3-fields hidden">
             {% bootstrap_field form.s3_bucket layout="horizontal" %}
             {% bootstrap_field form.s3_access_key layout="horizontal" %}
             {% bootstrap_field form.s3_secret_key layout="horizontal" %}
@@ -17,7 +17,7 @@
         </div>
 
         {# oss #}
-        <div class="oss-fields">
+        <div class="oss-fields hidden">
             {% bootstrap_field form.oss_bucket layout="horizontal" %}
             {% bootstrap_field form.oss_access_key layout="horizontal" %}
             {% bootstrap_field form.oss_secret_key layout="horizontal" %}
@@ -25,7 +25,7 @@
         </div>
 
         {# azure #}
-        <div class="azure-fields">
+        <div class="azure-fields hidden">
             {% bootstrap_field form.azure_container_name layout="horizontal" %}
             {% bootstrap_field form.azure_account_name layout="horizontal" %}
             {% bootstrap_field form.azure_account_key layout="horizontal" %}
@@ -36,7 +36,6 @@
         <div class="form-group">
             <div class="col-sm-4 col-sm-offset-2">
                 <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-
                 <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
             </div>
         </div>

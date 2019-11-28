@@ -24,6 +24,7 @@ class CommandStorageListView(PermissionsMixin, TemplateView):
         context = {
             'app': _('Terminal'),
             'action': _('Command storage list'),
+            'is_command': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
