@@ -271,7 +271,6 @@ class DynamicConfig:
 
     def LOGIN_URL(self):
         auth_openid = self.get('AUTH_OPENID')
-        print("Open id is: ", auth_openid)
         if auth_openid:
             return reverse_lazy("authentication:openid:openid-login")
         return self.get('LOGIN_URL')
@@ -293,7 +292,7 @@ class DynamicConfig:
     def get_from_db(self, item):
         if self.db_setting is not None:
             value = self.db_setting.get(item)
-            if value:
+            if value is not None:
                 return value
         return None
 

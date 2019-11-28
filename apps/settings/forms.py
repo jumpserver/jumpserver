@@ -4,8 +4,9 @@ import json
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db import transaction
+from django.conf import settings
 
-from .models import Setting, settings
+from .models import Setting
 from common.fields import (
     FormDictField, FormEncryptCharField, FormEncryptMixin
 )

@@ -88,6 +88,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+ASGI_APPLICATION = 'jumpserver.routing.application'
 
 
 # Dump all celery log to here
