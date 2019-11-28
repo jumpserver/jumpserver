@@ -19,8 +19,8 @@ class UserUserGroupRelationViewSet(BulkModelViewSet):
 
     def get_queryset(self):
         queryset = User.groups.through.objects.all()\
-            .annotate(user_name=F('user__name'))\
-            .annotate(usergroup_name=F('usergroup__name'))
+            .annotate(user_display=F('user__name'))\
+            .annotate(usergroup_display=F('usergroup__name'))
         return queryset
 
     def allow_bulk_destroy(self, qs, filtered):

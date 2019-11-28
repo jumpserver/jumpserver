@@ -2,12 +2,9 @@
 #
 
 from django.db.models import Q
-from rest_framework.views import Response
-from django.shortcuts import get_object_or_404
 
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgModelViewSet
-from orgs.mixins import generics
 from common.utils import get_object_or_none
 from ..models import AssetPermission
 from ..hands import (
@@ -17,9 +14,7 @@ from .. import serializers
 
 
 __all__ = [
-    'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
-    'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi', 'AssetPermissionAssetsApi',
+    'AssetPermissionViewSet',
 ]
 
 
@@ -171,99 +166,3 @@ class AssetPermissionViewSet(OrgModelViewSet):
         queryset = self.filter_user_group(queryset)
         queryset = queryset.distinct()
         return queryset
-
-
-class AssetPermissionRemoveUserApi(generics.RetrieveUpdateAPIView):
-    """
-    将用户从授权中移除，Detail页面会调用
-    """
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateUserSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            users = serializer.validated_data.get('users')
-            if users:
-                perm.users.remove(*tuple(users))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAddUserApi(generics.RetrieveUpdateAPIView):
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateUserSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            users = serializer.validated_data.get('users')
-            if users:
-                perm.users.add(*tuple(users))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionRemoveAssetApi(generics.RetrieveUpdateAPIView):
-    """
-    将用户从授权中移除，Detail页面会调用
-    """
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            assets = serializer.validated_data.get('assets')
-            if assets:
-                perm.assets.remove(*tuple(assets))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAddAssetApi(generics.RetrieveUpdateAPIView):
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            assets = serializer.validated_data.get('assets')
-            if assets:
-                perm.assets.add(*tuple(assets))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAssetsApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionAssetsSerializer
-    filter_fields = ("hostname", "ip")
-    search_fields = filter_fields
-
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(AssetPermission, pk=pk)
-
-    def get_queryset(self):
-        perm = self.get_object()
-        assets = perm.get_all_assets().only(
-            *self.serializer_class.Meta.only_fields
-        )
-        return assets

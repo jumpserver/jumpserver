@@ -129,14 +129,13 @@ class AssetPermissionUserView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-        user_remain = current_org.get_org_members(exclude=('Auditor',)).exclude(
-            assetpermission=self.object)
+        users = [str(i) for i in self.object.users.all().values_list('id', flat=True)]
         user_groups_remain = UserGroup.objects.exclude(
             assetpermission=self.object)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': user_remain,
+            'users': users,
             'user_groups_remain': user_groups_remain,
         }
         kwargs.update(context)
@@ -161,8 +160,11 @@ class AssetPermissionAssetView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
+        assets = self.object.assets.all().values_list('id', flat=True)
+        assets = [str(i) for i in assets]
         context = {
             'app': _('Perms'),
+            'assets': assets,
             'action': _('Asset permission asset list'),
             'system_users_remain': SystemUser.objects.exclude(
                 granted_by_permissions=self.object

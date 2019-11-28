@@ -3,9 +3,7 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
 {% block content %}
@@ -27,7 +25,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-8" style="padding-left: 0">
+                        <div class="col-sm-10" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ object.name }}</b></span>
@@ -67,33 +65,6 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr class="no-borders-tr">
-                                          <td width="50%">{% trans 'Active' %}:</td>
-                                            <td><span class="pull-right">
-                                                <div class="switch">
-                                                    <div class="onoffswitch">
-                                                        <input type="checkbox" {% if object.is_active %} checked {% endif %} {% if request.user == object %} disabled {% endif %} class="onoffswitch-checkbox" id="is_active">
-                                                        <label class="onoffswitch-label" for="is_active">
-                                                            <span class="onoffswitch-inner"></span>
-                                                            <span class="onoffswitch-switch"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </span></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                         </div>

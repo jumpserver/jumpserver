@@ -3,11 +3,11 @@
 from django.http import JsonResponse
 from rest_framework.settings import api_settings
 
-from ..filters import IDSpmFilter, CustomFilter
+from common.drf.filters import IDSpmFilter, CustomFilter
 
 __all__ = [
     "JSONResponseMixin", "CommonApiMixin",
-    "IDSpmFilterMixin", "CommonApiMixin",
+    "IDSpmFilterMixin",
 ]
 
 
