@@ -8,10 +8,29 @@ from django.utils.translation import ugettext_lazy as _
 from terminal.models import CommandStorage
 
 
-__all__ = ['CommandStorageCreateUpdateForm']
+__all__ = [
+    'CommandStorageServerForm', 'CommandStorageTypeESForm'
+]
 
 
-class CommandStorageTypeESForm(forms.ModelForm):
+class BaseCommandStorageForm(forms.ModelForm):
+    disable_fields = ['type']
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCommandStorageForm, self).__init__(*args, **kwargs)
+        for field in self.disable_fields:
+            self.fields[field].widget.attrs['disabled'] = True
+
+    class Meta:
+        model = CommandStorage
+        fields = ['name', 'type']
+
+
+class CommandStorageServerForm(BaseCommandStorageForm):
+    pass
+
+
+class CommandStorageTypeESForm(BaseCommandStorageForm):
     es_hosts = forms.CharField(
         max_length=128, label=_('Hosts'), required=False,
         help_text=_(
@@ -28,14 +47,3 @@ class CommandStorageTypeESForm(forms.ModelForm):
     es_doc_type = forms.CharField(
         max_length=128, label=_('Doc type'), required=False
     )
-
-
-class CommandStorageTypeForms(CommandStorageTypeESForm):
-    pass
-
-
-class CommandStorageCreateUpdateForm(CommandStorageTypeForms, forms.ModelForm):
-
-    class Meta:
-        model = CommandStorage
-        fields = ['name', 'type']

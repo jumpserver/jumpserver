@@ -24,17 +24,43 @@ class CommandStorageListView(PermissionsMixin, TemplateView):
         context = {
             'app': _('Terminal'),
             'action': _('Command storage list'),
+            'types': ['Server', 'ES'],
             'is_command': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
-class CommandStorageCreateView(PermissionsMixin, CreateView):
-    template_name = 'terminal/command_storage_create_update.html'
+class CommandStorageCreateUpdateViewMixin:
     model = CommandStorage
-    form_class = forms.CommandStorageCreateUpdateForm
     permission_classes = [IsSuperUser]
+    default_storage_type = 'server'
+    form_class = forms.CommandStorageServerForm
+    form_class_dict = {
+        'es': forms.CommandStorageTypeESForm
+    }
+
+    def get_storage_type(self):
+        return self.default_storage_type
+
+    def get_form_class(self):
+        tp = self.get_storage_type()
+        form_class = self.form_class_dict.get(tp)
+        if form_class:
+            return form_class
+        return super().get_form_class()
+
+    def get_initial(self):
+        return {'type': self.get_storage_type()}
+
+
+class CommandStorageCreateView(CommandStorageCreateUpdateViewMixin,
+                               PermissionsMixin, CreateView):
+    template_name = 'terminal/command_storage_create_update.html'
+
+    def get_storage_type(self):
+        tp = self.request.GET.get("type", 'server').lower()
+        return tp
 
     def get_context_data(self, **kwargs):
         context = {
@@ -46,14 +72,15 @@ class CommandStorageCreateView(PermissionsMixin, CreateView):
         return super().get_context_data(**kwargs)
 
 
-class CommandStorageUpdateView(PermissionsMixin, UpdateView):
+class CommandStorageUpdateView(CommandStorageCreateUpdateViewMixin,
+                               PermissionsMixin, UpdateView):
     template_name = 'terminal/command_storage_create_update.html'
-    model = CommandStorage
-    form_class = forms.CommandStorageCreateUpdateForm
-    permission_classes = [IsSuperUser]
+
+    def get_storage_type(self):
+        return self.object.type
 
     def get_initial(self):
-        initial_data = {}
+        initial_data = super().get_initial()
         for k, v in self.object.meta.items():
             _k = "{}_{}".format(self.object.type, k.lower())
             if k == 'HOSTS':

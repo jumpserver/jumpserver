@@ -7,10 +7,30 @@ from django.utils.translation import ugettext_lazy as _
 from terminal.models import ReplayStorage
 
 
-__all__ = ['ReplayStorageCreateUpdateForm']
+__all__ = [
+    'ReplayStorageServerForm', 'ReplayStorageAzureForm', 'ReplayStorageOSSForm',
+    'ReplayStorageS3Form',
+]
 
 
-class ReplayStorageTypeAzureForm(forms.ModelForm):
+class BaseReplayStorageForm(forms.ModelForm):
+    disable_fields = ['type']
+
+    def __init__(self, *args, **kwargs):
+        super(BaseReplayStorageForm, self).__init__(*args, **kwargs)
+        for field in self.disable_fields:
+            self.fields[field].widget.attrs['disabled'] = True
+
+    class Meta:
+        model = ReplayStorage
+        fields = ['name', 'type']
+
+
+class ReplayStorageServerForm(BaseReplayStorageForm):
+    pass
+
+
+class ReplayStorageAzureForm(BaseReplayStorageForm):
     azure_container_name = forms.CharField(
         max_length=128, label=_('Container name'), required=False
     )
@@ -18,7 +38,8 @@ class ReplayStorageTypeAzureForm(forms.ModelForm):
         max_length=128, label=_('Account name'), required=False
     )
     azure_account_key = forms.CharField(
-        max_length=128, label=_('Account key'), required=False
+        max_length=128, label=_('Account key'), required=False,
+        widget=forms.PasswordInput
     )
     azure_endpoint_suffix = forms.ChoiceField(
         choices=(
@@ -29,15 +50,17 @@ class ReplayStorageTypeAzureForm(forms.ModelForm):
     )
 
 
-class ReplayStorageTypeOSSForm(forms.ModelForm):
+class ReplayStorageOSSForm(BaseReplayStorageForm):
     oss_bucket = forms.CharField(
         max_length=128, label=_('Bucket'), required=False
     )
     oss_access_key = forms.CharField(
-        max_length=128, label=_('Access key'), required=False
+        max_length=128, label=_('Access key'), required=False,
+        widget=forms.PasswordInput
     )
     oss_secret_key = forms.CharField(
-        max_length=128, label=_('Secret key'), required=False
+        max_length=128, label=_('Secret key'), required=False,
+        widget=forms.PasswordInput
     )
     oss_endpoint = forms.CharField(
         max_length=128, label=_('Endpoint'), required=False,
@@ -50,15 +73,17 @@ class ReplayStorageTypeOSSForm(forms.ModelForm):
     )
 
 
-class ReplayStorageTypeS3Form(forms.ModelForm):
+class ReplayStorageS3Form(BaseReplayStorageForm):
     s3_bucket = forms.CharField(
         max_length=128, label=_('Bucket'), required=False
     )
     s3_access_key = forms.CharField(
-        max_length=128, label=_('Access key'), required=False
+        max_length=128, label=_('Access key'), required=False,
+        widget=forms.PasswordInput
     )
     s3_secret_key = forms.CharField(
-        max_length=128, label=_('Secret key'), required=False
+        max_length=128, label=_('Secret key'), required=False,
+        widget=forms.PasswordInput
     )
     s3_endpoint = forms.CharField(
         max_length=128, label=_('Endpoint'), required=False,
@@ -70,18 +95,3 @@ class ReplayStorageTypeS3Form(forms.ModelForm):
             """
         )
     )
-
-
-class ReplayStorageTypeForms(
-    ReplayStorageTypeS3Form,
-    ReplayStorageTypeOSSForm,
-    ReplayStorageTypeAzureForm,
-):
-    pass
-
-
-class ReplayStorageCreateUpdateForm(ReplayStorageTypeForms, forms.ModelForm):
-
-    class Meta:
-        model = ReplayStorage
-        fields = ['name', 'type']
