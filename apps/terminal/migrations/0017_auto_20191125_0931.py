@@ -28,31 +28,33 @@ def get_setting(apps, schema_editor, key):
 
 
 def migrate_command_storage(apps, schema_editor):
+    model = apps.get_model("terminal", "CommandStorage")
+    model.init_default_data()
+
     setting = get_setting(apps, schema_editor, "TERMINAL_COMMAND_STORAGE")
     if not setting:
         return
-    model = apps.get_model("terminal", "CommandStorage")
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE")
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
-    model.init_default_data()
 
 
 def migrate_replay_storage(apps, schema_editor):
+    model = apps.get_model("terminal", "ReplayStorage")
+    model.init_default_data()
+
     setting = get_setting(apps, schema_editor, "TERMINAL_REPLAY_STORAGE")
     if not setting:
         return
-    model = apps.get_model("terminal", "ReplayStorage")
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE", None)
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
-    model.init_default_data()
 
 
 class Migration(migrations.Migration):
