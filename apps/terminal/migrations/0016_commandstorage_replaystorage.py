@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
-                ('type', models.CharField(choices=[('server', 'Server'), ('es', 'Elasticsearch')], default='server', max_length=16)),
-                ('meta', common.fields.model.EncryptJsonDictTextField()),
+                ('type', models.CharField(choices=[('no', 'No'), ('server', 'Server'), ('es', 'Elasticsearch')], default='server', max_length=16, verbose_name='Type')),
+                ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
             ],
             options={
                 'abstract': False,
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
-                ('type', models.CharField(choices=[('server', 'Server'), ('s3', 'S3'), ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16)),
-                ('meta', common.fields.model.EncryptJsonDictTextField()),
+                ('type', models.CharField(choices=[('no', 'No'), ('server', 'Server'), ('s3', 'S3'), ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16, verbose_name='Type')),
+                ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
             ],
             options={
                 'abstract': False,
