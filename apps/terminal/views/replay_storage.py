@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 
 from common.permissions import PermissionsMixin, IsSuperUser
 from terminal.models import ReplayStorage
-from .. import forms
+from .. import forms, const
 
 
 __all__ = [
@@ -25,7 +25,7 @@ class ReplayStorageListView(PermissionsMixin, TemplateView):
             'app': _('Terminal'),
             'action': _('Replay storage list'),
             'is_replay': True,
-            'types': ['Server', 'S3', 'OSS', 'Azure']
+            'type_choices': const.REPLAY_STORAGE_TYPE_CHOICES,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -34,12 +34,12 @@ class ReplayStorageListView(PermissionsMixin, TemplateView):
 class ReplayStorageCreateUpdateViewMixin:
     model = ReplayStorage
     permission_classes = [IsSuperUser]
-    default_storage_type = 'server'
+    default_storage_type = const.REPLAY_STORAGE_TYPE_SERVER
     form_class = forms.ReplayStorageServerForm
     form_class_dict = {
-        's3': forms.ReplayStorageS3Form,
-        'oss': forms.ReplayStorageOSSForm,
-        'azure': forms.ReplayStorageAzureForm
+        const.REPLAY_STORAGE_TYPE_S3: forms.ReplayStorageS3Form,
+        const.REPLAY_STORAGE_TYPE_OSS: forms.ReplayStorageOSSForm,
+        const.REPLAY_STORAGE_TYPE_AZURE: forms.ReplayStorageAzureForm
     }
 
     def get_storage_type(self):
@@ -61,7 +61,7 @@ class ReplayStorageCreateView(ReplayStorageCreateUpdateViewMixin,
     template_name = 'terminal/replay_storage_create_update.html'
 
     def get_storage_type(self):
-        tp = self.request.GET.get("type", 'server').lower()
+        tp = self.request.GET.get("type", self.default_storage_type).lower()
         return tp
 
     def get_context_data(self, **kwargs):

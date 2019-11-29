@@ -1,6 +1,7 @@
 from importlib import import_module
 from django.conf import settings
 from .command.serializers import SessionCommandSerializer
+from ..const import COMMAND_STORAGE_TYPE_SERVER
 
 
 TYPE_ENGINE_MAPPING = {
@@ -21,7 +22,7 @@ def get_terminal_command_storages():
     storage_list = {}
     for s in CommandStorage.objects.all():
         tp = s.type
-        if tp == 'server':
+        if tp == COMMAND_STORAGE_TYPE_SERVER:
             storage = get_command_storage()
         else:
             if not TYPE_ENGINE_MAPPING.get(tp):

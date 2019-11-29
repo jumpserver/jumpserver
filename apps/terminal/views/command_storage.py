@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 
 from common.permissions import PermissionsMixin, IsSuperUser
 from terminal.models import CommandStorage
-from .. import forms
+from .. import forms, const
 
 
 __all__ = [
@@ -24,7 +24,7 @@ class CommandStorageListView(PermissionsMixin, TemplateView):
         context = {
             'app': _('Terminal'),
             'action': _('Command storage list'),
-            'types': ['Server', 'ES'],
+            'type_choices': const.COMMAND_STORAGE_TYPE_CHOICES,
             'is_command': True,
         }
         kwargs.update(context)
@@ -34,10 +34,10 @@ class CommandStorageListView(PermissionsMixin, TemplateView):
 class CommandStorageCreateUpdateViewMixin:
     model = CommandStorage
     permission_classes = [IsSuperUser]
-    default_storage_type = 'server'
+    default_storage_type = const.COMMAND_STORAGE_TYPE_SERVER
     form_class = forms.CommandStorageServerForm
     form_class_dict = {
-        'es': forms.CommandStorageTypeESForm
+        const.COMMAND_STORAGE_TYPE_ES: forms.CommandStorageTypeESForm
     }
 
     def get_storage_type(self):
@@ -59,7 +59,7 @@ class CommandStorageCreateView(CommandStorageCreateUpdateViewMixin,
     template_name = 'terminal/command_storage_create_update.html'
 
     def get_storage_type(self):
-        tp = self.request.GET.get("type", 'server').lower()
+        tp = self.request.GET.get("type", self.default_storage_type).lower()
         return tp
 
     def get_context_data(self, **kwargs):

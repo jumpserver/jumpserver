@@ -18,6 +18,7 @@ from common.mixins import CommonModelMixin
 from common.fields.model import EncryptJsonDictTextField
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
+from . import const
 
 
 class Terminal(models.Model):
@@ -287,15 +288,14 @@ class Command(AbstractSessionCommand):
 
 
 class CommandStorage(CommonModelMixin):
-    TYPE_CHOICES = [
-        ('no', 'No'),
-        ('server', 'Server'),
-        ('es', "Elasticsearch"),
-    ]
+    TYPE_CHOICES = const.COMMAND_STORAGE_TYPE_CHOICES
+    TYPE_SERVER = const.COMMAND_STORAGE_TYPE_SERVER
+    TYPE_NO = const.COMMAND_STORAGE_TYPE_NO
+
     name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
     type = models.CharField(
         max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
-        default='server'
+        default=TYPE_SERVER
     )
     meta = EncryptJsonDictTextField()
 
@@ -309,24 +309,21 @@ class CommandStorage(CommonModelMixin):
         return config
 
     def is_valid(self):
-        if self.type == 'server':
+        if self.type in [self.TYPE_SERVER, self.TYPE_NO]:
             return True
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
 
 class ReplayStorage(CommonModelMixin):
-    TYPE_CHOICES = [
-        ('no', 'No'),
-        ('server', 'Server'),
-        ('s3', "S3"),
-        ('oss', "OSS"),
-        ('azure', 'Azure'),
-    ]
+    TYPE_CHOICES = const.REPLAY_STORAGE_TYPE_CHOICES
+    TYPE_SERVER = const.REPLAY_STORAGE_TYPE_SERVER
+    TYPE_NO = const.REPLAY_STORAGE_TYPE_NO
+
     name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
     type = models.CharField(
         max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
-        default='server'
+        default=TYPE_SERVER
     )
     meta = EncryptJsonDictTextField()
 
@@ -340,7 +337,7 @@ class ReplayStorage(CommonModelMixin):
         return config
 
     def is_valid(self):
-        if self.type == 'server':
+        if self.type in [self.TYPE_SERVER, self.TYPE_NO]:
             return True
         storage = jms_storage.get_object_storage(self.config)
         target = 'tests.py'

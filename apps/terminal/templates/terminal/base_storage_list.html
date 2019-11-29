@@ -18,8 +18,8 @@
                                 </button>
                                 <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu">
-                                {% for tp in types %}
-                                    <li><a class="" href="{% block create_storage_url %}{% endblock %}?type={{ tp }}">{{ tp }}</a></li>
+                                {% for key, value in type_choices %}
+                                    <li><a class="" href="{% block create_storage_url %}{% endblock %}?type={{ key }}">{{ value }}</a></li>
                                 {% endfor %}
                                 </ul>
                             </div>
