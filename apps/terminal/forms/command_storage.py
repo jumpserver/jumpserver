@@ -9,7 +9,7 @@ from terminal.models import CommandStorage
 
 
 __all__ = [
-    'CommandStorageServerForm', 'CommandStorageTypeESForm'
+    'CommandStorageTypeESForm'
 ]
 
 
@@ -24,10 +24,6 @@ class BaseCommandStorageForm(forms.ModelForm):
     class Meta:
         model = CommandStorage
         fields = ['name', 'type']
-
-
-class CommandStorageServerForm(BaseCommandStorageForm):
-    pass
 
 
 class CommandStorageTypeESForm(BaseCommandStorageForm):

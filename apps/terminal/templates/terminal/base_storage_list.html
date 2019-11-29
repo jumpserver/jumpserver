@@ -55,12 +55,22 @@ function initTable() {
         columnDefs: [
             {targets: 3, createdCell: function (td, cellData, rowData) {
                     var name = htmlEscape(rowData.name);
-                    var update_btn = '<a class="btn btn-xs m-l-xs btn-info btn-update" data-uid="{{ DEFAULT_PK }}">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
-                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('{{ DEFAULT_PK }}', cellData)
-                        .replace('99991938', name);
+                    var del_btn, update_btn;
+                    if (['server', 'no'].indexOf(rowData.type) === -1){
+                        del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                        update_btn = '<a class="btn btn-xs m-l-xs btn-info btn-update" data-uid="{{ DEFAULT_PK }}">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+
+                    }
+                    else{
+                        del_btn = '<a class="btn btn-xs btn-danger disabled m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                        update_btn = '<a class="btn btn-xs m-l-xs disabled btn-info btn-update" data-uid="{{ DEFAULT_PK }}">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    }
                     var test_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-test-connective" data-uid="{{ DEFAULT_PK }}">{% trans 'Test' %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
-                    $(td).html(update_btn + test_btn + del_btn);
+                    $(td).html(update_btn + del_btn + test_btn);
                 }
             }
         ],

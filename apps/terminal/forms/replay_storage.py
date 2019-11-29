@@ -8,8 +8,7 @@ from terminal.models import ReplayStorage
 
 
 __all__ = [
-    'ReplayStorageServerForm', 'ReplayStorageAzureForm', 'ReplayStorageOSSForm',
-    'ReplayStorageS3Form',
+    'ReplayStorageAzureForm', 'ReplayStorageOSSForm', 'ReplayStorageS3Form',
 ]
 
 
@@ -24,10 +23,6 @@ class BaseReplayStorageForm(forms.ModelForm):
     class Meta:
         model = ReplayStorage
         fields = ['name', 'type']
-
-
-class ReplayStorageServerForm(BaseReplayStorageForm):
-    pass
 
 
 class ReplayStorageAzureForm(BaseReplayStorageForm):

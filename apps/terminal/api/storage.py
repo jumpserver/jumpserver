@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
 
@@ -16,7 +16,17 @@ __all__ = [
 ]
 
 
-class CommandStorageViewSet(viewsets.ModelViewSet):
+class BaseStorageViewSetMixin:
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not instance.can_delete():
+            data = {'msg': _('Deleting the default storage is not allowed')}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
+
+
+class CommandStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     filter_fields = ('name', 'type',)
     search_fields = filter_fields
     queryset = CommandStorage.objects.all()
@@ -24,7 +34,7 @@ class CommandStorageViewSet(viewsets.ModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-class ReplayStorageViewSet(viewsets.ModelViewSet):
+class ReplayStorageViewSet(BaseStorageViewSetMixin, viewsets.ModelViewSet):
     filter_fields = ('name', 'type',)
     search_fields = filter_fields
     queryset = ReplayStorage.objects.all()
