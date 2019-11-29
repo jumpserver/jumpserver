@@ -28,13 +28,13 @@ def get_setting(apps, schema_editor, key):
 
 
 def init_command_storage_data(model):
-    model.objects.update_or_create(defaults={'name': 'no', 'type': model.TYPE_NO})
-    model.objects.update_or_create(defaults={'name': 'default', 'type': model.TYPE_SERVER})
+    model.objects.update_or_create(defaults={'name': 'no', 'type': 'no'})
+    model.objects.update_or_create(defaults={'name': 'default', 'type': 'server'})
 
 
 def init_replay_storage_data(model):
-    model.objects.update_or_create(defaults={'name': 'no', 'type': model.TYPE_NO})
-    model.objects.update_or_create(defaults={'name': 'default', 'type': model.TYPE_SERVER})
+    model.objects.update_or_create(defaults={'name': 'no', 'type': 'no'})
+    model.objects.update_or_create(defaults={'name': 'default', 'type': 'server'})
 
 
 def migrate_command_storage(apps, schema_editor):
