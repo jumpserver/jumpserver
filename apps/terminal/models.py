@@ -288,6 +288,7 @@ class Command(AbstractSessionCommand):
 
 class CommandStorage(CommonModelMixin):
     TYPE_CHOICES = [
+        ('no', 'No'),
         ('server', 'Server'),
         ('es', "Elasticsearch"),
     ]
@@ -316,6 +317,7 @@ class CommandStorage(CommonModelMixin):
 
 class ReplayStorage(CommonModelMixin):
     TYPE_CHOICES = [
+        ('no', 'No'),
         ('server', 'Server'),
         ('s3', "S3"),
         ('oss', "OSS"),

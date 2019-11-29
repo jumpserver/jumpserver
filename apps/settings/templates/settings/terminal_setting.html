@@ -5,7 +5,8 @@
 {% load common_tags %}
 {% block help_message %}
     {% trans "Command and Replay storage configuration migrated to" %}
-    <b>{% trans "Sessions -> Terminal -> Storage configuration" %}</b>
+    {% trans "Sessions -> Terminal -> Storage configuration" %}
+    <b><a href="{% url 'terminal:replay-storage-list' %}">{% trans 'Here' %}</a></b>
 {% endblock %}
 
 {% block content %}
