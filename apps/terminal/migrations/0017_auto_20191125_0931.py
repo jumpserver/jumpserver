@@ -27,9 +27,19 @@ def get_setting(apps, schema_editor, key):
     return setting[0]
 
 
+def init_command_storage_data(model):
+    model.objects.creat_or_update(defaults={'name': 'no', 'type': model.TYPE_NO})
+    model.objects.creat_or_update(defaults={'name': 'default', 'type': model.TYPE_SERVER})
+
+
+def init_replay_storage_data(model):
+    model.objects.creat_or_update(defaults={'name': 'no', 'type': model.TYPE_NO})
+    model.objects.creat_or_update(defaults={'name': 'default', 'type': model.TYPE_SERVER})
+
+
 def migrate_command_storage(apps, schema_editor):
     model = apps.get_model("terminal", "CommandStorage")
-    model.init_default_data()
+    init_command_storage_data(model)
 
     setting = get_setting(apps, schema_editor, "TERMINAL_COMMAND_STORAGE")
     if not setting:
@@ -44,7 +54,7 @@ def migrate_command_storage(apps, schema_editor):
 
 def migrate_replay_storage(apps, schema_editor):
     model = apps.get_model("terminal", "ReplayStorage")
-    model.init_default_data()
+    init_replay_storage_data(model)
 
     setting = get_setting(apps, schema_editor, "TERMINAL_REPLAY_STORAGE")
     if not setting:
