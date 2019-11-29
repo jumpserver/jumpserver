@@ -38,7 +38,7 @@ def migrate_command_storage(apps, schema_editor):
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
-    model.create_or_update_default()
+    model.init_default_data()
 
 
 def migrate_replay_storage(apps, schema_editor):
@@ -52,7 +52,7 @@ def migrate_replay_storage(apps, schema_editor):
         if not tp:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
-    model.create_or_update_default()
+    model.init_default_data()
 
 
 class Migration(migrations.Migration):

@@ -325,9 +325,9 @@ class CommandStorage(CommonModelMixin):
         defaults = {'name': 'no', 'type': cls.TYPE_NO}
         instance = cls.objects.update_or_create(defaults=defaults)
         return instance
-    
+
     @classmethod
-    def create_or_update_default(cls):
+    def init_default_data(cls):
         cls.create_or_update_server()
         cls.create_or_update_no()
 
@@ -374,6 +374,6 @@ class ReplayStorage(CommonModelMixin):
         return instance
 
     @classmethod
-    def create_or_update_default(cls):
+    def init_default_data(cls):
         cls.create_or_update_server()
         cls.create_or_update_no()
