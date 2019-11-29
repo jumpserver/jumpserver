@@ -314,6 +314,23 @@ class CommandStorage(CommonModelMixin):
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
+    @classmethod
+    def create_or_update_server(cls):
+        defaults = {'name': 'default', 'type': cls.TYPE_SERVER}
+        instance = cls.objects.update_or_create(defaults=defaults)
+        return instance
+
+    @classmethod
+    def create_or_update_no(cls):
+        defaults = {'name': 'no', 'type': cls.TYPE_NO}
+        instance = cls.objects.update_or_create(defaults=defaults)
+        return instance
+    
+    @classmethod
+    def create_or_update_default(cls):
+        cls.create_or_update_server()
+        cls.create_or_update_no()
+
 
 class ReplayStorage(CommonModelMixin):
     TYPE_CHOICES = const.REPLAY_STORAGE_TYPE_CHOICES
@@ -343,3 +360,20 @@ class ReplayStorage(CommonModelMixin):
         target = 'tests.py'
         src = os.path.join(settings.BASE_DIR, 'common', target)
         return storage.is_valid(src, target)
+
+    @classmethod
+    def create_or_update_server(cls):
+        defaults = {'name': 'default', 'type': cls.TYPE_SERVER}
+        instance = cls.objects.update_or_create(defaults=defaults)
+        return instance
+
+    @classmethod
+    def create_or_update_no(cls):
+        defaults = {'name': 'no', 'type': cls.TYPE_NO}
+        instance = cls.objects.update_or_create(defaults=defaults)
+        return instance
+
+    @classmethod
+    def create_or_update_default(cls):
+        cls.create_or_update_server()
+        cls.create_or_update_no()
