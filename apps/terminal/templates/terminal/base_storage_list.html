@@ -31,6 +31,7 @@
                                     </th>
                                     <th class="text-center">{% trans 'Name' %}</th>
                                     <th class="text-center">{% trans 'Type' %}</th>
+                                    <th class="text-center">{% trans 'Comment' %}</th>
                                     <th class="text-center" style="width: 150px">{% trans 'Action' %}</th>
                                 </tr>
                                 </thead>
@@ -53,7 +54,7 @@ function initTable() {
     var options = {
         ele: $('#storage_list_table'),
         columnDefs: [
-            {targets: 3, createdCell: function (td, cellData, rowData) {
+            {targets: 4, createdCell: function (td, cellData, rowData) {
                     var name = htmlEscape(rowData.name);
                     var del_btn, update_btn;
                     if (['server', 'no'].indexOf(rowData.type) === -1){
@@ -76,7 +77,8 @@ function initTable() {
         ],
         ajax_url: storageTableAjaxUrl,
         columns: [
-            {data: "id"}, {data: "name" }, {data: "type"}, {data: "id"}
+            {data: "id"}, {data: "name" }, {data: "type"}, {data: "comment"},
+            {data: "id"}
         ],
         op_html: $('#actions').html()
     };

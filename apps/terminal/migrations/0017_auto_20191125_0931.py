@@ -30,11 +30,17 @@ def get_setting(apps, schema_editor, key):
 def init_storage_data(model):
     model.objects.update_or_create(
         name='no', type='no',
-        defaults={'name': 'no', 'type': 'no'}
+        defaults={
+            'name': 'no', 'type': 'no',
+            'comment': "Do not save"
+        }
     )
     model.objects.update_or_create(
         name='default', type='server',
-        defaults={'name': 'default', 'type': 'server'}
+        defaults={
+            'name': 'default', 'type': 'server',
+            'comment': "Store locally"
+        }
     )
 
 

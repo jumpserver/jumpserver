@@ -5,7 +5,6 @@ from django.db import migrations, models
 import uuid
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [

@@ -4,25 +4,35 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from terminal.models import ReplayStorage
+from terminal.models import ReplayStorage, CommandStorage
 
 
 __all__ = [
     'ReplayStorageAzureForm', 'ReplayStorageOSSForm', 'ReplayStorageS3Form',
+    'CommandStorageTypeESForm',
 ]
 
 
-class BaseReplayStorageForm(forms.ModelForm):
-    disable_fields = ['type']
+class BaseStorageForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
-        super(BaseReplayStorageForm, self).__init__(*args, **kwargs)
-        for field in self.disable_fields:
-            self.fields[field].widget.attrs['disabled'] = True
+        super(BaseStorageForm, self).__init__(*args, **kwargs)
+        self.fields['type'].widget.attrs['disabled'] = True
+        self.fields.move_to_end('comment')
+
+
+class BaseReplayStorageForm(BaseStorageForm, forms.ModelForm):
 
     class Meta:
         model = ReplayStorage
-        fields = ['name', 'type']
+        fields = ['name', 'type', 'comment']
+
+
+class BaseCommandStorageForm(forms.ModelForm):
+
+    class Meta:
+        model = CommandStorage
+        fields = ['name', 'type', 'comment']
 
 
 class ReplayStorageAzureForm(BaseReplayStorageForm):
@@ -89,4 +99,23 @@ class ReplayStorageS3Form(BaseReplayStorageForm):
             Example: http://s3.cn-north-1.amazonaws.com.cn
             """
         )
+    )
+
+
+class CommandStorageTypeESForm(BaseCommandStorageForm):
+    es_hosts = forms.CharField(
+        max_length=128, label=_('Hosts'), required=False,
+        help_text=_(
+            """
+            Tips: If there are multiple hosts, separate them with a comma (,) 
+            <br>
+            eg: http://www.jumpserver.a.com,http://www.jumpserver.b.com
+            """
+        )
+    )
+    es_index = forms.CharField(
+        max_length=128, label=_('Index'), required=False
+    )
+    es_doc_type = forms.CharField(
+        max_length=128, label=_('Doc type'), required=False
     )

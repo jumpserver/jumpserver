@@ -107,7 +107,7 @@ class ReplayStorageSerializer(BaseStorageSerializerMixin,
 
     class Meta:
         model = ReplayStorage
-        fields = ['id', 'name', 'type', 'meta']
+        fields = ['id', 'name', 'type', 'meta', 'comment']
 
 
 class CommandStorageMetaDictField(CustomMetaDictField):
@@ -125,4 +125,4 @@ class CommandStorageSerializer(BaseStorageSerializerMixin,
 
     class Meta:
         model = CommandStorage
-        fields = ['id', 'name', 'type', 'meta']
+        fields = ['id', 'name', 'type', 'meta', 'comment']
