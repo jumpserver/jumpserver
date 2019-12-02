@@ -57,7 +57,7 @@ function initTable() {
             {targets: 4, createdCell: function (td, cellData, rowData) {
                     var name = htmlEscape(rowData.name);
                     var del_btn, update_btn;
-                    if (['server', 'no'].indexOf(rowData.type) === -1){
+                    if (['server', 'null'].indexOf(rowData.type) === -1){
                         del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', name);

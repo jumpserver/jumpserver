@@ -29,9 +29,9 @@ def get_setting(apps, schema_editor, key):
 
 def init_storage_data(model):
     model.objects.update_or_create(
-        name='no', type='no',
+        name='null', type='null',
         defaults={
-            'name': 'no', 'type': 'no',
+            'name': 'null', 'type': 'null',
             'comment': "Do not save"
         }
     )
@@ -54,7 +54,7 @@ def migrate_command_storage(apps, schema_editor):
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE")
-        if not tp or name in ['default', 'no']:
+        if not tp or name in ['default', 'null']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 
@@ -69,7 +69,7 @@ def migrate_replay_storage(apps, schema_editor):
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE", None)
-        if not tp or name in ['default', 'no']:
+        if not tp or name in ['default', 'null']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 

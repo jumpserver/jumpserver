@@ -289,8 +289,8 @@ class Command(AbstractSessionCommand):
 
 class CommandStorage(CommonModelMixin):
     TYPE_CHOICES = const.COMMAND_STORAGE_TYPE_CHOICES
+    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
     TYPE_SERVER = const.COMMAND_STORAGE_TYPE_SERVER
-    TYPE_NO = const.COMMAND_STORAGE_TYPE_NO
 
     name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
     type = models.CharField(
@@ -311,20 +311,23 @@ class CommandStorage(CommonModelMixin):
         config.update({'TYPE': self.type})
         return config
 
+    def in_defaults(self):
+        return self.type in self.TYPE_DEFAULTS
+
     def is_valid(self):
-        if self.type in [self.TYPE_SERVER, self.TYPE_NO]:
+        if self.in_defaults():
             return True
         storage = jms_storage.get_log_storage(self.config)
         return storage.ping()
 
     def can_delete(self):
-        return self.type not in [self.TYPE_SERVER, self.TYPE_NO]
+        return not self.in_defaults()
 
 
 class ReplayStorage(CommonModelMixin):
     TYPE_CHOICES = const.REPLAY_STORAGE_TYPE_CHOICES
     TYPE_SERVER = const.REPLAY_STORAGE_TYPE_SERVER
-    TYPE_NO = const.REPLAY_STORAGE_TYPE_NO
+    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
 
     name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
     type = models.CharField(
@@ -345,8 +348,11 @@ class ReplayStorage(CommonModelMixin):
         config.update({'TYPE': self.type})
         return config
 
+    def in_defaults(self):
+        return self.type in self.TYPE_DEFAULTS
+
     def is_valid(self):
-        if self.type in [self.TYPE_SERVER, self.TYPE_NO]:
+        if self.in_defaults():
             return True
         storage = jms_storage.get_object_storage(self.config)
         target = 'tests.py'
@@ -354,5 +360,5 @@ class ReplayStorage(CommonModelMixin):
         return storage.is_valid(src, target)
 
     def can_delete(self):
-        return self.type not in [self.TYPE_SERVER, self.TYPE_NO]
+        return not self.in_defaults()
 
