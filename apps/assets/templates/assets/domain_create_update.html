@@ -25,9 +25,7 @@
 <script type="text/javascript">
 $(document).ready(function () {
     $('.select2').select2().off("select2:open");
-}).on('click', '.select2-selection__rendered', function (e) {
-    e.preventDefault();
-    $("#asset_list_modal").modal();
+    initAssetTreeModel('#id_assets');
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();

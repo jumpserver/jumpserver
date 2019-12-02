@@ -2,12 +2,9 @@
 #
 
 from django.db.models import Q
-from rest_framework.views import Response
-from django.shortcuts import get_object_or_404
 
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgModelViewSet
-from orgs.mixins import generics
 from common.utils import get_object_or_none
 from ..models import AssetPermission
 from ..hands import (
@@ -17,9 +14,7 @@ from .. import serializers
 
 
 __all__ = [
-    'AssetPermissionViewSet', 'AssetPermissionRemoveUserApi',
-    'AssetPermissionAddUserApi', 'AssetPermissionRemoveAssetApi',
-    'AssetPermissionAddAssetApi', 'AssetPermissionAssetsApi',
+    'AssetPermissionViewSet',
 ]
 
 
@@ -29,6 +24,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
     """
     model = AssetPermission
     serializer_class = serializers.AssetPermissionCreateUpdateSerializer
+    serializer_display_class = serializers.AssetPermissionListSerializer
     filter_fields = ['name']
     permission_classes = (IsOrgAdmin,)
 
@@ -38,11 +34,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
         )
         return queryset
 
-    def get_serializer_class(self):
-        if self.action in ("list", 'retrieve') and \
-                self.request.query_params.get("display"):
-            return serializers.AssetPermissionListSerializer
-        return self.serializer_class
+    def is_query_all(self):
+        query_all = self.request.query_params.get('all', '1') == '1'
+        return query_all
 
     def filter_valid(self, queryset):
         valid_query = self.request.query_params.get('is_valid', None)
@@ -81,7 +75,10 @@ class AssetPermissionViewSet(OrgModelViewSet):
         if not _nodes:
             return queryset.none()
 
-        nodes = set()
+        if not self.is_query_all():
+            queryset = queryset.filter(nodes__in=_nodes)
+            return queryset
+        nodes = set(_nodes)
         for node in _nodes:
             nodes |= set(node.get_ancestors(with_self=True))
         queryset = queryset.filter(nodes__in=nodes)
@@ -101,6 +98,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
             return queryset
         if not assets:
             return queryset.none()
+        if not self.is_query_all():
+            queryset = queryset.filter(assets__in=assets)
+            return queryset
         inherit_all_nodes = set()
         inherit_nodes_keys = assets.all().values_list('nodes__key', flat=True)
 
@@ -117,7 +117,6 @@ class AssetPermissionViewSet(OrgModelViewSet):
     def filter_user(self, queryset):
         user_id = self.request.query_params.get('user_id')
         username = self.request.query_params.get('username')
-        query_group = self.request.query_params.get('all')
         if user_id:
             user = get_object_or_none(User, pk=user_id)
         elif username:
@@ -126,14 +125,14 @@ class AssetPermissionViewSet(OrgModelViewSet):
             return queryset
         if not user:
             return queryset.none()
-        kwargs = {}
-        args = []
-        if query_group:
-            groups = user.groups.all()
-            args.append(Q(users=user) | Q(user_groups__in=groups))
-        else:
-            kwargs["users"] = user
-        return queryset.filter(*args, **kwargs).distinct()
+        if not self.is_query_all():
+            queryset = queryset.filter(users=user)
+            return queryset
+        groups = user.groups.all()
+        queryset = queryset.filter(
+            Q(users=user) | Q(user_groups__in=groups)
+        ).distinct()
+        return queryset
 
     def filter_user_group(self, queryset):
         user_group_id = self.request.query_params.get('user_group_id')
@@ -167,99 +166,3 @@ class AssetPermissionViewSet(OrgModelViewSet):
         queryset = self.filter_user_group(queryset)
         queryset = queryset.distinct()
         return queryset
-
-
-class AssetPermissionRemoveUserApi(generics.RetrieveUpdateAPIView):
-    """
-    将用户从授权中移除，Detail页面会调用
-    """
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateUserSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            users = serializer.validated_data.get('users')
-            if users:
-                perm.users.remove(*tuple(users))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAddUserApi(generics.RetrieveUpdateAPIView):
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateUserSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            users = serializer.validated_data.get('users')
-            if users:
-                perm.users.add(*tuple(users))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionRemoveAssetApi(generics.RetrieveUpdateAPIView):
-    """
-    将用户从授权中移除，Detail页面会调用
-    """
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            assets = serializer.validated_data.get('assets')
-            if assets:
-                perm.assets.remove(*tuple(assets))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAddAssetApi(generics.RetrieveUpdateAPIView):
-    model = AssetPermission
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
-
-    def update(self, request, *args, **kwargs):
-        perm = self.get_object()
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            assets = serializer.validated_data.get('assets')
-            if assets:
-                perm.assets.add(*tuple(assets))
-                perm.save()
-            return Response({"msg": "ok"})
-        else:
-            return Response({"error": serializer.errors})
-
-
-class AssetPermissionAssetsApi(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetPermissionAssetsSerializer
-    filter_fields = ("hostname", "ip")
-    search_fields = filter_fields
-
-    def get_object(self):
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(AssetPermission, pk=pk)
-
-    def get_queryset(self):
-        perm = self.get_object()
-        assets = perm.get_all_assets().only(
-            *self.serializer_class.Meta.only_fields
-        )
-        return assets

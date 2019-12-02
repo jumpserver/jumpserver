@@ -5,8 +5,6 @@
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <link href="{% static 'css/plugins/jstree/style.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">
     <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>
@@ -96,9 +94,6 @@ function beforeNodeAsync(treeId, treeNode) {
     return true
 }
 
-function makeLabel(data) {
-    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
-}
 
 function format(d) {
     var data = "";
@@ -176,7 +171,7 @@ function initTable() {
 				$(td).html(update_btn + del_btn);
             }}
         ],
-        ajax_url: '{% url "api-perms:asset-permission-list" %}?display=1',
+        ajax_url: '{% url "api-perms:asset-permission-list" %}',
         columns: [
             {data: "id"}, {data: "name"}, {data: "users", orderable: false},
             {data: "user_groups", orderable: false}, {data: "assets", orderable: false},
@@ -213,6 +208,10 @@ $(document).ready(function(){
         {title: "{% trans 'Hostname' %}", value: "hostname"},
         {title: "{% trans 'Node' %}", value: "node"},
         {title: "{% trans 'System user' %}", value: "system_user"},
+        {title: "{% trans 'Inherit' %}", value: "all", submenu: [
+            {title: "{% trans 'Include' %}", value: "1"},
+            {title: "{% trans 'Exclude' %}", value: "0"},
+        ]},
     ];
     initTableFilterDropdown('#permission_list_table_filter input', filterMenu)
 })

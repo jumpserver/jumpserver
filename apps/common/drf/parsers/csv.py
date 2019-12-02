@@ -9,7 +9,7 @@ import unicodecsv
 from rest_framework.parsers import BaseParser
 from rest_framework.exceptions import ParseError
 
-from ..utils import get_logger
+from common.utils import get_logger
 
 logger = get_logger(__file__)
 
