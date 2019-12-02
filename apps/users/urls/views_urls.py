@@ -35,6 +35,7 @@ urlpatterns = [
     path('user/update/', views.UserBulkUpdateView.as_view(), name='user-bulk-update'),
     path('user/<uuid:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     path('user/<uuid:pk>/assets/', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
+    path('user/<uuid:pk>/asset-permissions/', views.UserAssetPermissionListView.as_view(), name='user-asset-permission'),
     path('user/<uuid:pk>/login-history/', views.UserDetailView.as_view(), name='user-login-history'),
 
     # User group view

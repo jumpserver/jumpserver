@@ -2,10 +2,6 @@
 {% load static %}
 {% load i18n %}
 
-{% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
-{% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -54,8 +50,8 @@
                                             <th class="text-center">
                                                 <input type="checkbox" id="check_all" class="ipt_check_all" >
                                             </th>
-                                            <th class="text-center">{% trans 'Hostname' %}</th>
-                                            <th class="text-center">{% trans 'IP' %}</th>
+                                            <th class="text-center">{% trans 'Asset' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -75,7 +71,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2" id="id_assets" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 assets-select2" id="id_assets" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -112,10 +108,46 @@
                                         </form>
 
                                         {% for node in asset_permission.nodes.all %}
-                                        <tr>
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
                                           <td ><b class="bdg_group" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn-remove-node" type="button" data-gid="{{ node.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-xs btn-remove-node" type="button" data-uid="{{ node.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="system-user-table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-users" id="system_users_select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                        <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm" id="btn-add-system-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for system_user in object.system_users.all %}
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
+                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user|truncatechars:21}}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger btn-xs btn-remove-sys-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -129,52 +161,64 @@
             </div>
         </div>
     </div>
-
 {% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function addAssets(assets) {
-    var the_url = "{% url 'api-perms:asset-permission-add-asset' pk=asset_permission.id %}";
-    var body = {
-        assets: assets
-    };
-    var success = function(data) {
-        location.reload();
-    };
-    requestApi({
-        url: the_url,
-        body: JSON.stringify(body),
-        success: success
-    });
- }
 
-function removeAssets(assets) {
-    var the_url = "{% url 'api-perms:asset-permission-remove-asset' pk=asset_permission.id %}";
-    var body = {
-        assets: assets
-    };
-    var success = function(data) {
-        location.reload();
-    };
+var assetsRelationUrl = "{% url 'api-perms:asset-permissions-assets-relation-list' %}";
+var nodesRelationUrl = "{% url 'api-perms:asset-permissions-nodes-relation-list' %}";
+var systemUsersRelationUrl = "{% url 'api-perms:asset-permissions-system-users-relation-list' %}";
+
+function getRelationUrl(type) {
+    var theUrl = "";
+    switch (type) {
+        case "asset":
+            theUrl = assetsRelationUrl;
+            break;
+        case "node":
+            theUrl = nodesRelationUrl;
+            break;
+        case "systemuser":
+            theUrl = systemUsersRelationUrl;
+            break;
+    }
+    return theUrl;
+}
+
+function addObjects(objectsId, type) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {assetpermission: "{{ object.id }}"};
+        data[type] = v;
+        body.push(data)
+    });
     requestApi({
-        url: the_url,
+        url: theUrl,
         body: JSON.stringify(body),
-        success: success
+        method: "POST",
+        success: reloadPage
     });
 }
 
-function updateNodes(nodes, success) {
-    var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
-    var body = {
-        nodes: nodes
-    };
+function removeObject(objectId, type) {
+    if (!objectId)  {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    theUrl = setUrlParam(theUrl, 'assetpermission', "{{ object.id }}");
+    theUrl = setUrlParam(theUrl, type, objectId);
     requestApi({
-        url: the_url,
-        body: JSON.stringify(body),
-        success: success
+        url: theUrl,
+        method: "DELETE",
+        success: reloadPage
     });
 }
+
 
 var table;
 function initAssetTable() {
@@ -182,16 +226,18 @@ function initAssetTable() {
         ele: $('#asset_list_table'),
         toggle: true,
         columnDefs: [
-            {
-                targets: 0, createdCell: function (td, cellData, rowData) {
-                    var html = '<input type="checkbox" class="text-center ipt_check" id="id_' + cellData + '">';
-                    $(td).html(html);
-                }
-            },
+             {targets: 2, createdCell: function (td, cellData, rowData) {
+                  var removeBtn = '<a class="btn btn-xs btn-danger m-l-xs btn-remove-asset" disabled data-uid="{{ DEFAULT_PK }}"><i class="fa fa-minus"></i></a>'
+                      .replace('{{ DEFAULT_PK }}', cellData);
+                  if (assetDirectRelated.indexOf(cellData) !== -1) {
+                      removeBtn = removeBtn.replace('disabled', '')
+                  }
+		  		  $(td).html(removeBtn);
+             }}
         ],
-        ajax_url: "{% url 'api-perms:asset-permission-assets' pk=object.id %}",
+        ajax_url: "{% url 'api-perms:asset-permission-all-assets' pk=object.id %}",
         columns: [
-            {data: "id"}, {data: "hostname"}, {data: "ip"}
+            {data: "asset"}, {data: "asset_display"}, {data: "asset", width: "30px"}
         ],
         op_html: $('#actions').html()
     };
@@ -199,76 +245,38 @@ function initAssetTable() {
     return table
 }
 
+var assetDirectRelated = {{ assets | safe }};
+
 
 $(document).ready(function () {
     $('.select2').select2();
-    table = initAssetTable();
-
     nodesSelect2Init(".nodes-select2");
-
-    $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
-        if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
-            e.preventDefault();
-            e.stopPropagation();
-            $("#asset_list_modal").modal();
-        }
-    })
+    initAssetTable();
+    initAssetTreeModel('#id_assets');
 })
 .on('click', '.btn-add-assets', function () {
-    var assets_selected = $("#id_assets option:selected").map(function () {
-        return $(this).attr('value');
-    }).get();
-    if (assets_selected.length === 0) {
-		return false;
-	}
-    addAssets(assets_selected);
+    var assetsId = $("#id_assets").val();
+    addObjects(assetsId, "asset");
 })
 .on('click', '.btn-remove-asset', function () {
-    var asset_id = $(this).data("gid");
-    if (asset_id === "") {
-        return
-    }
-    var assets = [asset_id];
-    removeAssets(assets)
+    var assetId = $(this).data("uid");
+    removeObject(assetId, "asset")
 })
 .on('click', '#btn-add-node', function () {
-    var nodes_selected = {};
-    $("#nodes_select2 option:selected").each(function (i, data) {
-        nodes_selected[$(data).attr('value')] = $(data).text();
-    });
-    if (Object.keys(nodes_selected).length === 0) {
-		return false;
-	}
-    var nodes_origin = $('.bdg_group').map(function() {
-        return $(this).data('gid');
-    }).get();
-
-    var nodes = nodes_origin.concat(Object.keys(nodes_selected));
-    var success = function () {
-        $.map(nodes_selected, function(name, id) {
-            $('#opt_' + id).remove();
-            $('.group_edit tbody').append(
-               '<tr>' +
-               '<td><b class="bdg_group" data-gid="' + id + '">' + name + '</b></td>' +
-               '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
-               '</tr>'
-            )
-        });
-    };
-    updateNodes(nodes, success);
- })
+    var nodesId = $("#nodes_select2").val();
+    addObjects(nodesId, "node");
+})
 .on('click', '.btn-remove-node', function () {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var nodes = $('.bdg_group').map(function() {
-        if ($(this).data('gid') !== $this.data('gid')){
-            return $(this).data('gid');
-        }
-    }).get();
-    var success = function () {
-        $tr.remove()
-    };
-    updateNodes(nodes, success);
+    var nodeId = $(this).data("uid");
+    removeObject(nodeId, "node")
+})
+.on('click', '#btn-add-system-user', function () {
+    var systemUsersId = $("#system_users_select2").val();
+    addObjects(systemUsersId, "systemuser");
+})
+.on('click', '.btn-remove-sys-user', function () {
+    var systemUserId = $(this).data("uid");
+    removeObject(systemUserId, "systemuser")
 })
 </script>
 {% endblock %}

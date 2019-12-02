@@ -413,7 +413,7 @@ $.fn.serializeObject = function () {
 };
 
 function makeLabel(data) {
-    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
+    return "<label class='detail-key'><b>" + data[0] + ": </b></label> " + data[1] + "</br>"
 }
 
 function parseTableFilter(value) {
@@ -1241,10 +1241,28 @@ function readFile(ref) {
     return ref
 }
 
-function nodesSelect2Init(selector, url) {
-    if (!url) {
-        url = '/api/v1/assets/nodes/'
+
+
+function select2AjaxInit(option) {
+    /*
+    {
+      selector:
+      url: ,
+      disabledData: ,
+      displayFormat,
+      idFormat,
     }
+     */
+    var selector = option.selector;
+    var url = option.url;
+    var disabledData = option.disabledData;
+    var displayFormat = option.displayFormat || function (data) {
+        return data.name;
+    };
+    var idFormat = option.idFormat || function (data) {
+        return data.id;
+    };
+
     return $(selector).select2({
         closeOnSelect: false,
         ajax: {
@@ -1260,43 +1278,53 @@ function nodesSelect2Init(selector, url) {
             },
             processResults: function (data) {
                 var results = $.map(data.results, function (v, i) {
-                    return {id: v.id, text: v.full_value}
+                    var display = displayFormat(v);
+                    var id = idFormat(v);
+                    var d = {id: id, text: display};
+                    if (disabledData && disabledData.indexOf(v.id) !== -1) {
+                        d.disabled = true;
+                    }
+                    return d;
                 });
                 var more = !!data.next;
                 return {results: results, pagination: {"more": more}}
             }
         },
     })
+
 }
 
-function usersSelect2Init(selector, url) {
+function usersSelect2Init(selector, url, disabledData) {
     if (!url) {
         url = '/api/v1/users/users/'
     }
-    return $(selector).select2({
-        closeOnSelect: false,
-        ajax: {
-            url: url,
-            data: function (params) {
-                var page = params.page || 1;
-                var query = {
-                    search: params.term,
-                    offset: (page - 1) * 10,
-                    limit: 10
-                };
-                return query
-            },
-            processResults: function (data) {
-                var results = $.map(data.results, function (v, i) {
-                    var display = v.name + '(' + v.username +')';
-                    return {id: v.id, text: display}
-                });
-                var more = !!data.next;
-                return {results: results, pagination: {"more": more}}
-            }
-        },
-    })
+    function displayFormat(v) {
+        return v.name + '(' + v.username +')';
+    }
+    var option = {
+        url: url,
+        selector: selector,
+        disabledData: disabledData,
+        displayFormat: displayFormat
+    };
+    return select2AjaxInit(option)
+}
 
+
+function nodesSelect2Init(selector, url, disabledData) {
+    if (!url) {
+        url = '/api/v1/assets/nodes/'
+    }
+    function displayFormat(v) {
+        return v.full_value;
+    }
+    var option = {
+        url: url,
+        selector: selector,
+        disabledData: disabledData,
+        displayFormat: displayFormat
+    };
+    return select2AjaxInit(option)
 }
 
 function showCeleryTaskLog(taskId) {
@@ -1324,7 +1352,7 @@ function initDateRangePicker(selector, options) {
         timePicker24Hour: true,
         autoApply: true,
     };
-    var userLang = navigator.language || navigator.userLanguage;;
+    var userLang = navigator.language || navigator.userLanguage;
     if (userLang.indexOf('zh') !== -1) {
         defaultOption.locale = zhLocale;
     }

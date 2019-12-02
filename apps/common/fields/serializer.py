@@ -5,7 +5,9 @@ from rest_framework import serializers
 from django.utils import six
 
 
-__all__ = ['StringIDField', 'StringManyToManyField', 'ChoiceDisplayField']
+__all__ = [
+    'StringIDField', 'StringManyToManyField', 'ChoiceDisplayField',
+]
 
 
 class StringIDField(serializers.Field):

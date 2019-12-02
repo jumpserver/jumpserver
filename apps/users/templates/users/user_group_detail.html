@@ -3,13 +3,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <link href="{% static "css/plugins/datatables/datatables.min.css" %}" rel="stylesheet">
-    <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
-    <script src="{% static "js/plugins/datatables/datatables.min.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -98,7 +93,7 @@
                                         <tr>
                                           <td ><b class="bdg_user" data-uid={{ user.id }}>{{ user.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_remove_user" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-remove-user" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -132,7 +127,7 @@ function updateGroupMember(users) {
             $('.user_edit tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_user" data-uid="' + index + '">' + user_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_remove_user" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-user" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });
@@ -156,7 +151,7 @@ $(document).ready(function () {
             delete jumpserver.users_selected[data.id]
         });
     usersSelect2Init('#slct_users')
-}).on('click', '.btn_remove_user', function() {
+}).on('click', '.btn-remove-user', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
     var $badge = $tr.find('.bdg_user');
