@@ -28,7 +28,7 @@ class BaseReplayStorageForm(BaseStorageForm, forms.ModelForm):
         fields = ['name', 'type', 'comment']
 
 
-class BaseCommandStorageForm(forms.ModelForm):
+class BaseCommandStorageForm(BaseStorageForm, forms.ModelForm):
 
     class Meta:
         model = CommandStorage

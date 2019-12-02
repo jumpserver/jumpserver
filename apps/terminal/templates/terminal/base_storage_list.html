@@ -78,7 +78,7 @@ function initTable() {
         ajax_url: storageTableAjaxUrl,
         columns: [
             {data: "id"}, {data: "name" }, {data: "type"}, {data: "comment"},
-            {data: "id"}
+            {data: "id", orderable: false,}
         ],
         op_html: $('#actions').html()
     };
