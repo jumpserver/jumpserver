@@ -48,7 +48,7 @@ def migrate_command_storage(apps, schema_editor):
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE")
-        if not tp:
+        if not tp or name in ['default', 'no']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 
@@ -63,7 +63,7 @@ def migrate_replay_storage(apps, schema_editor):
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE", None)
-        if not tp:
+        if not tp or name in ['default', 'no']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 
