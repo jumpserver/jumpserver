@@ -41,6 +41,7 @@ class AssetUser(OrgModelMixin):
     ASSET_USER_CACHE_TIME = 3600 * 24
 
     _prefer = "system_user"
+    _assets_amount = None
 
     @property
     def private_key_obj(self):
@@ -143,6 +144,8 @@ class AssetUser(OrgModelMixin):
 
     @property
     def assets_amount(self):
+        if self._assets_amount is not None:
+            return self._assets_amount
         cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
         cached = cache.get(cache_key)
         if not cached:

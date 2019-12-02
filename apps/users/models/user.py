@@ -536,6 +536,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
             return True
         return False
 
+    def set_avatar(self, f):
+        self.avatar.save(self.username, f)
+
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"
         user_default = settings.STATIC_URL + "img/avatar/user.png"
