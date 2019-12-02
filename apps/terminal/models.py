@@ -298,6 +298,9 @@ class CommandStorage(CommonModelMixin):
         default=TYPE_SERVER
     )
     meta = EncryptJsonDictTextField(default={})
+    comment = models.TextField(
+        max_length=128, default='', blank=True, verbose_name=_('Comment')
+    )
 
     def __str__(self):
         return self.name
@@ -329,6 +332,9 @@ class ReplayStorage(CommonModelMixin):
         default=TYPE_SERVER
     )
     meta = EncryptJsonDictTextField(default={})
+    comment = models.TextField(
+        max_length=128, default='', blank=True, verbose_name=_('Comment')
+    )
 
     def __str__(self):
         return self.name

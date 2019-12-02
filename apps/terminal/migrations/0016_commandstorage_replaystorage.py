@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
                 ('type', models.CharField(choices=[('no', 'No'), ('server', 'Server'), ('es', 'Elasticsearch')], default='server', max_length=16, verbose_name='Type')),
                 ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
+                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
             ],
             options={
                 'abstract': False,
@@ -38,6 +39,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
                 ('type', models.CharField(choices=[('no', 'No'), ('server', 'Server'), ('s3', 'S3'), ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16, verbose_name='Type')),
                 ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
+                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
             ],
             options={
                 'abstract': False,
