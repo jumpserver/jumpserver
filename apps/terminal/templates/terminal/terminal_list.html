@@ -18,6 +18,7 @@
 {% block table_search %}{% endblock %}
 
 {% block table_container %}
+<div class="uc pull-left m-r-5"><a href="{% url "terminal:replay-storage-list" %}" class="btn btn-sm btn-primary"> {% trans "Storage configuration" %} </a></div>
 <table class="table table-striped table-bordered table-hover " id="terminal_list_table" >
     <thead>
         <tr>

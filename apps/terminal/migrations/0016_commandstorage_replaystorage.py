@@ -5,7 +5,6 @@ from django.db import migrations, models
 import uuid
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,8 +20,9 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
-                ('type', models.CharField(choices=[('server', 'Server'), ('es', 'Elasticsearch')], default='server', max_length=16)),
-                ('meta', common.fields.model.EncryptJsonDictTextField()),
+                ('type', models.CharField(choices=[('null', 'Null'), ('server', 'Server'), ('es', 'Elasticsearch')], default='server', max_length=16, verbose_name='Type')),
+                ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
+                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
             ],
             options={
                 'abstract': False,
@@ -36,8 +36,9 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Date created')),
                 ('date_updated', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
                 ('name', models.CharField(max_length=32, unique=True, verbose_name='Name')),
-                ('type', models.CharField(choices=[('server', 'Server'), ('s3', 'S3'), ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16)),
-                ('meta', common.fields.model.EncryptJsonDictTextField()),
+                ('type', models.CharField(choices=[('null', 'Null'), ('server', 'Server'), ('s3', 'S3'), ('oss', 'OSS'), ('azure', 'Azure')], default='server', max_length=16, verbose_name='Type')),
+                ('meta', common.fields.model.EncryptJsonDictTextField(default={})),
+                ('comment', models.TextField(blank=True, default='', max_length=128, verbose_name='Comment')),
             ],
             options={
                 'abstract': False,

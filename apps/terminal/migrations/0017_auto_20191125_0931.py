@@ -27,28 +27,49 @@ def get_setting(apps, schema_editor, key):
     return setting[0]
 
 
+def init_storage_data(model):
+    model.objects.update_or_create(
+        name='null', type='null',
+        defaults={
+            'name': 'null', 'type': 'null',
+            'comment': "Do not save"
+        }
+    )
+    model.objects.update_or_create(
+        name='default', type='server',
+        defaults={
+            'name': 'default', 'type': 'server',
+            'comment': "Store locally"
+        }
+    )
+
+
 def migrate_command_storage(apps, schema_editor):
+    model = apps.get_model("terminal", "CommandStorage")
+    init_storage_data(model)
+
     setting = get_setting(apps, schema_editor, "TERMINAL_COMMAND_STORAGE")
     if not setting:
         return
-    model = apps.get_model("terminal", "CommandStorage")
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE")
-        if not tp:
+        if not tp or name in ['default', 'null']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 
 
 def migrate_replay_storage(apps, schema_editor):
+    model = apps.get_model("terminal", "ReplayStorage")
+    init_storage_data(model)
+
     setting = get_setting(apps, schema_editor, "TERMINAL_REPLAY_STORAGE")
     if not setting:
         return
-    model = apps.get_model("terminal", "ReplayStorage")
     values = get_storage_data(setting)
     for name, meta in values.items():
         tp = meta.pop("TYPE", None)
-        if not tp:
+        if not tp or name in ['default', 'null']:
             continue
         model.objects.create(name=name, type=tp, meta=meta)
 

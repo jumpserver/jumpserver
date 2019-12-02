@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeIn">
+        <div class="col-lg-12">
+            <div class="tabs-container">
+                <ul class="nav nav-tabs">
+                    <li {% if is_replay %}class="active" {% endif %}><a href="{% url 'terminal:replay-storage-list' %}"> {% trans 'Replay storage' %}</a></li>
+                    <li {% if is_command %}class="active" {% endif %}><a href="{% url 'terminal:command-storage-list' %}" >{% trans 'Command storage' %}</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="my-tickets" class="tab-pane active">
+                        <div class="panel-body">
+                            <div class="btn-group uc pull-left m-r-5">
+                                <button class="btn btn-sm btn-primary">
+                                    {% block create_storage_info %}{% endblock %}
+                                </button>
+                                <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                {% for key, value in type_choices %}
+                                    <li><a class="" href="{% block create_storage_url %}{% endblock %}?type={{ key }}">{{ value }}</a></li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            <table class="table table-striped table-bordered table-hover" id="storage_list_table" >
+                                <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <input id="" type="checkbox" class="ipt_check_all">
+                                    </th>
+                                    <th class="text-center">{% trans 'Name' %}</th>
+                                    <th class="text-center">{% trans 'Type' %}</th>
+                                    <th class="text-center">{% trans 'Comment' %}</th>
+                                    <th class="text-center" style="width: 150px">{% trans 'Action' %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block content_bottom_left %}{% endblock %}
+{% block custom_foot_js %}
+<script>
+var storage_table , storageTableAjaxUrl , storageUpdateUrl , storageDeleteUrl , storageTestConnectiveUrl = null ;
+
+function initTable() {
+    var options = {
+        ele: $('#storage_list_table'),
+        columnDefs: [
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                    var name = htmlEscape(rowData.name);
+                    var del_btn, update_btn;
+                    if (['server', 'null'].indexOf(rowData.type) === -1){
+                        del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                        update_btn = '<a class="btn btn-xs m-l-xs btn-info btn-update" data-uid="{{ DEFAULT_PK }}">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+
+                    }
+                    else{
+                        del_btn = '<a class="btn btn-xs btn-danger disabled m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" mark=1 data-name="99991938">{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                        update_btn = '<a class="btn btn-xs m-l-xs disabled btn-info btn-update" data-uid="{{ DEFAULT_PK }}">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    }
+                    var test_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-test-connective" data-uid="{{ DEFAULT_PK }}">{% trans 'Test' %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    $(td).html(update_btn + del_btn + test_btn);
+                }
+            }
+        ],
+        ajax_url: storageTableAjaxUrl,
+        columns: [
+            {data: "id"}, {data: "name" }, {data: "type"}, {data: "comment"},
+            {data: "id", orderable: false,}
+        ],
+        op_html: $('#actions').html()
+    };
+    storage_table = jumpserver.initServerSideDataTable(options);
+    return storage_table
+}
+
+$(document).ready(function(){
+    initTable()
+})
+.on('click', '.btn-update', function (){
+    var $this = $(this);
+    var uid = $this.data('uid');
+    window.location.href = storageUpdateUrl.replace('{{ DEFAULT_PK }}', uid);
+})
+.on('click', '.btn-del', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var name = $this.data('name');
+    var the_url = storageDeleteUrl.replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+})
+.on('click', '.btn-test-connective', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var the_url = storageTestConnectiveUrl.replace('{{ DEFAULT_PK }}', uid);
+    var error = function (data) {
+        toastr.error(data)
+    };
+    var success = function(data) {
+        var isValid = data.is_valid;
+        if (isValid){
+            toastr.success(data.msg)
+        }
+        else{
+            toastr.error(data.msg)
+        }
+    };
+    requestApi({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
+})
+</script>
+{% endblock %}
+

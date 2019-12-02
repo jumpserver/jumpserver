@@ -1,24 +1,22 @@
-# ~*~ coding: utf-8 ~*~
+# coding: utf-8
 #
+
+__all__ = ['TerminalForm']
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Terminal
+from ..models import Terminal, ReplayStorage, CommandStorage
 
 
 def get_all_command_storage():
-    from common import utils
-    command_storage = utils.get_command_storage_setting()
-    for k, v in command_storage.items():
-        yield (k, k)
+    for c in CommandStorage.objects.all():
+        yield (c.name, c.name)
 
 
 def get_all_replay_storage():
-    from common import utils
-    replay_storage = utils.get_replay_storage_setting()
-    for k, v in replay_storage.items():
-        yield (k, k)
+    for r in ReplayStorage.objects.all():
+        yield (r.name, r.name)
 
 
 class TerminalForm(forms.ModelForm):

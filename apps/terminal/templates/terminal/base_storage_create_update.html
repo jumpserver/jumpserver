@@ -1,0 +1,59 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+    <form id="StorageForm" method="post" class="form-horizontal">
+        {% bootstrap_form form layout="horizontal"%}
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+                <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script type="text/javascript">
+var storageCreateUrl, storageUpdateUrl, storageListUrl = null;
+var type_id = '#' + '{{ form.type.id_for_label }}';
+var api_action = "{{ api_action }}";
+
+function getFormDataType(){
+    return $(type_id+ " option:selected").val();
+}
+function getFormData(form){
+    var data = form.serializeObject();
+    data['type'] = getFormDataType();
+    data['meta'] = constructFormDataMeta(data);
+    return data
+}
+
+$(document).ready(function () {
+})
+.on("submit", "form", function (evt) {
+    evt.preventDefault();
+    var the_url = storageCreateUrl;
+    var method = "POST";
+    {% if api_action == "update" %}
+        the_url = storageUpdateUrl.replace('{{ DEFAULT_PK }}', '{{ object.id }}');
+        method = "PUT";
+    {% endif %}
+    var redirect_to = storageListUrl;
+    var form = $("form");
+    var data = getFormData(form);
+    var props = {
+        url: the_url,
+        data: data,
+        method: method,
+        form: form,
+        redirect_to: redirect_to
+    };
+    formSubmit(props);
+})
+</script>
+{% endblock %}

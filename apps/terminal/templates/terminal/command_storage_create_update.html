@@ -1,0 +1,30 @@
+{% extends 'terminal/base_storage_create_update.html' %}
+{% load i18n static %}
+
+{% block custom_foot_js %}
+{{ block.super }}
+
+<script type="text/javascript">
+
+storageCreateUrl = "{% url 'api-terminal:command-storage-list' %}";
+storageUpdateUrl = "{% url 'api-terminal:command-storage-detail' pk=DEFAULT_PK %}";
+storageListUrl = "{% url "terminal:command-storage-list" %}";
+
+function constructFormDataMeta(data){
+    var meta = {};
+    var type = data.type;
+    for (var k in data){
+        if (k.startsWith(type)){
+            var v = data[k];
+            if (k === 'es_hosts'){
+                v = v.split(',');
+            }
+            meta[k] = v;
+            delete data[k]
+        }
+    }
+    return meta
+}
+
+</script>
+{% endblock %}
