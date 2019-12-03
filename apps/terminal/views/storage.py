@@ -171,7 +171,7 @@ class CommandStorageUpdateView(CommandStorageCreateUpdateViewMixin,
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Terminal'),
-            'action': _('Create command storage'),
+            'action': _('Update command storage'),
             'api_action': 'update'
         }
         kwargs.update(context)
