@@ -3,17 +3,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 from django.shortcuts import reverse
 
-from .models import Task, AdHoc, AdHocRunHistory, CommandExecution
-
-
-class CeleryResultSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    result = serializers.JSONField()
-    state = serializers.CharField(max_length=16)
-
-
-class CeleryTaskSerializer(serializers.Serializer):
-    pass
+from ..models import Task, AdHoc, AdHocRunHistory, CommandExecution
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -87,3 +77,4 @@ class CommandExecutionSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_log_url(obj):
         return reverse('api-ops:celery-task-log', kwargs={'pk': obj.id})
+

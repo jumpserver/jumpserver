@@ -600,6 +600,7 @@ jumpserver.initServerSideDataTable = function (options) {
     //    op_html: 'div.btn-group?',
     //    paging: true,
     //    paging_numbers_length: 5;
+    //    hideDefaultDefs: false;
     // }
     var pagingNumbersLength = 5;
     if (options.paging_numbers_length){
@@ -613,7 +614,8 @@ jumpserver.initServerSideDataTable = function (options) {
             orderable: false,
             width: "20px",
             createdCell: function (td, cellData) {
-                $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+                var data = '<input type="checkbox" class="text-center ipt_check" id=Id>'.replace('Id', cellData);
+                $(td).html(data);
             }
         },
         {
@@ -622,6 +624,9 @@ jumpserver.initServerSideDataTable = function (options) {
             render: $.fn.dataTable.render.text()
         }
     ];
+    if (options.hideDefaultDefs) {
+        columnDefs = [];
+    }
     var select_style = options.select_style || 'multi';
     columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
     var select = {
@@ -635,7 +640,7 @@ jumpserver.initServerSideDataTable = function (options) {
         pageLength: options.pageLength || 15,
         // dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         // dom: options.dom || '<"#uc.pull-left"><"pull-right"<"inline"l><"#fb.inline"><"inline"<"table-filter"f>><"#fa.inline">>tr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        dom: dom,
+        dom: options.dom || dom,
         order: options.order || [],
         buttons: [],
         columnDefs: columnDefs,

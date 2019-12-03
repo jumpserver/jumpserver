@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-from django.http import Http404
 from rest_framework import generics
 from django.db.models import F, Value
 from django.db.models.functions import Concat

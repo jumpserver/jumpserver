@@ -5,17 +5,20 @@ import os
 import re
 
 from django.utils.translation import ugettext as _
+from rest_framework import viewsets
 from celery.result import AsyncResult
 from rest_framework import generics
+from django_celery_beat.models import PeriodicTask
 
-from common.permissions import IsValidUser
+from common.permissions import IsValidUser, IsSuperUser
 from common.api import LogTailApi
 from ..models import CeleryTask
-from ..serializers import CeleryResultSerializer
+from ..serializers import CeleryResultSerializer, CeleryPeriodTaskSerializer
 from ..celery.utils import get_celery_task_log_path
+from common.mixins.api import CommonApiMixin
 
 
-__all__ = ['CeleryTaskLogApi', 'CeleryResultApi']
+__all__ = ['CeleryTaskLogApi', 'CeleryResultApi', 'CeleryPeriodTaskViewSet']
 
 
 class CeleryTaskLogApi(LogTailApi):
@@ -62,3 +65,14 @@ class CeleryResultApi(generics.RetrieveAPIView):
         pk = self.kwargs.get('pk')
         return AsyncResult(pk)
 
+
+class CeleryPeriodTaskViewSet(CommonApiMixin, viewsets.ModelViewSet):
+    queryset = PeriodicTask.objects.all()
+    serializer_class = CeleryPeriodTaskSerializer
+    permission_classes = (IsSuperUser,)
+    http_method_names = ('get', 'head', 'options', 'patch')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.exclude(description='')
+        return queryset

@@ -4,14 +4,22 @@ from rest_framework import serializers
 from django.utils.translation import ugettext_lazy as _
 
 from common.serializers import AdaptedBulkListSerializer
+from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
+from assets.models import Node
 from ..models import SystemUser
 from ..const import (
     GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
     GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
 )
 from .base import AuthSerializer, AuthSerializerMixin
+
+__all__ = [
+    'SystemUserSerializer', 'SystemUserAuthSerializer',
+    'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
+    'SystemUserNodeRelationSerializer',
+]
 
 
 class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
@@ -143,4 +151,43 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'username')
 
 
+class RelationMixin(BulkSerializerMixin, serializers.Serializer):
+    systemuser_display = serializers.ReadOnlyField()
 
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields.extend(['systemuser', "systemuser_display"])
+        return fields
+
+    class Meta:
+        list_serializer_class = AdaptedBulkListSerializer
+
+
+class SystemUserAssetRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    asset_display = serializers.ReadOnlyField()
+
+    class Meta(RelationMixin.Meta):
+        model = SystemUser.assets.through
+        fields = [
+            'id', "asset", "asset_display",
+        ]
+
+
+class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    node_display = serializers.SerializerMethodField()
+
+    class Meta(RelationMixin.Meta):
+        model = SystemUser.nodes.through
+        fields = [
+            'id', 'node', "node_display",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tree = Node.tree()
+
+    def get_node_display(self, obj):
+        if hasattr(obj, 'node_key'):
+            return self.tree.get_node_full_tag(obj.node_key)
+        else:
+            return obj.node.full_value
