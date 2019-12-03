@@ -16,6 +16,8 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
+    filter_fields = ("name", )
+    search_fields = filter_fields
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
 
