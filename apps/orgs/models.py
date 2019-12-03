@@ -118,6 +118,11 @@ class Organization(models.Model):
             return True
         return False
 
+    def can_user_by(self, user):
+        if self.get_org_users().filter(id=user.id):
+            return True
+        return False
+
     def is_real(self):
         return self.id not in (self.DEFAULT_NAME, self.ROOT_ID, self.SYSTEM_ID)
 
