@@ -19,14 +19,14 @@
         <div class="hr-line-dashed"></div>
 
         {# chrome #}
-        <div class="chrome-fields">
+        <div class="chrome-fields hidden">
         {% bootstrap_field form.chrome_target layout="horizontal" %}
         {% bootstrap_field form.chrome_username layout="horizontal" %}
         {% bootstrap_field form.chrome_password layout="horizontal" %}
         </div>
 
         {# mysql workbench #}
-        <div class="mysql_workbench-fields">
+        <div class="mysql_workbench-fields hidden">
             {% bootstrap_field form.mysql_workbench_ip layout="horizontal" %}
             {% bootstrap_field form.mysql_workbench_name layout="horizontal" %}
             {% bootstrap_field form.mysql_workbench_username layout="horizontal" %}
@@ -34,14 +34,14 @@
         </div>
 
         {# vmware #}
-        <div class="vmware_client-fields">
+        <div class="vmware_client-fields hidden">
         {% bootstrap_field form.vmware_target layout="horizontal" %}
         {% bootstrap_field form.vmware_username layout="horizontal" %}
         {% bootstrap_field form.vmware_password layout="horizontal" %}
         </div>
 
         {# custom #}
-        <div class="custom-fields">
+        <div class="custom-fields hidden">
         {% bootstrap_field form.custom_cmdline layout="horizontal" %}
         {% bootstrap_field form.custom_target layout="horizontal" %}
         {% bootstrap_field form.custom_username layout="horizontal" %}
