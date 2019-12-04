@@ -52,7 +52,8 @@ def create_operate_log(action, sender, resource):
 
 @receiver(post_save, dispatch_uid="my_unique_identifier")
 def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
-    if instance._meta.object_name == 'User' and 'last_login' in update_fields:
+    if instance._meta.object_name == 'User' and \
+            update_fields and 'last_login' in update_fields:
         return
     if created:
         action = models.OperateLog.ACTION_CREATE
