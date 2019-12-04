@@ -16,6 +16,8 @@ __all__ = ['DomainViewSet', 'GatewayViewSet', "GatewayTestConnectionApi"]
 
 class DomainViewSet(OrgBulkModelViewSet):
     model = Domain
+    filter_fields = ("name", )
+    search_fields = filter_fields
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.DomainSerializer
 
@@ -27,7 +29,7 @@ class DomainViewSet(OrgBulkModelViewSet):
 
 class GatewayViewSet(OrgBulkModelViewSet):
     model = Gateway
-    filter_fields = ("domain__name", "name", "username", "ip", "domain")
+    filter_fields = ("domain__name", "name", "username", "ip", "domain__id")
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.GatewaySerializer
