@@ -334,7 +334,8 @@ class PublicSettingApi(generics.RetrieveAPIView):
         c = settings.CONFIG
         instance = {
             "data": {
-                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD
+                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
+                "SECURITY_MAX_IDLE_TIME": c.SECURITY_MAX_IDLE_TIME,
             }
         }
         return instance

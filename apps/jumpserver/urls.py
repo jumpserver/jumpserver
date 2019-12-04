@@ -13,22 +13,23 @@ from .celery_flower import celery_flower_view
 from .swagger import get_swagger_view
 
 api_v1 = [
-   path('users/', include('users.urls.api_urls', namespace='api-users')),
-   path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
-   path('perms/', include('perms.urls.api_urls', namespace='api-perms')),
-   path('terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
-   path('ops/', include('ops.urls.api_urls', namespace='api-ops')),
-   path('audits/', include('audits.urls.api_urls', namespace='api-audits')),
-   path('orgs/', include('orgs.urls.api_urls', namespace='api-orgs')),
-   path('settings/', include('settings.urls.api_urls', namespace='api-settings')),
-   path('authentication/', include('authentication.urls.api_urls', namespace='api-auth')),
-   path('common/', include('common.urls.api_urls', namespace='api-common')),
-   path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
+    path('users/', include('users.urls.api_urls', namespace='api-users')),
+    path('assets/', include('assets.urls.api_urls', namespace='api-assets')),
+    path('perms/', include('perms.urls.api_urls', namespace='api-perms')),
+    path('terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
+    path('ops/', include('ops.urls.api_urls', namespace='api-ops')),
+    path('audits/', include('audits.urls.api_urls', namespace='api-audits')),
+    path('orgs/', include('orgs.urls.api_urls', namespace='api-orgs')),
+    path('settings/', include('settings.urls.api_urls', namespace='api-settings')),
+    path('authentication/', include('authentication.urls.api_urls', namespace='api-auth')),
+    path('common/', include('common.urls.api_urls', namespace='api-common')),
+    path('applications/', include('applications.urls.api_urls', namespace='api-applications')),
+    path('tickets/', include('tickets.urls.api_urls', namespace='api-tickets')),
 ]
 
 api_v2 = [
-   path('terminal/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
-   path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
+    path('terminal/', include('terminal.urls.api_urls_v2', namespace='api-terminal-v2')),
+    path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
 
@@ -42,6 +43,7 @@ app_view_patterns = [
     path('orgs/', include('orgs.urls.views_urls', namespace='orgs')),
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
+    path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
     re_path(r'flower/(?P<path>.*)', celery_flower_view, name='flower-view'),
 ]
 
@@ -65,7 +67,8 @@ urlpatterns = [
     path('api/v2/', include(api_v2)),
     re_path('api/(?P<app>\w+)/(?P<version>v\d)/.*', views.redirect_format_api),
     path('api/health/', views.HealthCheckView.as_view(), name="health"),
-    path('luna/', views.LunaView.as_view(), name='luna-view'),
+    re_path('luna/.*', views.LunaView.as_view(), name='luna-view'),
+    re_path('koko/.*', views.KokoView.as_view(), name='koko-view'),
     re_path('ws/.*', views.WsView.as_view(), name='ws-view'),
     path('i18n/<str:lang>/', views.I18NView.as_view(), name='i18n-switch'),
     path('settings/', include('settings.urls.view_urls', namespace='settings')),

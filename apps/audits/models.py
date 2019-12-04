@@ -110,5 +110,14 @@ class UserLoginLog(models.Model):
             login_logs = login_logs.filter(username__in=username_list)
         return login_logs
 
+    @property
+    def reason_display(self):
+        from authentication.errors import reason_choices, old_reason_choices
+        reason = reason_choices.get(self.reason)
+        if reason:
+            return reason
+        reason = old_reason_choices.get(self.reason, self.reason)
+        return reason
+
     class Meta:
         ordering = ['-datetime', 'username']

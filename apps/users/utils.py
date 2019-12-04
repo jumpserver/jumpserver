@@ -193,7 +193,6 @@ def send_reset_ssh_key_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
-
 def get_user_or_tmp_user(request):
     user = request.user
     tmp_user = get_tmp_user_from_cache(request)
@@ -212,16 +211,18 @@ def get_tmp_user_from_cache(request):
     return user
 
 
-def set_tmp_user_to_cache(request, user):
-    cache.set(request.session.session_key+'user', user, 600)
+def set_tmp_user_to_cache(request, user, ttl=3600):
+    cache.set(request.session.session_key+'user', user, ttl)
 
 
 def redirect_user_first_login_or_index(request, redirect_field_name):
     if request.user.is_first_login:
         return reverse('users:user-first-login')
-    return request.POST.get(
-        redirect_field_name,
-        request.GET.get(redirect_field_name, reverse('index')))
+    url_in_post = request.POST.get(redirect_field_name)
+    if url_in_post:
+        return url_in_post
+    url_in_get = request.GET.get(redirect_field_name, reverse('index'))
+    return url_in_get
 
 
 def generate_otp_uri(request, issuer="Jumpserver"):

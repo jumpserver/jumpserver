@@ -1,0 +1,86 @@
+<style>
+    li.dropdown-submenu {
+        width: 100%;
+    }
+</style>
+<ul class="dropdown-menu multi-level search-help" role="menu" aria-labelledby="dropdownMenu">
+</ul>
+
+<script>
+function addItem(menuRef, menuItem, parent) {
+    menuItem.forEach(function (item) {
+        if (item.submenu) {
+            var subItemData = "<li class='dropdown-submenu pull-left'>" +
+                "      <a tabindex='-1' class='search-select' href='#'>VALUE</a>" +
+                "</li>";
+            var subItem = $(subItemData.replace('VALUE', item.title));
+            var subMenu = $('<ul class="dropdown-menu"></ul>');
+            addItem(subMenu, item.submenu, item.value);
+            subItem.append(subMenu);
+            menuRef.append(subItem);
+        } else {
+            var itemRef = $('<li><a class="search-item" data-value="VALUE">TITLE</a></li>'
+                .replace('VALUE', item.value)
+                .replace('TITLE', item.title)
+            );
+            if (parent){
+                itemRef.find('a').data('parent', parent)
+            }
+            menuRef.append(itemRef)
+        }
+    })
+}
+function initTableFilterDropdown(selector, menu) {
+    /*
+    menu =  [
+        {title: "Title", value: "title"},
+        {title: "Status", value: "status", submenu: [
+            {"title": "xxx", value: "xxxx"}
+        ]},
+    ]
+    */
+    var dropdownRef = $(".search-help");
+    addItem(dropdownRef, menu);
+    $(selector).on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var offset1 = $(selector).offset();
+        var x = offset1.left;
+        var y = offset1.top;
+        var offset = $(".search-help").parent().offset();
+        x -= offset.left;
+        y -= offset.top;
+        {#x += 18;#}
+        y += 30;
+        $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
+        $('.dropdown-menu.search-help').show();
+    });
+    $('.search-item').on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var keyword = $(selector);
+        var value = $(this).data('value');
+        var oldValue = keyword.val();
+        var newValue = '';
+        var parentValue = $(this).data("parent");
+        var re;
+
+        if (parentValue) {
+            re = new RegExp(parentValue + '\\s*:\\s*\\w+');
+            oldValue = oldValue.replace(re, '');
+            newValue = oldValue + ' ' + parentValue + ':' + value;
+        } else {
+            re = new RegExp(value + '\\s*:\\s*\\w+');
+            oldValue = oldValue.replace(re, '');
+            newValue = oldValue + ' ' + value + ':';
+        }
+        keyword.val(newValue.trim());
+        $('.dropdown-menu.search-help').hide();
+        keyword.trigger('input');
+        keyword.focus()
+    });
+    $(window).on('click', function (e) {
+        dropdownRef.hide();
+    })
+}
+</script>

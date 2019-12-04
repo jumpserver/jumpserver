@@ -375,6 +375,7 @@ defaults = {
     'RADIUS_SERVER': 'localhost',
     'RADIUS_PORT': 1812,
     'RADIUS_SECRET': '',
+    'RADIUS_ENCRYPT_PASSWORD': True,
     'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
     'AUTH_LDAP_SYNC_IS_PERIODIC': False,
     'AUTH_LDAP_SYNC_INTERVAL': None,
@@ -394,8 +395,11 @@ defaults = {
     'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
     'FLOWER_URL': "127.0.0.1:5555",
     'DEFAULT_ORG_SHOW_ALL_USERS': True,
-    'PERIOD_TASK_ENABLED': True,
+    'PERIOD_TASK_ENABLE': True,
+    'FORCE_SCRIPT_NAME': '',
+    'LOGIN_CONFIRM_ENABLE': False,
     'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
+    'OTP_IN_RADIUS': False,
 }
 
 

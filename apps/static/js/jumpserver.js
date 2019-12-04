@@ -137,14 +137,19 @@ function setAjaxCSRFToken() {
     });
 }
 
-function activeNav() {
-    var url_array = document.location.pathname.split("/");
-    var app = url_array[1];
-    var resource = url_array[2];
+function activeNav(prefix) {
+    var path = document.location.pathname;
+    if (prefix) {
+        path = path.replace(prefix, '');
+        console.log(path);
+    }
+    var urlArray = path.split("/");
+    var app = urlArray[1];
+    var resource = urlArray[2];
     if (app === '') {
         $('#index').addClass('active');
     } else if (app === 'xpack' && resource === 'cloud') {
-        var item = url_array[3];
+        var item = urlArray[3];
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
         $('#' + app + ' #' + resource + ' #' + item + ' a').css('color', '#ffffff');
@@ -294,6 +299,8 @@ function requestApi(props) {
                     msg = jqXHR.responseJSON.error
                 } else if (jqXHR.responseJSON.msg) {
                     msg = jqXHR.responseJSON.msg
+                } else if (jqXHR.responseJSON.detail) {
+                    msg = jqXHR.responseJSON.detail
                 }
             }
             if (msg === "") {
@@ -302,7 +309,7 @@ function requestApi(props) {
             toastr.error(msg);
         }
         if (typeof props.error === 'function') {
-            return props.error(jqXHR.responseText, jqXHR.status);
+            return props.error(jqXHR.responseText, jqXHR.responseJSON, jqXHR.status);
         }
     });
     // return true;
@@ -411,6 +418,9 @@ function makeLabel(data) {
 
 function parseTableFilter(value) {
     var cleanValues = [];
+    if (!value) {
+        return {}
+    }
     var valuesArray = value.split(':');
     for (var i=0; i<valuesArray.length; i++) {
         var v = valuesArray[i].trim();
@@ -472,6 +482,11 @@ jumpserver.language = {
         last: "»"
     }
 };
+
+function setDataTablePagerLength(num) {
+    $.fn.DataTable.ext.pager.numbers_length = num;
+}
+
 jumpserver.initDataTable = function (options) {
     // options = {
     //    ele *: $('#dataTable_id'),
@@ -486,6 +501,7 @@ jumpserver.initDataTable = function (options) {
     //    op_html: 'div.btn-group?',
     //    paging: true
     // }
+    setDataTablePagerLength(5);
     var ele = options.ele || $('.dataTable');
     var columnDefs = [
         {
@@ -582,8 +598,14 @@ jumpserver.initServerSideDataTable = function (options) {
     //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
     //    uc_html: '<a>header button</a>',
     //    op_html: 'div.btn-group?',
-    //    paging: true
+    //    paging: true,
+    //    paging_numbers_length: 5;
     // }
+    var pagingNumbersLength = 5;
+    if (options.paging_numbers_length){
+        pagingNumbersLength = options.paging_numbers_length;
+    }
+    setDataTablePagerLength(pagingNumbersLength);
     var ele = options.ele || $('.dataTable');
     var columnDefs = [
         {
@@ -606,16 +628,21 @@ jumpserver.initServerSideDataTable = function (options) {
         style: select_style,
         selector: 'td:first-child'
     };
+    var dom = '<"#uc.pull-left"> <"pull-right"<"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
+        'tr' +
+        '<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>';
     var table = ele.DataTable({
         pageLength: options.pageLength || 15,
         // dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        dom: options.dom || '<"#uc.pull-left"><"pull-right"<"inline"l><"#fb.inline"><"inline"f><"#fa.inline">>tr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        // dom: options.dom || '<"#uc.pull-left"><"pull-right"<"inline"l><"#fb.inline"><"inline"<"table-filter"f>><"#fa.inline">>tr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+        dom: dom,
         order: options.order || [],
         buttons: [],
         columnDefs: columnDefs,
         serverSide: true,
         processing: true,
         searchDelay: 800,
+        oSearch: options.oSearch,
         ajax: {
             url: options.ajax_url,
             error: function (jqXHR, textStatus, errorThrown) {
@@ -1275,4 +1302,36 @@ function usersSelect2Init(selector, url) {
 function showCeleryTaskLog(taskId) {
     var url = '/ops/celery/task/taskId/log/'.replace('taskId', taskId);
     window.open(url, '', 'width=900,height=600')
+}
+
+function initDateRangePicker(selector, options) {
+    if (!options) {
+        options = {}
+    }
+    var zhLocale = {
+        format: 'YYYY-MM-DD HH:mm',
+        separator: ' ~ ',
+        applyLabel: "应用",
+        cancelLabel: "取消",
+        resetLabel: "重置",
+        daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],//汉化处理
+        monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+    };
+    var defaultOption = {
+        singleDatePicker: true,
+        showDropdowns: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        autoApply: true,
+    };
+    var userLang = navigator.language || navigator.userLanguage;;
+    if (userLang.indexOf('zh') !== -1) {
+        defaultOption.locale = zhLocale;
+    }
+    options = Object.assign(defaultOption, options);
+    return $(selector).daterangepicker(options);
+}
+
+function reloadPage() {
+    setTimeout( function () {window.location.reload();}, 300);
 }

@@ -37,7 +37,6 @@
                 <p>
                     {% trans  "Changes the world, starting with a little bit." %}
                 </p>
-
             </div>
             <div class="col-md-6">
                 <div class="ibox-content">
@@ -47,25 +46,29 @@
                     </div>
                     <form class="m-t" role="form" method="post" action="">
                         {% csrf_token %}
-
-                        {% if block_login %}
-                            <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
-                        {% elif password_expired %}
-                            <p class="red-fonts">{% trans 'The user password has expired' %}</p>
-                        {% elif form.errors %}
-                            {% if 'captcha' in form.errors %}
-                                <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
-                            {% else %}
+                        {% if form.non_field_errors %}
+                            <div style="line-height: 17px;">
                                 <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
-                            {% endif %}
-                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
+                            </div>
+                        {% elif form.errors.captcha %}
+                            <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
                         {% endif %}
 
                         <div class="form-group">
                             <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
+                            {% if form.errors.username %}
+                                <div class="help-block field-error">
+                                    <p class="red-fonts">{{ form.errors.username.as_text }}</p>
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="form-group">
                             <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
+                            {% if form.errors.password %}
+                                <div class="help-block field-error">
+                                    <p class="red-fonts">{{ form.errors.password.as_text }}</p>
+                                </div>
+                            {% endif %}
                         </div>
                         <div>
                             {{ form.captcha }}

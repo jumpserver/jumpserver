@@ -246,30 +246,35 @@ class AdHoc(models.Model):
         time_start = time.time()
         date_start = timezone.now()
         is_success = False
+        summary = {}
+        raw = ''
 
         try:
             date_start_s = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Start task: {}").format(date_start_s, self.task.name))
             raw, summary = self._run_only()
             is_success = summary.get('success', False)
-            return raw, summary
         except Exception as e:
             logger.error(e, exc_info=True)
-            summary = {}
             raw = {"dark": {"all": str(e)}, "contacted": []}
-            return raw, summary
         finally:
             date_end = timezone.now()
             date_end_s = date_end.strftime('%Y-%m-%d %H:%M:%S')
             print(_("{} Task finish").format(date_end_s))
             print('.\n\n.')
+            try:
+                summary_text = json.dumps(summary)
+            except json.JSONDecodeError:
+                summary_text = '{}'
             AdHocRunHistory.objects.filter(id=history.id).update(
                 date_start=date_start,
                 is_finished=True,
                 is_success=is_success,
                 date_finished=timezone.now(),
-                timedelta=time.time() - time_start
+                timedelta=time.time() - time_start,
+                _summary=summary_text
             )
+            return raw, summary
 
     def _run_only(self):
         Task.objects.filter(id=self.task.id).update(date_updated=timezone.now())
@@ -321,10 +326,9 @@ class AdHoc(models.Model):
         except AdHocRunHistory.DoesNotExist:
             return None
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        super().save(force_insert=force_insert, force_update=force_update,
-                     using=using, update_fields=update_fields)
+    def save(self, **kwargs):
+        instance = super().save(**kwargs)
+        return instance
 
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)
@@ -393,7 +397,10 @@ class AdHocRunHistory(models.Model):
 
     @summary.setter
     def summary(self, item):
-        self._summary = json.dumps(item)
+        try:
+            self._summary = json.dumps(item)
+        except json.JSONDecodeError:
+            self._summary = json.dumps({})
 
     @property
     def success_hosts(self):

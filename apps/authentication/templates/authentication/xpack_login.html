@@ -48,6 +48,13 @@
             float: right;
         }
 
+        .red-fonts {
+            color: red;
+        }
+
+        .field-error {
+            text-align: left;
+        }
 
     </style>
 </head>
@@ -69,30 +76,34 @@
                     <div style="margin-bottom: 10px">
                         <div>
                             <div class="col-md-1"></div>
-                            <div class="contact-form col-md-10" style="margin-top: 10px;height: 35px">
+                            <div class="contact-form col-md-10" style="margin-top: 20px;height: 35px">
                                 <form id="contact-form" action="" method="post" role="form" novalidate="novalidate">
                                     {% csrf_token %}
+                                    {% if form.non_field_errors %}
                                     <div style="height: 70px;color: red;line-height: 17px;">
-                                        {% if block_login %}
-                                            <p class="red-fonts">{% trans 'Log in frequently and try again later' %}</p>
-                                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
-                                        {% elif password_expired %}
-                                            <p class="red-fonts">{% trans 'The user password has expired' %}</p>
-                                        {% elif form.errors %}
-                                            {% if 'captcha' in form.errors %}
-                                                <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
-                                            {% else %}
-                                                <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
-                                            {% endif %}
-                                            <p class="red-fonts">{{ form.errors.password.as_text }}</p>
-                                        {% endif %}
+                                        <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
                                     </div>
+                                    {% elif form.errors.captcha %}
+                                        <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
+                                    {% else %}
+                                        <div style="height: 50px"></div>
+                                    {% endif %}
 
                                     <div class="form-group">
                                         <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="" value="{% if form.username.value %}{{ form.username.value }}{% endif %}" style="height: 35px">
+                                        {% if form.errors.username %}
+                                            <div class="help-block field-error">
+                                                <p class="red-fonts">{{ form.errors.username.as_text }}</p>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="form-group">
                                         <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="{% trans 'Password' %}" required="">
+                                        {% if form.errors.password %}
+                                            <div class="help-block field-error">
+                                                <p class="red-fonts">{{ form.errors.password.as_text }}</p>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <div class="form-group" style="height: 50px;margin-bottom: 0;font-size: 13px">
                                         {{ form.captcha }}

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import serializers
 
 from common.fields import StringManyToManyField
@@ -9,10 +10,9 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import User, UserGroup
 from .. import utils
 
-
 __all__ = [
     'UserGroupSerializer', 'UserGroupListSerializer',
-    'UserGroupUpdateMemberSerializer'
+    'UserGroupUpdateMemberSerializer',
 ]
 
 

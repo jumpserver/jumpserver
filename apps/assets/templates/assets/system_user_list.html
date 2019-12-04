@@ -2,11 +2,9 @@
 {% load i18n %}
 
 {% block help_message %}
-    <div class="alert alert-info help-message">
     {% trans 'System user is Jumpserver jump login assets used by the users, can be understood as the user login assets, such as web, sa, the dba (` ssh web@some-host `), rather than using a user the username login server jump (` ssh xiaoming@some-host `); '%}
     {% trans 'In simple terms, users log into Jumpserver using their own username, and Jumpserver uses system users to log into assets. '%}
     {% trans 'When system users are created, if you choose auto push Jumpserver to use Ansible push system users into the asset, if the asset (Switch) does not support ansible, please manually fill in the account password.' %}
-    </div>
 {% endblock %}
 
 {% block table_search %}
