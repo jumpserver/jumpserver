@@ -153,6 +153,14 @@ def get_request_ip(request):
     return login_ip
 
 
+def get_request_ip_or_data(request):
+    ip = ''
+    if hasattr(request, 'data'):
+        ip = request.data.get('remote_addr', '')
+    ip = ip or get_request_ip(request)
+    return ip
+
+
 def validate_ip(ip):
     try:
         ipaddress.ip_address(ip)

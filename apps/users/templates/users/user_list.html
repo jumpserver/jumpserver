@@ -26,7 +26,7 @@
 {% endblock %}
 {% block table_container %}
 <div class="uc pull-left m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
-<table class="table table-striped table-bordered table-hover " id="user_list_table" >
+<table class="table table-striped table-bordered table-hover " id="user_list_table">
     <thead>
         <tr>
             <th class="text-center">
@@ -124,7 +124,7 @@ function initTable() {
             {data: "role"},
             {data: "groups_display", orderable: false},
             {data: "source"},
-            {data: "is_valid", orderable: false},
+            {data: "is_valid", orderable: false, width: "50px"},
             {data: "id", orderable: false, width: "100px"}
         ],
         op_html: $('#actions').html()

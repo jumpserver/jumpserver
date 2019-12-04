@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'authentication.apps.AuthenticationConfig',  # authentication
     'applications.apps.ApplicationsConfig',
+    'tickets.apps.TicketsConfig',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -331,7 +332,7 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '{}/static/'.format(CONFIG.FORCE_SCRIPT_NAME)
 STATIC_ROOT = os.path.join(PROJECT_DIR, "data", "static")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
@@ -410,6 +411,7 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'authentication.backends.pubkey.PublicKeyAuthBackend',
 ]
 
 # Custom User Auth model
@@ -655,3 +657,4 @@ CHANNEL_LAYERS = {
 
 # Enable internal period task
 PERIOD_TASK_ENABLED = CONFIG.PERIOD_TASK_ENABLED
+FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME

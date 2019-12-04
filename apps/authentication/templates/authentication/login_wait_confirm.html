@@ -1,0 +1,166 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <title>{{ title }}</title>
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}"></script>
+
+</head>
+
+<body class="gray-bg">
+<div class="passwordBox2 animated fadeInDown">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="ibox-content">
+                <div>
+                    <img src="{{ LOGO_URL }}" style="margin: auto" width="82" height="82">
+                    <h2 style="display: inline">
+                        {{ JMS_TITLE }}
+                    </h2>
+                </div>
+                <p></p>
+                <div class="alert alert-success info-messages" >
+                    {{ msg|safe }}
+                </div>
+                <div class="alert alert-danger error-messages" style="display: none">
+                </div>
+                <div class="progress progress-bar-default progress-striped active">
+                    <div aria-valuemax="3600" aria-valuemin="0" aria-valuenow="43" role="progressbar" class="progress-bar">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <a class="btn btn-primary btn-sm block btn-refresh">
+                            <i class="fa fa-refresh"></i> {% trans 'Refresh' %}
+                        </a>
+                    </div>
+                    <div class="col-sm-3">
+                        <a class="btn btn-primary btn-sm block btn-copy" data-link="{{ ticket_detail_url }}">
+                            <i class="fa fa-clipboard"></i> {% trans 'Copy link' %}
+                        </a>
+                    </div>
+                    <div class="col-sm-3">
+                        <a class="btn btn-default btn-sm block btn-return">
+                            <i class="fa fa-reply"></i> {% trans 'Return' %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-md-6">
+            {% include '_copyright.html' %}
+        </div>
+    </div>
+</div>
+</body>
+{% include '_foot_js.html' %}
+<script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
+<script>
+var errorMsgShow = false;
+var errorMsgRef = $(".error-messages");
+var infoMsgRef = $(".info-messages");
+var timestamp = '{{ timestamp }}';
+var progressBarRef = $(".progress-bar");
+var interval, checkInterval;
+var url = "{% url 'api-auth:login-confirm-ticket-status' %}";
+var successUrl = "{% url 'authentication:login-guard' %}";
+
+function doRequestAuth() {
+     requestApi({
+        url: url,
+        method: "GET",
+        success: function (data) {
+            if (!data.error && data.msg === 'ok') {
+                window.onbeforeunload = function(){};
+                window.location = "{% url 'authentication:login-guard' %}"
+            } else if (data.error !== "login_confirm_wait") {
+                if (!errorMsgShow) {
+                    infoMsgRef.hide();
+                    errorMsgRef.show();
+                    progressBarRef.addClass('progress-bar-danger');
+                    errorMsgShow = true;
+                }
+                clearInterval(interval);
+                clearInterval(checkInterval);
+                $(".copy-btn").attr('disabled', 'disabled');
+                errorMsgRef.html(data.msg)
+            }
+        },
+        error: function (text, data) {
+        },
+        flash_message: false
+    })
+}
+function initClipboard() {
+    var clipboard = new Clipboard('.btn-copy', {
+        text: function (trigger) {
+            var origin = window.location.origin;
+            var link = origin + $(".btn-copy").data('link');
+            return link
+        }
+    });
+    clipboard.on("success", function (e) {
+        toastr.success("{% trans "Copy success" %}")
+    })
+}
+
+function handleProgressBar() {
+    var now = new Date().getTime() / 1000;
+    var offset = now - timestamp;
+    var percent = offset / 3600 * 100;
+    if (percent > 100) {
+        percent = 100
+    }
+    progressBarRef.css("width", percent + '%');
+    progressBarRef.attr('aria-valuenow', offset);
+}
+
+function cancelTicket() {
+    requestApi({
+        url: url,
+        method: "DELETE",
+        flash_message: false
+    })
+}
+
+function cancelCloseConfirm() {
+    window.onbeforeunload = function() {};
+    window.onunload = function(){};
+}
+
+function setCloseConfirm() {
+    window.onbeforeunload = function (e) {
+        return 'Confirm';
+    };
+    window.onunload = function (e) {
+        cancelTicket();
+    }
+}
+
+$(document).ready(function () {
+    interval = setInterval(handleProgressBar, 1000);
+    checkInterval = setInterval(doRequestAuth, 5000);
+    doRequestAuth();
+    initClipboard();
+    setCloseConfirm();
+}).on('click', '.btn-refresh', function () {
+    cancelCloseConfirm();
+    window.location.reload();
+}).on('click', '.btn-return', function () {
+    cancelCloseConfirm();
+    window.location = "{% url 'authentication:login' %}"
+})
+
+</script>
+</html>

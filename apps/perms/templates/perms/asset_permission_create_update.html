@@ -100,16 +100,6 @@
 <link rel="stylesheet" type="text/css" href={% static "css/plugins/daterangepicker/daterangepicker.css" %} />
 
 <script>
-var dateOptions = {
-    singleDatePicker: true,
-    showDropdowns: true,
-    timePicker: true,
-    timePicker24Hour: true,
-    autoApply: true,
-    locale: {
-        format: 'YYYY-MM-DD HH:mm'
-    }
-};
 var api_action =  "{{ api_action }}";
 
 $(document).ready(function () {
@@ -119,8 +109,8 @@ $(document).ready(function () {
     nodesSelect2Init(".nodes-select2");
     usersSelect2Init(".users-select2");
 
-    $('#date_start').daterangepicker(dateOptions);
-    $('#date_expired').daterangepicker(dateOptions);
+    initDateRangePicker('#date_start');
+    initDateRangePicker('#date_expired');
 
     $("#id_assets").parent().find(".select2-selection").on('click', function (e) {
         if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){

@@ -18,7 +18,9 @@ def jumpserver_processor(request):
         'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2019',
         'SECURITY_COMMAND_EXECUTION': settings.SECURITY_COMMAND_EXECUTION,
         'SECURITY_MFA_VERIFY_TTL': settings.SECURITY_MFA_VERIFY_TTL,
+        'FORCE_SCRIPT_NAME': settings.FORCE_SCRIPT_NAME,
         'SECURITY_VIEW_AUTH_NEED_MFA': settings.CONFIG.SECURITY_VIEW_AUTH_NEED_MFA,
+        'LOGIN_CONFIRM_ENABLE': settings.CONFIG.LOGIN_CONFIRM_ENABLE,
     }
     return context
 

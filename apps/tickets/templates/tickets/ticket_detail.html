@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        {{ object.title }}
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-11">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <dl class="dl-horizontal">
+                                        <dt>{% trans 'User' %}:</dt> <dd>{{ object.user_display }}</dd>
+                                        <dt>{% trans 'Type' %}:</dt> <dd>{{ object.get_type_display | default_if_none:"" }}</dd>
+                                        <dt>{% trans 'Status' %}:</dt>
+                                        <dd>
+                                        {% if object.status == "open" %}
+                                        <span class="label label-primary">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        {% elif object.status == "closed" %}
+                                        <span class="label label-danger">
+                                            {{ object.get_status_display }}
+                                        </span>
+                                        {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-lg-6">
+                                    <dl class="dl-horizontal">
+                                        <dt>{% trans 'Assignees' %}:</dt> <dd> {{ object.assignees_display }}</dd>
+                                        <dt>{% trans 'Assignee' %}:</dt> <dd>{{ object.assignee_display | default_if_none:"" }}</dd>
+                                        <dt>{% trans 'Date created' %}:</dt> <dd> {{ object.date_created }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="row m-t-sm">
+                                <div class="col-lg-12">
+                                    <div class="panel blank-panel">
+                                        <div class="panel-body">
+                                            <div class="feed-activity-list">
+                                                <div class="feed-element">
+                                                    <a href="#" class="pull-left">
+                                                        <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
+                                                    </a>
+                                                    <div class="media-body ">
+                                                        <strong>{{ object.user_display }}</strong> <small class="text-muted"> {{ object.date_created|timesince}} {% trans 'ago' %}</small>
+                                                        <br/>
+                                                        <small class="text-muted">{{ object.date_created }} </small>
+                                                        <div style="padding-top: 10px">
+                                                            {{ object.body_as_html | safe }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% for comment in object.comments.all %}
+                                                <div class="feed-element">
+                                                    <a href="#" class="pull-left">
+                                                        <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
+                                                    </a>
+                                                    <div class="media-body ">
+                                                        <strong>{{ comment.user_display }}</strong> <small class="text-muted"> {{ comment.date_created|timesince}} {% trans 'ago' %}</small>
+                                                        <br/>
+                                                        <small class="text-muted">{{ comment.date_created }} </small>
+                                                        <div style="padding-top: 10px">
+                                                            {{ comment.body }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="feed-element">
+                                                <a href="" class="pull-left">
+                                                    <img alt="image" class="img-circle" src="{% static 'img/avatar/user.png'%}" >
+                                                </a>
+                                                <div class="media-body">
+                                                     <textarea class="form-control" placeholder="" id="comment"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                {% if has_action_perm %}
+                                                    <a class="btn btn-sm btn-primary btn-update btn-action" data-action="approve"><i class="fa fa-check"></i> {% trans 'Approve' %}</a>
+                                                    <a class="btn btn-sm btn-warning btn-update btn-action" data-action="reject"><i class="fa fa-ban"></i> {% trans 'Reject' %}</a>
+                                                {% endif %}
+                                                <a class="btn btn-sm btn-danger btn-update btn-status" data-uid="closed"><i class="fa fa-times"></i> {% trans 'Close' %}</a>
+                                                <a class="btn btn-sm btn-info btn-update btn-comment" data-uid="comment"><i class="fa fa-pencil"></i> {% trans 'Comment' %}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+var ticketId = "{{ object.id }}";
+var status = "{{ object.status }}";
+
+var commentUrl = "{% url 'api-tickets:ticket-comment-list' ticket_id=object.id %}";
+var ticketDetailUrl = "{% url 'api-tickets:ticket-detail' pk=object.id %}";
+
+function createComment(successCallback) {
+    var commentText = $("#comment").val();
+    if (!commentText) {
+        return
+    }
+    var body = {
+        body: commentText,
+        ticket: ticketId,
+    };
+    var success = function () {
+        window.location.reload();
+    };
+    if (successCallback){
+        success = successCallback;
+    }
+    requestApi({
+        url: commentUrl,
+        data: JSON.stringify(body),
+        method: "POST",
+        success: success
+    })
+}
+$(document).ready(function () {
+    if (status !== "open") {
+        $('.btn-update').attr('disabled', '1')
+    }
+})
+.on('click', '.btn-comment', function () {
+    createComment();
+})
+.on('click', '.btn-action', function () {
+    createComment(function () {});
+    var action = $(this).data('action');
+    var data = {
+        url: ticketDetailUrl,
+        body: JSON.stringify({action: action}),
+        method: "PATCH",
+        success: reloadPage
+    };
+    requestApi(data);
+})
+.on('click', '.btn-status', function () {
+    var status = $(this).data('uid');
+    var data = {
+        url: ticketDetailUrl,
+        body: JSON.stringify({status: status}),
+        method: "PATCH",
+        success: reloadPage
+    };
+    requestApi(data);
+})
+</script>
+{% endblock %}

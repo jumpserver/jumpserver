@@ -1,115 +1,23 @@
 # -*- coding: utf-8 -*-
 #
-
 import uuid
-import time
 
 from django.core.cache import cache
-from django.urls import reverse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext as _
-
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 
-from common.utils import get_logger, get_request_ip
-from common.permissions import IsOrgAdminOrAppUser, IsValidUser
+from common.utils import get_logger
+from common.permissions import IsOrgAdminOrAppUser
 from orgs.mixins.api import RootOrgViewMixin
-from users.serializers import UserSerializer
 from users.models import User
 from assets.models import Asset, SystemUser
-from audits.models import UserLoginLog as LoginLog
-from users.utils import (
-    check_otp_code, increase_login_failed_count,
-    is_block_login, clean_failed_count
-)
-from .. import const
-from ..utils import check_user_valid
-from ..serializers import OtpVerifySerializer
-from ..signals import post_auth_success, post_auth_failed
 
 logger = get_logger(__name__)
 __all__ = [
-    'UserAuthApi', 'UserConnectionTokenApi', 'UserOtpAuthApi',
-    'UserOtpVerifyApi',
+    'UserConnectionTokenApi',
 ]
-
-
-class UserAuthApi(RootOrgViewMixin, APIView):
-    permission_classes = (AllowAny,)
-    serializer_class = UserSerializer
-
-    def get_serializer_context(self):
-        return {
-            'request': self.request,
-            'view': self
-        }
-
-    def get_serializer(self, *args, **kwargs):
-        kwargs['context'] = self.get_serializer_context()
-        return self.serializer_class(*args, **kwargs)
-
-    def post(self, request):
-        # limit login
-        username = request.data.get('username')
-        ip = request.data.get('remote_addr', None)
-        ip = ip or get_request_ip(request)
-
-        if is_block_login(username, ip):
-            msg = _("Log in frequently and try again later")
-            logger.warn(msg + ': ' + username + ':' + ip)
-            return Response({'msg': msg}, status=401)
-
-        user, msg = self.check_user_valid(request)
-        if not user:
-            username = request.data.get('username', '')
-            self.send_auth_signal(success=False, username=username, reason=msg)
-            increase_login_failed_count(username, ip)
-            return Response({'msg': msg}, status=401)
-
-        if not user.otp_enabled:
-            self.send_auth_signal(success=True, user=user)
-            # 登陆成功，清除原来的缓存计数
-            clean_failed_count(username, ip)
-            token, expired_at = user.create_bearer_token(request)
-            return Response(
-                {'token': token, 'user': self.get_serializer(user).data}
-            )
-
-        seed = uuid.uuid4().hex
-        cache.set(seed, user, 300)
-        return Response(
-            {
-                'code': 101,
-                'msg': _('Please carry seed value and '
-                         'conduct MFA secondary certification'),
-                'otp_url': reverse('api-auth:user-otp-auth'),
-                'seed': seed,
-                'user': self.get_serializer(user).data
-            }, status=300
-        )
-
-    @staticmethod
-    def check_user_valid(request):
-        username = request.data.get('username', '')
-        password = request.data.get('password', '')
-        public_key = request.data.get('public_key', '')
-        user, msg = check_user_valid(
-            username=username, password=password,
-            public_key=public_key
-        )
-        return user, msg
-
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
-        else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
-            )
 
 
 class UserConnectionTokenApi(RootOrgViewMixin, APIView):
@@ -153,59 +61,5 @@ class UserConnectionTokenApi(RootOrgViewMixin, APIView):
         return super().get_permissions()
 
 
-class UserOtpAuthApi(RootOrgViewMixin, APIView):
-    permission_classes = (AllowAny,)
-    serializer_class = UserSerializer
 
-    def get_serializer_context(self):
-        return {
-            'request': self.request,
-            'view': self
-        }
-
-    def get_serializer(self, *args, **kwargs):
-        kwargs['context'] = self.get_serializer_context()
-        return self.serializer_class(*args, **kwargs)
-
-    def post(self, request):
-        otp_code = request.data.get('otp_code', '')
-        seed = request.data.get('seed', '')
-        user = cache.get(seed, None)
-        if not user:
-            return Response(
-                {'msg': _('Please verify the user name and password first')},
-                status=401
-            )
-        if not check_otp_code(user.otp_secret_key, otp_code):
-            self.send_auth_signal(success=False, username=user.username, reason=const.mfa_failed)
-            return Response({'msg': _('MFA certification failed')}, status=401)
-        self.send_auth_signal(success=True, user=user)
-        token, expired_at = user.create_bearer_token(request)
-        data = {'token': token, 'user': self.get_serializer(user).data}
-        return Response(data)
-
-    def send_auth_signal(self, success=True, user=None, username='', reason=''):
-        if success:
-            post_auth_success.send(sender=self.__class__, user=user, request=self.request)
-        else:
-            post_auth_failed.send(
-                sender=self.__class__, username=username,
-                request=self.request, reason=reason
-            )
-
-
-class UserOtpVerifyApi(CreateAPIView):
-    permission_classes = (IsValidUser,)
-    serializer_class = OtpVerifySerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        code = serializer.validated_data["code"]
-
-        if request.user.check_otp(code):
-            request.session["MFA_VERIFY_TIME"] = int(time.time())
-            return Response({"ok": "1"})
-        else:
-            return Response({"error": "Code not valid"}, status=400)
 
