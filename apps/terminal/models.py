@@ -58,20 +58,36 @@ class Terminal(models.Model):
             self.user.is_active = active
             self.user.save()
 
+    def get_command_storage(self):
+        storage = CommandStorage.objects.filter(name=self.command_storage).first()
+        return storage
+
     def get_command_storage_config(self):
-        s = CommandStorage.objects.filter(name=self.command_storage).first()
+        s = self.get_command_storage()
         if s:
             config = s.config
         else:
             config = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
+        return config
+
+    def get_command_storage_setting(self):
+        config = self.get_command_storage_config()
         return {"TERMINAL_COMMAND_STORAGE": config}
 
+    def get_replay_storage(self):
+        storage = ReplayStorage.objects.filter(name=self.replay_storage).first()
+        return storage
+
     def get_replay_storage_config(self):
-        s = ReplayStorage.objects.filter(name=self.replay_storage).first()
+        s = self.get_replay_storage()
         if s:
             config = s.config
         else:
             config = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
+        return config
+
+    def get_replay_storage_setting(self):
+        config = self.get_replay_storage_config()
         return {"TERMINAL_REPLAY_STORAGE": config}
 
     @property
@@ -81,8 +97,8 @@ class Terminal(models.Model):
             if not k.startswith('TERMINAL'):
                 continue
             configs[k] = getattr(settings, k)
-        configs.update(self.get_command_storage_config())
-        configs.update(self.get_replay_storage_config())
+        configs.update(self.get_command_storage_setting())
+        configs.update(self.get_replay_storage_setting())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
