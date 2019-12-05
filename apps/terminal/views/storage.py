@@ -74,6 +74,8 @@ class ReplayStorageCreateUpdateViewMixin(BaseStorageCreateUpdateViewMixin):
     form_class = forms.ReplayStorageS3Form
     form_class_choices = {
         const.REPLAY_STORAGE_TYPE_S3: forms.ReplayStorageS3Form,
+        const.REPLAY_STORAGE_TYPE_CEPH: forms.ReplayStorageCephForm,
+        const.REPLAY_STORAGE_TYPE_SWIFT: forms.ReplayStorageSwiftForm,
         const.REPLAY_STORAGE_TYPE_OSS: forms.ReplayStorageOSSForm,
         const.REPLAY_STORAGE_TYPE_AZURE: forms.ReplayStorageAzureForm
     }

@@ -9,6 +9,7 @@ from terminal.models import ReplayStorage, CommandStorage
 
 __all__ = [
     'ReplayStorageAzureForm', 'ReplayStorageOSSForm', 'ReplayStorageS3Form',
+    'ReplayStorageCephForm', 'ReplayStorageSwiftForm',
     'CommandStorageTypeESForm',
 ]
 
@@ -99,6 +100,50 @@ class ReplayStorageS3Form(BaseReplayStorageForm):
             Example: http://s3.cn-north-1.amazonaws.com.cn
             """
         )
+    )
+
+
+class ReplayStorageCephForm(BaseReplayStorageForm):
+    ceph_bucket = forms.CharField(
+        max_length=128, label=_('Bucket'), required=False
+    )
+    ceph_access_key = forms.CharField(
+        max_length=128, label=_('Access key'), required=False,
+        widget=forms.PasswordInput
+    )
+    ceph_secret_key = forms.CharField(
+        max_length=128, label=_('Secret key'), required=False,
+        widget=forms.PasswordInput
+    )
+    ceph_endpoint = forms.CharField(
+        max_length=128, label=_('Endpoint'), required=False,
+        help_text=_(
+            """
+            S3: http://s3.{REGION_NAME}.amazonaws.com <br>
+            S3(China): http://s3.{REGION_NAME}.amazonaws.com.cn <br>
+            Example: http://s3.cn-north-1.amazonaws.com.cn
+            """
+        )
+    )
+
+
+class ReplayStorageSwiftForm(BaseReplayStorageForm):
+    swift_bucket = forms.CharField(
+        max_length=128, label=_('Bucket'), required=False
+    )
+    swift_access_key = forms.CharField(
+        max_length=128, label=_('Access key'), required=False,
+        widget=forms.PasswordInput
+    )
+    swift_secret_key = forms.CharField(
+        max_length=128, label=_('Secret key'), required=False,
+        widget=forms.PasswordInput
+    )
+    swift_region = forms.CharField(
+        max_length=128, label=_('Region'), required=False,
+    )
+    swift_endpoint = forms.CharField(
+        max_length=128, label=_('Endpoint'), required=False,
     )
 
 

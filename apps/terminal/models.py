@@ -360,10 +360,19 @@ class ReplayStorage(CommonModelMixin):
     def __str__(self):
         return self.name
 
+    def convert_type(self):
+        s3_type_list = [
+            const.REPLAY_STORAGE_TYPE_CEPH, const.REPLAY_STORAGE_TYPE_SWIFT
+        ]
+        tp = self.type
+        if tp in s3_type_list:
+            tp = const.REPLAY_STORAGE_TYPE_S3
+        return tp
+
     @property
     def config(self):
         config = self.meta
-        config.update({'TYPE': self.type})
+        config.update({'TYPE': self.convert_type()})
         return config
 
     def in_defaults(self):
