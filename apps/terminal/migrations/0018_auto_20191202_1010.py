@@ -10,9 +10,58 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='session',
+            name='date_last_active',
+        ),
         migrations.AlterField(
             model_name='session',
             name='remote_addr',
-            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Remote addr'),
+            field=models.CharField(blank=True, max_length=128, null=True,
+                                   verbose_name='Remote addr'),
+        ),
+        migrations.AddField(
+            model_name='session',
+            name='asset_id',
+            field=models.CharField(blank=True, db_index=True, default='',
+                                   max_length=36),
+        ),
+        migrations.AddField(
+            model_name='session',
+            name='system_user_id',
+            field=models.CharField(blank=True, db_index=True, default='',
+                                   max_length=36),
+        ),
+        migrations.AddField(
+            model_name='session',
+            name='user_id',
+            field=models.CharField(blank=True, db_index=True, default='',
+                                   max_length=36),
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='asset',
+            field=models.CharField(db_index=True, max_length=1024,
+                                   verbose_name='Asset'),
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='protocol',
+            field=models.CharField(
+                choices=[('ssh', 'ssh'), ('rdp', 'rdp'), ('vnc', 'vnc'),
+                         ('telnet', 'telnet')], db_index=True, default='ssh',
+                max_length=8),
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='system_user',
+            field=models.CharField(db_index=True, max_length=128,
+                                   verbose_name='System user'),
+        ),
+        migrations.AlterField(
+            model_name='session',
+            name='user',
+            field=models.CharField(db_index=True, max_length=128,
+                                   verbose_name='User'),
         ),
     ]

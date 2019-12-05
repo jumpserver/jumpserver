@@ -440,7 +440,10 @@ def stop_service(srv, sig=15):
         if process is None:
             print("\033[31m No process found\033[0m")
             continue
-        process.wait(1)
+        try:
+            process.wait(1)
+        except:
+            pass
         for i in range(STOP_TIMEOUT):
             if i == STOP_TIMEOUT - 1:
                 print("\033[31m Error\033[0m")
