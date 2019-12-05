@@ -18,6 +18,8 @@ router.register(r'terminals', api.TerminalViewSet, 'terminal')
 router.register(r'tasks', api.TaskViewSet, 'tasks')
 router.register(r'commands', api.CommandViewSet, 'command')
 router.register(r'status', api.StatusViewSet, 'status')
+router.register(r'replay-storages', api.ReplayStorageViewSet, 'replay-storage')
+router.register(r'command-storages', api.CommandStorageViewSet, 'command-storage')
 
 urlpatterns = [
     path('sessions/<uuid:pk>/replay/',
@@ -27,7 +29,9 @@ urlpatterns = [
     path('terminals/<uuid:terminal>/access-key/', api.TerminalTokenApi.as_view(),
          name='terminal-access-key'),
     path('terminals/config/', api.TerminalConfig.as_view(), name='terminal-config'),
-    path('commands/export/', api.CommandExportApi.as_view(), name="command-export")
+    path('commands/export/', api.CommandExportApi.as_view(), name="command-export"),
+    path('replay-storages/<uuid:pk>/test-connective/', api.ReplayStorageTestConnectiveApi.as_view(), name='replay-storage-test-connective'),
+    path('command-storages/<uuid:pk>/test-connective/', api.CommandStorageTestConnectiveApi.as_view(), name='command-storage-test-connective')
     # v2: get session's replay
     # path('v2/sessions/<uuid:pk>/replay/',
     #     api.SessionReplayV2ViewSet.as_view({'get': 'retrieve'}),

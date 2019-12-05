@@ -1,0 +1,25 @@
+{% extends 'terminal/base_storage_create_update.html' %}
+{% load i18n static %}
+
+{% block custom_foot_js %}
+{{ block.super }}
+
+<script type="text/javascript">
+storageCreateUrl = "{% url 'api-terminal:replay-storage-list' %}";
+storageUpdateUrl = "{% url 'api-terminal:replay-storage-detail' pk=DEFAULT_PK %}";
+storageListUrl = "{% url "terminal:replay-storage-list" %}";
+
+function constructFormDataMeta(data){
+    var meta = {};
+    var type = data.type;
+    for (var k in data){
+        if (k.startsWith(type)){
+            meta[k] = data[k];
+            delete data[k]
+        }
+    }
+    return meta
+}
+
+</script>
+{% endblock %}

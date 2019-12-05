@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import logging
+from django.dispatch import receiver
 
 from django.core.cache import cache
 from celery import subtask
@@ -11,6 +12,7 @@ from kombu.utils.encoding import safe_str
 from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger
+from common.signals import django_ready
 from .decorator import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
 from .logger import CeleryTaskFileHandler
 

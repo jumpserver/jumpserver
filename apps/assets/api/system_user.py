@@ -14,8 +14,8 @@
 # limitations under the License.
 
 from django.shortcuts import get_object_or_404
-from django.conf import settings
 from rest_framework.response import Response
+from django.db.models import Count
 
 from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
@@ -49,6 +49,11 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     search_fields = filter_fields
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(_assets_amount=Count('assets'))
+        return queryset
 
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):

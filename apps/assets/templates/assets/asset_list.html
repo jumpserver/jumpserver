@@ -382,9 +382,6 @@ $(document).ready(function(){
     var data = {
         'resources': id_list
     };
-    function refreshPage() {
-        setTimeout( function () {window.location.reload();}, 300);
-    }
 
     function reloadTable() {
         asset_table.ajax.reload();

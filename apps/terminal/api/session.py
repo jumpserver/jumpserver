@@ -12,7 +12,7 @@ import jms_storage
 
 from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
-from common.filters import DatetimeRangeFilter
+from common.drf.filters import DatetimeRangeFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
 from ..models import Session

@@ -13,8 +13,8 @@ from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
 from authentication.signals import post_auth_failed, post_auth_success
 from terminal.models import Session, Command
-from terminal.backends.command.serializers import SessionCommandSerializer
-from . import models, serializers
+from common.utils.encode import model_to_json
+from . import models
 from .tasks import write_login_log_async
 
 logger = get_logger(__name__)
@@ -51,7 +51,10 @@ def create_operate_log(action, sender, resource):
 
 
 @receiver(post_save, dispatch_uid="my_unique_identifier")
-def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
+def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
+    if instance._meta.object_name == 'User' and \
+            update_fields and 'last_login' in update_fields:
+        return
     if created:
         action = models.OperateLog.ACTION_CREATE
     else:
@@ -79,27 +82,20 @@ def on_user_change_password(sender, instance=None, **kwargs):
 def on_audits_log_create(sender, instance=None, **kwargs):
     if sender == models.UserLoginLog:
         category = "login_log"
-        serializer = serializers.LoginLogSerializer
     elif sender == models.FTPLog:
-        serializer = serializers.FTPLogSerializer
         category = "ftp_log"
     elif sender == models.OperateLog:
         category = "operation_log"
-        serializer = serializers.OperateLogSerializer
     elif sender == models.PasswordChangeLog:
         category = "password_change_log"
-        serializer = serializers.PasswordChangeLogSerializer
     elif sender == Session:
         category = "host_session_log"
-        serializer = serializers.SessionAuditSerializer
     elif sender == Command:
         category = "session_command_log"
-        serializer = SessionCommandSerializer
     else:
         return
 
-    s = serializer(instance=instance)
-    data = json_render.render(s.data).decode(errors='ignore')
+    data = model_to_json(instance)
     msg = "{} - {}".format(category, data)
     sys_logger.info(msg)
 

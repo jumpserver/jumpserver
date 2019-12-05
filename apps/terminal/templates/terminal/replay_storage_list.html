@@ -1,0 +1,14 @@
+{% extends 'terminal/base_storage_list.html' %}
+{% load i18n static %}
+
+{% block create_storage_url %}{% url "terminal:replay-storage-create" %}{% endblock%}
+{% block create_storage_info %}{% trans 'Create replay storage' %}{% endblock %}
+{% block custom_foot_js %}
+{{ block.super }}
+<script>
+    storageTableAjaxUrl = '{% url "api-terminal:replay-storage-list" %}';
+    storageUpdateUrl = '{% url "terminal:replay-storage-update" pk=DEFAULT_PK %}';
+    storageDeleteUrl = '{% url "api-terminal:replay-storage-detail" pk=DEFAULT_PK %}';
+    storageTestConnectiveUrl = '{% url "api-terminal:replay-storage-test-connective" pk=DEFAULT_PK %}';
+</script>
+{% endblock %}

@@ -1,10 +1,11 @@
 # coding:utf-8
 #
 
+import warnings
 import ldap
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django_auth_ldap.backend import _LDAPUser, LDAPBackend
+from django_auth_ldap.backend import _LDAPUser, LDAPBackend, LDAPSettings
 from django_auth_ldap.config import _LDAPConfig, LDAPSearch, LDAPSearchUnion
 
 from users.utils import construct_user_email
@@ -17,7 +18,6 @@ class LDAPAuthorizationBackend(LDAPBackend):
     """
     Override this class to override _LDAPUser to LDAPUser
     """
-
     @staticmethod
     def user_can_authenticate(user):
         """
@@ -27,18 +27,26 @@ class LDAPAuthorizationBackend(LDAPBackend):
         is_valid = getattr(user, 'is_valid', None)
         return is_valid or is_valid is None
 
-    def authenticate(self, request=None, username=None, password=None, **kwargs):
+    def pre_check(self, username):
+        if not settings.AUTH_LDAP:
+            return False
         logger.info('Authentication LDAP backend')
         if not username:
             logger.info('Authenticate failed: username is None')
-            return None
+            return False
         if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
             user_model = self.get_user_model()
             exist = user_model.objects.filter(username=username).exists()
             if not exist:
                 msg = 'Authentication failed: user ({}) is not in the user list'
                 logger.info(msg.format(username))
-                return None
+                return False
+        return True
+
+    def authenticate(self, request=None, username=None, password=None, **kwargs):
+        match = self.pre_check(username)
+        if not match:
+            return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)
         user = self.authenticate_ldap_user(ldap_user, password)
         logger.info('Authenticate user: {}'.format(user))

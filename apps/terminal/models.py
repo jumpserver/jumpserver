@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import uuid
+import jms_storage
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -13,9 +14,11 @@ from django.core.cache import cache
 
 from users.models import User
 from orgs.mixins.models import OrgModelMixin
-from common.utils import get_command_storage_setting, get_replay_storage_setting
+from common.mixins import CommonModelMixin
+from common.fields.model import EncryptJsonDictTextField
 from .backends import get_multi_command_storage
 from .backends.command.models import AbstractSessionCommand
+from . import const
 
 
 class Terminal(models.Model):
@@ -55,21 +58,21 @@ class Terminal(models.Model):
             self.user.is_active = active
             self.user.save()
 
-    def get_command_storage_setting(self):
-        storage_all = get_command_storage_setting()
-        if self.command_storage in storage_all:
-            storage = storage_all.get(self.command_storage)
+    def get_command_storage_config(self):
+        s = CommandStorage.objects.filter(name=self.command_storage).first()
+        if s:
+            config = s.config
         else:
-            storage = storage_all.get('default')
-        return {"TERMINAL_COMMAND_STORAGE": storage}
+            config = settings.DEFAULT_TERMINAL_COMMAND_STORAGE
+        return {"TERMINAL_COMMAND_STORAGE": config}
 
-    def get_replay_storage_setting(self):
-        storage_all = get_replay_storage_setting()
-        if self.replay_storage in storage_all:
-            storage = storage_all.get(self.replay_storage)
+    def get_replay_storage_config(self):
+        s = ReplayStorage.objects.filter(name=self.replay_storage).first()
+        if s:
+            config = s.config
         else:
-            storage = storage_all.get('default')
-        return {"TERMINAL_REPLAY_STORAGE": storage}
+            config = settings.DEFAULT_TERMINAL_REPLAY_STORAGE
+        return {"TERMINAL_REPLAY_STORAGE": config}
 
     @property
     def config(self):
@@ -78,8 +81,8 @@ class Terminal(models.Model):
             if not k.startswith('TERMINAL'):
                 continue
             configs[k] = getattr(settings, k)
-        configs.update(self.get_command_storage_setting())
-        configs.update(self.get_replay_storage_setting())
+        configs.update(self.get_command_storage_config())
+        configs.update(self.get_replay_storage_config())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
@@ -153,17 +156,19 @@ class Session(OrgModelMixin):
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    user = models.CharField(max_length=128, verbose_name=_("User"))
-    asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
-    system_user = models.CharField(max_length=128, verbose_name=_("System user"))
+    user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
+    user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
+    asset = models.CharField(max_length=1024, verbose_name=_("Asset"), db_index=True)
+    asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
+    system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
+    system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
-    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
+    remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     is_finished = models.BooleanField(default=False)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)
-    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh', max_length=8)
-    date_last_active = models.DateTimeField(verbose_name=_("Date last active"), default=timezone.now)
+    protocol = models.CharField(choices=PROTOCOL_CHOICES, default='ssh', max_length=8, db_index=True)
     date_start = models.DateTimeField(verbose_name=_("Date start"), db_index=True, default=timezone.now)
     date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
@@ -282,3 +287,80 @@ class Command(AbstractSessionCommand):
     class Meta:
         db_table = "terminal_command"
         ordering = ('-timestamp',)
+
+
+class CommandStorage(CommonModelMixin):
+    TYPE_CHOICES = const.COMMAND_STORAGE_TYPE_CHOICES
+    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
+    TYPE_SERVER = const.COMMAND_STORAGE_TYPE_SERVER
+
+    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    type = models.CharField(
+        max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
+        default=TYPE_SERVER
+    )
+    meta = EncryptJsonDictTextField(default={})
+    comment = models.TextField(
+        max_length=128, default='', blank=True, verbose_name=_('Comment')
+    )
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def config(self):
+        config = self.meta
+        config.update({'TYPE': self.type})
+        return config
+
+    def in_defaults(self):
+        return self.type in self.TYPE_DEFAULTS
+
+    def is_valid(self):
+        if self.in_defaults():
+            return True
+        storage = jms_storage.get_log_storage(self.config)
+        return storage.ping()
+
+    def can_delete(self):
+        return not self.in_defaults()
+
+
+class ReplayStorage(CommonModelMixin):
+    TYPE_CHOICES = const.REPLAY_STORAGE_TYPE_CHOICES
+    TYPE_SERVER = const.REPLAY_STORAGE_TYPE_SERVER
+    TYPE_DEFAULTS = dict(const.REPLAY_STORAGE_TYPE_CHOICES_DEFAULT).keys()
+
+    name = models.CharField(max_length=32, verbose_name=_("Name"), unique=True)
+    type = models.CharField(
+        max_length=16, choices=TYPE_CHOICES, verbose_name=_('Type'),
+        default=TYPE_SERVER
+    )
+    meta = EncryptJsonDictTextField(default={})
+    comment = models.TextField(
+        max_length=128, default='', blank=True, verbose_name=_('Comment')
+    )
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def config(self):
+        config = self.meta
+        config.update({'TYPE': self.type})
+        return config
+
+    def in_defaults(self):
+        return self.type in self.TYPE_DEFAULTS
+
+    def is_valid(self):
+        if self.in_defaults():
+            return True
+        storage = jms_storage.get_object_storage(self.config)
+        target = 'tests.py'
+        src = os.path.join(settings.BASE_DIR, 'common', target)
+        return storage.is_valid(src, target)
+
+    def can_delete(self):
+        return not self.in_defaults()
+

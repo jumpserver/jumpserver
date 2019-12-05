@@ -16,7 +16,7 @@ __all__ = [
 class FTPLog(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
-    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
+    remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System user"))
     operate = models.CharField(max_length=16, verbose_name=_("Operate"))
@@ -39,7 +39,7 @@ class OperateLog(OrgModelMixin):
     action = models.CharField(max_length=16, choices=ACTION_CHOICES, verbose_name=_("Action"))
     resource_type = models.CharField(max_length=64, verbose_name=_("Resource Type"))
     resource = models.CharField(max_length=128, verbose_name=_("Resource"))
-    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
+    remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -50,7 +50,7 @@ class PasswordChangeLog(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_('User'))
     change_by = models.CharField(max_length=128, verbose_name=_("Change by"))
-    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
+    remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
     datetime = models.DateTimeField(auto_now=True)
 
     def __str__(self):

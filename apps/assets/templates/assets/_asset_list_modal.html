@@ -190,6 +190,16 @@ function setAssetModalOptions(options) {
     assetModalOption = options;
 }
 
+function initAssetTreeModel(selector) {
+    $(selector).parent().find(".select2-selection").on('click', function (e) {
+        if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
+            e.preventDefault();
+            e.stopPropagation();
+            $("#asset_list_modal").modal();
+        }
+    })
+}
+
 
 $(document).ready(function(){
 
