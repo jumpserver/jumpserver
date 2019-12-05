@@ -91,7 +91,6 @@ REDIS_PORT: 6379
 # In order to perform this operation a successful bind must be completed on the connection
 # AUTH_LDAP_OPTIONS_OPT_REFERRALS: -1
 
-
 # OTP settings
 # OTP/MFA 配置
 # OTP_VALID_WINDOW: 0
@@ -100,3 +99,12 @@ REDIS_PORT: 6379
 # Perm show single asset to ungrouped node
 # 是否把未授权节点资产放入到 未分组 节点中
 # PERM_SINGLE_ASSET_TO_UNGROUP_NODE: false
+#
+# 启用定时任务
+# PERIOD_TASK_ENABLE: True
+#
+# 启用二次复合认证配置
+# LOGIN_CONFIRM_ENABLE: False
+#
+# Windows 登录跳过手动输入密码
+# WINDOWS_SKIP_ALL_MANUAL_PASSWORD: False

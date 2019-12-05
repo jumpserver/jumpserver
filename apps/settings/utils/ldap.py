@@ -21,10 +21,6 @@ __all__ = [
 LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
 
 
-class LDAPOUGroupException(Exception):
-    pass
-
-
 class LDAPConfig(object):
 
     def __init__(self, config=None):
@@ -93,8 +89,12 @@ class LDAPServerUtil(object):
     def paged_cookie(self):
         if self._paged_size is None:
             return None
-        cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
-        return cookie
+        try:
+            cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
+            return cookie
+        except Exception as e:
+            logger.error(e)
+            return None
 
     def get_search_filter_extra(self):
         extra = ''
@@ -119,14 +119,11 @@ class LDAPServerUtil(object):
     def search_user_entries_ou(self, search_ou, paged_cookie=None):
         search_filter = self.get_search_filter()
         attributes = list(self.config.attr_map.values())
-        ok = self.connection.search(
+        self.connection.search(
             search_base=search_ou, search_filter=search_filter,
             attributes=attributes, paged_size=self._paged_size,
             paged_cookie=paged_cookie
         )
-        if not ok:
-            error = _("Search no entry matched in ou {}".format(search_ou))
-            raise LDAPOUGroupException(error)
 
     @timeit
     def search_user_entries(self):

@@ -20,6 +20,8 @@ __all__ = [
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
+    filter_fields = ("name",)
+    search_fields = filter_fields
     serializer_class = TaskSerializer
     permission_classes = (IsOrgAdmin,)
 

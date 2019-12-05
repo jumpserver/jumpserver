@@ -14,7 +14,7 @@ class TicketSerializer(serializers.ModelSerializer):
             'id', 'user', 'user_display', 'title', 'body',
             'assignees', 'assignees_display',
             'status', 'action', 'date_created', 'date_updated',
-            'type_display', 'action_display',
+            'type', 'type_display', 'action_display',
         ]
         read_only_fields = [
             'user_display', 'assignees_display',

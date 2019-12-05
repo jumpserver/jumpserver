@@ -120,7 +120,7 @@ class UserResetPKApi(UserQuerysetMixin, generics.UpdateAPIView):
     def perform_update(self, serializer):
         from ..utils import send_reset_ssh_key_mail
         user = self.get_object()
-        user.is_public_key_valid = False
+        user.public_key = None
         user.save()
         send_reset_ssh_key_mail(user)
 
