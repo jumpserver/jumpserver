@@ -105,9 +105,9 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 data['src'] = url
                 return Response(data)
 
-        # 去定义的外部storage查找
-        configs = settings.TERMINAL_REPLAY_STORAGE
-        configs = {k: v for k, v in configs.items() if v['TYPE'] != 'server'}
+        # 去 Session 相关的 Terminal 中关联的存储中查找
+        replay_storage = session.terminal.get_replay_storage()
+        configs = {replay_storage.name: replay_storage.config}
         if not configs:
             return HttpResponseNotFound()
 
