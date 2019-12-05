@@ -10,6 +10,20 @@ from common.utils import get_signer
 signer = get_signer()
 
 
+class SettingQuerySet(models.QuerySet):
+    def __getattr__(self, item):
+        instances = self.filter(name=item)
+        if len(instances) == 1:
+            return instances[0]
+        else:
+            return Setting()
+
+
+class SettingManager(models.Manager):
+    def get_queryset(self):
+        return SettingQuerySet(self.model, using=self._db)
+
+
 class Setting(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_("Name"))
     value = models.TextField(verbose_name=_("Value"))
@@ -18,6 +32,7 @@ class Setting(models.Model):
     enabled = models.BooleanField(verbose_name=_("Enabled"), default=True)
     comment = models.TextField(verbose_name=_("Comment"))
 
+    objects = SettingManager()
     cache_key_prefix = '_SETTING_'
 
     def __str__(self):
