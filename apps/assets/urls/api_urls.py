@@ -12,6 +12,7 @@ app_name = 'assets'
 
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
+router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
 router.register(r'labels', api.LabelViewSet, 'label')

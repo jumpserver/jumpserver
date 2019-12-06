@@ -4,16 +4,18 @@
 import random
 
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
-from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser
+from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsSuperUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from ..models import Asset, Node
+from ..models import Asset, Node, Platform
 from .. import serializers
-from ..tasks import update_asset_hardware_info_manual, \
-    test_asset_connectivity_manual
+from ..tasks import (
+    update_asset_hardware_info_manual, test_asset_connectivity_manual
+)
 from ..filters import AssetByNodeFilterBackend, LabelFilterBackend
 
 
@@ -21,7 +23,7 @@ logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
-    'AssetGatewayApi',
+    'AssetGatewayApi', 'AssetPlatformViewSet',
 ]
 
 
@@ -51,6 +53,12 @@ class AssetViewSet(OrgBulkModelViewSet):
     def perform_create(self, serializer):
         assets = serializer.save()
         self.set_assets_node(assets)
+
+
+class AssetPlatformViewSet(ModelViewSet):
+    queryset = Platform.objects.all()
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.PlatformSerializer
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):

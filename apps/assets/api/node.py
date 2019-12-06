@@ -177,7 +177,7 @@ class NodeChildrenAsTreeApi(NodeChildrenApi):
         if not include_assets:
             return queryset
         assets = self.instance.get_assets().only(
-            "id", "hostname", "ip", 'platform', "os",
+            "id", "hostname", "ip", "os",
             "org_id", "protocols",
         )
         for asset in assets:

@@ -81,7 +81,7 @@ LOGGING = {
             'propagate': False,
         },
         'jumpserver': {
-            'handlers': ['console', 'file', 'syslog'],
+            'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
         },
         'ops.ansible_api': {
@@ -92,7 +92,7 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': "INFO",
         },
-        'jms.audits': {
+        'syslog': {
             'handlers': ['syslog'],
             'level': 'INFO'
         },
@@ -110,6 +110,7 @@ if CONFIG.SYSLOG_ADDR != '' and len(CONFIG.SYSLOG_ADDR.split(':')) == 2:
         'class': 'logging.handlers.SysLogHandler',
         'facility': CONFIG.SYSLOG_FACILITY,
         'address': (host, int(port)),
+        'socktype': CONFIG.SYSLOG_SOCKTYPE,
     })
 
 if not os.path.isdir(LOG_DIR):

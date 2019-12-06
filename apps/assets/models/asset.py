@@ -11,10 +11,12 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from .utils import Connectivity
+from common.fields.model import JsonDictTextField
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
+from .utils import Connectivity
 
-__all__ = ['Asset', 'ProtocolsMixin']
+__all__ = ['Asset', 'ProtocolsMixin', 'Platform']
 logger = logging.getLogger(__name__)
 
 
@@ -119,6 +121,41 @@ class NodesRelationMixin:
         return nodes
 
 
+class Platform(models.Model):
+    CHARSET_CHOICES = (
+        ('utf8', 'UTF-8'),
+        ('gbk', 'GBK'),
+    )
+    BASE_CHOICES = (
+        ('Linux', 'Linux'),
+        ('Unix', 'Unix'),
+        ('MacOS', 'MacOS'),
+        ('BSD', 'BSD'),
+        ('Windows', 'Windows'),
+        ('Other', 'Other'),
+    )
+    name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
+    base = models.CharField(choices=BASE_CHOICES, max_length=16, default='Linux', verbose_name=_("Base"))
+    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
+    meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
+    internal = models.BooleanField(default=False, verbose_name=_("Internal"))
+    comment = models.TextField(blank=True, null=True)
+
+    @classmethod
+    def default(cls):
+        linux, created = cls.objects.get_or_create(
+            defaults={'name': 'Linux'}, name='Linux'
+        )
+        return linux.id
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        pass
+        # ordering = ('name',)
+
+
 class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
@@ -138,9 +175,8 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                                 choices=ProtocolsMixin.PROTOCOL_CHOICES,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-
     protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
-    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
+    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))

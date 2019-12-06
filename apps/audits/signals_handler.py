@@ -18,7 +18,7 @@ from . import models
 from .tasks import write_login_log_async
 
 logger = get_logger(__name__)
-sys_logger = get_syslogger("audits")
+sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
 
 
@@ -95,7 +95,7 @@ def on_audits_log_create(sender, instance=None, **kwargs):
     else:
         return
 
-    data = model_to_json(instance)
+    data = model_to_json(instance, indent=None)
     msg = "{} - {}".format(category, data)
     sys_logger.info(msg)
 
