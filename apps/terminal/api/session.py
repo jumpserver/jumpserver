@@ -15,7 +15,7 @@ from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.drf.filters import DatetimeRangeFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
-from ..models import Session
+from ..models import Session, ReplayStorage
 from .. import serializers
 
 
@@ -105,9 +105,12 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 data['src'] = url
                 return Response(data)
 
-        # 去 Session 相关的 Terminal 中关联的存储中查找
-        replay_storage = session.terminal.get_replay_storage()
-        configs = {replay_storage.name: replay_storage.config}
+        replay_storages = ReplayStorage.objects.all()
+        configs = {
+            storage.name: storage.config
+            for storage in replay_storages
+            if not storage.in_defaults()
+        }
         if not configs:
             return HttpResponseNotFound()
 
