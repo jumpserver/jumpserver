@@ -127,6 +127,7 @@
 {% include 'assets/_asset_update_modal.html' %}
 {% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
+{% include 'assets/_node_detail_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -198,6 +199,8 @@ function initTree() {
             <li class="divider"></li>
             <li id="show_current_asset" class="btn-show-current-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-hand-o-up"></i> {% trans 'Display only current node assets' %}</a></li>
             <li id="show_all_asset" class="btn-show-all-asset" style="display: none;" tabindex="-1"><a><i class="fa fa-th"></i> {% trans 'Displays all child node assets' %}</a></li>
+            <li class="divider"></li>
+            <li id="menu_node_detail" class="btn-node-detail" tabindex="-1"><a><i class="fa fa-info-circle"></i> {% trans 'Node detail' %}</a></li>
         `
     })
 }
@@ -547,6 +550,30 @@ $(document).ready(function(){
         flash_message: false
     });
 
+}).on('click', '#menu_node_detail', function(e) {
+    e.preventDefault();
+    var the_url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}";
+    the_url = the_url.replace("{{ DEFAULT_PK }}", current_node_id);
+    function drawingNodeDetailModal(data){
+        $('#id_node_detail_id_view').html(data['id']);
+        $('#id_node_detail_name_view').html(data['name']);
+        $('#id_node_detail_full_name_view').html(data['full_value']);
+        $('#id_node_detail_key_view').html(data['key']);
+        $('#node_detail_modal').modal();
+    }
+    function error(data) {
+        alert(data)
+    }
+    function success(data) {
+        drawingNodeDetailModal(data)
+    }
+    requestApi({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success: success,
+        flash_message: false
+    });
 })
 
 </script>
