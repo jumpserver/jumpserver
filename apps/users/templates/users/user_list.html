@@ -266,7 +266,6 @@ $(document).ready(function(){
     }
     function doDelete(props) {
         props = props || {};
-        console.log(props)
         swal({
             title: "{% trans 'Are you sure?' %}",
             text: props.text || "{% trans 'This will delete the selected users !!!' %}",
