@@ -316,7 +316,7 @@ function requestApi(props) {
 }
 
 // Sweet Alert for Delete
-function objectDelete(obj, name, url, redirectTo) {
+function objectDelete(obj, name, url, redirectTo, title, success_message) {
     function doDelete() {
         var body = {};
         var success = function () {
@@ -335,14 +335,14 @@ function objectDelete(obj, name, url, redirectTo) {
             url: url,
             body: JSON.stringify(body),
             method: 'DELETE',
-            success_message: gettext("Delete the success"),
+            success_message: success_message || gettext("Delete the success"),
             success: success,
             error: fail
         });
     }
 
     swal({
-        title: gettext('Are you sure about deleting it?'),
+        title: title || gettext('Are you sure about deleting it?'),
         text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,

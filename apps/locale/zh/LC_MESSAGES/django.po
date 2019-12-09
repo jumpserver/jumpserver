@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-06 15:21+0800\n"
+"POT-Creation-Date: 2019-12-06 19:03+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -146,7 +146,7 @@ msgstr "资产"
 #: terminal/models.py:350 terminal/templates/terminal/base_storage_list.html:32
 #: terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:30 users/forms.py:162
-#: users/models/group.py:14 users/models/user.py:433
+#: users/models/group.py:14 users/models/user.py:443
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:54
 #: users/templates/users/user_asset_permission.html:174
@@ -202,7 +202,7 @@ msgstr "参数"
 #: orgs/models.py:16 perms/models/base.py:54
 #: perms/templates/perms/asset_permission_detail.html:93
 #: perms/templates/perms/remote_app_permission_detail.html:85
-#: users/models/user.py:474 users/serializers/group.py:32
+#: users/models/user.py:484 users/serializers/group.py:32
 #: users/templates/users/user_detail.html:112
 #: xpack/plugins/change_auth_plan/models.py:109
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
@@ -266,7 +266,7 @@ msgstr "创建日期"
 #: terminal/models.py:357 terminal/templates/terminal/base_storage_list.html:34
 #: terminal/templates/terminal/terminal_detail.html:63
 #: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:15
-#: users/models/user.py:466 users/templates/users/user_detail.html:130
+#: users/models/user.py:476 users/templates/users/user_detail.html:130
 #: users/templates/users/user_group_detail.html:62
 #: users/templates/users/user_group_list.html:37
 #: users/templates/users/user_profile.html:138
@@ -361,7 +361,7 @@ msgstr "重置"
 #: users/templates/users/_user.html:52
 #: users/templates/users/forgot_password.html:42
 #: users/templates/users/user_bulk_update.html:24
-#: users/templates/users/user_list.html:57
+#: users/templates/users/user_list.html:61
 #: users/templates/users/user_password_update.html:76
 #: users/templates/users/user_profile_update.html:68
 #: users/templates/users/user_pubkey_update.html:81
@@ -431,8 +431,8 @@ msgstr "详情"
 #: users/templates/users/user_group_list.html:20
 #: users/templates/users/user_group_list.html:71
 #: users/templates/users/user_list.html:20
-#: users/templates/users/user_list.html:103
-#: users/templates/users/user_list.html:106
+#: users/templates/users/user_list.html:107
+#: users/templates/users/user_list.html:110
 #: users/templates/users/user_profile.html:181
 #: users/templates/users/user_profile.html:191
 #: users/templates/users/user_profile.html:201
@@ -477,8 +477,8 @@ msgstr "更新"
 #: users/templates/users/user_detail.html:31
 #: users/templates/users/user_group_detail.html:27
 #: users/templates/users/user_group_list.html:73
-#: users/templates/users/user_list.html:111
-#: users/templates/users/user_list.html:115
+#: users/templates/users/user_list.html:117
+#: users/templates/users/user_list.html:121
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:33
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:58
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:27
@@ -719,7 +719,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: ops/models/adhoc.py:189 perms/templates/perms/asset_permission_list.html:205
 #: perms/templates/perms/remote_app_permission_user.html:50
 #: settings/templates/settings/_ldap_list_users_modal.html:31 users/forms.py:14
-#: users/forms.py:161 users/models/user.py:431
+#: users/forms.py:161 users/models/user.py:441
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:68
 #: users/templates/users/user_list.html:36
@@ -760,7 +760,7 @@ msgstr "密码"
 
 #: assets/forms/user.py:30 assets/serializers/asset_user.py:71
 #: assets/templates/assets/_asset_user_auth_update_modal.html:27
-#: users/models/user.py:460
+#: users/models/user.py:470
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -975,7 +975,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:452
+#: assets/models/cluster.py:22 users/models/user.py:462
 #: users/templates/users/user_detail.html:77
 msgid "Phone"
 msgstr "手机"
@@ -1001,7 +1001,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:575
+#: users/models/user.py:585
 msgid "System"
 msgstr "系统"
 
@@ -1142,7 +1142,7 @@ msgstr "默认资产组"
 #: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:34
 #: tickets/templates/tickets/ticket_list.html:103 users/forms.py:339
-#: users/models/user.py:148 users/models/user.py:164 users/models/user.py:563
+#: users/models/user.py:148 users/models/user.py:164 users/models/user.py:573
 #: users/serializers/group.py:21
 #: users/templates/users/user_asset_permission.html:55
 #: users/templates/users/user_asset_permission.html:84
@@ -1303,7 +1303,7 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:67 users/forms.py:282
-#: users/models/user.py:463 users/templates/users/first_login.html:42
+#: users/models/user.py:473 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:49
 #: users/templates/users/user_profile.html:69
 #: users/templates/users/user_profile_update.html:46
@@ -1727,7 +1727,7 @@ msgstr "选择节点"
 #: users/templates/users/user_detail.html:548
 #: users/templates/users/user_group_create_update.html:28
 #: users/templates/users/user_group_list.html:120
-#: users/templates/users/user_list.html:256
+#: users/templates/users/user_list.html:276
 #: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:54
 #: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:45
@@ -1784,8 +1784,8 @@ msgstr "创建管理用户"
 #: assets/templates/assets/system_user_list.html:217
 #: users/templates/users/user_group_list.html:164
 #: users/templates/users/user_group_list.html:195
-#: users/templates/users/user_list.html:165
-#: users/templates/users/user_list.html:197
+#: users/templates/users/user_list.html:184
+#: users/templates/users/user_list.html:216
 #: xpack/plugins/vault/templates/vault/vault.html:200
 msgid "Please select file"
 msgstr "选择文件"
@@ -1875,12 +1875,12 @@ msgid "Hardware"
 msgstr "硬件"
 
 #: assets/templates/assets/asset_list.html:109
-#: users/templates/users/user_list.html:50
+#: users/templates/users/user_list.html:51
 msgid "Delete selected"
 msgstr "批量删除"
 
 #: assets/templates/assets/asset_list.html:110
-#: users/templates/users/user_list.html:51
+#: users/templates/users/user_list.html:55
 msgid "Update selected"
 msgstr "批量更新"
 
@@ -1889,12 +1889,12 @@ msgid "Remove from this node"
 msgstr "从节点移除"
 
 #: assets/templates/assets/asset_list.html:112
-#: users/templates/users/user_list.html:52
+#: users/templates/users/user_list.html:56
 msgid "Deactive selected"
 msgstr "禁用所选"
 
 #: assets/templates/assets/asset_list.html:113
-#: users/templates/users/user_list.html:53
+#: users/templates/users/user_list.html:57
 msgid "Active selected"
 msgstr "激活所选"
 
@@ -1928,7 +1928,7 @@ msgstr "显示所有子节点资产"
 #: users/templates/users/user_detail.html:474
 #: users/templates/users/user_detail.html:542
 #: users/templates/users/user_group_list.html:114
-#: users/templates/users/user_list.html:250
+#: users/templates/users/user_list.html:270
 #: xpack/plugins/interface/templates/interface/interface.html:97
 msgid "Are you sure?"
 msgstr "你确认吗?"
@@ -1943,7 +1943,7 @@ msgstr "删除选择资产"
 #: users/templates/users/user_detail.html:478
 #: users/templates/users/user_detail.html:546
 #: users/templates/users/user_group_list.html:118
-#: users/templates/users/user_list.html:254
+#: users/templates/users/user_list.html:274
 #: xpack/plugins/interface/templates/interface/interface.html:101
 msgid "Cancel"
 msgstr "取消"
@@ -2326,7 +2326,7 @@ msgstr "Agent"
 
 #: audits/models.py:86 audits/templates/audits/login_log_list.html:62
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms.py:194 users/models/user.py:455
+#: users/forms.py:194 users/models/user.py:465
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2581,14 +2581,14 @@ msgid "Show"
 msgstr "显示"
 
 #: authentication/templates/authentication/_access_key_modal.html:66
-#: users/models/user.py:355 users/templates/users/user_profile.html:94
+#: users/models/user.py:365 users/templates/users/user_profile.html:94
 #: users/templates/users/user_profile.html:163
 #: users/templates/users/user_profile.html:166
 msgid "Disable"
 msgstr "禁用"
 
 #: authentication/templates/authentication/_access_key_modal.html:67
-#: users/models/user.py:356 users/templates/users/user_profile.html:92
+#: users/models/user.py:366 users/templates/users/user_profile.html:92
 #: users/templates/users/user_profile.html:170
 msgid "Enable"
 msgstr "启用"
@@ -3235,7 +3235,7 @@ msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
 #: perms/templates/perms/asset_permission_list.html:206
 #: perms/templates/perms/remote_app_permission_list.html:16
 #: templates/_nav.html:21 users/forms.py:313 users/models/group.py:26
-#: users/models/user.py:439 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:449 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:56
 #: users/templates/users/user_asset_permission.html:87
 #: users/templates/users/user_detail.html:222
@@ -3283,7 +3283,7 @@ msgstr "资产授权"
 #: perms/models/base.py:53
 #: perms/templates/perms/asset_permission_detail.html:85
 #: perms/templates/perms/remote_app_permission_detail.html:77
-#: users/models/user.py:471 users/templates/users/user_detail.html:108
+#: users/models/user.py:481 users/templates/users/user_detail.html:108
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
 msgstr "失效日期"
@@ -3858,7 +3858,7 @@ msgid "Refresh cache"
 msgstr "刷新缓存"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:33
-#: users/models/user.py:435 users/templates/users/user_detail.html:72
+#: users/models/user.py:445 users/templates/users/user_detail.html:72
 #: users/templates/users/user_profile.html:59
 msgid "Email"
 msgstr "邮件"
@@ -4827,11 +4827,11 @@ msgstr "工单列表"
 msgid "Ticket detail"
 msgstr "工单详情"
 
-#: users/api/user.py:174
+#: users/api/user.py:180
 msgid "Could not reset self otp, use profile reset instead"
 msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 
-#: users/forms.py:47 users/models/user.py:443
+#: users/forms.py:47 users/models/user.py:453
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:88
 #: users/templates/users/user_list.html:37
@@ -4839,7 +4839,7 @@ msgstr "不能再该页面重置MFA, 请去个人信息页面重置"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms.py:51 users/models/user.py:478
+#: users/forms.py:51 users/models/user.py:488
 #: users/templates/users/user_detail.html:104
 #: users/templates/users/user_list.html:39
 #: users/templates/users/user_profile.html:102
@@ -4957,7 +4957,7 @@ msgstr "选择用户"
 msgid "User auth from {}, go there change password"
 msgstr "用户认证源来自 {}, 请去相应系统修改密码"
 
-#: users/models/user.py:147 users/models/user.py:571
+#: users/models/user.py:147 users/models/user.py:581
 msgid "Administrator"
 msgstr "管理员"
 
@@ -4978,27 +4978,27 @@ msgstr "组织管理员"
 msgid "Org auditor"
 msgstr "组织审计员"
 
-#: users/models/user.py:357 users/templates/users/user_profile.html:90
+#: users/models/user.py:367 users/templates/users/user_profile.html:90
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:423
+#: users/models/user.py:433
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:446
+#: users/models/user.py:456
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:449 users/templates/users/user_detail.html:83
+#: users/models/user.py:459 users/templates/users/user_detail.html:83
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:482
+#: users/models/user.py:492
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:574
+#: users/models/user.py:584
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -5372,28 +5372,52 @@ msgstr "用户组删除"
 msgid "UserGroup Deleting failed."
 msgstr "用户组删除失败"
 
-#: users/templates/users/user_list.html:251
+#: users/templates/users/user_list.html:53
+msgid "Remove selected"
+msgstr "批量移除"
+
+#: users/templates/users/user_list.html:129
+#: users/templates/users/user_list.html:133
+msgid "Remove"
+msgstr "移除"
+
+#: users/templates/users/user_list.html:271
 msgid "This will delete the selected users !!!"
 msgstr "删除选中用户 !!!"
 
-#: users/templates/users/user_list.html:262
-msgid "User Deleted."
-msgstr "已被删除"
-
-#: users/templates/users/user_list.html:263
-#: users/templates/users/user_list.html:267
-msgid "User Delete"
-msgstr "删除"
-
-#: users/templates/users/user_list.html:266
+#: users/templates/users/user_list.html:282
 msgid "User Deleting failed."
 msgstr "用户删除失败"
 
-#: users/templates/users/user_list.html:327
+#: users/templates/users/user_list.html:283
+msgid "User Delete"
+msgstr "删除"
+
+#: users/templates/users/user_list.html:305
+msgid "This will remove the selected users !!"
+msgstr "移除选中用户 !!!"
+
+#: users/templates/users/user_list.html:307
+msgid "User Removing failed."
+msgstr "用户移除失败"
+
+#: users/templates/users/user_list.html:308
+msgid "User Remove"
+msgstr "用户移除"
+
+#: users/templates/users/user_list.html:357
+msgid "Are you sure about removing it?"
+msgstr "您确定移除吗?"
+
+#: users/templates/users/user_list.html:358
+msgid "Remove the success"
+msgstr "移除成功"
+
+#: users/templates/users/user_list.html:363
 msgid "User is expired"
 msgstr "用户已失效"
 
-#: users/templates/users/user_list.html:330
+#: users/templates/users/user_list.html:366
 msgid "User is inactive"
 msgstr "用户已禁用"
 
@@ -6503,6 +6527,9 @@ msgstr "密码匣子"
 msgid "vault create"
 msgstr "创建"
 
+#~ msgid "User Deleted."
+#~ msgstr "已被删除"
+
 #~ msgid "Search no entry matched in ou {}"
 #~ msgstr "在ou:{}中没有匹配条目"
 
@@ -6556,9 +6583,6 @@ msgstr "创建"
 #~ msgid "Delete failed"
 #~ msgstr "删除失败"
 
-#~ msgid "Are you sure about deleting it?"
-#~ msgstr "您确定删除吗?"
-
 #~ msgid "The connection fails"
 #~ msgstr "连接失败"
 
@@ -6587,9 +6611,6 @@ msgstr "创建"
 
 #~ msgid "Approve selected"
 #~ msgstr "同意所选"
-
-#~ msgid "Reject selected"
-#~ msgstr "拒绝所选"
 
 #~ msgid ""
 #~ "\n"

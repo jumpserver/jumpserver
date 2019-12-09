@@ -267,6 +267,16 @@ class RoleMixin:
         access_key = app.create_access_key()
         return app, access_key
 
+    def remove(self):
+        if not current_org.is_real():
+            return
+        if self.can_user_current_org:
+            current_org.users.remove(self)
+        if self.can_admin_current_org:
+            current_org.admins.remove(self)
+        if self.can_audit_current_org:
+            current_org.auditors.remove(self)
+
 
 class TokenMixin:
     CACHE_KEY_USER_RESET_PASSWORD_PREFIX = "_KEY_USER_RESET_PASSWORD_{}"

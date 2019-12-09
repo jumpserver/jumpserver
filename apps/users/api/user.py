@@ -67,6 +67,12 @@ class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
             self.permission_classes = (IsSuperUser,)
         return super().get_permissions()
 
+    def perform_destroy(self, instance):
+        if current_org.is_real():
+            instance.remove()
+        else:
+            return super().perform_destroy(instance)
+
     def perform_bulk_destroy(self, objects):
         for obj in objects:
             self.check_object_permissions(self.request, obj)

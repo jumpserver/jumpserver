@@ -47,7 +47,11 @@
 <div id="actions" class="hide">
     <div class="input-group">
         <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            <option value="delete">{% trans 'Delete selected' %}</option>
+            {% if CURRENT_ORG == 'DEFAULT' %}
+                <option value="delete">{% trans 'Delete selected' %}</option>
+            {% else %}
+                <option value="remove">{% trans 'Remove selected' %}</option>
+            {% endif %}
             <option value="update">{% trans 'Update selected' %}</option>
             <option value="deactive">{% trans 'Deactive selected' %}</option>
             <option value="active">{% trans 'Active selected' %}</option>
@@ -107,16 +111,31 @@ function initTable() {
                 }
 
                 var del_btn = "";
-                if (rowData.can_delete === false){
-                    del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
+                var rm_btn = "";
+                if ("{{ CURRENT_ORG }}" === 'DEFAULT'){
+                    if (rowData.can_delete === false){
+                        del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', name);
-                } else {
-                    del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                    } else {
+                        del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-action="delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
                             .replace('{{ DEFAULT_PK }}', cellData)
                             .replace('99991938', name);
+                    }
+                    $(td).html(update_btn + del_btn)
                 }
-                $(td).html(update_btn + del_btn)
+                else{
+                    if (rowData.can_delete === false){
+                        rm_btn = '<a class="btn btn-xs btn-warning m-l-xs" disabled>{% trans "Remove" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                    } else {
+                        rm_btn = '<a class="btn btn-xs btn-warning m-l-xs btn_user_delete" data-action="remove" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Remove" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', name);
+                    }
+                    $(td).html(update_btn + rm_btn)
+                }
              }}],
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [
@@ -245,10 +264,11 @@ $(document).ready(function(){
             success: reloadPage
         });
     }
-    function doDelete() {
+    function doDelete(props) {
+        props = props || {};
         swal({
             title: "{% trans 'Are you sure?' %}",
-            text: "{% trans 'This will delete the selected users !!!' %}",
+            text: props.text || "{% trans 'This will delete the selected users !!!' %}",
             type: "warning",
             showCancelButton: true,
             cancelButtonText: "{% trans 'Cancel' %}",
@@ -258,10 +278,6 @@ $(document).ready(function(){
         },function () {
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
-                function success() {
-                    var msg = "{% trans 'User Deleted.' %}";
-                    swal("{% trans 'User Delete' %}", msg, "success");
-                }
                 function fail() {
                     var msg = "{% trans 'User Deleting failed.' %}";
                     swal("{% trans 'User Delete' %}", msg, "error");
@@ -271,7 +287,7 @@ $(document).ready(function(){
                     method:'DELETE',
                     flash_message:true,
                     success:reloadPage,
-                    error: fail
+                    error: props.fail || fail
                  });
             }
             requestApi({
@@ -282,6 +298,17 @@ $(document).ready(function(){
                 success:success,
              })
         })
+    }
+
+    function doRemove(){
+        var props = {
+            text: "{% trans 'This will remove the selected users !!' %}",
+            fail: function fail(){
+                var msg = "{% trans 'User Removing failed.' %}";
+                swal("{% trans 'User Remove' %}", msg, "error");
+            }
+        };
+        doDelete(props);
     }
 
     function doUpdate() {
@@ -308,6 +335,9 @@ $(document).ready(function(){
         case 'delete':
             doDelete();
             break;
+        case 'remove':
+            doRemove();
+            break;
         case 'update':
             doUpdate();
             break;
@@ -321,8 +351,14 @@ $(document).ready(function(){
     var $this = $(this);
     var name = $this.data('name');
     var uid = $this.data('uid');
+    var action = $this.data('action');
+    var title, success_message = null;
+    if (action === 'remove'){
+        title = "{% trans 'Are you sure about removing it?' %}";
+        success_message = "{% trans 'Remove the success' %}";
+    }
     var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
-    objectDelete($this, name, the_url);
+    objectDelete($this, name, the_url, null, title, success_message);
 }).on('click', '.expired', function () {
     var msg = '{% trans "User is expired" %}';
     toastr.error(msg)
