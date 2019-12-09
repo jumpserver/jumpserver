@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from keycloak.realm import KeycloakRealm
 from keycloak.keycloak_openid import KeycloakOpenID
 
-from .signals import post_create_openid_user
+from .signals import post_create_or_update_openid_user
 from .decorator import ssl_verification
 
 OIDT_ACCESS_TOKEN = 'oidt_access_token'
@@ -155,7 +155,7 @@ class Client(object):
         """
         userinfo = self.get_userinfo(token=token_response['access_token'])
         with transaction.atomic():
-            user, _ = get_user_model().objects.update_or_create(
+            user, created = get_user_model().objects.update_or_create(
                 username=userinfo.get('preferred_username', ''),
                 defaults={
                     'email': userinfo.get('email', ''),
@@ -169,7 +169,9 @@ class Client(object):
                 refresh_token=token_response['refresh_token'],
             )
             if user:
-                post_create_openid_user.send(sender=user.__class__, user=user)
+                post_create_or_update_openid_user.send(
+                    sender=user.__class__, user=user, created=created
+                )
 
         return oidt_profile
 
