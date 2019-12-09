@@ -141,11 +141,14 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
 
 
 class PlatformSerializer(serializers.ModelSerializer):
-    meta = serializers.DictField()
+    meta = serializers.DictField(required=False, allow_null=True)
 
     class Meta:
         model = Platform
-        fields = ['id', 'name', 'base', 'charset', 'meta', 'comment']
+        fields = [
+            'id', 'name', 'base', 'charset',
+            'internal', 'meta', 'comment'
+        ]
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

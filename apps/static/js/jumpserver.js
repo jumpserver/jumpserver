@@ -177,7 +177,7 @@ function formSubmit(props) {
     */
     props = props || {};
     var data = props.data || props.form.serializeObject();
-    var redirect_to = props.redirect_to;
+    var redirectTo = props.redirect_to || props.redirectTo;
     $.ajax({
         url: props.url,
         type: props.method || 'POST',
@@ -185,12 +185,8 @@ function formSubmit(props) {
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textState, jqXHR) {
-        if (redirect_to) {
-            if (props.message) {
-                var messages = "ed65330a45559c87345a0eb6ac7812d18d0d8976$[[\"__json_message\"\0540\05425\054\"asdfasdf \\u521b\\u5efa\\u6210\\u529f\"]]"
-                setCookie("messages", messages)
-            }
-            location.href = redirect_to;
+        if (redirectTo) {
+            location.href = redirectTo;
         } else if (typeof props.success === 'function') {
             return props.success(data, textState, jqXHR);
         }
@@ -254,7 +250,6 @@ function formSubmit(props) {
             }
             $('.has-error').get(0).scrollIntoView();
         }
-
     })
 }
 

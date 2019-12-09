@@ -12,7 +12,6 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.fields.model import JsonDictTextField
-from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from .utils import Connectivity
 
@@ -139,7 +138,7 @@ class Platform(models.Model):
     charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
     meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
     internal = models.BooleanField(default=False, verbose_name=_("Internal"))
-    comment = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
 
     @classmethod
     def default(cls):
@@ -152,7 +151,7 @@ class Platform(models.Model):
         return self.name
 
     class Meta:
-        pass
+        verbose_name = _("Platform")
         # ordering = ('name',)
 
 

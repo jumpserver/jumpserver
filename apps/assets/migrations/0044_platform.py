@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('charset', models.CharField(choices=[('utf8', 'UTF-8'), ('gbk', 'GBK')], default='utf8', max_length=8, verbose_name='Charset')),
                 ('meta', common.fields.model.JsonDictTextField(blank=True, null=True, verbose_name='Meta')),
                 ('internal', models.BooleanField(default=False, verbose_name='Internal')),
-                ('comment', models.TextField(blank=True, null=True)),
+                ('comment', models.TextField(blank=True, null=True, verbose_name='Comment')),
             ],
         ),
         migrations.RunPython(create_internal_platform)
