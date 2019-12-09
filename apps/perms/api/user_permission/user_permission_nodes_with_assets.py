@@ -44,7 +44,7 @@ class UserGrantedNodeChildrenWithAssetsAsTreeApi(UserGrantedNodeChildrenAsTreeAp
         if self.node:
             nodes.append(self.node)
         elif self.root_keys:
-            nodes = Node.objects.filter(key__in=self.root_keys)
+            nodes = Node.objects.filter(key__in=self.root_keys).exclude(value='favorite')
 
         for node in nodes:
             assets = self.util.get_nodes_assets(node).only(
