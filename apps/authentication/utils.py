@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-from django.utils.translation import ugettext as _
 from django.contrib.auth import authenticate
 
-from common.utils import (
-    get_ip_city, get_object_or_none, validate_ip
-)
-from users.models import User
 from . import errors
 
 
