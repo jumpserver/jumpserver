@@ -17,6 +17,7 @@ from .base import ConnectivitySerializer
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
+    'AssetDetailSerializer',
 ]
 
 
@@ -65,7 +66,9 @@ class ProtocolsField(serializers.ListField):
 
 
 class AssetSerializer(BulkOrgResourceModelSerializer):
-    platform = serializers.SlugRelatedField(slug_field='name', queryset=Platform.objects.all())
+    platform = serializers.SlugRelatedField(
+        slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
+    )
     protocols = ProtocolsField(label=_('Protocols'), required=False)
     connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
@@ -149,6 +152,10 @@ class PlatformSerializer(serializers.ModelSerializer):
             'id', 'name', 'base', 'charset',
             'internal', 'meta', 'comment'
         ]
+
+
+class AssetDetailSerializer(AssetSerializer):
+    platform = PlatformSerializer(read_only=True)
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

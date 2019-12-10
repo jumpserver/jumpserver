@@ -1,6 +1,4 @@
-{% extends '_base_create_update.html' %}
-{% load static %}
-{% load bootstrap3 %}
+{% extends '_base_create_update.html' %} {% load static %} {% load bootstrap3 %}
 {% load i18n %}
 
 {% block form %}
@@ -8,6 +6,12 @@
     {% csrf_token %}
     {% bootstrap_field form.name layout="horizontal" %}
     {% bootstrap_field form.base layout="horizontal" %}
+    <div class="meta-config">
+        <div hidden class="windows-config">
+        {% bootstrap_field meta_form.security layout="horizontal" %}
+        {% bootstrap_field meta_form.console layout="horizontal" %}
+        </div>
+    </div>
     {% bootstrap_field form.comment layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
@@ -22,7 +26,24 @@
 
 {% block custom_foot_js %}
 <script type="text/javascript">
+function toggleWindowConfig() {
+    var baseRef = $("#id_base");
+    var windowConfigRef = $(".windows-config");
+    var windowConfigInputRef = windowConfigRef.find(".form-control");
+    if (baseRef.val().toLowerCase() === 'windows') {
+        windowConfigInputRef.attr('disabled', false);
+        windowConfigRef.show();
+    } else {
+        windowConfigInputRef.attr('disabled', true);
+        windowConfigRef.hide();
+    }
+}
+
 $(document).ready(function () {
+    toggleWindowConfig()
+})
+.on("change", "#id_base", function () {
+    toggleWindowConfig()
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();
@@ -35,6 +56,15 @@ $(document).ready(function () {
         theUrl = '{% url 'api-assets:platform-detail' pk=object.id %}';
         method = "PUT";
     {% endif %}
+
+    var metaData = $(".meta-config .form-control").serializeObject();
+    objectAttrsIsBool(metaData, ['console']);
+    var metaKeys = Object.keys(metaData);
+    metaKeys.forEach(function (k, v) {
+        delete data[k]
+    });
+    data.meta = metaData;
+    console.log(data);
     var props = {
         url: theUrl,
         data: data,

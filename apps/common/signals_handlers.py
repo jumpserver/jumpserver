@@ -10,6 +10,7 @@ from django.db import connection
 from django.conf import LazySettings
 from django.db.utils import ProgrammingError, OperationalError
 
+from jumpserver.utils import get_current_request
 
 from common.utils import get_logger
 from .local import thread_local
@@ -50,19 +51,29 @@ def on_request_finished_logging_db_query(sender, **kwargs):
         counters['total'].time += float(time)
 
     counters = sorted(counters.items(), key=lambda x: x[1])
+    if not counters:
+        return
+    method = 'GET'
+    path = '/Unknown'
+    current_request = get_current_request()
+    if current_request:
+        method = current_request.method
+        path = current_request.get_full_path()
+    logger.debug(">>> [{}] {}".format(method, path))
     for name, counter in counters:
         logger.debug("Query {:3} times using {:.2f}s {}".format(
             counter.counter, counter.time, name)
         )
 
 
-@receiver(request_finished)
 def on_request_finished_release_local(sender, **kwargs):
     thread_local.__release_local__()
 
 
 if settings.DEBUG and DEBUG_DB:
     request_finished.connect(on_request_finished_logging_db_query)
+else:
+    request_finished.connect(on_request_finished_release_local)
 
 
 @receiver(django_ready)

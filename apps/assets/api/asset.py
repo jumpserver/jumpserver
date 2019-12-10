@@ -5,6 +5,7 @@ import random
 
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.generics import RetrieveAPIView
 from django.shortcuts import get_object_or_404
 
 from common.utils import get_logger, get_object_or_none
@@ -21,7 +22,7 @@ from ..filters import AssetByNodeFilterBackend, LabelFilterBackend
 
 logger = get_logger(__file__)
 __all__ = [
-    'AssetViewSet',
+    'AssetViewSet', 'AssetPlatformRetrieveApi',
     'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
     'AssetGatewayApi', 'AssetPlatformViewSet',
 ]
@@ -55,10 +56,32 @@ class AssetViewSet(OrgBulkModelViewSet):
         self.set_assets_node(assets)
 
 
+class AssetPlatformRetrieveApi(RetrieveAPIView):
+    queryset = Platform.objects.all()
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.PlatformSerializer
+
+    def get_object(self):
+        asset_pk = self.kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_pk)
+        return asset.platform
+
+
 class AssetPlatformViewSet(ModelViewSet):
     queryset = Platform.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.PlatformSerializer
+    filterset_fields = ['name', 'base']
+    search_fields = ['name']
+
+    def check_object_permissions(self, request, obj):
+        if request.method.lower() in ['delete', 'put', 'patch'] and \
+                obj.internal:
+            self.permission_denied(
+                request, message={"detail": "Internal platform"}
+            )
+
+        return super().check_object_permissions(request, obj)
 
 
 class AssetRefreshHardwareApi(generics.RetrieveAPIView):

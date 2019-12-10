@@ -244,10 +244,10 @@
                                                 {% for group in user_object.groups.all %}
                                                     <tr>
                                                         <td >
-                                                            <b class="bdg_group" data-gid={{ group.id }}>{{ group.name }}</b>
+                                                            <b class="bdg_group" >{{ group.name }}</b>
                                                         </td>
                                                         <td>
-                                                            <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
+                                                            <button class="btn btn-danger pull-right btn-xs btn_leave_group" data-uid={{ group.id }} type="button"><i class="fa fa-minus"></i></button>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -307,37 +307,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.nodes_selected = {};
 var usersSelect2;
-
-function updateUserGroups(groups) {
-    var the_url = "{% url 'api-users:user-update-group' pk=user_object.id %}";
-    var body = {
-        groups: Object.assign([], groups)
-    };
-    var success = function(data) {
-        // remove all the selected groups from select > option and rendered ul element;
-        $('.select2-selection__rendered').empty();
-        $('#groups_selected').val('');
-        $.map(jumpserver.nodes_selected, function(group_name, index) {
-            $('#opt_' + index).remove();
-            // change tr html of user groups.
-            $('.group_edit tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.groups_selected
-        jumpserver.nodes_selected = {};
-    };
-    requestApi({
-        url: the_url,
-        body: JSON.stringify(body),
-        success: success
-    });
-}
 
 function updateUserLoginReviewer(reviewers) {
     var url = "{% url 'api-auth:login-confirm-setting-update' user_id=user_object.id %}";
@@ -352,16 +322,44 @@ function updateUserLoginReviewer(reviewers) {
     })
 }
 
+
+var usersGroupsRelationUrl = "{% url 'api-users:users-groups-relation-list' %}";
+
+function addObjects(objectsId) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = usersGroupsRelationUrl;
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {user: "{{ object.id }}"};
+        data["usergroup"] = v;
+        body.push(data)
+    });
+    requestApi({
+        url: theUrl,
+        body: JSON.stringify(body),
+        method: "POST",
+        success: reloadPage
+    });
+}
+
+function removeObject(objectId) {
+    if (!objectId)  {
+        return
+    }
+    var theUrl = usersGroupsRelationUrl;
+    theUrl = setUrlParam(theUrl, 'user', "{{ object.id }}");
+    theUrl = setUrlParam(theUrl, 'usergroup', objectId);
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: reloadPage
+    });
+}
+
 $(document).ready(function() {
-    $('.select2').select2()
-        .on('select2:select', function(evt) {
-            var data = evt.params.data;
-            jumpserver.nodes_selected[data.id] = data.text;
-        })
-        .on('select2:unselect', function(evt) {
-            var data = evt.params.data;
-            delete jumpserver.nodes_selected[data.id];
-        });
+    $('.select2').select2();
     usersSelect2 = usersSelect2Init('.users-select2')
 })
 .on('click', '#is_active', function() {
@@ -405,31 +403,11 @@ $(document).ready(function() {
     });
  })
 .on('click', '#btn_join_group', function() {
-    if (Object.keys(jumpserver.nodes_selected).length === 0) {
-        return false;
-    }
-    var groups = $('.bdg_group').map(function() {
-        return $(this).data('gid');
-    }).get();
-    $.map(jumpserver.nodes_selected, function(value, index) {
-        groups.push(index);
-        $('#opt_' + index).remove();
-    });
-    updateUserGroups(groups)
+    var objectsId = $("#groups_selected").val();
+    addObjects(objectsId);
 }).on('click', '.btn_leave_group', function() {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_group');
-    var gid = $badge.data('gid');
-    var group_name = $badge.html() || $badge.text();
-    $('#groups_selected').append(
-        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
-    );
-    $tr.remove();
-    var groups = $('.bdg_group').map(function() {
-        return $(this).data('gid');
-    }).get();
-    updateUserGroups(groups)
+    var objectId = $(this).data('uid');
+    removeObject(objectId)
 }).on('click', '#btn-reset-password', function() {
     function doReset() {
         var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';

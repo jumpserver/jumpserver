@@ -12,6 +12,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from common.fields.model import JsonDictTextField
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
 from .utils import Connectivity
 
@@ -36,6 +37,13 @@ def default_node():
         return root
     except:
         return None
+
+
+class AssetManager(OrgManager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            platform_base=models.F('platform__base')
+        )
 
 
 class AssetQuerySet(models.QuerySet):
@@ -210,7 +218,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = OrgManager.from_queryset(AssetQuerySet)()
+    objects = AssetManager.from_queryset(AssetQuerySet)()
     _connectivity = None
 
     def __str__(self):
@@ -226,19 +234,20 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         return True, warning
 
     def is_windows(self):
-        if self.platform in ("Windows", "Windows2016"):
-            return True
-        else:
-            return False
+        return self.platform_base == "Windows"
 
     def is_unixlike(self):
-        if self.platform not in ("Windows", "Windows2016", "Other"):
+        if self.platform_base not in ("Windows", "Windows2016", "Other"):
             return True
         else:
             return False
 
     def is_support_ansible(self):
-        return self.has_protocol('ssh') and self.platform not in ("Other",)
+        return self.has_protocol('ssh') and self.platform_base not in ("Other",)
+
+    @lazyproperty
+    def platform_base(self):
+        return self.platform.base
 
     @property
     def cpu_info(self):
@@ -299,9 +308,9 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def as_tree_node(self, parent_node):
         from common.tree import TreeNode
         icon_skin = 'file'
-        if self.platform.lower() == 'windows':
+        if self.platform_base.lower() == 'windows':
             icon_skin = 'windows'
-        elif self.platform.lower() == 'linux':
+        elif self.platform_base.lower() == 'linux':
             icon_skin = 'linux'
         data = {
             'id': str(self.id),
@@ -318,7 +327,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                     'hostname': self.hostname,
                     'ip': self.ip,
                     'protocols': self.protocols_as_list,
-                    'platform': self.platform,
+                    'platform': self.platform_base,
                 }
             }
         }

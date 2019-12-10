@@ -14,7 +14,7 @@ app_name = 'users'
 router = BulkRouter()
 router.register(r'users', api.UserViewSet, 'user')
 router.register(r'groups', api.UserGroupViewSet, 'user-group')
-router.register(r'users-groups-relations', api.UserUserGroupRelationViewSet, 'user-group-relation')
+router.register(r'users-groups-relations', api.UserUserGroupRelationViewSet, 'users-groups-relation')
 
 
 urlpatterns = [
@@ -28,8 +28,6 @@ urlpatterns = [
     path('users/<uuid:pk>/pubkey/reset/', api.UserResetPKApi.as_view(), name='user-public-key-reset'),
     path('users/<uuid:pk>/pubkey/update/', api.UserUpdatePKApi.as_view(), name='user-public-key-update'),
     path('users/<uuid:pk>/unblock/', api.UserUnblockPKApi.as_view(), name='user-unblock'),
-    path('users/<uuid:pk>/groups/', api.UserUpdateGroupApi.as_view(), name='user-update-group'),
-    path('groups/<uuid:pk>/users/', api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
 ]
 urlpatterns += router.urls
 

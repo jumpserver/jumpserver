@@ -1136,8 +1136,8 @@ function objectAttrsIsBool(obj, attrs) {
     attrs.forEach(function (attr) {
         if (!obj[attr]) {
             obj[attr] = false
-        } else if (['on', '1'].includes(obj[attr])) {
-            obj[attr] = true
+        } else {
+            obj[attr] = ['on', '1', 'true', 'True'].includes(obj[attr]);
         }
     })
 }

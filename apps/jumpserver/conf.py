@@ -283,10 +283,10 @@ class DynamicConfig:
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
-        if self.get('AUTH_OPENID'):
+        if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
-        if self.get('AUTH_RADIUS'):
+        if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
 

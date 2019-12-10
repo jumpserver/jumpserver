@@ -4,7 +4,12 @@ from django.utils.translation import ugettext as _
 
 from common.permissions import PermissionsMixin, IsSuperUser
 from ..models import Platform
-from ..forms import PlatformForm
+from ..forms import PlatformForm, PlatformMetaForm
+
+__all__ = [
+    'PlatformListView', 'PlatformUpdateView', 'PlatformCreateView',
+    'PlatformDetailView',
+]
 
 
 class PlatformListView(PermissionsMixin, generic.TemplateView):
@@ -28,9 +33,11 @@ class PlatformCreateView(PermissionsMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        meta_form = PlatformMetaForm()
         context.update({
             'app': _('Assets'),
             'action': _("Create platform"),
+            'meta_form': meta_form,
         })
         return context
 
@@ -43,9 +50,25 @@ class PlatformUpdateView(generic.UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        meta_form = PlatformMetaForm(initial=self.object.meta)
         context.update({
             'app': _('Assets'),
             'action': _("Update platform"),
             'type': 'update',
+            'meta_form': meta_form,
+        })
+        return context
+
+
+class PlatformDetailView(generic.DetailView):
+    permission_classes = (IsSuperUser,)
+    model = Platform
+    template_name = 'assets/platform_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'app': _('Assets'),
+            'action': _("Platform detail"),
         })
         return context

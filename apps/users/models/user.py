@@ -19,6 +19,7 @@ from django.shortcuts import reverse
 from orgs.utils import current_org
 from common.utils import get_signer, date_expired_default, get_logger, lazyproperty
 from common import fields
+from ..signals import post_user_change_password
 
 
 __all__ = ['User']
@@ -43,14 +44,10 @@ class AuthMixin:
         self.set_password(password_raw_)
 
     def set_password(self, raw_password):
-        self._set_password = True
         if self.can_update_password():
             self.date_password_last_updated = timezone.now()
+            post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
-        else:
-            error = _("User auth from {}, go there change password").format(
-                self.source)
-            raise PermissionError(error)
 
     def can_update_password(self):
         return self.is_local
@@ -196,22 +193,22 @@ class RoleMixin:
     def is_app(self):
         return self.role == 'App'
 
-    @property
+    @lazyproperty
     def user_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_user_orgs(self)
 
-    @property
+    @lazyproperty
     def admin_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_admin_orgs(self)
 
-    @property
+    @lazyproperty
     def audit_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_audit_orgs(self)
 
-    @property
+    @lazyproperty
     def admin_or_audit_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_admin_or_audit_orgs(self)
@@ -223,26 +220,26 @@ class RoleMixin:
         else:
             return False
 
-    @property
+    @lazyproperty
     def is_org_auditor(self):
         if self.is_super_auditor or self.related_audit_orgs.exists():
             return True
         else:
             return False
 
-    @property
+    @lazyproperty
     def can_admin_current_org(self):
         return current_org.can_admin_by(self)
 
-    @property
+    @lazyproperty
     def can_audit_current_org(self):
         return current_org.can_audit_by(self)
 
-    @property
+    @lazyproperty
     def can_user_current_org(self):
         return current_org.can_user_by(self)
 
-    @property
+    @lazyproperty
     def can_admin_or_audit_current_org(self):
         return self.can_admin_current_org or self.can_audit_current_org
 

@@ -38,6 +38,8 @@ urlpatterns = [
          api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
     path('assets/<uuid:pk>/gateway/',
          api.AssetGatewayApi.as_view(), name='asset-gateway'),
+    path('assets/<uuid:pk>/platform/',
+         api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
     path('asset-users/auth-info/',
          api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),

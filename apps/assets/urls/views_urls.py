@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('platform/', views.PlatformListView.as_view(), name='platform-list'),
     path('platform/create/', views.PlatformCreateView.as_view(), name='platform-create'),
+    path('platform/<int:pk>/', views.PlatformDetailView.as_view(), name='platform-detail'),
     path('platform/<int:pk>/update/', views.PlatformUpdateView.as_view(), name='platform-update'),
 
     # User asset view

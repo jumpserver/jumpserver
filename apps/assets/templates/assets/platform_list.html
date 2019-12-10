@@ -31,11 +31,11 @@ function initTable() {
     var options = {
         ele: $('#platform_list_table'),
         columnDefs: [
-            {#{targets: 1, render: function (cellData, tp, rowData, meta) {#}
-            {#    cellData = htmlEscape(cellData);#}
-            {#    var detail_btn = '<a href="{% url "assets:admin-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';#}
-            {#    return detail_btn.replace('{{ DEFAULT_PK }}', rowData.id);#}
-            {# }},#}
+            {targets: 1, render: function (cellData, tp, rowData, meta) {
+                cellData = htmlEscape(cellData);
+                var detailBtn = '<a href="{% url "assets:platform-detail" pk=999 %}">' + cellData + '</a>';
+                return detailBtn.replace('999', rowData.id);
+             }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var updateBtn = '<a href="{% url "assets:platform-update" pk=9999 %}" class="btn btn-xs m-l-xs btn-info" disabled>{% trans "Update" %}</a>'.replace('9999', cellData);
                 var delBtn = '<a class="btn btn-xs btn-danger m-l-xs btn-object-delete" data-uid="{{ DEFAULT_PK }}" disabled>{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);

@@ -23,8 +23,10 @@ class AssetPermissionViewSet(OrgModelViewSet):
     资产授权列表的增删改查api
     """
     model = AssetPermission
-    serializer_class = serializers.AssetPermissionCreateUpdateSerializer
-    serializer_display_class = serializers.AssetPermissionListSerializer
+    serializer_classes = {
+        'default': serializers.AssetPermissionCreateUpdateSerializer,
+        'display': serializers.AssetPermissionListSerializer
+    }
     filter_fields = ['name']
     permission_classes = (IsOrgAdmin,)
 

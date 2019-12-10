@@ -46,7 +46,8 @@
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script>
-var groups_table = 0;
+var groupsTable = 0;
+var usersAmountTpl = '<a class="group-users-amount" data-uid="ID">NUM</a>';
 function initTable() {
     var options = {
         ele: $('#group_list_table'),
@@ -58,14 +59,16 @@ function initTable() {
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
             {targets: 2, createdCell: function (td, cellData, rowData) {
-                var html = createPopover(cellData);
-                $(td).html(html);
+                var data = usersAmountTpl
+                    .replace("ID", rowData.id)
+                    .replace('NUM', cellData);
+                $(td).html(data);
              }},
             {targets: 3, createdCell: function (td, cellData) {
                 cellData = htmlEscape(cellData);
                 var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-             }},
+            }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 var name = htmlEscape(rowData.name);
                 var update_btn = '<a href="{% url "users:user-group-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
@@ -81,17 +84,33 @@ function initTable() {
             }}
         ],
         ajax_url: '{% url "api-users:user-group-list" %}?display=1',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "users", orderable: false},
+        columns: [{data: "id"}, {data: "name" }, {data: "users_amount", orderable: false},
                   {data: "comment"}, {data: "id", orderable: false, width:"100px"}],
         order: [],
         op_html: $('#actions').html()
     };
-    groups_table = jumpserver.initServerSideDataTable(options);
-    return groups_table
+    groupsTable = jumpserver.initServerSideDataTable(options);
+    return groupsTable
+}
+
+var usersGroupsRelationUrl = "{% url 'api-users:users-groups-relation-list' %}";
+
+function getGroupUsers(groupId, callback) {
+    var theUrl = setUrlParam(usersGroupsRelationUrl, "usergroup", groupId);
+    if (!callback) {
+        callback = function (data) {
+            console.log(data)
+        }
+    }
+    requestApi({
+        url: theUrl,
+        method: "GET",
+        success: callback,
+        flash_message: false,
+    })
 }
 $(document).ready(function() {
     initTable()
-
 }).on('click', '.btn_delete_user_group', function(){
     var $this = $(this);
     var group_id = $this.data('gid');
@@ -100,7 +119,7 @@ $(document).ready(function() {
     objectDelete($this, name, the_url)
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#group_list_table').DataTable()
+    var $data_table = $('#group_list_table').DataTable();
     var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
         plain_id_list.push(this.data().id);
@@ -142,7 +161,7 @@ $(document).ready(function() {
             break;
     }
 }).on('click', '.btn_export', function(){
-    var groups = groups_table.selected;
+    var groups = groupsTable.selected;
     var data = {
         'resources': groups
     };
@@ -173,7 +192,7 @@ $(document).ready(function() {
         });
 })
 .on('click', '#download_update_template', function(){
-    var groups = groups_table.selected;
+    var groups = groupsTable.selected;
     var data = {
         'resources': groups
     };
@@ -188,21 +207,32 @@ $(document).ready(function() {
         }
     };
     APIExportData(props);
-}).on('click', '#btn_update_confirm',function () {
-        var url = "{% url 'api-users:user-group-list' %}";
-        var file = document.getElementById('update_file').files[0];
-        if(!file){
-            toastr.error("{% trans "Please select file" %}");
-            return
-        }
-        var data_table = $('#group_list_table').DataTable();
-        APIImportData({
-            url: url,
-            method: "PUT",
-            body: file,
-            data_table: data_table
+}).on('click', '#btn_update_confirm', function () {
+    var url = "{% url 'api-users:user-group-list' %}";
+    var file = document.getElementById('update_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    var data_table = $('#group_list_table').DataTable();
+    APIImportData({
+        url: url,
+        method: "PUT",
+        body: file,
+        data_table: data_table
+    });
+}).on('click', '.group-users-amount', function () {
+    var $this = $(this);
+    var groupId = $(this).data("uid");
+    getGroupUsers(groupId, function (data) {
+        var groups = [];
+        data.forEach(function (v) {
+            groups.push(v.user_display);
         });
-})
-
+        var popover = createPopover(groups);
+        $this.parent().html(popover);
+        $(popover).trigger('click');
+    })
+});
 </script>
 {% endblock %}
