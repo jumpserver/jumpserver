@@ -16,6 +16,8 @@ __all__ = [
 
 
 class BaseRemoteAppForm(OrgModelForm):
+    default_initial_data = {}
+
     def __init__(self, *args, **kwargs):
         # 过滤RDP资产和系统用户
         super().__init__(*args, **kwargs)
@@ -23,6 +25,14 @@ class BaseRemoteAppForm(OrgModelForm):
         field_asset.queryset = field_asset.queryset.has_protocol('rdp')
         self.fields['type'].widget.attrs['disabled'] = True
         self.fields.move_to_end('comment')
+        self.initial_default()
+
+    def initial_default(self):
+        for name, value in self.default_initial_data.items():
+            field = self.fields.get(name)
+            if not field:
+                continue
+            field.initial = value
 
     class Meta:
         model = RemoteApp
@@ -37,6 +47,10 @@ class BaseRemoteAppForm(OrgModelForm):
 
 
 class RemoteAppChromeForm(BaseRemoteAppForm):
+    default_initial_data = {
+        'path': r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe'
+    }
+
     chrome_target = forms.CharField(
         max_length=128, label=_('Target URL'), required=False
     )
@@ -50,6 +64,11 @@ class RemoteAppChromeForm(BaseRemoteAppForm):
 
 
 class RemoteAppMySQLWorkbenchForm(BaseRemoteAppForm):
+    default_initial_data = {
+        'path': r'C:\Program Files\MySQL\MySQL Workbench 8.0 CE'
+                r'\MySQLWorkbench.exe'
+    }
+
     mysql_workbench_ip = forms.CharField(
         max_length=128, label=_('Database IP'), required=False
     )
@@ -66,6 +85,11 @@ class RemoteAppMySQLWorkbenchForm(BaseRemoteAppForm):
 
 
 class RemoteAppVMwareForm(BaseRemoteAppForm):
+    default_initial_data = {
+        'path': r'C:\Program Files (x86)\VMware\Infrastructure'
+                r'\Virtual Infrastructure Client\Launcher\VpxClient.exe'
+    }
+
     vmware_target = forms.CharField(
         max_length=128, label=_('Target address'), required=False
     )
@@ -79,6 +103,7 @@ class RemoteAppVMwareForm(BaseRemoteAppForm):
 
 
 class RemoteAppCustomForm(BaseRemoteAppForm):
+
     custom_cmdline = forms.CharField(
         max_length=128, label=_('Operating parameter'), required=False
     )

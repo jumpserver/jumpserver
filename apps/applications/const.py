@@ -50,4 +50,3 @@ REMOTE_APP_TYPE_CHOICES = (
     (REMOTE_APP_TYPE_VMWARE_CLIENT, 'vSphere Client'),
     (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
 )
-
