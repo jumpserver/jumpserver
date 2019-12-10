@@ -5,18 +5,38 @@ from django.utils.translation import ugettext as _
 from django import forms
 
 from orgs.mixins.forms import OrgModelForm
-from assets.models import SystemUser
 
 from ..models import RemoteApp
-from .. import const
 
 
 __all__ = [
-    'RemoteAppCreateUpdateForm',
+    'RemoteAppChromeForm', 'RemoteAppMySQLWorkbenchForm',
+    'RemoteAppVMwareForm', 'RemoteAppCustomForm'
 ]
 
 
-class RemoteAppTypeChromeForm(forms.ModelForm):
+class BaseRemoteAppForm(OrgModelForm):
+    def __init__(self, *args, **kwargs):
+        # 过滤RDP资产和系统用户
+        super().__init__(*args, **kwargs)
+        field_asset = self.fields['asset']
+        field_asset.queryset = field_asset.queryset.has_protocol('rdp')
+        self.fields['type'].widget.attrs['disabled'] = True
+        self.fields.move_to_end('comment')
+
+    class Meta:
+        model = RemoteApp
+        fields = [
+            'name', 'asset', 'type', 'path', 'comment'
+        ]
+        widgets = {
+            'asset': forms.Select(attrs={
+                'class': 'select2', 'data-placeholder': _('Asset')
+            }),
+        }
+
+
+class RemoteAppChromeForm(BaseRemoteAppForm):
     chrome_target = forms.CharField(
         max_length=128, label=_('Target URL'), required=False
     )
@@ -29,7 +49,7 @@ class RemoteAppTypeChromeForm(forms.ModelForm):
     )
 
 
-class RemoteAppTypeMySQLWorkbenchForm(forms.ModelForm):
+class RemoteAppMySQLWorkbenchForm(BaseRemoteAppForm):
     mysql_workbench_ip = forms.CharField(
         max_length=128, label=_('Database IP'), required=False
     )
@@ -45,7 +65,7 @@ class RemoteAppTypeMySQLWorkbenchForm(forms.ModelForm):
     )
 
 
-class RemoteAppTypeVMwareForm(forms.ModelForm):
+class RemoteAppVMwareForm(BaseRemoteAppForm):
     vmware_target = forms.CharField(
         max_length=128, label=_('Target address'), required=False
     )
@@ -58,7 +78,7 @@ class RemoteAppTypeVMwareForm(forms.ModelForm):
     )
 
 
-class RemoteAppTypeCustomForm(forms.ModelForm):
+class RemoteAppCustomForm(BaseRemoteAppForm):
     custom_cmdline = forms.CharField(
         max_length=128, label=_('Operating parameter'), required=False
     )
@@ -73,51 +93,3 @@ class RemoteAppTypeCustomForm(forms.ModelForm):
         max_length=128, label=_('Login password'), required=False
     )
 
-
-class RemoteAppTypeForms(
-    RemoteAppTypeChromeForm,
-    RemoteAppTypeMySQLWorkbenchForm,
-    RemoteAppTypeVMwareForm,
-    RemoteAppTypeCustomForm
-):
-    pass
-
-
-class RemoteAppCreateUpdateForm(RemoteAppTypeForms, OrgModelForm):
-    def __init__(self, *args, **kwargs):
-        # 过滤RDP资产和系统用户
-        super().__init__(*args, **kwargs)
-        field_asset = self.fields['asset']
-        field_asset.queryset = field_asset.queryset.has_protocol('rdp')
-
-    class Meta:
-        model = RemoteApp
-        fields = [
-            'name', 'asset', 'type', 'path', 'comment'
-        ]
-        widgets = {
-            'asset': forms.Select(attrs={
-                'class': 'select2', 'data-placeholder': _('Asset')
-            }),
-        }
-
-    def _clean_params(self):
-        app_type = self.data.get('type')
-        fields = const.REMOTE_APP_TYPE_MAP_FIELDS.get(app_type, [])
-        params = {}
-        for field in fields:
-            name = field['name']
-            value = self.cleaned_data[name]
-            params.update({name: value})
-        return params
-
-    def _save_params(self, instance):
-        params = self._clean_params()
-        instance.params = params
-        instance.save()
-        return instance
-
-    def save(self, commit=True):
-        instance = super().save(commit=commit)
-        instance = self._save_params(instance)
-        return instance

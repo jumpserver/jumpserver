@@ -9,13 +9,14 @@ from .. import const
 
 
 class ReplayStorageMetaDictField(CustomMetaDictField):
-    type_map_fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS
+    type_fields_map = const.REPLAY_STORAGE_TYPE_FIELDS_MAP
     default_type = const.REPLAY_STORAGE_TYPE_SERVER
-    need_convert_key = True
+    convert_key_remove_type_prefix = True
+    convert_key_to_upper = True
 
 
 class BaseStorageSerializerMixin:
-    type_map_fields = None
+    type_fields_map = None
 
     def process_meta(self, instance, validated_data):
         new_meta = copy.deepcopy(validated_data.get('meta', {}))
@@ -25,7 +26,7 @@ class BaseStorageSerializerMixin:
             return new_meta
 
         old_meta = instance.meta
-        fields = self.type_map_fields.get(instance.type, [])
+        fields = self.type_fields_map.get(instance.type, [])
         for field in fields:
             if not field.get('write_only', False):
                 continue
@@ -48,7 +49,7 @@ class ReplayStorageSerializer(BaseStorageSerializerMixin,
 
     meta = ReplayStorageMetaDictField()
 
-    type_map_fields = const.REPLAY_STORAGE_TYPE_MAP_FIELDS
+    type_fields_map = const.REPLAY_STORAGE_TYPE_FIELDS_MAP
 
     class Meta:
         model = ReplayStorage
@@ -56,9 +57,10 @@ class ReplayStorageSerializer(BaseStorageSerializerMixin,
 
 
 class CommandStorageMetaDictField(CustomMetaDictField):
-    type_map_fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS
+    type_fields_map = const.COMMAND_STORAGE_TYPE_FIELDS_MAP
     default_type = const.COMMAND_STORAGE_TYPE_SERVER
-    need_convert_key = True
+    convert_key_remove_type_prefix = True
+    convert_key_to_upper = True
 
 
 class CommandStorageSerializer(BaseStorageSerializerMixin,
@@ -66,7 +68,7 @@ class CommandStorageSerializer(BaseStorageSerializerMixin,
 
     meta = CommandStorageMetaDictField()
 
-    type_map_fields = const.COMMAND_STORAGE_TYPE_MAP_FIELDS
+    type_fields_map = const.COMMAND_STORAGE_TYPE_FIELDS_MAP
 
     class Meta:
         model = CommandStorage

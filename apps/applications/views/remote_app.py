@@ -1,19 +1,16 @@
 #  coding: utf-8
 #
 
+from django.http import Http404
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
-from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
-
 
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
-from common.const import create_success_msg, update_success_msg
 
 from ..models import RemoteApp
-from .. import forms
+from .. import forms, const
 
 
 __all__ = [
@@ -30,52 +27,78 @@ class RemoteAppListView(PermissionsMixin, TemplateView):
         context = {
             'app': _('Applications'),
             'action': _('RemoteApp list'),
+            'type_choices': const.REMOTE_APP_TYPE_CHOICES,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
-class RemoteAppCreateView(PermissionsMixin, SuccessMessageMixin, CreateView):
+class BaseRemoteAppCreateUpdateView:
     template_name = 'applications/remote_app_create_update.html'
     model = RemoteApp
-    form_class = forms.RemoteAppCreateUpdateForm
-    success_url = reverse_lazy('applications:remote-app-list')
     permission_classes = [IsOrgAdmin]
+    default_type = const.REMOTE_APP_TYPE_CHROME
+    form_class = forms.RemoteAppChromeForm
+    form_class_choices = {
+        const.REMOTE_APP_TYPE_CHROME: forms.RemoteAppChromeForm,
+        const.REMOTE_APP_TYPE_MYSQL_WORKBENCH: forms.RemoteAppMySQLWorkbenchForm,
+        const.REMOTE_APP_TYPE_VMWARE_CLIENT: forms.RemoteAppVMwareForm,
+        const.REMOTE_APP_TYPE_CUSTOM: forms.RemoteAppCustomForm
+    }
+
+    def get_initial(self):
+        return {'type': self.get_type()}
+
+    def get_type(self):
+        return self.default_type
+
+    def get_form_class(self):
+        tp = self.get_type()
+        form_class = self.form_class_choices.get(tp)
+        if not form_class:
+            raise Http404()
+        return form_class
+
+
+class RemoteAppCreateView(BaseRemoteAppCreateUpdateView,
+                          PermissionsMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Applications'),
             'action': _('Create RemoteApp'),
-            'type': 'create'
+            'api_action': 'create'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        return create_success_msg % ({'name': cleaned_data['name']})
+    def get_type(self):
+        tp = self.request.GET.get("type")
+        if tp:
+            return tp.lower()
+        return super().get_type()
 
 
-class RemoteAppUpdateView(PermissionsMixin, SuccessMessageMixin, UpdateView):
-    template_name = 'applications/remote_app_create_update.html'
-    model = RemoteApp
-    form_class = forms.RemoteAppCreateUpdateForm
-    success_url = reverse_lazy('applications:remote-app-list')
-    permission_classes = [IsOrgAdmin]
+class RemoteAppUpdateView(BaseRemoteAppCreateUpdateView,
+                          PermissionsMixin, UpdateView):
 
     def get_initial(self):
-        return {k: v for k, v in self.object.params.items()}
+        initial_data = super().get_initial()
+        params = {k: v for k, v in self.object.params.items()}
+        initial_data.update(params)
+        return initial_data
+
+    def get_type(self):
+        return self.object.type
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Applications'),
             'action': _('Update RemoteApp'),
-            'type': 'update'
+            'api_action': 'update'
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-    def get_success_message(self, cleaned_data):
-        return update_success_msg % ({'name': cleaned_data['name']})
 
 
 class RemoteAppDetailView(PermissionsMixin, DetailView):

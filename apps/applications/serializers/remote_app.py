@@ -1,7 +1,7 @@
 # coding: utf-8
 #
 
-
+import copy
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
@@ -18,25 +18,52 @@ __all__ = [
 
 
 class RemoteAppParamsDictField(CustomMetaDictField):
-    type_map_fields = const.REMOTE_APP_TYPE_MAP_FIELDS
+    type_fields_map = const.REMOTE_APP_TYPE_FIELDS_MAP
     default_type = const.REMOTE_APP_TYPE_CHROME
+    convert_key_remove_type_prefix = False
+    convert_key_to_upper = False
 
 
 class RemoteAppSerializer(BulkOrgResourceModelSerializer):
     params = RemoteAppParamsDictField()
+    type_fields_map = const.REMOTE_APP_TYPE_FIELDS_MAP
 
     class Meta:
         model = RemoteApp
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'asset', 'type', 'path', 'params',
-            'comment', 'created_by', 'date_created', 'asset_info',
-            'get_type_display',
+            'id', 'name', 'asset', 'asset_info', 'type', 'get_type_display',
+            'path', 'params', 'date_created', 'created_by', 'comment',
         ]
         read_only_fields = [
             'created_by', 'date_created', 'asset_info',
             'get_type_display'
         ]
+
+    def process_params(self, instance, validated_data):
+        new_params = copy.deepcopy(validated_data.get('params', {}))
+        tp = validated_data.get('type', '')
+
+        if tp != instance.type:
+            return new_params
+
+        old_params = instance.params
+        fields = self.type_fields_map.get(instance.type, [])
+        for field in fields:
+            if not field.get('write_only', False):
+                continue
+            field_name = field['name']
+            new_value = new_params.get(field_name, '')
+            old_value = old_params.get(field_name, '')
+            field_value = new_value if new_value else old_value
+            new_params[field_name] = field_value
+
+        return new_params
+
+    def update(self, instance, validated_data):
+        params = self.process_params(instance, validated_data)
+        validated_data['params'] = params
+        return super().update(instance, validated_data)
 
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):
