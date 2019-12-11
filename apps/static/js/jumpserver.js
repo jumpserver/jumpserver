@@ -1076,6 +1076,7 @@ function APIImportData(props) {
         },
         error: function (error) {
             var data = error.responseJSON;
+            console.log(data);
             if (data instanceof Array) {
                 var html = '';
                 var li = '';
