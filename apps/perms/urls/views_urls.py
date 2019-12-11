@@ -23,4 +23,6 @@ urlpatterns = [
     path('remote-app-permission/<uuid:pk>/', views.RemoteAppPermissionDetailView.as_view(), name='remote-app-permission-detail'),
     path('remote-app-permission/<uuid:pk>/user/', views.RemoteAppPermissionUserView.as_view(), name='remote-app-permission-user-list'),
     path('remote-app-permission/<uuid:pk>/remote-app/', views.RemoteAppPermissionRemoteAppView.as_view(), name='remote-app-permission-remote-app-list'),
+
+    # database-app-permission
 ]

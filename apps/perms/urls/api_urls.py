@@ -3,7 +3,7 @@
 from django.urls import re_path
 from common import api as capi
 from .asset_permission import asset_permission_urlpatterns
-from .application_permission import remote_app_permission_urlpatterns
+from .remote_app_permission import remote_app_permission_urlpatterns
 
 app_name = 'perms'
 
