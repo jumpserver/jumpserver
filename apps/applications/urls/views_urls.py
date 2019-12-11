@@ -11,6 +11,11 @@ urlpatterns = [
     path('remote-app/<uuid:pk>/update/', views.RemoteAppUpdateView.as_view(), name='remote-app-update'),
     path('remote-app/<uuid:pk>/', views.RemoteAppDetailView.as_view(), name='remote-app-detail'),
     # User RemoteApp view
-    path('user-remote-app/', views.UserRemoteAppListView.as_view(), name='user-remote-app-list')
+    path('user-remote-app/', views.UserRemoteAppListView.as_view(), name='user-remote-app-list'),
+
+    path('database-app/', views.DatabaseAppListView.as_view(), name='database-app-list'),
+    path('database-app/create/', views.DatabaseAppCreateView.as_view(), name='database-app-create'),
+    path('database-app/<uuid:pk>/update/', views.DatabaseAppUpdateView.as_view(), name='database-app-update'),
+    path('database-app/<uuid:pk>/', views.DatabaseAppDetailView.as_view(), name='database-app-detail'),
 
 ]

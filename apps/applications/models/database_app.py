@@ -27,7 +27,7 @@ class DatabaseApp(CommonModelMixin, OrgModelMixin):
     type = models.CharField(
         default=const.DATABASE_APP_TYPE_MYSQL,
         choices=const.DATABASE_APP_TYPE_CHOICES,
-        max_length=128, verbose_name=_('Database type')
+        max_length=128, verbose_name=_('Type')
     )
     host = models.CharField(
         max_length=128, verbose_name=_('Host'), db_index=True

@@ -25,3 +25,13 @@ class DatabaseAppSerializer(BulkOrgResourceModelSerializer):
             'created_by', 'date_created', 'date_updated'
             'get_type_display'
         ]
+
+    @staticmethod
+    def clean_password_field(validated_data):
+        value = validated_data.get('password')
+        if not value:
+            validated_data.pop('password', None)
+
+    def update(self, instance, validated_data):
+        self.clean_password_field(validated_data)
+        return super().update(instance, validated_data)
