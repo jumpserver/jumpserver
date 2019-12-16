@@ -12,29 +12,6 @@ REMOTE_APP_TYPE_MYSQL_WORKBENCH = 'mysql_workbench'
 REMOTE_APP_TYPE_VMWARE_CLIENT = 'vmware_client'
 REMOTE_APP_TYPE_CUSTOM = 'custom'
 
-REMOTE_APP_TYPE_CHOICES = (
-    (
-        _('Browser'),
-        (
-            (REMOTE_APP_TYPE_CHROME, 'Chrome'),
-        )
-    ),
-    (
-        _('Database tools'),
-        (
-            (REMOTE_APP_TYPE_MYSQL_WORKBENCH, 'MySQL Workbench'),
-        )
-    ),
-    (
-        _('Virtualization tools'),
-        (
-            (REMOTE_APP_TYPE_VMWARE_CLIENT, 'vSphere Client'),
-        )
-    ),
-    (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
-
-)
-
 # Fields attribute write_only default => False
 
 REMOTE_APP_TYPE_CHROME_FIELDS = [
@@ -60,9 +37,16 @@ REMOTE_APP_TYPE_CUSTOM_FIELDS = [
     {'name': 'custom_password', 'write_only': True}
 ]
 
-REMOTE_APP_TYPE_MAP_FIELDS = {
+REMOTE_APP_TYPE_FIELDS_MAP = {
     REMOTE_APP_TYPE_CHROME: REMOTE_APP_TYPE_CHROME_FIELDS,
     REMOTE_APP_TYPE_MYSQL_WORKBENCH: REMOTE_APP_TYPE_MYSQL_WORKBENCH_FIELDS,
     REMOTE_APP_TYPE_VMWARE_CLIENT: REMOTE_APP_TYPE_VMWARE_CLIENT_FIELDS,
     REMOTE_APP_TYPE_CUSTOM: REMOTE_APP_TYPE_CUSTOM_FIELDS
 }
+
+REMOTE_APP_TYPE_CHOICES = (
+    (REMOTE_APP_TYPE_CHROME, 'Chrome'),
+    (REMOTE_APP_TYPE_MYSQL_WORKBENCH, 'MySQL Workbench'),
+    (REMOTE_APP_TYPE_VMWARE_CLIENT, 'vSphere Client'),
+    (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
+)

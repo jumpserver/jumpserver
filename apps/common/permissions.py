@@ -149,11 +149,7 @@ class CanUpdateDeleteUser(permissions.BasePermission):
             return False
         if obj.is_super_auditor:
             return False
-        if obj.is_org_admin:
-            return False
-        if len(obj.audit_orgs) > 1:
-            return False
-        if len(obj.user_orgs) > 1:
+        if obj.can_admin_current_org:
             return False
         return True
 
@@ -173,12 +169,6 @@ class CanUpdateDeleteUser(permissions.BasePermission):
         if obj.is_superuser:
             return False
         if obj.is_super_auditor:
-            return False
-        if obj.is_org_admin:
-            return False
-        if len(obj.audit_orgs) > 1:
-            return False
-        if len(obj.user_orgs) > 1:
             return False
         return True
 

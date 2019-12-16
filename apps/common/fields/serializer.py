@@ -51,12 +51,13 @@ class CustomMetaDictField(serializers.DictField):
     CommandStorage meta field
     ReplayStorage meta field
     """
-    type_map_fields = {}
+    type_fields_map = {}
     default_type = None
-    need_convert_key = False
+    convert_key_remove_type_prefix = False
+    convert_key_to_upper = False
 
     def filter_attribute(self, attribute, instance):
-        fields = self.type_map_fields.get(instance.type, [])
+        fields = self.type_fields_map.get(instance.type, [])
         for field in fields:
             if field.get('write_only', False):
                 attribute.pop(field['name'], None)
@@ -70,29 +71,35 @@ class CustomMetaDictField(serializers.DictField):
         attribute = self.filter_attribute(attribute, instance)
         return attribute
 
-    def convert_value_key(self, dictionary, value):
-        if not self.need_convert_key:
-            # remote app
+    def convert_value_key_remove_type_prefix(self, dictionary, value):
+        if not self.convert_key_remove_type_prefix:
             return value
         tp = dictionary.get('type')
-        _value = {}
+        prefix = '{}_'.format(tp)
+        convert_value = {}
         for k, v in value.items():
-            prefix = '{}_'.format(tp)
-            _k = k
             if k.lower().startswith(prefix):
-                _k = k.lower().split(prefix, 1)[1]
-            _k = _k.upper()
-            _value[_k] = value[k]
-        return _value
+                k = k.lower().split(prefix, 1)[1]
+            convert_value[k] = v
+        return convert_value
+
+    def convert_value_key_to_upper(self, value):
+        if not self.convert_key_to_upper:
+            return value
+        convert_value = {k.upper(): v for k, v in value.items()}
+        return convert_value
+
+    def convert_value_key(self, dictionary, value):
+        value = self.convert_value_key_remove_type_prefix(dictionary, value)
+        value = self.convert_value_key_to_upper(value)
+        return value
 
     def filter_value_key(self, dictionary, value):
-        tp = dictionary.get('type', self.default_type)
-        fields = self.type_map_fields.get(tp, [])
+        tp = dictionary.get('type')
+        fields = self.type_fields_map.get(tp, [])
         fields_names = [field['name'] for field in fields]
-        no_need_keys = [k for k in value.keys() if k not in fields_names]
-        for k in no_need_keys:
-            value.pop(k)
-        return value
+        filter_value = {k: v for k, v in value.items() if k in fields_names}
+        return filter_value
 
     def get_value(self, dictionary):
         """

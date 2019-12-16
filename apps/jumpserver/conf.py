@@ -443,10 +443,10 @@ class ConfigManager:
         try:
             from config import config as c
             self.from_object(c)
-            return self.config
+            return True
         except ImportError:
             pass
-        return None
+        return False
 
     def load_from_yml(self):
         for i in ['config.yml', 'config.yaml']:
@@ -454,7 +454,7 @@ class ConfigManager:
                 continue
             loaded = self.from_yaml(i)
             if loaded:
-                return self.config
+                return True
         return False
 
     @classmethod
@@ -463,20 +463,20 @@ class ConfigManager:
         cls.config_class = config_class
         if not root_path:
             root_path = PROJECT_DIR
+
         manager = cls(root_path=root_path)
-        config = manager.load_from_object()
-        if config:
-            return config
-        config = manager.load_from_yml()
-        if config:
-            return config
-        msg = """
+        if manager.load_from_object():
+            return manager.config
+        elif manager.load_from_yml():
+            return manager.config
+        else:
+            msg = """
 
-        Error: No config file found.
+            Error: No config file found.
 
-        You can run `cp config_example.yml config.yml`, and edit it.
-        """
-        raise ImportError(msg)
+            You can run `cp config_example.yml config.yml`, and edit it.
+            """
+            raise ImportError(msg)
 
     @classmethod
     def get_dynamic_config(cls, config):

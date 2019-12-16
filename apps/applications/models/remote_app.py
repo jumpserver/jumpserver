@@ -62,7 +62,7 @@ class RemoteApp(OrgModelMixin):
         _parameters.append(self.type)
         path = '\"%s\"' % self.path
         _parameters.append(path)
-        for field in const.REMOTE_APP_TYPE_MAP_FIELDS[self.type]:
+        for field in const.REMOTE_APP_TYPE_FIELDS_MAP[self.type]:
             value = self.params.get(field['name'])
             if value is None:
                 continue
