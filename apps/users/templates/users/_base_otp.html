@@ -1,60 +1,20 @@
+{% extends '_without_nav_base.html' %}
 {% load static %}
 {% load i18n %}
 
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title> {{ JMS_TITLE }} </title>
-        <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
-		<link rel="stylesheet" href="{% static 'fonts/font_otp/iconfont.css' %}" />
-		<link rel="stylesheet" href="{% static 'css/otp.css' %}" />
-        <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-        <script src="{% static "js/plugins/qrcode/qrcode.min.js" %}"></script>
-        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-	</head>
-
-	<body>
-		<!--头部-->
-		 <header>
-		 	<div class="logo">
-		 		<a href="{% url 'index' %}">
-		 			<img src="{{ LOGO_URL }}" alt="" width="50px" height="50px"/>
-		 		</a>
-		 		<a href="{% url 'index' %}">{{ JMS_TITLE }}</a>
-		 	</div>
-		 	<div>
-                <a href="{% url 'index' %}">{% trans 'Home page' %}</a>
-		 		<b>丨</b>
-                <a href="http://docs.jumpserver.org/zh/docs/">{% trans 'Docs' %}</a>
-		 		<b>丨</b>
-		 		<a href="https://www.github.com/jumpserver/">GitHub</a>
-		 	</div>
-		 </header>
-
-		 <!--内容-->
-		 <article>
-            <div class="" style="text-align: center; margin-bottom: 50px">
-                <h2>
-                    {% block small_title %}
-                    {% endblock %}
-                </h2>
-            </div>
-		 	<div >
-                <div class="verify">{% trans 'Security token validation' %}&nbsp;&nbsp;{% trans 'Account' %}&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;{% trans 'Follow these steps to complete the binding operation' %}</div>
-                <hr style="width: 500px; margin: auto; margin-top: 10px;">
-                {% block content %}
+{% block body %}
+    <article>
+        <div class="" style="text-align: center; margin-bottom: 50px">
+            <h2>
+                {% block small_title %}
                 {% endblock %}
-		 	</div>
-		 </article>
-
-
-        <footer>
-            <div class="" style="margin-top: 100px;">
-                {% include '_copyright.html' %}
-            </div>
-        </footer>
-
-	</body>
-</html>
-
+            </h2>
+        </div>
+        <div >
+            <div class="verify">{% trans 'Security token validation' %}&nbsp;&nbsp;{% trans 'Account' %}&nbsp;<span>{{ user.username }}</span>&nbsp;&nbsp;{% trans 'Follow these steps to complete the binding operation' %}</div>
+            <hr style="width: 500px; margin: auto; margin-top: 10px;">
+            {% block content %}
+            {% endblock %}
+        </div>
+     </article>
+{% endblock %}

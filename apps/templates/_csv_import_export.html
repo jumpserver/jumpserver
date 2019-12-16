@@ -3,17 +3,17 @@
    <div class=" btn-group">
         <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
         <ul class="dropdown-menu">
-            <li>
+            <li id="li_csv_export">
                 <a id="btn_csv_export" tabindex="0">
                 <span>{% trans "Export" %}</span>
                 </a>
             </li>
-            <li>
+            <li id="li_csv_import">
                 <a id="btn_csv_import" data-toggle="modal" data-target="#csv_import_modal" tabindex="0">
                 <span>{% trans "Import" %}</span>
                 </a>
             </li>
-            <li>
+            <li id="li_csv_update">
                 <a id="btn_csv_update" data-toggle="modal" data-target="#csv_update_modal" tabindex="0">
                 <span>{% trans "Update" %}</span>
                 </a>
@@ -27,57 +27,17 @@
 <script>
 var csvTable = null;
 var csvListUrl = null;
+var csvExportCallback = null;
 
-function initCsvImportExport(table, objectType, listUrl) {
+function initCsvImportExport(table, objectType, listUrl, hide) {
     csvTable = table;
     $(".csv_object_type").html(objectType);
     csvListUrl = listUrl ? listUrl : csvTable.ajax.url();
-}
-
-function exportObjects(listUrl, objectsId, template, table) {
-    /*
-    {
-       listUrl:
-       objectsId:
-       template:
-       table:
-
+    if (hide && hide.length > 0) {
+        hide.forEach(function (v) {
+            $("#li_csv_" + v).hide();
+        })
     }
-     */
-    var tableParams = table.ajax.params();
-    var exportUrl = setUrlParam(listUrl, 'format', 'csv');
-    if (template) {
-        exportUrl = setUrlParam(exportUrl, 'template', template)
-    }
-    for (var k in tableParams) {
-        if (datatableInternalParams.includes(k)) {
-            continue
-        }
-        if (!tableParams[k]) {
-            continue
-        }
-        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
-    }
-
-    if (!objectsId) {
-        window.open(exportUrl);
-        return
-    }
-
-    requestApi({
-        url: '{% url "api-common:resources-cache" %}',
-        data: JSON.stringify({resources: objectsId}),
-        method: "POST",
-        flash_message: false,
-        success: function (data) {
-            exportUrl = setUrlParam(exportUrl, 'spm', data.spm);
-            console.log(exportUrl);
-            window.open(exportUrl);
-        },
-        failed: function () {
-            toastr.error("{% trans "Export error" %}");
-        }
-    });
 }
 
 var datatableInternalParams = ['draw', 'limit', 'order', 'offset'];
@@ -85,6 +45,18 @@ $(document).ready(function () {
 
 }).on('click', '#btn_csv_export', function () {
     var selectedObjects = csvTable.selected;
-    exportObjects(csvListUrl, selectedObjects, null, csvTable)
+    function _export() {
+        APIExportCSV({
+           listUrl: csvListUrl,
+           objectsId: selectedObjects,
+           table: csvTable
+        });
+    }
+    if (csvExportCallback) {
+        csvExportCallback(_export)
+    } else {
+        _export();
+    }
+
 })
 </script>

@@ -25,13 +25,17 @@
         <p class="text-danger" id="updated_failed"></p>
         <p id="updated_failed_detail"></p>
     </div>
-
 <script>
 $(document).ready(function () {
 
 }).on('click', '#csv_download_update_template', function () {
     var objectsId = csvTable.selected;
-    exportObjects(csvListUrl, objectsId, 'update', csvTable);
+    APIExportCSV({
+       listUrl: csvListUrl,
+       objectsId: objectsId,
+       template: 'update',
+       table: csvTable
+    });
 }).on('click', '#btn_csv_update_confirm', function () {
     var file = document.getElementById('csv_update_file').files[0];
     if(!file){

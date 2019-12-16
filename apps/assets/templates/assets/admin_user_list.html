@@ -21,9 +21,6 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
-{#        <th class="text-center">{% trans 'Reachable' %}</th>#}
-{#        <th class="text-center">{% trans 'Unreachable' %}</th>#}
-{#        <th class="text-center">{% trans 'Ratio' %}</th>#}
         <th class="text-center">{% trans 'Comment' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
@@ -64,7 +61,6 @@ $(document).ready(function(){
     admin_user_table = initTable();
     initCsvImportExport(admin_user_table, "{% trans "Admin user" %}")
 })
-
 .on('click', '.btn_admin_user_delete', function () {
 	var $this = $(this);
 	var $data_table = $("#admin_user_list_table").DataTable();

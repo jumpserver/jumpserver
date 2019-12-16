@@ -8,10 +8,10 @@
 {% block content %}
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
+       <div class="col-sm-3" id="split-left" style="padding-left: 3px;padding-right: 0">
            {% include 'assets/_node_tree.html' %}
        </div>
-       <div class="col-lg-9 animated fadeInRight" id="split-right">
+       <div class="col-sm-9 animated fadeInRight" id="split-right">
            <div class="tree-toggle" style="z-index: 10">
                <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggleSpliter()">
                    <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
@@ -39,13 +39,13 @@ var showTree = 1;
 function toggleSpliter() {
     if (showTree === 1) {
         $("#split-left").hide(500, function () {
-            $("#split-right").attr("class", "col-lg-12");
+            $("#split-right").attr("class", "col-sm-12");
             $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
             showTree = 1;
         });
     } else {
         console.log("hide")
-        $("#split-right").attr("class", "col-lg-9");
+        $("#split-right").attr("class", "col-sm-9");
         $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
         $("#split-left").show(500);
         showTree = 0;

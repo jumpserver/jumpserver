@@ -1027,6 +1027,62 @@ function rootNodeAddDom(ztree, callback) {
     })
 }
 
+function APIExportCSV(props) {
+    /*
+    {
+       listUrl:
+       objectsId:
+       template:
+       table:
+       params:
+    }
+     */
+    var _listUrl = props.listUrl;
+    var _objectsId = props.objectsId;
+    var _template = props.template;
+    var _table = props.table;
+    var _params = props.params || {};
+
+    var tableParams = _table.ajax.params();
+    var exportUrl = setUrlParam(_listUrl, 'format', 'csv');
+    if (_template) {
+        exportUrl = setUrlParam(exportUrl, 'template', _template)
+    }
+    for (var k in tableParams) {
+        if (datatableInternalParams.includes(k)) {
+            continue
+        }
+        if (!tableParams[k]) {
+            continue
+        }
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+    for (var k in _params) {
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+
+    if (!_objectsId) {
+        console.log(exportUrl);
+        window.open(exportUrl);
+        return
+    }
+
+    requestApi({
+        url: '/api/v1/common/resources/cache/',
+        data: JSON.stringify({resources: _objectsId}),
+        method: "POST",
+        flash_message: false,
+        success: function (data) {
+            exportUrl = setUrlParam(exportUrl, 'spm', data.spm);
+            console.log(exportUrl);
+            window.open(exportUrl);
+        },
+        failed: function () {
+            toastr.error(gettext('Export failed'));
+        }
+    });
+}
+
 function APIExportData(props) {
     props = props || {};
     $.ajax({

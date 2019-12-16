@@ -2,6 +2,7 @@
 #
 import re
 import os
+import logging
 from collections import defaultdict
 from django.conf import settings
 from django.dispatch import receiver
@@ -12,12 +13,11 @@ from django.db.utils import ProgrammingError, OperationalError
 
 from jumpserver.utils import get_current_request
 
-from common.utils import get_logger
 from .local import thread_local
 from .signals import django_ready
 
 pattern = re.compile(r'FROM `(\w+)`')
-logger = get_logger(__name__)
+logger = logging.getLogger("jumpserver.common")
 DEBUG_DB = os.environ.get('DEBUG_DB', '0') == '1'
 
 
