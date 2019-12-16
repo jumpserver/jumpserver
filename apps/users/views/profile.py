@@ -33,7 +33,7 @@ __all__ = [
     'UserPublicKeyUpdateView', 'UserPublicKeyGenerateView',
     'UserCheckPasswordView', 'UserOtpEnableInstallAppView',
     'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
-    'UserOtpDisableAuthenticationView', 'UserOtpUpdateView',
+    'UserDisableMFAView', 'UserOtpUpdateView',
 ]
 
 logger = get_logger(__name__)
@@ -211,17 +211,17 @@ class UserOtpEnableBindView(TemplateView, FormView):
         user.save()
 
 
-class UserOtpDisableAuthenticationView(FormView):
-    template_name = 'users/user_otp_authentication.html'
+class UserDisableMFAView(FormView):
+    template_name = 'users/user_disable_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-settings-success')
 
     def form_valid(self, form):
         user = self.request.user
         otp_code = form.cleaned_data.get('otp_code')
-        otp_secret_key = user.otp_secret_key
 
-        if check_otp_code(otp_secret_key, otp_code):
+        valid = user.check_mfa(otp_code)
+        if valid:
             user.disable_mfa()
             user.save()
             return super().form_valid(form)
@@ -230,7 +230,7 @@ class UserOtpDisableAuthenticationView(FormView):
             return super().form_invalid(form)
 
 
-class UserOtpUpdateView(UserOtpDisableAuthenticationView):
+class UserOtpUpdateView(UserDisableMFAView):
     success_url = reverse_lazy('users:user-otp-enable-bind')
 
 
