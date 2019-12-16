@@ -27,12 +27,12 @@ def combine_seq(s1, s2, callback=None):
     return seq
 
 
-def get_logger(name=None):
+def get_logger(name=''):
     return logging.getLogger('jumpserver.%s' % name)
 
 
-def get_syslogger(name=None):
-    return logging.getLogger('jms.%s' % name)
+def get_syslogger(name=''):
+    return logging.getLogger('syslog.%s' % name)
 
 
 def timesince(dt, since='', default="just now"):

@@ -74,7 +74,7 @@ class UserAssetListView(PermissionsMixin, TemplateView):
 
 class AssetCreateView(PermissionsMixin, FormMixin, TemplateView):
     model = Asset
-    form_class = forms.AssetCreateForm
+    form_class = forms.AssetCreateUpdateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
     permission_classes = [IsOrgAdmin]
@@ -110,7 +110,7 @@ class AssetCreateView(PermissionsMixin, FormMixin, TemplateView):
 
 class AssetUpdateView(PermissionsMixin, UpdateView):
     model = Asset
-    form_class = forms.AssetUpdateForm
+    form_class = forms.AssetCreateUpdateForm
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
     permission_classes = [IsOrgAdmin]

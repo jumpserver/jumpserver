@@ -184,6 +184,7 @@ class Config(dict):
         'ASSETS_PERM_CACHE_ENABLE': False,
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
+        'SYSLOG_SOCKTYPE': 2,
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'FLOWER_URL': "127.0.0.1:5555",
@@ -282,10 +283,10 @@ class DynamicConfig:
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
-        if self.get('AUTH_OPENID'):
+        if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
-        if self.get('AUTH_RADIUS'):
+        if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
 

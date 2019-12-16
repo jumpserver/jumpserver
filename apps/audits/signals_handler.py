@@ -11,6 +11,7 @@ from rest_framework.request import Request
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
+from users.signals import post_user_change_password
 from authentication.signals import post_auth_failed, post_auth_success
 from terminal.models import Session, Command
 from common.utils.encode import model_to_json
@@ -18,7 +19,7 @@ from . import models
 from .tasks import write_login_log_async
 
 logger = get_logger(__name__)
-sys_logger = get_syslogger("audits")
+sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
 
 
@@ -50,7 +51,7 @@ def create_operate_log(action, sender, resource):
             logger.error("Create operate log error: {}".format(e))
 
 
-@receiver(post_save, dispatch_uid="my_unique_identifier")
+@receiver(post_save)
 def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
     if instance._meta.object_name == 'User' and \
             update_fields and 'last_login' in update_fields:
@@ -62,21 +63,27 @@ def on_object_created_or_update(sender, instance=None, created=False, update_fie
     create_operate_log(action, sender, instance)
 
 
-@receiver(post_delete, dispatch_uid="my_unique_identifier")
+@receiver(post_delete)
 def on_object_delete(sender, instance=None, **kwargs):
     create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
 
 
-@receiver(post_save, sender=User, dispatch_uid="my_unique_identifier")
-def on_user_change_password(sender, instance=None, **kwargs):
-    if hasattr(instance, '_set_password'):
-        if not current_request or not current_request.user.is_authenticated:
-            return
-        with transaction.atomic():
-            models.PasswordChangeLog.objects.create(
-                user=instance, change_by=current_request.user,
-                remote_addr=get_request_ip(current_request),
-            )
+@receiver(post_user_change_password, sender=User)
+def on_user_change_password(sender, user=None, **kwargs):
+    if not current_request:
+        remote_addr = '127.0.0.1'
+        change_by = 'System'
+    else:
+        remote_addr = get_request_ip(current_request)
+        if not current_request.user.is_authenticated:
+            change_by = str(user)
+        else:
+            change_by = str(current_request.user)
+    with transaction.atomic():
+        models.PasswordChangeLog.objects.create(
+            user=str(user), change_by=change_by,
+            remote_addr=remote_addr,
+        )
 
 
 def on_audits_log_create(sender, instance=None, **kwargs):
@@ -95,7 +102,7 @@ def on_audits_log_create(sender, instance=None, **kwargs):
     else:
         return
 
-    data = model_to_json(instance)
+    data = model_to_json(instance, indent=None)
     msg = "{} - {}".format(category, data)
     sys_logger.info(msg)
 

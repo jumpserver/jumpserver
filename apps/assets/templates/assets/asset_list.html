@@ -1,131 +1,52 @@
-{% extends 'base.html' %}
+{% extends '_base_asset_tree_list.html' %}
 {% load static %}
 {% load i18n %}
 
 {% block help_message %}
-{#    <div class="alert alert-info help-message">#}
-{#    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>#}
-{#    左侧是资产树，右击可以新建、删除、更改树节点，授权资产也是以节点方式组织的，右侧是属于该节点下的资产#}
     {% trans 'The left side is the asset tree, right click to create, delete, and change the tree node, authorization asset is also organized as a node, and the right side is the asset under that node' %}
-{#    </div>#}
 {% endblock %}
 
-{% block custom_head_css_js %}
-{#    <link href="{% static 'css/plugins/ztree/awesomeStyle/awesome.css' %}" rel="stylesheet">#}
-{#    <script type="text/javascript" src="{% static 'js/plugins/ztree/jquery.ztree.all.min.js' %}"></script>#}
-    <script src="{% static 'js/jquery.form.min.js' %}"></script>
-	<style type="text/css">
-        div#rMenu {
-            position:absolute;
-            visibility:hidden;
-            text-align: left;
-            {#top: 100%;#}
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            {#float: left;#}
-            padding: 0 0;
-            margin: 2px 0 0;
-            list-style: none;
-            background-clip: padding-box;
-         }
-        .dataTables_wrapper .dataTables_processing {
-            opacity: .9;
-            border: none;
-        }
-        div#rMenu li{
-        	margin: 1px 0;
-        	cursor: pointer;
-        	list-style: none outside none;
-         }
-        .dropdown a:hover {
-            background-color: #f1f1f1
-        }
-	</style>
-
-{% endblock %}
-
-{% block content %}
-<div class="wrapper wrapper-content">
-   <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
-           {% include 'assets/_node_tree.html' %}
-       </div>
-       <div class="col-lg-9 animated fadeInRight" id="split-right">
-           <div class="tree-toggle" style="z-index: 9999">
-               <div class="btn btn-sm btn-primary tree-toggle-btn">
-                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
-               </div>
-           </div>
-           <div class="mail-box-header">
-               <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
-               <div class="" style="float: right">
-                   <div class=" btn-group">
-                        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class=" btn_export" tabindex="0">
-                                <span>{% trans "Export" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                                <span>{% trans "Import" %}</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                                <span>{% trans "Update" %}</span>
-                                </a>
-                            </li>
-                        </ul>
-                   </div>
-               </div>
-               <div class="btn-group" style="float: right">
-                  <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
-                  <ul class="dropdown-menu labels">
-                      {% for label in labels %}
-                          <li><a style="font-weight: bolder">{{ label.name }}#{{ label.value }}</a></li>
-                      {% endfor %}
-                  </ul>
-               </div>
-               <table class="table table-striped table-bordered table-hover " id="asset_list_table" style="width: 100%">
-                   <thead>
-                       <tr>
-                           <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
-                           <th class="text-center">{% trans 'Hostname' %}</th>
-                           <th class="text-center">{% trans 'IP' %}</th>
-                           <th class="text-center">{% trans 'Hardware' %}</th>
-                           <th class="text-center">{% trans 'Reachable' %}</th>
-                           <th class="text-center">{% trans 'Action' %}</th>
-                       </tr>
-                   </thead>
-                   <tbody>
-                   </tbody>
-               </table>
-               <div id="actions" class="hide">
-                   <div class="input-group">
-                       <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-                           <option value="delete">{% trans 'Delete selected' %}</option>
-                           <option value="update">{% trans 'Update selected' %}</option>
-                           <option value="remove">{% trans 'Remove from this node' %}</option>
-                           <option value="deactive">{% trans 'Deactive selected' %}</option>
-                           <option value="active">{% trans 'Active selected' %}</option>
-                       </select>
-                       <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                           <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-                            {% trans 'Submit' %}
-                           </button>
-                       </div>
-                   </div>
-               </div>
+{% block table_container %}
+   <div class="uc pull-left m-r-5"><a class="btn btn-sm btn-primary btn-create-asset"> {% trans "Create asset" %} </a></div>
+   {% include '_csv_import_export.html' %}
+   <div class="btn-group" style="float: right">
+      <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">{% trans 'Label' %} <span class="caret"></span></button>
+      <ul class="dropdown-menu labels">
+          {% for label in labels %}
+              <li><a style="font-weight: bolder">{{ label.name }}#{{ label.value }}</a></li>
+          {% endfor %}
+      </ul>
+   </div>
+   <table class="table table-striped table-bordered table-hover " id="asset_list_table" style="width: 100%">
+       <thead>
+           <tr>
+               <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+               <th class="text-center">{% trans 'Hostname' %}</th>
+               <th class="text-center">{% trans 'IP' %}</th>
+               <th class="text-center">{% trans 'Hardware' %}</th>
+               <th class="text-center">{% trans 'Reachable' %}</th>
+               <th class="text-center">{% trans 'Action' %}</th>
+           </tr>
+       </thead>
+       <tbody>
+       </tbody>
+   </table>
+   <div id="actions" class="hide">
+       <div class="input-group">
+           <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+               <option value="delete">{% trans 'Delete selected' %}</option>
+               <option value="update">{% trans 'Update selected' %}</option>
+               <option value="remove">{% trans 'Remove from this node' %}</option>
+               <option value="deactive">{% trans 'Deactive selected' %}</option>
+               <option value="active">{% trans 'Active selected' %}</option>
+           </select>
+           <div class="input-group-btn pull-left" style="padding-left: 5px;">
+               <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                {% trans 'Submit' %}
+               </button>
            </div>
        </div>
    </div>
-</div>
-
-{% include 'assets/_asset_update_modal.html' %}
-{% include 'assets/_asset_import_modal.html' %}
 {% include 'assets/_asset_list_modal.html' %}
 {% include 'assets/_node_detail_modal.html' %}
 {% endblock %}
@@ -205,22 +126,6 @@ function initTree() {
     })
 }
 
-
-function toggle() {
-    if (show === 0) {
-        $("#split-left").hide(500, function () {
-            $("#split-right").attr("class", "col-lg-12");
-            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
-            show = 1;
-        });
-    } else {
-        $("#split-right").attr("class", "col-lg-9");
-        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
-        $("#split-left").show(500);
-        show = 0;
-    }
-}
-
 function onNodeSelected(event, treeNode) {
     current_node = treeNode;
     current_node_id = treeNode.meta.node.id;
@@ -261,7 +166,8 @@ function onAssetModalConfirmAddAssetToNode(table) {
 }
 
 $(document).ready(function(){
-    initTable();
+    asset_table = initTable();
+    initCsvImportExport(asset_table, "{% trans "Asset" %}");
     initTree();
 
     if(getCookie('show_current_asset') === '1'){
@@ -282,81 +188,6 @@ $(document).ready(function(){
     $("#asset_list_table_filter input").val(val);
     asset_table.search(val).draw();
  })
-.on('click', '.btn_export', function () {
-    var assets = asset_table.selected;
-    var data = {
-        'resources': assets
-    };
-    var search = $("input[type='search']").val();
-    var props = {
-        method: "POST",
-        body: JSON.stringify(data),
-        success_url: "{% url 'api-assets:asset-list' %}",
-        format: 'csv',
-        params: {
-            search: search,
-            node_id: current_node_id || '',
-            show_current_asset: getCookie('show_current_asset')
-        }
-    };
-    APIExportData(props);
-})
-.on('click', '#btn_import_confirm', function () {
-    var file = document.getElementById('id_file').files[0];
-    if(!file){
-        toastr.error("{% trans "Please select file" %}");
-        return
-    }
-    var url = "{% url 'api-assets:asset-list' %}";
-    if (current_node_id){
-        url = setUrlParam(url, 'node_id', current_node_id);
-    }
-    var data_table = $('#asset_list_table').DataTable();
-
-    APIImportData({
-        url: url,
-        method: "POST",
-        body: file,
-        data_table: data_table
-    });
-})
-.on('click', '#download_update_template', function () {
-    var assets = asset_table.selected;
-    var data = {
-        'resources': assets
-    };
-    var search = $("input[type='search']").val();
-    var props = {
-        method: "POST",
-        body: JSON.stringify(data),
-        success_url: "{% url 'api-assets:asset-list' %}?format=csv&template=update",
-        format: 'csv',
-        params: {
-            search: search,
-            node_id: current_node_id || ''
-        }
-    };
-    APIExportData(props);
-})
-.on('click', '#btn_update_confirm', function () {
-    var file = document.getElementById('update_file').files[0];
-    if(!file){
-        toastr.error("{% trans "Please select file" %}");
-        return
-    }
-    var url = "{% url 'api-assets:asset-list' %}";
-    if (current_node_id){
-        url = setUrlParam(url, 'node_id', current_node_id);
-    }
-    var data_table = $('#asset_list_table').DataTable();
-
-    APIImportData({
-        url: url,
-        method: "PUT",
-        body: file,
-        data_table: data_table
-    });
-})
 .on('click', '.btn-create-asset', function () {
     var url = "{% url 'assets:asset-create' %}";
     if (current_node_id) {

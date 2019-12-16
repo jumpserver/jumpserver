@@ -24,7 +24,7 @@ from ..signals import post_user_create
 
 logger = get_logger(__name__)
 __all__ = [
-    'UserViewSet', 'UserChangePasswordApi', 'UserUpdateGroupApi',
+    'UserViewSet', 'UserChangePasswordApi',
     'UserResetPasswordApi', 'UserResetPKApi', 'UserUpdatePKApi',
     'UserUnblockPKApi', 'UserProfileApi', 'UserResetOTPApi',
 ]
@@ -39,8 +39,10 @@ class UserQuerysetMixin:
 class UserViewSet(CommonApiMixin, UserQuerysetMixin, BulkModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
     search_fields = filter_fields
-    serializer_class = serializers.UserSerializer
-    serializer_display_class = serializers.UserDisplaySerializer
+    serializer_classes = {
+        'default': serializers.UserSerializer,
+        'display': serializers.UserDisplaySerializer
+    }
     permission_classes = (IsOrgAdmin, CanUpdateDeleteUser)
 
     def get_queryset(self):
@@ -97,11 +99,6 @@ class UserChangePasswordApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
         user = self.get_object()
         user.password_raw = serializer.validated_data["password"]
         user.save()
-
-
-class UserUpdateGroupApi(UserQuerysetMixin, generics.RetrieveUpdateAPIView):
-    serializer_class = serializers.UserUpdateGroupSerializer
-    permission_classes = (IsOrgAdmin,)
 
 
 class UserResetPasswordApi(UserQuerysetMixin, generics.UpdateAPIView):

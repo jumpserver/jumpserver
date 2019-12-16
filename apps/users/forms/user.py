@@ -1,39 +1,19 @@
-# ~*~ coding: utf-8 ~*~
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
 
 from common.utils import validate_ssh_public_key
 from orgs.mixins.forms import OrgModelForm
-from .models import User, UserGroup
-from .utils import check_password_rules, get_current_org_members
+from ..models import User
+from ..utils import (
+    check_password_rules, get_current_org_members, get_source_choices
+)
 
 
-class UserCheckPasswordForm(forms.Form):
-    username = forms.CharField(label=_('Username'), max_length=100)
-    password = forms.CharField(
-        label=_('Password'), widget=forms.PasswordInput,
-        max_length=128, strip=False
-    )
-
-
-class UserCheckOtpCodeForm(forms.Form):
-    otp_code = forms.CharField(label=_('MFA code'), max_length=6)
-
-
-def get_source_choices():
-    choices_all = dict(User.SOURCE_CHOICES)
-    choices = [
-        (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
-    ]
-    if settings.AUTH_LDAP:
-        choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
-    if settings.AUTH_OPENID:
-        choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
-    if settings.AUTH_RADIUS:
-        choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
-    return choices
+__all__ = [
+    'UserCreateForm', 'UserUpdateForm', 'UserBulkUpdateForm',
+    'UserCheckOtpCodeForm', 'UserCheckPasswordForm'
+]
 
 
 class UserCreateUpdateFormMixin(OrgModelForm):
@@ -157,131 +137,6 @@ class UserUpdateForm(UserCreateUpdateFormMixin):
     pass
 
 
-class UserProfileForm(forms.ModelForm):
-    username = forms.CharField(disabled=True, label=_("Username"))
-    name = forms.CharField(disabled=True, label=_("Name"))
-    email = forms.CharField(disabled=True)
-
-    class Meta:
-        model = User
-        fields = [
-            'username', 'name', 'email',
-            'wechat', 'phone',
-        ]
-
-
-UserProfileForm.verbose_name = _("Profile")
-
-
-class UserMFAForm(forms.ModelForm):
-
-    mfa_description = _(
-        'When enabled, '
-        'you will enter the MFA binding process the next time you log in. '
-        'you can also directly bind in '
-        '"personal information -> quick modification -> change MFA Settings"!')
-
-    class Meta:
-        model = User
-        fields = ['mfa_level']
-        widgets = {'mfa_level': forms.RadioSelect()}
-        help_texts = {
-            'mfa_level': _('* Enable MFA authentication '
-                           'to make the account more secure.'),
-        }
-
-
-UserMFAForm.verbose_name = _("MFA")
-
-
-class UserFirstLoginFinishForm(forms.Form):
-    finish_description = _(
-        'In order to protect you and your company, '
-        'please keep your account, '
-        'password and key sensitive information properly. '
-        '(for example: setting complex password, enabling MFA authentication)'
-    )
-
-
-UserFirstLoginFinishForm.verbose_name = _("Finish")
-
-
-class UserPasswordForm(forms.Form):
-    old_password = forms.CharField(
-        max_length=128, widget=forms.PasswordInput,
-        label=_("Old password")
-    )
-    new_password = forms.CharField(
-        min_length=5, max_length=128,
-        widget=forms.PasswordInput,
-        label=_("New password")
-    )
-    confirm_password = forms.CharField(
-        min_length=5, max_length=128,
-        widget=forms.PasswordInput,
-        label=_("Confirm password")
-    )
-
-    def __init__(self, *args, **kwargs):
-        self.instance = kwargs.pop('instance')
-        super().__init__(*args, **kwargs)
-
-    def clean_old_password(self):
-        old_password = self.cleaned_data['old_password']
-        if not self.instance.check_password(old_password):
-            raise forms.ValidationError(_('Old password error'))
-        return old_password
-
-    def clean_confirm_password(self):
-        new_password = self.cleaned_data['new_password']
-        confirm_password = self.cleaned_data['confirm_password']
-
-        if new_password != confirm_password:
-            raise forms.ValidationError(_('Password does not match'))
-        return confirm_password
-
-    def save(self):
-        password = self.cleaned_data['new_password']
-        self.instance.reset_password(new_password=password)
-        return self.instance
-
-
-class UserPublicKeyForm(forms.Form):
-    pubkey_description = _('Automatically configure and download the SSH key')
-    public_key = forms.CharField(
-        label=_('ssh public key'), max_length=5000, required=False,
-        widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
-        help_text=_('Paste your id_rsa.pub here.')
-    )
-
-    def __init__(self, *args, **kwargs):
-        if 'instance' in kwargs:
-            self.instance = kwargs.pop('instance')
-        else:
-            self.instance = None
-        super().__init__(*args, **kwargs)
-
-    def clean_public_key(self):
-        public_key = self.cleaned_data['public_key']
-        if self.instance.public_key and public_key == self.instance.public_key:
-            msg = _('Public key should not be the same as your old one.')
-            raise forms.ValidationError(msg)
-
-        if public_key and not validate_ssh_public_key(public_key):
-            raise forms.ValidationError(_('Not a valid ssh public key'))
-        return public_key
-
-    def save(self):
-        public_key = self.cleaned_data['public_key']
-        if public_key:
-            self.instance.public_key = public_key
-            self.instance.save()
-        return self.instance
-
-
-UserPublicKeyForm.verbose_name = _("Public key")
-
-
 class UserBulkUpdateForm(OrgModelForm):
     users = forms.ModelMultipleChoiceField(
         required=True,
@@ -333,40 +188,12 @@ class UserBulkUpdateForm(OrgModelForm):
         return users
 
 
-class UserGroupForm(OrgModelForm):
-    users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.none(),
-        label=_("User"),
-        widget=forms.SelectMultiple(
-            attrs={
-                'class': 'users-select2',
-                'data-placeholder': _('Select users')
-            }
-        ),
-        required=False,
+class UserCheckPasswordForm(forms.Form):
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput,
+        max_length=128, strip=False
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.set_fields_queryset()
 
-    def set_fields_queryset(self):
-        users_field = self.fields.get('users')
-        if self.instance:
-            users_field.initial = self.instance.users.all()
-            users_field.queryset = self.instance.users.all()
-        else:
-            users_field.queryset = User.objects.none()
-
-    def save(self, commit=True):
-        raise Exception("Save by restful api")
-
-    class Meta:
-        model = UserGroup
-        fields = [
-            'name', 'users', 'comment',
-        ]
-
-
-class FileForm(forms.Form):
-    file = forms.FileField()
+class UserCheckOtpCodeForm(forms.Form):
+    otp_code = forms.CharField(label=_('MFA code'), max_length=6)

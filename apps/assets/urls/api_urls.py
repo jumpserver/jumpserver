@@ -12,6 +12,7 @@ app_name = 'assets'
 
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
+router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
 router.register(r'labels', api.LabelViewSet, 'label')
@@ -37,6 +38,8 @@ urlpatterns = [
          api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
     path('assets/<uuid:pk>/gateway/',
          api.AssetGatewayApi.as_view(), name='asset-gateway'),
+    path('assets/<uuid:pk>/platform/',
+         api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
     path('asset-users/auth-info/',
          api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),

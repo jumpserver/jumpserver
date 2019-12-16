@@ -1,83 +1,64 @@
-{% load i18n %}
+{% extends '_base_only_content.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html>
+{% load i18n %}
+{% block html_title %} {{ title }} {% endblock %}
+{% block title %} {{ title }}{% endblock %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block custom_head_css_js %}
+    <style>
+        .passwordBox {
+            max-width: 660px;
+        }
+    </style>
+{% endblock %}
 
-    <title>{{ title }}</title>
-
-    {% include '_head_css_js.html' %}
-    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    <script src="{% static "js/jumpserver.js" %}"></script>
-
-</head>
-
-<body class="gray-bg">
-    <div class="passwordBox2 animated fadeInDown">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="ibox-content">
-                    <div>
-                        <img src="{{ LOGO_URL }}" style="margin: auto" width="82" height="82">
-                        <h2 style="display: inline">
-                            {{ JMS_TITLE }}
-                        </h2>
-                    </div>
-                    {% if errors %}
-                    <p>
-                        <div class="alert alert-danger">
-                            {{ errors }}
-                        </div>
-                    </p>
-                    {% endif %}
-
-                    {% if messages %}
-                        <p>
-                        <div class="alert alert-success" id="messages">
-                            {{ messages|safe }}
-                        </div>
-                    </p>
-                    {% endif %}
-                    <div class="row">
-                        <div class="col-lg-3">
-                                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">{% trans 'Return' %}</a>
-                        </div>
-                    </div>
-                </div>
+{% block content %}
+    <div>
+        {% if errors %}
+            <p>
+            <div class="alert alert-danger">
+                {{ errors }}
             </div>
-        </div>
-        <hr/>
+            </p>
+        {% endif %}
+
+        {% if messages %}
+            <p>
+            <div class="alert alert-success" id="messages">
+                {{ messages|safe }}
+            </div>
+            </p>
+        {% endif %}
         <div class="row">
-            <div class="col-md-6">
-                {% include '_copyright.html' %}
+            <div class="col-lg-3">
+                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">{% trans 'Return' %}</a>
             </div>
         </div>
     </div>
-</body>
+{% endblock %}
+
+{% block custom_foot_js %}
 <script>
     var time = '{{ interval }}';
-    if (!time){
+    if (!time) {
         time = 5;
     } else {
         time = parseInt(time);
     }
+
     function redirect_page() {
         if (time >= 0) {
-            var messages = '{{ messages|safe }}， <b>' + time +'</b> ...';
+            var messages = '{{ messages|safe }}， <b>' + time + '</b> ...';
             $('#messages').html(messages);
             time--;
             setTimeout(redirect_page, 1000);
-        }
-        else {
+        } else {
             window.location.href = "{{ redirect_url }}";
         }
     }
     {% if auto_redirect %}
-    window.onload = redirect_page;
+        window.onload = redirect_page;
     {% endif %}
 </script>
-</html>
+{% endblock %}
+

@@ -177,7 +177,7 @@ function formSubmit(props) {
     */
     props = props || {};
     var data = props.data || props.form.serializeObject();
-    var redirect_to = props.redirect_to;
+    var redirectTo = props.redirect_to || props.redirectTo;
     $.ajax({
         url: props.url,
         type: props.method || 'POST',
@@ -185,12 +185,8 @@ function formSubmit(props) {
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textState, jqXHR) {
-        if (redirect_to) {
-            if (props.message) {
-                var messages = "ed65330a45559c87345a0eb6ac7812d18d0d8976$[[\"__json_message\"\0540\05425\054\"asdfasdf \\u521b\\u5efa\\u6210\\u529f\"]]"
-                setCookie("messages", messages)
-            }
-            location.href = redirect_to;
+        if (redirectTo) {
+            location.href = redirectTo;
         } else if (typeof props.success === 'function') {
             return props.success(data, textState, jqXHR);
         }
@@ -254,7 +250,6 @@ function formSubmit(props) {
             }
             $('.has-error').get(0).scrollIntoView();
         }
-
     })
 }
 
@@ -1032,6 +1027,62 @@ function rootNodeAddDom(ztree, callback) {
     })
 }
 
+function APIExportCSV(props) {
+    /*
+    {
+       listUrl:
+       objectsId:
+       template:
+       table:
+       params:
+    }
+     */
+    var _listUrl = props.listUrl;
+    var _objectsId = props.objectsId;
+    var _template = props.template;
+    var _table = props.table;
+    var _params = props.params || {};
+
+    var tableParams = _table.ajax.params();
+    var exportUrl = setUrlParam(_listUrl, 'format', 'csv');
+    if (_template) {
+        exportUrl = setUrlParam(exportUrl, 'template', _template)
+    }
+    for (var k in tableParams) {
+        if (datatableInternalParams.includes(k)) {
+            continue
+        }
+        if (!tableParams[k]) {
+            continue
+        }
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+    for (var k in _params) {
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+
+    if (!_objectsId) {
+        console.log(exportUrl);
+        window.open(exportUrl);
+        return
+    }
+
+    requestApi({
+        url: '/api/v1/common/resources/cache/',
+        data: JSON.stringify({resources: _objectsId}),
+        method: "POST",
+        flash_message: false,
+        success: function (data) {
+            exportUrl = setUrlParam(exportUrl, 'spm', data.spm);
+            console.log(exportUrl);
+            window.open(exportUrl);
+        },
+        failed: function () {
+            toastr.error(gettext('Export failed'));
+        }
+    });
+}
+
 function APIExportData(props) {
     props = props || {};
     $.ajax({
@@ -1081,6 +1132,7 @@ function APIImportData(props) {
         },
         error: function (error) {
             var data = error.responseJSON;
+            console.log(data);
             if (data instanceof Array) {
                 var html = '';
                 var li = '';
@@ -1141,8 +1193,8 @@ function objectAttrsIsBool(obj, attrs) {
     attrs.forEach(function (attr) {
         if (!obj[attr]) {
             obj[attr] = false
-        } else if (['on', '1'].includes(obj[attr])) {
-            obj[attr] = true
+        } else {
+            obj[attr] = ['on', '1', 'true', 'True'].includes(obj[attr]);
         }
     })
 }

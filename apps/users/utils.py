@@ -329,3 +329,18 @@ def construct_user_email(username, email):
 def get_current_org_members(exclude=()):
     from orgs.utils import current_org
     return current_org.get_org_members(exclude=exclude)
+
+
+def get_source_choices():
+    from .models import User
+    choices_all = dict(User.SOURCE_CHOICES)
+    choices = [
+        (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
+    ]
+    if settings.AUTH_LDAP:
+        choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
+    if settings.AUTH_OPENID:
+        choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
+    if settings.AUTH_RADIUS:
+        choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
+    return choices

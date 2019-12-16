@@ -8,28 +8,7 @@
 {% endblock %}
 
 {% block table_search %}
-    <div class="" style="float: right">
-       <div class=" btn-group">
-            <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a class=" btn_export" tabindex="0">
-                    <span>{% trans "Export" %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a class=" btn_import" data-toggle="modal" data-target="#import_modal" tabindex="0">
-                    <span>{% trans "Import" %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a class=" btn_update" data-toggle="modal" data-target="#update_modal" tabindex="0">
-                    <span>{% trans "Update" %}</span>
-                    </a>
-                </li>
-            </ul>
-       </div>
-   </div>
+    {% include '_csv_import_export.html' %}
 {% endblock %}
 
 {% block table_container %}
@@ -57,8 +36,6 @@
     <tbody>
     </tbody>
 </table>
-    {% include 'assets/_system_user_import_modal.html' %}
-    {% include 'assets/_system_user_update_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -89,14 +66,13 @@ function initTable() {
         ],
         op_html: $('#actions').html()
     };
-    system_user_table = jumpserver.initServerSideDataTable(options);
-    return system_user_table
+    return jumpserver.initServerSideDataTable(options);
 }
 
 $(document).ready(function(){
-    initTable();
+    system_user_table = initTable();
+    initCsvImportExport(system_user_table, "{% trans 'System user' %}")
 })
-
 .on('click', '.btn_admin_user_delete', function () {
     var $this = $(this);
     var $data_table = $('#cluster_list_table').DataTable();
@@ -107,125 +83,6 @@ $(document).ready(function(){
     setTimeout( function () {
         $data_table.ajax.reload();
     }, 3000);
-})
-
-.on('click', '#btn_bulk_update', function () {
-    var action = $('#slct_bulk_update').val();
-    var $data_table = $('#system_user_list_table').DataTable();
-    var id_list = [];
-    var plain_id_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        id_list.push({id: this.data().id});
-        plain_id_list.push(this.data().id);
-    });
-    if (id_list === []) {
-        return false;
-    }
-    var the_url = "{% url 'api-assets:system-user-list' %}";
-    function doDelete() {
-        swal({
-            title: "{% trans 'Are you sure?' %}",
-            text: "{% trans 'This will delete the selected System Users !!!' %}",
-            type: "warning",
-            showCancelButton: true,
-            cancelButtonText: "{% trans 'Cancel' %}",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "{% trans 'Confirm' %}",
-            closeOnConfirm: false
-        }, function() {
-            var success = function() {
-                var msg = "{% trans 'System Users Deleted.' %}";
-                swal("{% trans 'System Users Delete' %}", msg, "success");
-                $('#system_user_list_table').DataTable().ajax.reload();
-            };
-            var fail = function() {
-                var msg = "{% trans 'System Users Deleting failed.' %}";
-                swal("{% trans 'System Users Delete' %}", msg, "error");
-            };
-            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
-            requestApi({url: url_delete, method: 'DELETE', success: success, error: fail});
-            $data_table.ajax.reload();
-            jumpserver.checked = false;
-        });
-    }
-    function doUpdate() {
-{#        TODO: bulk update the System Users #}
-    }
-    switch (action) {
-        case 'delete':
-            doDelete();
-            break;
-        case 'update':
-            doUpdate();
-            break;
-        default:
-            break;
-    }
-})
-.on('click', '.btn_export', function () {
-    var system_users = system_user_table.selected;
-    var data = {
-        'resources': system_users
-    };
-    var search = $("input[type='search']").val();
-    var props = {
-        method: "POST",
-        body: JSON.stringify(data),
-        success_url: "{% url 'api-assets:system-user-list' %}",
-        format: "csv",
-        params:{
-            search:search
-        }
-    };
-    APIExportData(props);
-})
-.on('click', '#btn_import_confirm', function () {
-    var url = "{% url 'api-assets:system-user-list' %}";
-    var file = document.getElementById('id_file').files[0];
-    if(!file){
-        toastr.error("{% trans 'Please select file' %}");
-        return
-    }
-    var data_table = $('#system_user_list_table').DataTable();
-    APIImportData({
-        url: url,
-        method: "POST",
-        body: file,
-        data_table: data_table
-    });
-})
-.on('click', '#download_update_template', function () {
-    var system_users = system_user_table.selected;
-    var data = {
-        'resources': system_users
-    };
-    var search = $("input[type='search']").val();
-    var props = {
-        method: "POST",
-        body: JSON.stringify(data),
-        success_url: "{% url 'api-assets:system-user-list' %}?format=csv&template=update",
-        format: "csv",
-        params:{
-            search:search
-        }
-    };
-    APIExportData(props);
-})
-.on('click', '#btn_update_confirm', function () {
-    var file = document.getElementById('update_file').files[0];
-    if(!file){
-        toastr.error("{% trans "Please select file" %}");
-        return
-    }
-    var url = "{% url 'api-assets:system-user-list' %}";
-    var data_table = $('#system_user_list_table').DataTable();
-
-    APIImportData({
-        url: url,
-        method: "PUT",
-        body: file,
-        data_table: data_table
-    });
 })
 </script>
 {% endblock %}

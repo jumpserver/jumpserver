@@ -13,7 +13,7 @@
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
   <div class="row">
-    <div class="col-lg-12">
+    <div class="col-sm-12">
         <div class="ibox">
             <div class="ibox-title">
               <h5>{% trans 'First Login' %}</h5>
@@ -55,7 +55,7 @@
                   </div>
                   <div class="content clearfix" style="background-color: #eee; border-radius:5px;">
                       <div class="row">
-                          <form action="" method="post" class="form col-lg-8 p-m" id="fl_form" style="padding-left: 40px;">
+                          <form action="" method="post" class="form col-sm-8 p-m" id="fl_form" style="padding-left: 40px;">
                               {% csrf_token %}
                               {{ wizard.management_form }}
                               {#{% if wizard.form.forms %}#}
@@ -88,7 +88,7 @@
                               {% endif %}
 
                           </form>
-                          <div class="col-lg-4">
+                          <div class="col-sm-4">
                               <div class="text-center">
                                   <div style="margin-top: 20px">
                                       <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>

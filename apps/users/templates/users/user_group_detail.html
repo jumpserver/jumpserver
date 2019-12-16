@@ -91,9 +91,9 @@
 
                                         {% for user in user_group.users.all %}
                                         <tr>
-                                          <td ><b class="bdg_user" data-uid={{ user.id }}>{{ user.name }}</b></td>
+                                          <td ><b class="bdg_user" >{{ user.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-remove-user" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-remove-user" data-uid={{ user.id }} type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -110,73 +110,51 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.users_selected = {};
 
-function updateGroupMember(users) {
-    var the_url = "{% url 'api-users:user-group-update-user' pk=user_group.id %}";
-    var body = {
-        users: Object.assign([], users)
-    };
-    var success = function(data) {
-        // remove all the selected groups from select > option and rendered ul element;
-        $('.select2-selection__rendered').empty();
-        $('#slct_users').val('');
-        $.map(jumpserver.users_selected, function(user_name, index) {
-            $('#opt_' + index).remove();
-            // change tr html of users
-            $('.user_edit tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_user" data-uid="' + index + '">' + user_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-user" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.selected_groups
-        jumpserver.users_selected = {};
-    };
+var usersGroupsRelationUrl = "{% url 'api-users:users-groups-relation-list' %}";
+
+function addObjects(objectsId) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = usersGroupsRelationUrl;
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {usergroup: "{{ object.id }}"};
+        data["user"] = v;
+        body.push(data)
+    });
     requestApi({
-        url: the_url,
+        url: theUrl,
         body: JSON.stringify(body),
-        success: success
+        method: "POST",
+        success: reloadPage
+    });
+}
+
+function removeObject(objectId, type) {
+    if (!objectId)  {
+        return
+    }
+    var theUrl = usersGroupsRelationUrl;
+    theUrl = setUrlParam(theUrl, 'usergroup', "{{ object.id }}");
+    theUrl = setUrlParam(theUrl, 'user', objectId);
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: reloadPage
     });
 }
 
 $(document).ready(function () {
-   $('.select2').select2()
-          .on('select2:select', function(evt) {
-            var data = evt.params.data;
-            jumpserver.users_selected[data.id] = data.text;
-        }).on('select2:unselect', function(evt) {
-            var data = evt.params.data;
-            delete jumpserver.users_selected[data.id]
-        });
+   $('.select2').select2();
     usersSelect2Init('#slct_users')
 }).on('click', '.btn-remove-user', function() {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_user');
-    var uid = $badge.data('uid');
-    var user_name = $badge.html() || $badge.text();
-    $('#slct_users').append(
-        '<option value="' + uid + '" id="opt_' + uid + '">' + user_name + '</option>'
-    );
-    $tr.remove();
-    var users = $('.bdg_user').map(function() {
-        return $(this).data('uid');
-    }).get();
-    updateGroupMember(users)
+    var objectId = $(this).data("uid");
+    removeObject(objectId);
 }).on('click', '#btn_add_user', function() {
-    if (Object.keys(jumpserver.users_selected).length === 0) {
-        return false;
-    }
-    var users = $('.bdg_user').map(function() {
-        return $(this).data('uid');
-    }).get();
-    $.map(jumpserver.users_selected, function(value, index) {
-        users.push(index);
-        $('#opt_' + index).remove();
-    });
-    updateGroupMember(users)
+    var objectsId = $("#slct_users").val();
+    addObjects(objectsId);
 }).on('click', '.btn-delete-user-group', function () {
     var $this = $(this);
     var name = "{{ user_group.name }}";
@@ -185,5 +163,6 @@ $(document).ready(function () {
     var redirect_url = "{% url 'users:user-group-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })
+
 </script>
 {% endblock %}
