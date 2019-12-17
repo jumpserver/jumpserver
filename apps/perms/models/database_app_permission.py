@@ -21,3 +21,6 @@ class DatabaseAppPermission(BasePermission):
         unique_together = [('org_id', 'name')]
         verbose_name = _('DatabaseApp permission')
         ordering = ('name',)
+
+    def get_all_database_apps(self):
+        return self.database_apps.all()

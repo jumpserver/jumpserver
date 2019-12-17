@@ -18,6 +18,10 @@
                                 <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
                                 </a>
                             </li>
+                            <li>
+                                <a href="{% url 'perms:database-app-permission-database-app-list' pk=database_app_permission.id  %}" class="text-center">
+                                    <i class="fa fa-inbox"></i> {% trans 'DatabaseApp' %}</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">

@@ -14,6 +14,8 @@ __all__ = [
     'DatabaseAppPermissionUserRelationViewSet',
     'DatabaseAppPermissionUserGroupRelationViewSet',
     'DatabaseAppPermissionAllUserListApi',
+    'DatabaseAppPermissionDatabaseAppRelationViewSet',
+    'DatabaseAppPermissionAllDatabaseAppListApi',
 ]
 
 
@@ -71,3 +73,36 @@ class DatabaseAppPermissionAllUserListApi(generics.ListAPIView):
             *self.serializer_class.Meta.only_fields
         )
         return users
+
+
+class DatabaseAppPermissionDatabaseAppRelationViewSet(RelationMixin):
+    serializer_class = serializers.DatabaseAppPermissionDatabaseAppRelationSerializer
+    model = models.DatabaseAppPermission.database_apps.through
+    permission_classes = (IsOrgAdmin,)
+    filterset_fields = [
+        'id', 'databaseapp', 'databaseapppermission',
+    ]
+    search_fields = [
+        "id", "databaseapp__name", "databaseapppermission__name"
+    ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset \
+            .annotate(databaseapp_display=F('databaseapp__name'))
+        return queryset
+
+
+class DatabaseAppPermissionAllDatabaseAppListApi(generics.ListAPIView):
+    permission_classes = (IsOrgAdmin,)
+    serializer_class = serializers.DatabaseAppPermissionAllDatabaseAppSerializer
+    filter_fields = ("name",)
+    search_fields = filter_fields
+
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+        perm = get_object_or_404(models.DatabaseAppPermission, pk=pk)
+        database_apps = perm.get_all_database_apps().only(
+            *self.serializer_class.Meta.only_fields
+        )
+        return database_apps

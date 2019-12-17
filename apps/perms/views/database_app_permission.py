@@ -11,6 +11,7 @@ from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from users.models import UserGroup
+from applications.models import DatabaseApp
 
 from .. import models, forms
 
@@ -18,7 +19,7 @@ from .. import models, forms
 __all__ = [
     'DatabaseAppPermissionListView', 'DatabaseAppPermissionCreateView',
     'DatabaseAppPermissionUpdateView', 'DatabaseAppPermissionDetailView',
-    'DatabaseAppPermissionUserView'
+    'DatabaseAppPermissionUserView', 'DatabaseAppPermissionDatabaseAppView',
 ]
 
 
@@ -110,9 +111,37 @@ class DatabaseAppPermissionUserView(PermissionsMixin,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-#
-#
-# class DatabaseAppPermissionDatabaseAppView(PermissionsMixin,
-#                                            SingleObjectMixin,
-#                                            ListView):
-#     pass
+
+
+class DatabaseAppPermissionDatabaseAppView(PermissionsMixin,
+                                           SingleObjectMixin,
+                                           ListView):
+    template_name = 'perms/database_app_permission_database_app.html'
+    context_object_name = 'database_app_permission'
+    paginate_by = settings.DISPLAY_PER_PAGE
+    object = None
+    permission_classes = [IsOrgAdmin]
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(
+            queryset=models.DatabaseAppPermission.objects.all()
+        )
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = list(self.object.get_all_database_apps())
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        database_apps = self.object.get_all_database_apps().values_list('id', flat=True)
+        database_apps = [str(i) for i in database_apps]
+        context = {
+            'app': _('Perms'),
+            'database_apps': database_apps,
+            'database_apps_remain': DatabaseApp.objects.exclude(
+                granted_by_permissions=self.object
+            ),
+            'action': _('DatabaseApp permission DatabaseApp list'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

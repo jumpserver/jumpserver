@@ -30,5 +30,5 @@ urlpatterns = [
     path('database-app-permission/<uuid:pk>/update/', views.DatabaseAppPermissionUpdateView.as_view(), name='database-app-permission-update'),
     path('database-app-permission/<uuid:pk>/', views.DatabaseAppPermissionDetailView.as_view(), name='database-app-permission-detail'),
     path('database-app-permission/<uuid:pk>/user/', views.DatabaseAppPermissionUserView.as_view(), name='database-app-permission-user-list'),
-    # path('database-app-permission/<uuid:pk>/database-app/', views.DatabaseAppPermissionDatabaseAppView.as_view(), name='database-app-permission-database-app-list'),
+    path('database-app-permission/<uuid:pk>/database-app/', views.DatabaseAppPermissionDatabaseAppView.as_view(), name='database-app-permission-database-app-list'),
 ]
