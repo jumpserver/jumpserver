@@ -1,0 +1,61 @@
+# coding: utf-8
+#
+from rest_framework import serializers
+
+from applications.models import DatabaseApp
+from common.mixins import BulkSerializerMixin
+from common.serializers import AdaptedBulkListSerializer
+
+from .. import models
+
+__all__ = [
+    'DatabaseAppPermissionUserRelationSerializer',
+    'DatabaseAppPermissionUserGroupRelationSerializer',
+    'DatabaseAppPermissionAllUserSerializer',
+]
+
+
+class RelationMixin(BulkSerializerMixin, serializers.Serializer):
+    databaseapppermission_display = serializers.ReadOnlyField()
+
+    def get_field_names(self, declared_fields, info):
+        fields = super().get_field_names(declared_fields, info)
+        fields.extend(['databaseapppermission', "databaseapppermission_display"])
+        return fields
+
+    class Meta:
+        list_serializer_class = AdaptedBulkListSerializer
+
+
+class DatabaseAppPermissionUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    user_display = serializers.ReadOnlyField()
+
+    class Meta(RelationMixin.Meta):
+        model = models.DatabaseAppPermission.users.through
+        fields = [
+            'id', 'user', 'user_display',
+        ]
+
+
+class DatabaseAppPermissionUserGroupRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    usergroup_display = serializers.ReadOnlyField()
+
+    class Meta(RelationMixin.Meta):
+        model = models.DatabaseAppPermission.user_groups.through
+        fields = [
+            'id', 'usergroup', "usergroup_display",
+        ]
+
+
+class DatabaseAppPermissionAllUserSerializer(serializers.ModelSerializer):
+    user = serializers.UUIDField(read_only=True, source='id')
+    user_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DatabaseApp
+        only_fields = ['id', 'username', 'name']
+        fields = ['user', 'user_display']
+
+    @staticmethod
+    def get_user_display(obj):
+        return str(obj)

@@ -7,8 +7,10 @@ from django.views.generic import (
     TemplateView, CreateView, UpdateView, DetailView, ListView
 )
 from django.views.generic.edit import SingleObjectMixin
+from django.conf import settings
 
 from common.permissions import PermissionsMixin, IsOrgAdmin
+from users.models import UserGroup
 
 from .. import models, forms
 
@@ -16,7 +18,7 @@ from .. import models, forms
 __all__ = [
     'DatabaseAppPermissionListView', 'DatabaseAppPermissionCreateView',
     'DatabaseAppPermissionUpdateView', 'DatabaseAppPermissionDetailView',
-    # 'DatabaseAppPermissionDatabaseAppView', 'DatabaseAppPermissionUserView'
+    'DatabaseAppPermissionUserView'
 ]
 
 
@@ -79,10 +81,35 @@ class DatabaseAppPermissionDetailView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-# class DatabaseAppPermissionUserView(PermissionsMixin,
-#                                     SingleObjectMixin,
-#                                     ListView):
-#     pass
+class DatabaseAppPermissionUserView(PermissionsMixin,
+                                    SingleObjectMixin,
+                                    ListView):
+    template_name = 'perms/database_app_permission_user.html'
+    context_object_name = 'database_app_permission'
+    paginate_by = settings.DISPLAY_PER_PAGE
+    object = None
+    permission_classes = [IsOrgAdmin]
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=models.DatabaseAppPermission.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = list(self.object.get_all_users())
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        users = [str(i) for i in self.object.users.all().values_list('id', flat=True)]
+        user_groups_remain = UserGroup.objects.exclude(
+            databaseapppermission=self.object)
+        context = {
+            'app': _('Perms'),
+            'action': _('DatabaseApp permission user list'),
+            'users': users,
+            'user_groups_remain': user_groups_remain,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 #
 #
 # class DatabaseAppPermissionDatabaseAppView(PermissionsMixin,
