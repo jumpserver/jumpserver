@@ -15,7 +15,7 @@ from ..forms import CommandExecutionForm
 
 
 __all__ = [
-    'CommandExecutionListView', 'CommandExecutionStartView'
+    'CommandExecutionListView', 'CommandExecutionCreateView'
 ]
 
 
@@ -55,7 +55,7 @@ class CommandExecutionListView(PermissionsMixin, DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class CommandExecutionStartView(PermissionsMixin, TemplateView):
+class CommandExecutionCreateView(PermissionsMixin, TemplateView):
     template_name = 'ops/command_execution_create.html'
     form_class = CommandExecutionForm
     permission_classes = [IsValidUser]

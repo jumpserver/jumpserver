@@ -46,6 +46,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     被授权资产的数据结构
     """
     protocols = ProtocolsField(label=_('Protocols'), required=False, read_only=True)
+    platform = serializers.ReadOnlyField(source='platform_base')
 
     class Meta:
         model = Asset

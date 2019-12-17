@@ -99,10 +99,10 @@ class Task(models.Model):
 
     @property
     def history_summary(self):
-        history = self.get_run_history()
+        history = self.get_run_history().values('is_success')
         total = len(history)
-        success = len([history for history in history if history.is_success])
-        failed = len([history for history in history if not history.is_success])
+        success = len([history for history in history if history['is_success']])
+        failed = total - success
         return {'total': total, 'success': success, 'failed': failed}
 
     def get_run_history(self):
