@@ -4,7 +4,6 @@
 from django.utils.translation import ugettext as _
 from django import forms
 from orgs.mixins.forms import OrgModelForm
-from orgs.utils import current_org
 
 from ..models import RemoteAppPermission
 
@@ -43,13 +42,3 @@ class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
                 attrs={'class': 'select2', 'data-placeholder': _('System user')}
             )
         }
-
-    def clean_user_groups(self):
-        users = self.cleaned_data.get('users')
-        user_groups = self.cleaned_data.get('user_groups')
-
-        if not users and not user_groups:
-            raise forms.ValidationError(
-                _("User or group at least one required")
-            )
-        return self.cleaned_data['user_groups']
