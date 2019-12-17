@@ -14,7 +14,7 @@ router.register('database-app-permissions-database-apps-relations', api.Database
 
 user_permission_urlpatterns = [
     path('<uuid:pk>/database-apps/', api.UserGrantedDatabaseAppsApi.as_view(), name='user-database-apps'),
-    path('database-apps/', api.UserGrantedDatabaseAppsApi.as_view(), name='user-database-apps'),
+    path('database-apps/', api.UserGrantedDatabaseAppsApi.as_view(), name='my-database-apps'),
 
     # DatabaseApps as tree
     path('<uuid:pk>/database-apps/tree/', api.UserGrantedDatabaseAppsAsTreeApi.as_view(), name='user-databases-apps-tree'),

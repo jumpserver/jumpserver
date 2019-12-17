@@ -7,13 +7,13 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 
-from common.permissions import PermissionsMixin, IsOrgAdmin
+from common.permissions import PermissionsMixin, IsOrgAdmin, IsValidUser
 
 from .. import models, const, forms
 
 __all__ = [
     'DatabaseAppListView', 'DatabaseAppCreateView', 'DatabaseAppUpdateView',
-    'DatabaseAppDetailView'
+    'DatabaseAppDetailView', 'UserDatabaseAppListView',
 ]
 
 
@@ -98,6 +98,18 @@ class DatabaseAppDetailView(PermissionsMixin, DetailView):
         context = {
             'app': _('Applications'),
             'action': _('DatabaseApp detail'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserDatabaseAppListView(PermissionsMixin, TemplateView):
+    template_name = 'applications/user_database_app_list.html'
+    permission_classes = [IsValidUser]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'action': _('My DatabaseApp'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
