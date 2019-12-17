@@ -45,6 +45,9 @@
             <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
             <li id="label"><a href="{% url 'assets:label-list' %}">{% trans 'Labels' %}</a></li>
             <li id="cmd-filter"><a href="{% url 'assets:cmd-filter-list' %}">{% trans 'Command filters' %}</a></li>
+            {% if request.user.is_superuser %}
+            <li id="platform"><a href="{% url 'assets:platform-list' %}">{% trans 'Platform list' %}</a></li>
+            {% endif %}
         </ul>
     </li>
 {% endif %}

@@ -27,10 +27,17 @@ class IDSpmFilterMixin:
 
 class SerializerMixin:
     def get_serializer_class(self):
-        if self.request.method.lower() == 'get' and\
-                self.request.query_params.get('draw') \
-                and hasattr(self, 'serializer_display_class'):
-            return self.serializer_display_class
+        serializer_class = None
+        if hasattr(self, 'serializer_classes') and \
+                isinstance(self.serializer_classes, dict):
+            if self.action == 'list' and self.request.query_params.get('draw'):
+                serializer_class = self.serializer_classes.get('display')
+            if serializer_class is None:
+                serializer_class = self.serializer_classes.get(
+                    self.action, self.serializer_classes.get('default')
+                )
+        if serializer_class:
+            return serializer_class
         return super().get_serializer_class()
 
 

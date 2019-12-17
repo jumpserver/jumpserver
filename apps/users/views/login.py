@@ -4,13 +4,13 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.views.generic import RedirectView
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect
 from django.shortcuts import reverse, redirect
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateView
 from django.conf import settings
 from django.urls import reverse_lazy
 from formtools.wizard.views import SessionWizardView
+from django.views.generic import FormView
 
 from common.utils import get_object_or_none
 from common.permissions import PermissionsMixin, IsValidUser
@@ -33,22 +33,24 @@ class UserLoginView(RedirectView):
     query_string = True
 
 
-class UserForgotPasswordView(TemplateView):
+class UserForgotPasswordView(FormView):
     template_name = 'users/forgot_password.html'
+    form_class = forms.UserForgotPasswordForm
 
-    def post(self, request):
-        email = request.POST.get('email')
+    def form_valid(self, form):
+        request = self.request
+        email = form.cleaned_data['email']
         user = get_object_or_none(User, email=email)
         if not user:
             error = _('Email address invalid, please input again')
             return self.get(request, errors=error)
         elif not user.can_update_password():
-            error = _('User auth from {}, go there change password'.format(user.source))
+            error = _('User auth from {}, go there change password'.format(
+                user.source))
             return self.get(request, errors=error)
         else:
             send_reset_password_mail(user)
-            return HttpResponseRedirect(
-                reverse('users:forgot-password-sendmail-success'))
+            return redirect('users:forgot-password-sendmail-success')
 
 
 class UserForgotPasswordSendmailSuccessView(TemplateView):
@@ -79,44 +81,47 @@ class UserResetPasswordSuccessView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UserResetPasswordView(TemplateView):
+class UserResetPasswordView(FormView):
     template_name = 'users/reset_password.html'
+    form_class = forms.UserTokenResetPasswordForm
 
     def get(self, request, *args, **kwargs):
-        token = request.GET.get('token', '')
+        context = self.get_context_data(**kwargs)
+        errors = kwargs.get('errors')
+        if errors:
+            context['errors'] = errors
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        token = self.request.GET.get('token', '')
         user = User.validate_reset_password_token(token)
         if not user:
-            kwargs.update({'errors': _('Token invalid or expired')})
-        else:
-            check_rules = get_password_check_rules()
-            kwargs.update({'password_check_rules': check_rules})
-        return super().get(request, *args, **kwargs)
+            context['errors'] = _('Token invalid or expired')
+            context['token_invalid'] = True
+        check_rules = get_password_check_rules()
+        context['password_check_rules'] = check_rules
+        return context
 
-    def post(self, request, *args, **kwargs):
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password-confirm')
-        token = request.GET.get('token')
-
-        if password != password_confirm:
-            return self.get(request, errors=_('Password not same'))
-
+    def form_valid(self, form):
+        token = self.request.GET.get('token')
         user = User.validate_reset_password_token(token)
         if not user:
-            return self.get(request, errors=_('Token invalid or expired'))
+            return self.get(self.request, errors=_('Token invalid or expired'))
+
         if not user.can_update_password():
-            error = _('User auth from {}, go there change password'.format(user.source))
-            return self.get(request, errors=error)
+            errors = _('User auth from {}, go there change password'.format(user.source))
+            return self.get(self.request, errors=errors)
 
+        password = form.cleaned_data['new_password']
         is_ok = check_password_rules(password)
         if not is_ok:
-            return self.get(
-                request,
-                errors=_('* Your password does not meet the requirements')
-            )
+            errors = _('* Your password does not meet the requirements')
+            return self.get(self.request, errors=errors)
 
         user.reset_password(password)
         User.expired_reset_password_token(token)
-        return HttpResponseRedirect(reverse('users:reset-password-success'))
+        return redirect('users:reset-password-success')
 
 
 class UserFirstLoginView(PermissionsMixin, SessionWizardView):
@@ -177,5 +182,4 @@ class UserFirstLoginView(PermissionsMixin, SessionWizardView):
                 choices = [(k, v) for k, v in choices if k in [0, 1]]
             form.fields["mfa_level"].choices = choices
             form.fields["mfa_level"].initial = self.request.user.mfa_level
-
         return form

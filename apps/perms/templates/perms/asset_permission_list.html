@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends '_base_asset_tree_list.html' %}
 {% load static %}
 {% load i18n %}
 
@@ -12,56 +12,36 @@
         .toggle {
             cursor: pointer;
         }
-        .detail-key {
-            width: 70px;
-        }
     </style>
 {% endblock %}
 
-{% block content %}
-<div class="wrapper wrapper-content">
-   <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px;padding-right: 0">
-           {% include 'assets/_node_tree.html' %}
-       </div>
-       <div class="col-lg-9 animated fadeInRight" id="split-right">
-           <div class="tree-toggle">
-               <div class="btn btn-sm btn-primary tree-toggle-btn">
-                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
-               </div>
-           </div>
-          <div class="mail-box-header">
-              <div class="btn-group uc pull-left m-r-5">
-                 <button class="btn btn-sm btn-primary btn-create-permission">
-                     {% trans "Create permission" %}
-                 </button>
-                 <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
-                 <ul class="dropdown-menu">
-                     <li><a class="refresh-asset-permission-cache" href="#">{% trans 'Refresh permission cache' %}</a></li>
-                 </ul>
-              </div>
-              <table class="table table-striped table-bordered table-hover" id="permission_list_table" style="width: 100%">
-                  <thead>
-                  <tr>
-                       <th></th>
-                       <th>{% trans 'Name' %}</th>
-                       <th class="text-center">{% trans 'User' %}</th>
-                       <th class="text-center">{% trans 'User group' %}</th>
-                       <th class="text-center">{% trans 'Asset' %}</th>
-                       <th class="text-center">{% trans 'Node'%}</th>
-                       <th class="text-center">{% trans 'System user' %}</th>
-                       <th class="text-center">{% trans 'Validity' %}</th>
-                       <th class="text-center" >{% trans 'Action' %}</th>
-                   </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-              </table>
-          </div>
-       </div>
-   </div>
-</div>
-
+{% block table_container %}
+     <div class="btn-group uc pull-left m-r-5">
+        <button class="btn btn-sm btn-primary btn-create-permission">
+            {% trans "Create permission" %}
+        </button>
+        <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a class="refresh-asset-permission-cache" href="#">{% trans 'Refresh permission cache' %}</a></li>
+        </ul>
+     </div>
+     <table class="table table-striped table-bordered table-hover" id="permission_list_table" style="width: 100%">
+         <thead>
+         <tr>
+              <th></th>
+              <th>{% trans 'Name' %}</th>
+              <th class="text-center">{% trans 'User' %}</th>
+              <th class="text-center">{% trans 'User group' %}</th>
+              <th class="text-center">{% trans 'Asset' %}</th>
+              <th class="text-center">{% trans 'Node'%}</th>
+              <th class="text-center">{% trans 'System user' %}</th>
+              <th class="text-center">{% trans 'Validity' %}</th>
+              <th class="text-center" >{% trans 'Action' %}</th>
+          </tr>
+         </thead>
+         <tbody>
+         </tbody>
+     </table>
 {% include '_filter_dropdown.html' %}
 {% endblock %}
 

@@ -184,6 +184,7 @@ class Config(dict):
         'ASSETS_PERM_CACHE_ENABLE': False,
         'SYSLOG_ADDR': '',  # '192.168.0.1:514'
         'SYSLOG_FACILITY': 'user',
+        'SYSLOG_SOCKTYPE': 2,
         'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
         'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
         'FLOWER_URL': "127.0.0.1:5555",
@@ -282,10 +283,10 @@ class DynamicConfig:
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
-        if self.get('AUTH_OPENID'):
+        if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
-        if self.get('AUTH_RADIUS'):
+        if self.static_config.get('AUTH_RADIUS'):
             backends.insert(0, 'authentication.backends.radius.RadiusBackend')
         return backends
 
@@ -442,10 +443,10 @@ class ConfigManager:
         try:
             from config import config as c
             self.from_object(c)
-            return self.config
+            return True
         except ImportError:
             pass
-        return None
+        return False
 
     def load_from_yml(self):
         for i in ['config.yml', 'config.yaml']:
@@ -453,7 +454,7 @@ class ConfigManager:
                 continue
             loaded = self.from_yaml(i)
             if loaded:
-                return self.config
+                return True
         return False
 
     @classmethod
@@ -462,20 +463,20 @@ class ConfigManager:
         cls.config_class = config_class
         if not root_path:
             root_path = PROJECT_DIR
+
         manager = cls(root_path=root_path)
-        config = manager.load_from_object()
-        if config:
-            return config
-        config = manager.load_from_yml()
-        if config:
-            return config
-        msg = """
+        if manager.load_from_object():
+            return manager.config
+        elif manager.load_from_yml():
+            return manager.config
+        else:
+            msg = """
 
-        Error: No config file found.
+            Error: No config file found.
 
-        You can run `cp config_example.yml config.yml`, and edit it.
-        """
-        raise ImportError(msg)
+            You can run `cp config_example.yml config.yml`, and edit it.
+            """
+            raise ImportError(msg)
 
     @classmethod
     def get_dynamic_config(cls, config):

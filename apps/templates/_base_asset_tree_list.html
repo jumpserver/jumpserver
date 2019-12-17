@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block help_message %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper wrapper-content">
+   <div class="row">
+       <div class="col-sm-3" id="split-left" style="padding-left: 3px;padding-right: 0">
+           {% include 'assets/_node_tree.html' %}
+       </div>
+       <div class="col-sm-9 animated fadeInRight" id="split-right">
+           <div class="tree-toggle" style="z-index: 10">
+               <div class="btn btn-sm btn-primary tree-toggle-btn" onclick="toggleSpliter()">
+                   <i class="fa fa-angle-left fa-x" id="toggle-icon"></i>
+               </div>
+           </div>
+           <div class="mail-box-header">
+               {% block table_container %}
+                    <table class="table table-striped table-bordered table-hover" id="{% block table_id %}editable{% endblock %}" >
+                        <thead>
+                            <tr>
+                                {% block table_head %} {% endblock %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% block table_body %} {% endblock %}
+                        </tbody>
+                    </table>
+                {% endblock %}
+           </div>
+       </div>
+   </div>
+</div>
+<script>
+var showTree = 1;
+function toggleSpliter() {
+    if (showTree === 1) {
+        $("#split-left").hide(500, function () {
+            $("#split-right").attr("class", "col-sm-12");
+            $("#toggle-icon").attr("class", "fa fa-angle-right fa-x");
+            showTree = 1;
+        });
+    } else {
+        console.log("hide")
+        $("#split-right").attr("class", "col-sm-9");
+        $("#toggle-icon").attr("class", "fa fa-angle-left fa-x");
+        $("#split-left").show(500);
+        showTree = 0;
+    }
+}
+</script>
+{% endblock %}

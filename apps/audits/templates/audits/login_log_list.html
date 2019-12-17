@@ -102,47 +102,47 @@
 
 
 {% block custom_foot_js %}
-    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
-    <script>
-        $(document).ready(function() {
-            jumpserver.initStaticTable('#login_log_table');
-            $('#date .input-daterange').datepicker({
-                format: "yyyy-mm-dd",
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        jumpserver.initStaticTable('#login_log_table');
+        $('#date .input-daterange').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
 
-            });
-            $('.select2').select2({
-                dropdownAutoWidth: true,
-                width: 'auto'
-            });
+        });
+        $('.select2').select2({
+            dropdownAutoWidth: true,
+            width: 'auto'
+        });
+    })
+    .on('click', '.btn_export', function () {
+        var date_from = $('#id_date_from').val();
+        var date_to = $('#id_date_to').val();
+        var user = $('.select2 option:selected').val();
+        var keyword = $('#search').val();
+        $.ajax({
+            url: "{% url "audits:login-log-export" %}",
+            method: 'POST',
+            data: JSON.stringify({
+                'date_from':date_from,
+                'date_to':date_to,
+                'user':user,
+                'keyword':keyword
+            }),
+            dataType: "json",
+            success: function (data, textStatus) {
+                window.open(data.redirect)
+            },
+            error: function () {
+                toastr.error('Export failed');
+            }
         })
-        .on('click', '.btn_export', function () {
-            var date_from = $('#id_date_from').val();
-            var date_to = $('#id_date_to').val();
-            var user = $('.select2 option:selected').val();
-            var keyword = $('#search').val();
-            $.ajax({
-                url: "{% url "audits:login-log-export" %}",
-                method: 'POST',
-                data: JSON.stringify({
-                    'date_from':date_from,
-                    'date_to':date_to,
-                    'user':user,
-                    'keyword':keyword
-                }),
-                dataType: "json",
-                success: function (data, textStatus) {
-                    window.open(data.redirect)
-                },
-                error: function () {
-                    toastr.error('Export failed');
-                }
-            })
-        })
-    </script>
+    })
+</script>
 {% endblock %}
 

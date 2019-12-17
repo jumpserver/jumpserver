@@ -1,0 +1,62 @@
+{% load i18n %}
+<div class="" style="float: right">
+   <div class=" btn-group">
+        <button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle">CSV <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li id="li_csv_export">
+                <a id="btn_csv_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
+                </a>
+            </li>
+            <li id="li_csv_import">
+                <a id="btn_csv_import" data-toggle="modal" data-target="#csv_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+                </a>
+            </li>
+            <li id="li_csv_update">
+                <a id="btn_csv_update" data-toggle="modal" data-target="#csv_update_modal" tabindex="0">
+                <span>{% trans "Update" %}</span>
+                </a>
+            </li>
+        </ul>
+   </div>
+</div>
+{% include '_csv_import_modal.html' %}
+{% include '_csv_update_modal.html' %}
+
+<script>
+var csvTable = null;
+var csvListUrl = null;
+var csvExportCallback = null;
+
+function initCsvImportExport(table, objectType, listUrl, hide) {
+    csvTable = table;
+    $(".csv_object_type").html(objectType);
+    csvListUrl = listUrl ? listUrl : csvTable.ajax.url();
+    if (hide && hide.length > 0) {
+        hide.forEach(function (v) {
+            $("#li_csv_" + v).hide();
+        })
+    }
+}
+
+var datatableInternalParams = ['draw', 'limit', 'order', 'offset'];
+$(document).ready(function () {
+
+}).on('click', '#btn_csv_export', function () {
+    var selectedObjects = csvTable.selected;
+    function _export() {
+        APIExportCSV({
+           listUrl: csvListUrl,
+           objectsId: selectedObjects,
+           table: csvTable
+        });
+    }
+    if (csvExportCallback) {
+        csvExportCallback(_export)
+    } else {
+        _export();
+    }
+
+})
+</script>

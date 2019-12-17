@@ -2,11 +2,8 @@
 #
 
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
-from django.conf import settings
-from users.utils import get_login_failed_count
 
 
 class UserLoginForm(forms.Form):

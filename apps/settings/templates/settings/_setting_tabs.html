@@ -1,0 +1,37 @@
+{% load i18n %}
+<ul class="nav nav-tabs">
+    <li id="tab-basic">
+        <a href="{% url 'settings:basic-setting' %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Basic setting' %}</a>
+    </li>
+    <li id="tab-email" >
+        <a href="{% url 'settings:email-setting' %}"  class="text-center"><i class="fa fa-envelope"></i> {% trans 'Email setting' %} </a>
+    </li>
+    <li id="tab-email-content" >
+        <a href="{% url 'settings:email-content-setting' %}"  class="text-center"><i class="fa fa-file-text"></i> {% trans 'Email content setting' %} </a>
+    </li>
+    <li id="tab-ldap">
+        <a href="{% url 'settings:ldap-setting' %}" class="text-center"><i class="fa fa-archive"></i> {% trans 'LDAP setting' %} </a>
+    </li>
+    <li id="tab-terminal">
+        <a href="{% url 'settings:terminal-setting' %}" class="text-center"><i class="fa fa-hdd-o"></i> {% trans 'Terminal setting' %} </a>
+    </li>
+    <li id="tab-security">
+        <a href="{% url 'settings:security-setting' %}" class="text-center"><i class="fa fa-lock"></i> {% trans 'Security setting' %} </a>
+    </li>
+</ul>
+
+<script>
+$(document).ready(function () {
+    var path = location.pathname;
+    if (path.endsWith('/')) {
+        path = path.substring(0, path.length-1)
+    }
+    var pathList = path.split('/');
+    var tabId = pathList[pathList.length-1];
+    if (tabId === "settings") {
+        tabId = "basic"
+    }
+    tabId = "#tab-" + tabId;
+    $(tabId).addClass("active")
+})
+</script>

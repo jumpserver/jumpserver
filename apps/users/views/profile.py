@@ -31,9 +31,9 @@ __all__ = [
     'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserPublicKeyGenerateView',
-    'UserOtpEnableAuthenticationView', 'UserOtpEnableInstallAppView',
+    'UserCheckPasswordView', 'UserOtpEnableInstallAppView',
     'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
-    'UserOtpDisableAuthenticationView', 'UserOtpUpdateView',
+    'UserDisableMFAView', 'UserOtpUpdateView',
 ]
 
 logger = get_logger(__name__)
@@ -140,23 +140,9 @@ class UserPublicKeyGenerateView(PermissionsMixin, View):
         return response
 
 
-class UserOtpEnableAuthenticationView(FormView):
-    template_name = 'users/user_password_authentication.html'
+class UserCheckPasswordView(FormView):
+    template_name = 'users/user_password_check.html'
     form_class = forms.UserCheckPasswordForm
-
-    def get_form(self, form_class=None):
-        user = get_user_or_tmp_user(self.request)
-        form = super().get_form(form_class=form_class)
-        form['username'].initial = user.username
-        return form
-
-    def get_context_data(self, **kwargs):
-        user = get_user_or_tmp_user(self.request)
-        context = {
-            'user': user
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         user = get_user_or_tmp_user(self.request)
@@ -165,10 +151,17 @@ class UserOtpEnableAuthenticationView(FormView):
         if not user:
             form.add_error("password", _("Password invalid"))
             return self.form_invalid(form)
+        if not user.mfa_is_otp():
+            user.enable_mfa()
+            user.save()
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('users:user-otp-enable-install-app')
+        if settings.OTP_IN_RADIUS:
+            success_url = reverse_lazy('users:user-otp-settings-success')
+        else:
+            success_url = reverse('users:user-otp-enable-install-app')
+        return success_url
 
 
 class UserOtpEnableInstallAppView(TemplateView):
@@ -213,23 +206,23 @@ class UserOtpEnableBindView(TemplateView, FormView):
 
     def save_otp(self, otp_secret_key):
         user = get_user_or_tmp_user(self.request)
-        user.enable_otp()
+        user.enable_mfa()
         user.otp_secret_key = otp_secret_key
         user.save()
 
 
-class UserOtpDisableAuthenticationView(FormView):
-    template_name = 'users/user_otp_authentication.html'
+class UserDisableMFAView(FormView):
+    template_name = 'users/user_disable_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-settings-success')
 
     def form_valid(self, form):
         user = self.request.user
         otp_code = form.cleaned_data.get('otp_code')
-        otp_secret_key = user.otp_secret_key
 
-        if check_otp_code(otp_secret_key, otp_code):
-            user.disable_otp()
+        valid = user.check_mfa(otp_code)
+        if valid:
+            user.disable_mfa()
             user.save()
             return super().form_valid(form)
         else:
@@ -237,15 +230,12 @@ class UserOtpDisableAuthenticationView(FormView):
             return super().form_invalid(form)
 
 
-class UserOtpUpdateView(UserOtpDisableAuthenticationView):
+class UserOtpUpdateView(UserDisableMFAView):
     success_url = reverse_lazy('users:user-otp-enable-bind')
 
 
 class UserOtpSettingsSuccessView(TemplateView):
     template_name = 'flash_message_standalone.html'
-
-    # def get(self, request, *args, **kwargs):
-    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         title, describe = self.get_title_describe()
@@ -265,8 +255,9 @@ class UserOtpSettingsSuccessView(TemplateView):
             auth_logout(self.request)
         title = _('MFA enable success')
         describe = _('MFA enable success, return login page')
-        if not user.otp_enabled:
+        if not user.mfa_enabled:
             title = _('MFA disable success')
             describe = _('MFA disable success, return login page')
 
         return title, describe
+

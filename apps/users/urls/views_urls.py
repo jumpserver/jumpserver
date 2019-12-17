@@ -20,10 +20,10 @@ urlpatterns = [
     path('profile/password/update/', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     path('profile/pubkey/update/', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
     path('profile/pubkey/generate/', views.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
-    path('profile/otp/enable/authentication/', views.UserOtpEnableAuthenticationView.as_view(), name='user-otp-enable-authentication'),
+    path('profile/otp/enable/authentication/', views.UserCheckPasswordView.as_view(), name='user-otp-enable-authentication'),
     path('profile/otp/enable/install-app/', views.UserOtpEnableInstallAppView.as_view(), name='user-otp-enable-install-app'),
     path('profile/otp/enable/bind/', views.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
-    path('profile/otp/disable/authentication/', views.UserOtpDisableAuthenticationView.as_view(), name='user-otp-disable-authentication'),
+    path('profile/otp/disable/authentication/', views.UserDisableMFAView.as_view(), name='user-otp-disable-authentication'),
     path('profile/otp/update/', views.UserOtpUpdateView.as_view(), name='user-otp-update'),
     path('profile/otp/settings-success/', views.UserOtpSettingsSuccessView.as_view(), name='user-otp-settings-success'),
 

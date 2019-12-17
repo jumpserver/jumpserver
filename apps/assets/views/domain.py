@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.views.generic import TemplateView, CreateView, \
-    UpdateView, DeleteView, DetailView
+from django.views.generic import (
+    TemplateView, CreateView, UpdateView, DeleteView, DetailView
+)
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse_lazy, reverse

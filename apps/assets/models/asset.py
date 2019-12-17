@@ -11,10 +11,12 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from .utils import Connectivity
+from common.fields.model import JsonDictTextField
+from common.utils import lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
+from .utils import Connectivity
 
-__all__ = ['Asset', 'ProtocolsMixin']
+__all__ = ['Asset', 'ProtocolsMixin', 'Platform']
 logger = logging.getLogger(__name__)
 
 
@@ -35,6 +37,13 @@ def default_node():
         return root
     except:
         return None
+
+
+class AssetManager(OrgManager):
+    def get_queryset(self):
+        return super().get_queryset().annotate(
+            platform_base=models.F('platform__base')
+        )
 
 
 class AssetQuerySet(models.QuerySet):
@@ -119,6 +128,41 @@ class NodesRelationMixin:
         return nodes
 
 
+class Platform(models.Model):
+    CHARSET_CHOICES = (
+        ('utf8', 'UTF-8'),
+        ('gbk', 'GBK'),
+    )
+    BASE_CHOICES = (
+        ('Linux', 'Linux'),
+        ('Unix', 'Unix'),
+        ('MacOS', 'MacOS'),
+        ('BSD', 'BSD'),
+        ('Windows', 'Windows'),
+        ('Other', 'Other'),
+    )
+    name = models.SlugField(verbose_name=_("Name"), unique=True, allow_unicode=True)
+    base = models.CharField(choices=BASE_CHOICES, max_length=16, default='Linux', verbose_name=_("Base"))
+    charset = models.CharField(default='utf8', choices=CHARSET_CHOICES, max_length=8, verbose_name=_("Charset"))
+    meta = JsonDictTextField(blank=True, null=True, verbose_name=_("Meta"))
+    internal = models.BooleanField(default=False, verbose_name=_("Internal"))
+    comment = models.TextField(blank=True, null=True, verbose_name=_("Comment"))
+
+    @classmethod
+    def default(cls):
+        linux, created = cls.objects.get_or_create(
+            defaults={'name': 'Linux'}, name='Linux'
+        )
+        return linux.id
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _("Platform")
+        # ordering = ('name',)
+
+
 class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     # Important
     PLATFORM_CHOICES = (
@@ -138,9 +182,8 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                                 choices=ProtocolsMixin.PROTOCOL_CHOICES,
                                 verbose_name=_('Protocol'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-
     protocols = models.CharField(max_length=128, default='ssh/22', blank=True, verbose_name=_("Protocols"))
-    platform = models.CharField(max_length=128, choices=PLATFORM_CHOICES, default='Linux', verbose_name=_('Platform'))
+    platform = models.ForeignKey(Platform, default=Platform.default, on_delete=models.PROTECT, verbose_name=_("Platform"), related_name='assets')
     domain = models.ForeignKey("assets.Domain", null=True, blank=True, related_name='assets', verbose_name=_("Domain"), on_delete=models.SET_NULL)
     nodes = models.ManyToManyField('assets.Node', default=default_node, related_name='assets', verbose_name=_("Nodes"))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
@@ -175,7 +218,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    objects = OrgManager.from_queryset(AssetQuerySet)()
+    objects = AssetManager.from_queryset(AssetQuerySet)()
     _connectivity = None
 
     def __str__(self):
@@ -191,19 +234,20 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         return True, warning
 
     def is_windows(self):
-        if self.platform in ("Windows", "Windows2016"):
-            return True
-        else:
-            return False
+        return self.platform_base == "Windows"
 
     def is_unixlike(self):
-        if self.platform not in ("Windows", "Windows2016", "Other"):
+        if self.platform_base not in ("Windows", "Windows2016", "Other"):
             return True
         else:
             return False
 
     def is_support_ansible(self):
-        return self.has_protocol('ssh') and self.platform not in ("Other",)
+        return self.has_protocol('ssh') and self.platform_base not in ("Other",)
+
+    @lazyproperty
+    def platform_base(self):
+        return self.platform.base
 
     @property
     def cpu_info(self):
@@ -264,9 +308,9 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
     def as_tree_node(self, parent_node):
         from common.tree import TreeNode
         icon_skin = 'file'
-        if self.platform.lower() == 'windows':
+        if self.platform_base.lower() == 'windows':
             icon_skin = 'windows'
-        elif self.platform.lower() == 'linux':
+        elif self.platform_base.lower() == 'linux':
             icon_skin = 'linux'
         data = {
             'id': str(self.id),
@@ -283,7 +327,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
                     'hostname': self.hostname,
                     'ip': self.ip,
                     'protocols': self.protocols_as_list,
-                    'platform': self.platform,
+                    'platform': self.platform_base,
                 }
             }
         }
