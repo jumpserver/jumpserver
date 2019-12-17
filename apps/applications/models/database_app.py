@@ -42,7 +42,7 @@ class DatabaseApp(CommonModelMixin, OrgModelMixin):
         verbose_name=_('Login mode')
     )
     user = models.CharField(
-        max_length=32, blank=True, db_index=True, verbose_name=_('Username')
+        max_length=32, blank=True, db_index=True, verbose_name=_('User')
     )
     password = EncryptCharField(
         max_length=128, blank=True, null=True, verbose_name=_('Password')
@@ -50,6 +50,9 @@ class DatabaseApp(CommonModelMixin, OrgModelMixin):
     comment = models.TextField(
         max_length=128, default='', blank=True, verbose_name=_('Comment')
     )
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         unique_together = [('org_id', 'name'), ]

@@ -17,13 +17,14 @@ class DatabaseAppSerializer(BulkOrgResourceModelSerializer):
         model = models.DatabaseApp
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'type', 'get_type_display', 'host', 'port', 'database',
-            'login_mode', 'user', 'password', 'comment',
+            'id', 'name', 'type', 'get_type_display', 'host', 'port',
+            'database', 'login_mode', 'get_login_mode_display',
+            'user', 'password', 'comment',
             'created_by', 'date_created', 'date_updated',
         ]
         read_only_fields = [
             'created_by', 'date_created', 'date_updated'
-            'get_type_display'
+            'get_type_display', 'get_login_mode_display'
         ]
 
     @staticmethod

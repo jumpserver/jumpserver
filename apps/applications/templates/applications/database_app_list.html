@@ -26,6 +26,7 @@
             <th class="text-center">{% trans 'Host' %}</th>
             <th class="text-center">{% trans 'Port' %}</th>
             <th class="text-center">{% trans 'Database' %}</th>
+            <th class="text-center">{% trans 'Login mode' %}</th>
             <th class="text-center">{% trans 'User' %}</th>
             <th class="text-center">{% trans 'Comment' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
@@ -48,7 +49,13 @@ function initTable() {
                     var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                     $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                 }},
-            {targets: 8, createdCell: function (td, cellData, rowData) {
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                    $(td).html(rowData.get_type_display)
+                }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                    $(td).html(rowData.get_login_mode_display)
+                }},
+            {targets: 9, createdCell: function (td, cellData, rowData) {
                     var update_btn = '<a href="{% url "applications:database-app-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
                     var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-rid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                     $(td).html(update_btn + del_btn)
@@ -58,10 +65,11 @@ function initTable() {
         columns: [
             {data: "id"},
             {data: "name" },
-            {data: "get_type_display", orderable: false},
+            {data: "type"},
             {data: "host"},
             {data: "port"},
             {data: "database"},
+            {data: "login_mode"},
             {data: "user"},
             {data: "comment"},
             {data: "id", orderable: false}
