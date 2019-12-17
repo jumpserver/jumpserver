@@ -15,6 +15,8 @@ router.register(r'database-apps', api.DatabaseAppViewSet, 'database-app')
 
 urlpatterns = [
     path('remote-apps/<uuid:pk>/connection-info/', api.RemoteAppConnectionInfoApi.as_view(), name='remote-app-connection-info'),
+    
+    path('database-apps/<uuid:pk>/connection-info/', api.DatabaseAppConnectionInfoApi.as_view(), name='database-app-connection-info'),
 ]
 
 old_version_urlpatterns = [

@@ -1,13 +1,15 @@
 # coding: utf-8
 #
 
+from rest_framework import serializers
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 
 from .. import models
 
 __all__ = [
-    'DatabaseAppSerializer'
+    'DatabaseAppSerializer',
+    'DatabaseAppConnectionInfoSerializer',
 ]
 
 
@@ -36,3 +38,11 @@ class DatabaseAppSerializer(BulkOrgResourceModelSerializer):
     def update(self, instance, validated_data):
         self.clean_password_field(validated_data)
         return super().update(instance, validated_data)
+
+
+class DatabaseAppConnectionInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.DatabaseApp
+        fields = [
+            'id', 'name', 'host', 'port', 'database', 'user', 'password'
+        ]
