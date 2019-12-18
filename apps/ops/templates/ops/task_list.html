@@ -10,7 +10,6 @@
             </th>
             <th class="text-left">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Run times' %}</th>
-            <th class="text-center">{% trans 'Versions' %}</th>
             <th class="text-center">{% trans 'Hosts' %}</th>
             <th class="text-center">{% trans 'Success' %}</th>
             <th class="text-center">{% trans 'Date' %}</th>
@@ -36,34 +35,40 @@ $(document).ready(function () {
                 $(td).html(innerHtml);
             }},
             {targets: 2, createdCell: function (td, cellData) {
+                var summary = cellData ? cellData.stat : {failed: 0, success: 0, total: 0};
                 var innerHtml = '<span class="text-danger">failed</span>/<span class="text-navy">success</span>/total';
-                if (cellData) {
-                    innerHtml = innerHtml.replace('failed', cellData.failed)
-                        .replace('success', cellData.success)
-                        .replace('total', cellData.total);
-                    $(td).html(innerHtml);
-                } else {
-                    $(td).html('')
-                }
+                innerHtml = innerHtml.replace('failed', summary.failed)
+                    .replace('success', summary.success)
+                    .replace('total', summary.total);
+                $(td).html(innerHtml);
             }},
-            {targets: 5, createdCell: function (td, cellData) {
+            {targets: 3, createdCell: function (td, cellData) {
+                var hostsAmount = cellData ? cellData.hosts_amount : 0;
+                 $(td).html(hostsAmount)
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
                 var successBtn = '<i class="fa fa-check text-navy"></i>';
                 var failedBtn = '<i class="fa fa-times text-danger"></i>';
-                if (cellData) {
+                if (cellData && cellData.is_success) {
                     $(td).html(successBtn)
                 } else {
                     $(td).html(failedBtn)
                 }
             }},
-            {targets: 6, createdCell: function (td, cellData) {
-                $(td).html(toSafeLocalDateStr(cellData));
+            {targets: 5, createdCell: function (td, cellData) {
+                if (cellData) {
+                    $(td).html(toSafeLocalDateStr(cellData.date_start));
+                } else {
+                    $(td).html('');
+                }
             }},
-            {targets: 7, createdCell: function (td, cellData) {
+            {targets: 6, createdCell: function (td, cellData) {
+                cellData = cellData ? cellData.timedelta : 0;
                 var delta = readableSecond(cellData);
                 $(td).html(delta);
             }},
             {
-                targets: 8,
+                targets: 7,
                 createdCell: function (td, cellData, rowData) {
                     var runBtn = '<a data-uid="ID" class="btn btn-xs btn-primary btn-run">{% trans "Run" %}</a> '.replace('ID', cellData);
                     var delBtn = '<a data-uid="ID" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>'.replace('ID', cellData);
@@ -73,10 +78,11 @@ $(document).ready(function () {
         ],
         ajax_url: '{% url "api-ops:task-list" %}',
         columns: [
-            {data: "id"}, {data: "name", className: "text-left"}, {data: "history_summary", orderable: false},
-            {data: "versions", orderable: false}, {data: "assets_amount", orderable: false},
-            {data: "is_success", orderable: false}, {data: "date_updated"},
-            {data: "timedelta", orderable:false}, {data: "id", orderable: false},
+            {data: "id"}, {data: "name", className: "text-left"},
+            {data: "latest_history", orderable: false},
+            {data: "latest_history", orderable: false},
+            {data: "latest_history", orderable: false}, {data: "latest_history"},
+            {data: "latest_history", orderable:false}, {data: "id", orderable: false},
         ],
         order: [],
         op_html: $('#actions').html()

@@ -4,6 +4,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.views import Response
+from django.db.models import Count, Q
 
 from common.permissions import IsOrgAdmin
 from common.serializers import CeleryTaskSerializer
@@ -31,6 +32,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(created_by=current_org.id)
         else:
             queryset = queryset.filter(created_by='')
+        queryset = queryset.select_related('latest_history')
         return queryset
 
 
