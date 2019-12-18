@@ -4,9 +4,8 @@ from django.db import migrations
 
 
 def get_storage_data(s):
-    from common.utils import get_signer
+    from common.utils import signer
     import json
-    signer = get_signer()
     value = s.value
     encrypted = s.encrypted
     if encrypted:

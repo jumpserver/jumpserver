@@ -80,11 +80,23 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is finished' %}:</td>
-                                            <td><b>{{ object.latest_history.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>
+                                                {% if object.latest_history.is_finished %}
+                                                    {% trans 'Yes' %}
+                                                {% else %}
+                                                    {% trans 'No' %}
+                                                {% endif %}
+                                            </b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
-                                            <td><b>{{ object.latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>
+                                                {% if object.latest_history.is_success %}
+                                                    {% trans 'Yes' %}
+                                                {% else %}
+                                                    {% trans 'No' %}
+                                                {% endif %}
+                                            </b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Contents' %}:</td>

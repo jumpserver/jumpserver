@@ -33,11 +33,14 @@ def get_after_app_ready_tasks():
 
 def register_as_period_task(
         crontab=None, interval=None, name=None,
+        args=(), kwargs=None,
         description=''):
     """
     Warning: Task must be have not any args and kwargs
     :param crontab:  "* * * * *"
     :param interval:  60*60*60
+    :param args: ()
+    :param kwargs: {}
     :param description: "
     :param name: ""
     :return:
@@ -58,7 +61,8 @@ def register_as_period_task(
                'task': task,
                'interval': interval,
                'crontab': crontab,
-               'args': (),
+               'args': args,
+               'kwargs': kwargs if kwargs else {},
                'enabled': True,
                'description': description
            }

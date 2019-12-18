@@ -5,9 +5,7 @@ from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
-from common.utils import get_signer
-
-signer = get_signer()
+from common.utils import signer
 
 
 class SettingQuerySet(models.QuerySet):

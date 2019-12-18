@@ -184,8 +184,11 @@ def encrypt_password(password, salt=None):
 
 
 def get_signer():
-    signer = Signer(settings.SECRET_KEY)
-    return signer
+    s = Signer(settings.SECRET_KEY)
+    return s
+
+
+signer = get_signer()
 
 
 def ensure_last_char_is_ascii(data):

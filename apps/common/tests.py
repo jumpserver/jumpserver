@@ -2,11 +2,10 @@ from django.test import TestCase
 
 # Create your tests here.
 
-from .utils import random_string, get_signer
+from .utils import random_string, signer
 
 
 def test_signer_len():
-    signer = get_signer()
     results = {}
     for i in range(1, 4096):
         s = random_string(i)
