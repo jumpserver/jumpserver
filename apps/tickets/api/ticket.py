@@ -13,7 +13,7 @@ class TicketViewSet(mixins.TicketMixin, viewsets.ModelViewSet):
     serializer_class = serializers.TicketSerializer
     queryset = models.Ticket.objects.all()
     permission_classes = (IsValidUser,)
-    filter_fields = ['status', 'title', 'action']
+    filter_fields = ['status', 'title', 'action', 'user_display']
     search_fields = ['user_display', 'title']
 
 
