@@ -5,8 +5,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.forms import OrgModelForm
-from orgs.utils import current_org
-from assets.models import Asset, Node
+from assets.models import Asset, Node, SystemUser
 from ..models import AssetPermission, Action
 
 __all__ = [
@@ -57,6 +56,12 @@ class AssetPermissionForm(OrgModelForm):
             assets_field.queryset = Asset.objects.none()
             nodes_field.queryset = Node.objects.none()
             users_field.queryset = []
+
+        # 过滤系统用户
+        system_users_field = self.fields.get('system_users')
+        system_users_field.queryset = SystemUser.objects.exclude(
+            protocol=SystemUser.PROTOCOL_MYSQL
+        )
 
     def set_nodes_initial(self, nodes):
         field = self.fields['nodes']

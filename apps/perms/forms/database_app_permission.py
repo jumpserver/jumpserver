@@ -4,6 +4,7 @@
 from django.utils.translation import ugettext as _
 from django import forms
 from orgs.mixins.forms import OrgModelForm
+from assets.models import SystemUser
 
 from ..models import DatabaseAppPermission
 
@@ -20,6 +21,12 @@ class DatabaseAppPermissionCreateUpdateForm(OrgModelForm):
             users_field.queryset = self.instance.users.all()
         else:
             users_field.queryset = []
+
+        # 过滤系统用户
+        system_users_field = self.fields.get('system_users')
+        system_users_field.queryset = SystemUser.objects.filter(
+            protocol=SystemUser.PROTOCOL_MYSQL
+        )
 
     class Meta:
         model = DatabaseAppPermission
