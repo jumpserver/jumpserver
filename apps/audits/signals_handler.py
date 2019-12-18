@@ -23,7 +23,7 @@ sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
 
 
-MODELS_EXCLUDE_RECORD = (
+MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
     'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
     'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
@@ -36,7 +36,7 @@ def create_operate_log(action, sender, resource):
     if not user or not user.is_authenticated:
         return
     model_name = sender._meta.object_name
-    if model_name not in MODELS_EXCLUDE_RECORD:
+    if model_name not in MODELS_NEED_RECORD:
         return
     resource_type = sender._meta.verbose_name
     remote_addr = get_request_ip(current_request)
