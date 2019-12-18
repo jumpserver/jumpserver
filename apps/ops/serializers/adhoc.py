@@ -56,20 +56,22 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class AdHocSerializer(serializers.ModelSerializer):
+    become_display = serializers.ReadOnlyField()
+
     class Meta:
         model = AdHoc
-        fields = '__all__'
+        fields = [
+            "id", "task", 'tasks', "pattern", "options",
+            "hosts", "run_as_admin", "run_as", "become",
+            "created_by", "date_created", "short_id",
+            "become_display",
+        ]
         read_only_fields = [
             'created_by', 'date_created'
         ]
         extra_kwargs = {
             "become": {'write_only': True}
         }
-
-    def get_field_names(self, declared_fields, info):
-        fields = super().get_field_names(declared_fields, info)
-        fields.extend(['short_id'])
-        return fields
 
 
 class CommandExecutionSerializer(serializers.ModelSerializer):

@@ -206,6 +206,12 @@ class AdHoc(models.Model):
         )
         return inventory
 
+    @property
+    def become_display(self):
+        if self.become:
+            return self.become.get("user", "")
+        return ""
+
     def run(self):
         try:
             hid = current_task.request.id
