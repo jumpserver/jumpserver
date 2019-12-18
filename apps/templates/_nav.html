@@ -116,7 +116,7 @@
         </a>
         <ul class="nav nav-second-level">
             <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
-            <li id="command-execution"><a href="{% url 'ops:command-execution-start' %}">{% trans 'Batch command' %}</a></li>
+            <li id="command-execution"><a href="{% url 'ops:command-execution-create' %}">{% trans 'Batch command' %}</a></li>
             {% if request.user.is_superuser %}
             <li><a href="{% url 'flower-view' path='' %}" target="_blank" >{% trans 'Task monitor' %}</a></li>
             {% endif %}

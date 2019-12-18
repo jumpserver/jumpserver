@@ -437,7 +437,7 @@ def sort_assets(assets, order_by='hostname', reverse=False):
 
 class ParserNode:
     nodes_only_fields = ("key", "value", "id")
-    assets_only_fields = ("platform", "hostname", "id", "ip", "protocols")
+    assets_only_fields = ("hostname", "id", "ip", "protocols", "org_id")
     system_users_only_fields = (
         "id", "name", "username", "protocol", "priority", "login_mode",
     )
@@ -445,7 +445,6 @@ class ParserNode:
     @staticmethod
     def parse_node_to_tree_node(node):
         name = '{} ({})'.format(node.value, node.assets_amount)
-        # name = node.value
         data = {
             'id': node.key,
             'name': name,
@@ -468,7 +467,7 @@ class ParserNode:
     @staticmethod
     def parse_asset_to_tree_node(node, asset):
         icon_skin = 'file'
-        platform = asset.platform.lower()
+        platform = asset.platform_base.lower()
         if platform == 'windows':
             icon_skin = 'windows'
         elif platform == 'linux':
@@ -489,8 +488,8 @@ class ParserNode:
                     'hostname': asset.hostname,
                     'ip': asset.ip,
                     'protocols': asset.protocols_as_list,
-                    'platform': asset.platform,
-                    "org_name": asset.org_name,
+                    'platform': asset.platform_base,
+                    'org_name': asset.org_name,
                 },
             }
         }

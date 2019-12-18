@@ -6,9 +6,8 @@ from django import forms
 from django.utils import six
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-from ..utils import get_signer
+from ..utils import signer
 
-signer = get_signer()
 
 __all__ = [
     'FormDictField', 'FormEncryptCharField', 'FormEncryptDictField',

@@ -20,5 +20,5 @@ urlpatterns = [
     path('celery/task/<uuid:pk>/log/', views.CeleryTaskLogView.as_view(), name='celery-task-log'),
 
     path('command-execution/', views.CommandExecutionListView.as_view(), name='command-execution-list'),
-    path('command-execution/start/', views.CommandExecutionStartView.as_view(), name='command-execution-start'),
+    path('command-execution/create/', views.CommandExecutionCreateView.as_view(), name='command-execution-create'),
 ]

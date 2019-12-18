@@ -10,14 +10,13 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from common.utils import get_signer
+from common.utils import signer
 from .base import AssetUser
 from .asset import Asset
 
 
 __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
-signer = get_signer()
 
 
 class AdminUser(AssetUser):

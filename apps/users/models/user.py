@@ -17,14 +17,12 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
-from common.utils import get_signer, date_expired_default, get_logger, lazyproperty
+from common.utils import signer, date_expired_default, get_logger, lazyproperty
 from common import fields
 from ..signals import post_user_change_password
 
 
 __all__ = ['User']
-
-signer = get_signer()
 
 logger = get_logger(__file__)
 

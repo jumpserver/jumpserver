@@ -40,6 +40,9 @@ class Migration(migrations.Migration):
                 ('internal', models.BooleanField(default=False, verbose_name='Internal')),
                 ('comment', models.TextField(blank=True, null=True, verbose_name='Comment')),
             ],
+            options={
+                'verbose_name': 'Platform'
+            }
         ),
         migrations.RunPython(create_internal_platform)
     ]
