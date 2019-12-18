@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgModelMixin
 from common.mixins import CommonModelMixin
-from common.fields.model import EncryptCharField
 from .. import const
 
 

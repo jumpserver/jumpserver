@@ -6,6 +6,7 @@ from common.mixins import BulkSerializerMixin
 from common.serializers import AdaptedBulkListSerializer
 from assets.models import Asset, Node
 from ..models import AssetPermission
+from users.models import User
 
 __all__ = [
     'AssetPermissionUserRelationSerializer',
@@ -50,14 +51,12 @@ class AssetPermissionUserRelationSerializer(RelationMixin, serializers.ModelSeri
         ]
 
 
-class AssetPermissionAllUserSerializer(serializers.ModelSerializer):
+class AssetPermissionAllUserSerializer(serializers.Serializer):
     user = serializers.UUIDField(read_only=True, source='id')
     user_display = serializers.SerializerMethodField()
 
     class Meta:
-        model = Asset
         only_fields = ['id', 'username', 'name']
-        fields = ['user', 'user_display']
 
     @staticmethod
     def get_user_display(obj):
@@ -84,14 +83,12 @@ class AssetPermissionAssetRelationSerializer(RelationMixin, serializers.ModelSer
         ]
 
 
-class AssetPermissionAllAssetSerializer(serializers.ModelSerializer):
+class AssetPermissionAllAssetSerializer(serializers.Serializer):
     asset = serializers.UUIDField(read_only=True, source='id')
     asset_display = serializers.SerializerMethodField()
 
     class Meta:
-        model = Asset
         only_fields = ['id', 'hostname', 'ip']
-        fields = ['asset', 'asset_display']
 
     @staticmethod
     def get_asset_display(obj):

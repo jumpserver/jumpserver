@@ -50,14 +50,12 @@ class DatabaseAppPermissionUserGroupRelationSerializer(RelationMixin, serializer
         ]
 
 
-class DatabaseAppPermissionAllUserSerializer(serializers.ModelSerializer):
+class DatabaseAppPermissionAllUserSerializer(serializers.Serializer):
     user = serializers.UUIDField(read_only=True, source='id')
     user_display = serializers.SerializerMethodField()
 
     class Meta:
-        model = DatabaseApp
         only_fields = ['id', 'username', 'name']
-        fields = ['user', 'user_display']
 
     @staticmethod
     def get_user_display(obj):
@@ -74,14 +72,12 @@ class DatabaseAppPermissionDatabaseAppRelationSerializer(RelationMixin, serializ
         ]
 
 
-class DatabaseAppPermissionAllDatabaseAppSerializer(serializers.ModelSerializer):
+class DatabaseAppPermissionAllDatabaseAppSerializer(serializers.Serializer):
     databaseapp = serializers.UUIDField(read_only=True, source='id')
     databaseapp_display = serializers.SerializerMethodField()
 
     class Meta:
-        model = DatabaseApp
         only_fields = ['id', 'name']
-        fields = ['databaseapp', 'databaseapp_display']
 
     @staticmethod
     def get_databaseapp_display(obj):

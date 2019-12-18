@@ -140,7 +140,7 @@ class SystemUser(AssetUser):
         return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_MYSQL]
 
     @property
-    def is_need_test(self):
+    def is_need_test_asset_connective(self):
         return self.protocol not in [self.PROTOCOL_MYSQL]
 
     @property
