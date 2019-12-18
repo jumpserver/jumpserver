@@ -88,6 +88,44 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="system-user-table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-users" id="system_users_select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm" id="btn-add-system-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for system_user in object.system_users.all %}
+                                            <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
+                                                <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user|truncatechars:21}}</b></td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn-remove-system-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -99,14 +137,20 @@
 <script>
 
 var databaseAppsRelationUrl = "{% url 'api-perms:database-app-permissions-database-apps-relation-list' %}";
+var systemUsersRelationUrl = "{% url 'api-perms:database-app-permissions-system-users-relation-list' %}";
+
 
 function getRelationUrl(type) {
-    if (type === 'databaseapp'){
-        return databaseAppsRelationUrl;
+    var theUrl = "";
+    switch (type) {
+        case "databaseapp":
+            theUrl = databaseAppsRelationUrl;
+            break;
+        case "systemuser":
+            theUrl = systemUsersRelationUrl;
+            break;
     }
-    else{
-        return ''
-    }
+    return theUrl;
 }
 
 function addObjects(objectsId, type) {
@@ -180,6 +224,14 @@ $(document).ready(function () {
 .on('click', '.btn-remove-database-app', function () {
     var databaseAppsId = $(this).data("uid");
     removeObject(databaseAppsId, "databaseapp")
+})
+.on('click', '#btn-add-system-user', function () {
+    var systemUsersId = $("#system_users_select2").val();
+    addObjects(systemUsersId, "systemuser");
+})
+.on('click', '.btn-remove-system-user', function () {
+    var systemUserId = $(this).data("uid");
+    removeObject(systemUserId, "systemuser")
 })
 </script>
 {% endblock %}

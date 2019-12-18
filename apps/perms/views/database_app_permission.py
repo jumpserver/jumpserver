@@ -12,6 +12,7 @@ from django.conf import settings
 from common.permissions import PermissionsMixin, IsOrgAdmin
 from users.models import UserGroup
 from applications.models import DatabaseApp
+from assets.models import SystemUser
 
 from .. import models, forms
 
@@ -140,6 +141,9 @@ class DatabaseAppPermissionDatabaseAppView(PermissionsMixin,
             'database_apps': database_apps,
             'database_apps_remain': DatabaseApp.objects.exclude(
                 granted_by_permissions=self.object
+            ),
+            'system_users_remain': SystemUser.objects.exclude(
+                granted_by_database_app_permissions=self.object
             ),
             'action': _('DatabaseApp permission DatabaseApp list'),
         }

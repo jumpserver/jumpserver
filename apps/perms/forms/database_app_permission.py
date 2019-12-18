@@ -36,4 +36,7 @@ class DatabaseAppPermissionCreateUpdateForm(OrgModelForm):
             'database_apps': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('DatabaseApp')}
             ),
+            'system_users': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('System users')}
+            ),
         }

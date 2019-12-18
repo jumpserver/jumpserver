@@ -20,39 +20,17 @@
 {% block custom_foot_js %}
 <script type="text/javascript">
 var app_type_id = '#' + '{{ form.type.id_for_label }}';
-var login_mode_id = '#' + '{{ form.login_mode.id_for_label }}';
-var password_id = '#' + '{{ form.password.id_for_label }}';
 
 function getFormDataType(){
     return $(app_type_id+ " option:selected").val();
 }
-function cleanFormDataPassword(data){
-    var login_mode = $(login_mode_id).val();
-    if (login_mode === 'manual'){
-        delete data['password']
-    }
-}
 function getFormData(form){
     var data = form.serializeObject();
     data['type'] = getFormDataType();
-    cleanFormDataPassword(data);
     return data
-}
-function fieldDisplayOfLoginModeChange(){
-    var login_mode = $(login_mode_id).val();
-    if (login_mode === 'manual'){
-        $(password_id).closest('.form-group').addClass('hidden');
-    }
-    else{
-        $(password_id).closest('.form-group').removeClass('hidden');
-    }
 }
 
 $(document).ready(function () {
-    fieldDisplayOfLoginModeChange();
-})
-.on('change', login_mode_id, function(){
-    fieldDisplayOfLoginModeChange();
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();

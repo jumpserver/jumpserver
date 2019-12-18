@@ -11,6 +11,7 @@ router.register('database-app-permissions', api.DatabaseAppPermissionViewSet, 'd
 router.register('database-app-permissions-users-relations', api.DatabaseAppPermissionUserRelationViewSet, 'database-app-permissions-users-relation')
 router.register('database-app-permissions-user-groups-relations', api.DatabaseAppPermissionUserGroupRelationViewSet, 'database-app-permissions-user-groups-relation')
 router.register('database-app-permissions-database-apps-relations', api.DatabaseAppPermissionDatabaseAppRelationViewSet, 'database-app-permissions-database-apps-relation')
+router.register('database-app-permissions-system-users-relations', api.DatabaseAppPermissionSystemUserRelationViewSet, 'database-app-permissions-system-users-relation')
 
 user_permission_urlpatterns = [
     path('<uuid:pk>/database-apps/', api.UserGrantedDatabaseAppsApi.as_view(), name='user-database-apps'),
@@ -19,6 +20,9 @@ user_permission_urlpatterns = [
     # DatabaseApps as tree
     path('<uuid:pk>/database-apps/tree/', api.UserGrantedDatabaseAppsAsTreeApi.as_view(), name='user-databases-apps-tree'),
     path('database-apps/tree/', api.UserGrantedDatabaseAppsAsTreeApi.as_view(), name='my-databases-apps-tree'),
+
+    path('<uuid:pk>/database-apps/<uuid:database_app_id>/system-users/', api.UserGrantedDatabaseAppSystemUsersApi.as_view(), name='user-database-app-system-users'),
+    path('database-apps/<uuid:database_app_id>/system-users/', api.UserGrantedDatabaseAppSystemUsersApi.as_view(), name='user-database-app-system-users'),
 ]
 
 user_group_permission_urlpatterns = [

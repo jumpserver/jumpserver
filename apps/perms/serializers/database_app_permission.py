@@ -14,7 +14,7 @@ class DatabaseAppPermissionSerializer(BulkOrgResourceModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
             'id', 'name', 'users', 'user_groups',
-            'database_apps', 'comment', 'is_active',
+            'database_apps', 'system_users', 'comment', 'is_active',
             'date_start', 'date_expired', 'is_valid',
             'created_by', 'date_created'
         ]

@@ -10,7 +10,6 @@ from ..hands import IsOrgAdmin, IsAppUser
 
 __all__ = [
     'DatabaseAppViewSet',
-    'DatabaseAppConnectionInfoApi',
 ]
 
 
@@ -20,9 +19,3 @@ class DatabaseAppViewSet(OrgBulkModelViewSet):
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)
     serializer_class = serializers.DatabaseAppSerializer
-
-
-class DatabaseAppConnectionInfoApi(generics.RetrieveAPIView):
-    model = models.DatabaseApp
-    permission_classes = (IsAppUser,)
-    serializer_class = serializers.DatabaseAppConnectionInfoSerializer

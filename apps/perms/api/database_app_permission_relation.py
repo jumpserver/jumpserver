@@ -3,6 +3,7 @@
 
 from rest_framework import generics
 from django.db.models import F, Value
+from django.db.models.functions import Concat
 from django.shortcuts import get_object_or_404
 
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -16,6 +17,7 @@ __all__ = [
     'DatabaseAppPermissionAllUserListApi',
     'DatabaseAppPermissionDatabaseAppRelationViewSet',
     'DatabaseAppPermissionAllDatabaseAppListApi',
+    'DatabaseAppPermissionSystemUserRelationViewSet',
 ]
 
 
@@ -106,3 +108,25 @@ class DatabaseAppPermissionAllDatabaseAppListApi(generics.ListAPIView):
             *self.serializer_class.Meta.only_fields
         )
         return database_apps
+
+
+class DatabaseAppPermissionSystemUserRelationViewSet(RelationMixin):
+    serializer_class = serializers.DatabaseAppPermissionSystemUserRelationSerializer
+    model = models.DatabaseAppPermission.system_users.through
+    permission_classes = (IsOrgAdmin,)
+    filterset_fields = [
+        'id', 'systemuser', 'databaseapppermission'
+    ]
+    search_fields = [
+        'databaseapppermission__name', 'systemuser__name', 'systemuser__username'
+    ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(
+            systemuser_display=Concat(
+                F('systemuser__name'), Value('('), F('systemuser__username'),
+                Value(')')
+            )
+        )
+        return queryset

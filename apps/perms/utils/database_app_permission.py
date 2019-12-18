@@ -7,6 +7,7 @@ from orgs.utils import set_to_root_org
 from ..models import DatabaseAppPermission
 from common.tree import TreeNode
 from applications.models import DatabaseApp
+from assets.models import SystemUser
 
 
 __all__ = [
@@ -57,6 +58,16 @@ class DatabaseAppPermissionUtil:
             granted_by_permissions__in=self.permissions
         )
         return database_apps
+
+    def get_database_app_system_users(self, database_app):
+        queryset = self.permissions
+        kwargs = {'database_apps': database_app}
+        queryset = queryset.filter(**kwargs)
+        system_users_ids = queryset.values_list('system_users', flat=True)
+        system_users_ids = system_users_ids.distinct()
+        system_users = SystemUser.objects.filter(id__in=system_users_ids)
+        system_users = system_users.order_by('-priority')
+        return system_users
 
 
 def construct_database_apps_tree_root():

@@ -16,6 +16,10 @@ class DatabaseAppPermission(BasePermission):
         'applications.DatabaseApp', related_name='granted_by_permissions',
         blank=True, verbose_name=_("DatabaseApp")
     )
+    system_users = models.ManyToManyField(
+        'assets.SystemUser', related_name='granted_by_database_app_permissions',
+        verbose_name=_("System user")
+    )
 
     class Meta:
         unique_together = [('org_id', 'name')]

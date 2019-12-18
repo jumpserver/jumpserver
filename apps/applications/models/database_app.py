@@ -15,13 +15,6 @@ __all__ = ['DatabaseApp']
 
 
 class DatabaseApp(CommonModelMixin, OrgModelMixin):
-    LOGIN_AUTO = 'auto'
-    LOGIN_MANUAL = 'manual'
-    LOGIN_MODE_CHOICES = (
-        (LOGIN_AUTO, _('Automatic login')),
-        (LOGIN_MANUAL, _('Manually login'))
-    )
-
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     type = models.CharField(
@@ -36,16 +29,6 @@ class DatabaseApp(CommonModelMixin, OrgModelMixin):
     database = models.CharField(
         max_length=128, blank=True, null=True, verbose_name=_('Database'),
         db_index=True
-    )
-    login_mode = models.CharField(
-        choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10,
-        verbose_name=_('Login mode')
-    )
-    user = models.CharField(
-        max_length=32, blank=True, db_index=True, verbose_name=_('User')
-    )
-    password = EncryptCharField(
-        max_length=128, blank=True, null=True, verbose_name=_('Password')
     )
     comment = models.TextField(
         max_length=128, default='', blank=True, verbose_name=_('Comment')

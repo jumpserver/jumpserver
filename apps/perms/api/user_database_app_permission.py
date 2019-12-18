@@ -10,13 +10,16 @@ from orgs.mixins import generics
 from users.models import User, UserGroup
 from applications.serializers import DatabaseAppSerializer
 from applications.models import DatabaseApp
-from .. import utils
+from assets.models import SystemUser
+from .. import utils, serializers
+from .mixin import UserPermissionMixin
 
 __all__ = [
     'UserGrantedDatabaseAppsApi',
     'UserGrantedDatabaseAppsAsTreeApi',
     'UserGroupGrantedDatabaseAppsApi',
-    'ValidateUserDatabaseAppPermissionApi'
+    'ValidateUserDatabaseAppPermissionApi',
+    'UserGrantedDatabaseAppSystemUsersApi',
 ]
 
 
@@ -65,6 +68,19 @@ class UserGrantedDatabaseAppsAsTreeApi(UserGrantedDatabaseAppsApi):
         return super().get_serializer(data, many=True)
 
 
+class UserGrantedDatabaseAppSystemUsersApi(UserPermissionMixin, generics.ListAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.DatabaseAppSystemUserSerializer
+    only_fields = serializers.DatabaseAppSystemUserSerializer.Meta.only_fields
+
+    def get_queryset(self):
+        util = utils.DatabaseAppPermissionUtil(self.obj)
+        database_app_id = self.kwargs.get('database_app_id')
+        database_app = get_object_or_404(DatabaseApp, id=database_app_id)
+        system_users = util.get_database_app_system_users(database_app)
+        return system_users
+
+
 # Validate
 
 class ValidateUserDatabaseAppPermissionApi(APIView):
@@ -73,19 +89,22 @@ class ValidateUserDatabaseAppPermissionApi(APIView):
     def get(self, request, *args, **kwargs):
         user_id = request.query_params.get('user_id', '')
         database_app_id = request.query_params.get('database_app_id', '')
+        system_user_id = request.query_params.get('system_user_id', '')
 
         try:
             user_id = uuid.UUID(user_id)
             database_app_id = uuid.UUID(database_app_id)
+            system_user_id = uuid.UUID(system_user_id)
         except ValueError:
             return Response({'msg': False}, status=403)
 
         user = get_object_or_404(User, id=user_id)
         database_app = get_object_or_404(DatabaseApp, id=database_app_id)
+        system_user = get_object_or_404(SystemUser, id=system_user_id)
 
         util = utils.DatabaseAppPermissionUtil(user)
-        database_apps = util.get_database_apps()
-        if database_app in database_apps:
+        system_users = util.get_database_app_system_users(database_app)
+        if system_user in system_users:
             return Response({'msg': True}, status=200)
 
         return Response({'msg': False}, status=403)
