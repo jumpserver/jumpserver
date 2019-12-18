@@ -169,6 +169,7 @@ class Session(OrgModelMixin):
         ('rdp', 'rdp'),
         ('vnc', 'vnc'),
         ('telnet', 'telnet'),
+        ('mysql', 'mysql'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
