@@ -31,10 +31,10 @@ from ..signals import post_user_create
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
-    'UserUpdateView', 'UserGrantedAssetView',
-    'UserBulkUpdateView', 'UserAssetPermissionListView',
-    'UserRemoteAppPermissionListView',
-    'UserGrantedRemoteAppView',
+    'UserUpdateView', 'UserBulkUpdateView',
+    'UserGrantedAssetView', 'UserAssetPermissionListView',
+    'UserGrantedRemoteAppView', 'UserRemoteAppPermissionListView',
+    'UserGrantedDatabasesAppView',
 ]
 
 logger = get_logger(__name__)
@@ -227,6 +227,21 @@ class UserAssetPermissionListView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
+class UserGrantedRemoteAppView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_granted_remote_app.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('User granted RemoteApp'),
+            'active_user_granted_remote_app': True,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
 class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
     model = User
     template_name = 'users/user_remote_app_permission.html'
@@ -242,16 +257,16 @@ class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 
-class UserGrantedRemoteAppView(PermissionsMixin, DetailView):
+class UserGrantedDatabasesAppView(PermissionsMixin, DetailView):
     model = User
-    template_name = 'users/user_granted_remote_app.html'
+    template_name = 'users/user_granted_database_app.html'
     permission_classes = [IsOrgAdmin]
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Users'),
-            'action': _('User granted RemoteApp'),
-            'active_user_granted_remote_app': True,
+            'action': _('User granted DatabaseApp'),
+            'active_user_granted_database_app': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
