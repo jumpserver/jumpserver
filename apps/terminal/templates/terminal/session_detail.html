@@ -136,7 +136,13 @@ $ {{ command.input }}
                 }, 300)
             }
             var the_url = "{% url 'api-terminal:tasks-list' %}";
-            requestApi({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
+            requestApi({
+                url: the_url,
+                method: 'POST',
+                body: JSON.stringify(data),
+                success: success,
+                success_message: "{% trans 'Terminate success'%}"
+            });
         }
         $(document).ready(function () {
             $('.footable').footable();
