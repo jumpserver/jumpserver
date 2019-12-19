@@ -158,7 +158,7 @@ function activeNav(prefix) {
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
-        $('#' + app + ' #' + resource.replaceAll('-', '_')).addClass('active');
+        $('#' + app + ' #' + resource.replace(/-/g, '_')).addClass('active');
     }
 }
 

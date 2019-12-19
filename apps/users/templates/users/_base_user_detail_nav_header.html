@@ -1,24 +1,48 @@
 {% load static %}
 {% load i18n %}
 
-<li class="{% if active_user_detail %}active{% endif %}">
+<li id="user_detail_nav">
     <a href="{% url 'users:user-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
 </li>
-<li class="{% if active_user_granted_asset %}active{% endif %}">
+<li id="user_detail_assets_nav">
     <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
 </li>
-<li class="{% if active_user_asset_permission %}active{% endif %}">
+<li id="user_detail_asset_permissions_nav">
     <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
 </li>
-<li class="{% if active_user_granted_remote_app %}active{% endif %}">
+<li id="user_detail_remote_apps_nav">
     <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp granted' %}</a>
 </li>
-<li class="{% if active_user_remote_app_permission %}active{% endif %}">
+<li id="user_detail_remote_app_permissions_nav">
     <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'RemoteApp permission' %}</a>
 </li>
-<li class="{% if active_user_granted_database_app %}active{% endif %}">
+<li id="user_detail_database_apps_nav">
     <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center"><i class="fa fa-database"></i> {% trans 'DatabaseApp granted' %}</a>
 </li>
-<li class="{% if active_user_database_app_permission %}active{% endif %}">
+<li id="user_detail_database_app_permissions_nav">
     <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'DatabaseApp permission' %}</a>
 </li>
+
+<script>
+function activeUserDetailNav(prefix) {
+    var path = document.location.pathname;
+    if (prefix) {
+        path = path.replace(prefix, '');
+        console.log(path);
+    }
+    var urlArray = path.split("/");
+    var page_prefix = 'user_detail';
+    var page_suffix = 'nav';
+    var page = urlArray[urlArray.length-2];
+    var navId = '';
+    if (page === "{{ object.id }}" || page === undefined){
+        navId = "#" + page_prefix + '_' + page_suffix
+    }
+    else{
+        navId = "#" + page_prefix + '_' + page.replace(/-/g, '_') + '_' + page_suffix
+
+    }
+    $(navId).addClass('active')
+}
+activeUserDetailNav("{{ FORCE_SCRIPT_NAME }}");
+</script>

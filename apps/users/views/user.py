@@ -185,7 +185,6 @@ class UserDetailView(PermissionsMixin, DetailView):
             'can_delete': CanUpdateDeleteUser.has_delete_object_permission(
                 self.request, self, user
             ),
-            'active_user_detail': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -206,7 +205,6 @@ class UserGrantedAssetView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('User granted assets'),
-            'active_user_granted_asset': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -221,7 +219,6 @@ class UserAssetPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('Asset permission'),
-            'active_user_asset_permission': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -236,7 +233,6 @@ class UserGrantedRemoteAppView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('User granted RemoteApp'),
-            'active_user_granted_remote_app': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -251,7 +247,6 @@ class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('RemoteApp permission'),
-            'active_user_remote_app_permission': True
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -266,7 +261,6 @@ class UserGrantedDatabasesAppView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('User granted DatabaseApp'),
-            'active_user_granted_database_app': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -281,7 +275,6 @@ class UserDatabaseAppPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('DatabaseApp permission'),
-            'active_user_database_app_permission': True
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
