@@ -136,15 +136,16 @@ class DatabaseAppPermissionDatabaseAppView(PermissionsMixin,
     def get_context_data(self, **kwargs):
         database_apps = self.object.get_all_database_apps().values_list('id', flat=True)
         database_apps = [str(i) for i in database_apps]
+        system_users_remain = SystemUser.objects\
+            .exclude(granted_by_database_app_permissions=self.object)\
+            .filter(protocol=SystemUser.PROTOCOL_MYSQL)
         context = {
             'app': _('Perms'),
             'database_apps': database_apps,
             'database_apps_remain': DatabaseApp.objects.exclude(
                 granted_by_permissions=self.object
             ),
-            'system_users_remain': SystemUser.objects.exclude(
-                granted_by_database_app_permissions=self.object
-            ),
+            'system_users_remain': system_users_remain,
             'action': _('DatabaseApp permission DatabaseApp list'),
         }
         kwargs.update(context)
