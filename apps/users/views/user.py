@@ -33,6 +33,7 @@ __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
     'UserUpdateView', 'UserGrantedAssetView',
     'UserBulkUpdateView', 'UserAssetPermissionListView',
+    'UserRemoteAppPermissionListView',
 ]
 
 logger = get_logger(__name__)
@@ -217,6 +218,20 @@ class UserAssetPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('Asset permission'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_remote_app_permission.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('RemoteApp permission')
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
