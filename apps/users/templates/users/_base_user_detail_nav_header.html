@@ -11,11 +11,14 @@
     <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
 </li>
 <li class="{% if active_user_granted_remote_app %}active{% endif %}">
-    <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'RemoteApp granted' %}</a>
+    <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp granted' %}</a>
 </li>
 <li class="{% if active_user_remote_app_permission %}active{% endif %}">
-    <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp permission' %}</a>
+    <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'RemoteApp permission' %}</a>
 </li>
 <li class="{% if active_user_granted_database_app %}active{% endif %}">
-    <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'DatabaseApp granted' %}</a>
+    <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center"><i class="fa fa-database"></i> {% trans 'DatabaseApp granted' %}</a>
+</li>
+<li class="{% if active_user_database_app_permission %}active{% endif %}">
+    <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'DatabaseApp permission' %}</a>
 </li>

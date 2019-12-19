@@ -12,7 +12,10 @@ __all__ = ['DatabaseAppPermissionViewSet']
 
 class DatabaseAppPermissionViewSet(OrgBulkModelViewSet):
     model = models.DatabaseAppPermission
-    serializer_class = serializers.DatabaseAppPermissionSerializer
+    serializer_classes = {
+        'default': serializers.DatabaseAppPermissionSerializer,
+        'display': serializers.DatabaseAppPermissionListSerializer
+    }
     filter_fields = ('name',)
     search_fields = filter_fields
     permission_classes = (IsOrgAdmin,)

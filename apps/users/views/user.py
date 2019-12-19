@@ -34,7 +34,7 @@ __all__ = [
     'UserUpdateView', 'UserBulkUpdateView',
     'UserGrantedAssetView', 'UserAssetPermissionListView',
     'UserGrantedRemoteAppView', 'UserRemoteAppPermissionListView',
-    'UserGrantedDatabasesAppView',
+    'UserGrantedDatabasesAppView', 'UserDatabaseAppPermissionListView',
 ]
 
 logger = get_logger(__name__)
@@ -267,6 +267,21 @@ class UserGrantedDatabasesAppView(PermissionsMixin, DetailView):
             'app': _('Users'),
             'action': _('User granted DatabaseApp'),
             'active_user_granted_database_app': True,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserDatabaseAppPermissionListView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_database_app_permission.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('DatabaseApp permission'),
+            'active_user_database_app_permission': True
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
