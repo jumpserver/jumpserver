@@ -13,22 +13,10 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="{% url 'users:user-detail' pk=user_object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-asset-permission' pk=user_object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-remote-app-permission' pk=user_object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp permission' %}</a>
-                            </li>
+                            {% include 'users/_base_user_detail_nav_header.html' %}
                             <li class="pull-right">
-                                <a class="btn btn-outline {% if can_update %} btn-default {% else %} disabled {% endif %}" href="{% url 'users:user-update' pk=user_object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                                <a class="btn btn-outline {% if can_update %} btn-default {% else %} disabled {% endif %}" href="{% url 'users:user-update' pk=object.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
-
                             <li class="pull-right">
                                 <a class="btn btn-outline {% if can_delete %} btn-danger btn-delete-user {% else %} disabled {% endif %}">
                                     <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
@@ -40,7 +28,7 @@
                         <div class="col-sm-8" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ user_object.name }}</b></span>
+                                    <span class="label"><b>{{ object.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -60,43 +48,43 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td colspan="2">
-                                                <img src="{{ user_object.avatar_url }}" class="img-circle" width="64" height="64">
+                                                <img src="{{ object.avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ user_object.name }}</b></td>
+                                            <td><b>{{ object.name }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Username' %}:</td>
-                                            <td><b>{{ user_object.username }}</b></td>
+                                            <td><b>{{ object.username }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Email' %}:</td>
-                                            <td><b>{{ user_object.email }}</b></td>
+                                            <td><b>{{ object.email }}</b></td>
                                         </tr>
                                         {% if user.phone %}
                                             <tr>
                                                 <td>{% trans 'Phone' %}:</td>
-                                                <td><b>{{ user_object.phone }}</b></td>
+                                                <td><b>{{ object.phone }}</b></td>
                                             </tr>
                                         {% endif %}
-                                        {% if user_object.wechat %}
+                                        {% if object.wechat %}
                                             <tr>
                                                 <td>{% trans 'Wechat' %}:</td>
-                                                <td><b>{{ user_object.wechat }}</b></td>
+                                                <td><b>{{ object.wechat }}</b></td>
                                             </tr>
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Role' %}:</td>
-                                            <td><b>{{ user_object.role_display }}</b></td>
+                                            <td><b>{{ object.role_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'MFA certification' %}:</td>
                                             <td><b>
-                                                {% if user_object.mfa_force_enabled %}
+                                                {% if object.mfa_force_enabled %}
                                                     {% trans 'Force enabled' %}
-                                                {% elif  user_object.mfa_enabled%}
+                                                {% elif  object.mfa_enabled%}
                                                     {% trans 'Enabled' %}
                                                 {% else %}
                                                     {% trans 'Disabled' %}
@@ -105,33 +93,33 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Source' %}:</td>
-                                            <td><b>{{ user_object.get_source_display }}</b></td>
+                                            <td><b>{{ object.get_source_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>
-                                            <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ user_object.created_by }}</b></td>
+                                            <td><b>{{ object.created_by }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date joined' %}:</td>
-                                            <td><b>{{ user_object.date_joined|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ object.date_joined|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Last login' %}:</td>
-                                            <td><b>{{ user_object.last_login|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ object.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
-                                        {% if user_object.can_update_password %}
+                                        {% if object.can_update_password %}
                                         <tr>
                                             <td>{% trans 'Last password updated' %}:</td>
-                                            <td><b>{{ user_object.date_password_last_updated|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ object.date_password_last_updated|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ user_object.comment }}</b></td>
+                                            <td><b>{{ object.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -151,7 +139,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %} {% if request.user == user_object %} disabled {% endif %} class="onoffswitch-checkbox" id="is_active">
+                                                        <input type="checkbox" {% if object.is_active %} checked {% endif %} {% if request.user == object %} disabled {% endif %} class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -166,7 +154,7 @@
                                                 <span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.mfa_force_enabled %} checked {% endif %}
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if object.mfa_force_enabled %} checked {% endif %}
                                                                id="force_enable_mfa">
                                                         <label class="onoffswitch-label" for="force_enable_mfa">
                                                             <span class="onoffswitch-inner"></span>
@@ -185,22 +173,22 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        {% if user_object.can_update_password %}
+                                        {% if object.can_update_password %}
                                         <tr>
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == object %} disabled="disabled" {% endif %} id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
                                         {% endif %}
-                                        {% if user_object.can_update_ssh_key %}
+                                        {% if object.can_update_ssh_key %}
                                         <tr>
                                             <td>{% trans 'Send reset ssh key mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == user_object %} disabled="disabled" {% endif %} id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" {% if request.user == object %} disabled="disabled" {% endif %} id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -219,7 +207,7 @@
                             </div>
                             {% if request.user.can_admin_current_org %}
 
-                                {% if user_object.can_user_current_org or user_object.can_admin_current_org %}
+                                {% if object.can_user_current_org or object.can_admin_current_org %}
                                     <div class="panel panel-info">
                                         <div class="panel-heading">
                                             <i class="fa fa-info-circle"></i> {% trans 'User group' %}
@@ -244,7 +232,7 @@
                                                     </tr>
                                                 </form>
 
-                                                {% for group in user_object.groups.all %}
+                                                {% for group in object.groups.all %}
                                                     <tr>
                                                         <td >
                                                             <b class="bdg_group" >{{ group.name }}</b>
@@ -281,8 +269,8 @@
                                                         </td>
                                                     </tr>
                                                 </form>
-                                                {% if user_object.get_login_confirm_setting %}
-                                                    {% for u in user_object.login_confirm_setting.reviewers.all %}
+                                                {% if object.get_login_confirm_setting %}
+                                                    {% for u in object.login_confirm_setting.reviewers.all %}
                                                         <tr>
                                                             <td >
                                                                 <b class="bdg_reviewer">{{ u }}</b>
@@ -313,7 +301,7 @@
 var usersSelect2;
 
 function updateUserLoginReviewer(reviewers) {
-    var url = "{% url 'api-auth:login-confirm-setting-update' user_id=user_object.id %}";
+    var url = "{% url 'api-auth:login-confirm-setting-update' user_id=object.id %}";
     var data = {reviewers: reviewers};
     requestApi({
         url: url,
@@ -366,7 +354,7 @@ $(document).ready(function() {
     usersSelect2 = usersSelect2Init('.users-select2')
 })
 .on('click', '#is_active', function() {
-    var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
+    var the_url = "{% url 'api-users:user-detail' pk=object.id %}";
     var checked = $(this).prop('checked');
     var body = {
         'is_active': checked
@@ -379,12 +367,12 @@ $(document).ready(function() {
     });
 })
 .on('click', '#force_enable_mfa', function() {
-    {% if request.user == user_object %}
+    {% if request.user == object %}
         toastr.error("{% trans 'Goto profile page enable MFA' %}");
         return;
     {% endif %}
 
-    var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
+    var the_url = "{% url 'api-users:user-detail' pk=object.id %}";
     var checked = $(this).prop('checked');
     var mfa_level;
     var otp_secret_key;
@@ -413,7 +401,7 @@ $(document).ready(function() {
     removeObject(objectId)
 }).on('click', '#btn-reset-password', function() {
     function doReset() {
-        var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';
+        var the_url = '{% url "api-users:user-reset-password" pk=object.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans "An e-mail has been sent to the user`s mailbox." %}";
@@ -439,7 +427,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn-reset-pk', function() {
     function doReset() {
-        var the_url = '{% url "api-users:user-public-key-reset" pk=user_object.id %}';
+        var the_url = '{% url "api-users:user-public-key-reset" pk=object.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
@@ -491,15 +479,15 @@ $(document).ready(function() {
     requestApi({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 }).on('click', '.btn-delete-user', function () {
     var $this = $(this);
-    var name = "{{ user_object.name }}";
-    var uid = "{{ user_object.id }}";
+    var name = "{{ object.name }}";
+    var uid = "{{ object.id }}";
     var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'users:user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 }).on('click', '#btn-unblock-user', function () {
     function doReset() {
-        {#var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';#}
-        var the_url = '{%  url "api-users:user-unblock" pk=user_object.id %}';
+        {#var the_url = '{% url "api-users:user-reset-password" pk=object.id %}';#}
+        var the_url = '{%  url "api-users:user-unblock" pk=object.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans "Success" %}";
@@ -533,7 +521,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn-reset-mfa', function () {
     requestApi({
-        url: "{% url 'api-users:user-reset-otp' pk=user_object.id %}",
+        url: "{% url 'api-users:user-reset-otp' pk=object.id %}",
         method: "GET",
         success_message: "{% trans 'Reset user MFA success' %}"
     })

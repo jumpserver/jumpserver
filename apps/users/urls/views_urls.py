@@ -36,6 +36,7 @@ urlpatterns = [
     path('user/<uuid:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     path('user/<uuid:pk>/assets/', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
     path('user/<uuid:pk>/asset-permissions/', views.UserAssetPermissionListView.as_view(), name='user-asset-permission'),
+    path('user/<uuid:pk>/remote-apps/', views.UserGrantedRemoteAppView.as_view(), name='user-granted-remote-app'),
     path('user/<uuid:pk>/remote-app-permissions/', views.UserRemoteAppPermissionListView.as_view(), name='user-remote-app-permission'),
     path('user/<uuid:pk>/login-history/', views.UserDetailView.as_view(), name='user-login-history'),
 

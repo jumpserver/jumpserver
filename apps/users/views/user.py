@@ -34,6 +34,7 @@ __all__ = [
     'UserUpdateView', 'UserGrantedAssetView',
     'UserBulkUpdateView', 'UserAssetPermissionListView',
     'UserRemoteAppPermissionListView',
+    'UserGrantedRemoteAppView',
 ]
 
 logger = get_logger(__name__)
@@ -165,7 +166,7 @@ class UserBulkUpdateView(PermissionsMixin, TemplateView):
 class UserDetailView(PermissionsMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user_object"
+    context_object_name = "object"
     key_prefix_block = "_LOGIN_BLOCK_{}"
     permission_classes = [IsOrgAdmin]
 
@@ -184,6 +185,7 @@ class UserDetailView(PermissionsMixin, DetailView):
             'can_delete': CanUpdateDeleteUser.has_delete_object_permission(
                 self.request, self, user
             ),
+            'active_user_detail': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -204,6 +206,7 @@ class UserGrantedAssetView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('User granted assets'),
+            'active_user_granted_asset': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -218,6 +221,7 @@ class UserAssetPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('Asset permission'),
+            'active_user_asset_permission': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -231,7 +235,23 @@ class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Users'),
-            'action': _('RemoteApp permission')
+            'action': _('RemoteApp permission'),
+            'active_user_remote_app_permission': True
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserGrantedRemoteAppView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_granted_remote_app.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('User granted RemoteApp'),
+            'active_user_granted_remote_app': True,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
