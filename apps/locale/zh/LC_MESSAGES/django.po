@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-19 15:33+0800\n"
+"POT-Creation-Date: 2019-12-19 15:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -4732,6 +4732,10 @@ msgstr "监控"
 #: terminal/templates/terminal/session_detail.html:109
 msgid "Terminate session"
 msgstr "终止会话"
+
+#: terminal/templates/terminal/session_detail.html:144
+msgid "Terminate success"
+msgstr "终断成功"
 
 #: terminal/templates/terminal/session_list.html:30
 msgid "Login from"
