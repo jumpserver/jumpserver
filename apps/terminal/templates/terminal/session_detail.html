@@ -141,7 +141,7 @@ $ {{ command.input }}
                 method: 'POST',
                 body: JSON.stringify(data),
                 success: success,
-                success_message: {% trans 'Terminate success'%}
+                success_message: "{% trans 'Terminate success'%}"
             });
         }
         $(document).ready(function () {
