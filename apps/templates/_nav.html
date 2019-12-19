@@ -61,6 +61,7 @@
         </a>
         <ul class="nav nav-second-level">
             <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
+            <li id="database-app"><a href="{% url 'applications:database-app-list' %}">{% trans 'DatabaseApp' %}</a></li>
         </ul>
     </li>
 {% endif %}
@@ -77,6 +78,9 @@
             {% if LICENSE_VALID %}
             <li id="remote-app-permission">
                 <a href="{% url 'perms:remote-app-permission-list' %}">{% trans 'RemoteApp' %}</a>
+            </li>
+            <li id="database-app-permission">
+                <a href="{% url 'perms:database-app-permission-list' %}">{% trans 'DatabaseApp' %}</a>
             </li>
             {% endif %}
         </ul>

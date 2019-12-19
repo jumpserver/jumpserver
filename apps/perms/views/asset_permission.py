@@ -162,13 +162,14 @@ class AssetPermissionAssetView(PermissionsMixin,
     def get_context_data(self, **kwargs):
         assets = self.object.assets.all().values_list('id', flat=True)
         assets = [str(i) for i in assets]
+        system_users_remain = SystemUser.objects\
+            .exclude(granted_by_permissions=self.object)\
+            .exclude(protocol=SystemUser.PROTOCOL_MYSQL)
         context = {
             'app': _('Perms'),
             'assets': assets,
             'action': _('Asset permission asset list'),
-            'system_users_remain': SystemUser.objects.exclude(
-                granted_by_permissions=self.object
-            ),
+            'system_users_remain': system_users_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

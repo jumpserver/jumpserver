@@ -6,15 +6,13 @@ from django import forms
 from orgs.mixins.forms import OrgModelForm
 from assets.models import SystemUser
 
-from ..models import RemoteAppPermission
+from ..models import DatabaseAppPermission
 
 
-__all__ = [
-    'RemoteAppPermissionCreateUpdateForm',
-]
+__all__ = ['DatabaseAppPermissionCreateUpdateForm']
 
 
-class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
+class DatabaseAppPermissionCreateUpdateForm(OrgModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -27,11 +25,11 @@ class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
         # 过滤系统用户
         system_users_field = self.fields.get('system_users')
         system_users_field.queryset = SystemUser.objects.filter(
-            protocol=SystemUser.PROTOCOL_RDP
+            protocol=SystemUser.PROTOCOL_MYSQL
         )
 
     class Meta:
-        model = RemoteAppPermission
+        model = DatabaseAppPermission
         exclude = (
             'id', 'date_created', 'created_by', 'org_id'
         )
@@ -42,10 +40,10 @@ class RemoteAppPermissionCreateUpdateForm(OrgModelForm):
             'user_groups': forms.SelectMultiple(
                 attrs={'class': 'select2', 'data-placeholder': _('User group')}
             ),
-            'remote_apps': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('RemoteApp')}
+            'database_apps': forms.SelectMultiple(
+                attrs={'class': 'select2', 'data-placeholder': _('DatabaseApp')}
             ),
             'system_users': forms.SelectMultiple(
-                attrs={'class': 'select2', 'data-placeholder': _('System user')}
-            )
+                attrs={'class': 'select2', 'data-placeholder': _('System users')}
+            ),
         }

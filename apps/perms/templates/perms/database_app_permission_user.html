@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'perms:database-app-permission-detail' pk=database_app_permission.id %}" class="text-center">
+                                    <i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'perms:database-app-permission-user-list' pk=database_app_permission.id %}" class="text-center">
+                                <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:database-app-permission-database-app-list' pk=database_app_permission.id  %}" class="text-center">
+                                    <i class="fa fa-inbox"></i> {% trans 'DatabaseApp' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'User list of ' %} <b>{{ database_app_permission.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover" id="user_list_table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                </th>
+                                                <th>{% trans 'Name' %}</th>
+                                                <th class="text-center">{% trans 'Action' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user to permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2 users-select2" style="width: 100%" multiple="" tabindex="4">
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user group to permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2 user-groups-select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for user_group in user_groups_remain %}
+                                                        <option value="{{ user_group.id }}" id="opt_{{ user_group.id }}">{{ user_group }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-group">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for user_group in database_app_permission.user_groups.all %}
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %}>
+                                          <td ><b class="bdg_group" data-gid={{ user_group.id }}>{{ user_group }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger btn-xs btn-remove-group" type="button" data-gid="{{ user_group.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+var usersDirectRelated = {{ users | safe }};
+
+var table;
+function initUsersTable() {
+    var options = {
+        ele: $('#user_list_table'),
+        toggle: true,
+        columnDefs: [
+             {targets: 2, createdCell: function (td, cellData, rowData) {
+                  var removeBtn = '<a class="btn btn-xs btn-danger m-l-xs btn-remove-user" disabled data-uid="{{ DEFAULT_PK }}"><i class="fa fa-minus"></i></a>'
+                      .replace('{{ DEFAULT_PK }}', cellData);
+                  if (usersDirectRelated.indexOf(cellData) !== -1) {
+                      removeBtn = removeBtn.replace('disabled', '')
+                  }
+		  		  $(td).html(removeBtn);
+             }}
+        ],
+        ajax_url: "{% url 'api-perms:database-app-permission-all-users' pk=object.id %}",
+        columns: [
+            {data: "user"}, {data: "user_display"}, {data: "user", width: "30px"}
+        ],
+        op_html: $('#actions').html()
+    };
+    table = jumpserver.initServerSideDataTable(options);
+    return table
+}
+
+function addUsers(usersId) {
+    if (!usersId || usersId.length === 0) {
+        return
+    }
+    var theUrl = "{% url 'api-perms:database-app-permissions-users-relation-list' %}";
+    var body = [];
+    usersId.forEach(function (v, i) {
+        body.push({
+            "user": v,
+            "databaseapppermission": "{{ object.id }}"
+        })
+    });
+    var success = function(data) {
+        location.reload();
+    };
+    requestApi({
+        url: theUrl,
+        body: JSON.stringify(body),
+        method: "POST",
+        success: success
+    });
+}
+
+function removeUser(userId) {
+    var theUrl = "{% url 'api-perms:database-app-permissions-users-relation-list' %}?user=userId&databaseapppermission={{ object.id }}";
+    theUrl = theUrl.replace("userId", userId);
+    var success = function(data) {
+        location.reload();
+    };
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: success
+    });
+}
+
+function addGroups(groupsId) {
+    if (!groupsId || groupsId.length === 0) {
+        return
+    }
+    var theUrl = "{% url 'api-perms:database-app-permissions-user-groups-relation-list' %}";
+    var body = [];
+    groupsId.forEach(function (v, i) {
+        body.push({
+            "usergroup": v,
+            "databaseapppermission": "{{ object.id }}"
+        })
+    });
+    var success = function(data) {
+        location.reload();
+    };
+    requestApi({
+        url: theUrl,
+        body: JSON.stringify(body),
+        method: "POST",
+        success: success
+    });
+}
+
+function removeGroup(groupId) {
+    var theUrl = "{% url 'api-perms:database-app-permissions-user-groups-relation-list' %}?databaseapppermission={{ object.id }}";
+    theUrl = theUrl.replace("groupId", groupId);
+    var success = function(data) {
+        location.reload();
+    };
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: success
+    });
+}
+
+$(document).ready(function () {
+    $(".select2").select2();
+    initUsersTable();
+    usersSelect2Init(".users-select2", null, usersDirectRelated);
+}).on('click', '.btn-add-user', function () {
+	var usersSelected = $(".users-select2").val();
+    addUsers(usersSelected);
+}).on('click', '.btn-remove-user', function () {
+    var userId = $(this).data("uid");
+    removeUser(userId)
+}).on('click', '#btn-add-group', function () {
+    var groupsSelected = $(".user-groups-select2").val();
+    addGroups(groupsSelected);
+}).on('click', '.btn-remove-group', function () {
+    var groupId = $(this).data("gid");
+    removeGroup(groupId);
+})
+</script>
+{% endblock %}

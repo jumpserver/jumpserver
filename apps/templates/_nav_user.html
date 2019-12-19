@@ -16,6 +16,11 @@
                 <i class="" style="width: 14px"></i><span class="nav-label">{% trans 'RemoteApp' %}</span><span class="label label-info pull-right"></span>
             </a>
         </li>
+        <li id="user-database-app">
+            <a href="{% url 'applications:user-database-app-list' %}">
+                <i class="" style="width: 14px"></i><span class="nav-label">{% trans 'DatabaseApp' %}</span><span class="label label-info pull-right"></span>
+            </a>
+        </li>
     </ul>
 </li>
 {% endif %}

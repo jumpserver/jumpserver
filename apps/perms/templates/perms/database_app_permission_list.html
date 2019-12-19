@@ -3,9 +3,9 @@
 {% block table_search %}{% endblock %}
 {% block table_container %}
     <div class="uc pull-left  m-r-5">
-        <a href="{% url 'perms:remote-app-permission-create' %}" class="btn btn-sm btn-primary"> {% trans "Create permission" %} </a>
+        <a href="{% url 'perms:database-app-permission-create' %}" class="btn btn-sm btn-primary"> {% trans "Create permission" %} </a>
     </div>
-    <table class="table table-striped table-bordered table-hover " id="remote_app_permission_list_table" >
+    <table class="table table-striped table-bordered table-hover " id="database_app_permission_list_table" >
         <thead>
         <tr>
             <th class="text-center">
@@ -14,7 +14,7 @@
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'User' %}</th>
             <th class="text-center">{% trans 'User group' %}</th>
-            <th class="text-center">{% trans 'RemoteApp' %}</th>
+            <th class="text-center">{% trans 'DatabaseApp' %}</th>
             <th class="text-center">{% trans 'System user' %}</th>
             <th class="text-center">{% trans 'Validity' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
@@ -29,11 +29,11 @@
 <script>
 function initTable() {
     var options = {
-        ele: $('#remote_app_permission_list_table'),
+        ele: $('#database_app_permission_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                     cellData = htmlEscape(cellData);
-                    {% url 'perms:remote-app-permission-detail' pk=DEFAULT_PK as the_url  %}
+                    {% url 'perms:database-app-permission-detail' pk=DEFAULT_PK as the_url  %}
                     var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                     $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                 }},
@@ -61,18 +61,18 @@ function initTable() {
                     }
                 }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
-                    var update_btn = '<a href="{% url "perms:remote-app-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-rid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                    var update_btn = '<a href="{% url "perms:database-app-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-delete" data-did="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                     $(td).html(update_btn + del_btn)
                 }}
         ],
-        ajax_url: '{% url "api-perms:remote-app-permission-list" %}',
+        ajax_url: '{% url "api-perms:database-app-permission-list" %}',
         columns: [
             {data: "id"},
             {data: "name" },
             {data: "users", orderable: false},
             {data: "user_groups", orderable: false},
-            {data: "remote_apps", orderable: false},
+            {data: "database_apps", orderable: false},
             {data: "system_users", orderable: false},
             {data: "is_valid", orderable: false},
             {data: "id", orderable: false, width: "100px"}
@@ -86,10 +86,10 @@ $(document).ready(function(){
 })
 .on('click', '.btn-delete', function () {
     var $this = $(this);
-    var $data_table = $('#remote_app_list_table').DataTable();
+    var $data_table = $('#database_app_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
-    var rid = $this.data('rid');
-    var the_url = '{% url "api-perms:remote-app-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', rid);
+    var did = $this.data('did');
+    var the_url = '{% url "api-perms:database-app-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', did);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();

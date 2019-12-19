@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 # RemoteApp
+
 REMOTE_APP_BOOT_PROGRAM_NAME = '||jmservisor'
 
 REMOTE_APP_TYPE_CHROME = 'chrome'
@@ -49,4 +50,14 @@ REMOTE_APP_TYPE_CHOICES = (
     (REMOTE_APP_TYPE_MYSQL_WORKBENCH, 'MySQL Workbench'),
     (REMOTE_APP_TYPE_VMWARE_CLIENT, 'vSphere Client'),
     (REMOTE_APP_TYPE_CUSTOM, _('Custom')),
+)
+
+
+# DatabaseApp
+
+
+DATABASE_APP_TYPE_MYSQL = 'mysql'
+
+DATABASE_APP_TYPE_CHOICES = (
+    (DATABASE_APP_TYPE_MYSQL, 'MySQL'),
 )

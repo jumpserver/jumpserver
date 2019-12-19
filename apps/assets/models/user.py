@@ -92,11 +92,13 @@ class SystemUser(AssetUser):
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
     PROTOCOL_VNC = 'vnc'
+    PROTOCOL_MYSQL = 'mysql'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
         (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
+        (PROTOCOL_MYSQL, 'mysql'),
     )
 
     LOGIN_AUTO = 'auto'
@@ -132,6 +134,18 @@ class SystemUser(AssetUser):
             return True
         else:
             return False
+
+    @property
+    def is_need_cmd_filter(self):
+        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_MYSQL]
+
+    @property
+    def is_need_test_asset_connective(self):
+        return self.protocol not in [self.PROTOCOL_MYSQL]
+
+    @property
+    def can_perm_to_asset(self):
+        return self.protocol not in [self.PROTOCOL_MYSQL]
 
     @property
     def cmd_filter_rules(self):

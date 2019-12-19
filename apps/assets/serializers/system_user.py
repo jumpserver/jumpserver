@@ -103,8 +103,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def validate(self, attrs):
         username = attrs.get("username", "manual")
+        auto_gen_key = attrs.pop("auto_generate_key", False)
         protocol = attrs.get("protocol")
-        auto_gen_key = attrs.get("auto_generate_key", False)
+
+        if protocol not in [SystemUser.PROTOCOL_RDP, SystemUser.PROTOCOL_SSH]:
+            return attrs
+
         if auto_gen_key:
             password = SystemUser.gen_password()
             attrs["password"] = password
@@ -119,7 +123,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             public_key = ssh_pubkey_gen(private_key, password=password,
                                         username=username)
             attrs["public_key"] = public_key
-        attrs.pop("auto_generate_key", None)
         return attrs
 
     @classmethod

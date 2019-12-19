@@ -43,8 +43,8 @@
                             {% bootstrap_field form.user_groups layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
 
-                            <h3>{% trans 'RemoteApp' %}</h3>
-                            {% bootstrap_field form.remote_apps layout="horizontal" %}
+                            <h3>{% trans 'DatabaseApp' %}</h3>
+                            {% bootstrap_field form.database_apps layout="horizontal" %}
                             {% bootstrap_field form.system_users layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
 
@@ -121,13 +121,13 @@ $(document).ready(function () {
     var form = $("form");
     var data = form.serializeObject();
     var method = "POST";
-    var the_url = '{% url "api-perms:remote-app-permission-list" %}';
-    var redirect_to = '{% url "perms:remote-app-permission-list" %}';
+    var the_url = '{% url "api-perms:database-app-permission-list" %}';
+    var redirect_to = '{% url "perms:database-app-permission-list" %}';
     {% if api_action == "update" %}
-        the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
+        the_url = '{% url "api-perms:database-app-permission-detail" pk=object.id %}';
         method = "PUT";
     {% endif %}
-    objectAttrsIsList(data, ['users', 'user_groups', 'remote_apps', 'system_users']);
+    objectAttrsIsList(data, ['users', 'user_groups', 'database_apps', 'system_users']);
     objectAttrsIsDatetime(data, ['date_expired', 'date_start']);
     objectAttrsIsBool(data, ['is_active']);
     var props = {
