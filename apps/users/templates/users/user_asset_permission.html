@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'users/_base_user_detail.html' %}
 {% load static %}
 {% load i18n %}
 
@@ -6,67 +6,57 @@
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
-{% block content %}
-    <div class="wrapper wrapper-content animated fadeInRight">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="panel-options">
-                        <ul class="nav nav-tabs">
-                            {% include 'users/_base_user_detail_nav_header.html' %}
-                        </ul>
-                    </div>
-                    <div class="tab-content">
-                        <div class="col-sm-10" style="padding-left: 0">
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span class="label"><b>{{ object.name }}</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <div class="mail-box-header">
-                                        <table class="table table-striped table-bordered table-hover"
-                                               id="permission_list_table"
-                                               style="width: 100%">
-                                            <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>{% trans 'Name' %}</th>
-                                                <th class="text-center">{% trans 'User' %}</th>
-                                                <th class="text-center">{% trans 'User group' %}</th>
-                                                <th class="text-center">{% trans 'Asset' %}</th>
-                                                <th class="text-center">{% trans 'Node' %}</th>
-                                                <th class="text-center">{% trans 'System user' %}</th>
-                                                <th class="text-center">{% trans 'Validity' %}</th>
-                                                <th class="text-center">{% trans 'Action' %}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
+{% block content_table %}
+<div class="col-sm-10" style="padding-left: 0">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <span class="label"><b>{{ object.name }}</b></span>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                </ul>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="mail-box-header">
+                <table class="table table-striped table-bordered table-hover"
+                       id="permission_list_table"
+                       style="width: 100%">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>{% trans 'Name' %}</th>
+                        <th class="text-center">{% trans 'User' %}</th>
+                        <th class="text-center">{% trans 'User group' %}</th>
+                        <th class="text-center">{% trans 'Asset' %}</th>
+                        <th class="text-center">{% trans 'Node' %}</th>
+                        <th class="text-center">{% trans 'System user' %}</th>
+                        <th class="text-center">{% trans 'Validity' %}</th>
+                        <th class="text-center">{% trans 'Action' %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    {% include '_filter_dropdown.html' %}
+</div>
+
+{% include '_filter_dropdown.html' %}
+
 {% endblock %}
+
 {% block custom_foot_js %}
 <script>
 jumpserver.nodes_selected = {};
