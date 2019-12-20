@@ -185,7 +185,7 @@ class AdHoc(models.Model):
     hosts = models.ManyToManyField('assets.Asset', verbose_name=_("Host"))
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
     run_as = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Username'))
-    become = EncryptJsonDictCharField(max_length=1024, default='', blank=True, verbose_name=_("Become"))
+    become = EncryptJsonDictCharField(max_length=1024, default='', null=True, blank=True, verbose_name=_("Become"))
     created_by = models.CharField(max_length=64, default='', blank=True, null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
 
