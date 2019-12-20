@@ -96,10 +96,10 @@ LOGGING = {
             'handlers': ['syslog'],
             'level': 'INFO'
         },
-        # 'django.db': {
-        #     'handlers': ['console', 'file'],
-        #     'level': 'DEBUG'
-        # }
+        'django.db': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 }
 SYSLOG_ENABLE = CONFIG.SYSLOG_ENABLE

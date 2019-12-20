@@ -26,7 +26,10 @@ class BasicAssetSerializer(serializers.ModelSerializer):
 class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
+    # connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
+    score = serializers.IntegerField(read_only=True)
+    union_id = serializers.CharField(read_only=True)
+    asset_username = serializers.CharField(read_only=True)
 
     backend = serializers.CharField(read_only=True, label=_("Backend"))
 
@@ -35,11 +38,14 @@ class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         read_only_fields = (
             'date_created', 'date_updated', 'created_by',
-            'is_latest', 'version', 'connectivity',
+            'is_latest', 'score', 'connectivity', "union_id",
+            "version", "asset_username",
         )
         fields = [
-            "id", "hostname", "ip", "username", "password", "asset", "version",
-            "is_latest", "connectivity", "backend",
+            "id", "hostname", "ip", "username", "password",
+            "asset_id", "score", "backend", "union_id", "asset_username",
+            "version",
+            #"is_latest", "connectivity",
             "date_created", "date_updated", "private_key", "public_key",
         ]
         extra_kwargs = {

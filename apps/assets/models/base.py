@@ -11,12 +11,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from common.utils import (
-    signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
+    ssh_key_string_to_obj, ssh_key_gen, get_logger
 )
 from common.validators import alphanumeric
 from common import fields
 from orgs.mixins.models import OrgModelMixin
-from .utils import private_key_validator, Connectivity
+from .utils import Connectivity
 
 
 logger = get_logger(__file__)

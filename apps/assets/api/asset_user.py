@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.shortcuts import get_object_or_404
+from django.http import Http404
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework_bulk import BulkModelViewSet
-from django.shortcuts import get_object_or_404
-from django.http import Http404
-from django.conf import settings
+from queryset_sequence import QuerySetSequence
+from queryset_sequence.pagination import SequenceCursorPagination
 
 from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
 from common.mixins import CommonApiMixin
 from ..backends import AssetUserManager
+from ..backends.asset_user import (
+    AssetAdminUserManager, AssetSystemUserManager, AuthbookManager,
+    QuerySetChain
+)
 from ..models import Asset, Node, SystemUser, AdminUser
 from .. import serializers
 from ..tasks import test_asset_users_connectivity_manual
@@ -71,6 +77,14 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
         return False
 
     def get_queryset(self):
+        # # return QuerySetSequence(
+        # #     AssetSystemUserManager().query_all(),
+        # #     AssetAdminUserManager().query_all(),
+        # #     AuthbookManager().query_all(),
+        # # )
+        # # return AssetSystemUserManager().query_all()
+        # # return AssetAdminUserManager().query_all()
+        # return AuthbookManager().query_all()
         # 尽可能先返回更少的数据
         username = self.request.GET.get('username')
         asset_id = self.request.GET.get('asset_id')
