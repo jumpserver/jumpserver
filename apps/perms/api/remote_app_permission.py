@@ -11,6 +11,7 @@ from ..serializers import (
     RemoteAppPermissionSerializer,
     RemoteAppPermissionUpdateUserSerializer,
     RemoteAppPermissionUpdateRemoteAppSerializer,
+    RemoteAppPermissionListSerializer,
 )
 
 
@@ -25,7 +26,10 @@ class RemoteAppPermissionViewSet(OrgModelViewSet):
     model = RemoteAppPermission
     filter_fields = ('name', )
     search_fields = filter_fields
-    serializer_class = RemoteAppPermissionSerializer
+    serializer_classes = {
+        'default': RemoteAppPermissionSerializer,
+        'display': RemoteAppPermissionListSerializer,
+    }
     permission_classes = (IsOrgAdmin,)
 
 

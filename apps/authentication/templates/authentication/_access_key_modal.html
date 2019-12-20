@@ -62,7 +62,7 @@ function initAccessKeyTable() {
             }},
             {targets: 5, createdCell: function (td, cellData, rowData) {
                 var btn = '';
-                var btn_del = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="ID">{% trans "Delete" %}</a>';
+                var btn_del = '<a class="btn btn-xs btn-danger m-l-xs btn-api-keydel" data-id="ID">{% trans "Delete" %}</a>';
                 var btn_inactive = '<a class="btn btn-xs btn-info m-l-xs btn-inactive" data-id="ID">{% trans "Disable" %}</a>';
                 var btn_active = '<a class="btn btn-xs btn-primary m-l-xs btn-active" data-id="ID">{% trans "Enable" %}</a>';
 
@@ -107,7 +107,7 @@ $(document).ready(function () {
 }).on("click", ".btn-secret", function () {
     var $this = $(this);
     $this.parent().html($this.data("secret"))
-}).on("click", ".btn-del", function () {
+}).on("click", ".btn-api-key-del", function () {
     var url = "{% url "api-auth:access-key-detail" pk=DEFAULT_PK %}";
     url = url.replace("{{ DEFAULT_PK }}", $(this).data("id")) ;
     objectDelete($(this), $(this).data("id"), url);

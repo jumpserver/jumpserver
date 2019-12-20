@@ -1,0 +1,100 @@
+{% extends 'users/_base_user_detail.html' %}
+{% load i18n static %}
+
+{% block custom_head_css_js %}
+    <script src="{% static 'js/jquery.form.min.js' %}"></script>
+{% endblock %}
+
+{% block content_table %}
+<div class="col-sm-10" style="padding-left: 0">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <span class="label"><b>{{ object.name }}</b></span>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                </ul>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <table class="table table-striped table-bordered table-hover " id="database_app_list_table" >
+                <thead>
+                <tr>
+                    <th class="text-center">
+                        <input type="checkbox" id="check_all" class="ipt_check_all" >
+                    </th>
+                    <th class="text-center">{% trans 'Name' %}</th>
+                    <th class="text-center">{% trans 'Type' %}</th>
+                    <th class="text-center">{% trans 'Host' %}</th>
+                    <th class="text-center">{% trans 'Database' %}</th>
+                    <th class="text-center">{% trans 'Comment' %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+var inited = false;
+var database_app_table, url;
+
+function initTable() {
+    if (inited){
+        return
+    } else {
+        inited = true;
+    }
+    url = '{% url "api-perms:user-database-apps" pk=object.id %}';
+    var options = {
+        ele: $('#database_app_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                    cellData = htmlEscape(cellData);
+                    {% url 'applications:database-app-detail' pk=DEFAULT_PK as the_url  %}
+                    var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
+                    $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+                }},
+            {targets: 2, createdCell: function (td, cellData, rowData) {
+                    var type = htmlEscape(rowData.get_type_display);
+                    $(td).html(type);
+                }},
+            {targets: 3, createdCell: function (td, cellData, rowData) {
+                    var host = htmlEscape(cellData);
+                    $(td).html(host);
+                }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                    var database = htmlEscape(cellData);
+                    $(td).html(database);
+                }}
+        ],
+        ajax_url: url,
+        columns: [
+            {data: "id"},
+            {data: "name"},
+            {data: "type"},
+            {data: "host"},
+            {data: "database"},
+            {data: "comment", orderable: false},
+        ]
+    };
+    database_app_table = jumpserver.initServerSideDataTable(options);
+    return database_app_table
+}
+$(document).ready(function(){
+    initTable();
+})
+</script>
+{% endblock %}
