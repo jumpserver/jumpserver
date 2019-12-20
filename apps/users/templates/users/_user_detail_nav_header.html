@@ -1,29 +1,49 @@
 {% load static %}
 {% load i18n %}
 
+<style>
+    .nav .open>a, .nav .open>a:hover, .nav .open>a:focus{
+        border-color: white;
+    }
+</style>
+
 <li id="user_detail_nav">
     <a href="{% url 'users:user-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
 </li>
-<li id="user_detail_assets_nav">
-    <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
+<li id="user_detail_user_permission_nav" class="btn-group">
+    <a class="btn btn-sm" href="{% url 'users:user-granted-asset' pk=object.id %}">
+        {% trans "User permissions" %}
+    </a>
+    <a data-toggle="dropdown" class="btn dropdown-toggle"><span class="caret"></span></a>
+
+    <ul class="dropdown-menu">
+        <li id="user_detail_assets_nav">
+            <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i>
+                {% trans 'Asset granted' %}
+            </a>
+
+        </li>
+        <li id="user_detail_asset_permissions_nav">
+            <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
+        </li>
+
+        {% if LICENSE_VALID %}
+        <li id="user_detail_remote_apps_nav">
+            <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp granted' %}</a>
+        </li>
+        <li id="user_detail_remote_app_permissions_nav">
+            <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'RemoteApp permission' %}</a>
+        </li>
+        <li id="user_detail_database_apps_nav">
+            <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center"><i class="fa fa-database"></i> {% trans 'DatabaseApp granted' %}</a>
+        </li>
+        <li id="user_detail_database_app_permissions_nav">
+            <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'DatabaseApp permission' %}</a>
+        </li>
+        {% endif %}
+
+    </ul>
 </li>
-<li id="user_detail_asset_permissions_nav">
-    <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
-</li>
-{% if LICENSE_VALID %}
-<li id="user_detail_remote_apps_nav">
-    <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp granted' %}</a>
-</li>
-<li id="user_detail_remote_app_permissions_nav">
-    <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'RemoteApp permission' %}</a>
-</li>
-<li id="user_detail_database_apps_nav">
-    <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center"><i class="fa fa-database"></i> {% trans 'DatabaseApp granted' %}</a>
-</li>
-<li id="user_detail_database_app_permissions_nav">
-    <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'DatabaseApp permission' %}</a>
-</li>
-{% endif %}
 
 <script>
 function activeUserDetailNav(prefix) {
@@ -36,13 +56,15 @@ function activeUserDetailNav(prefix) {
     var page_prefix = 'user_detail';
     var page_suffix = 'nav';
     var page = urlArray[urlArray.length-2];
-    var navId = '';
+    var navId, navId2 = '';
     if (page === "{{ object.id }}" || page === undefined){
         navId = "#" + page_prefix + '_' + page_suffix
     }
     else{
-        navId = "#" + page_prefix + '_' + page.replace(/-/g, '_') + '_' + page_suffix
-
+        navId = "#" + page_prefix + '_' + 'user_permission' + '_' + page_suffix;
+        navId2 = "#" + page_prefix + '_' + page.replace(/-/g, '_') + '_' + page_suffix + ' a';
+        var tip_circle = '<span class="fa fa-circle" style="padding-left: 5px; color: #1ab394"></span>';
+        $(navId2).html($(navId2).html() + tip_circle)
     }
     $(navId).addClass('active')
 }
