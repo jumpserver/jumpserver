@@ -10,6 +10,7 @@
 <li id="user_detail_asset_permissions_nav">
     <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
 </li>
+{% if LICENSE_VALID %}
 <li id="user_detail_remote_apps_nav">
     <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center"><i class="fa fa-desktop"></i> {% trans 'RemoteApp granted' %}</a>
 </li>
@@ -22,6 +23,7 @@
 <li id="user_detail_database_app_permissions_nav">
     <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'DatabaseApp permission' %}</a>
 </li>
+{% endif %}
 
 <script>
 function activeUserDetailNav(prefix) {
