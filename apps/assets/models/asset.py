@@ -155,6 +155,12 @@ class Platform(models.Model):
         )
         return linux.id
 
+    def is_windows(self):
+        return self.base.lower() in ('windows',)
+
+    def is_unixlike(self):
+        return self.base.lower() in ("linux", "unix", "macos", "bsd")
+
     def __str__(self):
         return self.name
 
@@ -233,21 +239,18 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
             return False, warning
         return True, warning
 
-    def is_windows(self):
-        return self.platform_base == "Windows"
-
-    def is_unixlike(self):
-        if self.platform_base not in ("Windows", "Windows2016", "Other"):
-            return True
-        else:
-            return False
-
-    def is_support_ansible(self):
-        return self.has_protocol('ssh') and self.platform_base not in ("Other",)
-
     @lazyproperty
     def platform_base(self):
         return self.platform.base
+
+    def is_windows(self):
+        return self.platform.is_windows()
+
+    def is_unixlike(self):
+        return self.platform.is_unixlike()
+
+    def is_support_ansible(self):
+        return self.has_protocol('ssh') and self.platform_base not in ("Other",)
 
     @property
     def cpu_info(self):

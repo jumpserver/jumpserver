@@ -63,7 +63,12 @@ class CommandExecution(models.Model):
         if ok:
             runner = CommandRunner(self.inventory)
             try:
-                result = runner.execute(self.command, 'all')
+                host = self.hosts[0]
+                if host.is_windows():
+                    shell = 'win_shell'
+                else:
+                    shell = 'shell'
+                result = runner.execute(self.command, 'all', module=shell)
                 self.result = result.results_command
             except SoftTimeLimitExceeded as e:
                 print("Run timeout than 60s")
