@@ -63,7 +63,7 @@ class CommandExecution(models.Model):
         if ok:
             runner = CommandRunner(self.inventory)
             try:
-                host = self.hosts[0]
+                host = self.hosts.first()
                 if host.is_windows():
                     shell = 'win_shell'
                 else:
