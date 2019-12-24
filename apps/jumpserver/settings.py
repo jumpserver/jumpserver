@@ -71,7 +71,6 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'authentication.apps.AuthenticationConfig',  # authentication
     'applications.apps.ApplicationsConfig',
-    'tickets.apps.TicketsConfig',
     'rest_framework',
     'rest_framework_swagger',
     'drf_yasg',
@@ -109,7 +108,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
+    # 'authentication.backends.openid.middleware.OpenIDAuthenticationMiddleware',
+    'authentication.backends.oidc_rp.middleware.OIDCRefreshIDTokenMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
     'jumpserver.middleware.DemoMiddleware',
     'jumpserver.middleware.RequestMiddleware',
@@ -332,7 +332,7 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '{}/static/'.format(CONFIG.FORCE_SCRIPT_NAME)
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_DIR, "data", "static")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
@@ -411,7 +411,6 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'authentication.backends.pubkey.PublicKeyAuthBackend',
 ]
 
 # Custom User Auth model
@@ -467,21 +466,26 @@ if AUTH_LDAP:
 BASE_SITE_URL = CONFIG.BASE_SITE_URL
 AUTH_OPENID = CONFIG.AUTH_OPENID
 AUTH_OPENID_SERVER_URL = CONFIG.AUTH_OPENID_SERVER_URL
-AUTH_OPENID_REALM_NAME = CONFIG.AUTH_OPENID_REALM_NAME
+AUTH_OPENID_TOKEN_ENDPOINT = CONFIG.AUTH_OPENID_TOKEN_ENDPOINT
+AUTH_OPENID_USERINFO_ENDPOINT = CONFIG.AUTH_OPENID_USERINFO_ENDPOINT
 AUTH_OPENID_CLIENT_ID = CONFIG.AUTH_OPENID_CLIENT_ID
 AUTH_OPENID_CLIENT_SECRET = CONFIG.AUTH_OPENID_CLIENT_SECRET
-AUTH_OPENID_IGNORE_SSL_VERIFICATION = CONFIG.AUTH_OPENID_IGNORE_SSL_VERIFICATION
+AUTH_OPENID_LOGOUT = CONFIG.AUTH_OPENID_LOGOUT
 AUTH_OPENID_SHARE_SESSION = CONFIG.AUTH_OPENID_SHARE_SESSION
+# AUTH_OPENID_BACKENDS = [
+#     'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
+#     'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
+# ]
 AUTH_OPENID_BACKENDS = [
-    'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend',
-    'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
+    'authentication.backends.oidc_rp.backends.OIDCAuthBackend',
+    # 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend',
 ]
 
 if AUTH_OPENID:
     LOGIN_URL = reverse_lazy("authentication:openid:openid-login")
     LOGIN_COMPLETE_URL = reverse_lazy("authentication:openid:openid-login-complete")
     AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[0])
-    AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
+    # AUTHENTICATION_BACKENDS.insert(0, AUTH_OPENID_BACKENDS[1])
 
 # Radius Auth
 AUTH_RADIUS = CONFIG.AUTH_RADIUS
@@ -657,4 +661,3 @@ CHANNEL_LAYERS = {
 
 # Enable internal period task
 PERIOD_TASK_ENABLED = CONFIG.PERIOD_TASK_ENABLED
-FORCE_SCRIPT_NAME = CONFIG.FORCE_SCRIPT_NAME

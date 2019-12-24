@@ -11,12 +11,10 @@ app_name = 'authentication'
 
 urlpatterns = [
     # openid
-    path('openid/', include(('authentication.backends.openid.urls', 'authentication'), namespace='openid')),
+    path('openid/', include(('authentication.backends.oidc_rp.urls', 'authentication'), namespace='openid')),
 
     # login
     path('login/', views.UserLoginView.as_view(), name='login'),
     path('login/otp/', views.UserLoginOtpView.as_view(), name='login-otp'),
-    path('login/wait-confirm/', views.UserLoginWaitConfirmView.as_view(), name='login-wait-confirm'),
-    path('login/guard/', views.UserLoginGuardView.as_view(), name='login-guard'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
 ]
