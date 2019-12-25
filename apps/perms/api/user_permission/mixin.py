@@ -10,9 +10,12 @@ from ...hands import Node, Asset
 class UserAssetPermissionMixin(UserPermissionMixin):
     util = None
 
+    def get_cache_policy(self):
+        return self.request.query_params.get('cache_policy', '0')
+
     @lazyproperty
     def util(self):
-        cache_policy = self.request.query_params.get('cache_policy', '0')
+        cache_policy = self.get_cache_policy()
         system_user_id = self.request.query_params.get("system_user")
         util = AssetPermissionUtilV2(self.obj, cache_policy=cache_policy)
         if system_user_id:
