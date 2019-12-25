@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.db.models import F, Value, IntegerField, CharField
+from django.db.models import F, Value, IntegerField, CharField, Q
 from django.db.models.functions import Concat
 
 from ..models import Asset
@@ -26,10 +26,16 @@ class AdminUserBackend(BaseBackend):
             assets_id = self.make_assets_as_id(assets)
             self.queryset = self.queryset.filter(id__in=assets_id)
         if node:
-            self.queryset = self.queryset.filter(node__key=node.key)
+            self.queryset = self.queryset.filter(nodes__id=node.id)
         kwargs = self.clean_kwargs(kwargs)
         if kwargs:
             self.queryset = self.queryset.filter(**kwargs)
+
+    def search(self, item):
+        q = []
+        for i in ['hostname', 'ip', 'username']:
+            kwargs = {i + '__icontains': item}
+            q.append(Q(**kwargs))
 
     def all(self):
         qs = self.model.objects.all().annotate(

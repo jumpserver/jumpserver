@@ -24,7 +24,7 @@ class SystemUserBackend(BaseBackend):
             assets_id = self.make_assets_as_id(assets)
             self.queryset = self.queryset.filter(asset__id__in=assets_id)
         if node:
-            self.queryset = self.queryset.filter(asset__node__id=node.id)
+            self.queryset = self.queryset.filter(asset__nodes__id=node.id)
         kwargs = self.clean_kwargs(kwargs)
         if kwargs:
             self.queryset = self.queryset.filter(**kwargs)

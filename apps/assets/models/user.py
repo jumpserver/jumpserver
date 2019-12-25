@@ -4,14 +4,12 @@
 
 import logging
 
-from functools import reduce
 from django.db import models
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from common.utils import signer
-from .base import AssetUser
+from .base import BaseUser
 from .asset import Asset
 
 
@@ -19,7 +17,7 @@ __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
 
 
-class AdminUser(AssetUser):
+class AdminUser(BaseUser):
     """
     A privileged user that ansible can use it to push system user and so on
     """
@@ -87,7 +85,7 @@ class AdminUser(AssetUser):
                 continue
 
 
-class SystemUser(AssetUser):
+class SystemUser(BaseUser):
     PROTOCOL_SSH = 'ssh'
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'

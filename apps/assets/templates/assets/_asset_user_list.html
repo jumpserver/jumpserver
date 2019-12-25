@@ -20,7 +20,7 @@
       <th class="text-center">{% trans 'IP' %}</th>
       <th class="text-center">{% trans 'Username' %}</th>
       <th class="text-center">{% trans 'Version' %}</th>
-      <th class="text-center">{% trans 'Connectivity'%}</th>
+{#      <th class="text-center">{% trans 'Connectivity'%}</th>#}
       <th class="text-center">{% trans 'Datetime' %}</th>
       <th class="text-center">{% trans 'Action' %}</th>
    </tr>
@@ -49,28 +49,12 @@ function initAssetUserTable() {
         columnDefs: [
             {
                 targets: 5, createdCell: function (td, cellData) {
-                  var innerHtml = "";
-                  if (cellData.status == 1) {
-                      innerHtml = '<i class="fa fa-circle text-navy"></i>'
-                  } else if (cellData.status == 0) {
-                      innerHtml = '<i class="fa fa-circle text-danger"></i>'
-                  } else {
-                      innerHtml = '<i class="fa fa-circle text-warning"></i>'
-                  }
-                  var dateManual = toSafeLocalDateStr(cellData.datetime);
-                  var dataContent = testDatetime + dateManual;
-                  innerHtml = "<a data-toggle='popover' data-content='" + dataContent + "'" + 'data-placement="auto bottom"' + ">" + innerHtml + "</a>";
-                  $(td).html(innerHtml);
-                }
-            },
-            {
-                targets: 6, createdCell: function (td, cellData) {
                     var data = toSafeLocalDateStr(cellData);
                     $(td).html(data);
                 },
             },
             {
-                targets: 7, createdCell: function (td, cellData, rowData) {
+                targets: 6, createdCell: function (td, cellData, rowData) {
                     var view_btn = '<button class="btn btn-xs btn-primary m-l-xs btn-view-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans "View" %}</button>'
                     var update_btn = '<li><a class="btn-update-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Update' %}</a></li>';
                     var test_btn = '<li><a class="btn-test-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Test' %}</a></li>';
@@ -96,11 +80,10 @@ function initAssetUserTable() {
         ],
         ajax_url: assetUserListUrl,
         columns: [
-            {data: "id"}, {data: "hostname"}, {data: "ip"},
+            {data: "union_id"}, {data: "hostname"}, {data: "ip"},
             {data: "username"}, {data: "version", orderable: false},
-            {data: "connectivity"},
             {data: "date_created", orderable: false},
-            {data: "asset", orderable: false}
+            {data: "union_id", orderable: false}
         ],
         op_html: $('#actions').html()
     };

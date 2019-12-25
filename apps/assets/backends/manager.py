@@ -20,16 +20,21 @@ class AssetUserQueryset:
         self._queryset = None
 
     def filter(self, hostname=None, ip=None, username=None, assets=None,
-               asset=None, node=None, prefer_id=None):
+               asset=None, node=None, prefer_id=None, **kwargs):
         if not assets and asset:
             assets = [asset]
-        kwargs = dict(
+        kwargs.update(dict(
             hostname=hostname, ip=ip, username=username,
             assets=assets, node=node, prefer_id=prefer_id,
-        )
+        ))
         print("Filter: {}".format(kwargs))
         for backend in self.backends:
             backend.filter(**kwargs)
+        return self
+
+    def search(self, item):
+        for backend in self.backends:
+            backend.search(item)
         return self
 
     def distinct(self):

@@ -22,7 +22,7 @@ from .utils import Connectivity
 logger = get_logger(__file__)
 
 
-class AssetUser(OrgModelMixin):
+class BaseUser(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     username = models.CharField(max_length=32, blank=True, verbose_name=_('Username'), validators=[alphanumeric], db_index=True)

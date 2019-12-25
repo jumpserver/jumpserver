@@ -2,6 +2,7 @@ from .base import *
 from .asset import *
 from .label import Label
 from .user import *
+from .asset_user import *
 from .cluster import *
 from .group import *
 from .domain import *

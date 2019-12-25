@@ -8,6 +8,7 @@ from common.serializers import AdaptedBulkListSerializer
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from ..models import AuthBook, Asset
 from ..backends import AssetUserManager
+
 from .base import ConnectivitySerializer, AuthSerializerMixin
 
 
@@ -17,19 +18,12 @@ __all__ = [
 ]
 
 
-class BasicAssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        fields = ['hostname', 'ip']
-
-
 class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
     hostname = serializers.CharField(read_only=True, label=_("Hostname"))
     ip = serializers.CharField(read_only=True, label=_("IP"))
     # connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
     score = serializers.IntegerField(read_only=True)
     union_id = serializers.CharField(read_only=True)
-    asset_username = serializers.CharField(read_only=True)
 
     backend = serializers.CharField(read_only=True, label=_("Backend"))
 
@@ -38,12 +32,12 @@ class AssetUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         read_only_fields = (
             'date_created', 'date_updated', 'created_by',
-            'is_latest', 'score', 'connectivity', "union_id",
-            "version", "asset_username",
+            'is_latest', 'score', 'connectivity',
+            "version",
         )
         fields = [
             "id", "hostname", "ip", "username", "password",
-            "asset_id", "score", "backend", "union_id", "asset_username",
+            "asset_id", "score", "backend", "union_id",
             "version",
             #"is_latest", "connectivity",
             "date_created", "date_updated", "private_key", "public_key",

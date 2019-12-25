@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.conf import settings
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import filters
+from rest_framework import generics, filters
 from rest_framework_bulk import BulkModelViewSet
 
 from common.permissions import IsOrgAdminOrAppUser, NeedMFAVerify
 from common.utils import get_object_or_none, get_logger
 from common.mixins import CommonApiMixin
 from ..backends import AssetUserManager
-from ..models import Asset, Node, SystemUser, AdminUser
+from ..models import Asset, Node
 from .. import serializers
 from ..tasks import test_asset_users_connectivity_manual
 
@@ -34,8 +32,14 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
             value = request.GET.get(field)
             if not value:
                 continue
-            if field in ("node_id", "system_user_id", "admin_user_id"):
+            if field == "node_id":
+                value = get_object_or_none(Node, pk=value)
+                kwargs["node"] = value
                 continue
+            elif field == "asset_id":
+                field = "asset"
+            elif field in ["system_user_id", "admin_user_id"]:
+                field = "prefer_id"
             kwargs[field] = value
         return queryset.filter(**kwargs)
 
@@ -45,13 +49,8 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
         value = request.GET.get('search')
         if not value:
             return queryset
+        queryset = queryset.search(value)
         return queryset
-        # _queryset = AssetUserManager.none()
-        # for field in view.search_fields:
-        #     if field in ("node_id", "system_user_id", "admin_user_id"):
-        #         continue
-        #     _queryset |= queryset.filter(**{field: value})
-        # return _queryset.distinct()
 
 
 class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
@@ -59,14 +58,15 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
     filter_fields = [
-        "id", "ip", "hostname", "username", "asset_id", "node_id",
+        "ip", "hostname", "username",
+        "asset_id", "node_id",
         "system_user_id", "admin_user_id"
     ]
-    search_fields = filter_fields
-    filter_backends = (
+    search_fields = ["ip", "hostname", "username"]
+    filter_backends = [
         AssetUserFilterBackend,
         AssetUserSearchBackend,
-    )
+    ]
 
     def allow_bulk_destroy(self, qs, filtered):
         return False
@@ -74,44 +74,6 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     def get_queryset(self):
         manager = AssetUserManager()
         queryset = manager.all()
-        # return AssetSystemUserManager().query_all()
-        # return AssetAdminUserManager().query_all()
-        # return AuthbookBackend().query_all()
-        # 尽可能先返回更少的数据
-        return queryset
-        username = self.request.GET.get('username')
-        asset_id = self.request.GET.get('asset_id')
-        node_id = self.request.GET.get('node_id')
-        admin_user_id = self.request.GET.get("admin_user_id")
-        system_user_id = self.request.GET.get("system_user_id")
-
-        kwargs = {}
-        assets = None
-
-        manager = AssetUserManager()
-        if system_user_id:
-            system_user = get_object_or_404(SystemUser, id=system_user_id)
-            assets = system_user.get_all_assets()
-            username = system_user.username
-        elif admin_user_id:
-            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
-            assets = admin_user.assets.all()
-            username = admin_user.username
-            manager.prefer('admin_user')
-
-        if asset_id:
-            asset = get_object_or_404(Asset, id=asset_id)
-            assets = [asset]
-        elif node_id:
-            node = get_object_or_404(Node, id=node_id)
-            assets = node.get_all_assets()
-
-        if username:
-            kwargs['username'] = username
-        if assets is not None:
-            kwargs['assets'] = assets
-
-        queryset = manager.filter(**kwargs)
         return queryset
 
 

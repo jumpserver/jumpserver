@@ -11,7 +11,12 @@ class BaseBackend:
         pass
 
     @abstractmethod
-    def filter(self, username=None, hostname=None, ip=None, assets=None, node=None, prefer_id=None):
+    def filter(self, username=None, hostname=None, ip=None, assets=None,
+               node=None, prefer_id=None, **kwargs):
+        pass
+
+    @abstractmethod
+    def search(self, item):
         pass
 
     @abstractmethod
