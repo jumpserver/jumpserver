@@ -59,6 +59,9 @@ class GetUserAssetPermissionActionsApi(UserAssetPermissionMixin,
 class ValidateUserAssetPermissionApi(UserAssetPermissionMixin, APIView):
     permission_classes = (IsOrgAdminOrAppUser,)
 
+    def get_cache_policy(self):
+        return 0
+
     def get_obj(self):
         user_id = self.request.query_params.get('user_id', '')
         user = get_object_or_404(User, id=user_id)
