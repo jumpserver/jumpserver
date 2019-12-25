@@ -170,8 +170,10 @@ class AssetUser(OrgModelMixin):
     def get_asset_user(self, asset):
         from ..backends import AssetUserManager
         try:
-            manager = AssetUserManager().prefer(self._prefer)
-            other = manager.get(username=self.username, asset=asset, prefer_id=self.id)
+            manager = AssetUserManager()
+            other = manager.get_object(
+                username=self.username, asset=asset, prefer_id=self.id
+            )
             return other
         except Exception as e:
             logger.error(e, exc_info=True)

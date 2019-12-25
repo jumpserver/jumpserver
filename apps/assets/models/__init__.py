@@ -1,3 +1,4 @@
+from .base import *
 from .asset import *
 from .label import Label
 from .user import *

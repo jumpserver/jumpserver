@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
+from itertools import islice, chain, groupby
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-from .base import AssetUserQuerySet
-from .db import AuthBookBackend
+from ..models import AssetUser
+
+from .db import AuthbookBackend
 from .system_user import SystemUserBackend
 from .admin_user import AdminUserBackend
 
@@ -12,99 +14,86 @@ class NotSupportError(Exception):
     pass
 
 
-class AssetUserManager:
-    """
-    资产用户管理器
-    """
-    ObjectDoesNotExist = ObjectDoesNotExist
-    MultipleObjectsReturned = MultipleObjectsReturned
-    NotSupportError = NotSupportError
-    MSG_NOT_EXIST = '{} Object matching query does not exist'
-    MSG_MULTIPLE = '{} get() returned more than one object ' \
-                   '-- it returned {}!'
+class AssetUserQueryset:
+    def __init__(self, backends=()):
+        self.backends = backends
+        self._queryset = None
 
+    def filter(self, hostname=None, ip=None, username=None, assets=None,
+               asset=None, node=None, prefer_id=None):
+        if not assets and asset:
+            assets = [asset]
+        kwargs = dict(
+            hostname=hostname, ip=ip, username=username,
+            assets=assets, node=node, prefer_id=prefer_id,
+        )
+        print("Filter: {}".format(kwargs))
+        for backend in self.backends:
+            backend.filter(**kwargs)
+        return self
+
+    def distinct(self):
+        print("dictinct")
+        queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
+        print("Chain it")
+        queryset_sorted = sorted(
+            queryset_chain,
+            key=lambda item: (item["asset_username"], item["score"]),
+            reverse=True,
+        )
+        print("Sorted")
+        results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
+        print("groupby")
+        final = [next(result[1]) for result in results]
+        self._queryset = final
+
+    def get(self, **kwargs):
+        self.filter(**kwargs)
+        count = self.count()
+        if count == 1:
+            return self.queryset[0]
+        elif count > 1:
+            msg = '{} get'.format(count)
+            raise MultipleObjectsReturned(msg)
+        else:
+            raise ObjectDoesNotExist()
+
+    def get_object(self, **kwargs):
+        data = self.get(**kwargs)
+        obj = AssetUser()
+        for k, v in data.items():
+            setattr(obj, k, v)
+        return obj
+
+    @property
+    def queryset(self):
+        if self._queryset is None:
+            self.distinct()
+        return self._queryset
+
+    def count(self):
+        return len(self.queryset)
+
+    def __getitem__(self, ndx):
+        if type(ndx) is slice:
+            return list(islice(self.queryset, ndx.start, ndx.stop, ndx.step or 1))
+        else:
+            return self.queryset[ndx]
+
+
+class AssetUserManager:
     backends = (
-        ('db', AuthBookBackend),
+        ('db', AuthbookBackend),
         ('system_user', SystemUserBackend),
         ('admin_user', AdminUserBackend),
     )
 
-    _prefer = "system_user"
-
-    def filter(self, username=None, assets=None, latest=True, prefer=None, prefer_id=None):
-        if assets is not None and not assets:
-            return AssetUserQuerySet([])
-
-        if prefer:
-            self._prefer = prefer
-
-        instances_map = {}
-        instances = []
-        for name, backend in self.backends:
-            # if name != "db":
-            #     continue
-            _instances = backend.filter(
-                username=username, assets=assets, latest=latest,
-                prefer=self._prefer, prefer_id=prefer_id,
-            )
-            instances_map[name] = _instances
-
-        # 如果不是获取最新版本，就不再merge
-        if not latest:
-            for _instances in instances_map.values():
-                instances.extend(_instances)
-            return AssetUserQuerySet(instances)
-
-        # merge的顺序
-        ordering = ["db"]
-        if self._prefer == "system_user":
-            ordering.extend(["system_user", "admin_user"])
-        else:
-            ordering.extend(["admin_user", "system_user"])
-        # 根据prefer决定优先使用系统用户或管理用户谁的
-        ordering_instances = [instances_map.get(i, []) for i in ordering]
-        instances = self._merge_instances(*ordering_instances)
-        return AssetUserQuerySet(instances)
-
-    def get(self, username, asset, **kwargs):
-        instances = self.filter(username, assets=[asset], **kwargs)
-        if len(instances) == 1:
-            return instances[0]
-        elif len(instances) == 0:
-            self.raise_does_not_exist(self.__class__.__name__)
-        else:
-            self.raise_multiple_return(self.__class__.__name__, len(instances))
-
-    def raise_does_not_exist(self, name):
-        raise self.ObjectDoesNotExist(self.MSG_NOT_EXIST.format(name))
-
-    def raise_multiple_return(self, name, length):
-        raise self.MultipleObjectsReturned(self.MSG_MULTIPLE.format(name, length))
-
-    @staticmethod
-    def create(**kwargs):
-        instance = AuthBookBackend.create(**kwargs)
-        return instance
+    def __init__(self):
+        self.backends = [backend() for name, backend in self.backends]
+        self._queryset = AssetUserQueryset(self.backends)
 
     def all(self):
-        return self.filter()
+        return self._queryset
 
-    def prefer(self, s):
-        self._prefer = s
-        return self
-
-    @staticmethod
-    def none():
-        return AssetUserQuerySet()
-
-    @staticmethod
-    def _merge_instances(*args):
-        instances = list(args[0])
-        keywords = [obj.keyword for obj in instances]
-
-        for _instances in args[1:]:
-            need_merge_instances = [obj for obj in _instances if obj.keyword not in keywords]
-            need_merge_keywords = [obj.keyword for obj in need_merge_instances]
-            instances.extend(need_merge_instances)
-            keywords.extend(need_merge_keywords)
-        return instances
+    def __getattr__(self, item):
+        return getattr(self._queryset, item)
