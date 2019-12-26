@@ -4,6 +4,7 @@ from functools import reduce
 from django.db.models import F, CharField, Value, IntegerField, Q
 from django.db.models.functions import Concat
 
+from orgs.utils import current_org
 from ..models import AuthBook, SystemUser, Asset
 from .base import BaseBackend
 
@@ -34,11 +35,6 @@ class DBBackend(BaseBackend):
 
     def count(self):
         return self.queryset.count()
-
-    def exclude(self, asset_username_list):
-        self.queryset = self.queryset.filter.exclude(
-            asset_username__in=asset_username_list
-        )
 
     @staticmethod
     def clean_kwargs(kwargs):
@@ -96,6 +92,10 @@ class SystemUserBackend(DBBackend):
             backend=Value(self.backend, CharField())
         )
         qs = self.model.objects.all().annotate(**kwargs)
+        org_id = ''
+        if current_org.is_real():
+            org_id = current_org.id
+        qs = qs.filter(asset__org_id=org_id)
         qs = self.qs_to_values(qs)
         return qs
 

@@ -5,7 +5,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 from common.utils import get_logger
 
-from ..models import AssetUser
+from ..models import AssetUser, AuthBook
 from .db import AuthbookBackend, SystemUserBackend, AdminUserBackend
 
 logger = get_logger(__name__)
@@ -21,13 +21,14 @@ class AssetUserQueryset:
         self._queryset = None
 
     def filter(self, hostname=None, ip=None, username=None, assets=None,
-               asset=None, node=None, prefer_id=None, **kwargs):
+               asset=None, node=None, prefer_id=None):
         if not assets and asset:
             assets = [asset]
-        kwargs.update(dict(
+
+        kwargs = dict(
             hostname=hostname, ip=ip, username=username,
             assets=assets, node=node, prefer_id=prefer_id,
-        ))
+        )
         logger.debug("Filter: {}".format(kwargs))
         for backend in self.backends:
             backend.filter(**kwargs)
@@ -39,26 +40,20 @@ class AssetUserQueryset:
         return self
 
     def distinct(self):
-        authbook_asset_username = set(
-            self.backends[0].value_list('asset_username', flat=True)
+        logger.debug("Chain it")
+        queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
+        logger.debug("Sort it")
+        queryset_sorted = sorted(
+            queryset_chain,
+            key=lambda item: (item["asset_username"], item["score"]),
+            reverse=True,
         )
-        for backend in self.backends[1:]:
-            backend.exclude(authbook_asset_username)
-
-        # logger.debug("Chain it")
-        # queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
-        # logger.debug("Sort it")
-        # queryset_sorted = sorted(
-        #     queryset_chain,
-        #     key=lambda item: (item["asset_username"], item["score"]),
-        #     reverse=True,
-        # )
-        # logger.debug("Group by it")
-        # results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
-        # logger.debug("Get the first")
-        # final = [next(result[1]) for result in results]
-        # logger.debug("End")
-        # self._queryset = final
+        logger.debug("Group by it")
+        results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
+        logger.debug("Get the first")
+        final = [next(result[1]) for result in results]
+        logger.debug("End")
+        self._queryset = final
 
     def get(self, **kwargs):
         self.filter(**kwargs)
@@ -107,6 +102,13 @@ class AssetUserManager:
 
     def all(self):
         return self._queryset
+
+    @staticmethod
+    def create(**kwargs):
+        print(**kwargs)
+        authbook = AuthBook(**kwargs)
+        authbook.save()
+        return authbook
 
     def __getattr__(self, item):
         return getattr(self._queryset, item)

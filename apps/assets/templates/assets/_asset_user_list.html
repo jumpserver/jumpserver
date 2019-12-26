@@ -72,7 +72,7 @@ function initAssetUserTable(oSearch) {
                         '           </div>';
                         actions = actions.replaceAll("username123", rowData.username)
                                          .replaceAll("hostname123", rowData.hostname)
-                                         .replaceAll("asset123", rowData.asset_id);
+                                         .replaceAll("asset123", rowData.asset);
 				    $(td).html(actions);
                 },
                 width: '70px'
@@ -80,10 +80,10 @@ function initAssetUserTable(oSearch) {
         ],
         ajax_url: assetUserListUrl,
         columns: [
-            {data: "asset_id"}, {data: "hostname"}, {data: "ip"},
+            {data: "asset"}, {data: "hostname"}, {data: "ip"},
             {data: "username"}, {data: "version", orderable: false},
             {data: "date_created", orderable: false},
-            {data: "asset_id", orderable: false}
+            {data: "asset", orderable: false}
         ],
         op_html: $('#actions').html()
     };

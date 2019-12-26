@@ -57,7 +57,12 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
 
 
 class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
-    serializer_class = serializers.AssetUserSerializer
+    serializer_class = serializers.AssetUserReadSerializer
+    serializer_classes = {
+        'default': serializers.AssetUserWriteSerializer,
+        'list': serializers.AssetUserReadSerializer,
+        'retrieve': serializers.AssetUserReadSerializer,
+    }
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
     filter_fields = [
@@ -103,12 +108,13 @@ class AssetUserAuthInfoApi(generics.RetrieveAPIView):
         query_params = self.request.query_params
         username = query_params.get('username')
         asset_id = query_params.get('asset_id')
-        prefer = query_params.get("prefer")
+        prefer_id = query_params.get("prefer_id")
         asset = get_object_or_none(Asset, pk=asset_id)
         try:
             manger = AssetUserManager()
-            instance = manger.get(username, asset, prefer=prefer)
+            instance = manger.get(username=username, asset=asset, prefer_id=prefer_id)
         except Exception as e:
+            print("Error: ", e)
             raise Http404("Not found")
         else:
             return instance
