@@ -42,7 +42,7 @@ var testDatetime = "{% trans 'Test datetime: ' %}";
 var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 var mfaNeedCheck = "{{ SECURITY_VIEW_AUTH_NEED_MFA }}" === "True";
 
-function initAssetUserTable() {
+function initAssetUserTable(oSearch) {
     var options = {
         ele: $('#asset_user_list_table'),
         toggle: true,
@@ -72,7 +72,7 @@ function initAssetUserTable() {
                         '           </div>';
                         actions = actions.replaceAll("username123", rowData.username)
                                          .replaceAll("hostname123", rowData.hostname)
-                                         .replaceAll("asset123", rowData.asset);
+                                         .replaceAll("asset123", rowData.asset_id);
 				    $(td).html(actions);
                 },
                 width: '70px'
@@ -80,15 +80,18 @@ function initAssetUserTable() {
         ],
         ajax_url: assetUserListUrl,
         columns: [
-            {data: "union_id"}, {data: "hostname"}, {data: "ip"},
+            {data: "asset_id"}, {data: "hostname"}, {data: "ip"},
             {data: "username"}, {data: "version", orderable: false},
             {data: "date_created", orderable: false},
-            {data: "union_id", orderable: false}
+            {data: "asset_id", orderable: false}
         ],
         op_html: $('#actions').html()
     };
-    table = jumpserver.initServerSideDataTable(options);
-    return table
+    if (oSearch) {
+        options.oSearch = {"sSearch": oSearch}
+    }
+    assetUserTable = jumpserver.initServerSideDataTable(options);
+    return assetUserTable
 }
 $(document).ready(function(){
 })

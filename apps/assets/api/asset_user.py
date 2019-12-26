@@ -41,7 +41,10 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
             elif field in ["system_user_id", "admin_user_id"]:
                 field = "prefer_id"
             kwargs[field] = value
-        return queryset.filter(**kwargs)
+        if kwargs:
+            queryset = queryset.filter(**kwargs)
+        print("Filter {}".format(kwargs))
+        return queryset
 
 
 class AssetUserSearchBackend(filters.BaseFilterBackend):
@@ -64,8 +67,7 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     ]
     search_fields = ["ip", "hostname", "username"]
     filter_backends = [
-        AssetUserFilterBackend,
-        AssetUserSearchBackend,
+        AssetUserFilterBackend, AssetUserSearchBackend,
     ]
 
     def allow_bulk_destroy(self, qs, filtered):

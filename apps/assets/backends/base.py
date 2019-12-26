@@ -42,7 +42,3 @@ class BaseBackend:
         if isinstance(assets[0], Asset):
             assets = [a.id for a in assets]
         return assets
-
-    @staticmethod
-    def clean_kwargs(kwargs):
-        return {k: v for k, v in kwargs.items() if v}

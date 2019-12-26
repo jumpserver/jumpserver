@@ -3,11 +3,12 @@
 from itertools import islice, chain, groupby
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
-from ..models import AssetUser
+from common.utils import get_logger
 
-from .db import AuthbookBackend
-from .system_user import SystemUserBackend
-from .admin_user import AdminUserBackend
+from ..models import AssetUser
+from .db import AuthbookBackend, SystemUserBackend, AdminUserBackend
+
+logger = get_logger(__name__)
 
 
 class NotSupportError(Exception):
@@ -27,7 +28,7 @@ class AssetUserQueryset:
             hostname=hostname, ip=ip, username=username,
             assets=assets, node=node, prefer_id=prefer_id,
         ))
-        print("Filter: {}".format(kwargs))
+        logger.debug("Filter: {}".format(kwargs))
         for backend in self.backends:
             backend.filter(**kwargs)
         return self
@@ -38,19 +39,26 @@ class AssetUserQueryset:
         return self
 
     def distinct(self):
-        print("dictinct")
-        queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
-        print("Chain it")
-        queryset_sorted = sorted(
-            queryset_chain,
-            key=lambda item: (item["asset_username"], item["score"]),
-            reverse=True,
+        authbook_asset_username = set(
+            self.backends[0].value_list('asset_username', flat=True)
         )
-        print("Sorted")
-        results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
-        print("groupby")
-        final = [next(result[1]) for result in results]
-        self._queryset = final
+        for backend in self.backends[1:]:
+            backend.exclude(authbook_asset_username)
+
+        # logger.debug("Chain it")
+        # queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
+        # logger.debug("Sort it")
+        # queryset_sorted = sorted(
+        #     queryset_chain,
+        #     key=lambda item: (item["asset_username"], item["score"]),
+        #     reverse=True,
+        # )
+        # logger.debug("Group by it")
+        # results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
+        # logger.debug("Get the first")
+        # final = [next(result[1]) for result in results]
+        # logger.debug("End")
+        # self._queryset = final
 
     def get(self, **kwargs):
         self.filter(**kwargs)
