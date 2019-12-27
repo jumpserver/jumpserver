@@ -27,7 +27,8 @@ MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
     'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
     'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
-    'Platform', 'RemoteAppPermission', 'ChangeAuthPlan', 'GatherUserTask',
+    'Platform', 'ChangeAuthPlan', 'GatherUserTask',
+    'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
 )
 
 
