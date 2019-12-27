@@ -19,11 +19,12 @@ class DBBackend(BaseBackend):
     def get_queryset(self):
         return self.queryset
 
-    def filter(self, assets=None, node=None, prefer_id=None, **kwargs):
+    def filter(self, assets=None, node=None, prefer_id=None, id__in=None, **kwargs):
         self.filter_prefer(prefer_id)
         self.filter_node(node)
         self.filter_assets(assets)
         self.filter_other(kwargs)
+        self.filter_id_in(id__in)
 
     def filter_assets(self, assets):
         assets_id = self.make_assets_as_id(assets)
@@ -32,6 +33,9 @@ class DBBackend(BaseBackend):
 
     def filter_node(self, node):
         pass
+
+    def filter_id_in(self, ids):
+        self.queryset = self.queryset.filter(union_id__in=ids)
 
     def count(self):
         return self.queryset.count()

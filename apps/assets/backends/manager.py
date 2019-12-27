@@ -21,13 +21,14 @@ class AssetUserQueryset:
         self._queryset = None
 
     def filter(self, hostname=None, ip=None, username=None, assets=None,
-               asset=None, node=None, prefer_id=None):
+               asset=None, node=None, prefer_id=None, id__in=None):
         if not assets and asset:
             assets = [asset]
 
         kwargs = dict(
             hostname=hostname, ip=ip, username=username,
             assets=assets, node=node, prefer_id=prefer_id,
+            id__in=id__in,
         )
         logger.debug("Filter: {}".format(kwargs))
         for backend in self.backends:
@@ -105,7 +106,6 @@ class AssetUserManager:
 
     @staticmethod
     def create(**kwargs):
-        print(**kwargs)
         authbook = AuthBook(**kwargs)
         authbook.save()
         return authbook
