@@ -29,7 +29,7 @@
   </tbody>
 </table>
 {% include 'assets/_asset_user_auth_update_modal.html' %}
-{% include 'assets/_asset_user_auth_view_modal.html' %}
+{#{% include 'assets/_asset_user_auth_view_modal.html' %}#}
 {% include 'authentication/_mfa_confirm_modal.html' %}
 
 <script>
@@ -42,7 +42,7 @@ var testDatetime = "{% trans 'Test datetime: ' %}";
 var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 var mfaNeedCheck = "{{ SECURITY_VIEW_AUTH_NEED_MFA }}" === "True";
 
-function initAssetUserTable(oSearch) {
+function initAssetUserTable() {
     var options = {
         ele: $('#asset_user_list_table'),
         toggle: true,
@@ -80,16 +80,13 @@ function initAssetUserTable(oSearch) {
         ],
         ajax_url: assetUserListUrl,
         columns: [
-            {data: "asset"}, {data: "hostname"}, {data: "ip"},
+            {data: "id"}, {data: "hostname"}, {data: "ip"},
             {data: "username"}, {data: "version", orderable: false},
             {data: "date_created", orderable: false},
             {data: "asset", orderable: false}
         ],
         op_html: $('#actions').html()
     };
-    if (oSearch) {
-        options.oSearch = {"sSearch": oSearch}
-    }
     assetUserTable = jumpserver.initServerSideDataTable(options);
     return assetUserTable
 }

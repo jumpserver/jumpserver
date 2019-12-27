@@ -45,7 +45,8 @@ class BaseUser(OrgModelMixin):
     @property
     def private_key_obj(self):
         if self.private_key:
-            return ssh_key_string_to_obj(self.private_key, password=self.password)
+            key_obj = ssh_key_string_to_obj(self.private_key, password=self.password)
+            return key_obj
         else:
             return None
 
