@@ -713,8 +713,14 @@ jumpserver.initServerSideDataTable = function (options) {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
                 if (row.id && $.inArray(row.id, table.selected) === -1) {
-                    table.selected.push(row.id);
-                    table.selected_rows.push(row);
+                    if (select.style === 'multi'){
+                        table.selected.push(row.id);
+                        table.selected_rows.push(row);
+                    }
+                    else{
+                        table.selected = [row.id];
+                        table.selected_rows = [row];
+                    }
                 }
             })
         }
