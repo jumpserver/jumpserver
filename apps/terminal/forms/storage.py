@@ -149,7 +149,7 @@ class ReplayStorageSwiftForm(BaseReplayStorageForm):
 
 class CommandStorageTypeESForm(BaseCommandStorageForm):
     es_hosts = forms.CharField(
-        max_length=128, label=_('Hosts'), required=False,
+        max_length=128, label=_('Hosts'), required=True,
         help_text=_(
             """
             Tips: If there are multiple hosts, separate them with a comma (,) 
@@ -159,8 +159,8 @@ class CommandStorageTypeESForm(BaseCommandStorageForm):
         )
     )
     es_index = forms.CharField(
-        max_length=128, label=_('Index'), required=False
+        max_length=128, label=_('Index'), required=True
     )
     es_doc_type = forms.CharField(
-        max_length=128, label=_('Doc type'), required=False
+        max_length=128, label=_('Doc type'), required=True
     )
