@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-20 15:57+0800\n"
+"POT-Creation-Date: 2019-12-30 12:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "自定义"
 #: applications/templates/applications/remote_app_list.html:28
 #: applications/templates/applications/user_remote_app_list.html:18
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:339 assets/models/authbook.py:24
+#: assets/models/asset.py:342 assets/models/authbook.py:24
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
 #: assets/serializers/asset_user.py:82 assets/serializers/system_user.py:45
 #: assets/templates/assets/admin_user_list.html:23
@@ -51,13 +51,13 @@ msgstr "自定义"
 #: users/templates/users/user_asset_permission.html:70
 #: users/templates/users/user_granted_remote_app.html:36
 #: xpack/plugins/change_auth_plan/forms.py:73
-#: xpack/plugins/change_auth_plan/models.py:419
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:44
+#: xpack/plugins/change_auth_plan/models.py:418
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:40
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:13
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:14
-#: xpack/plugins/cloud/models.py:307
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
+#: xpack/plugins/cloud/models.py:306
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:60
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 #: xpack/plugins/vault/forms.py:13 xpack/plugins/vault/forms.py:15
 msgid "Asset"
@@ -159,17 +159,17 @@ msgstr "运行参数"
 #: users/templates/users/user_pubkey_update.html:57
 #: users/templates/users/user_remote_app_permission.html:36
 #: xpack/plugins/change_auth_plan/forms.py:56
-#: xpack/plugins/change_auth_plan/models.py:64
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:61
+#: xpack/plugins/change_auth_plan/models.py:63
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:59
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
-#: xpack/plugins/cloud/models.py:59 xpack/plugins/cloud/models.py:144
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:50
+#: xpack/plugins/cloud/models.py:58 xpack/plugins/cloud/models.py:143
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:47
 #: xpack/plugins/cloud/templates/cloud/account_list.html:12
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:56
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:53
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:12
 #: xpack/plugins/gathered_user/models.py:28
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:16
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:52
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:47
 #: xpack/plugins/orgs/templates/orgs/org_list.html:12
 msgid "Name"
 msgstr "名称"
@@ -202,7 +202,7 @@ msgstr "主机"
 #: applications/models/database_app.py:27
 #: applications/templates/applications/database_app_detail.html:60
 #: applications/templates/applications/database_app_list.html:27
-#: assets/forms/asset.py:25 assets/models/asset.py:184
+#: assets/forms/asset.py:25 assets/models/asset.py:190
 #: assets/models/domain.py:50
 #: assets/templates/assets/domain_gateway_list.html:64
 msgid "Port"
@@ -225,7 +225,7 @@ msgstr "数据库"
 #: applications/templates/applications/remote_app_list.html:29
 #: applications/templates/applications/user_database_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/asset.py:149 assets/models/asset.py:219
+#: assets/models/asset.py:149 assets/models/asset.py:225
 #: assets/models/base.py:32 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
 #: assets/models/domain.py:21 assets/models/domain.py:53
@@ -257,16 +257,16 @@ msgstr "数据库"
 #: users/templates/users/user_group_detail.html:62
 #: users/templates/users/user_group_list.html:16
 #: users/templates/users/user_profile.html:138
-#: xpack/plugins/change_auth_plan/models.py:105
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:117
+#: xpack/plugins/change_auth_plan/models.py:104
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:115
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
-#: xpack/plugins/cloud/models.py:77 xpack/plugins/cloud/models.py:173
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:70
+#: xpack/plugins/cloud/models.py:76 xpack/plugins/cloud/models.py:172
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:67
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:105
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:102
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:18
 #: xpack/plugins/gathered_user/models.py:42
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:64
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:59
 #: xpack/plugins/orgs/templates/orgs/org_list.html:23
 msgid "Comment"
 msgstr "备注"
@@ -306,7 +306,7 @@ msgstr "参数"
 #: applications/models/remote_app.py:39
 #: applications/templates/applications/database_app_detail.html:72
 #: applications/templates/applications/remote_app_detail.html:68
-#: assets/models/asset.py:217 assets/models/base.py:35
+#: assets/models/asset.py:223 assets/models/base.py:35
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:59 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:63
@@ -321,9 +321,9 @@ msgstr "参数"
 #: perms/templates/perms/remote_app_permission_detail.html:85
 #: users/models/user.py:479 users/serializers/group.py:32
 #: users/templates/users/user_detail.html:97
-#: xpack/plugins/change_auth_plan/models.py:109
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:113
-#: xpack/plugins/cloud/models.py:80 xpack/plugins/cloud/models.py:179
+#: xpack/plugins/change_auth_plan/models.py:108
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
+#: xpack/plugins/cloud/models.py:79 xpack/plugins/cloud/models.py:178
 #: xpack/plugins/gathered_user/models.py:46
 msgid "Created by"
 msgstr "创建者"
@@ -333,7 +333,7 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42
 #: applications/templates/applications/database_app_detail.html:68
 #: applications/templates/applications/remote_app_detail.html:64
-#: assets/models/asset.py:218 assets/models/base.py:33
+#: assets/models/asset.py:224 assets/models/base.py:33
 #: assets/models/cluster.py:26 assets/models/domain.py:23
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
@@ -349,11 +349,11 @@ msgstr "创建者"
 #: terminal/templates/terminal/terminal_detail.html:59
 #: tickets/templates/tickets/ticket_detail.html:52 users/models/group.py:18
 #: users/templates/users/user_group_detail.html:58
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:105
-#: xpack/plugins/cloud/models.py:83 xpack/plugins/cloud/models.py:182
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:66
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:101
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:60
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:103
+#: xpack/plugins/cloud/models.py:82 xpack/plugins/cloud/models.py:181
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:63
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:98
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:55
 msgid "Date created"
 msgstr "创建日期"
 
@@ -402,13 +402,13 @@ msgstr "远程应用"
 #: users/templates/users/user_profile_update.html:67
 #: users/templates/users/user_pubkey_update.html:74
 #: users/templates/users/user_pubkey_update.html:80
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:69
-#: xpack/plugins/cloud/templates/cloud/account_create_update.html:33
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:53
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:44
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:65
+#: xpack/plugins/cloud/templates/cloud/account_create_update.html:29
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:49
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:40
 #: xpack/plugins/interface/templates/interface/interface.html:72
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:33
-#: xpack/plugins/vault/templates/vault/vault_create.html:45
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:29
+#: xpack/plugins/vault/templates/vault/vault_create.html:41
 msgid "Reset"
 msgstr "重置"
 
@@ -446,9 +446,9 @@ msgstr "重置"
 #: users/templates/users/user_password_update.html:76
 #: users/templates/users/user_profile_update.html:68
 #: users/templates/users/user_pubkey_update.html:81
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:70
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:66
 #: xpack/plugins/interface/templates/interface/interface.html:74
-#: xpack/plugins/vault/templates/vault/vault_create.html:46
+#: xpack/plugins/vault/templates/vault/vault_create.html:42
 msgid "Submit"
 msgstr "提交"
 
@@ -475,8 +475,8 @@ msgstr "提交"
 #: perms/templates/perms/remote_app_permission_detail.html:13
 #: perms/templates/perms/remote_app_permission_remote_app.html:13
 #: perms/templates/perms/remote_app_permission_user.html:13
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:17
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:20
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:13
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:18
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:17
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:106
 #: xpack/plugins/change_auth_plan/views.py:91
@@ -526,14 +526,14 @@ msgstr "详情"
 #: users/templates/users/user_profile.html:191
 #: users/templates/users/user_profile.html:201
 #: users/templates/users/user_remote_app_permission.html:110
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:29
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:27
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:56
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:23
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:20
 #: xpack/plugins/cloud/templates/cloud/account_list.html:40
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:29
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:57
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:46
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:25
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:20
 #: xpack/plugins/orgs/templates/orgs/org_list.html:93
 msgid "Update"
 msgstr "更新"
@@ -576,14 +576,14 @@ msgstr "更新"
 #: users/templates/users/user_list.html:94
 #: users/templates/users/user_list.html:98
 #: users/templates/users/user_remote_app_permission.html:111
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:33
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:31
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:58
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:27
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:24
 #: xpack/plugins/cloud/templates/cloud/account_list.html:42
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:33
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:30
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:58
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:47
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:29
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:24
 #: xpack/plugins/orgs/templates/orgs/org_list.html:95
 msgid "Delete"
 msgstr "删除"
@@ -638,7 +638,7 @@ msgstr "创建数据库应用"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:18
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:20
 #: xpack/plugins/cloud/templates/cloud/account_list.html:16
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:72
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:67
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:19
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:20
 #: xpack/plugins/orgs/templates/orgs/org_list.html:24
@@ -732,23 +732,23 @@ msgstr "不能包含特殊字符：[ {} ]"
 msgid "* The contains characters that are not allowed"
 msgstr "* 包含不被允许的字符"
 
-#: assets/forms/asset.py:66 assets/models/asset.py:188
+#: assets/forms/asset.py:66 assets/models/asset.py:194
 #: assets/models/user.py:111 assets/templates/assets/asset_detail.html:186
 #: assets/templates/assets/asset_detail.html:194
 #: assets/templates/assets/system_user_assets.html:87
 #: perms/models/asset_permission.py:81
-#: xpack/plugins/change_auth_plan/models.py:75
+#: xpack/plugins/change_auth_plan/models.py:74
 #: xpack/plugins/gathered_user/models.py:31
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:17
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/forms/asset.py:69 assets/models/asset.py:192
+#: assets/forms/asset.py:69 assets/models/asset.py:198
 #: assets/models/cluster.py:19 assets/models/user.py:67
 #: assets/templates/assets/admin_user_list.html:62
 #: assets/templates/assets/asset_detail.html:72 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:161
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:68
+#: xpack/plugins/cloud/models.py:160
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:65
 #: xpack/plugins/orgs/templates/orgs/org_list.html:19
 msgid "Admin user"
 msgstr "管理用户"
@@ -761,7 +761,7 @@ msgstr "管理用户"
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:75 assets/models/asset.py:187
+#: assets/forms/asset.py:75 assets/models/asset.py:193
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:76
 #: assets/templates/assets/user_asset_list.html:80
@@ -769,8 +769,8 @@ msgstr "标签"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/forms/asset.py:78 assets/models/asset.py:162
-#: assets/models/asset.py:186 assets/serializers/asset.py:70
+#: assets/forms/asset.py:78 assets/models/asset.py:168
+#: assets/models/asset.py:192 assets/serializers/asset.py:70
 #: assets/templates/assets/asset_detail.html:100
 #: assets/templates/assets/user_asset_list.html:78
 msgid "Platform"
@@ -789,9 +789,9 @@ msgstr "系统平台"
 #: xpack/plugins/change_auth_plan/forms.py:74
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:55
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:15
-#: xpack/plugins/cloud/models.py:157
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:64
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:64
+#: xpack/plugins/cloud/models.py:156
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:61
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:61
 msgid "Node"
 msgstr "节点"
 
@@ -816,7 +816,7 @@ msgstr "如果有多个的互相隔离的网络，设置资产属于的网域，
 #: assets/forms/label.py:15
 #: perms/templates/perms/asset_permission_asset.html:74
 #: xpack/plugins/change_auth_plan/forms.py:64
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:74
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:70
 msgid "Select assets"
 msgstr "选择资产"
 
@@ -854,27 +854,28 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: users/templates/users/user_list.html:15
 #: users/templates/users/user_profile.html:47
 #: xpack/plugins/change_auth_plan/forms.py:58
-#: xpack/plugins/change_auth_plan/models.py:66
-#: xpack/plugins/change_auth_plan/models.py:415
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:65
+#: xpack/plugins/change_auth_plan/models.py:65
+#: xpack/plugins/change_auth_plan/models.py:414
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:53
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:12
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:13
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:64
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:25
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:75
 msgid "Username"
 msgstr "用户名"
 
 #: assets/forms/platform.py:20 ops/templates/ops/task_detail.html:85
 #: ops/templates/ops/task_detail.html:95
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:84
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:75
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:82
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:72
 msgid "Yes"
 msgstr "是"
 
 #: assets/forms/platform.py:21 ops/templates/ops/task_detail.html:87
 #: ops/templates/ops/task_detail.html:97
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:86
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:77
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:84
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:74
 msgid "No"
 msgstr "否"
 
@@ -908,8 +909,8 @@ msgstr "密码或密钥密码"
 #: users/templates/users/user_profile_update.html:41
 #: users/templates/users/user_pubkey_update.html:41
 #: users/templates/users/user_update.html:20
-#: xpack/plugins/change_auth_plan/models.py:96
-#: xpack/plugins/change_auth_plan/models.py:264
+#: xpack/plugins/change_auth_plan/models.py:95
+#: xpack/plugins/change_auth_plan/models.py:263
 msgid "Password"
 msgstr "密码"
 
@@ -972,7 +973,7 @@ msgstr "元数据"
 msgid "Internal"
 msgstr "内部的"
 
-#: assets/models/asset.py:179 assets/models/domain.py:49
+#: assets/models/asset.py:185 assets/models/domain.py:49
 #: assets/serializers/asset_user.py:28
 #: assets/templates/assets/_asset_list_modal.html:47
 #: assets/templates/assets/_asset_user_list.html:20
@@ -984,12 +985,13 @@ msgstr "内部的"
 #: perms/templates/perms/asset_permission_list.html:187
 #: settings/forms/terminal.py:16 users/templates/users/_granted_assets.html:31
 #: users/templates/users/user_asset_permission.html:156
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:54
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:63
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:50
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:24
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:74
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:180 assets/serializers/asset_user.py:27
+#: assets/models/asset.py:186 assets/serializers/asset_user.py:27
 #: assets/serializers/gathered_user.py:20
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/_asset_user_auth_update_modal.html:9
@@ -1001,12 +1003,13 @@ msgstr "IP"
 #: perms/templates/perms/asset_permission_list.html:188
 #: settings/forms/terminal.py:15 users/templates/users/_granted_assets.html:30
 #: users/templates/users/user_asset_permission.html:157
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:53
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:62
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:49
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:23
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:73
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:183 assets/models/domain.py:51
+#: assets/models/asset.py:189 assets/models/domain.py:51
 #: assets/models/user.py:114 assets/templates/assets/asset_detail.html:68
 #: assets/templates/assets/domain_gateway_list.html:65
 #: assets/templates/assets/system_user_detail.html:67
@@ -1016,86 +1019,86 @@ msgstr "主机名"
 msgid "Protocol"
 msgstr "协议"
 
-#: assets/models/asset.py:185 assets/serializers/asset.py:72
+#: assets/models/asset.py:191 assets/serializers/asset.py:72
 #: assets/templates/assets/asset_create.html:24
 #: assets/templates/assets/user_asset_list.html:77
 #: perms/serializers/user_permission.py:59
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:189 assets/models/authbook.py:27
+#: assets/models/asset.py:195 assets/models/authbook.py:27
 #: assets/models/cmd_filter.py:22 assets/models/domain.py:54
 #: assets/models/label.py:22 assets/templates/assets/asset_detail.html:108
 #: authentication/models.py:45
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:195 assets/templates/assets/asset_detail.html:64
+#: assets/models/asset.py:201 assets/templates/assets/asset_detail.html:64
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:196 assets/templates/assets/asset_detail.html:116
+#: assets/models/asset.py:202 assets/templates/assets/asset_detail.html:116
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:199 assets/templates/assets/asset_detail.html:80
+#: assets/models/asset.py:205 assets/templates/assets/asset_detail.html:80
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:200 assets/templates/assets/asset_detail.html:84
+#: assets/models/asset.py:206 assets/templates/assets/asset_detail.html:84
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:201 assets/templates/assets/asset_detail.html:112
+#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:112
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:203
+#: assets/models/asset.py:209
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:204
+#: assets/models/asset.py:210
 #: xpack/plugins/license/templates/license/license_detail.html:71
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:205
+#: assets/models/asset.py:211
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:206
+#: assets/models/asset.py:212
 msgid "CPU vcpus"
 msgstr "CPU总数"
 
-#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:92
+#: assets/models/asset.py:213 assets/templates/assets/asset_detail.html:92
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:208
+#: assets/models/asset.py:214
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:209
+#: assets/models/asset.py:215
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:211 assets/templates/assets/asset_detail.html:104
+#: assets/models/asset.py:217 assets/templates/assets/asset_detail.html:104
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:212
+#: assets/models/asset.py:218
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:213
+#: assets/models/asset.py:219
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:214
+#: assets/models/asset.py:220
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:216 assets/templates/assets/asset_create.html:46
+#: assets/models/asset.py:222 assets/templates/assets/asset_create.html:46
 #: assets/templates/assets/asset_detail.html:220 templates/_nav.html:46
 msgid "Labels"
 msgstr "标签管理"
@@ -1116,21 +1119,22 @@ msgstr "版本"
 msgid "AuthBook"
 msgstr ""
 
-#: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:100
-#: xpack/plugins/change_auth_plan/models.py:271
+#: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:99
+#: xpack/plugins/change_auth_plan/models.py:270
 msgid "SSH private key"
 msgstr "ssh密钥"
 
-#: assets/models/base.py:31 xpack/plugins/change_auth_plan/models.py:103
-#: xpack/plugins/change_auth_plan/models.py:267
+#: assets/models/base.py:31 xpack/plugins/change_auth_plan/models.py:102
+#: xpack/plugins/change_auth_plan/models.py:266
 msgid "SSH public key"
 msgstr "ssh公钥"
 
 #: assets/models/base.py:34 assets/models/gathered_user.py:20
 #: assets/templates/assets/cmd_filter_detail.html:68 common/mixins/models.py:52
 #: ops/models/adhoc.py:49
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:109
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:68
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:107
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:27
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:79
 msgid "Date updated"
 msgstr "更新日期"
 
@@ -1248,17 +1252,18 @@ msgid "Gateway"
 msgstr "网关"
 
 #: assets/models/gathered_user.py:16
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:67
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:26
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:78
 msgid "Present"
 msgstr "存在"
 
 #: assets/models/gathered_user.py:17
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:65
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:76
 msgid "Date last login"
 msgstr "最后登录日期"
 
 #: assets/models/gathered_user.py:18
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:66
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:77
 msgid "IP last login"
 msgstr "最后登录IP"
 
@@ -1278,7 +1283,6 @@ msgstr "默认资产组"
 #: audits/models.py:51 audits/templates/audits/ftp_log_list.html:37
 #: audits/templates/audits/ftp_log_list.html:74
 #: audits/templates/audits/operate_log_list.html:37
-#: audits/templates/audits/operate_log_list.html:70
 #: audits/templates/audits/password_change_log_list.html:37
 #: audits/templates/audits/password_change_log_list.html:54
 #: authentication/models.py:43 ops/templates/ops/command_execution_list.html:41
@@ -1311,7 +1315,7 @@ msgstr "默认资产组"
 #: users/templates/users/user_remote_app_permission.html:37
 #: users/templates/users/user_remote_app_permission.html:58
 #: users/views/profile.py:68 xpack/plugins/orgs/forms.py:28
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:113
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:108
 #: xpack/plugins/orgs/templates/orgs/org_list.html:15
 msgid "User"
 msgstr "用户"
@@ -1374,7 +1378,7 @@ msgstr "手动登录"
 #: assets/views/platform.py:55 assets/views/platform.py:71
 #: assets/views/system_user.py:29 assets/views/system_user.py:46
 #: assets/views/system_user.py:63 assets/views/system_user.py:79
-#: templates/_nav.html:39 xpack/plugins/change_auth_plan/models.py:71
+#: templates/_nav.html:39 xpack/plugins/change_auth_plan/models.py:70
 msgid "Assets"
 msgstr "资产管理"
 
@@ -1531,7 +1535,7 @@ msgstr "测试资产可连接性: {}"
 
 #: assets/tasks/asset_user_connectivity.py:27
 #: assets/tasks/push_system_user.py:130
-#: xpack/plugins/change_auth_plan/models.py:528
+#: xpack/plugins/change_auth_plan/models.py:527
 msgid "The asset {} system platform {} does not support run Ansible tasks"
 msgstr "资产 {} 系统平台 {} 不支持运行 Ansible 任务"
 
@@ -1639,13 +1643,9 @@ msgstr "资产列表"
 #: ops/templates/ops/command_execution_create.html:112
 #: settings/templates/settings/_ldap_list_users_modal.html:41
 #: users/templates/users/_granted_assets.html:7
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:62
 msgid "Loading"
 msgstr "加载中"
-
-#: assets/templates/assets/_asset_update_modal.html:4
-msgid "Update assets"
-msgstr "更新资产"
 
 #: assets/templates/assets/_asset_user_auth_update_modal.html:4
 msgid "Update asset user auth"
@@ -1748,8 +1748,8 @@ msgstr "节点详情"
 #: ops/templates/ops/adhoc_history_detail.html:47
 #: ops/templates/ops/task_detail.html:54
 #: terminal/templates/terminal/session_list.html:24
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:64
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:60
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:59
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:57
 msgid "ID"
 msgstr "ID"
 
@@ -1781,7 +1781,7 @@ msgstr "存在子节点，不能删除"
 msgid "Have assets, cancel"
 msgstr "存在资产，不能删除"
 
-#: assets/templates/assets/_node_tree.html:254
+#: assets/templates/assets/_node_tree.html:255
 msgid "Rename success"
 msgstr "重命名成功"
 
@@ -1791,9 +1791,9 @@ msgstr "重命名成功"
 #: perms/templates/perms/asset_permission_create_update.html:36
 #: perms/templates/perms/database_app_permission_create_update.html:37
 #: perms/templates/perms/remote_app_permission_create_update.html:37
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:41
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:27
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:27
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:37
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:23
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:23
 msgid "Basic"
 msgstr "基本"
 
@@ -1815,9 +1815,9 @@ msgstr "自动生成密钥"
 #: perms/templates/perms/database_app_permission_create_update.html:51
 #: perms/templates/perms/remote_app_permission_create_update.html:51
 #: terminal/templates/terminal/terminal_update.html:38
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:65
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:48
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:39
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:61
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:44
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:35
 msgid "Other"
 msgstr "其它"
 
@@ -1834,7 +1834,7 @@ msgstr "资产列表"
 
 #: assets/templates/assets/admin_user_assets.html:24
 #: perms/templates/perms/asset_permission_asset.html:31
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:31
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:27
 msgid "Asset list of "
 msgstr "资产列表"
 
@@ -1860,7 +1860,7 @@ msgstr "替换资产的管理员"
 #: assets/templates/assets/admin_user_detail.html:86
 #: perms/templates/perms/asset_permission_asset.html:99
 #: xpack/plugins/change_auth_plan/forms.py:68
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:99
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:95
 #: xpack/plugins/gathered_user/forms.py:36
 msgid "Select nodes"
 msgstr "选择节点"
@@ -1880,11 +1880,11 @@ msgstr "选择节点"
 #: users/templates/users/user_detail.html:511
 #: users/templates/users/user_group_create_update.html:28
 #: users/templates/users/user_list.html:184
-#: xpack/plugins/cloud/templates/cloud/account_create_update.html:34
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:54
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:45
+#: xpack/plugins/cloud/templates/cloud/account_create_update.html:30
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:50
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:41
 #: xpack/plugins/interface/templates/interface/interface.html:103
-#: xpack/plugins/orgs/templates/orgs/org_create_update.html:34
+#: xpack/plugins/orgs/templates/orgs/org_create_update.html:30
 msgid "Confirm"
 msgstr "确认"
 
@@ -1920,8 +1920,8 @@ msgstr "资产用户"
 #: terminal/templates/terminal/session_detail.html:85
 #: users/templates/users/user_detail.html:126
 #: users/templates/users/user_profile.html:150
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:128
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:132
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:126
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:129
 #: xpack/plugins/license/templates/license/license_detail.html:93
 msgid "Quick modify"
 msgstr "快速修改"
@@ -2394,7 +2394,7 @@ msgstr "成功"
 
 #: audits/models.py:33
 #: authentication/templates/authentication/_access_key_modal.html:22
-#: xpack/plugins/vault/templates/vault/vault.html:38
+#: xpack/plugins/vault/templates/vault/vault.html:8
 msgid "Create"
 msgstr "创建"
 
@@ -2424,8 +2424,8 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:78 xpack/plugins/cloud/models.py:264
-#: xpack/plugins/cloud/models.py:287
+#: audits/models.py:78 xpack/plugins/cloud/models.py:263
+#: xpack/plugins/cloud/models.py:286
 msgid "Failed"
 msgstr "失败"
 
@@ -2453,10 +2453,10 @@ msgid "MFA"
 msgstr "MFA"
 
 #: audits/models.py:87 audits/templates/audits/login_log_list.html:63
-#: xpack/plugins/change_auth_plan/models.py:423
+#: xpack/plugins/change_auth_plan/models.py:422
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:15
-#: xpack/plugins/cloud/models.py:278
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:69
+#: xpack/plugins/cloud/models.py:277
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:64
 msgid "Reason"
 msgstr "原因"
 
@@ -2464,9 +2464,9 @@ msgstr "原因"
 #: tickets/templates/tickets/ticket_detail.html:34
 #: tickets/templates/tickets/ticket_list.html:36
 #: tickets/templates/tickets/ticket_list.html:104
-#: xpack/plugins/cloud/models.py:275 xpack/plugins/cloud/models.py:310
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:70
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:65
+#: xpack/plugins/cloud/models.py:274 xpack/plugins/cloud/models.py:309
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:65
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
 msgid "Status"
 msgstr "状态"
 
@@ -2483,8 +2483,8 @@ msgstr "登录日期"
 #: perms/templates/perms/database_app_permission_detail.html:77
 #: perms/templates/perms/remote_app_permission_detail.html:73
 #: terminal/models.py:189 terminal/templates/terminal/session_list.html:32
-#: xpack/plugins/change_auth_plan/models.py:250
-#: xpack/plugins/change_auth_plan/models.py:426
+#: xpack/plugins/change_auth_plan/models.py:249
+#: xpack/plugins/change_auth_plan/models.py:425
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:59
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:17
 #: xpack/plugins/gathered_user/models.py:140
@@ -2505,8 +2505,8 @@ msgstr "选择用户"
 #: ops/templates/ops/command_execution_list.html:49
 #: ops/templates/ops/command_execution_list.html:54
 #: templates/_base_list.html:37 templates/_user_profile.html:23
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:52
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:48
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:47
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:45
 msgid "Search"
 msgstr "搜索"
 
@@ -2526,10 +2526,13 @@ msgstr "日期"
 
 #: audits/templates/audits/login_log_list.html:91
 #: templates/_csv_import_export.html:8
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:49
-#: xpack/plugins/vault/templates/vault/vault.html:47
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:60
 msgid "Export"
 msgstr "导出"
+
+#: audits/templates/audits/operate_log_list.html:70
+msgid "Handlers"
+msgstr "操作者"
 
 #: audits/views.py:86 audits/views.py:130 audits/views.py:167
 #: audits/views.py:212 audits/views.py:244 templates/_nav.html:144
@@ -3026,8 +3029,8 @@ msgid "Become"
 msgstr "Become"
 
 #: ops/models/adhoc.py:189 users/templates/users/user_group_detail.html:54
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:62
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:56
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:59
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:51
 msgid "Create by"
 msgstr "创建者"
 
@@ -3049,8 +3052,8 @@ msgstr "完成时间"
 
 #: ops/models/adhoc.py:275 ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/task_history.html:61 ops/templates/ops/task_list.html:16
-#: xpack/plugins/change_auth_plan/models.py:253
-#: xpack/plugins/change_auth_plan/models.py:429
+#: xpack/plugins/change_auth_plan/models.py:252
+#: xpack/plugins/change_auth_plan/models.py:428
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:58
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:16
 #: xpack/plugins/gathered_user/models.py:143
@@ -3087,7 +3090,7 @@ msgstr "{} 任务结束"
 
 #: ops/models/command.py:23
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:56
-#: xpack/plugins/cloud/models.py:273
+#: xpack/plugins/cloud/models.py:272
 msgid "Result"
 msgstr "结果"
 
@@ -3095,11 +3098,11 @@ msgstr "结果"
 msgid "Task start"
 msgstr "任务开始"
 
-#: ops/models/command.py:75
+#: ops/models/command.py:80
 msgid "Command `{}` is forbidden ........"
 msgstr "命令 `{}` 不允许被执行 ......."
 
-#: ops/models/command.py:81
+#: ops/models/command.py:86
 msgid "Task end"
 msgstr "任务结束"
 
@@ -3297,9 +3300,9 @@ msgid "Contents"
 msgstr "内容"
 
 #: ops/templates/ops/task_list.html:73
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:137
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:135
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:54
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:141
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:138
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:55
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:44
 msgid "Run"
@@ -3450,8 +3453,8 @@ msgstr "用户或用户组"
 #: perms/templates/perms/asset_permission_asset.html:23
 #: perms/templates/perms/asset_permission_detail.html:22
 #: perms/templates/perms/asset_permission_user.html:23
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:20
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:23
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:16
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:21
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:20
 msgid "Assets and node"
 msgstr "资产或节点"
@@ -3473,9 +3476,9 @@ msgstr "添加资产"
 #: perms/templates/perms/remote_app_permission_user.html:92
 #: perms/templates/perms/remote_app_permission_user.html:120
 #: users/templates/users/user_group_detail.html:87
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:80
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:93
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:130
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:76
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:88
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:125
 msgid "Add"
 msgstr "添加"
 
@@ -3485,7 +3488,7 @@ msgstr "添加节点"
 
 #: perms/templates/perms/asset_permission_asset.html:105
 #: users/templates/users/user_detail.html:226
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:105
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:101
 msgid "Join"
 msgstr "加入"
 
@@ -3547,8 +3550,8 @@ msgstr "刷新授权缓存"
 #: users/templates/users/user_database_app_permission.html:41
 #: users/templates/users/user_list.html:19
 #: users/templates/users/user_remote_app_permission.html:41
-#: xpack/plugins/cloud/models.py:74
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:58
+#: xpack/plugins/cloud/models.py:73
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:55
 #: xpack/plugins/cloud/templates/cloud/account_list.html:14
 msgid "Validity"
 msgstr "有效"
@@ -4092,7 +4095,6 @@ msgstr "当前无勾选用户，请勾选你想要导入的用户"
 #: settings/templates/settings/_ldap_list_users_modal.html:172
 #: templates/_csv_import_export.html:13 templates/_csv_import_modal.html:5
 #: xpack/plugins/license/templates/license/license_detail.html:101
-#: xpack/plugins/vault/templates/vault/vault.html:52
 msgid "Import"
 msgstr "导入"
 
@@ -4157,29 +4159,27 @@ msgstr "系统设置"
 msgid "Update setting successfully"
 msgstr "更新设置成功"
 
-#: templates/_csv_import_modal.html:12 templates/_import_modal.html:12
+#: templates/_csv_import_modal.html:12
 msgid "Download the imported template or use the exported CSV file format"
 msgstr "下载导入的模板或使用导出的csv格式"
 
-#: templates/_csv_import_modal.html:13 templates/_import_modal.html:13
+#: templates/_csv_import_modal.html:13
 msgid "Download the import template"
 msgstr "下载导入模版"
 
 #: templates/_csv_import_modal.html:17 templates/_csv_update_modal.html:17
-#: templates/_import_modal.html:17 templates/_update_modal.html:17
 msgid "Select the CSV file to import"
 msgstr "请选择csv文件导入"
 
 #: templates/_csv_import_modal.html:39 templates/_csv_update_modal.html:42
-#: xpack/plugins/vault/templates/vault/vault.html:200
 msgid "Please select file"
 msgstr "选择文件"
 
-#: templates/_csv_update_modal.html:12 templates/_update_modal.html:12
+#: templates/_csv_update_modal.html:12
 msgid "Download the update template or use the exported CSV file format"
 msgstr "下载更新的模板或使用导出的csv格式"
 
-#: templates/_csv_update_modal.html:13 templates/_update_modal.html:13
+#: templates/_csv_update_modal.html:13
 msgid "Download the update template"
 msgstr "下载更新模版"
 
@@ -4632,9 +4632,9 @@ msgid ""
 "            "
 msgstr ""
 
-#: terminal/forms/storage.py:143 xpack/plugins/cloud/models.py:304
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:109
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
+#: terminal/forms/storage.py:143 xpack/plugins/cloud/models.py:303
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:106
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:59
 msgid "Region"
 msgstr "地域"
 
@@ -5150,9 +5150,9 @@ msgstr "生成重置密码链接，通过邮件发送给用户"
 msgid "Set password"
 msgstr "设置密码"
 
-#: users/forms/user.py:132 xpack/plugins/change_auth_plan/models.py:89
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:49
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:69
+#: users/forms/user.py:132 xpack/plugins/change_auth_plan/models.py:88
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:45
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:67
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:57
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:16
 msgid "Password strategy"
@@ -5249,8 +5249,8 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:147
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:60
+#: xpack/plugins/cloud/models.py:146
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:57
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:13
 msgid "Account"
 msgstr "账户"
@@ -5506,7 +5506,7 @@ msgid "User group detail"
 msgstr "用户组详情"
 
 #: users/templates/users/user_group_detail.html:81
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:121
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:116
 msgid "Add user"
 msgstr "添加用户"
 
@@ -5956,16 +5956,16 @@ msgid "Password length"
 msgstr "密码长度"
 
 #: xpack/plugins/change_auth_plan/forms.py:75
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:58
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:81
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:54
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:79
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:17
 #: xpack/plugins/cloud/forms.py:33 xpack/plugins/cloud/forms.py:87
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:41
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:72
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:37
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:69
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:16
 #: xpack/plugins/gathered_user/forms.py:13
 #: xpack/plugins/gathered_user/forms.py:41
-#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:32
+#: xpack/plugins/gathered_user/templates/gathered_user/task_create_update.html:28
 msgid "Periodic perform"
 msgstr "定时执行"
 
@@ -5995,8 +5995,8 @@ msgstr ""
 "具</a>） <br>注意： 如果同时设置了定期执行和周期执行，优先使用定期执行"
 
 #: xpack/plugins/change_auth_plan/meta.py:9
-#: xpack/plugins/change_auth_plan/models.py:117
-#: xpack/plugins/change_auth_plan/models.py:257
+#: xpack/plugins/change_auth_plan/models.py:116
+#: xpack/plugins/change_auth_plan/models.py:256
 #: xpack/plugins/change_auth_plan/views.py:33
 #: xpack/plugins/change_auth_plan/views.py:50
 #: xpack/plugins/change_auth_plan/views.py:74
@@ -6007,69 +6007,69 @@ msgstr ""
 msgid "Change auth plan"
 msgstr "改密计划"
 
-#: xpack/plugins/change_auth_plan/models.py:58
+#: xpack/plugins/change_auth_plan/models.py:57
 msgid "Custom password"
 msgstr "自定义密码"
 
-#: xpack/plugins/change_auth_plan/models.py:59
+#: xpack/plugins/change_auth_plan/models.py:58
 msgid "All assets use the same random password"
 msgstr "所有资产使用相同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models.py:60
+#: xpack/plugins/change_auth_plan/models.py:59
 msgid "All assets use different random password"
 msgstr "所有资产使用不同的随机密码"
 
-#: xpack/plugins/change_auth_plan/models.py:79
-#: xpack/plugins/change_auth_plan/models.py:148
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:100
-#: xpack/plugins/cloud/models.py:165 xpack/plugins/cloud/models.py:219
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:91
+#: xpack/plugins/change_auth_plan/models.py:78
+#: xpack/plugins/change_auth_plan/models.py:147
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:98
+#: xpack/plugins/cloud/models.py:164 xpack/plugins/cloud/models.py:218
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:88
 #: xpack/plugins/gathered_user/models.py:35
 #: xpack/plugins/gathered_user/models.py:72
 msgid "Cycle perform"
 msgstr "周期执行"
 
-#: xpack/plugins/change_auth_plan/models.py:84
-#: xpack/plugins/change_auth_plan/models.py:146
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:92
-#: xpack/plugins/cloud/models.py:170 xpack/plugins/cloud/models.py:217
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:83
+#: xpack/plugins/change_auth_plan/models.py:83
+#: xpack/plugins/change_auth_plan/models.py:145
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:90
+#: xpack/plugins/cloud/models.py:169 xpack/plugins/cloud/models.py:216
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:80
 #: xpack/plugins/gathered_user/models.py:40
 #: xpack/plugins/gathered_user/models.py:70
 msgid "Regularly perform"
 msgstr "定期执行"
 
-#: xpack/plugins/change_auth_plan/models.py:93
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:74
+#: xpack/plugins/change_auth_plan/models.py:92
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:72
 msgid "Password rules"
 msgstr "密码规则"
 
-#: xpack/plugins/change_auth_plan/models.py:213
+#: xpack/plugins/change_auth_plan/models.py:212
 msgid "* For security, do not change {} user's password"
 msgstr "* 为了安全，禁止更改 {} 用户的密码"
 
-#: xpack/plugins/change_auth_plan/models.py:217
+#: xpack/plugins/change_auth_plan/models.py:216
 msgid "Assets is empty, please add the asset"
 msgstr "资产为空，请添加资产"
 
-#: xpack/plugins/change_auth_plan/models.py:261
+#: xpack/plugins/change_auth_plan/models.py:260
 msgid "Change auth plan snapshot"
 msgstr "改密计划快照"
 
-#: xpack/plugins/change_auth_plan/models.py:276
-#: xpack/plugins/change_auth_plan/models.py:433
+#: xpack/plugins/change_auth_plan/models.py:275
+#: xpack/plugins/change_auth_plan/models.py:432
 msgid "Change auth plan execution"
 msgstr "改密计划执行"
 
-#: xpack/plugins/change_auth_plan/models.py:442
+#: xpack/plugins/change_auth_plan/models.py:441
 msgid "Change auth plan execution subtask"
 msgstr "改密计划执行子任务"
 
-#: xpack/plugins/change_auth_plan/models.py:460
+#: xpack/plugins/change_auth_plan/models.py:459
 msgid "Authentication failed"
 msgstr "认证失败"
 
-#: xpack/plugins/change_auth_plan/models.py:462
+#: xpack/plugins/change_auth_plan/models.py:461
 msgid "Connection timeout"
 msgstr "连接超时"
 
@@ -6094,36 +6094,36 @@ msgstr "* 密码长度范围 6-30 位"
 msgid "* Please enter a valid crontab expression"
 msgstr "* 请输入有效的 crontab 表达式"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:23
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:26
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:19
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:24
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:23
 #: xpack/plugins/change_auth_plan/views.py:133
 msgid "Plan execution list"
 msgstr "执行列表"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:66
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:62
 msgid "Add asset to this plan"
 msgstr "添加资产"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:91
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_asset_list.html:87
 msgid "Add node to this plan"
 msgstr "添加节点"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:11
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_create_update.html:7
 msgid ""
 "When the user password on the asset is changed, the action is performed "
 "using the admin user associated with the asset"
 msgstr "更改资产上的用户密码时，将会使用与该资产关联的管理用户进行操作"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:76
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:74
 msgid "Length"
 msgstr "长度"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:134
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:132
 msgid "Run plan manually"
 msgstr "手动执行计划"
 
-#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:178
+#: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:176
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:102
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:90
 msgid "Execute failed"
@@ -6134,7 +6134,7 @@ msgid "Execution list of plan"
 msgstr "执行列表"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:104
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:89
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:84
 msgid "Log"
 msgstr "日志"
 
@@ -6204,80 +6204,80 @@ msgstr "选择管理员"
 msgid "Cloud center"
 msgstr "云管中心"
 
-#: xpack/plugins/cloud/models.py:53
+#: xpack/plugins/cloud/models.py:52
 msgid "Available"
 msgstr "有效"
 
-#: xpack/plugins/cloud/models.py:54
+#: xpack/plugins/cloud/models.py:53
 msgid "Unavailable"
 msgstr "无效"
 
-#: xpack/plugins/cloud/models.py:63
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:54
+#: xpack/plugins/cloud/models.py:62
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:51
 #: xpack/plugins/cloud/templates/cloud/account_list.html:13
 msgid "Provider"
 msgstr "云服务商"
 
-#: xpack/plugins/cloud/models.py:66
+#: xpack/plugins/cloud/models.py:65
 msgid "Access key id"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:70
+#: xpack/plugins/cloud/models.py:69
 msgid "Access key secret"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:88
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:30
+#: xpack/plugins/cloud/models.py:87
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:26
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:150
+#: xpack/plugins/cloud/models.py:149
 msgid "Regions"
 msgstr "地域"
 
-#: xpack/plugins/cloud/models.py:153
+#: xpack/plugins/cloud/models.py:152
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:176
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:97
+#: xpack/plugins/cloud/models.py:175
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:94
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:17
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:187 xpack/plugins/cloud/models.py:271
+#: xpack/plugins/cloud/models.py:186 xpack/plugins/cloud/models.py:270
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:265 xpack/plugins/cloud/models.py:288
+#: xpack/plugins/cloud/models.py:264 xpack/plugins/cloud/models.py:287
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/models.py:266
+#: xpack/plugins/cloud/models.py:265
 msgid "Partial succeed"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:281 xpack/plugins/cloud/models.py:313
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:71
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:66
+#: xpack/plugins/cloud/models.py:280 xpack/plugins/cloud/models.py:312
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:289
+#: xpack/plugins/cloud/models.py:288
 msgid "Exist"
 msgstr "存在"
 
-#: xpack/plugins/cloud/models.py:294
+#: xpack/plugins/cloud/models.py:293
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:298
+#: xpack/plugins/cloud/models.py:297
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:301
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:117
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:61
+#: xpack/plugins/cloud/models.py:300
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:114
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:58
 msgid "Instance"
 msgstr "实例"
 
@@ -6297,7 +6297,7 @@ msgstr "AWS (国际)"
 msgid "Qcloud"
 msgstr "腾讯云"
 
-#: xpack/plugins/cloud/templates/cloud/account_detail.html:20
+#: xpack/plugins/cloud/templates/cloud/account_detail.html:17
 #: xpack/plugins/cloud/views.py:79
 msgid "Account detail"
 msgstr "账户详情"
@@ -6307,61 +6307,61 @@ msgstr "账户详情"
 msgid "Create account"
 msgstr "创建账户"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:33
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:29
 msgid "Region & Instance"
 msgstr "地域 & 实例"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:37
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:33
 msgid "Node & AdminUser"
 msgstr "节点 & 管理用户"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:67
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:63
 msgid "Load failed"
 msgstr "加载失败"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:20
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:25
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:21
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:17
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:20
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:18
 #: xpack/plugins/cloud/views.py:144
 msgid "Sync task detail"
 msgstr "同步任务详情"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:23
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:28
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:24
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:20
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:23
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:21
 #: xpack/plugins/cloud/views.py:160
 msgid "Sync task history"
 msgstr "同步历史列表"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:31
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:27
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:23
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:26
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:24
 #: xpack/plugins/cloud/views.py:212
 msgid "Sync instance list"
 msgstr "同步实例列表"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:138
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:135
 msgid "Run task manually"
 msgstr "手动执行任务"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:181
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:178
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:99
 msgid "Sync success"
 msgstr "同步成功"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:65
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:60
 msgid "Total count"
 msgstr "总数"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:66
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:61
 msgid "Succeed count"
 msgstr "成功"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:67
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:62
 msgid "Failed count"
 msgstr "失败"
 
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:68
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:63
 msgid "Exist count"
 msgstr "存在"
 
@@ -6409,7 +6409,8 @@ msgid "Periodic"
 msgstr "定时执行"
 
 #: xpack/plugins/gathered_user/models.py:57
-#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:38
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:13
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:49
 msgid "Gather user task"
 msgstr "收集用户任务"
 
@@ -6424,6 +6425,12 @@ msgstr "收集用户执行"
 #: xpack/plugins/gathered_user/models.py:155
 msgid "Assets is empty, please change nodes"
 msgstr "资产为空，请更改节点"
+
+#: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:224
+#, fuzzy
+#| msgid "Asset users of"
+msgid "Asset user"
+msgstr "资产用户"
 
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:7
 #: xpack/plugins/gathered_user/views.py:50
@@ -6616,7 +6623,7 @@ msgid "Select auditor"
 msgstr "选择审计员"
 
 #: xpack/plugins/orgs/forms.py:29
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:76
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:71
 #: xpack/plugins/orgs/templates/orgs/org_list.html:13
 msgid "Admin"
 msgstr "管理员"
@@ -6627,12 +6634,12 @@ msgstr "管理员"
 msgid "Organizations"
 msgstr "组织管理"
 
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:22
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:17
 #: xpack/plugins/orgs/views.py:80
 msgid "Org detail"
 msgstr "组织详情"
 
-#: xpack/plugins/orgs/templates/orgs/org_detail.html:84
+#: xpack/plugins/orgs/templates/orgs/org_detail.html:79
 msgid "Add admin"
 msgstr "添加管理员"
 
@@ -6661,6 +6668,12 @@ msgstr "密码匣子"
 msgid "Import vault"
 msgstr "导入密码"
 
+#: xpack/plugins/vault/templates/vault/vault.html:66
+#, fuzzy
+#| msgid "Vault"
+msgid "vault"
+msgstr "密码匣子"
+
 #: xpack/plugins/vault/views.py:24
 msgid "vault list"
 msgstr "密码匣子"
@@ -6668,6 +6681,9 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "Update assets"
+#~ msgstr "更新资产"
 
 #~ msgid "Browser"
 #~ msgstr "浏览器"
