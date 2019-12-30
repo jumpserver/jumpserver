@@ -4,6 +4,14 @@
 {% load bootstrap3 %}
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <style>
+        ul{
+            padding-inline-start: 20px
+        }
+        ul li{
+            list-style-type:none;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +54,39 @@
                             {% bootstrap_field form.system_users layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Action' %}</h3>
-                            {% bootstrap_field form.actions layout="horizontal" %}
+
+                            <div class="form-group required">
+                                <label class="col-md-2 control-label">动作</label>
+                                <div class="col-md-9">
+                                    <div id="id_actions">
+                                        <ul>
+                                            <li>
+                                                <div class="checkbox">{{ form.actions.0}}</div>
+                                                <ul>
+                                                    <li>
+                                                        <div class="checkbox">{{ form.actions.1}}</div>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="checkbox">{{ form.actions.4}}</div>
+                                                        <ul>
+                                                            <li>
+                                                                <div class="checkbox">{{ form.actions.2}}</div>
+                                                            </li>
+                                                            <li>
+                                                                <div class="checkbox">{{ form.actions.3}}</div>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+
+                                            </li>
+                                        </ul>
+                                        <div class="help-block">提示：RDP 协议不支持单独控制上传或下载文件</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Other' %}</h3>
                             <div class="form-group">
@@ -100,6 +140,18 @@
 <script>
 var api_action =  "{{ api_action }}";
 
+var all_checkbox_child =  $('input[name=actions]:gt(0)');
+{#console.log(all_checkbox_child)#}
+var updownload_checkbox_child = '';
+var aaa = true
+
+
+function SelectAllOrDeselectAll (flag){
+    for (var i = 0; i < all_checkbox_child.length; i++){
+        all_checkbox_child[i].checked = flag
+    }
+}
+
 $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
@@ -133,6 +185,46 @@ $(document).ready(function () {
         redirect_to: redirect_to
     };
     formSubmit(props);
- })
+ }).on("click", "#id_actions_0", function () {
+    if($('#id_actions_0')[0].checked){
+        SelectAllOrDeselectAll(true)
+    }else{
+        SelectAllOrDeselectAll(false)
+    }
+}).on("change","input[name=actions]", function () {
+    var flag = true;
+    for(var i = 0; i < all_checkbox_child.length; i++){
+        if(all_checkbox_child[i].checked === false) {
+            flag = false
+        }
+    }
+    $("#id_actions_0")[0].checked = flag
+}).on("click", "#id_actions_4", function () {
+    if($('#id_actions_4')[0].checked){
+        $('#id_actions_2')[0].checked = true;
+        $('#id_actions_3')[0].checked = true
+    }else{
+        $('#id_actions_2')[0].checked = false;
+        $('#id_actions_3')[0].checked = false
+    }
+}).on('click', "#id_actions_2", function () {
+    var id_actions_2_check = $('#id_actions_2')[0].checked;
+    var id_actions_3_check = $('#id_actions_3')[0].checked;
+    if (id_actions_2_check === false){
+        $('#id_actions_4')[0].checked = false
+    }
+    if (id_actions_2_check && id_actions_3_check){
+        $('#id_actions_4')[0].checked = true
+    }
+}).on('click', "#id_actions_3", function () {
+    var id_actions_2_check = $('#id_actions_2')[0].checked;
+    var id_actions_3_check = $('#id_actions_3')[0].checked;
+    if (id_actions_3_check === false){
+        $('#id_actions_4')[0].checked = false
+    }
+    if (id_actions_2_check && id_actions_3_check){
+        $('#id_actions_4')[0].checked = true
+    }
+})
 </script>
 {% endblock %}
