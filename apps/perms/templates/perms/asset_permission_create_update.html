@@ -139,16 +139,15 @@
 
 <script>
 var api_action =  "{{ api_action }}";
+var all_action = document.getElementById("id_actions_0");
+var all_action_child =  $('input[name=actions]:gt(0)');
+var updownload_action = document.getElementById("id_actions_4");
+var upload_file_action = document.getElementById("id_actions_2");
+var download_file_action = document.getElementById("id_actions_3");
 
-var all_checkbox_child =  $('input[name=actions]:gt(0)');
-{#console.log(all_checkbox_child)#}
-var updownload_checkbox_child = '';
-var aaa = true
-
-
-function SelectAllOrDeselectAll (flag){
-    for (var i = 0; i < all_checkbox_child.length; i++){
-        all_checkbox_child[i].checked = flag
+function SelectAllOrDeselectAll (flag, ele){
+    for (var i = 0; i < ele.length; i++){
+        ele[i].checked = flag
     }
 }
 
@@ -186,44 +185,40 @@ $(document).ready(function () {
     };
     formSubmit(props);
  }).on("click", "#id_actions_0", function () {
-    if($('#id_actions_0')[0].checked){
-        SelectAllOrDeselectAll(true)
+    if(all_action.checked){
+        SelectAllOrDeselectAll(true, all_action_child)
     }else{
-        SelectAllOrDeselectAll(false)
+        SelectAllOrDeselectAll(false, all_action_child)
     }
 }).on("change","input[name=actions]", function () {
     var flag = true;
-    for(var i = 0; i < all_checkbox_child.length; i++){
-        if(all_checkbox_child[i].checked === false) {
+    for(var i = 0; i < all_action_child.length; i++){
+        if(all_action_child[i].checked === false) {
             flag = false
         }
     }
-    $("#id_actions_0")[0].checked = flag
+    all_action.checked = flag
 }).on("click", "#id_actions_4", function () {
-    if($('#id_actions_4')[0].checked){
-        $('#id_actions_2')[0].checked = true;
-        $('#id_actions_3')[0].checked = true
+    if(updownload_action.checked){
+        upload_file_action.checked = true;
+        download_file_action.checked = true
     }else{
-        $('#id_actions_2')[0].checked = false;
-        $('#id_actions_3')[0].checked = false
+        upload_file_action.checked = false;
+        download_file_action.checked = false
     }
 }).on('click', "#id_actions_2", function () {
-    var id_actions_2_check = $('#id_actions_2')[0].checked;
-    var id_actions_3_check = $('#id_actions_3')[0].checked;
-    if (id_actions_2_check === false){
-        $('#id_actions_4')[0].checked = false
+    if (upload_file_action.checked === false){
+        updownload_action.checked = false
     }
-    if (id_actions_2_check && id_actions_3_check){
-        $('#id_actions_4')[0].checked = true
+    if (upload_file_action.checked && download_file_action.checked){
+        updownload_action[0].checked = true
     }
 }).on('click', "#id_actions_3", function () {
-    var id_actions_2_check = $('#id_actions_2')[0].checked;
-    var id_actions_3_check = $('#id_actions_3')[0].checked;
-    if (id_actions_3_check === false){
-        $('#id_actions_4')[0].checked = false
+    if (download_file_action.checked === false){
+        updownload_action.checked = false
     }
-    if (id_actions_2_check && id_actions_3_check){
-        $('#id_actions_4')[0].checked = true
+    if (upload_file_action.checked && download_file_action.checked){
+        updownload_action.checked = true
     }
 })
 </script>
