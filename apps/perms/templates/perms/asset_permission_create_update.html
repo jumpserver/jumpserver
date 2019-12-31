@@ -211,7 +211,7 @@ $(document).ready(function () {
         updownload_action.checked = false
     }
     if (upload_file_action.checked && download_file_action.checked){
-        updownload_action[0].checked = true
+        updownload_action.checked = true
     }
 }).on('click', "#id_actions_3", function () {
     if (download_file_action.checked === false){
