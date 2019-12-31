@@ -251,7 +251,7 @@ class Session(OrgModelMixin):
         return cls.objects.filter(is_finished=False)
 
     def is_active(self):
-        if self.protocol in ['ssh', 'telnet']:
+        if self.protocol in ['ssh', 'telnet', 'rdp']:
             key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
             return bool(cache.get(key))
         return True
