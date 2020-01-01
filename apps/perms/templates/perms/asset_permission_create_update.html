@@ -149,11 +149,22 @@ var actionAllChildElement = $('input[name=actions]:gt(0)');
 var actionUploadElement = document.getElementById(actionUploadID);
 var actionDownloadElement = document.getElementById(actionDownloadID);
 var actionUpDownloadElement = document.getElementById(actionUpDownloadID);
+var actionUpDownloadChildElement = [actionUploadElement,actionDownloadElement];
 
 function SelectAllOrDeselectAll (flag, ele){
     for (var i = 0; i < ele.length; i++){
         ele[i].checked = flag
     }
+}
+
+function ChangeActionAllCheck(){
+    var flag = true;
+    for(var i = 0; i < actionAllChildElement.length; i++){
+        if(actionAllChildElement[i].checked === false){
+            flag = false
+        }
+    }
+    actionAllElement.checked = flag;
 }
 
 $(document).ready(function () {
@@ -189,37 +200,22 @@ $(document).ready(function () {
         redirect_to: redirect_to
     };
     formSubmit(props);
- }).on("click", actionAllID, function () {
-     SelectAllOrDeselectAll(actionAllElement.checked, actionAllChildElement);
-}).on("change","input[name=actions]", function () {
-    var flag = true;
-    for(var i = 0; i < actionAllChildElement.length; i++){
-        if(actionAllChildElement[i].checked === false){
-            flag = false
-        }
-     }
-    actionAllElement.checked=flag
-}).on("click", actionUpDownloadID, function () {
-    if(actionUpDownloadElement.checked){
-        actionUploadElement.checked = true;
-        actionDownloadElement.checked = true
+ }).on("change","input[name=actions]", function (e) {
+    var current_ele = e.target || e.srcElement;
+    var current_ele_id = current_ele.getAttribute("id");
+
+    if (current_ele_id === actionAllID){
+        SelectAllOrDeselectAll(actionAllElement.checked, actionAllChildElement);
     }else{
-        actionUploadElement.checked = false;
-        actionDownloadElement.checked = false
-    }
-}).on('click', actionUploadID, function () {
-    if (actionUploadElement.checked === false){
-        actionUpDownloadElement.checked = false
-    }
-    if (actionUploadElement.checked && actionDownloadElement.checked){
-        actionUpDownloadElement.checked = true
-    }
-}).on('click', actionDownloadID, function () {
-    if (actionDownloadElement.checked === false){
-        actionUpDownloadElement.checked = false
-    }
-    if (actionUploadElement.checked && actionDownloadElement.checked){
-        actionUpDownloadElement.checked = true
+        if(current_ele_id === actionUpDownloadID){
+            SelectAllOrDeselectAll(actionUpDownloadElement.checked, actionUpDownloadChildElement)
+        }
+        if([actionUploadID, actionDownloadID].indexOf(current_ele_id) != -1){
+            var actionUpDownloadCheck = actionUploadElement.checked && actionDownloadElement.checked;
+            actionUpDownloadElement.checked = actionUpDownloadCheck
+
+        }
+        ChangeActionAllCheck()
     }
 })
 </script>
