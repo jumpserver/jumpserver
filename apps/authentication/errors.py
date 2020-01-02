@@ -118,9 +118,9 @@ class MFAFailedError(AuthFailedNeedLogMixin, AuthFailedError):
 
 class BlockLoginError(AuthFailedNeedBlockMixin, AuthFailedError):
     error = 'block_login'
-    msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
 
     def __init__(self, username, ip):
+        self.msg = block_login_msg.format(settings.SECURITY_LOGIN_LIMIT_TIME)
         super().__init__(username=username, ip=ip)
 
 
