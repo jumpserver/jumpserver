@@ -24,8 +24,10 @@ from common.permissions import (
 )
 from .. import forms
 from ..models import User
-from ..utils import generate_otp_uri, check_otp_code, \
-    get_user_or_tmp_user, get_password_check_rules, check_password_rules
+from ..utils import (
+    generate_otp_uri, check_otp_code, get_user_or_tmp_user,
+    delete_tmp_user_for_cache, check_password_rules, get_password_check_rules,
+)
 
 __all__ = [
     'UserProfileView',
@@ -163,6 +165,13 @@ class UserCheckPasswordView(FormView):
             success_url = reverse('users:user-otp-enable-install-app')
         return success_url
 
+    def get_context_data(self, **kwargs):
+        context = {
+            'user': get_user_or_tmp_user(self.request)
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
 
 class UserOtpEnableInstallAppView(TemplateView):
     template_name = 'users/user_otp_enable_install_app.html'
@@ -181,17 +190,6 @@ class UserOtpEnableBindView(TemplateView, FormView):
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-settings-success')
 
-    def get_context_data(self, **kwargs):
-        user = get_user_or_tmp_user(self.request)
-        otp_uri, otp_secret_key = generate_otp_uri(self.request)
-        context = {
-            'otp_uri': otp_uri,
-            'otp_secret_key': otp_secret_key,
-            'user': user
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
-
     def form_valid(self, form):
         otp_code = form.cleaned_data.get('otp_code')
         otp_secret_key = cache.get(self.request.session.session_key+'otp_key', '')
@@ -209,6 +207,17 @@ class UserOtpEnableBindView(TemplateView, FormView):
         user.enable_mfa()
         user.otp_secret_key = otp_secret_key
         user.save()
+
+    def get_context_data(self, **kwargs):
+        user = get_user_or_tmp_user(self.request)
+        otp_uri, otp_secret_key = generate_otp_uri(self.request)
+        context = {
+            'otp_uri': otp_uri,
+            'otp_secret_key': otp_secret_key,
+            'user': user
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class UserDisableMFAView(FormView):
@@ -258,6 +267,6 @@ class UserOtpSettingsSuccessView(TemplateView):
         if not user.mfa_enabled:
             title = _('MFA disable success')
             describe = _('MFA disable success, return login page')
-
+        delete_tmp_user_for_cache(self.request)
         return title, describe
 

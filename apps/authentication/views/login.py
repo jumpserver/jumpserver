@@ -20,7 +20,7 @@ from django.urls import reverse_lazy
 
 from common.utils import get_request_ip, get_object_or_none
 from users.utils import (
-    redirect_user_first_login_or_index
+    redirect_user_first_login_or_index, set_tmp_user_to_cache
 )
 from .. import forms, mixins, errors
 
@@ -128,13 +128,14 @@ class UserLoginGuardView(mixins.AuthMixin, RedirectView):
         except errors.LoginConfirmBaseError:
             return self.format_redirect_url(self.login_confirm_url)
         else:
-            auth_login(self.request, user)
-            self.send_auth_signal(success=True, user=user)
-            self.clear_auth_mark()
             # 启用但是没有设置otp, 排除radius
             if user.mfa_enabled_but_not_set():
                 # 1,2,mfa_setting & F
+                set_tmp_user_to_cache(self.request, user)
                 return reverse('users:user-otp-enable-authentication')
+            auth_login(self.request, user)
+            self.send_auth_signal(success=True, user=user)
+            self.clear_auth_mark()
             url = redirect_user_first_login_or_index(
                 self.request, self.redirect_field_name
             )

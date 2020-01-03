@@ -6,7 +6,7 @@ from django.conf import settings
 from common.utils import get_object_or_none, get_request_ip, get_logger
 from users.models import User
 from users.utils import (
-    is_block_login, clean_failed_count, increase_login_failed_count
+    is_block_login, clean_failed_count, increase_login_failed_count,
 )
 from . import errors
 from .utils import check_user_valid
