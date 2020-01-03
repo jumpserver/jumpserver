@@ -1,0 +1,47 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ FAVICON_URL }}" type="image/x-icon">
+    <title>{% block html_title %}{% endblock %}</title>
+
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static "js/jumpserver.js" %}"></script>
+    <style>
+        .passwordBox {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
+        }
+    </style>
+    {% block custom_head_css_js %} {% endblock %}
+</head>
+
+<body class="gray-bg">
+    <div class="passwordBox animated fadeInDown">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="ibox-content">
+                    <img src="{{ LOGO_URL }}" style="margin: auto" width="50" height="50">
+                    <h2 class="font-bold" style="display: inline">{% block title %}{% endblock %}</h2>
+                    <h1></h1>
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-12">
+                 {% include '_copyright.html' %}
+            </div>
+        </div>
+    </div>
+</body>
+{% block custom_foot_js %} {% endblock %}
+</html>

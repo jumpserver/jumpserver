@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
-from ..models import Asset, Node, Label
+from ..models import Asset, Node, Label, Platform
 from ..const import (
     GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
     GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
@@ -16,7 +16,8 @@ from .base import ConnectivitySerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
-    'ProtocolsField',
+    'ProtocolsField', 'PlatformSerializer',
+    'AssetDetailSerializer',
 ]
 
 
@@ -65,6 +66,9 @@ class ProtocolsField(serializers.ListField):
 
 
 class AssetSerializer(BulkOrgResourceModelSerializer):
+    platform = serializers.SlugRelatedField(
+        slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
+    )
     protocols = ProtocolsField(label=_('Protocols'), required=False)
     connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
 
@@ -111,7 +115,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         queryset = queryset.prefetch_related(
             Prefetch('nodes', queryset=Node.objects.all().only('id')),
             Prefetch('labels', queryset=Label.objects.all().only('id')),
-        ).select_related('admin_user', 'domain')
+        ).select_related('admin_user', 'domain', 'platform')
         return queryset
 
     def compatible_with_old_protocol(self, validated_data):
@@ -137,6 +141,21 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def update(self, instance, validated_data):
         self.compatible_with_old_protocol(validated_data)
         return super().update(instance, validated_data)
+
+
+class PlatformSerializer(serializers.ModelSerializer):
+    meta = serializers.DictField(required=False, allow_null=True)
+
+    class Meta:
+        model = Platform
+        fields = [
+            'id', 'name', 'base', 'charset',
+            'internal', 'meta', 'comment'
+        ]
+
+
+class AssetDetailSerializer(AssetSerializer):
+    platform = PlatformSerializer(read_only=True)
 
 
 class AssetSimpleSerializer(serializers.ModelSerializer):

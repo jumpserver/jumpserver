@@ -4,9 +4,13 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <style>
+    .table.node_edit {
+        margin-bottom: 0;
+    }
+    </style>
 {% endblock %}
+
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -98,15 +102,8 @@
                                                 </td>
                                             </tr>
                                         </form>
-
-                                        {% for node in system_user.nodes.all|sort %}
-                                        <tr>
-                                          <td ><b class="bdg_node" data-gid={{ node.id }}>{{ node.full_value }}</b></td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
-                                        </tr>
-                                        {% endfor %}
+                                        <table class="table" id="node_list_table">
+                                        </table>
                                         </tbody>
                                     </table>
                                 </div>
@@ -120,91 +117,115 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+var assetsRelationUrl = "{% url 'api-assets:system-users-assets-relation-list' %}";
+var nodesRelationUrl = "{% url 'api-assets:system-users-nodes-relation-list' %}";
 
-function updateSystemUserNode(nodes) {
-    var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
-    var body = {
-        nodes: Object.assign([], nodes)
-    };
-    var success = function(data) {
-        // remove all the selected groups from select > option and rendered ul element;
-        $('.select2-selection__rendered').empty();
-        $('#node_selected').val('');
-        $.map(jumpserver.nodes_selected, function(node_name, index) {
-            $('#opt_' + index).remove();
-            // change tr html of user groups.
-            $('.node_edit tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_node" data-gid="' + index + '">' + node_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-node" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.nodes_selected
-        jumpserver.nodes_selected = {};
-    };
+function getRelationUrl(type) {
+    var theUrl = "";
+    switch (type) {
+        case "asset":
+            theUrl = assetsRelationUrl;
+            break;
+        case "node":
+            theUrl = nodesRelationUrl;
+            break;
+    }
+    return theUrl;
+}
+
+function addObjects(objectsId, type) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {systemuser: "{{ object.id }}"};
+        data[type] = v;
+        body.push(data)
+    });
     requestApi({
-        url: the_url,
+        url: theUrl,
         body: JSON.stringify(body),
+        method: "POST",
+        success: reloadPage
+    });
+}
+
+function removeObject(objectId, type, success) {
+    if (!objectId)  {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    theUrl = setUrlParam(theUrl, 'systemuser', "{{ object.id }}");
+    theUrl = setUrlParam(theUrl, type, objectId);
+    if (!success) {
+        success = reloadPage
+    }
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
         success: success
     });
 }
-jumpserver.nodes_selected = {};
+
+function initNodeTable() {
+    var theUrl = setUrlParam(nodesRelationUrl, "systemuser", "{{ object.id }}");
+    var options = {
+        ele: $('#node_list_table'),
+        toggle: true,
+        columnDefs: [
+             {targets: 1, createdCell: function (td, cellData) {
+                  var removeBtn = '<button class="btn btn-danger pull-right btn-xs btn-remove-from-node" data-uid="UID" type="button"><i class="fa fa-minus"></i></button>'
+                      .replace('UID', cellData);
+		  		  $(td).html(removeBtn);
+             }}
+        ],
+        ajax_url: theUrl,
+        dom: "trp",
+        hideDefaultDefs: true,
+        columns: [
+            {data: "node_display", orderable: false},
+            {data: "node", orderable: false},
+        ],
+    };
+    table = jumpserver.initServerSideDataTable(options);
+    return table
+}
+
 
 $(document).ready(function () {
-	$('.select2').select2()
-    nodesSelect2Init(".nodes-select2")
-	.on('select2:select', function(evt) {
-            var data = evt.params.data;
-            jumpserver.nodes_selected[data.id] = data.text;
-    })
-    .on('select2:unselect', function(evt) {
-        var data = evt.params.data;
-        delete jumpserver.nodes_selected[data.id];
-    });
+	$('.select2').select2();
+    nodesSelect2Init(".nodes-select2");
 	assetUserListUrl = setUrlParam(assetUserListUrl, "system_user_id", "{{ system_user.id }}");
     needPush = true;
     initAssetUserTable();
-
+    initNodeTable();
 })
 .on('click', '.btn-remove-from-node', function() {
     var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_node');
-    var gid = $badge.data('gid');
-    var node_name = $badge.html() || $badge.text();
-    $('#groups_selected').append(
-        '<option value="' + gid + '" id="opt_' + gid + '">' + node_name + '</option>'
-    );
-    $tr.remove();
-    var nodes = $('.bdg_node').map(function () {
-        return $(this).data('gid');
-    }).get();
-    updateSystemUserNode(nodes);
+    var nodeId = $(this).data('uid');
+    var success = function() {
+        var $tr = $this.closest('tr');
+        $tr.remove();
+    };
+    removeObject(nodeId, "node", success)
 })
 .on('click', '#btn-add-to-node', function() {
-    if (Object.keys(jumpserver.nodes_selected).length === 0) {
-        return false;
-    }
-    var nodes = $('.bdg_node').map(function() {
-        return $(this).data('gid');
-    }).get();
-    $.map(jumpserver.nodes_selected, function(value, index) {
-        nodes.push(index);
-    });
-    updateSystemUserNode(nodes);
+    var nodes = $("#node_selected").val();
+    addObjects(nodes, "node");
 })
 .on('click', '.btn-push', function () {
-    var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
     var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
+        var taskId = data.task;
+        showCeleryTaskLog(taskId);
     };
     requestApi({
-        url: the_url,
+        url: theUrl,
         error: error,
         method: 'GET',
         success: success
@@ -213,39 +234,37 @@ $(document).ready(function () {
 .on('click', '.btn-push-auth', function () {
     var $this = $(this);
     var asset_id = $this.data('asset');
-    var the_url = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}";
-    the_url = the_url.replace("{{ DEFAULT_PK }}", asset_id);
+    var theUrl = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}";
+    theUrl = theUrl.replace("{{ DEFAULT_PK }}", asset_id);
     var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
+        var taskId = data.task;
+        showCeleryTaskLog(taskId);
     };
     var error = function (data) {
         alert(data)
     };
     requestApi({
-        url: the_url,
+        url: theUrl,
         method: 'GET',
         success: success,
         error: error
     })
 })
 .on('click', '.btn-test-connective', function () {
-    var the_url = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
     var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
+        var taskId = data.task;
+        showCeleryTaskLog(taskId);
     };
     requestApi({
-        url: the_url,
+        url: theUrl,
         error: error,
         method: 'GET',
         success: success
     });
 })
-
-
 </script>
 {% endblock %}

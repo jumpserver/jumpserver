@@ -25,7 +25,7 @@
 
 <div class="wrapper wrapper-content">
    <div class="row">
-       <div class="col-lg-3" id="split-left" style="padding-left: 3px;overflow: auto;max-height: 500px">
+       <div class="col-sm-3" id="split-left" style="padding-left: 3px;overflow: auto;max-height: 500px">
            <div class="ibox float-e-margins">
                <div class="ibox-content mailbox-content" style="padding-top: 0;padding-left: 1px">
                    <div class="file-manager ">
@@ -37,7 +37,7 @@
                </div>
            </div>
        </div>
-       <div class="col-lg-9 animated fadeInRight" id="split-right">
+       <div class="col-sm-9 animated fadeInRight" id="split-right">
            <div class="mail-box-header">
                <table class="table table-striped table-bordered table-hover " id="asset_list_modal_table" style="width: 100%">
                    <thead>
@@ -188,6 +188,16 @@ function initModalTree() {
 
 function setAssetModalOptions(options) {
     assetModalOption = options;
+}
+
+function initAssetTreeModel(selector) {
+    $(selector).parent().find(".select2-selection").on('click', function (e) {
+        if ($(e.target).attr('class') !== 'select2-selection__choice__remove'){
+            e.preventDefault();
+            e.stopPropagation();
+            $("#asset_list_modal").modal();
+        }
+    })
 }
 
 

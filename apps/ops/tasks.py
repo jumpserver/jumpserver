@@ -1,21 +1,22 @@
 # coding: utf-8
 import os
 import subprocess
-import datetime
 import time
 
 from django.conf import settings
 from celery import shared_task, subtask
 from celery.exceptions import SoftTimeLimitExceeded
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none, get_disk_usage
 from .celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic,
     after_app_ready_start
 )
 from .celery.utils import create_or_update_celery_periodic_tasks
 from .models import Task, CommandExecution, CeleryTask
+from .utils import send_server_performance_mail
 
 logger = get_logger(__file__)
 
@@ -59,7 +60,7 @@ def run_command_execution(cid, **kwargs):
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24)
+@register_as_period_task(interval=3600*24, description=_("Clean task history period"))
 def clean_tasks_adhoc_period():
     logger.debug("Start clean task adhoc and run history")
     tasks = Task.objects.all()
@@ -72,7 +73,7 @@ def clean_tasks_adhoc_period():
 
 @shared_task
 @after_app_shutdown_clean_periodic
-@register_as_period_task(interval=3600*24)
+@register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
     expire_days = 30
     logger.debug("Start clean celery task history")
@@ -101,6 +102,19 @@ def create_or_update_registered_periodic_tasks():
     from .celery.decorator import get_register_period_tasks
     for task in get_register_period_tasks():
         create_or_update_celery_periodic_tasks(task)
+
+
+@shared_task
+@register_as_period_task(interval=3600)
+def check_server_performance_period():
+    usages = get_disk_usage()
+    usages = {path: usage for path, usage in usages.items()
+              if not path.startswith('/etc')}
+
+    for path, usage in usages.items():
+        if usage.percent > 80:
+            send_server_performance_mail(path, usage, usages)
+            return
 
 
 @shared_task(queue="ansible")

@@ -11,14 +11,15 @@ from rest_framework.request import Request
 from jumpserver.utils import current_request
 from common.utils import get_request_ip, get_logger, get_syslogger
 from users.models import User
+from users.signals import post_user_change_password
 from authentication.signals import post_auth_failed, post_auth_success
 from terminal.models import Session, Command
-from terminal.backends.command.serializers import SessionCommandSerializer
-from . import models, serializers
-from .tasks import write_login_log_async
+from common.utils.encode import model_to_json
+from .utils import write_login_log
+from . import models
 
 logger = get_logger(__name__)
-sys_logger = get_syslogger("audits")
+sys_logger = get_syslogger(__name__)
 json_render = JSONRenderer()
 
 
@@ -26,6 +27,8 @@ MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
     'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
     'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
+    'Platform', 'ChangeAuthPlan', 'GatherUserTask',
+    'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
 )
 
 
@@ -50,8 +53,11 @@ def create_operate_log(action, sender, resource):
             logger.error("Create operate log error: {}".format(e))
 
 
-@receiver(post_save, dispatch_uid="my_unique_identifier")
-def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
+@receiver(post_save)
+def on_object_created_or_update(sender, instance=None, created=False, update_fields=None, **kwargs):
+    if instance._meta.object_name == 'User' and \
+            update_fields and 'last_login' in update_fields:
+        return
     if created:
         action = models.OperateLog.ACTION_CREATE
     else:
@@ -59,47 +65,46 @@ def on_object_created_or_update(sender, instance=None, created=False, **kwargs):
     create_operate_log(action, sender, instance)
 
 
-@receiver(post_delete, dispatch_uid="my_unique_identifier")
+@receiver(post_delete)
 def on_object_delete(sender, instance=None, **kwargs):
     create_operate_log(models.OperateLog.ACTION_DELETE, sender, instance)
 
 
-@receiver(post_save, sender=User, dispatch_uid="my_unique_identifier")
-def on_user_change_password(sender, instance=None, **kwargs):
-    if hasattr(instance, '_set_password'):
-        if not current_request or not current_request.user.is_authenticated:
-            return
-        with transaction.atomic():
-            models.PasswordChangeLog.objects.create(
-                user=instance, change_by=current_request.user,
-                remote_addr=get_request_ip(current_request),
-            )
+@receiver(post_user_change_password, sender=User)
+def on_user_change_password(sender, user=None, **kwargs):
+    if not current_request:
+        remote_addr = '127.0.0.1'
+        change_by = 'System'
+    else:
+        remote_addr = get_request_ip(current_request)
+        if not current_request.user.is_authenticated:
+            change_by = str(user)
+        else:
+            change_by = str(current_request.user)
+    with transaction.atomic():
+        models.PasswordChangeLog.objects.create(
+            user=str(user), change_by=change_by,
+            remote_addr=remote_addr,
+        )
 
 
 def on_audits_log_create(sender, instance=None, **kwargs):
     if sender == models.UserLoginLog:
         category = "login_log"
-        serializer = serializers.LoginLogSerializer
     elif sender == models.FTPLog:
-        serializer = serializers.FTPLogSerializer
         category = "ftp_log"
     elif sender == models.OperateLog:
         category = "operation_log"
-        serializer = serializers.OperateLogSerializer
     elif sender == models.PasswordChangeLog:
         category = "password_change_log"
-        serializer = serializers.PasswordChangeLogSerializer
     elif sender == Session:
         category = "host_session_log"
-        serializer = serializers.SessionAuditSerializer
     elif sender == Command:
         category = "session_command_log"
-        serializer = SessionCommandSerializer
     else:
         return
 
-    s = serializer(instance=instance)
-    data = json_render.render(s.data).decode(errors='ignore')
+    data = model_to_json(instance, indent=None)
     msg = "{} - {}".format(category, data)
     sys_logger.info(msg)
 
@@ -129,7 +134,7 @@ def on_user_auth_success(sender, user, request, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     data = generate_data(user.username, request)
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
-    write_login_log_async.delay(**data)
+    write_login_log(**data)
 
 
 @receiver(post_auth_failed)
@@ -137,4 +142,4 @@ def on_user_auth_failed(sender, username, request, reason, **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
     data.update({'reason': reason, 'status': False})
-    write_login_log_async.delay(**data)
+    write_login_log(**data)

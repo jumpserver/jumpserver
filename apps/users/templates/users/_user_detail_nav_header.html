@@ -1,0 +1,97 @@
+{% load static %}
+{% load i18n %}
+
+<style>
+    .nav .open>a, .nav .open>a:hover, .nav .open>a:focus{
+        border-color: white;
+    }
+</style>
+
+<li id="id_nav_user_detail">
+    <a href="{% url 'users:user-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
+</li>
+<li id="id_nav_user_detail_user_permission" class="btn-group">
+    <a class="btn btn-sm dropdown-toggle" data-toggle="dropdown">
+        <span>{% trans "User permissions" %}</span>
+        <i class="caret"></i>
+    </a>
+
+    <ul class="dropdown-menu">
+        <li id="id_nav_user_detail_assets">
+            <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center">
+                <i class="fa fa-cubes"></i>
+                <span>{% trans 'Asset granted' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+
+        </li>
+        <li id="id_nav_user_detail_asset_permissions">
+            <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center">
+                <i class="fa fa-edit"></i>
+                <span>{% trans 'Asset permission' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+        </li>
+
+        {% if LICENSE_VALID %}
+        <li id="id_nav_user_detail_remote_apps">
+            <a href="{% url 'users:user-granted-remote-app' pk=object.id %}" class="text-center">
+                <i class="fa fa-desktop"></i>
+                <span>{% trans 'RemoteApp granted' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+        </li>
+        <li id="id_nav_user_detail_remote_app_permissions">
+            <a href="{% url 'users:user-remote-app-permission' pk=object.id %}" class="text-center">
+                <i class="fa fa-edit"></i>
+                <span>{% trans 'RemoteApp permission' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+        </li>
+        <li id="id_nav_user_detail_database_apps">
+            <a href="{% url 'users:user-granted-database-app' pk=object.id %}" class="text-center">
+                <i class="fa fa-database"></i>
+                <span>{% trans 'DatabaseApp granted' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+        </li>
+        <li id="id_nav_user_detail_database_app_permissions">
+            <a href="{% url 'users:user-database-app-permission' pk=object.id %}" class="text-center">
+                <i class="fa fa-edit"></i>
+                <span>{% trans 'DatabaseApp permission' %}</span>
+                <i class="highlight-circle"></i>
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</li>
+
+<script>
+function activeUserDetailNav(prefix) {
+    var path = document.location.pathname;
+    if (prefix) {
+        path = path.replace(prefix, '');
+        console.log(path);
+    }
+    var navId, navId2 = '';
+    var idPrefix = 'id_nav_user_detail';
+    var navUserDetailId = "#" + idPrefix;
+    var navUserPermissionId = "#" + idPrefix + "_user_permission";
+    var urlArray = path.split("/");
+    var page = urlArray[urlArray.length-2];
+
+    if (page === "{{ object.id }}" || page === undefined){
+        navId = navUserDetailId;
+    }
+    else{
+        navId = navUserPermissionId;
+        navId2 = "#" + idPrefix + '_' + page.replace(/-/g, '_');
+        var highlightCircle = '<span class="fa fa-circle" style="padding-left: 5px; color: #1ab394"></span>';
+        $(navId2 + '>a>i.highlight-circle').html(highlightCircle);
+        $(navId + '>a>span').html($(navId2 + '>a>span').html());
+    }
+    $(navId).addClass('active')
+}
+activeUserDetailNav("{{ FORCE_SCRIPT_NAME }}");
+</script>

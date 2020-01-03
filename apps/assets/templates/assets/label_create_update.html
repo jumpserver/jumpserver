@@ -29,9 +29,7 @@ $(document).ready(function () {
     $('.select2').select2({
         closeOnSelect: false
     })
-}).on('click', '.select2-selection__rendered', function (e) {
-    e.preventDefault();
-    $("#asset_list_modal").modal();
+    initAssetTreeModel("#id_assets");
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();

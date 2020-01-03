@@ -1,10 +1,11 @@
 # coding: utf-8
 #
 
-
+import copy
 from rest_framework import serializers
 
 from common.serializers import AdaptedBulkListSerializer
+from common.fields.serializer import CustomMetaDictField
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 
 from .. import const
@@ -16,71 +17,53 @@ __all__ = [
 ]
 
 
-class RemoteAppParamsDictField(serializers.DictField):
-    """
-    RemoteApp field => params
-    """
-    @staticmethod
-    def filter_attribute(attribute, instance):
-        """
-        过滤掉params字段值中write_only特性的key-value值
-        For example, the chrome_password field is not returned when serializing
-        {
-            'chrome_target': 'http://www.jumpserver.org/',
-            'chrome_username': 'admin',
-            'chrome_password': 'admin',
-        }
-        """
-        for field in const.REMOTE_APP_TYPE_MAP_FIELDS[instance.type]:
-            if field.get('write_only', False):
-                attribute.pop(field['name'], None)
-        return attribute
-
-    def get_attribute(self, instance):
-        """
-        序列化时调用
-        """
-        attribute = super().get_attribute(instance)
-        attribute = self.filter_attribute(attribute, instance)
-        return attribute
-
-    @staticmethod
-    def filter_value(dictionary, value):
-        """
-        过滤掉不属于当前app_type所包含的key-value值
-        """
-        app_type = dictionary.get('type', const.REMOTE_APP_TYPE_CHROME)
-        fields = const.REMOTE_APP_TYPE_MAP_FIELDS[app_type]
-        fields_names = [field['name'] for field in fields]
-        no_need_keys = [k for k in value.keys() if k not in fields_names]
-        for k in no_need_keys:
-            value.pop(k)
-        return value
-
-    def get_value(self, dictionary):
-        """
-        反序列化时调用
-        """
-        value = super().get_value(dictionary)
-        value = self.filter_value(dictionary, value)
-        return value
+class RemoteAppParamsDictField(CustomMetaDictField):
+    type_fields_map = const.REMOTE_APP_TYPE_FIELDS_MAP
+    default_type = const.REMOTE_APP_TYPE_CHROME
+    convert_key_remove_type_prefix = False
+    convert_key_to_upper = False
 
 
 class RemoteAppSerializer(BulkOrgResourceModelSerializer):
     params = RemoteAppParamsDictField()
+    type_fields_map = const.REMOTE_APP_TYPE_FIELDS_MAP
 
     class Meta:
         model = RemoteApp
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'asset', 'type', 'path', 'params',
-            'comment', 'created_by', 'date_created', 'asset_info',
-            'get_type_display',
+            'id', 'name', 'asset', 'asset_info', 'type', 'get_type_display',
+            'path', 'params', 'date_created', 'created_by', 'comment',
         ]
         read_only_fields = [
             'created_by', 'date_created', 'asset_info',
             'get_type_display'
         ]
+
+    def process_params(self, instance, validated_data):
+        new_params = copy.deepcopy(validated_data.get('params', {}))
+        tp = validated_data.get('type', '')
+
+        if tp != instance.type:
+            return new_params
+
+        old_params = instance.params
+        fields = self.type_fields_map.get(instance.type, [])
+        for field in fields:
+            if not field.get('write_only', False):
+                continue
+            field_name = field['name']
+            new_value = new_params.get(field_name, '')
+            old_value = old_params.get(field_name, '')
+            field_value = new_value if new_value else old_value
+            new_params[field_name] = field_value
+
+        return new_params
+
+    def update(self, instance, validated_data):
+        params = self.process_params(instance, validated_data)
+        validated_data['params'] = params
+        return super().update(instance, validated_data)
 
 
 class RemoteAppConnectionInfoSerializer(serializers.ModelSerializer):

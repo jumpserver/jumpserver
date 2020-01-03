@@ -11,14 +11,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from common.utils import (
-    get_signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
+    signer, ssh_key_string_to_obj, ssh_key_gen, get_logger
 )
 from common.validators import alphanumeric
 from common import fields
 from orgs.mixins.models import OrgModelMixin
 from .utils import private_key_validator, Connectivity
 
-signer = get_signer()
 
 logger = get_logger(__file__)
 
@@ -41,6 +40,7 @@ class AssetUser(OrgModelMixin):
     ASSET_USER_CACHE_TIME = 3600 * 24
 
     _prefer = "system_user"
+    _assets_amount = None
 
     @property
     def private_key_obj(self):
@@ -143,6 +143,8 @@ class AssetUser(OrgModelMixin):
 
     @property
     def assets_amount(self):
+        if self._assets_amount is not None:
+            return self._assets_amount
         cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
         cached = cache.get(cache_key)
         if not cached:

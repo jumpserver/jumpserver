@@ -7,10 +7,7 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.views.i18n import JavaScriptCatalog
 
-# from .views import IndexView, LunaView, I18NView, HealthCheckView, redirect_format_api
 from . import views
-from .celery_flower import celery_flower_view
-from .swagger import get_swagger_view
 
 api_v1 = [
     path('users/', include('users.urls.api_urls', namespace='api-users')),
@@ -44,7 +41,7 @@ app_view_patterns = [
     path('auth/', include('authentication.urls.view_urls'), name='auth'),
     path('applications/', include('applications.urls.views_urls', namespace='applications')),
     path('tickets/', include('tickets.urls.views_urls', namespace='tickets')),
-    re_path(r'flower/(?P<path>.*)', celery_flower_view, name='flower-view'),
+    re_path(r'flower/(?P<path>.*)', views.celery_flower_view, name='flower-view'),
 ]
 
 
@@ -82,19 +79,19 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
             + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += js_i18n_patterns
 
-handler404 = 'jumpserver.error_views.handler404'
-handler500 = 'jumpserver.error_views.handler500'
+handler404 = 'jumpserver.views.handler404'
+handler500 = 'jumpserver.views.handler500'
 
 if settings.DEBUG:
     urlpatterns += [
         re_path('^swagger(?P<format>\.json|\.yaml)$',
-                get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/', get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/', get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
+                views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
+        path('docs/', views.get_swagger_view().with_ui('swagger', cache_timeout=1), name="docs"),
+        path('redoc/', views.get_swagger_view().with_ui('redoc', cache_timeout=1), name='redoc'),
 
         re_path('^v2/swagger(?P<format>\.json|\.yaml)$',
-                get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
-        path('docs/v2/', get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
-        path('redoc/v2/', get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
+                views.get_swagger_view().without_ui(cache_timeout=1), name='schema-json'),
+        path('docs/v2/', views.get_swagger_view("v2").with_ui('swagger', cache_timeout=1), name="docs"),
+        path('redoc/v2/', views.get_swagger_view("v2").with_ui('redoc', cache_timeout=1), name='redoc'),
     ]
 

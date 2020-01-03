@@ -158,7 +158,7 @@ function activeNav(prefix) {
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
-        $('#' + app + ' #' + resource.replaceAll('-', '_')).addClass('active');
+        $('#' + app + ' #' + resource.replace(/-/g, '_')).addClass('active');
     }
 }
 
@@ -177,7 +177,7 @@ function formSubmit(props) {
     */
     props = props || {};
     var data = props.data || props.form.serializeObject();
-    var redirect_to = props.redirect_to;
+    var redirectTo = props.redirect_to || props.redirectTo;
     $.ajax({
         url: props.url,
         type: props.method || 'POST',
@@ -185,12 +185,8 @@ function formSubmit(props) {
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textState, jqXHR) {
-        if (redirect_to) {
-            if (props.message) {
-                var messages = "ed65330a45559c87345a0eb6ac7812d18d0d8976$[[\"__json_message\"\0540\05425\054\"asdfasdf \\u521b\\u5efa\\u6210\\u529f\"]]"
-                setCookie("messages", messages)
-            }
-            location.href = redirect_to;
+        if (redirectTo) {
+            location.href = redirectTo;
         } else if (typeof props.success === 'function') {
             return props.success(data, textState, jqXHR);
         }
@@ -254,7 +250,6 @@ function formSubmit(props) {
             }
             $('.has-error').get(0).scrollIntoView();
         }
-
     })
 }
 
@@ -316,7 +311,7 @@ function requestApi(props) {
 }
 
 // Sweet Alert for Delete
-function objectDelete(obj, name, url, redirectTo) {
+function objectDelete(obj, name, url, redirectTo, title, success_message) {
     function doDelete() {
         var body = {};
         var success = function () {
@@ -335,14 +330,14 @@ function objectDelete(obj, name, url, redirectTo) {
             url: url,
             body: JSON.stringify(body),
             method: 'DELETE',
-            success_message: gettext("Delete the success"),
+            success_message: success_message || gettext("Delete the success"),
             success: success,
             error: fail
         });
     }
 
     swal({
-        title: gettext('Are you sure about deleting it?'),
+        title: title || gettext('Are you sure about deleting it?'),
         text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,
@@ -413,7 +408,7 @@ $.fn.serializeObject = function () {
 };
 
 function makeLabel(data) {
-    return "<label class='detail-key'><b>" + data[0] + ": </b></label>" + data[1] + "</br>"
+    return "<label class='detail-key'><b>" + data[0] + ": </b></label> " + data[1] + "</br>"
 }
 
 function parseTableFilter(value) {
@@ -600,6 +595,7 @@ jumpserver.initServerSideDataTable = function (options) {
     //    op_html: 'div.btn-group?',
     //    paging: true,
     //    paging_numbers_length: 5;
+    //    hideDefaultDefs: false;
     // }
     var pagingNumbersLength = 5;
     if (options.paging_numbers_length){
@@ -613,7 +609,8 @@ jumpserver.initServerSideDataTable = function (options) {
             orderable: false,
             width: "20px",
             createdCell: function (td, cellData) {
-                $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+                var data = '<input type="checkbox" class="text-center ipt_check" id=Id>'.replace('Id', cellData);
+                $(td).html(data);
             }
         },
         {
@@ -622,6 +619,9 @@ jumpserver.initServerSideDataTable = function (options) {
             render: $.fn.dataTable.render.text()
         }
     ];
+    if (options.hideDefaultDefs) {
+        columnDefs = [];
+    }
     var select_style = options.select_style || 'multi';
     columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
     var select = {
@@ -635,7 +635,7 @@ jumpserver.initServerSideDataTable = function (options) {
         pageLength: options.pageLength || 15,
         // dom: options.dom || '<"#uc.pull-left">fltr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         // dom: options.dom || '<"#uc.pull-left"><"pull-right"<"inline"l><"#fb.inline"><"inline"<"table-filter"f>><"#fa.inline">>tr<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        dom: dom,
+        dom: options.dom || dom,
         order: options.order || [],
         buttons: [],
         columnDefs: columnDefs,
@@ -713,8 +713,14 @@ jumpserver.initServerSideDataTable = function (options) {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
                 if (row.id && $.inArray(row.id, table.selected) === -1) {
-                    table.selected.push(row.id);
-                    table.selected_rows.push(row);
+                    if (select.style === 'multi'){
+                        table.selected.push(row.id);
+                        table.selected_rows.push(row);
+                    }
+                    else{
+                        table.selected = [row.id];
+                        table.selected_rows = [row];
+                    }
                 }
             })
         }
@@ -1027,6 +1033,62 @@ function rootNodeAddDom(ztree, callback) {
     })
 }
 
+function APIExportCSV(props) {
+    /*
+    {
+       listUrl:
+       objectsId:
+       template:
+       table:
+       params:
+    }
+     */
+    var _listUrl = props.listUrl;
+    var _objectsId = props.objectsId;
+    var _template = props.template;
+    var _table = props.table;
+    var _params = props.params || {};
+
+    var tableParams = _table.ajax.params();
+    var exportUrl = setUrlParam(_listUrl, 'format', 'csv');
+    if (_template) {
+        exportUrl = setUrlParam(exportUrl, 'template', _template)
+    }
+    for (var k in tableParams) {
+        if (datatableInternalParams.includes(k)) {
+            continue
+        }
+        if (!tableParams[k]) {
+            continue
+        }
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+    for (var k in _params) {
+        exportUrl = setUrlParam(exportUrl, k, tableParams[k])
+    }
+
+    if (!_objectsId) {
+        console.log(exportUrl);
+        window.open(exportUrl);
+        return
+    }
+
+    requestApi({
+        url: '/api/v1/common/resources/cache/',
+        data: JSON.stringify({resources: _objectsId}),
+        method: "POST",
+        flash_message: false,
+        success: function (data) {
+            exportUrl = setUrlParam(exportUrl, 'spm', data.spm);
+            console.log(exportUrl);
+            window.open(exportUrl);
+        },
+        failed: function () {
+            toastr.error(gettext('Export failed'));
+        }
+    });
+}
+
 function APIExportData(props) {
     props = props || {};
     $.ajax({
@@ -1076,6 +1138,7 @@ function APIImportData(props) {
         },
         error: function (error) {
             var data = error.responseJSON;
+            console.log(data);
             if (data instanceof Array) {
                 var html = '';
                 var li = '';
@@ -1136,8 +1199,8 @@ function objectAttrsIsBool(obj, attrs) {
     attrs.forEach(function (attr) {
         if (!obj[attr]) {
             obj[attr] = false
-        } else if (['on', '1'].includes(obj[attr])) {
-            obj[attr] = true
+        } else {
+            obj[attr] = ['on', '1', 'true', 'True'].includes(obj[attr]);
         }
     })
 }
@@ -1241,10 +1304,28 @@ function readFile(ref) {
     return ref
 }
 
-function nodesSelect2Init(selector, url) {
-    if (!url) {
-        url = '/api/v1/assets/nodes/'
+
+
+function select2AjaxInit(option) {
+    /*
+    {
+      selector:
+      url: ,
+      disabledData: ,
+      displayFormat,
+      idFormat,
     }
+     */
+    var selector = option.selector;
+    var url = option.url;
+    var disabledData = option.disabledData;
+    var displayFormat = option.displayFormat || function (data) {
+        return data.name;
+    };
+    var idFormat = option.idFormat || function (data) {
+        return data.id;
+    };
+
     return $(selector).select2({
         closeOnSelect: false,
         ajax: {
@@ -1260,43 +1341,53 @@ function nodesSelect2Init(selector, url) {
             },
             processResults: function (data) {
                 var results = $.map(data.results, function (v, i) {
-                    return {id: v.id, text: v.full_value}
+                    var display = displayFormat(v);
+                    var id = idFormat(v);
+                    var d = {id: id, text: display};
+                    if (disabledData && disabledData.indexOf(v.id) !== -1) {
+                        d.disabled = true;
+                    }
+                    return d;
                 });
                 var more = !!data.next;
                 return {results: results, pagination: {"more": more}}
             }
         },
     })
+
 }
 
-function usersSelect2Init(selector, url) {
+function usersSelect2Init(selector, url, disabledData) {
     if (!url) {
         url = '/api/v1/users/users/'
     }
-    return $(selector).select2({
-        closeOnSelect: false,
-        ajax: {
-            url: url,
-            data: function (params) {
-                var page = params.page || 1;
-                var query = {
-                    search: params.term,
-                    offset: (page - 1) * 10,
-                    limit: 10
-                };
-                return query
-            },
-            processResults: function (data) {
-                var results = $.map(data.results, function (v, i) {
-                    var display = v.name + '(' + v.username +')';
-                    return {id: v.id, text: display}
-                });
-                var more = !!data.next;
-                return {results: results, pagination: {"more": more}}
-            }
-        },
-    })
+    function displayFormat(v) {
+        return v.name + '(' + v.username +')';
+    }
+    var option = {
+        url: url,
+        selector: selector,
+        disabledData: disabledData,
+        displayFormat: displayFormat
+    };
+    return select2AjaxInit(option)
+}
 
+
+function nodesSelect2Init(selector, url, disabledData) {
+    if (!url) {
+        url = '/api/v1/assets/nodes/'
+    }
+    function displayFormat(v) {
+        return v.full_value;
+    }
+    var option = {
+        url: url,
+        selector: selector,
+        disabledData: disabledData,
+        displayFormat: displayFormat
+    };
+    return select2AjaxInit(option)
 }
 
 function showCeleryTaskLog(taskId) {
@@ -1324,7 +1415,7 @@ function initDateRangePicker(selector, options) {
         timePicker24Hour: true,
         autoApply: true,
     };
-    var userLang = navigator.language || navigator.userLanguage;;
+    var userLang = navigator.language || navigator.userLanguage;
     if (userLang.indexOf('zh') !== -1) {
         defaultOption.locale = zhLocale;
     }

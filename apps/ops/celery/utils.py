@@ -10,6 +10,10 @@ from django_celery_beat.models import (
     PeriodicTask, IntervalSchedule, CrontabSchedule, PeriodicTasks
 )
 
+from common.utils import get_logger
+
+logger = get_logger(__name__)
+
 
 def create_or_update_celery_periodic_tasks(tasks):
     """
@@ -21,6 +25,7 @@ def create_or_update_celery_periodic_tasks(tasks):
             'args': (16, 16),
             'kwargs': {},
             'enabled': False,
+            'description': ''
         },
     }
     :return:
@@ -35,34 +40,30 @@ def create_or_update_celery_periodic_tasks(tasks):
             return None
 
         if isinstance(detail.get("interval"), int):
-            intervals = IntervalSchedule.objects.filter(
-                every=detail["interval"], period=IntervalSchedule.SECONDS
+            kwargs = dict(
+                every=detail['interval'],
+                period=IntervalSchedule.SECONDS,
             )
-            if intervals:
-                interval = intervals[0]
-            else:
-                interval = IntervalSchedule.objects.create(
-                    every=detail['interval'],
-                    period=IntervalSchedule.SECONDS,
-                )
+            # 不能使用 get_or_create，因为可能会有多个
+            interval = IntervalSchedule.objects.filter(**kwargs).first()
+            if interval is None:
+                interval = IntervalSchedule.objects.create(**kwargs)
         elif isinstance(detail.get("crontab"), str):
             try:
                 minute, hour, day, month, week = detail["crontab"].split()
             except ValueError:
-                raise SyntaxError("crontab is not valid")
+                logger.error("crontab is not valid")
+                return
             kwargs = dict(
                 minute=minute, hour=hour, day_of_week=week,
                 day_of_month=day, month_of_year=month, timezone=get_current_timezone()
             )
-            contabs = CrontabSchedule.objects.filter(
-                **kwargs
-            )
-            if contabs:
-                crontab = contabs[0]
-            else:
+            crontab = CrontabSchedule.objects.filter(**kwargs).first()
+            if crontab is None:
                 crontab = CrontabSchedule.objects.create(**kwargs)
         else:
-            raise SyntaxError("Schedule is not valid")
+            logger.error("Schedule is not valid")
+            return
 
         defaults = dict(
             interval=interval,
@@ -71,9 +72,8 @@ def create_or_update_celery_periodic_tasks(tasks):
             task=detail['task'],
             args=json.dumps(detail.get('args', [])),
             kwargs=json.dumps(detail.get('kwargs', {})),
-            enabled=detail.get('enabled', True),
+            description=detail.get('description') or ''
         )
-
         task = PeriodicTask.objects.update_or_create(
             defaults=defaults, name=name,
         )
@@ -99,4 +99,3 @@ def get_celery_task_log_path(task_id):
     path = os.path.join(settings.CELERY_LOG_DIR, rel_path)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return path
-

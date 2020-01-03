@@ -17,13 +17,12 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from orgs.utils import current_org
-from common.utils import get_signer, date_expired_default, get_logger, lazyproperty
+from common.utils import signer, date_expired_default, get_logger, lazyproperty
 from common import fields
+from ..signals import post_user_change_password
 
 
 __all__ = ['User']
-
-signer = get_signer()
 
 logger = get_logger(__file__)
 
@@ -43,14 +42,10 @@ class AuthMixin:
         self.set_password(password_raw_)
 
     def set_password(self, raw_password):
-        self._set_password = True
         if self.can_update_password():
             self.date_password_last_updated = timezone.now()
+            post_user_change_password.send(self.__class__, user=self)
             super().set_password(raw_password)
-        else:
-            error = _("User auth from {}, go there change password").format(
-                self.source)
-            raise PermissionError(error)
 
     def can_update_password(self):
         return self.is_local
@@ -196,22 +191,22 @@ class RoleMixin:
     def is_app(self):
         return self.role == 'App'
 
-    @property
+    @lazyproperty
     def user_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_user_orgs(self)
 
-    @property
+    @lazyproperty
     def admin_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_admin_orgs(self)
 
-    @property
+    @lazyproperty
     def audit_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_audit_orgs(self)
 
-    @property
+    @lazyproperty
     def admin_or_audit_orgs(self):
         from orgs.models import Organization
         return Organization.get_user_admin_or_audit_orgs(self)
@@ -223,26 +218,26 @@ class RoleMixin:
         else:
             return False
 
-    @property
+    @lazyproperty
     def is_org_auditor(self):
         if self.is_super_auditor or self.related_audit_orgs.exists():
             return True
         else:
             return False
 
-    @property
+    @lazyproperty
     def can_admin_current_org(self):
         return current_org.can_admin_by(self)
 
-    @property
+    @lazyproperty
     def can_audit_current_org(self):
         return current_org.can_audit_by(self)
 
-    @property
+    @lazyproperty
     def can_user_current_org(self):
         return current_org.can_user_by(self)
 
-    @property
+    @lazyproperty
     def can_admin_or_audit_current_org(self):
         return self.can_admin_current_org or self.can_audit_current_org
 
@@ -266,6 +261,16 @@ class RoleMixin:
         )
         access_key = app.create_access_key()
         return app, access_key
+
+    def remove(self):
+        if not current_org.is_real():
+            return
+        if self.can_user_current_org:
+            current_org.users.remove(self)
+        if self.can_admin_current_org:
+            current_org.admins.remove(self)
+        if self.can_audit_current_org:
+            current_org.auditors.remove(self)
 
 
 class TokenMixin:
@@ -384,7 +389,7 @@ class MFAMixin:
 
     @staticmethod
     def mfa_is_otp():
-        if settings.CONFIG.OTP_IN_RADIUS:
+        if settings.OTP_IN_RADIUS:
             return False
         return True
 
@@ -401,7 +406,7 @@ class MFAMixin:
         return check_otp_code(self.otp_secret_key, code)
 
     def check_mfa(self, code):
-        if settings.CONFIG.OTP_IN_RADIUS:
+        if settings.OTP_IN_RADIUS:
             return self.check_radius(code)
         else:
             return self.check_otp(code)
@@ -539,6 +544,9 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         if user_group in self.groups.all():
             return True
         return False
+
+    def set_avatar(self, f):
+        self.avatar.save(self.username, f)
 
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"

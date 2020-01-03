@@ -4,7 +4,7 @@ import json
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from ..utils import get_signer
+from ..utils import signer
 
 
 __all__ = [
@@ -12,8 +12,8 @@ __all__ = [
     'JsonCharField', 'JsonTextField', 'JsonListCharField', 'JsonListTextField',
     'JsonDictCharField', 'JsonDictTextField', 'EncryptCharField',
     'EncryptTextField', 'EncryptMixin', 'EncryptJsonDictTextField',
+    'EncryptJsonDictCharField',
 ]
-signer = get_signer()
 
 
 class JsonMixin:
@@ -108,14 +108,24 @@ class JsonTextField(JsonMixin, models.TextField):
 
 
 class EncryptMixin:
+    """
+    EncryptMixin要放在最前面
+    """
     def from_db_value(self, value, expression, connection, context):
-        if value is not None:
-            return signer.unsign(value)
-        return None
+        if value is None:
+            return value
+        value = signer.unsign(value)
+        sp = super()
+        if hasattr(sp, 'from_db_value'):
+            return sp.from_db_value(value, expression, connection, context)
+        return value
 
     def get_prep_value(self, value):
         if value is None:
             return value
+        sp = super()
+        if hasattr(sp, 'get_prep_value'):
+            value = sp.get_prep_value(value)
         return signer.sign(value)
 
 
@@ -149,4 +159,7 @@ class EncryptCharField(EncryptMixin, models.CharField):
 class EncryptJsonDictTextField(EncryptMixin, JsonDictTextField):
     pass
 
+
+class EncryptJsonDictCharField(EncryptMixin, JsonDictCharField):
+    pass
 

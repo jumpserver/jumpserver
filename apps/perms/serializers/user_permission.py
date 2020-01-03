@@ -13,6 +13,7 @@ __all__ = [
     'AssetGrantedSerializer',
     'ActionsSerializer', 'AssetSystemUserSerializer',
     'RemoteAppSystemUserSerializer',
+    'DatabaseAppSystemUserSerializer',
 ]
 
 
@@ -41,11 +42,22 @@ class RemoteAppSystemUserSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class DatabaseAppSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        only_fields = (
+            'id', 'name', 'username', 'priority', 'protocol', 'login_mode',
+        )
+        fields = list(only_fields)
+        read_only_fields = fields
+
+
 class AssetGrantedSerializer(serializers.ModelSerializer):
     """
     被授权资产的数据结构
     """
     protocols = ProtocolsField(label=_('Protocols'), required=False, read_only=True)
+    platform = serializers.ReadOnlyField(source='platform_base')
 
     class Meta:
         model = Asset

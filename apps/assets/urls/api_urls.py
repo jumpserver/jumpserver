@@ -12,6 +12,7 @@ app_name = 'assets'
 
 router = BulkRouter()
 router.register(r'assets', api.AssetViewSet, 'asset')
+router.register(r'platforms', api.AssetPlatformViewSet, 'platform')
 router.register(r'admin-users', api.AdminUserViewSet, 'admin-user')
 router.register(r'system-users', api.SystemUserViewSet, 'system-user')
 router.register(r'labels', api.LabelViewSet, 'label')
@@ -23,6 +24,8 @@ router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
 router.register(r'asset-users-info', api.AssetUserExportViewSet, 'asset-user-info')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
+router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
+router.register(r'system-users-nodes-relations', api.SystemUserNodeRelationViewSet, 'system-users-nodes-relation')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filters', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')
@@ -35,6 +38,8 @@ urlpatterns = [
          api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
     path('assets/<uuid:pk>/gateway/',
          api.AssetGatewayApi.as_view(), name='asset-gateway'),
+    path('assets/<uuid:pk>/platform/',
+         api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
     path('asset-users/auth-info/',
          api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),

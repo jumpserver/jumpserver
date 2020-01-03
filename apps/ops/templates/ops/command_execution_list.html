@@ -6,8 +6,6 @@
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <style>
         .form-control {
             height: 30px;
@@ -16,6 +14,11 @@
         #search_btn {
             margin-bottom: 0;
         }
+
+        .select2-selection__rendered span.select2-selection, .select2-container .select2-selection--single {
+            height: 30px !important;
+        }
+
     </style>
 {% endblock %}
 

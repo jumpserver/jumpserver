@@ -98,9 +98,7 @@ class AssetPermissionDetailView(PermissionsMixin, DetailView):
         context = {
             'app': _('Perms'),
             'action': _('Asset permission detail'),
-            'system_users_remain': SystemUser.objects.exclude(
-                granted_by_permissions=self.object
-            ),
+
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -131,14 +129,13 @@ class AssetPermissionUserView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-        user_remain = current_org.get_org_members(exclude=('Auditor',)).exclude(
-            assetpermission=self.object)
+        users = [str(i) for i in self.object.users.all().values_list('id', flat=True)]
         user_groups_remain = UserGroup.objects.exclude(
             assetpermission=self.object)
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': user_remain,
+            'users': users,
             'user_groups_remain': user_groups_remain,
         }
         kwargs.update(context)
@@ -163,13 +160,16 @@ class AssetPermissionAssetView(PermissionsMixin,
         return queryset
 
     def get_context_data(self, **kwargs):
-        nodes_remain = Node.objects.exclude(
-            id__in=self.object.nodes.all().values_list('id', flat=True)
-        ).only('key')
+        assets = self.object.assets.all().values_list('id', flat=True)
+        assets = [str(i) for i in assets]
+        system_users_remain = SystemUser.objects\
+            .exclude(granted_by_permissions=self.object)\
+            .exclude(protocol=SystemUser.PROTOCOL_MYSQL)
         context = {
             'app': _('Perms'),
+            'assets': assets,
             'action': _('Asset permission asset list'),
-            'nodes_remain': nodes_remain,
+            'system_users_remain': system_users_remain,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

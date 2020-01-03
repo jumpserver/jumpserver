@@ -216,8 +216,9 @@ function OnRightClick(event, treeId, treeNode) {
 
 function showRMenu(type, x, y) {
     var offset = $("#tree-node-id").offset();
+    var scrollTop = document.querySelector('.treebox').scrollTop;
     x -= offset.left;
-    y -= offset.top;
+    y -= offset.top + scrollTop;
     x += document.body.scrollLeft;
     y += document.body.scrollTop + document.documentElement.scrollTop;
     rMenu.css({"top":y+"px", "left":x+"px", "visibility":"visible"});

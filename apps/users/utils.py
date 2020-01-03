@@ -215,6 +215,12 @@ def set_tmp_user_to_cache(request, user, ttl=3600):
     cache.set(request.session.session_key+'user', user, ttl)
 
 
+def delete_tmp_user_for_cache(request):
+    if not request.session.session_key:
+        return None
+    cache.delete(request.session.session_key+'user')
+
+
 def redirect_user_first_login_or_index(request, redirect_field_name):
     if request.user.is_first_login:
         return reverse('users:user-first-login')
@@ -329,3 +335,18 @@ def construct_user_email(username, email):
 def get_current_org_members(exclude=()):
     from orgs.utils import current_org
     return current_org.get_org_members(exclude=exclude)
+
+
+def get_source_choices():
+    from .models import User
+    choices_all = dict(User.SOURCE_CHOICES)
+    choices = [
+        (User.SOURCE_LOCAL, choices_all[User.SOURCE_LOCAL]),
+    ]
+    if settings.AUTH_LDAP:
+        choices.append((User.SOURCE_LDAP, choices_all[User.SOURCE_LDAP]))
+    if settings.AUTH_OPENID:
+        choices.append((User.SOURCE_OPENID, choices_all[User.SOURCE_OPENID]))
+    if settings.AUTH_RADIUS:
+        choices.append((User.SOURCE_RADIUS, choices_all[User.SOURCE_RADIUS]))
+    return choices

@@ -43,7 +43,7 @@ class AssetUserQuerySet(list):
             else:
                 in_kwargs[k] = v
         for k in in_kwargs:
-            kwargs.pop(k)
+            kwargs.pop(k, None)
 
         if len(in_kwargs) == 0:
             return self
@@ -56,7 +56,7 @@ class AssetUserQuerySet(list):
                     v = [str(i) for i in v]
                 if isinstance(attr, uuid.UUID):
                     attr = str(attr)
-                if v in attr:
+                if attr in v:
                     matched = True
             if matched:
                 queryset.append(i)
@@ -68,11 +68,12 @@ class AssetUserQuerySet(list):
             real = []
             for k, v in kwargs.items():
                 wanted.append(v)
-                value = getattr(obj, k)
+                value = getattr(obj, k, None)
                 if isinstance(value, uuid.UUID):
                     value = str(value)
                 real.append(value)
             return wanted == real
+        kwargs = {k: v for k, v in kwargs.items() if k.find('__in') == -1}
         if len(kwargs) > 0:
             queryset = AssetUserQuerySet([i for i in self if filter_it(i)])
         else:

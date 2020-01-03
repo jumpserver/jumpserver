@@ -3,9 +3,7 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
 {% endblock %}
 
@@ -82,11 +80,23 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is finished' %}:</td>
-                                            <td><b>{{ object.latest_history.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>
+                                                {% if object.latest_history.is_finished %}
+                                                    {% trans 'Yes' %}
+                                                {% else %}
+                                                    {% trans 'No' %}
+                                                {% endif %}
+                                            </b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
-                                            <td><b>{{ object.latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>
+                                                {% if object.latest_history.is_success %}
+                                                    {% trans 'Yes' %}
+                                                {% else %}
+                                                    {% trans 'No' %}
+                                                {% endif %}
+                                            </b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Contents' %}:</td>

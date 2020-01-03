@@ -55,7 +55,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:domain-list" %}',
         columns: [
             {data: "id"}, {data: "name" }, {data: "asset_count", orderable: false },
-            {data: "gateway_count", orderable: false }, {data: "comment" }, {data: "id", orderable: false, width: "100px"}
+            {data: "gateway_count", orderable: false }, {data: "comment" }, {data: "id", orderable: false, width: "120px"}
         ],
         op_html: $('#actions').html()
     };

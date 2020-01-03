@@ -95,6 +95,14 @@ class Organization(models.Model):
     def get_org_admins(self):
         return self.org_admins
 
+    def org_id(self):
+        if self.is_real():
+            return self.id
+        elif self.is_root():
+            return None
+        else:
+            return ''
+
     @lazyproperty
     def org_auditors(self):
         from users.models import User

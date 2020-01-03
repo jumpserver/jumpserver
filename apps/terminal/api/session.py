@@ -12,10 +12,10 @@ import jms_storage
 
 from common.utils import is_uuid, get_logger
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
-from common.filters import DatetimeRangeFilter
+from common.drf.filters import DatetimeRangeFilter
 from orgs.mixins.api import OrgBulkModelViewSet
 from ..hands import SystemUser
-from ..models import Session
+from ..models import Session, ReplayStorage
 from .. import serializers
 
 
@@ -105,9 +105,12 @@ class SessionReplayViewSet(viewsets.ViewSet):
                 data['src'] = url
                 return Response(data)
 
-        # 去定义的外部storage查找
-        configs = settings.TERMINAL_REPLAY_STORAGE
-        configs = {k: v for k, v in configs.items() if v['TYPE'] != 'server'}
+        replay_storages = ReplayStorage.objects.all()
+        configs = {
+            storage.name: storage.config
+            for storage in replay_storages
+            if not storage.in_defaults()
+        }
         if not configs:
             return HttpResponseNotFound()
 

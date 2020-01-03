@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
+"""
+配置分类：
+1. Django使用的配置文件，写到settings中
+2. 程序需要, 用户不需要更改的写到settings中
+3. 程序需要, 用户需要更改的写到本config中
+"""
 import os
 import sys
 import types
@@ -8,6 +14,7 @@ import errno
 import json
 import yaml
 from importlib import import_module
+from django.urls import reverse_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -27,6 +34,10 @@ def import_string(dotted_path):
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
         ) from err
+
+
+class DoesNotExist(Exception):
+    pass
 
 
 class Config(dict):
@@ -72,34 +83,234 @@ class Config(dict):
                       the application's :attr:`~flask.Flask.root_path`.
     :param defaults: an optional dictionary of default values
     """
+    defaults = {
+        # Django Config
+        'SECRET_KEY': '',
+        'BOOTSTRAP_TOKEN': '',
+        'DEBUG': True,
+        'SITE_URL': 'http://localhost:8080',
+        'LOG_LEVEL': 'DEBUG',
+        'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
+        'DB_ENGINE': 'mysql',
+        'DB_NAME': 'jumpserver',
+        'DB_HOST': '127.0.0.1',
+        'DB_PORT': 3306,
+        'DB_USER': 'root',
+        'DB_PASSWORD': '',
+        'REDIS_HOST': '127.0.0.1',
+        'REDIS_PORT': 6379,
+        'REDIS_PASSWORD': '',
+        'REDIS_DB_CELERY': 3,
+        'REDIS_DB_CACHE': 4,
+        'REDIS_DB_SESSION': 5,
+        'REDIS_DB_WS': 6,
+        'CAPTCHA_TEST_MODE': None,
+        'TOKEN_EXPIRATION': 3600 * 24,
+        'DISPLAY_PER_PAGE': 25,
+        'DEFAULT_EXPIRED_YEARS': 70,
+        'SESSION_COOKIE_DOMAIN': None,
+        'CSRF_COOKIE_DOMAIN': None,
+        'SESSION_COOKIE_AGE': 3600 * 24,
+        'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
+        'LOGIN_URL': reverse_lazy('authentication:login'),
 
-    def __init__(self, root_path=None, defaults=None):
-        self.defaults = defaults or {}
-        self.root_path = root_path
-        super().__init__({})
+        # Custom Config
+        # Auth LDAP settings
+        'AUTH_LDAP': False,
+        'AUTH_LDAP_SERVER_URI': 'ldap://localhost:389',
+        'AUTH_LDAP_BIND_DN': 'cn=admin,dc=jumpserver,dc=org',
+        'AUTH_LDAP_BIND_PASSWORD': '',
+        'AUTH_LDAP_SEARCH_OU': 'ou=tech,dc=jumpserver,dc=org',
+        'AUTH_LDAP_SEARCH_FILTER': '(cn=%(user)s)',
+        'AUTH_LDAP_START_TLS': False,
+        'AUTH_LDAP_USER_ATTR_MAP': {"username": "cn", "name": "sn", "email": "mail"},
+        'AUTH_LDAP_CONNECT_TIMEOUT': 30,
+        'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
+        'AUTH_LDAP_SYNC_IS_PERIODIC': False,
+        'AUTH_LDAP_SYNC_INTERVAL': None,
+        'AUTH_LDAP_SYNC_CRONTAB': None,
+        'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
+        'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
 
-    def from_envvar(self, variable_name, silent=False):
-        """Loads a configuration from an environment variable pointing to
-        a configuration file.  This is basically just a shortcut with nicer
-        error messages for this line of code::
+        'AUTH_OPENID': False,
+        'BASE_SITE_URL': 'http://localhost:8080',
+        'AUTH_OPENID_SERVER_URL': 'http://openid',
+        'AUTH_OPENID_REALM_NAME': 'jumpserver',
+        'AUTH_OPENID_CLIENT_ID': 'jumpserver',
+        'AUTH_OPENID_CLIENT_SECRET': '',
+        'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
+        'AUTH_OPENID_SHARE_SESSION': True,
 
-            app.config.from_pyfile(os.environ['YOURAPPLICATION_SETTINGS'])
+        'AUTH_RADIUS': False,
+        'RADIUS_SERVER': 'localhost',
+        'RADIUS_PORT': 1812,
+        'RADIUS_SECRET': '',
+        'RADIUS_ENCRYPT_PASSWORD': True,
+        'OTP_IN_RADIUS': False,
 
-        :param variable_name: name of the environment variable
-        :param silent: set to ``True`` if you want silent failure for missing
-                       files.
-        :return: bool. ``True`` if able to load config, ``False`` otherwise.
-        """
-        rv = os.environ.get(variable_name)
-        if not rv:
-            if silent:
+        'OTP_VALID_WINDOW': 2,
+        'OTP_ISSUER_NAME': 'Jumpserver',
+        'EMAIL_SUFFIX': 'jumpserver.org',
+
+        'TERMINAL_PASSWORD_AUTH': True,
+        'TERMINAL_PUBLIC_KEY_AUTH': True,
+        'TERMINAL_HEARTBEAT_INTERVAL': 20,
+        'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
+        'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
+        'TERMINAL_SESSION_KEEP_DURATION': 9999,
+        'TERMINAL_HOST_KEY': '',
+        'TERMINAL_TELNET_REGEX': '',
+        'TERMINAL_COMMAND_STORAGE': {},
+
+        'SECURITY_MFA_AUTH': False,
+        'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
+        'SECURITY_VIEW_AUTH_NEED_MFA': True,
+        'SECURITY_LOGIN_LIMIT_COUNT': 7,
+        'SECURITY_LOGIN_LIMIT_TIME': 30,
+        'SECURITY_MAX_IDLE_TIME': 30,
+        'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
+        'SECURITY_PASSWORD_MIN_LENGTH': 6,
+        'SECURITY_PASSWORD_UPPER_CASE': False,
+        'SECURITY_PASSWORD_LOWER_CASE': False,
+        'SECURITY_PASSWORD_NUMBER': False,
+        'SECURITY_PASSWORD_SPECIAL_CHAR': False,
+
+        'HTTP_BIND_HOST': '0.0.0.0',
+        'HTTP_LISTEN_PORT': 8080,
+        'WS_LISTEN_PORT': 8070,
+        'LOGIN_LOG_KEEP_DAYS': 90,
+        'ASSETS_PERM_CACHE_TIME': 3600 * 24,
+        'SECURITY_MFA_VERIFY_TTL': 3600,
+        'ASSETS_PERM_CACHE_ENABLE': False,
+        'SYSLOG_ADDR': '',  # '192.168.0.1:514'
+        'SYSLOG_FACILITY': 'user',
+        'SYSLOG_SOCKTYPE': 2,
+        'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
+        'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
+        'FLOWER_URL': "127.0.0.1:5555",
+        'DEFAULT_ORG_SHOW_ALL_USERS': True,
+        'PERIOD_TASK_ENABLE': True,
+        'FORCE_SCRIPT_NAME': '',
+        'LOGIN_CONFIRM_ENABLE': False,
+        'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
+    }
+
+    def convert_type(self, k, v):
+        default_value = self.defaults.get(k)
+        if default_value is None:
+            return v
+        tp = type(default_value)
+        # 对bool特殊处理
+        if tp is bool and isinstance(v, str):
+            if v in ("true", "True", "1"):
+                return True
+            else:
                 return False
-            raise RuntimeError('The environment variable %r is not set '
-                               'and as such configuration could not be '
-                               'loaded.  Set this variable and make it '
-                               'point to a configuration file' %
-                               variable_name)
-        return self.from_pyfile(rv, silent=silent)
+        if tp in [list, dict] and isinstance(v, str):
+            try:
+                v = json.loads(v)
+                return v
+            except json.JSONDecodeError:
+                return v
+
+        try:
+            if tp in [list, dict]:
+                v = json.loads(v)
+            else:
+                v = tp(v)
+        except Exception:
+            pass
+        return v
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
+
+    def get_from_config(self, item):
+        try:
+            value = super().__getitem__(item)
+        except KeyError:
+            value = None
+        return value
+
+    def get_from_env(self, item):
+        value = os.environ.get(item, None)
+        if value is not None:
+            value = self.convert_type(item, value)
+        return value
+
+    def get(self, item):
+        # 再从配置文件中获取
+        value = self.get_from_config(item)
+        if value is not None:
+            return value
+        # 其次从环境变量来
+        value = self.get_from_env(item)
+        if value is not None:
+            return value
+        return self.defaults.get(item)
+
+    def __getitem__(self, item):
+        return self.get(item)
+
+    def __getattr__(self, item):
+        return self.get(item)
+
+
+class DynamicConfig:
+    def __init__(self, static_config):
+        self.static_config = static_config
+        self.db_setting = None
+
+    def __getitem__(self, item):
+        return self.dynamic(item)
+
+    def __getattr__(self, item):
+        return self.dynamic(item)
+
+    def dynamic(self, item):
+        return lambda: self.get(item)
+
+    def LOGIN_URL(self):
+        auth_openid = self.get('AUTH_OPENID')
+        if auth_openid:
+            return reverse_lazy("authentication:openid:openid-login")
+        return self.get('LOGIN_URL')
+
+    def AUTHENTICATION_BACKENDS(self):
+        backends = [
+            'authentication.backends.pubkey.PublicKeyAuthBackend',
+            'django.contrib.auth.backends.ModelBackend',
+        ]
+        if self.get('AUTH_LDAP'):
+            backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
+        if self.static_config.get('AUTH_OPENID'):
+            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
+            backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')
+        if self.static_config.get('AUTH_RADIUS'):
+            backends.insert(0, 'authentication.backends.radius.RadiusBackend')
+        return backends
+
+    def get_from_db(self, item):
+        if self.db_setting is not None:
+            value = self.db_setting.get(item)
+            if value is not None:
+                return value
+        return None
+
+    def get(self, item):
+        # 先从数据库中获取
+        value = self.get_from_db(item)
+        if value is not None:
+            return value
+        return self.static_config.get(item)
+
+
+class ConfigManager:
+    config_class = Config
+
+    def __init__(self, root_path=None):
+        self.root_path = root_path
+        self.config = self.config_class()
 
     def from_pyfile(self, filename, silent=False):
         """Updates the values in the config from a Python file.  This function
@@ -162,7 +373,7 @@ class Config(dict):
             obj = import_string(obj)
         for key in dir(obj):
             if key.isupper():
-                self[key] = getattr(obj, key)
+                self.config[key] = getattr(obj, key)
 
     def from_json(self, filename, silent=False):
         """Updates the values in the config from a JSON file. This function
@@ -224,218 +435,50 @@ class Config(dict):
         for mapping in mappings:
             for (key, value) in mapping:
                 if key.isupper():
-                    self[key] = value
+                    self.config[key] = value
         return True
 
-    def get_namespace(self, namespace, lowercase=True, trim_namespace=True):
-        """Returns a dictionary containing a subset of configuration options
-        that match the specified namespace/prefix. Example usage::
-
-            app.config['IMAGE_STORE_TYPE'] = 'fs'
-            app.config['IMAGE_STORE_PATH'] = '/var/app/images'
-            app.config['IMAGE_STORE_BASE_URL'] = 'http://img.website.com'
-            image_store_config = app.config.get_namespace('IMAGE_STORE_')
-
-        The resulting dictionary `image_store_config` would look like::
-
-            {
-                'types': 'fs',
-                'path': '/var/app/images',
-                'base_url': 'http://img.website.com'
-            }
-
-        This is often useful when configuration options map directly to
-        keyword arguments in functions or class constructors.
-
-        :param namespace: a configuration namespace
-        :param lowercase: a flag indicating if the keys of the resulting
-                          dictionary should be lowercase
-        :param trim_namespace: a flag indicating if the keys of the resulting
-                          dictionary should not include the namespace
-
-        .. versionadded:: 0.11
-        """
-        rv = {}
-        for k, v in self.items():
-            if not k.startswith(namespace):
-                continue
-            if trim_namespace:
-                key = k[len(namespace):]
-            else:
-                key = k
-            if lowercase:
-                key = key.lower()
-            rv[key] = v
-        return rv
-
-    def convert_type(self, k, v):
-        default_value = self.defaults.get(k)
-        if default_value is None:
-            return v
-        tp = type(default_value)
-        # 对bool特殊处理
-        if tp is bool and isinstance(v, str):
-            if v in ("true", "True", "1"):
-                return True
-            else:
-                return False
-        if tp in [list, dict] and isinstance(v, str):
-            try:
-                v = json.loads(v)
-                return v
-            except json.JSONDecodeError:
-                return v
-
+    def load_from_object(self):
+        sys.path.insert(0, PROJECT_DIR)
         try:
-            if tp in [list, dict]:
-                v = json.loads(v)
-            else:
-                v = tp(v)
-        except Exception:
-            pass
-        return v
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, dict.__repr__(self))
-
-    def __getitem__(self, item):
-        # 先从设置的来
-        try:
-            value = super().__getitem__(item)
-        except KeyError:
-            value = None
-        if value is not None:
-            return value
-        # 其次从环境变量来
-        value = os.environ.get(item, None)
-        if value is not None:
-            return self.convert_type(item, value)
-        return self.defaults.get(item)
-
-    def __getattr__(self, item):
-        return self.__getitem__(item)
-
-
-defaults = {
-    'SECRET_KEY': '',
-    'BOOTSTRAP_TOKEN': '',
-    'DEBUG': True,
-    'SITE_URL': 'http://localhost',
-    'LOG_LEVEL': 'DEBUG',
-    'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
-    'DB_ENGINE': 'mysql',
-    'DB_NAME': 'jumpserver',
-    'DB_HOST': '127.0.0.1',
-    'DB_PORT': 3306,
-    'DB_USER': 'root',
-    'DB_PASSWORD': '',
-    'REDIS_HOST': '127.0.0.1',
-    'REDIS_PORT': 6379,
-    'REDIS_PASSWORD': '',
-    'REDIS_DB_CELERY': 3,
-    'REDIS_DB_CACHE': 4,
-    'REDIS_DB_SESSION': 5,
-    'REDIS_DB_WS': 6,
-    'CAPTCHA_TEST_MODE': None,
-    'TOKEN_EXPIRATION': 3600 * 24,
-    'DISPLAY_PER_PAGE': 25,
-    'DEFAULT_EXPIRED_YEARS': 70,
-    'SESSION_COOKIE_DOMAIN': None,
-    'CSRF_COOKIE_DOMAIN': None,
-    'SESSION_COOKIE_AGE': 3600 * 24,
-    'SESSION_EXPIRE_AT_BROWSER_CLOSE': False,
-    'AUTH_OPENID': False,
-    'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
-    'AUTH_OPENID_SHARE_SESSION': True,
-    'OTP_VALID_WINDOW': 2,
-    'OTP_ISSUER_NAME': 'Jumpserver',
-    'EMAIL_SUFFIX': 'jumpserver.org',
-    'TERMINAL_PASSWORD_AUTH': True,
-    'TERMINAL_PUBLIC_KEY_AUTH': True,
-    'TERMINAL_HEARTBEAT_INTERVAL': 20,
-    'TERMINAL_ASSET_LIST_SORT_BY': 'hostname',
-    'TERMINAL_ASSET_LIST_PAGE_SIZE': 'auto',
-    'TERMINAL_SESSION_KEEP_DURATION': 9999,
-    'TERMINAL_HOST_KEY': '',
-    'TERMINAL_TELNET_REGEX': '',
-    'TERMINAL_COMMAND_STORAGE': {},
-    'SECURITY_MFA_AUTH': False,
-    'SECURITY_SERVICE_ACCOUNT_REGISTRATION': True,
-    'SECURITY_VIEW_AUTH_NEED_MFA': True,
-    'SECURITY_LOGIN_LIMIT_COUNT': 7,
-    'SECURITY_LOGIN_LIMIT_TIME': 30,
-    'SECURITY_MAX_IDLE_TIME': 30,
-    'SECURITY_PASSWORD_EXPIRATION_TIME': 9999,
-    'SECURITY_PASSWORD_MIN_LENGTH': 6,
-    'SECURITY_PASSWORD_UPPER_CASE': False,
-    'SECURITY_PASSWORD_LOWER_CASE': False,
-    'SECURITY_PASSWORD_NUMBER': False,
-    'SECURITY_PASSWORD_SPECIAL_CHAR': False,
-    'AUTH_RADIUS': False,
-    'RADIUS_SERVER': 'localhost',
-    'RADIUS_PORT': 1812,
-    'RADIUS_SECRET': '',
-    'RADIUS_ENCRYPT_PASSWORD': True,
-    'AUTH_LDAP_SEARCH_PAGED_SIZE': 1000,
-    'AUTH_LDAP_SYNC_IS_PERIODIC': False,
-    'AUTH_LDAP_SYNC_INTERVAL': None,
-    'AUTH_LDAP_SYNC_CRONTAB': None,
-    'AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS': False,
-    'AUTH_LDAP_OPTIONS_OPT_REFERRALS': -1,
-    'HTTP_BIND_HOST': '0.0.0.0',
-    'HTTP_LISTEN_PORT': 8080,
-    'WS_LISTEN_PORT': 8070,
-    'LOGIN_LOG_KEEP_DAYS': 90,
-    'ASSETS_PERM_CACHE_TIME': 3600*24,
-    'SECURITY_MFA_VERIFY_TTL': 3600,
-    'ASSETS_PERM_CACHE_ENABLE': False,
-    'SYSLOG_ADDR': '',  # '192.168.0.1:514'
-    'SYSLOG_FACILITY': 'user',
-    'PERM_SINGLE_ASSET_TO_UNGROUP_NODE': False,
-    'WINDOWS_SSH_DEFAULT_SHELL': 'cmd',
-    'FLOWER_URL': "127.0.0.1:5555",
-    'DEFAULT_ORG_SHOW_ALL_USERS': True,
-    'PERIOD_TASK_ENABLE': True,
-    'FORCE_SCRIPT_NAME': '',
-    'LOGIN_CONFIRM_ENABLE': False,
-    'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
-    'OTP_IN_RADIUS': False,
-}
-
-
-def load_from_object(config):
-    try:
-        from config import config as c
-        config.from_object(c)
-        return True
-    except ImportError:
-        pass
-    return False
-
-
-def load_from_yml(config):
-    for i in ['config.yml', 'config.yaml']:
-        if not os.path.isfile(os.path.join(config.root_path, i)):
-            continue
-        loaded = config.from_yaml(i)
-        if loaded:
+            from config import config as c
+            self.from_object(c)
             return True
-    return False
+        except ImportError:
+            pass
+        return False
 
+    def load_from_yml(self):
+        for i in ['config.yml', 'config.yaml']:
+            if not os.path.isfile(os.path.join(self.root_path, i)):
+                continue
+            loaded = self.from_yaml(i)
+            if loaded:
+                return True
+        return False
 
-def load_user_config():
-    sys.path.insert(0, PROJECT_DIR)
-    config = Config(PROJECT_DIR, defaults)
+    @classmethod
+    def load_user_config(cls, root_path=None, config_class=None):
+        config_class = config_class or Config
+        cls.config_class = config_class
+        if not root_path:
+            root_path = PROJECT_DIR
 
-    loaded = load_from_object(config)
-    if not loaded:
-        loaded = load_from_yml(config)
-    if not loaded:
-        msg = """
-    
-        Error: No config file found.
-    
-        You can run `cp config_example.yml config.yml`, and edit it.
-        """
-        raise ImportError(msg)
-    return config
+        manager = cls(root_path=root_path)
+        if manager.load_from_object():
+            return manager.config
+        elif manager.load_from_yml():
+            return manager.config
+        else:
+            msg = """
+
+            Error: No config file found.
+
+            You can run `cp config_example.yml config.yml`, and edit it.
+            """
+            raise ImportError(msg)
+
+    @classmethod
+    def get_dynamic_config(cls, config):
+        return DynamicConfig(config)
+

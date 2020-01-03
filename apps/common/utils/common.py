@@ -9,6 +9,7 @@ import uuid
 from functools import wraps
 import time
 import ipaddress
+import psutil
 
 
 UUID_PATTERN = re.compile(r'\w{8}(-\w{4}){3}-\w{12}')
@@ -26,12 +27,12 @@ def combine_seq(s1, s2, callback=None):
     return seq
 
 
-def get_logger(name=None):
+def get_logger(name=''):
     return logging.getLogger('jumpserver.%s' % name)
 
 
-def get_syslogger(name=None):
-    return logging.getLogger('jms.%s' % name)
+def get_syslogger(name=''):
+    return logging.getLogger('syslog.%s' % name)
 
 
 def timesince(dt, since='', default="just now"):
@@ -234,3 +235,10 @@ class lazyproperty:
             value = self.func(instance)
             setattr(instance, self.func.__name__, value)
             return value
+
+
+def get_disk_usage():
+    partitions = psutil.disk_partitions()
+    mount_points = [p.mountpoint for p in partitions]
+    usages = {p: psutil.disk_usage(p) for p in mount_points}
+    return usages

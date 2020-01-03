@@ -3,8 +3,6 @@
 {% load static %}
 {% load bootstrap3 %}
 {% block custom_head_css_js %}
-    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
-    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
 {% endblock %}
 
@@ -125,7 +123,7 @@ $(document).ready(function () {
     var method = "POST";
     var the_url = '{% url "api-perms:remote-app-permission-list" %}';
     var redirect_to = '{% url "perms:remote-app-permission-list" %}';
-    {% if type == "update" %}
+    {% if api_action == "update" %}
         the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
         method = "PUT";
     {% endif %}

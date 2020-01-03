@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from django.db import transaction
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -43,6 +44,11 @@ class AdminUserViewSet(OrgBulkModelViewSet):
     search_fields = filter_fields
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsOrgAdmin,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(_assets_amount=Count('assets'))
+        return queryset
 
 
 class AdminUserAuthApi(generics.UpdateAPIView):

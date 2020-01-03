@@ -10,14 +10,13 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from common.utils import get_signer
+from common.utils import signer
 from .base import AssetUser
 from .asset import Asset
 
 
 __all__ = ['AdminUser', 'SystemUser']
 logger = logging.getLogger(__name__)
-signer = get_signer()
 
 
 class AdminUser(AssetUser):
@@ -93,11 +92,13 @@ class SystemUser(AssetUser):
     PROTOCOL_RDP = 'rdp'
     PROTOCOL_TELNET = 'telnet'
     PROTOCOL_VNC = 'vnc'
+    PROTOCOL_MYSQL = 'mysql'
     PROTOCOL_CHOICES = (
         (PROTOCOL_SSH, 'ssh'),
         (PROTOCOL_RDP, 'rdp'),
         (PROTOCOL_TELNET, 'telnet'),
         (PROTOCOL_VNC, 'vnc'),
+        (PROTOCOL_MYSQL, 'mysql'),
     )
 
     LOGIN_AUTO = 'auto'
@@ -133,6 +134,18 @@ class SystemUser(AssetUser):
             return True
         else:
             return False
+
+    @property
+    def is_need_cmd_filter(self):
+        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_MYSQL]
+
+    @property
+    def is_need_test_asset_connective(self):
+        return self.protocol not in [self.PROTOCOL_MYSQL]
+
+    @property
+    def can_perm_to_asset(self):
+        return self.protocol not in [self.PROTOCOL_MYSQL]
 
     @property
     def cmd_filter_rules(self):

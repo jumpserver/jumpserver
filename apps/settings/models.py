@@ -1,14 +1,11 @@
 import json
 
 from django.db import models
-from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
+from django.core.cache import cache
 
-from common.utils import get_signer
-
-signer = get_signer()
+from common.utils import signer
 
 
 class SettingQuerySet(models.QuerySet):
@@ -34,12 +31,28 @@ class Setting(models.Model):
     comment = models.TextField(verbose_name=_("Comment"))
 
     objects = SettingManager()
+    cache_key_prefix = '_SETTING_'
 
     def __str__(self):
         return self.name
 
-    def __getattr__(self, item):
-        return cache.get(item)
+    @classmethod
+    def get(cls, item):
+        cached = cls.get_from_cache(item)
+        if cached is not None:
+            return cached
+        instances = cls.objects.filter(name=item)
+        if len(instances) == 1:
+            s = instances[0]
+            s.refresh_setting()
+            return s.cleaned_value
+        return None
+
+    @classmethod
+    def get_from_cache(cls, item):
+        key = cls.cache_key_prefix + item
+        cached = cache.get(key)
+        return cached
 
     @property
     def cleaned_value(self):
@@ -65,44 +78,6 @@ class Setting(models.Model):
             raise ValueError("Json dump error: {}".format(str(e)))
 
     @classmethod
-    def save_storage(cls, name, data):
-        """
-        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
-        :param data: {}
-        :return: Setting object
-        """
-        obj = cls.objects.filter(name=name).first()
-        if not obj:
-            obj = cls()
-            obj.name = name
-            obj.encrypted = True
-            obj.cleaned_value = data
-        else:
-            value = obj.cleaned_value
-            if value is None:
-                value = {}
-            value.update(data)
-            obj.cleaned_value = value
-        obj.save()
-        return obj
-
-    @classmethod
-    def delete_storage(cls, name, storage_name):
-        """
-        :param name: TERMINAL_REPLAY_STORAGE or TERMINAL_COMMAND_STORAGE
-        :param storage_name: ""
-        :return: bool
-        """
-        obj = cls.objects.filter(name=name).first()
-        if not obj:
-            return False
-        value = obj.cleaned_value
-        value.pop(storage_name, '')
-        obj.cleaned_value = value
-        obj.save()
-        return True
-
-    @classmethod
     def refresh_all_settings(cls):
         try:
             settings_list = cls.objects.all()
@@ -112,16 +87,8 @@ class Setting(models.Model):
             pass
 
     def refresh_setting(self):
-        setattr(settings, self.name, self.cleaned_value)
-        if self.name == "AUTH_LDAP":
-            if self.cleaned_value and settings.AUTH_LDAP_BACKEND not in settings.AUTHENTICATION_BACKENDS:
-                old_setting = settings.AUTHENTICATION_BACKENDS
-                old_setting.insert(0, settings.AUTH_LDAP_BACKEND)
-                settings.AUTHENTICATION_BACKENDS = old_setting
-            elif not self.cleaned_value and settings.AUTH_LDAP_BACKEND in settings.AUTHENTICATION_BACKENDS:
-                old_setting = settings.AUTHENTICATION_BACKENDS
-                old_setting.remove(settings.AUTH_LDAP_BACKEND)
-                settings.AUTHENTICATION_BACKENDS = old_setting
+        key = self.cache_key_prefix + self.name
+        cache.set(key, self.cleaned_value, None)
 
     class Meta:
         db_table = "settings_setting"

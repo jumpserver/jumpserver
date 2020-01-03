@@ -1,0 +1,68 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% load static %}
+<style>
+    .modal-body {
+        background-color: white !important;
+    }
+</style>
+{% block modal_id %}node_detail_modal{% endblock %}
+
+{% block modal_title %}{% trans "Node detail" %}{% endblock %}
+
+
+{% block modal_body %}
+<form class="form-horizontal" action="" style="padding-top: 20px">
+<div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'ID' %}</label>
+        <div class="col-sm-8">
+            <p class="form-control-static" id="id_node_detail_id_view"></p>
+        </div>
+        <div class="col-sm-2" style="padding-left: 2px">
+            <a class="btn btn-white btn-sm btn-node-detail-copy-id"><i class="fa fa-copy"></i></a>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Name' %}</label>
+        <div class="col-sm-8" >
+            <p class="form-control-static" id="id_node_detail_name_view"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Full name' %}</label>
+        <div class="col-sm-8" >
+            <p class="form-control-static" id="id_node_detail_full_name_view"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="" class="col-sm-2 control-label">{% trans 'Key' %}</label>
+        <div class="col-sm-8">
+            <p class="form-control-static" id="id_node_detail_key_view"></p>
+        </div>
+    </div>
+</div>
+</form>
+<script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
+<script>
+
+function initClipboard() {
+    var clipboard = new Clipboard('.btn-node-detail-copy-id', {
+        text: function (trigger) {
+            return $("#id_node_detail_id_view").html()
+        }
+    });
+    clipboard.on("success", function (e) {
+        toastr.success("{% trans "Copy success" %}")
+    })
+}
+$(document).ready(function () {
+    initClipboard();
+})
+</script>
+
+{% endblock %}
+
+{% block modal_button %}
+<button data-dismiss="modal" class="btn btn-white" type="button">{% trans "Close" %}</button>
+{% endblock %}

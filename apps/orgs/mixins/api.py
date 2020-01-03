@@ -46,7 +46,11 @@ class OrgModelViewSet(CommonApiMixin, OrgQuerySetMixin, ModelViewSet):
 
 class OrgBulkModelViewSet(CommonApiMixin, OrgQuerySetMixin, BulkModelViewSet):
     def allow_bulk_destroy(self, qs, filtered):
-        if qs.count() <= filtered.count():
+        qs_count = qs.count()
+        filtered_count = filtered.count()
+        if filtered_count == 1:
+            return True
+        if qs_count <= filtered_count:
             return False
         if self.request.query_params.get('spm', ''):
             return True

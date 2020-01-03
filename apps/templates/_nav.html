@@ -45,6 +45,9 @@
             <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
             <li id="label"><a href="{% url 'assets:label-list' %}">{% trans 'Labels' %}</a></li>
             <li id="cmd-filter"><a href="{% url 'assets:cmd-filter-list' %}">{% trans 'Command filters' %}</a></li>
+            {% if request.user.is_superuser %}
+            <li id="platform"><a href="{% url 'assets:platform-list' %}">{% trans 'Platform list' %}</a></li>
+            {% endif %}
         </ul>
     </li>
 {% endif %}
@@ -58,6 +61,7 @@
         </a>
         <ul class="nav nav-second-level">
             <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
+            <li id="database-app"><a href="{% url 'applications:database-app-list' %}">{% trans 'DatabaseApp' %}</a></li>
         </ul>
     </li>
 {% endif %}
@@ -74,6 +78,9 @@
             {% if LICENSE_VALID %}
             <li id="remote-app-permission">
                 <a href="{% url 'perms:remote-app-permission-list' %}">{% trans 'RemoteApp' %}</a>
+            </li>
+            <li id="database-app-permission">
+                <a href="{% url 'perms:database-app-permission-list' %}">{% trans 'DatabaseApp' %}</a>
             </li>
             {% endif %}
         </ul>
@@ -113,7 +120,7 @@
         </a>
         <ul class="nav nav-second-level">
             <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task list' %}</a></li>
-            <li id="command-execution"><a href="{% url 'ops:command-execution-start' %}">{% trans 'Batch command' %}</a></li>
+            <li id="command-execution"><a href="{% url 'ops:command-execution-create' %}">{% trans 'Batch command' %}</a></li>
             {% if request.user.is_superuser %}
             <li><a href="{% url 'flower-view' path='' %}" target="_blank" >{% trans 'Task monitor' %}</a></li>
             {% endif %}

@@ -1,0 +1,52 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+
+{% block modal_id %}csv_import_modal{% endblock %}
+{% block modal_title%}<span class="csv_object_type">csv</span> {% trans 'Import' %}{% endblock %}
+{% block modal_confirm_id %}btn_csv_import_confirm{% endblock %}
+
+{% block modal_body %}
+<form method="post" id="fm_import">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="control-label">{% trans "Download the imported template or use the exported CSV file format" %}</label>
+        <a id="csv_download_template" style="display: block">{% trans 'Download the import template' %}</a>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="id_file">{% trans "Select the CSV file to import" %}</label>
+        <input id="id_csv_file" type="file" name="file" />
+    </div>
+</form>
+
+<div style="max-height: 300px;overflow: auto">
+    <p class="text-success" id="success_created"></p>
+    <p id="success_created_detail"></p>
+    <p class="text-danger" id="created_failed"></p>
+    <p id="created_failed_detail"></p>
+</div>
+
+<script>
+$(document).ready(function () {
+
+}).on("click", '#csv_download_template', function () {
+    var theUrl ="csvImportURL?format=csv&template=import&limit=1" ;
+    theUrl = theUrl.replace("csvImportURL", csvListUrl);
+    window.open(theUrl)
+}).on('click', '#btn_csv_import_confirm', function () {
+    var file = document.getElementById('id_csv_file').files[0];
+    if(!file){
+        toastr.error("{% trans "Please select file" %}");
+        return
+    }
+    APIImportData({
+        url: csvListUrl,
+        method: "POST",
+        body: file,
+        data_table: csvTable
+    });
+})
+</script>
+{% endblock %}
+
+

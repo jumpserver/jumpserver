@@ -55,7 +55,7 @@
                                             <tr>
                                                 <td>{{ forloop.counter }}</td>
                                                 <td>{{ command.input | truncatechars:40 }}</td>
-                                                <td><pre style="border: none;background: none">
+                                                <td><pre style="border: none;background: none; white-space: pre-wrap;">
 $ {{ command.input }}
 
 {{ command.output }}
@@ -136,7 +136,13 @@ $ {{ command.input }}
                 }, 300)
             }
             var the_url = "{% url 'api-terminal:tasks-list' %}";
-            requestApi({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
+            requestApi({
+                url: the_url,
+                method: 'POST',
+                body: JSON.stringify(data),
+                success: success,
+                success_message: "{% trans 'Terminate success'%}"
+            });
         }
         $(document).ready(function () {
             $('.footable').footable();
