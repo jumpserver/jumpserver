@@ -86,7 +86,7 @@ $(document).ready(function () {
             forceParse: false,
             calendarWeeks: true,
             autoclose: true,
-            language: navigator.language || "en",
+            language: getUserLang(),
         };
         dateFromRef.datepicker(options).on("changeDate", function () {
             var value = $(this).val() + ' 0:0:0';

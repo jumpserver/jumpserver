@@ -18,9 +18,6 @@ $(document).ready(function(){
     if ($('.tooltip')[0]) {
         $('.tooltip').tooltip();
     }
-    var userLang = navigator.language || navigator.userLanguage;
-    if (userLang.indexOf('zh') !== -1) {
-        $.fn.select2.defaults.set('language', 'zh-CN')
-    }
+    $.fn.select2.defaults.set('language', getUserLang())
 });
 </script>
