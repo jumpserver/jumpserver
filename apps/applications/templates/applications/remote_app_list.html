@@ -7,10 +7,9 @@
 {% block table_search %}{% endblock %}
 {% block table_container %}
     <div class="btn-group uc pull-left m-r-5">
-        <button class="btn btn-sm btn-primary">
+        <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle">
             {% trans "Create RemoteApp" %}
-        </button>
-        <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
+            <span class="caret"></span></button>
         <ul class="dropdown-menu">
             {% for key, value in type_choices %}
                 <li><a class="" href="{% url 'applications:remote-app-create' %}?type={{ key }}">{{ value }}</a></li>
