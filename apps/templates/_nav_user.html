@@ -5,17 +5,18 @@
     </a>
 </li>
 
-{% if LICENSE_VALID %}
 <li id="applications">
     <a>
         <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'My Applications' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
+        {% if LICENSE_VALID %}
         <li id="user-remote-app">
             <a href="{% url 'applications:user-remote-app-list' %}">
                 <i class="" style="width: 14px"></i><span class="nav-label">{% trans 'RemoteApp' %}</span><span class="label label-info pull-right"></span>
             </a>
         </li>
+        {% endif %}
         <li id="user-database-app">
             <a href="{% url 'applications:user-database-app-list' %}">
                 <i class="" style="width: 14px"></i><span class="nav-label">{% trans 'DatabaseApp' %}</span><span class="label label-info pull-right"></span>
@@ -23,7 +24,6 @@
         </li>
     </ul>
 </li>
-{% endif %}
 
 {% if SECURITY_COMMAND_EXECUTION %}
 <li id="ops">
