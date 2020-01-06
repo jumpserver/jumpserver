@@ -9,10 +9,6 @@ from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Node
 from ..models import SystemUser
-from ..const import (
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-)
 from .base import AuthSerializer, AuthSerializerMixin
 
 __all__ = [
@@ -46,15 +42,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
         }
-
-    @staticmethod
-    def validate_name(name):
-        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
-        res = re.search(pattern, name)
-        if res is not None:
-            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-            raise serializers.ValidationError(msg)
-        return name
 
     def validate_auto_push(self, value):
         login_mode = self.initial_data.get("login_mode")

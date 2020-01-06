@@ -8,10 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Asset, Node, Label, Platform
-from ..const import (
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-)
 from .base import ConnectivitySerializer
 
 __all__ = [
@@ -99,15 +95,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'hardware_info': {'label': _('Hardware info')},
             'org_name': {'label': _('Org name')}
         }
-
-    @staticmethod
-    def validate_hostname(hostname):
-        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
-        res = re.search(pattern, hostname)
-        if res is not None:
-            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-            raise serializers.ValidationError(msg)
-        return hostname
 
     @classmethod
     def setup_eager_loading(cls, queryset):
