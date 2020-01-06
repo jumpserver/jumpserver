@@ -19,7 +19,11 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 <table class="subscription-level-table">
     <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="4">身份验证 Authentication</td>
+        <td class="features-first-td-background-style" rowspan="5" style="text-align: center">
+            身份验证
+            <br>
+            <span>Authentication</span>
+        </td>
         <td class="features-second-td-background-style" rowspan="3" >登录认证
         </td>
         <td class="features-third-td-background-style">资源统一登录和认证
@@ -40,7 +44,17 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">账号管理 Account</td>
+        <td class="features-second-td-background-style">登录复核
+        </td>
+        <td class="features-third-td-background-style">支持二次登录复核
+        </td>
+      </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-first-td-background-style" rowspan="9" style="text-align: center" >
+            账号管理
+            <br>
+            <span>Account</span>
+        </td>
         <td class="features-second-td-background-style" rowspan="2">集中账号管理
         </td>
         <td class="features-third-td-background-style">管理用户管理
@@ -85,7 +99,11 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">授权控制 Authorization</td>
+        <td class="features-first-td-background-style" rowspan="10" style="text-align: center">
+            授权控制
+            <br>
+            <span>Authorization</span>
+        </td>
         <td class="features-second-td-background-style" rowspan="3">资产授权管理
         </td>
         <td class="features-third-td-background-style">资产树
@@ -99,6 +117,12 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
         <td class="features-third-td-background-style">节点内资产自动继承授权
         </td>
     </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">数据库授权
+        </td>
+        <td class="features-outline-td-background-style">实现mysql数据库应用级授权
+        </td>
+     </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-outline-td-background-style">RemoteApp(X-PACK)
         </td>
@@ -136,7 +160,11 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="6">安全审计 Audit</td>
+        <td class="features-first-td-background-style" rowspan="7" style="text-align: center">
+            安全审计
+            <br>
+            <span>Audit</span>
+        </td>
         <td class="features-second-td-background-style" rowspan="2">会话管理
         </td>
         <td class="features-third-td-background-style">在线会话管理
@@ -168,6 +196,12 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
         <td class="features-third-td-background-style">上传/下载记录审计
         </td>
     </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">工单管理
+        </td>
+        <td class="features-third-td-background-style">二次登录复核管理
+        </td>
+     </tr>
 </table>
 
 ## 安装及使用指南

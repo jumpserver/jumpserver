@@ -24,7 +24,194 @@ Change the world, starting from little things.
 
 ### Features
 
- ![Jumpserver 功能](https://jumpserver-release.oss-cn-hangzhou.aliyuncs.com/Jumpserver148.jpeg "Jumpserver 功能")
+
+<table class="subscription-level-table">
+    <tr class="subscription-level-tr-border">
+        <td class="features-first-td-background-style" rowspan="5" style="text-align: center">
+            身份验证
+            <br>
+            <span>Authentication</span>
+        </td>
+        <td class="features-second-td-background-style" rowspan="3" >登录认证
+        </td>
+        <td class="features-third-td-background-style">资源统一登录和认证
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">LDAP 认证
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">支持 OpenID，实现单点登录
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">多因子认证
+        </td>
+        <td class="features-third-td-background-style">MFA（Google Authenticator）
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">登录复核
+        </td>
+        <td class="features-third-td-background-style">支持二次登录复核
+        </td>
+      </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-first-td-background-style" rowspan="9" style="text-align: center" >
+            账号管理
+            <br>
+            <span>Account</span>
+        </td>
+        <td class="features-second-td-background-style" rowspan="2">集中账号管理
+        </td>
+        <td class="features-third-td-background-style">管理用户管理
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">系统用户管理
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style" rowspan="4">统一密码管理
+        </td>
+        <td class="features-third-td-background-style">资产密码托管
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">自动生成密码
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">密码自动推送
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">密码过期设置
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style" rowspan="2">批量密码变更(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">定期批量修改密码
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">生成随机密码
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">多云环境的资产纳管(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">对私有云、公有云资产统一纳管
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-first-td-background-style" rowspan="10" style="text-align: center">
+            授权控制
+            <br>
+            <span>Authorization</span>
+        </td>
+        <td class="features-second-td-background-style" rowspan="3">资产授权管理
+        </td>
+        <td class="features-third-td-background-style">资产树
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">资产或资产组灵活授权
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">节点内资产自动继承授权
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">数据库授权
+        </td>
+        <td class="features-outline-td-background-style">实现mysql数据库应用级授权
+        </td>
+     </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">RemoteApp(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">实现更细粒度的应用级授权
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">组织管理(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">实现多租户管理，权限隔离
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">多维度授权
+        </td>
+        <td class="features-third-td-background-style">可对用户、用户组或系统角色授权
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">指令限制
+        </td>
+        <td class="features-third-td-background-style">限制特权指令使用，支持黑白名单
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">统一文件传输
+        </td>
+        <td class="features-third-td-background-style">SFTP 文件上传/下载
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">文件管理
+        </td>
+        <td class="features-third-td-background-style">Web SFTP 文件管理
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-first-td-background-style" rowspan="7" style="text-align: center">
+            安全审计
+            <br>
+            <span>Audit</span>
+        </td>
+        <td class="features-second-td-background-style" rowspan="2">会话管理
+        </td>
+        <td class="features-third-td-background-style">在线会话管理
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">历史会话管理
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style" rowspan="2">录像管理
+        </td>
+        <td class="features-third-td-background-style">Linux 录像支持
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-third-td-background-style">Windows 录像支持
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">指令审计
+        </td>
+        <td class="features-third-td-background-style">指令记录
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">文件传输审计
+        </td>
+        <td class="features-third-td-background-style">上传/下载记录审计
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">工单管理
+        </td>
+        <td class="features-third-td-background-style">二次登录复核管理
+        </td>
+     </tr>
+</table>
+
 
 ### Start 
 
