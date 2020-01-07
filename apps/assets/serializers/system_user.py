@@ -123,6 +123,7 @@ class SystemUserAuthSerializer(AuthSerializer):
     """
     系统用户认证信息
     """
+    private_key = serializers.SerializerMethodField()
 
     class Meta:
         model = SystemUser
@@ -130,6 +131,10 @@ class SystemUserAuthSerializer(AuthSerializer):
             "id", "name", "username", "protocol",
             "login_mode", "password", "private_key",
         ]
+
+    @staticmethod
+    def get_private_key(obj):
+        return obj.get_private_key()
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):
