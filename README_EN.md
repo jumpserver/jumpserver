@@ -28,186 +28,229 @@ Change the world, starting from little things.
 <table class="subscription-level-table">
     <tr class="subscription-level-tr-border">
         <td class="features-first-td-background-style" rowspan="5" style="text-align: center">
-            身份验证
-            <br>
-            <span>Authentication</span>
+            Identity Authentication
         </td>
-        <td class="features-second-td-background-style" rowspan="3" >登录认证
+        <td class="features-second-td-background-style" rowspan="3" >
+            Login Authentication
         </td>
-        <td class="features-third-td-background-style">资源统一登录和认证
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">LDAP 认证
+        <td class="features-third-td-background-style">
+            Resource unified login and authentication
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">支持 OpenID，实现单点登录
+        <td class="features-third-td-background-style">
+            LDAP Authentication
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多因子认证
-        </td>
-        <td class="features-third-td-background-style">MFA（Google Authenticator）
+        <td class="features-third-td-background-style">
+            Support OpenID，achieved single sign-on
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">登录复核
+        <td class="features-second-td-background-style">
+            Multi-factors Authentication
         </td>
-        <td class="features-third-td-background-style">支持二次登录复核
+        <td class="features-third-td-background-style">
+            MFA（Google Authenticator）
         </td>
-      </tr>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            Login Review
+        </td>
+        <td class="features-third-td-background-style">
+            Support secondary login review
+        </td>
+    </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-first-td-background-style" rowspan="9" style="text-align: center" >
-            账号管理
-            <br>
-            <span>Account</span>
+            Account Management
         </td>
-        <td class="features-second-td-background-style" rowspan="2">集中账号管理
+        <td class="features-second-td-background-style" rowspan="2">
+            Centralized Account Management
         </td>
-        <td class="features-third-td-background-style">管理用户管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">系统用户管理
+        <td class="features-third-td-background-style">
+            Manage user management
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="4">统一密码管理
-        </td>
-        <td class="features-third-td-background-style">资产密码托管
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">自动生成密码
+        <td class="features-third-td-background-style">
+            System user management
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码自动推送
+        <td class="features-second-td-background-style" rowspan="4">
+            Unified password management
+        </td>
+        <td class="features-third-td-background-style">
+            Asset password custody
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码过期设置
+        <td class="features-third-td-background-style">
+            Auto-generated password
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style" rowspan="2">批量密码变更(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">定期批量修改密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">生成随机密码
+        <td class="features-third-td-background-style">
+            Automatic push password
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">多云环境的资产纳管(X-PACK)
+        <td class="features-third-td-background-style">
+            Password expired setting
         </td>
-        <td class="features-outline-td-background-style">对私有云、公有云资产统一纳管
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style" rowspan="2">
+            Batch password changes(X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">
+            Batch change password on a regular basis
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">
+            Generate random password
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">
+            Incorporate Multi-cloud Asset into management (X-PACK)
+        </td>
+        <td class="features-outline-td-background-style">
+            Unified management of private and pulic cloud asset
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-first-td-background-style" rowspan="10" style="text-align: center">
-            授权控制
-            <br>
-            <span>Authorization</span>
+            Authorization Control
         </td>
-        <td class="features-second-td-background-style" rowspan="3">资产授权管理
+        <td class="features-second-td-background-style" rowspan="3">
+            Asset authorization management 
         </td>
-        <td class="features-third-td-background-style">资产树
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">资产或资产组灵活授权
+        <td class="features-third-td-background-style">
+            Asset tree
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">节点内资产自动继承授权
+        <td class="features-third-td-background-style">
+            Flexible Asset or Asset group authorization
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">数据库授权
+        <td class="features-third-td-background-style">
+            Asset within nodes automatically inherit authorization
         </td>
-        <td class="features-outline-td-background-style">实现mysql数据库应用级授权
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-outline-td-background-style">
+            Database authorization
+        </td>
+        <td class="features-outline-td-background-style">
+            Implement mysql database app-level authorization
         </td>
      </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">RemoteApp(X-PACK)
+        <td class="features-outline-td-background-style">
+            RemoteApp(X-PACK)
         </td>
-        <td class="features-outline-td-background-style">实现更细粒度的应用级授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">组织管理(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">实现多租户管理，权限隔离
+        <td class="features-outline-td-background-style">
+            Implement more fine-grained app-level authorization
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多维度授权
+        <td class="features-outline-td-background-style">
+            Organization management (X-PACK)
         </td>
-        <td class="features-third-td-background-style">可对用户、用户组或系统角色授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令限制
-        </td>
-        <td class="features-third-td-background-style">限制特权指令使用，支持黑白名单
+        <td class="features-outline-td-background-style">
+            Implement multi-tenant management，privilege isolation
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">统一文件传输
+        <td class="features-second-td-background-style">
+            Multi-dimensional authorization
         </td>
-        <td class="features-third-td-background-style">SFTP 文件上传/下载
+        <td class="features-third-td-background-style">
+            Can authorize user,user group or system user 
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件管理
+        <td class="features-second-td-background-style">
+            Command limitation
         </td>
-        <td class="features-third-td-background-style">Web SFTP 文件管理
+        <td class="features-third-td-background-style">
+            Restrict the use of privileged instructions,support black and white list
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            Unified file transfer
+        </td>
+        <td class="features-third-td-background-style">
+            SFTP file upload/download
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            File management
+        </td>
+        <td class="features-third-td-background-style">
+            Web SFTP file mangement
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
         <td class="features-first-td-background-style" rowspan="7" style="text-align: center">
-            安全审计
-            <br>
-            <span>Audit</span>
+            Security Audit
         </td>
-        <td class="features-second-td-background-style" rowspan="2">会话管理
+        <td class="features-second-td-background-style" rowspan="2">
+            Session management
         </td>
-        <td class="features-third-td-background-style">在线会话管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">历史会话管理
+        <td class="features-third-td-background-style">
+            Session online management
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="2">录像管理
-        </td>
-        <td class="features-third-td-background-style">Linux 录像支持
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">Windows 录像支持
+        <td class="features-third-td-background-style">
+            Session offline management
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令审计
+        <td class="features-second-td-background-style" rowspan="2">
+            Video management
         </td>
-        <td class="features-third-td-background-style">指令记录
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件传输审计
-        </td>
-        <td class="features-third-td-background-style">上传/下载记录审计
+        <td class="features-third-td-background-style">
+            Support Linux video
         </td>
     </tr>
     <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">工单管理
+        <td class="features-third-td-background-style">
+            Support Windows video
         </td>
-        <td class="features-third-td-background-style">二次登录复核管理
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            Command audit
+        </td>
+        <td class="features-third-td-background-style">
+            Command recording 
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            File transfer audit
+        </td>
+        <td class="features-third-td-background-style">
+            Upload/Download record audit
+        </td>
+    </tr>
+    <tr class="subscription-level-tr-border">
+        <td class="features-second-td-background-style">
+            Ticket management
+        </td>
+        <td class="features-third-td-background-style">
+            Secondary login review management
         </td>
      </tr>
 </table>
