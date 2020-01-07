@@ -54,13 +54,15 @@
 
 
 {# Applications #}
-{% if request.user.can_admin_current_org and LICENSE_VALID %}
+{% if request.user.can_admin_current_org %}
     <li id="applications">
         <a>
             <i class="fa fa-th" style="width: 14px"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
         </a>
         <ul class="nav nav-second-level">
+            {% if LICENSE_VALID %}
             <li id="remote-app"><a href="{% url 'applications:remote-app-list' %}">{% trans 'RemoteApp' %}</a></li>
+            {% endif %}
             <li id="database-app"><a href="{% url 'applications:database-app-list' %}">{% trans 'DatabaseApp' %}</a></li>
         </ul>
     </li>
@@ -79,10 +81,10 @@
             <li id="remote-app-permission">
                 <a href="{% url 'perms:remote-app-permission-list' %}">{% trans 'RemoteApp' %}</a>
             </li>
+            {% endif %}
             <li id="database-app-permission">
                 <a href="{% url 'perms:database-app-permission-list' %}">{% trans 'DatabaseApp' %}</a>
             </li>
-            {% endif %}
         </ul>
     </li>
 {% endif %}

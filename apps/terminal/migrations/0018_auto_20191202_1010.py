@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='session',
             name='asset',
-            field=models.CharField(db_index=True, max_length=1024,
+            field=models.CharField(db_index=True, max_length=128,
                                    verbose_name='Asset'),
         ),
         migrations.AlterField(

@@ -175,7 +175,7 @@ class Session(OrgModelMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
     user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
-    asset = models.CharField(max_length=1024, verbose_name=_("Asset"), db_index=True)
+    asset = models.CharField(max_length=128, verbose_name=_("Asset"), db_index=True)
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
     system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)

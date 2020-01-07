@@ -13,10 +13,9 @@
                     <div id="my-tickets" class="tab-pane active">
                         <div class="panel-body">
                             <div class="btn-group uc pull-left m-r-5">
-                                <button class="btn btn-sm btn-primary">
+                                <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle">
                                     {% block create_storage_info %}{% endblock %}
-                                </button>
-                                <button data-toggle="dropdown" class="btn btn-primary btn-sm dropdown-toggle"><span class="caret"></span></button>
+                                    <span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                 {% for key, value in type_choices %}
                                     <li><a class="" href="{% block create_storage_url %}{% endblock %}?type={{ key }}">{{ value }}</a></li>
