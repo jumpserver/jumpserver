@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import io
 import os
 import uuid
 from hashlib import md5
@@ -75,6 +76,14 @@ class AssetUser(OrgModelMixin):
     def part_id(self):
         i = '-'.join(str(self.id).split('-')[:3])
         return i
+
+    def get_private_key(self):
+        if not self.private_key_obj:
+            return None
+        string_io = io.StringIO()
+        self.private_key_obj.write_private_key(string_io)
+        private_key = string_io.getvalue()
+        return private_key
 
     def get_related_assets(self):
         assets = self.assets.all()
