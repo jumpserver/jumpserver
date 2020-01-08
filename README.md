@@ -17,157 +17,197 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ## 核心功能列表
 
-<table class="subscription-level-table">
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="4">身份验证 Authentication</td>
-        <td class="features-second-td-background-style" rowspan="3" >登录认证
-        </td>
-        <td class="features-third-td-background-style">资源统一登录和认证
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">LDAP 认证
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">支持 OpenID，实现单点登录
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多因子认证
-        </td>
-        <td class="features-third-td-background-style">MFA（Google Authenticator）
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">账号管理 Account</td>
-        <td class="features-second-td-background-style" rowspan="2">集中账号管理
-        </td>
-        <td class="features-third-td-background-style">管理用户管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">系统用户管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="4">统一密码管理
-        </td>
-        <td class="features-third-td-background-style">资产密码托管
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">自动生成密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码自动推送
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码过期设置
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style" rowspan="2">批量密码变更(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">定期批量修改密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">生成随机密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">多云环境的资产纳管(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">对私有云、公有云资产统一纳管
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">授权控制 Authorization</td>
-        <td class="features-second-td-background-style" rowspan="3">资产授权管理
-        </td>
-        <td class="features-third-td-background-style">资产树
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">资产或资产组灵活授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">节点内资产自动继承授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">RemoteApp(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">实现更细粒度的应用级授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">组织管理(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">实现多租户管理，权限隔离
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多维度授权
-        </td>
-        <td class="features-third-td-background-style">可对用户、用户组或系统角色授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令限制
-        </td>
-        <td class="features-third-td-background-style">限制特权指令使用，支持黑白名单
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">统一文件传输
-        </td>
-        <td class="features-third-td-background-style">SFTP 文件上传/下载
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件管理
-        </td>
-        <td class="features-third-td-background-style">Web SFTP 文件管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="6">安全审计 Audit</td>
-        <td class="features-second-td-background-style" rowspan="2">会话管理
-        </td>
-        <td class="features-third-td-background-style">在线会话管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">历史会话管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="2">录像管理
-        </td>
-        <td class="features-third-td-background-style">Linux 录像支持
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">Windows 录像支持
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令审计
-        </td>
-        <td class="features-third-td-background-style">指令记录
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件传输审计
-        </td>
-        <td class="features-third-td-background-style">上传/下载记录审计
-        </td>
-    </tr>
+<table>
+  <tr>
+    <th rowspan="7">身份认证</th>
+    <th rowspan="4">登录认证</th>
+    <th>资源统一登录与认证</th>
+  </tr>
+  <tr>
+    <td>LDAP/AD 认证</td>
+  </tr>
+  <tr>
+    <td>RADIUS 认证</td>
+  </tr>
+  <tr>
+    <td>OpenID 认证（实现单点登录）</td>
+  </tr>
+  <tr>
+    <td rowspan="2">MFA认证</td>
+    <td>MFA 二次认证（Google Authenticator）</td>
+  </tr>
+  <tr>
+    <td>RADIUS 二次认证</td>
+  </tr>
+  <tr>
+    <td>登录复核（X-PACK）</td>
+    <td>用户登录行为受管理员的监管与控制</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
 </table>
 
 ## 安装及使用指南
