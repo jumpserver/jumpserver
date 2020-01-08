@@ -106,7 +106,7 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>实现更细粒度的应用级授权</td>
   </tr>
   <tr>
-    <td>MySQL（数据库应用）、RemoteApp（远程应用）（X-PACK）</td>
+    <td>MySQL 数据库应用、RemoteApp 远程应用（X-PACK）</td>
   </tr>
   <tr>
     <td>动作授权</td>
