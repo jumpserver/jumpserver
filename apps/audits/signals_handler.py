@@ -15,8 +15,8 @@ from users.signals import post_user_change_password
 from authentication.signals import post_auth_failed, post_auth_success
 from terminal.models import Session, Command
 from common.utils.encode import model_to_json
+from .utils import write_login_log
 from . import models
-from .tasks import write_login_log_async
 
 logger = get_logger(__name__)
 sys_logger = get_syslogger(__name__)
@@ -27,7 +27,8 @@ MODELS_NEED_RECORD = (
     'User', 'UserGroup', 'Asset', 'Node', 'AdminUser', 'SystemUser',
     'Domain', 'Gateway', 'Organization', 'AssetPermission', 'CommandFilter',
     'CommandFilterRule', 'License', 'Setting', 'Account', 'SyncInstanceTask',
-    'Platform', 'RemoteAppPermission', 'ChangeAuthPlan', 'GatherUserTask',
+    'Platform', 'ChangeAuthPlan', 'GatherUserTask',
+    'RemoteApp', 'RemoteAppPermission', 'DatabaseApp', 'DatabaseAppPermission',
 )
 
 
@@ -133,7 +134,7 @@ def on_user_auth_success(sender, user, request, **kwargs):
     logger.debug('User login success: {}'.format(user.username))
     data = generate_data(user.username, request)
     data.update({'mfa': int(user.mfa_enabled), 'status': True})
-    write_login_log_async.delay(**data)
+    write_login_log(**data)
 
 
 @receiver(post_auth_failed)
@@ -141,4 +142,4 @@ def on_user_auth_failed(sender, username, request, reason, **kwargs):
     logger.debug('User login failed: {}'.format(username))
     data = generate_data(username, request)
     data.update({'reason': reason, 'status': False})
-    write_login_log_async.delay(**data)
+    write_login_log(**data)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import io
 import os
 import uuid
 from hashlib import md5
@@ -119,6 +120,14 @@ class AuthMixin:
             self.private_key_obj.write_private_key_file(key_path)
             os.chmod(key_path, 0o400)
         return key_path
+
+    def get_private_key(self):
+        if not self.private_key_obj:
+            return None
+        string_io = io.StringIO()
+        self.private_key_obj.write_private_key(string_io)
+        private_key = string_io.getvalue()
+        return private_key
 
     @property
     def public_key_obj(self):

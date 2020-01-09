@@ -95,7 +95,7 @@ function autoLoginModeProtocol() {
     // 协议+自动登录模式字段控制
     $('#auth_title_id').removeClass('hidden');
     var protocol = $(protocol_id + " option:selected").text();
-    if (protocol === 'rdp') {
+    if (['rdp'].indexOf(protocol) !== -1) {
         authFieldsDisplay();
         $(auto_generate_key).closest('.form-group').removeClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
@@ -105,7 +105,7 @@ function autoLoginModeProtocol() {
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (protocol === 'vnc') {
+    else if (['vnc', 'mysql'].indexOf(protocol) !== -1) {
         $('.auth-fields').removeClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
@@ -141,7 +141,7 @@ function manualLoginModeProtocol() {
     // 协议+手动登录模式字段控制
     $('#auth_title_id').addClass('hidden');
     var protocol = $(protocol_id + " option:selected").text();
-    if (protocol === 'rdp') {
+    if (['rdp'].indexOf(protocol) !== -1) {
         $('.auth-fields').addClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').addClass('hidden');
@@ -151,7 +151,7 @@ function manualLoginModeProtocol() {
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (protocol === 'vnc') {
+    else if (['vnc', 'mysql'].indexOf(protocol) !== -1) {
         $('.auth-fields').addClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').addClass('hidden');

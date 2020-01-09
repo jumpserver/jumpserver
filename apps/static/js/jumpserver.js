@@ -158,7 +158,7 @@ function activeNav(prefix) {
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
-        $('#' + app + ' #' + resource.replaceAll('-', '_')).addClass('active');
+        $('#' + app + ' #' + resource.replace(/-/g, '_')).addClass('active');
     }
 }
 
@@ -713,8 +713,14 @@ jumpserver.initServerSideDataTable = function (options) {
             var rows = table.rows(indexes).data();
             $.each(rows, function (id, row) {
                 if (row.id && $.inArray(row.id, table.selected) === -1) {
-                    table.selected.push(row.id);
-                    table.selected_rows.push(row);
+                    if (select.style === 'multi'){
+                        table.selected.push(row.id);
+                        table.selected_rows.push(row);
+                    }
+                    else{
+                        table.selected = [row.id];
+                        table.selected_rows = [row];
+                    }
                 }
             })
         }
@@ -1231,7 +1237,7 @@ function toSafeDateISOStr(s) {
 
 function toSafeLocalDateStr(d) {
     var date = safeDate(d);
-    var date_s = date.toLocaleString(navigator.language, {hour12: false});
+    var date_s = date.toLocaleString(getUserLang(), {hour12: false});
     return date_s.split("/").join('-')
 }
 
@@ -1251,7 +1257,7 @@ function getTimeUnits(u) {
         "m": "分",
         "s": "秒",
     };
-    if (navigator.language === "zh-CN") {
+    if (getUserLang() === "zh-CN") {
         return units[u]
     }
     return u
@@ -1389,6 +1395,16 @@ function showCeleryTaskLog(taskId) {
     window.open(url, '', 'width=900,height=600')
 }
 
+function getUserLang(){
+    let userLangZh = document.cookie.indexOf('django_language=zh');
+    if (userLangZh !== -1){
+        return 'zh-CN'
+    }
+    else{
+        return 'en-US'
+    }
+}
+
 function initDateRangePicker(selector, options) {
     if (!options) {
         options = {}
@@ -1402,6 +1418,15 @@ function initDateRangePicker(selector, options) {
         daysOfWeek: ["日", "一", "二", "三", "四", "五", "六"],//汉化处理
         monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
     };
+    var enLocale = {
+        format: "YYYY-MM-DD HH:mm",
+        separator: " - ",
+        applyLabel: "Apply",
+        cancelLabel: "Cancel",
+        resetLabel: "Reset",
+        daysOfWeek: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+        monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    };
     var defaultOption = {
         singleDatePicker: true,
         showDropdowns: true,
@@ -1409,9 +1434,12 @@ function initDateRangePicker(selector, options) {
         timePicker24Hour: true,
         autoApply: true,
     };
-    var userLang = navigator.language || navigator.userLanguage;
-    if (userLang.indexOf('zh') !== -1) {
+    if (getUserLang() === 'zh-CN') {
         defaultOption.locale = zhLocale;
+    }
+    else{
+        // en-US
+        defaultOption.locale = enLocale;
     }
     options = Object.assign(defaultOption, options);
     return $(selector).daterangepicker(options);

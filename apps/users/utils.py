@@ -215,6 +215,12 @@ def set_tmp_user_to_cache(request, user, ttl=3600):
     cache.set(request.session.session_key+'user', user, ttl)
 
 
+def delete_tmp_user_for_cache(request):
+    if not request.session.session_key:
+        return None
+    cache.delete(request.session.session_key+'user')
+
+
 def redirect_user_first_login_or_index(request, redirect_field_name):
     if request.user.is_first_login:
         return reverse('users:user-first-login')

@@ -228,7 +228,7 @@ class AdHocRunner:
 
 class CommandRunner(AdHocRunner):
     results_callback_class = CommandResultCallback
-    modules_choices = ('shell', 'raw', 'command', 'script')
+    modules_choices = ('shell', 'raw', 'command', 'script', 'win_shell')
 
     def execute(self, cmd, pattern, module='shell'):
         if module and module not in self.modules_choices:

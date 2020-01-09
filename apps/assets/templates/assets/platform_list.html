@@ -50,7 +50,7 @@ function initTable() {
         ajax_url: '{% url "api-assets:platform-list" %}',
         columns: [
             {data: "id"}, {data: "name"}, {data: "base" },
-            {data: "comment"}, {data: "id", orderable: false, width: "100px"}
+            {data: "comment"}, {data: "id", orderable: false, width: "120px"}
         ]
     };
     platformTable = jumpserver.initServerSideDataTable(options);

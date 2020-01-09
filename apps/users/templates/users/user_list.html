@@ -26,7 +26,7 @@
 <div id="actions" class="hide">
     <div class="input-group">
         <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            {% if CURRENT_ORG == 'DEFAULT' %}
+            {% if CURRENT_ORG.is_default %}
                 <option value="delete">{% trans 'Delete selected' %}</option>
             {% else %}
                 <option value="remove">{% trans 'Remove selected' %}</option>
@@ -121,7 +121,7 @@ function initTable() {
             {data: "groups_display", orderable: false},
             {data: "source"},
             {data: "is_valid", orderable: false, width: "50px"},
-            {data: "id", orderable: false, width: "100px"}
+            {data: "id", orderable: false, width: "120px"}
         ],
         op_html: $('#actions').html()
     };

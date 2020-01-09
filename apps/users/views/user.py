@@ -31,8 +31,10 @@ from ..signals import post_user_create
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
-    'UserUpdateView', 'UserGrantedAssetView',
-    'UserBulkUpdateView', 'UserAssetPermissionListView',
+    'UserUpdateView', 'UserBulkUpdateView',
+    'UserGrantedAssetView', 'UserAssetPermissionListView',
+    'UserGrantedRemoteAppView', 'UserRemoteAppPermissionListView',
+    'UserGrantedDatabasesAppView', 'UserDatabaseAppPermissionListView',
 ]
 
 logger = get_logger(__name__)
@@ -164,7 +166,7 @@ class UserBulkUpdateView(PermissionsMixin, TemplateView):
 class UserDetailView(PermissionsMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user_object"
+    context_object_name = "object"
     key_prefix_block = "_LOGIN_BLOCK_{}"
     permission_classes = [IsOrgAdmin]
 
@@ -217,6 +219,62 @@ class UserAssetPermissionListView(PermissionsMixin, DetailView):
         context = {
             'app': _('Users'),
             'action': _('Asset permission'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserGrantedRemoteAppView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_granted_remote_app.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('User granted RemoteApp'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserRemoteAppPermissionListView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_remote_app_permission.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('RemoteApp permission'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserGrantedDatabasesAppView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_granted_database_app.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('User granted DatabaseApp'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class UserDatabaseAppPermissionListView(PermissionsMixin, DetailView):
+    model = User
+    template_name = 'users/user_database_app_permission.html'
+    permission_classes = [IsOrgAdmin]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('DatabaseApp permission'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='adhoc',
             name='_become',
-            field=common.fields.model.EncryptJsonDictCharField(blank=True, default='', max_length=1024, verbose_name='Become'),
+            field=common.fields.model.EncryptJsonDictCharField(blank=True, null=True, default='', max_length=1024, verbose_name='Become'),
         ),
         migrations.AlterField(
             model_name='adhoc',

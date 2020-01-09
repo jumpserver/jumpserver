@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'perms:database-app-permission-detail' pk=database_app_permission.id %}" class="text-center">
+                                    <i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:database-app-permission-user-list' pk=database_app_permission.id %}" class="text-center">
+                                    <i class="fa fa-group"></i> {% trans 'Users and user groups' %}
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'perms:database-app-permission-database-app-list' pk=database_app_permission.id  %}" class="text-center">
+                                <i class="fa fa-inbox"></i> {% trans 'DatabaseApp' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'DatabaseApp list of ' %} <b>{{ database_app_permission.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-striped table-bordered table-hover" id="database_app_list_table" style="width: 100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                            </th>
+                                            <th class="text-center">{% trans 'DatabaseApp' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add DatabaseApp to this permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select DatabaseApp' %}" class="select2" id="database_app_select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for database_app in database_apps_remain %}
+                                                            <option value="{{ database_app.id }}">{{ database_app }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-database-app">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="system-user-table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-users" id="system_users_select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm" id="btn-add-system-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for system_user in object.system_users.all %}
+                                            <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
+                                                <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user|truncatechars:21}}</b></td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn-remove-system-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+
+var databaseAppsRelationUrl = "{% url 'api-perms:database-app-permissions-database-apps-relation-list' %}";
+var systemUsersRelationUrl = "{% url 'api-perms:database-app-permissions-system-users-relation-list' %}";
+
+
+function getRelationUrl(type) {
+    var theUrl = "";
+    switch (type) {
+        case "databaseapp":
+            theUrl = databaseAppsRelationUrl;
+            break;
+        case "systemuser":
+            theUrl = systemUsersRelationUrl;
+            break;
+    }
+    return theUrl;
+}
+
+function addObjects(objectsId, type) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {databaseapppermission: "{{ object.id }}"};
+        data[type] = v;
+        body.push(data)
+    });
+    requestApi({
+        url: theUrl,
+        body: JSON.stringify(body),
+        method: "POST",
+        success: reloadPage
+    });
+}
+
+function removeObject(objectId, type) {
+    if (!objectId)  {
+        return
+    }
+    var theUrl = getRelationUrl(type);
+    theUrl = setUrlParam(theUrl, 'databaseapppermission', "{{ object.id }}");
+    theUrl = setUrlParam(theUrl, type, objectId);
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: reloadPage
+    });
+}
+
+var databaseAppsDirectRelated = {{ database_apps | safe }};
+var table;
+
+function initDatabaseAppTable() {
+    var options = {
+        ele: $('#database_app_list_table'),
+        toggle: true,
+        columnDefs: [
+             {targets: 2, createdCell: function (td, cellData, rowData) {
+                  var removeBtn = '<a class="btn btn-xs btn-danger m-l-xs btn-remove-database-app" disabled data-uid="{{ DEFAULT_PK }}"><i class="fa fa-minus"></i></a>'
+                      .replace('{{ DEFAULT_PK }}', cellData);
+                  if (databaseAppsDirectRelated.indexOf(cellData) !== -1) {
+                      removeBtn = removeBtn.replace('disabled', '')
+                  }
+		  		  $(td).html(removeBtn);
+             }}
+        ],
+        ajax_url: "{% url 'api-perms:database-app-permission-all-database-apps' pk=object.id %}",
+        columns: [
+            {data: "databaseapp"}, {data: "databaseapp_display"}, {data: "databaseapp", width: "30px"}
+        ],
+        op_html: $('#actions').html()
+    };
+    table = jumpserver.initServerSideDataTable(options);
+    return table
+}
+
+$(document).ready(function () {
+    $('.select2').select2();
+    initDatabaseAppTable();
+})
+.on('click', '.btn-add-database-app', function () {
+    var databaseAppsId = $("#database_app_select2").val();
+    addObjects(databaseAppsId, "databaseapp");
+})
+.on('click', '.btn-remove-database-app', function () {
+    var databaseAppsId = $(this).data("uid");
+    removeObject(databaseAppsId, "databaseapp")
+})
+.on('click', '#btn-add-system-user', function () {
+    var systemUsersId = $("#system_users_select2").val();
+    addObjects(systemUsersId, "systemuser");
+})
+.on('click', '.btn-remove-system-user', function () {
+    var systemUserId = $(this).data("uid");
+    removeObject(systemUserId, "systemuser")
+})
+</script>
+{% endblock %}

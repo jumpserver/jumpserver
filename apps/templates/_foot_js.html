@@ -7,7 +7,7 @@
 <script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
 <script src="{% static "js/inspinia.js" %}"></script>
 <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-<script src="{% static "js/jumpserver.js" %}?v=6"></script>
+<script src="{% static "js/jumpserver.js" %}?v=7"></script>
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 <script src="{% static 'js/plugins/select2/i18n/zh-CN.js' %}"></script>
 <script>
@@ -18,9 +18,6 @@ $(document).ready(function(){
     if ($('.tooltip')[0]) {
         $('.tooltip').tooltip();
     }
-    var userLang = navigator.language || navigator.userLanguage;
-    if (userLang.indexOf('zh') !== -1) {
-        $.fn.select2.defaults.set('language', 'zh-CN')
-    }
+    $.fn.select2.defaults.set('language', getUserLang())
 });
 </script>

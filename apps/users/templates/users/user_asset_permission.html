@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'users/_base_user_detail.html' %}
 {% load static %}
 {% load i18n %}
 
@@ -6,75 +6,55 @@
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
-{% block content %}
-    <div class="wrapper wrapper-content animated fadeInRight">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="panel-options">
-                        <ul class="nav nav-tabs">
-                            <li>
-                                <a href="{% url 'users:user-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:user-granted-asset' pk=object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
-                            </li>
-                            <li class="active">
-                                <a href="{% url 'users:user-asset-permission' pk=object.id %}" class="text-center"><i class="fa fa-edit"></i> {% trans 'Asset permission' %}</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="tab-content">
-                        <div class="col-sm-10" style="padding-left: 0">
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span class="label"><b>{{ object.name }}</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <div class="mail-box-header">
-                                        <table class="table table-striped table-bordered table-hover"
-                                               id="permission_list_table"
-                                               style="width: 100%">
-                                            <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>{% trans 'Name' %}</th>
-                                                <th class="text-center">{% trans 'User' %}</th>
-                                                <th class="text-center">{% trans 'User group' %}</th>
-                                                <th class="text-center">{% trans 'Asset' %}</th>
-                                                <th class="text-center">{% trans 'Node' %}</th>
-                                                <th class="text-center">{% trans 'System user' %}</th>
-                                                <th class="text-center">{% trans 'Validity' %}</th>
-                                                <th class="text-center">{% trans 'Action' %}</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
+{% block content_table %}
+<div class="col-sm-10" style="padding-left: 0">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <span class="label"><b>{{ object.name }}</b></span>
+            <div class="ibox-tools">
+                <a class="collapse-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                </ul>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
             </div>
         </div>
+        <div class="ibox-content">
+            <table class="table table-striped table-bordered table-hover"
+                   id="permission_list_table"
+                   style="width: 100%">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>{% trans 'Name' %}</th>
+                    <th class="text-center">{% trans 'User' %}</th>
+                    <th class="text-center">{% trans 'User group' %}</th>
+                    <th class="text-center">{% trans 'Asset' %}</th>
+                    <th class="text-center">{% trans 'Node' %}</th>
+                    <th class="text-center">{% trans 'System user' %}</th>
+                    <th class="text-center">{% trans 'Validity' %}</th>
+                    <th class="text-center">{% trans 'Action' %}</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
-    {% include '_filter_dropdown.html' %}
+</div>
+
+{% include '_filter_dropdown.html' %}
+
 {% endblock %}
+
 {% block custom_foot_js %}
 <script>
 jumpserver.nodes_selected = {};
@@ -159,7 +139,7 @@ function initTable() {
             {data: "id"}, {data: "name"}, {data: "users", orderable: false},
             {data: "user_groups", orderable: false}, {data: "assets", orderable: false},
             {data: "nodes", orderable: false}, {data: "system_users", orderable: false},
-            {data: "is_valid", orderable: false}, {data: "id", orderable: false, width: "100px"}
+            {data: "is_valid", orderable: false}, {data: "id", orderable: false, width: "120px"}
         ],
         select: {},
         op_html: $('#actions').html()
@@ -183,19 +163,6 @@ $(document).ready(function() {
         ]},
     ];
     initTableFilterDropdown('#permission_list_table_filter input', filterMenu)
-})
-.on('click', '#is_active', function() {
-    var the_url = "{% url 'api-users:user-detail' pk=object.id %}";
-    var checked = $(this).prop('checked');
-    var body = {
-        'is_active': checked
-    };
-    var success = '{% trans "Update successfully!" %}';
-    requestApi({
-        url: the_url,
-        body: JSON.stringify(body),
-        success_message: success
-    });
 })
 .on('click', '.toggle', function (e) {
     e.preventDefault();
@@ -221,6 +188,14 @@ $(document).ready(function() {
             detailRows.push(tr.attr('id'));
         }
     }
+})
+.on('click', '.btn-del', function () {
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var name = $this.data('name');
+    var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
+            .replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
 })
 </script>
 {% endblock %}

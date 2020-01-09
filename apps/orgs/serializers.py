@@ -4,10 +4,6 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from users.models import User, UserGroup
 from assets.models import Asset, Domain, AdminUser, SystemUser, Label
-from assets.const import (
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-)
 from perms.models import AssetPermission
 from common.serializers import AdaptedBulkListSerializer
 from .utils import set_current_org, get_current_org
@@ -21,15 +17,6 @@ class OrgSerializer(ModelSerializer):
         list_serializer_class = AdaptedBulkListSerializer
         fields = '__all__'
         read_only_fields = ['created_by', 'date_created']
-
-    @staticmethod
-    def validate_name(name):
-        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
-        res = re.search(pattern, name)
-        if res is not None:
-            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-            raise serializers.ValidationError(msg)
-        return name
 
 
 class OrgReadSerializer(ModelSerializer):

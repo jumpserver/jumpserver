@@ -9,10 +9,6 @@ from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Node
 from ..models import SystemUser
-from ..const import (
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN,
-    GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-)
 from .base import AuthSerializer, AuthSerializerMixin
 
 __all__ = [
@@ -46,15 +42,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode_display': {'label': _('Login mode display')},
             'created_by': {'read_only': True},
         }
-
-    @staticmethod
-    def validate_name(name):
-        pattern = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_PATTERN
-        res = re.search(pattern, name)
-        if res is not None:
-            msg = GENERAL_FORBIDDEN_SPECIAL_CHARACTERS_ERROR_MSG
-            raise serializers.ValidationError(msg)
-        return name
 
     def validate_auto_push(self, value):
         login_mode = self.initial_data.get("login_mode")
@@ -103,8 +90,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
 
     def validate(self, attrs):
         username = attrs.get("username", "manual")
+        auto_gen_key = attrs.pop("auto_generate_key", False)
         protocol = attrs.get("protocol")
-        auto_gen_key = attrs.get("auto_generate_key", False)
+
+        if protocol not in [SystemUser.PROTOCOL_RDP, SystemUser.PROTOCOL_SSH]:
+            return attrs
+
         if auto_gen_key:
             password = SystemUser.gen_password()
             attrs["password"] = password
@@ -119,7 +110,6 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             public_key = ssh_pubkey_gen(private_key, password=password,
                                         username=username)
             attrs["public_key"] = public_key
-        attrs.pop("auto_generate_key", None)
         return attrs
 
     @classmethod
@@ -133,6 +123,7 @@ class SystemUserAuthSerializer(AuthSerializer):
     """
     系统用户认证信息
     """
+    private_key = serializers.SerializerMethodField()
 
     class Meta:
         model = SystemUser
@@ -140,6 +131,10 @@ class SystemUserAuthSerializer(AuthSerializer):
             "id", "name", "username", "protocol",
             "login_mode", "password", "private_key",
         ]
+
+    @staticmethod
+    def get_private_key(obj):
+        return obj.get_private_key()
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):

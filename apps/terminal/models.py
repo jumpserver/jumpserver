@@ -169,12 +169,13 @@ class Session(OrgModelMixin):
         ('rdp', 'rdp'),
         ('vnc', 'vnc'),
         ('telnet', 'telnet'),
+        ('mysql', 'mysql'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"), db_index=True)
     user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
-    asset = models.CharField(max_length=1024, verbose_name=_("Asset"), db_index=True)
+    asset = models.CharField(max_length=128, verbose_name=_("Asset"), db_index=True)
     asset_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     system_user = models.CharField(max_length=128, verbose_name=_("System user"), db_index=True)
     system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
@@ -250,7 +251,7 @@ class Session(OrgModelMixin):
         return cls.objects.filter(is_finished=False)
 
     def is_active(self):
-        if self.protocol in ['ssh', 'telnet']:
+        if self.protocol in ['ssh', 'telnet', 'rdp', 'mysql']:
             key = self.ACTIVE_CACHE_KEY_PREFIX.format(self.id)
             return bool(cache.get(key))
         return True

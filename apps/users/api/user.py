@@ -179,5 +179,4 @@ class UserResetOTPApi(UserQuerysetMixin, generics.RetrieveAPIView):
         if user.mfa_enabled:
             user.reset_mfa()
             user.save()
-            logout(request)
         return Response({"msg": "success"})

@@ -123,7 +123,7 @@ $(document).ready(function () {
     var method = "POST";
     var the_url = '{% url "api-perms:remote-app-permission-list" %}';
     var redirect_to = '{% url "perms:remote-app-permission-list" %}';
-    {% if type == "update" %}
+    {% if api_action == "update" %}
         the_url = '{% url "api-perms:remote-app-permission-detail" pk=object.id %}';
         method = "PUT";
     {% endif %}

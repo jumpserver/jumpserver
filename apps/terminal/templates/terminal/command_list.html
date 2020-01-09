@@ -86,7 +86,7 @@ $(document).ready(function () {
             forceParse: false,
             calendarWeeks: true,
             autoclose: true,
-            language: navigator.language || "en",
+            language: getUserLang(),
         };
         dateFromRef.datepicker(options).on("changeDate", function () {
             var value = $(this).val() + ' 0:0:0';
@@ -168,7 +168,7 @@ $(document).ready(function () {
 
 
 function format(d) {
-    var output = $("<pre style='border: none; background: none'></pre>");
+    var output = $("<pre style='border: none; background: none; white-space: pre-wrap'></pre>");
 
     output.append('$ ', d.input);
     output.append('\r\n\r\n');
