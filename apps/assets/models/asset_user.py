@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 #
-from .base import BaseUser
+from .authbook import AuthBook
 
 
-class AssetUser(BaseUser):
+class AssetUser(AuthBook):
     hostname = ""
     ip = ""
-    asset_id = ""
-    score = 0
     backend = ""
     union_id = ""
     asset_username = ""
-    version = 0
 
     class Meta:
-        abstract = True
+        proxy = True

@@ -3120,7 +3120,7 @@ msgstr "成功资产"
 
 #: ops/templates/ops/celery_task_log.html:4
 msgid "Task log"
-msgstr "任务列表"
+msgstr "任务日志"
 
 #: ops/templates/ops/command_execution_create.html:106
 #: terminal/templates/terminal/session_detail.html:95

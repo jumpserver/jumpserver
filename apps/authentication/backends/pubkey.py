@@ -19,7 +19,7 @@ class PublicKeyAuthBackend:
             return None
         else:
             if user.check_public_key(public_key) and \
-                    self.user_can_authenticate(user):
+                  self.user_can_authenticate(user):
                 return user
 
     @staticmethod

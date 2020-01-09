@@ -4,6 +4,7 @@ from celery import shared_task
 from django.utils.translation import ugettext as _
 
 from common.utils import get_logger
+from orgs.utils import org_aware_func
 from . import const
 from .utils import check_asset_can_run_ansible
 
@@ -19,9 +20,9 @@ __all__ = [
 
 def get_test_asset_user_connectivity_tasks(asset):
     if asset.is_unixlike():
-        tasks = const.TEST_ASSET_USER_CONN_TASKS
+        tasks = const.PING_UNIXLIKE_TASKS
     elif asset.is_windows():
-        tasks = const.TEST_WINDOWS_ASSET_USER_CONN_TASKS
+        tasks = const.PING_WINDOWS_TASKS
     else:
         msg = _(
             "The asset {} system platform {} does not "
@@ -32,7 +33,7 @@ def get_test_asset_user_connectivity_tasks(asset):
     return tasks
 
 
-@shared_task(queue="ansible")
+@org_aware_func("asset_user")
 def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
     """
     :param asset_user: <AuthBook>对象
@@ -53,8 +54,7 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
     args = (task_name,)
     kwargs = {
         'hosts': [asset_user.asset], 'tasks': tasks,
-        'pattern': 'all', 'options': const.TASK_OPTIONS,
-        'created_by': asset_user.org_id,
+        'options': const.TASK_OPTIONS,
     }
     if run_as_admin:
         kwargs["run_as_admin"] = True

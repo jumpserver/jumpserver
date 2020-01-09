@@ -103,9 +103,11 @@ class SystemUser(BaseUser):
         (LOGIN_AUTO, _('Automatic login')),
         (LOGIN_MANUAL, _('Manually login'))
     )
-
+    username_same_with_user = models.BooleanField(default=False, verbose_name=_("Username same with user"))
     nodes = models.ManyToManyField('assets.Node', blank=True, verbose_name=_("Nodes"))
     assets = models.ManyToManyField('assets.Asset', blank=True, verbose_name=_("Assets"))
+    users = models.ManyToManyField('users.User', blank=True, verbose_name=_("Users"))
+    groups = models.ManyToManyField('users.UserGroup', blank=True, verbose_name=_("User groups"))
     priority = models.IntegerField(default=20, verbose_name=_("Priority"), validators=[MinValueValidator(1), MaxValueValidator(100)])
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
@@ -113,6 +115,7 @@ class SystemUser(BaseUser):
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     login_mode = models.CharField(choices=LOGIN_MODE_CHOICES, default=LOGIN_AUTO, max_length=10, verbose_name=_('Login mode'))
     cmd_filters = models.ManyToManyField('CommandFilter', related_name='system_users', verbose_name=_("Command filter"), blank=True)
+    _prefer = 'system_user'
 
     def __str__(self):
         return '{0.name}({0.username})'.format(self)

@@ -287,7 +287,7 @@ class Asset(ProtocolsMixin, NodesRelationMixin, OrgModelMixin):
         if not self.admin_user:
             return {}
 
-        self.admin_user.load_specific_asset_auth(self)
+        self.admin_user.load_asset_special_auth(self)
         info = {
             'username': self.admin_user.username,
             'password': self.admin_user.password,

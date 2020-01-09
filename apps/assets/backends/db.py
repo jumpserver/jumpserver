@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 from functools import reduce
-from django.db.models import F, CharField, Value, IntegerField, Q
+from django.db.models import F, CharField, Value, IntegerField, Q, Count
 from django.db.models.functions import Concat
 
 from orgs.utils import current_org
@@ -19,8 +19,9 @@ class DBBackend(BaseBackend):
     def get_queryset(self):
         return self.queryset
 
-    def filter(self, assets=None, node=None, prefer_id=None, id__in=None, **kwargs):
-        self.filter_prefer(prefer_id)
+    def filter(self, assets=None, node=None, prefer=None, prefer_id=None,
+               id__in=None, **kwargs):
+        self.filter_prefer(prefer, prefer_id)
         self.filter_node(node)
         self.filter_assets(assets)
         self.filter_other(kwargs)
@@ -35,7 +36,8 @@ class DBBackend(BaseBackend):
         pass
 
     def filter_id_in(self, ids):
-        self.queryset = self.queryset.filter(union_id__in=ids)
+        if ids and isinstance(ids, list):
+            self.queryset = self.queryset.filter(union_id__in=ids)
 
     def count(self):
         return self.queryset.count()
@@ -49,7 +51,7 @@ class DBBackend(BaseBackend):
         if kwargs:
             self.queryset = self.queryset.filter(**kwargs)
 
-    def filter_prefer(self, prefer_id):
+    def filter_prefer(self, prefer, prefer_id):
         pass
 
     def search(self, item):
@@ -63,10 +65,13 @@ class DBBackend(BaseBackend):
 
 class SystemUserBackend(DBBackend):
     model = SystemUser.assets.through
-    backend = 'SystemUser'
+    backend = 'system_user'
     base_score = 0
 
-    def filter_prefer(self, prefer_id):
+    def filter_prefer(self, prefer, prefer_id):
+        if prefer and prefer != self.backend:
+            self.queryset = self.queryset.none()
+
         if prefer_id:
             self.queryset = self.queryset.filter(systemuser__id=prefer_id)
 
@@ -74,8 +79,7 @@ class SystemUserBackend(DBBackend):
         if node:
             self.queryset = self.queryset.filter(asset__nodes__id=node.id)
 
-    def all(self):
-        print("Call system user all")
+    def get_annotate(self):
         kwargs = dict(
             hostname=F("asset__hostname"),
             ip=F("asset__ip"),
@@ -95,13 +99,52 @@ class SystemUserBackend(DBBackend):
             org_id=F("asset__org_id"),
             backend=Value(self.backend, CharField())
         )
+        return kwargs
+
+    def get_filter(self):
+        return dict(
+            systemuser__username_same_with_user=False,
+        )
+
+    def all(self):
+        kwargs = self.get_annotate()
+        filters = self.get_filter()
         qs = self.model.objects.all().annotate(**kwargs)
         org_id = ''
         if current_org.is_real():
             org_id = current_org.id
-        qs = qs.filter(asset__org_id=org_id)
+        filters['org_id'] = org_id
+        qs = qs.filter(**filters)
         qs = self.qs_to_values(qs)
         return qs
+
+
+class DynamicSystemUserBackend(SystemUserBackend):
+    backend = 'system_user'
+
+    def get_annotate(self):
+        kwargs = super().get_annotate()
+        kwargs.update(dict(
+            username=F("systemuser__users__username"),
+            asset_username=Concat(
+                F("asset__id"), Value("_"),
+                F("systemuser__users__username"),
+                output_field=CharField()
+            ),
+            union_id=Concat(
+                F("systemuser_id"), Value("_"), F("asset_id"),
+                Value("_"), F("systemuser__users__id"),
+                output_field=CharField()
+            ),
+            users_count=Count('systemuser__users'),
+        ))
+        return kwargs
+
+    def get_filter(self):
+        return dict(
+            users_count__gt=0,
+            systemuser__username_same_with_user=True
+        )
 
 
 class AdminUserBackend(DBBackend):
@@ -109,7 +152,9 @@ class AdminUserBackend(DBBackend):
     backend = 'admin_user'
     base_score = 200
 
-    def filter_prefer(self, prefer_id):
+    def filter_prefer(self, prefer, prefer_id):
+        if prefer and prefer != self.backend:
+            self.queryset = self.queryset.none()
         if prefer_id:
             self.queryset = self.queryset.filter(admin_user__id=prefer_id)
 
@@ -137,7 +182,7 @@ class AdminUserBackend(DBBackend):
 
 class AuthbookBackend(DBBackend):
     model = AuthBook
-    backend = 'authbook'
+    backend = 'db'
     base_score = 400
 
     def filter_node(self, node):

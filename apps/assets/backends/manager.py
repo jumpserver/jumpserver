@@ -3,10 +3,14 @@
 from itertools import islice, chain, groupby
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
+from orgs.utils import current_org
 from common.utils import get_logger
 
 from ..models import AssetUser, AuthBook
-from .db import AuthbookBackend, SystemUserBackend, AdminUserBackend
+from .db import (
+    AuthbookBackend, SystemUserBackend, AdminUserBackend,
+    DynamicSystemUserBackend
+)
 
 logger = get_logger(__name__)
 
@@ -21,13 +25,13 @@ class AssetUserQueryset:
         self._queryset = None
 
     def filter(self, hostname=None, ip=None, username=None, assets=None,
-               asset=None, node=None, prefer_id=None, id__in=None):
+               asset=None, node=None, prefer_id=None, prefer=None, id__in=None):
         if not assets and asset:
             assets = [asset]
 
         kwargs = dict(
             hostname=hostname, ip=ip, username=username,
-            assets=assets, node=node, prefer_id=prefer_id,
+            assets=assets, node=node, prefer=prefer, prefer_id=prefer_id,
             id__in=id__in,
         )
         logger.debug("Filter: {}".format(kwargs))
@@ -60,15 +64,17 @@ class AssetUserQueryset:
         self.filter(**kwargs)
         count = self.count()
         if count == 1:
-            return self.queryset[0]
+            data = self.queryset[0]
+            return self.to_asset_user(data)
         elif count > 1:
             msg = '{} get'.format(count)
             raise MultipleObjectsReturned(msg)
         else:
-            raise ObjectDoesNotExist()
+            msg = 'Org is: {}'.format(current_org.name)
+            raise ObjectDoesNotExist(msg)
 
-    def get_object(self, **kwargs):
-        data = self.get(**kwargs)
+    @staticmethod
+    def to_asset_user(data):
         obj = AssetUser()
         for k, v in data.items():
             setattr(obj, k, v)
@@ -85,9 +91,11 @@ class AssetUserQueryset:
 
     def __getitem__(self, ndx):
         if type(ndx) is slice:
-            return list(islice(self.queryset, ndx.start, ndx.stop, ndx.step or 1))
+            items = islice(self.queryset, ndx.start, ndx.stop, ndx.step or 1)
+            return [self.to_asset_user(d) for d in items]
         else:
-            return self.queryset[ndx]
+            item = self.queryset[ndx]
+            return self.to_asset_user(item)
 
 
 class AssetUserManager:
@@ -95,6 +103,7 @@ class AssetUserManager:
         ('db', AuthbookBackend),
         ('system_user', SystemUserBackend),
         ('admin_user', AdminUserBackend),
+        ('system_user_dynamic', DynamicSystemUserBackend),
     )
 
     def __init__(self):

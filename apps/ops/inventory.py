@@ -110,7 +110,7 @@ class JMSInventory(JMSBaseInventory):
         try:
             asset = self.assets.get(id=host.get('id'))
             manager = AssetUserManager()
-            run_user = manager.get_object(username=self.run_as, asset=asset)
+            run_user = manager.get(username=self.run_as, asset=asset)
         except Exception as e:
             logger.error(e, exc_info=True)
             return {}

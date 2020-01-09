@@ -50,11 +50,6 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.annotate(_assets_amount=Count('assets'))
-        return queryset
-
 
 class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -82,7 +77,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         instance = super().get_object()
         aid = self.kwargs.get('aid')
         asset = get_object_or_404(Asset, pk=aid)
-        instance.load_specific_asset_auth(asset)
+        instance.load_asset_special_auth(asset)
         return instance
 
 

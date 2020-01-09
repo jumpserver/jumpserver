@@ -67,7 +67,7 @@ def clean_tasks_adhoc_period():
     for task in tasks:
         adhoc = task.adhoc.all().order_by('-date_created')[5:]
         for ad in adhoc:
-            ad.history.all().delete()
+            ad.execution.all().delete()
             ad.delete()
 
 

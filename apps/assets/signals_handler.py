@@ -112,6 +112,22 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     add_nodes_assets_to_system_users.delay(nodes_keys, system_users)
 
 
+@receiver(m2m_changed, sender=SystemUser.groups.through)
+def on_system_user_groups_change(sender, instance=None, action=None, model=None,
+                                 pk_set=None, reverse=False, **kwargs):
+    """
+    当系统用户和用户组关系发生变化时，应该将组下用户关联到新的系统用户上
+    """
+    if action != "post_add":
+        return
+    if reverse:
+        return
+    logger.info("System user groups update signal recv: {}".format(instance))
+    groups = model.objects.filter(pk__in=pk_set).annotate(users_count=Count("users"))
+    users = groups.filter(users_count__gt=0).values_list('users', flat=True)
+    instance.users.add(*tuple(users))
+
+
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
     """

@@ -7,10 +7,10 @@ from celery import shared_task
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 
-from orgs.utils import tmp_to_org
+from orgs.utils import tmp_to_org, org_aware_func
 from common.utils import get_logger
 from ..models import GatheredUser, Node
-from .utils import clean_hosts
+from .utils import clean_ansible_task_hosts
 from . import const
 
 __all__ = ['gather_asset_users', 'gather_nodes_asset_users']
@@ -101,11 +101,12 @@ def add_asset_users(assets, results):
 
 
 @shared_task(queue="ansible")
+@org_aware_func("assets")
 def gather_asset_users(assets, task_name=None):
     from ops.utils import update_or_create_ansible_task
     if task_name is None:
         task_name = _("Gather assets users")
-    assets = clean_hosts(assets)
+    assets = clean_ansible_task_hosts(assets)
     if not assets:
         return
     hosts_category = {
@@ -131,7 +132,7 @@ def gather_asset_users(assets, task_name=None):
         task, created = update_or_create_ansible_task(
             task_name=_task_name, hosts=value['hosts'], tasks=value['tasks'],
             pattern='all', options=const.TASK_OPTIONS,
-            run_as_admin=True, created_by=value['hosts'][0].org_id,
+            run_as_admin=True,
         )
         raw, summary = task.run()
         results[k].update(raw['ok'])

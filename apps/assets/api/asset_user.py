@@ -43,7 +43,7 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
             kwargs[field] = value
         if kwargs:
             queryset = queryset.filter(**kwargs)
-        print("Filter {}".format(kwargs))
+        logger.debug("Filter {}".format(kwargs))
         return queryset
 
 
@@ -132,7 +132,10 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
         prefer_id = self.request.GET.get("prefer_id")
         asset = get_object_or_none(Asset, pk=asset_id)
         manager = AssetUserManager()
-        asset_users = manager.filter(username=username, assets=[asset], prefer_id=prefer_id)
+        asset_users = manager.filter(
+            username=username, assets=[asset],
+            prefer_id=prefer_id
+        )
         return asset_users
 
     def retrieve(self, request, *args, **kwargs):
@@ -141,6 +144,7 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
         kwargs = {}
         if prefer == "admin_user":
             kwargs["run_as_admin"] = True
+        asset_users = list(asset_users)
         task = test_asset_users_connectivity_manual.delay(asset_users, **kwargs)
         return Response({"task": task.id})
 

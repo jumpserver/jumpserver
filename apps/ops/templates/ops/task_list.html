@@ -79,10 +79,10 @@ $(document).ready(function () {
         ajax_url: '{% url "api-ops:task-list" %}',
         columns: [
             {data: "id"}, {data: "name", className: "text-left"},
-            {data: "latest_history", orderable: false},
-            {data: "latest_history", orderable: false},
-            {data: "latest_history", orderable: false}, {data: "latest_history"},
-            {data: "latest_history", orderable:false}, {data: "id", orderable: false},
+            {data: "latest_execution", orderable: false},
+            {data: "latest_execution", orderable: false},
+            {data: "latest_execution", orderable: false}, {data: "latest_execution"},
+            {data: "latest_execution", orderable:false}, {data: "id", orderable: false},
         ],
         order: [],
         op_html: $('#actions').html()
