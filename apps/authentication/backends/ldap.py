@@ -32,6 +32,9 @@ class LDAPAuthorizationBackend(LDAPBackend):
         if not username:
             logger.info('Authenticate failed: username is None')
             return None
+        if not password:
+            logger.info('Authenticate failed: password is None')
+            return None
         if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
             user_model = self.get_user_model()
             exist = user_model.objects.filter(username=username).exists()
