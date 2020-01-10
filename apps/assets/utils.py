@@ -84,11 +84,15 @@ class TreeService(Tree):
         children_ids = self.all_children_ids(nid, with_self=with_self)
         return [self.get_node(i, deep=deep) for i in children_ids]
 
-    def ancestors(self, nid, with_self=False, deep=False):
+    def ancestors_ids(self, nid, with_self=True):
         ancestor_ids = list(self.rsearch(nid))
         ancestor_ids.pop()
         if not with_self:
             ancestor_ids.pop(0)
+        return ancestor_ids
+
+    def ancestors(self, nid, with_self=False, deep=False):
+        ancestor_ids = self.ancestors_ids(nid, with_self=with_self)
         return [self.get_node(i, deep=deep) for i in ancestor_ids]
 
     def get_node_full_tag(self, nid):
