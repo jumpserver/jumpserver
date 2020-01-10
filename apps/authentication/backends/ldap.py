@@ -27,12 +27,15 @@ class LDAPAuthorizationBackend(LDAPBackend):
         is_valid = getattr(user, 'is_valid', None)
         return is_valid or is_valid is None
 
-    def pre_check(self, username):
+    def pre_check(self, username, password):
         if not settings.AUTH_LDAP:
             return False
         logger.info('Authentication LDAP backend')
         if not username:
             logger.info('Authenticate failed: username is None')
+            return False
+        if not password:
+            logger.info('Authenticate failed: password is None')
             return False
         if settings.AUTH_LDAP_USER_LOGIN_ONLY_IN_USERS:
             user_model = self.get_user_model()
@@ -44,7 +47,7 @@ class LDAPAuthorizationBackend(LDAPBackend):
         return True
 
     def authenticate(self, request=None, username=None, password=None, **kwargs):
-        match = self.pre_check(username)
+        match = self.pre_check(username, password)
         if not match:
             return None
         ldap_user = LDAPUser(self, username=username.strip(), request=request)

@@ -17,157 +17,156 @@ Jumpserver 采纳分布式架构，支持多机房跨区域部署，支持横向
 
 ## 核心功能列表
 
-<table class="subscription-level-table">
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="4">身份验证 Authentication</td>
-        <td class="features-second-td-background-style" rowspan="3" >登录认证
-        </td>
-        <td class="features-third-td-background-style">资源统一登录和认证
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">LDAP 认证
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">支持 OpenID，实现单点登录
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多因子认证
-        </td>
-        <td class="features-third-td-background-style">MFA（Google Authenticator）
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">账号管理 Account</td>
-        <td class="features-second-td-background-style" rowspan="2">集中账号管理
-        </td>
-        <td class="features-third-td-background-style">管理用户管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">系统用户管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="4">统一密码管理
-        </td>
-        <td class="features-third-td-background-style">资产密码托管
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">自动生成密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码自动推送
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">密码过期设置
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style" rowspan="2">批量密码变更(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">定期批量修改密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">生成随机密码
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">多云环境的资产纳管(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">对私有云、公有云资产统一纳管
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="9">授权控制 Authorization</td>
-        <td class="features-second-td-background-style" rowspan="3">资产授权管理
-        </td>
-        <td class="features-third-td-background-style">资产树
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">资产或资产组灵活授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">节点内资产自动继承授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">RemoteApp(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">实现更细粒度的应用级授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-outline-td-background-style">组织管理(X-PACK)
-        </td>
-        <td class="features-outline-td-background-style">实现多租户管理，权限隔离
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">多维度授权
-        </td>
-        <td class="features-third-td-background-style">可对用户、用户组或系统角色授权
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令限制
-        </td>
-        <td class="features-third-td-background-style">限制特权指令使用，支持黑白名单
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">统一文件传输
-        </td>
-        <td class="features-third-td-background-style">SFTP 文件上传/下载
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件管理
-        </td>
-        <td class="features-third-td-background-style">Web SFTP 文件管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-first-td-background-style" rowspan="6">安全审计 Audit</td>
-        <td class="features-second-td-background-style" rowspan="2">会话管理
-        </td>
-        <td class="features-third-td-background-style">在线会话管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">历史会话管理
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style" rowspan="2">录像管理
-        </td>
-        <td class="features-third-td-background-style">Linux 录像支持
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-third-td-background-style">Windows 录像支持
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">指令审计
-        </td>
-        <td class="features-third-td-background-style">指令记录
-        </td>
-    </tr>
-    <tr class="subscription-level-tr-border">
-        <td class="features-second-td-background-style">文件传输审计
-        </td>
-        <td class="features-third-td-background-style">上传/下载记录审计
-        </td>
-    </tr>
+<table>
+  <tr>
+    <td rowspan="7">身份认证<br>Authentication</td>
+    <td rowspan="4">登录认证</td>
+    <td>资源统一登录与认证</td>
+  </tr>
+  <tr>
+    <td>LDAP/AD 认证</td>
+  </tr>
+  <tr>
+    <td>RADIUS 认证</td>
+  </tr>
+  <tr>
+    <td>OpenID 认证（实现单点登录）</td>
+  </tr>
+  <tr>
+    <td rowspan="2">MFA认证</td>
+    <td>MFA 二次认证（Google Authenticator）</td>
+  </tr>
+  <tr>
+    <td>RADIUS 二次认证</td>
+  </tr>
+  <tr>
+    <td>登录复核（X-PACK）</td>
+    <td>用户登录行为受管理员的监管与控制</td>
+  </tr>
+  <tr>
+    <td rowspan="11">账号管理<br>Account</td>
+    <td rowspan="2">集中账号</td>
+    <td>管理用户管理</td>
+  </tr>
+  <tr>
+    <td>系统用户管理</td>
+  </tr>
+  <tr>
+    <td rowspan="4">统一密码</td>
+    <td>资产密码托管</td>
+  </tr>
+  <tr>
+    <td>自动生成密码</td>
+  </tr>
+  <tr>
+    <td>自动推送密码</td>
+  </tr>
+  <tr>
+    <td>密码过期设置</td>
+  </tr>
+  <tr>
+    <td rowspan="2">批量改密（X-PACK）</td>
+    <td>定期批量改密</td>
+  </tr>
+  <tr>
+    <td>多种密码策略</td>
+  </tr>
+  <tr>
+    <td>多云纳管（X-PACK）</td>
+    <td>对私有云、公有云资产自动统一纳管</td>
+  </tr>
+  <tr>
+    <td>收集用户（X-PACK）</td>
+    <td>自定义任务定期收集主机用户</td>
+  </tr>
+  <tr>
+    <td>密码匣子（X-PACK）</td>
+    <td>统一对资产主机的用户密码进行查看、更新、测试操作</td>
+  </tr>
+  <tr>
+    <td rowspan="15">授权控制<br>Authorization</td>
+    <td>多维授权</td>
+    <td>对用户、用户组、资产、资产节点、应用以及系统用户进行授权</td>
+  </tr>
+  <tr>
+    <td rowspan="4">资产授权</td>
+    <td>资产以树状结构进行展示</td>
+  </tr>
+  <tr>
+    <td>资产和节点均可灵活授权</td>
+  </tr>
+  <tr>
+    <td>节点内资产自动继承授权</td>
+  </tr>
+  <tr>
+    <td>子节点自动继承父节点授权</td>
+  </tr>
+  <tr>
+    <td rowspan="2">应用授权</td>
+    <td>实现更细粒度的应用级授权</td>
+  </tr>
+  <tr>
+    <td>MySQL 数据库应用、RemoteApp 远程应用（X-PACK）</td>
+  </tr>
+  <tr>
+    <td>动作授权</td>
+    <td>实现对授权资产的文件上传、下载以及连接动作的控制</td>
+  </tr>
+  <tr>
+    <td>时间授权</td>
+    <td>实现对授权资源使用时间段的限制</td>
+  </tr>
+  <tr>
+    <td>特权指令</td>
+    <td>实现对特权指令的使用（支持黑白名单）</td>
+  </tr>
+  <tr>
+    <td>命令过滤</td>
+    <td>实现对授权系统用户所执行的命令进行控制</td>
+  </tr>
+  <tr>
+    <td>文件传输</td>
+    <td>SFTP 文件上传/下载</td>
+  </tr>
+  <tr>
+    <td>文件管理</td>
+    <td>实现 Web SFTP 文件管理</td>
+  </tr>
+  <tr>
+    <td>工单管理（X-PACK）</td>
+    <td>支持对用户登录请求行为进行控制</td>
+  </tr>
+  <tr>
+    <td>组织管理（X-PACK）</td>
+    <td>实现多租户管理与权限隔离</td>
+  </tr>
+  <tr>
+    <td rowspan="7">安全审计<br>Audit</td>
+    <td>操作审计</td>
+    <td>用户操作行为审计</td>
+  </tr>
+  <tr>
+    <td rowspan="2">会话审计</td>
+    <td>在线会话内容审计</td>
+  </tr>
+  <tr>
+    <td>历史会话内容审计</td>
+  </tr>
+  <tr>
+    <td rowspan="2">录像审计</td>
+    <td>支持对 Linux、Windows 等资产操作的录像进行回放审计</td>
+  </tr>
+  <tr>
+    <td>支持对 RemoteApp（X-PACK）、MySQL 等应用操作的录像进行回放审计</td>
+  </tr>
+  <tr>
+    <td>指令审计</td>
+    <td>支持对资产和应用等操作的命令进行审计</td>
+  </tr>
+  <tr>
+    <td>文件传输</td>
+    <td>可对文件的上传、下载记录进行审计</td>
+  </tr>
 </table>
 
 ## 安装及使用指南
