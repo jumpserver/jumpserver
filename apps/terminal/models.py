@@ -362,18 +362,23 @@ class ReplayStorage(CommonModelMixin):
         return self.name
 
     def convert_type(self):
-        s3_type_list = [
-            const.REPLAY_STORAGE_TYPE_CEPH, const.REPLAY_STORAGE_TYPE_SWIFT
-        ]
+        s3_type_list = [const.REPLAY_STORAGE_TYPE_CEPH]
         tp = self.type
         if tp in s3_type_list:
             tp = const.REPLAY_STORAGE_TYPE_S3
         return tp
 
+    def get_extra_config(self):
+        extra_config = {'TYPE': self.convert_type()}
+        if self.type == const.REPLAY_STORAGE_TYPE_SWIFT:
+            extra_config.update({'signer': 'S3SignerType'})
+        return extra_config
+
     @property
     def config(self):
         config = self.meta
-        config.update({'TYPE': self.convert_type()})
+        extra_config = self.get_extra_config()
+        config.update(extra_config)
         return config
 
     def in_defaults(self):

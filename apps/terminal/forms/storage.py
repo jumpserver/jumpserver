@@ -145,6 +145,12 @@ class ReplayStorageSwiftForm(BaseReplayStorageForm):
     swift_endpoint = forms.CharField(
         max_length=128, label=_('Endpoint'), required=False,
     )
+    swift_protocol = forms.ChoiceField(
+        choices=(
+            ('HTTP', 'http'),
+            ('HTTPS', 'https')
+        ), initial='http', label=_('Protocol'), required=True,
+    )
 
 
 class CommandStorageTypeESForm(BaseCommandStorageForm):
