@@ -1396,8 +1396,8 @@ function showCeleryTaskLog(taskId) {
 }
 
 function getUserLang(){
-    let userLangZh = document.cookie.indexOf('django_language=zh');
-    if (userLangZh !== -1){
+    let userLangZh = document.cookie.indexOf('django_language=en');
+    if (userLangZh === -1){
         return 'zh-CN'
     }
     else{
