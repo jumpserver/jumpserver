@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 11:35+0800\n"
+"POT-Creation-Date: 2020-01-13 14:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -109,7 +109,7 @@ msgstr "运行参数"
 #: applications/templates/applications/user_database_app_list.html:16
 #: applications/templates/applications/user_remote_app_list.html:16
 #: assets/forms/asset.py:20 assets/forms/domain.py:77 assets/forms/user.py:74
-#: assets/forms/user.py:94 assets/models/asset.py:144 assets/models/base.py:27
+#: assets/forms/user.py:94 assets/models/asset.py:144 assets/models/base.py:28
 #: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:20 assets/models/group.py:20
 #: assets/models/label.py:18 assets/templates/assets/_node_detail_modal.html:27
@@ -226,7 +226,7 @@ msgstr "数据库"
 #: applications/templates/applications/user_database_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:19
 #: assets/models/asset.py:149 assets/models/asset.py:225
-#: assets/models/base.py:32 assets/models/cluster.py:29
+#: assets/models/base.py:33 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
 #: assets/models/domain.py:21 assets/models/domain.py:53
 #: assets/models/group.py:23 assets/models/label.py:23
@@ -306,7 +306,7 @@ msgstr "参数"
 #: applications/models/remote_app.py:39
 #: applications/templates/applications/database_app_detail.html:72
 #: applications/templates/applications/remote_app_detail.html:68
-#: assets/models/asset.py:223 assets/models/base.py:35
+#: assets/models/asset.py:223 assets/models/base.py:36
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:59 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:63
@@ -333,7 +333,7 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42
 #: applications/templates/applications/database_app_detail.html:68
 #: applications/templates/applications/remote_app_detail.html:64
-#: assets/models/asset.py:224 assets/models/base.py:33
+#: assets/models/asset.py:224 assets/models/base.py:34
 #: assets/models/cluster.py:26 assets/models/domain.py:23
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
@@ -708,6 +708,10 @@ msgstr "远程应用详情"
 msgid "My RemoteApp"
 msgstr "我的远程应用"
 
+#: assets/api/admin_user.py:59
+msgid "Deleted failed, There are related assets"
+msgstr "删除失败，存在关联资产"
+
 #: assets/api/node.py:61
 msgid "You can't update the root node name"
 msgstr "不能修改根节点名称"
@@ -825,7 +829,7 @@ msgid "SSH gateway support proxy SSH,RDP,VNC"
 msgstr "SSH网关，支持代理SSH,RDP和VNC"
 
 #: assets/forms/domain.py:78 assets/forms/user.py:75 assets/forms/user.py:95
-#: assets/models/base.py:28 assets/models/gathered_user.py:15
+#: assets/models/base.py:29 assets/models/gathered_user.py:15
 #: assets/templates/assets/_asset_user_auth_update_modal.html:15
 #: assets/templates/assets/_asset_user_auth_view_modal.html:21
 #: assets/templates/assets/_asset_user_list.html:21
@@ -888,7 +892,7 @@ msgstr "基础平台"
 msgid "Password or private key passphrase"
 msgstr "密码或密钥密码"
 
-#: assets/forms/user.py:26 assets/models/base.py:29
+#: assets/forms/user.py:26 assets/models/base.py:30
 #: assets/serializers/asset_user.py:63
 #: assets/templates/assets/_asset_user_auth_update_modal.html:21
 #: assets/templates/assets/_asset_user_auth_view_modal.html:27
@@ -1006,6 +1010,7 @@ msgstr "主机名"
 #: assets/templates/assets/domain_gateway_list.html:65
 #: assets/templates/assets/system_user_detail.html:67
 #: assets/templates/assets/system_user_list.html:26
+#: terminal/forms/storage.py:152
 #: terminal/templates/terminal/session_list.html:29
 #: terminal/templates/terminal/session_list.html:73
 msgid "Protocol"
@@ -1110,17 +1115,17 @@ msgstr "版本"
 msgid "AuthBook"
 msgstr ""
 
-#: assets/models/base.py:30 xpack/plugins/change_auth_plan/models.py:99
+#: assets/models/base.py:31 xpack/plugins/change_auth_plan/models.py:99
 #: xpack/plugins/change_auth_plan/models.py:270
 msgid "SSH private key"
 msgstr "ssh密钥"
 
-#: assets/models/base.py:31 xpack/plugins/change_auth_plan/models.py:102
+#: assets/models/base.py:32 xpack/plugins/change_auth_plan/models.py:102
 #: xpack/plugins/change_auth_plan/models.py:266
 msgid "SSH public key"
 msgstr "ssh公钥"
 
-#: assets/models/base.py:34 assets/models/gathered_user.py:20
+#: assets/models/base.py:35 assets/models/gathered_user.py:20
 #: assets/templates/assets/cmd_filter_detail.html:68 common/mixins/models.py:52
 #: ops/models/adhoc.py:49
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:107
@@ -3117,7 +3122,7 @@ msgstr "执行历史"
 #: ops/templates/ops/adhoc_detail.html:51
 #: ops/templates/ops/command_execution_list.html:65
 #: ops/templates/ops/task_adhoc.html:57 ops/templates/ops/task_list.html:13
-#: terminal/forms/storage.py:152
+#: terminal/forms/storage.py:158
 msgid "Hosts"
 msgstr "主机"
 
@@ -3223,33 +3228,33 @@ msgstr "任务列表"
 msgid "Go"
 msgstr ""
 
-#: ops/templates/ops/command_execution_create.html:185
+#: ops/templates/ops/command_execution_create.html:179
 msgid "Selected assets"
 msgstr "已选择资产"
 
-#: ops/templates/ops/command_execution_create.html:188
+#: ops/templates/ops/command_execution_create.html:182
 msgid "In total"
 msgstr "总共"
 
-#: ops/templates/ops/command_execution_create.html:225
+#: ops/templates/ops/command_execution_create.html:219
 msgid ""
 "Select the left asset, select the running system user, execute command in "
 "batch"
 msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
 
-#: ops/templates/ops/command_execution_create.html:269
+#: ops/templates/ops/command_execution_create.html:263
 msgid "Unselected assets"
 msgstr "没有选中资产"
 
-#: ops/templates/ops/command_execution_create.html:273
+#: ops/templates/ops/command_execution_create.html:267
 msgid "No input command"
 msgstr "没有输入命令"
 
-#: ops/templates/ops/command_execution_create.html:277
+#: ops/templates/ops/command_execution_create.html:271
 msgid "No system user was selected"
 msgstr "没有选择系统用户"
 
-#: ops/templates/ops/command_execution_create.html:287
+#: ops/templates/ops/command_execution_create.html:281
 msgid "Pending"
 msgstr "等待"
 
@@ -4627,7 +4632,7 @@ msgstr ""
 msgid "Region"
 msgstr "地域"
 
-#: terminal/forms/storage.py:154
+#: terminal/forms/storage.py:160
 msgid ""
 "\n"
 "            Tips: If there are multiple hosts, separate them with a comma "
@@ -4642,11 +4647,11 @@ msgstr ""
 "            eg: http://www.jumpserver.a.com,http://www.jumpserver.b.com\n"
 "            "
 
-#: terminal/forms/storage.py:162
+#: terminal/forms/storage.py:168
 msgid "Index"
 msgstr "索引"
 
-#: terminal/forms/storage.py:165
+#: terminal/forms/storage.py:171
 msgid "Doc type"
 msgstr "文档类型"
 
@@ -6416,8 +6421,6 @@ msgid "Assets is empty, please change nodes"
 msgstr "资产为空，请更改节点"
 
 #: xpack/plugins/gathered_user/templates/gathered_user/gathered_user_list.html:224
-#, fuzzy
-#| msgid "Asset users of"
 msgid "Asset user"
 msgstr "资产用户"
 
@@ -6530,10 +6533,8 @@ msgid "Enterprise edition"
 msgstr "企业版"
 
 #: xpack/plugins/license/models.py:78
-#, fuzzy
-#| msgid "Enterprise edition"
 msgid "Ultimate edition"
-msgstr "企业版"
+msgstr "旗舰版"
 
 #: xpack/plugins/license/templates/license/_license_import_modal.html:4
 #: xpack/plugins/license/templates/license/license_detail.html:86
@@ -6653,8 +6654,6 @@ msgid "Import vault"
 msgstr "导入密码"
 
 #: xpack/plugins/vault/templates/vault/vault.html:66
-#, fuzzy
-#| msgid "Vault"
 msgid "vault"
 msgstr "密码匣子"
 
