@@ -132,13 +132,12 @@ def on_asset_nodes_add(sender, instance=None, action='', model=None, pk_set=None
     if action != "post_add":
         return
     logger.debug("Assets node add signal recv: {}".format(action))
-    queryset = model.objects.filter(pk__in=pk_set).values_list('key', flat=True)
     if model == Node:
-        nodes = queryset
-        assets = [instance]
+        nodes = model.objects.filter(pk__in=pk_set).values_list('key', flat=True)
+        assets = [instance.id]
     else:
-        nodes = [instance]
-        assets = queryset
+        nodes = [instance.key]
+        assets = model.objects.filter(pk__in=pk_set).values_list('id', flat=True)
     # 节点资产发生变化时，将资产关联到节点及祖先节点关联的系统用户, 只关注新增的
     nodes_ancestors_keys = set()
     node_tree = TreeService.new()
