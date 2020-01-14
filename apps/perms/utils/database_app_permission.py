@@ -56,7 +56,7 @@ class DatabaseAppPermissionUtil:
     def get_database_apps(self):
         database_apps = DatabaseApp.objects.filter(
             granted_by_permissions__in=self.permissions
-        )
+        ).distinct()
         return database_apps
 
     def get_database_app_system_users(self, database_app):

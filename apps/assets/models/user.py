@@ -137,7 +137,7 @@ class SystemUser(AssetUser):
 
     @property
     def is_need_cmd_filter(self):
-        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_MYSQL]
+        return self.protocol not in [self.PROTOCOL_RDP, self.PROTOCOL_VNC]
 
     @property
     def is_need_test_asset_connective(self):

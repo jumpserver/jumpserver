@@ -88,6 +88,7 @@ var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
 var password_id = '#' + '{{ form.password.id_for_label }}';
 var private_key_id = '#' + '{{ form.private_key.id_for_label }}';
 var auto_push_id = '#' + '{{ form.auto_push.id_for_label }}';
+var command_filter_block_id = '#command-filter-block';
 var sudo_id = '#' + '{{ form.sudo.id_for_label }}';
 var shell_id = '#' + '{{ form.shell.id_for_label }}';
 
@@ -101,17 +102,27 @@ function autoLoginModeProtocol() {
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').removeClass('hidden');
         $(auto_push_id).closest('.form-group').removeClass('hidden');
-        $('#command-filter-block').addClass('hidden');
+        $(command_filter_block_id).addClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (['vnc', 'mysql'].indexOf(protocol) !== -1) {
+    else if (protocol === 'vnc') {
         $('.auth-fields').removeClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').removeClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').addClass('hidden');
+        $(command_filter_block_id).addClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else if (protocol === 'mysql'){
+        $('.auth-fields').removeClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').removeClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
@@ -121,7 +132,7 @@ function autoLoginModeProtocol() {
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').removeClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').removeClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
@@ -131,7 +142,7 @@ function autoLoginModeProtocol() {
         $(private_key_id).closest('.form-group').removeClass('hidden');
         $(password_id).closest('.form-group').removeClass('hidden');
         $(auto_push_id).closest('.form-group').removeClass('hidden');
-        $('#command-filter-block').removeClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').removeClass('hidden');
         $(shell_id).closest('.form-group').removeClass('hidden');
     }
@@ -147,17 +158,27 @@ function manualLoginModeProtocol() {
         $(password_id).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').addClass('hidden');
+        $(command_filter_block_id).addClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
-    else if (['vnc', 'mysql'].indexOf(protocol) !== -1) {
+    else if (protocol === 'vnc'){
         $('.auth-fields').addClass('hidden');
         $(auto_generate_key).closest('.form-group').addClass('hidden');
         $(password_id).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').addClass('hidden');
+        $(command_filter_block_id).addClass('hidden');
+        $(sudo_id).closest('.form-group').addClass('hidden');
+        $(shell_id).closest('.form-group').addClass('hidden');
+    }
+    else if (protocol === 'mysql'){
+        $('.auth-fields').addClass('hidden');
+        $(auto_generate_key).closest('.form-group').addClass('hidden');
+        $(password_id).closest('.form-group').addClass('hidden');
+        $(private_key_id).closest('.form-group').addClass('hidden');
+        $(auto_push_id).closest('.form-group').addClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
@@ -167,7 +188,7 @@ function manualLoginModeProtocol() {
         $(password_id).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').removeClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').addClass('hidden');
         $(shell_id).closest('.form-group').addClass('hidden');
     }
@@ -177,7 +198,7 @@ function manualLoginModeProtocol() {
         $(password_id).closest('.form-group').addClass('hidden');
         $(private_key_id).closest('.form-group').addClass('hidden');
         $(auto_push_id).closest('.form-group').addClass('hidden');
-        $('#command-filter-block').removeClass('hidden');
+        $(command_filter_block_id).removeClass('hidden');
         $(sudo_id).closest('.form-group').removeClass('hidden');
         $(shell_id).closest('.form-group').removeClass('hidden');
     }

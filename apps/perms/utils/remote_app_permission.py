@@ -9,7 +9,6 @@ from orgs.utils import set_to_root_org
 from ..models import RemoteAppPermission
 from ..hands import RemoteApp, SystemUser
 
-
 __all__ = [
     'RemoteAppPermissionUtil',
     'construct_remote_apps_tree_root',
@@ -56,7 +55,7 @@ class RemoteAppPermissionUtil:
     def get_remote_apps(self):
         remote_apps = RemoteApp.objects.filter(
             granted_by_permissions__in=self.permissions
-        )
+        ).distinct()
         return remote_apps
 
     def get_remote_app_system_users(self, remote_app):

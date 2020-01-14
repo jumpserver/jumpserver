@@ -1,1 +1,2 @@
-tiff-dev jpeg-dev zlib-dev freetype-dev lcms-dev libwebp-dev tcl-dev tk-dev python3-dev libressl-dev openldap-dev cyrus-sasl-dev krb5-dev sshpass postgresql-dev mariadb-dev sqlite-dev libffi-dev openssh-client gcc libc-dev linux-headers make autoconf
+gcc make python3-dev python3 libffi-dev mariadb-dev libc-dev libffi-dev krb5-dev openldap-dev jpeg-dev linux-headers sshpass openssh-client
+
