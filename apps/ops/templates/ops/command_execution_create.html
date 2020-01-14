@@ -86,7 +86,7 @@
                             <div class="col-sm-2">
                                 <select class="select2 form-control" id="system-users-select">
                                     {% for s in system_users %}
-                                        <option value="{{ s.id }}" {% if s.protocol != 'ssh' or s.login_mode != 'auto' %}disabled{% endif %}>{{ s }}</option>
+                                        <option value="{{ s.id }}" {% if s.login_mode == 'manual' or s.protocol in 'mysql|telnet|vnc'%}disabled{% endif %}>{{ s }}</option>
                                     {% endfor %}
                                 </select>
                                 <button type="button" class="btn btn-primary btn-execute" style="margin-top: 30px; width: 100%">
