@@ -41,17 +41,21 @@
                                  </div>
                             {% endif %}
                             {% csrf_token %}
+
                             <h3>{% trans 'Basic' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
+
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'User' %}</h3>
                             {% bootstrap_field form.users layout="horizontal" %}
                             {% bootstrap_field form.user_groups layout="horizontal" %}
+
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Asset' %}</h3>
                             {% bootstrap_field form.assets layout="horizontal" %}
                             {% bootstrap_field form.nodes layout="horizontal" %}
                             {% bootstrap_field form.system_users layout="horizontal" %}
+
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Action' %}</h3>
                             <div class="form-group required">
@@ -139,33 +143,20 @@
 <script>
 var api_action =  "{{ api_action }}";
 
-var actionAllID = "id_actions_0";
-var actionUploadID = "id_actions_2";
-var actionDownloadID = "id_actions_3";
-var actionUpDownloadID = "id_actions_4";
-
-var actionAllElement = document.getElementById(actionAllID);
-var actionAllChildElement = $('input[name=actions]:gt(0)');
-var actionUploadElement = document.getElementById(actionUploadID);
-var actionDownloadElement = document.getElementById(actionDownloadID);
-var actionUpDownloadElement = document.getElementById(actionUpDownloadID);
-var actionUpDownloadChildElement = [actionUploadElement,actionDownloadElement];
-
-function SelectAllOrDeselectAll (flag, ele){
-    for (var i = 0; i < ele.length; i++){
-        ele[i].checked = flag
-    }
-}
-
-function ChangeActionAllCheck(){
-    var flag = true;
-    for(var i = 0; i < actionAllChildElement.length; i++){
-        if(actionAllChildElement[i].checked === false){
-            flag = false
-        }
-    }
-    actionAllElement.checked = flag;
-}
+var idActionAll = "id_actions_0";
+var idActionConnect = "id_actions_1";
+var idActionUpload = "id_actions_2";
+var idActionDownload = "id_actions_3";
+var idActionUpDownload = "id_actions_4";
+var elementActionAll = document.getElementById(idActionAll);
+var elementActionConnect = document.getElementById(idActionConnect);
+var elementActionUpload = document.getElementById(idActionUpload);
+var elementActionDownload = document.getElementById(idActionDownload);
+var elementActionUpDownload = document.getElementById(idActionUpDownload);
+var elementActionUpDownloadChildren = [elementActionUpload, elementActionDownload];
+var elementActionAllChildren = [
+    elementActionConnect, elementActionUpload, elementActionDownload, elementActionUpDownload
+];
 
 $(document).ready(function () {
     $('.select2').select2({
@@ -177,6 +168,27 @@ $(document).ready(function () {
     initDateRangePicker('#date_start');
     initDateRangePicker('#date_expired');
     initAssetTreeModel('#id_assets');
+}).on("change", "input[name=actions]", function (e) {
+    let idAction = e.target.getAttribute("id");
+    if (idAction === idActionAll){
+        $.each(elementActionAllChildren, function(i, elementAction){
+            elementAction.checked = elementActionAll.checked
+        });
+        return;
+    }
+    else if (idAction === idActionUpDownload){
+        $.each(elementActionUpDownloadChildren, function(i, elementAction){
+            elementAction.checked = elementActionUpDownload.checked
+        });
+    }
+    else if ([idActionUpload, idActionDownload].indexOf(idAction) !== -1){
+        elementActionUpDownload.checked = elementActionUpload.checked && elementActionDownload.checked
+    }
+    let checked = true;
+    $.each(elementActionAllChildren, function(i, elementAction){
+        checked &= elementAction.checked;
+    });
+    elementActionAll.checked = checked;
 })
 .on("submit", "form", function (evt) {
     evt.preventDefault();
@@ -200,23 +212,6 @@ $(document).ready(function () {
         redirect_to: redirect_to
     };
     formSubmit(props);
- }).on("change","input[name=actions]", function (e) {
-    var current_ele = e.target || e.srcElement;
-    var current_ele_id = current_ele.getAttribute("id");
-
-    if (current_ele_id === actionAllID){
-        SelectAllOrDeselectAll(actionAllElement.checked, actionAllChildElement);
-    }else{
-        if(current_ele_id === actionUpDownloadID){
-            SelectAllOrDeselectAll(actionUpDownloadElement.checked, actionUpDownloadChildElement)
-        }
-        if([actionUploadID, actionDownloadID].indexOf(current_ele_id) != -1){
-            var actionUpDownloadCheck = actionUploadElement.checked && actionDownloadElement.checked;
-            actionUpDownloadElement.checked = actionUpDownloadCheck
-
-        }
-        ChangeActionAllCheck()
-    }
 })
 </script>
 {% endblock %}
