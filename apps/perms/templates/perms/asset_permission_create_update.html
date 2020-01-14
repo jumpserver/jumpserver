@@ -5,11 +5,14 @@
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
-        ul{
+        .ul-padding-0 {
+            padding-inline-start: 0px
+        }
+        .ul-padding-20 {
             padding-inline-start: 20px
         }
         ul li{
-            list-style-type:none;
+            list-style-type: none;
         }
     </style>
 {% endblock %}
@@ -59,20 +62,20 @@
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Action' %}</h3>
                             <div class="form-group required">
-                                <label class="col-md-2 control-label">动作</label>
+                                <label class="col-md-2 control-label">{% trans 'Action' %}</label>
                                 <div class="col-md-9">
                                     <div id="id_actions">
-                                        <ul>
+                                        <ul class="ul-padding-0">
                                             <li>
                                                 <div class="checkbox">{{ form.actions.0}}</div>
-                                                <ul>
+                                                <ul class="ul-padding-20">
                                                     <li>
                                                         <div class="checkbox">{{ form.actions.1}}</div>
                                                     </li>
 
                                                     <li>
                                                         <div class="checkbox">{{ form.actions.4}}</div>
-                                                        <ul>
+                                                        <ul class="ul-padding-20">
                                                             <li>
                                                                 <div class="checkbox">{{ form.actions.2}}</div>
                                                             </li>
@@ -85,7 +88,7 @@
 
                                             </li>
                                         </ul>
-                                        <div class="help-block">提示：RDP 协议不支持单独控制上传或下载文件</div>
+                                        <div class="help-block">{% trans 'Tips: The RDP protocol does not support separate controls for uploading or downloading files' %}</div>
                                     </div>
                                 </div>
                             </div>
