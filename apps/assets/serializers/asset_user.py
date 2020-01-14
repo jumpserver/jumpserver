@@ -13,9 +13,8 @@ from .base import ConnectivitySerializer, AuthSerializerMixin
 
 
 __all__ = [
-    'AssetUserWriteSerializer',
-    'AssetUserReadSerializer', 'AssetUserAuthInfoSerializer',
-    'AssetUserExportSerializer', 'AssetUserPushSerializer',
+    'AssetUserWriteSerializer', 'AssetUserReadSerializer',
+    'AssetUserAuthInfoSerializer', 'AssetUserPushSerializer',
 ]
 
 
@@ -33,6 +32,13 @@ class AssetUserWriteSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializ
             'private_key': {'write_only': True},
             'public_key': {'write_only': True},
         }
+
+    def create(self, validated_data):
+        if not validated_data.get("name") and validated_data.get("username"):
+            validated_data["name"] = validated_data["username"]
+        instance = AssetUserManager.create(**validated_data)
+        instance.set_to_latest()
+        return instance
 
 
 class AssetUserReadSerializer(AssetUserWriteSerializer):
@@ -59,15 +65,8 @@ class AssetUserReadSerializer(AssetUserWriteSerializer):
             'public_key': {'write_only': True},
         }
 
-    def create(self, validated_data):
-        if not validated_data.get("name") and validated_data.get("username"):
-            validated_data["name"] = validated_data["username"]
-        instance = AssetUserManager.create(**validated_data)
-        instance.set_to_latest()
-        return instance
 
-
-class AssetUserExportSerializer(AssetUserReadSerializer):
+class AssetUserAuthInfoSerializer(AssetUserReadSerializer):
     password = serializers.CharField(
         max_length=256, allow_blank=True, allow_null=True,
         required=False, label=_('Password')
@@ -80,12 +79,6 @@ class AssetUserExportSerializer(AssetUserReadSerializer):
         max_length=4096, allow_blank=True, allow_null=True,
         required=False, label=_('Private key')
     )
-
-
-class AssetUserAuthInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AuthBook
-        fields = ['password', 'private_key', 'public_key']
 
 
 class AssetUserPushSerializer(serializers.Serializer):

@@ -38,11 +38,11 @@
 <script src="{% static "js/plugins/clipboard/clipboard.min.js" %}"></script>
 <script>
 var showPassword = false;
-
-var authAssetId = "";
 var authHostname = "";
 var authUsername = "";
 var mfaFor = "";
+var authUid = "";
+var authInfoDetailUrl = "{% url "api-assets:asset-user-auth-info-detail" pk=DEFAULT_PK %}";
 
 function initClipboard() {
     var clipboard = new Clipboard('.btn-copy-password', {
@@ -56,12 +56,10 @@ function initClipboard() {
 }
 
 function showAuth() {
-    var url = "{% url "api-assets:asset-user-auth-info" %}?asset_id=" + authAssetId + "&username=" + authUsername;
-    if (prefer) {
-        url = setUrlParam(url, 'prefer', prefer)
-    }
+    var url = authInfoDetailUrl.replace("{{ DEFAULT_PK }}", authUid);
     $("#id_username_view").html(authUsername);
     $("#id_hostname_view").html(authHostname);
+    $("#id_password_view").val('');
     var success = function (data) {
         var password = data.password;
         $("#id_password_view").val(password);
@@ -89,7 +87,13 @@ $(document).ready(function () {
         $("#id_password_view").attr("type", "password")
     }
 }).on("show.bs.modal", "#asset_user_auth_view", function () {
+    showPassword = false;
+    $("#id_password_view").attr("type", "password");
     showAuth();
+}).on("hide.bs.modal", "#asset_user_auth_view", function () {
+    $("#id_username_view").html('');
+    $("#id_hostname_view").html('');
+    $("#id_password_view").val('');
 })
 </script>
 {% endblock %}

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-from itertools import islice, chain, groupby
+from itertools import chain, groupby
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 from orgs.utils import current_org
-from common.utils import get_logger
+from common.utils import get_logger, lazyproperty
+from common.struct import QuerySetChain
 
 from ..models import AssetUser, AuthBook
 from .db import (
@@ -22,27 +23,45 @@ class NotSupportError(Exception):
 class AssetUserQueryset:
     def __init__(self, backends=()):
         self.backends = backends
-        self._queryset = None
+        self._distinct_queryset = None
 
-    def filter(self, hostname=None, ip=None, username=None, assets=None,
-               asset=None, node=None, prefer_id=None, prefer=None, id__in=None):
+    def backends_queryset(self):
+        return [b.get_queryset() for b in self.backends]
+
+    @lazyproperty
+    def backends_counts(self):
+        print("Call backend count")
+        return [b.count() for b in self.backends]
+
+    def filter(self, hostname=None, ip=None, username=None,
+               assets=None, asset=None, node=None,
+               id=None, prefer_id=None, prefer=None, id__in=None):
         if not assets and asset:
             assets = [asset]
 
         kwargs = dict(
             hostname=hostname, ip=ip, username=username,
             assets=assets, node=node, prefer=prefer, prefer_id=prefer_id,
-            id__in=id__in,
+            id__in=id__in, union_id=id,
         )
         logger.debug("Filter: {}".format(kwargs))
+        backends = []
         for backend in self.backends:
-            backend.filter(**kwargs)
-        return self
+            clone = backend.filter(**kwargs)
+            backends.append(clone)
+        return self._clone(backends)
+
+    def _clone(self, backends=None):
+        if backends is None:
+            backends = self.backends
+        return self.__class__(backends)
 
     def search(self, item):
+        backends = []
         for backend in self.backends:
-            backend.search(item)
-        return self
+            new = backend.search(item)
+            backends.append(new)
+        return self._clone(backends)
 
     def distinct(self):
         logger.debug("Chain it")
@@ -57,15 +76,16 @@ class AssetUserQueryset:
         results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
         logger.debug("Get the first")
         final = [next(result[1]) for result in results]
+        self._distinct_queryset = final
         logger.debug("End")
-        self._queryset = final
+        return self
 
     def get(self, **kwargs):
-        self.filter(**kwargs)
-        count = self.count()
+        queryset = list(self.filter(**kwargs))
+        count = len(queryset)
         if count == 1:
-            data = self.queryset[0]
-            return self.to_asset_user(data)
+            data = queryset[0]
+            return data
         elif count > 1:
             msg = '{} get'.format(count)
             raise MultipleObjectsReturned(msg)
@@ -82,20 +102,25 @@ class AssetUserQueryset:
 
     @property
     def queryset(self):
-        if self._queryset is None:
-            self.distinct()
-        return self._queryset
+        if self._distinct_queryset is not None:
+            return self._distinct_queryset
+        return QuerySetChain(self.backends_queryset())
 
     def count(self):
-        return len(self.queryset)
+        if self._distinct_queryset is not None:
+            return len(self._distinct_queryset)
+        else:
+            return sum(self.backends_counts)
 
     def __getitem__(self, ndx):
-        if type(ndx) is slice:
-            items = islice(self.queryset, ndx.start, ndx.stop, ndx.step or 1)
-            return [self.to_asset_user(d) for d in items]
-        else:
-            item = self.queryset[ndx]
-            return self.to_asset_user(item)
+        return self.queryset.__getitem__(ndx)
+
+    def __iter__(self):
+        self._data = iter(self.queryset)
+        return self
+
+    def __next__(self):
+        return next(self._data)
 
 
 class AssetUserManager:

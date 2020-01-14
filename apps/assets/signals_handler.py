@@ -118,9 +118,7 @@ def on_system_user_groups_change(sender, instance=None, action=None, model=None,
     """
     当系统用户和用户组关系发生变化时，应该将组下用户关联到新的系统用户上
     """
-    if action != "post_add":
-        return
-    if reverse:
+    if action != "post_add" or reverse:
         return
     logger.info("System user groups update signal recv: {}".format(instance))
     groups = model.objects.filter(pk__in=pk_set).annotate(users_count=Count("users"))

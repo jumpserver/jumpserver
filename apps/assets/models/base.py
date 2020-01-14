@@ -160,12 +160,14 @@ class AuthMixin:
             queryset = queryset.filter(asset=asset)
         return queryset.exists()
 
-    def get_asset_user(self, asset):
+    def get_asset_user(self, asset, username=None):
         from ..backends import AssetUserManager
+        if username is None:
+            username = self.username
         try:
             manager = AssetUserManager()
             other = manager.get(
-                username=self.username, asset=asset,
+                username=username, asset=asset,
                 prefer_id=self.id, prefer=self._prefer,
             )
             return other
@@ -173,11 +175,11 @@ class AuthMixin:
             logger.error(e, exc_info=True)
             return None
 
-    def load_asset_special_auth(self, asset=None):
+    def load_asset_special_auth(self, asset=None, username=None):
         if not asset:
             return self
 
-        instance = self.get_asset_user(asset)
+        instance = self.get_asset_user(asset, username=username)
         if instance:
             self._merge_auth(instance)
 
@@ -240,6 +242,9 @@ class BaseUser(OrgModelMixin, AuthMixin, ConnectivityMixin):
     def get_related_assets(self):
         assets = self.assets.filter(org_id=self.org_id)
         return assets
+
+    def get_username(self):
+        return self.username
 
     @lazyproperty
     def assets_amount(self):

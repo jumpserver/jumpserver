@@ -29,20 +29,24 @@
   </tbody>
 </table>
 {% include 'assets/_asset_user_auth_update_modal.html' %}
-{#{% include 'assets/_asset_user_auth_view_modal.html' %}#}
+{% include 'assets/_asset_user_auth_view_modal.html' %}
 {% include 'authentication/_mfa_confirm_modal.html' %}
 
 <script>
-var assetUserListUrl = "{% url "api-assets:asset-user-list" %}";
+var defaultAssetUserListUrl = "{% url "api-assets:asset-user-list" %}";
 var assetUserTable;
-var needPush = false;
-var prefer = null;
+var defaultNeedPush = false;
 var lastMFATime = "{{ request.session.MFA_VERIFY_TIME }}";
 var testDatetime = "{% trans 'Test datetime: ' %}";
 var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 var mfaNeedCheck = "{{ SECURITY_VIEW_AUTH_NEED_MFA }}" === "True";
 
-function initAssetUserTable() {
+function initAssetUserTable(option) {
+    if (!option) {
+        option = {}
+    }
+    var assetUserListUrl = option.assetUserListUrl || defaultAssetUserListUrl;
+    var needPush = option.needPush === undefined ? defaultNeedPush : option.needPush;
     var options = {
         ele: $('#asset_user_list_table'),
         toggle: true,
@@ -55,7 +59,7 @@ function initAssetUserTable() {
             },
             {
                 targets: 6, createdCell: function (td, cellData, rowData) {
-                    var view_btn = '<button class="btn btn-xs btn-primary m-l-xs btn-view-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans "View" %}</button>'
+                    var view_btn = '<button class="btn btn-xs btn-primary m-l-xs btn-view-auth" data-user="username123" data-hostname="hostname123" data-uid="uid123" data-asset="asset123">{% trans "View" %}</button>';
                     var update_btn = '<li><a class="btn-update-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Update' %}</a></li>';
                     var test_btn = '<li><a class="btn-test-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Test' %}</a></li>';
                     var push_btn = '<li><a class="btn-push-auth" data-user="username123" data-hostname="hostname123" data-asset="asset123">{% trans 'Push' %}</a></li>';
@@ -72,6 +76,7 @@ function initAssetUserTable() {
                         '           </div>';
                         actions = actions.replaceAll("username123", rowData.username)
                                          .replaceAll("hostname123", rowData.hostname)
+                                         .replaceAll("uid123", rowData.id)
                                          .replaceAll("asset123", rowData.asset);
 				    $(td).html(actions);
                 },
@@ -93,9 +98,11 @@ function initAssetUserTable() {
 $(document).ready(function(){
 })
 .on('click', '.btn-view-auth', function () {
-    authAssetId = $(this).data("asset") ;
+    // 通知给view auth modal
+    authAssetId = $(this).data("asset");
     authHostname = $(this).data("hostname");
     authUsername = $(this).data('user');
+    authUid = $(this).data("uid");
     if (!mfaNeedCheck){
         $("#asset_user_auth_view").modal('show');
         return
@@ -124,16 +131,16 @@ $(document).ready(function(){
 .on("click", '.btn-test-auth', function () {
     authUsername = $(this).data("user") ;
     authAssetId = $(this).data("asset");
-    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id=" + authAssetId + "&username=" + authUsername;
-    if (prefer) {
-        the_url = setUrlParam(the_url, "prefer", prefer)
+    var theUrl = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id=" + authAssetId + "&username=" + authUsername;
+    if (authPrefer) {
+        theUrl = setUrlParam(theUrl, "prefer", authPrefer)
     }
     var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
+        var taskId = data.task;
+        showCeleryTaskLog(taskId);
     };
     requestApi({
-        url: the_url,
+        url: theUrl,
         method: 'GET',
         success: success,
         flash_message: false

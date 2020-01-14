@@ -197,9 +197,12 @@ function initNodeTable() {
 $(document).ready(function () {
 	$('.select2').select2();
     nodesSelect2Init(".nodes-select2");
-	assetUserListUrl = setUrlParam(assetUserListUrl, "system_user_id", "{{ system_user.id }}");
-    needPush = true;
-    initAssetUserTable();
+	var assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "prefer_id", "{{ system_user.id }}");
+	assetUserListUrl = setUrlParam(assetUserListUrl, "prefer", "system_user");
+    initAssetUserTable({
+        assetUserListUrl: assetUserListUrl,
+        needPush: true
+    });
     initNodeTable();
 })
 .on('click', '.btn-remove-from-node', function() {

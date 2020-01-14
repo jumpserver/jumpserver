@@ -1,29 +1,18 @@
 # ~*~ coding: utf-8 ~*~
-# Copyright (C) 2014-2018 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
-#
-# Licensed under the GNU General Public License v2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.gnu.org/licenses/gpl-2.0.html
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from django.db.models import Count
 
 from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
+from orgs.utils import tmp_to_root_org
 from ..models import SystemUser, Asset
+from ..backends import AssetUserManager
 from .. import serializers
+from ..serializers.base import AuthInfoSerializer
 from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
     push_system_user_a_asset_manual, test_system_user_connectivity_a_asset,
@@ -57,7 +46,7 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     model = SystemUser
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = serializers.SystemUserAuthSerializer
+    serializer_class = AuthInfoSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -70,15 +59,23 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     Get system user with asset auth info
     """
     model = SystemUser
-    permission_classes = (IsAppUser,)
-    serializer_class = serializers.SystemUserAuthSerializer
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = AuthInfoSerializer
 
     def get_object(self):
         instance = super().get_object()
-        aid = self.kwargs.get('aid')
-        asset = get_object_or_404(Asset, pk=aid)
-        instance.load_asset_special_auth(asset)
-        return instance
+        username = self.request.query_params.get("username")
+        if not username:
+            username = instance.username
+        asset_id = self.kwargs.get('aid')
+        with tmp_to_root_org():
+            asset = get_object_or_404(Asset, pk=asset_id)
+            manager = AssetUserManager()
+            try:
+                auth_info = manager.get(asset=asset, username=username)
+                return auth_info
+            except:
+                raise Http404
 
 
 class SystemUserPushApi(generics.RetrieveAPIView):

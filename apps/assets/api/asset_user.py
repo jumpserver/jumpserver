@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-
-from django.http import Http404
 from django.conf import settings
+from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import generics, filters
 from rest_framework_bulk import BulkModelViewSet
@@ -17,8 +16,8 @@ from ..tasks import test_asset_users_connectivity_manual
 
 
 __all__ = [
-    'AssetUserViewSet', 'AssetUserAuthInfoApi', 'AssetUserTestConnectiveApi',
-    'AssetUserExportViewSet',
+    'AssetUserViewSet', 'AssetUserTestConnectiveApi',
+    'AssetUserAuthInfoViewSet',
 ]
 
 
@@ -38,8 +37,6 @@ class AssetUserFilterBackend(filters.BaseFilterBackend):
                 continue
             elif field == "asset_id":
                 field = "asset"
-            elif field in ["system_user_id", "admin_user_id"]:
-                field = "prefer_id"
             kwargs[field] = value
         if kwargs:
             queryset = queryset.filter(**kwargs)
@@ -65,9 +62,9 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     permission_classes = [IsOrgAdminOrAppUser]
     http_method_names = ['get', 'post']
     filter_fields = [
-        "ip", "hostname", "username",
+        "id", "ip", "hostname", "username",
         "asset_id", "node_id",
-        "system_user_id", "admin_user_id"
+        "prefer", "prefer_id",
     ]
     search_fields = ["ip", "hostname", "username"]
     filter_backends = [
@@ -77,14 +74,26 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     def allow_bulk_destroy(self, qs, filtered):
         return False
 
+    def get_object(self):
+        pk = self.kwargs.get("pk")
+        queryset = self.get_queryset()
+        try:
+            obj = queryset.get(id=pk)
+            return obj
+        except Exception:
+            raise Http404()
+
+    def perform_destroy(self, instance):
+        pass
+
     def get_queryset(self):
         manager = AssetUserManager()
         queryset = manager.all()
         return queryset
 
 
-class AssetUserExportViewSet(AssetUserViewSet):
-    serializer_classes = {"default": serializers.AssetUserExportSerializer}
+class AssetUserAuthInfoViewSet(AssetUserViewSet):
+    serializer_classes = {"default": serializers.AssetUserAuthInfoSerializer}
     http_method_names = ['get']
     permission_classes = [IsOrgAdminOrAppUser]
 
@@ -92,31 +101,6 @@ class AssetUserExportViewSet(AssetUserViewSet):
         if settings.SECURITY_VIEW_AUTH_NEED_MFA:
             self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
         return super().get_permissions()
-
-
-class AssetUserAuthInfoApi(generics.RetrieveAPIView):
-    serializer_class = serializers.AssetUserAuthInfoSerializer
-    permission_classes = [IsOrgAdminOrAppUser]
-
-    def get_permissions(self):
-        if settings.SECURITY_VIEW_AUTH_NEED_MFA:
-            self.permission_classes = [IsOrgAdminOrAppUser, NeedMFAVerify]
-        return super().get_permissions()
-
-    def get_object(self):
-        query_params = self.request.query_params
-        username = query_params.get('username')
-        asset_id = query_params.get('asset_id')
-        prefer_id = query_params.get("prefer_id")
-        asset = get_object_or_none(Asset, pk=asset_id)
-        try:
-            manger = AssetUserManager()
-            instance = manger.get_object(username=username, asset=asset, prefer_id=prefer_id)
-        except Exception as e:
-            print("Error: ", e)
-            raise Http404("Not found")
-        else:
-            return instance
 
 
 class AssetUserTestConnectiveApi(generics.RetrieveAPIView):

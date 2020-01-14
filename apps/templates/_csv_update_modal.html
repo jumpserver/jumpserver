@@ -6,7 +6,7 @@
 {% block modal_title%}<span class="csv_object_type">csv</span> {% trans 'Update' %}{% endblock %}
 
 {% block modal_body %}
-    <form method="post" id="fm_import">
+    <form method="post" id="fm_update">
         {% csrf_token %}
         <div class="form-group">
             <label class="control-label">{% trans "Download the update template or use the exported CSV file format" %}</label>

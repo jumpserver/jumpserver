@@ -130,7 +130,7 @@ def org_aware_func(org_arg_name):
                 print("Error: {} not has org_id attr".format(org_aware_resource))
                 return func(*args, **kwargs)
             with tmp_to_org(org_aware_resource.org_id):
-                print("Current org id: {}".format(org_aware_resource.org_id))
+                # print("Current org id: {}".format(org_aware_resource.org_id))
                 return func(*args, **kwargs)
         return wrapper
     return decorate

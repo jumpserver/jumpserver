@@ -21,7 +21,7 @@ router.register(r'domains', api.DomainViewSet, 'domain')
 router.register(r'gateways', api.GatewayViewSet, 'gateway')
 router.register(r'cmd-filters', api.CommandFilterViewSet, 'cmd-filter')
 router.register(r'asset-users', api.AssetUserViewSet, 'asset-user')
-router.register(r'asset-users-info', api.AssetUserExportViewSet, 'asset-user-info')
+router.register(r'asset-user-auth-infos', api.AssetUserAuthInfoViewSet, 'asset-user-auth-info')
 router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
@@ -41,11 +41,8 @@ urlpatterns = [
     path('assets/<uuid:pk>/platform/',
          api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
-    path('asset-users/auth-info/',
-         api.AssetUserAuthInfoApi.as_view(), name='asset-user-auth-info'),
     path('asset-users/test-connective/',
          api.AssetUserTestConnectiveApi.as_view(), name='asset-user-connective'),
-
 
     path('admin-users/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),

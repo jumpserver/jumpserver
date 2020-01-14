@@ -122,6 +122,12 @@ class SystemUser(BaseUser):
     def __str__(self):
         return '{0.name}({0.username})'.format(self)
 
+    def get_username(self):
+        if self.username_same_with_user:
+            return list(self.users.values_list('username', flat=True))
+        else:
+            return self.username
+
     @property
     def nodes_amount(self):
         return self.nodes.all().count()

@@ -34,6 +34,7 @@
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.login_mode layout="horizontal" %}
                             {% bootstrap_field form.username layout="horizontal" %}
+                            {% bootstrap_field form.username_same_with_user layout="horizontal" %}
                             {% bootstrap_field form.priority layout="horizontal" %}
                             {% bootstrap_field form.protocol layout="horizontal" %}
 
@@ -205,6 +206,10 @@ $(document).ready(function () {
     $('.select2').select2();
     authFieldsDisplay();
     fieldDisplay();
+    var checked = $("#id_username_same_with_user").prop('checked');
+    if (checked) {
+        $("#id_username").attr("disabled", true)
+    }
 })
 .on('change', auto_generate_key, function(){
     authFieldsDisplay();
@@ -240,6 +245,14 @@ $(document).ready(function () {
     readFile($(this)).on("onload", function (evt, data) {
          $(this).data("file", data)
     })
+}).on("change", '#id_username_same_with_user', function () {
+    var checked = $(this).prop('checked');
+    var usernameRef = $("#id_username");
+    if (checked) {
+        usernameRef.attr("disabled", true)
+    } else {
+        usernameRef.attr("disabled", false)
+    }
 })
 
 </script>
