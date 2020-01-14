@@ -62,7 +62,7 @@
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Action' %}</h3>
                             <div class="form-group required">
-                                <label class="col-md-2 control-label">{% trans 'Action' %}</label>
+                                <label class="col-md-2 control-label">{{ form.actions.label }}</label>
                                 <div class="col-md-9">
                                     <div id="id_actions">
                                         <ul class="ul-padding-0">
@@ -88,7 +88,7 @@
 
                                             </li>
                                         </ul>
-                                        <div class="help-block">{% trans 'Tips: The RDP protocol does not support separate controls for uploading or downloading files' %}</div>
+                                        <div class="help-block">{{ form.actions.help_text }}</div>
                                     </div>
                                 </div>
                             </div>
