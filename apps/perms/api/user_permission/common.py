@@ -84,6 +84,8 @@ class ValidateUserAssetPermissionApi(UserAssetPermissionMixin, APIView):
         system_users_actions = self.util.get_asset_system_users_with_actions(
             asset)
         actions = system_users_actions.get(system_user)
+        if actions is None:
+            return Response({'msg': False}, status=403)
         if action_name in Action.value_to_choices(actions):
             return Response({'msg': True}, status=200)
         return Response({'msg': False}, status=403)
