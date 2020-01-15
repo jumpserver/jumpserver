@@ -138,10 +138,10 @@
                 }
             },
             callback: {
-                onCheck: onCheck
+                onCheck: onCheck,
+                onClick: onClick,
             }
         };
-
 
         $.get(url, function (data, status) {
             $.fn.zTree.init($("#assetTree"), setting, data);
@@ -152,25 +152,29 @@
             });
         });
     }
-
+    function onClick(event, treeId, treeNode, clickFlag){
+        if (treeNode.meta.type === 'asset'){
+            let protocolsStr = treeNode.meta.asset.protocols + '';
+            if (protocolsStr.indexOf('ssh/') === -1){
+                toastr.warning("{% trans "Asset configuration does not include the SSH protocol" %}");
+            }
+        }
+    }
     function getSelectedAssetsNode() {
         var nodes = zTree.getCheckedNodes(true);
         var assetsNodeId = [];
         var assetsNode = [];
         nodes.forEach(function (node) {
             if (node.meta.type === 'asset' && !node.isHidden) {
-                var protocols = node.meta.asset.protocols;
-                protocols.forEach(function (val) {
-                    if (assetsNodeId.indexOf(node.id) === -1 && val.indexOf("ssh") > -1) {
-                        assetsNodeId.push(node.id);
-                        assetsNode.push(node)
-                    }
-                });
+                var protocolsStr = node.meta.asset.protocols + '';
+                if (assetsNodeId.indexOf(node.id) === -1 && protocolsStr.indexOf('ssh') > -1){
+                    assetsNodeId.push(node.id);
+                    assetsNode.push(node)
+                }
             }
         });
         return assetsNode;
     }
-
     function onCheck(e, treeId, treeNode) {
         var nodes = getSelectedAssetsNode();
         var nodes_names = nodes.map(function (node) {
