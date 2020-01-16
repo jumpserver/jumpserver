@@ -15,7 +15,7 @@ def jumpserver_processor(request):
         'FAVICON_URL': static('img/facio.ico'),
         'JMS_TITLE': 'Jumpserver',
         'VERSION': settings.VERSION,
-        'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2019',
+        'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2020',
         'SECURITY_COMMAND_EXECUTION': settings.SECURITY_COMMAND_EXECUTION,
         'SECURITY_MFA_VERIFY_TTL': settings.SECURITY_MFA_VERIFY_TTL,
         'FORCE_SCRIPT_NAME': settings.FORCE_SCRIPT_NAME,
