@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-14 16:52+0800\n"
+"POT-Creation-Date: 2020-01-15 12:40+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -3222,33 +3222,37 @@ msgstr "任务列表"
 msgid "Go"
 msgstr ""
 
-#: ops/templates/ops/command_execution_create.html:179
+#: ops/templates/ops/command_execution_create.html:159
+msgid "Asset configuration does not include the SSH protocol"
+msgstr "资产配置不包含 SSH 协议"
+
+#: ops/templates/ops/command_execution_create.html:183
 msgid "Selected assets"
 msgstr "已选择资产"
 
-#: ops/templates/ops/command_execution_create.html:182
+#: ops/templates/ops/command_execution_create.html:186
 msgid "In total"
 msgstr "总共"
 
-#: ops/templates/ops/command_execution_create.html:219
+#: ops/templates/ops/command_execution_create.html:223
 msgid ""
 "Select the left asset, select the running system user, execute command in "
 "batch"
 msgstr "选择左侧资产, 选择运行的系统用户，批量执行命令"
 
-#: ops/templates/ops/command_execution_create.html:263
+#: ops/templates/ops/command_execution_create.html:267
 msgid "Unselected assets"
 msgstr "没有选中资产"
 
-#: ops/templates/ops/command_execution_create.html:267
+#: ops/templates/ops/command_execution_create.html:271
 msgid "No input command"
 msgstr "没有输入命令"
 
-#: ops/templates/ops/command_execution_create.html:271
+#: ops/templates/ops/command_execution_create.html:275
 msgid "No system user was selected"
 msgstr "没有选择系统用户"
 
-#: ops/templates/ops/command_execution_create.html:281
+#: ops/templates/ops/command_execution_create.html:285
 msgid "Pending"
 msgstr "等待"
 
