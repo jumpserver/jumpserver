@@ -2,6 +2,7 @@
 #
 
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 
 from common.tree import TreeNode
 from orgs.utils import set_to_root_org
@@ -72,7 +73,7 @@ class RemoteAppPermissionUtil:
 def construct_remote_apps_tree_root():
     tree_root = {
         'id': 'ID_REMOTE_APP_ROOT',
-        'name': 'RemoteApp',
+        'name': _('RemoteApp'),
         'title': 'RemoteApp',
         'pId': '',
         'open': False,
