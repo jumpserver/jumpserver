@@ -2,6 +2,7 @@
 #
 
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 from orgs.utils import set_to_root_org
 
 from ..models import DatabaseAppPermission
@@ -15,7 +16,6 @@ __all__ = [
     'construct_database_apps_tree_root',
     'parse_database_app_to_tree_node'
 ]
-
 
 def get_user_database_app_permissions(user, include_group=True):
     if include_group:
@@ -73,7 +73,7 @@ class DatabaseAppPermissionUtil:
 def construct_database_apps_tree_root():
     tree_root = {
         'id': 'ID_DATABASE_APP_ROOT',
-        'name': 'DatabaseApp',
+        'name': _('DatabaseApp'),
         'title': 'DatabaseApp',
         'pId': '',
         'open': False,

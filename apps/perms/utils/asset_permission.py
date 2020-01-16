@@ -481,6 +481,7 @@ class ParserNode:
             'isParent': False,
             'open': False,
             'iconSkin': icon_skin,
+            'nocheck': not asset.has_protocol('ssh'),
             'meta': {
                 'type': 'asset',
                 'asset': {
