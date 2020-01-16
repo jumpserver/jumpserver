@@ -73,8 +73,8 @@
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
-    assetUserListUrl = setUrlParam(assetUserListUrl, "asset_id", "{{ asset.id }}");
-    initAssetUserTable()
+    assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "asset_id", "{{ asset.id }}");
+    initAssetUserTable({assetUserListUrl: assetUserListUrl})
 })
 
 .on('click', '#btn-bulk-test-connective', function () {

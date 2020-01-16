@@ -628,7 +628,7 @@ jumpserver.initServerSideDataTable = function (options) {
         style: select_style,
         selector: 'td:first-child'
     };
-    var dom = '<"#uc.pull-left"> <"pull-right"<"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
+    var dom = '<"#uc.pull-left"> <"pull-right"<"#lb.inline"> <"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
         'tr' +
         '<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>';
     var table = ele.DataTable({
@@ -767,6 +767,7 @@ jumpserver.initServerSideDataTable = function (options) {
         $('#uc').html(options.uc_html || '');
         $('#fb').html(options.fb_html || '');
         $('#fa').html(options.fa_html || '');
+        $('#lb').html(options.lb_html || '');
     });
     var table_id = table.settings()[0].sTableId;
     $('#' + table_id + ' .ipt_check_all').on('click', function () {

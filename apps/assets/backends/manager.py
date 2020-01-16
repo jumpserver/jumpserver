@@ -30,7 +30,6 @@ class AssetUserQueryset:
 
     @lazyproperty
     def backends_counts(self):
-        print("Call backend count")
         return [b.count() for b in self.backends]
 
     def filter(self, hostname=None, ip=None, username=None,
@@ -64,20 +63,16 @@ class AssetUserQueryset:
         return self._clone(backends)
 
     def distinct(self):
-        logger.debug("Chain it")
+        logger.debug("Distinct asset user queryset")
         queryset_chain = chain(*(backend.get_queryset() for backend in self.backends))
-        logger.debug("Sort it")
         queryset_sorted = sorted(
             queryset_chain,
             key=lambda item: (item["asset_username"], item["score"]),
             reverse=True,
         )
-        logger.debug("Group by it")
         results = groupby(queryset_sorted, key=lambda item: item["asset_username"])
-        logger.debug("Get the first")
         final = [next(result[1]) for result in results]
         self._distinct_queryset = final
-        logger.debug("End")
         return self
 
     def get(self, **kwargs):
@@ -120,11 +115,11 @@ class AssetUserQueryset:
         return self
 
     def __next__(self):
-        return next(self._data)
+        return self.to_asset_user(next(self._data))
 
 
 class AssetUserManager:
-    backends = (
+    support_backends = (
         ('db', AuthbookBackend),
         ('system_user', SystemUserBackend),
         ('admin_user', AdminUserBackend),
@@ -132,11 +127,21 @@ class AssetUserManager:
     )
 
     def __init__(self):
-        self.backends = [backend() for name, backend in self.backends]
+        self.backends = [backend() for name, backend in self.support_backends]
         self._queryset = AssetUserQueryset(self.backends)
 
     def all(self):
         return self._queryset
+
+    def delete(self, obj):
+        name_backends_map = dict(self.support_backends)
+        backend_name = getattr(obj, 'backend', obj['backend'])
+        backend_cls = name_backends_map.get(backend_name)
+        union_id = getattr(obj, 'union_id', obj['union_id'])
+        if backend_cls:
+            backend_cls().delete(union_id)
+        else:
+            raise ObjectDoesNotExist("Not backend found")
 
     @staticmethod
     def create(**kwargs):

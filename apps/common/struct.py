@@ -44,7 +44,6 @@ class QuerySetChain:
         return sum(self.querysets_counts)
 
     def __iter__(self):
-        print("Inter >>>>>>>>>>>>.")
         self._chain = chain(*self.querysets)
         return self
 

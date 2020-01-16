@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #
 from django.conf import settings
-from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import generics, filters
 from rest_framework_bulk import BulkModelViewSet
@@ -12,7 +11,7 @@ from common.mixins import CommonApiMixin
 from ..backends import AssetUserManager
 from ..models import Asset, Node
 from .. import serializers
-from ..tasks import test_asset_users_connectivity_manual
+from ..tasks import test_asset_users_connectivity_manual, push_system_user_to_assets
 
 
 __all__ = [
@@ -53,6 +52,14 @@ class AssetUserSearchBackend(filters.BaseFilterBackend):
         return queryset
 
 
+class AssetUserLatestFilterBackend(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        latest = request.GET.get('latest') == '1'
+        if latest:
+            queryset = queryset.distinct()
+        return queryset
+
+
 class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     serializer_classes = {
         'default': serializers.AssetUserWriteSerializer,
@@ -60,7 +67,6 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
         'retrieve': serializers.AssetUserReadSerializer,
     }
     permission_classes = [IsOrgAdminOrAppUser]
-    http_method_names = ['get', 'post']
     filter_fields = [
         "id", "ip", "hostname", "username",
         "asset_id", "node_id",
@@ -69,6 +75,7 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     search_fields = ["ip", "hostname", "username"]
     filter_backends = [
         AssetUserFilterBackend, AssetUserSearchBackend,
+        AssetUserLatestFilterBackend,
     ]
 
     def allow_bulk_destroy(self, qs, filtered):
@@ -77,14 +84,17 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
     def get_object(self):
         pk = self.kwargs.get("pk")
         queryset = self.get_queryset()
-        try:
-            obj = queryset.get(id=pk)
-            return obj
-        except Exception:
-            raise Http404()
+        obj = queryset.get(id=pk)
+        return obj
+
+    def get_exception_handler(self):
+        def handler(e, context):
+            return Response({"error": str(e)}, status=400)
+        return handler
 
     def perform_destroy(self, instance):
-        pass
+        manager = AssetUserManager()
+        manager.delete(instance)
 
     def get_queryset(self):
         manager = AssetUserManager()
@@ -103,24 +113,25 @@ class AssetUserAuthInfoViewSet(AssetUserViewSet):
         return super().get_permissions()
 
 
-class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
+class AssetUserTaskBaseView(generics.RetrieveAPIView):
+    permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.TaskIDSerializer
+    filter_backends = AssetUserViewSet.filter_backends
+    filter_fields = AssetUserViewSet.filter_fields
+
+    def get_asset_users(self):
+        queryset = AssetUserManager()
+        for backend_cls in self.filter_backends:
+            queryset = backend_cls().filter_queryset(
+                self.request, queryset, self
+            )
+        return queryset
+
+
+class AssetUserTestConnectiveApi(AssetUserTaskBaseView):
     """
     Test asset users connective
     """
-    permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = serializers.TaskIDSerializer
-
-    def get_asset_users(self):
-        username = self.request.GET.get('username')
-        asset_id = self.request.GET.get('asset_id')
-        prefer_id = self.request.GET.get("prefer_id")
-        asset = get_object_or_none(Asset, pk=asset_id)
-        manager = AssetUserManager()
-        asset_users = manager.filter(
-            username=username, assets=[asset],
-            prefer_id=prefer_id
-        )
-        return asset_users
 
     def retrieve(self, request, *args, **kwargs):
         asset_users = self.get_asset_users()
@@ -133,16 +144,22 @@ class AssetUserTestConnectiveApi(generics.RetrieveAPIView):
         return Response({"task": task.id})
 
 
-class AssetUserPushApi(generics.CreateAPIView):
+class AssetUserPushApi(AssetUserTaskBaseView):
     """
     Test asset users connective
     """
-    serializer_class = serializers.AssetUserPushSerializer
     permission_classes = (IsOrgAdminOrAppUser,)
+    serializer_class = serializers.TaskIDSerializer
+    filter_backends = AssetUserViewSet.filter_backends
+    filter_fields = AssetUserViewSet.filter_fields
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        asset = serializer.validated_data["asset"]
-        username = serializer.validated_data["username"]
-        pass
+    def retrieve(self, request, *args, **kwargs):
+        asset_users = self.get_asset_users()
+        prefer = self.request.GET.get("prefer")
+        kwargs = {}
+        if prefer == "admin_user":
+            kwargs["run_as_admin"] = True
+        asset_users = list(asset_users)
+        task = test_asset_users_connectivity_manual.delay(asset_users, **kwargs)
+        return Response({"task": task.id})
+

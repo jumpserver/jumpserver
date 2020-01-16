@@ -23,6 +23,10 @@ class BaseBackend:
     def get_queryset(self):
         pass
 
+    @abstractmethod
+    def delete(self, union_id):
+        pass
+
     @staticmethod
     def qs_to_values(qs):
         values = qs.values(

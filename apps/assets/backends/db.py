@@ -11,6 +11,8 @@ from .base import BaseBackend
 
 
 class DBBackend(BaseBackend):
+    union_id_length = 2
+
     def __init__(self, queryset=None):
         if queryset is None:
             queryset = self.all()
@@ -28,6 +30,16 @@ class DBBackend(BaseBackend):
     def get_queryset(self):
         return self.queryset
 
+    def delete(self, union_id):
+        cleaned_union_id = union_id.split('_')
+        # 如果union_id通不过本检查，代表可能不是本backend, 应该返回空
+        if not self._check_union_id(union_id, cleaned_union_id):
+            return
+        return self._perform_delete_by_union_id(cleaned_union_id)
+
+    def _perform_delete_by_union_id(self, union_id_cleaned):
+        pass
+
     def filter(self, assets=None, node=None, prefer=None, prefer_id=None,
                union_id=None, id__in=None, **kwargs):
         clone = self._clone()
@@ -40,8 +52,20 @@ class DBBackend(BaseBackend):
         return clone
 
     def _filter_union_id(self, union_id):
-        if union_id:
-            self.queryset = self.queryset.filter(union_id=union_id)
+        if not union_id:
+            return
+        cleaned_union_id = union_id.split('_')
+        # 如果union_id通不过本检查，代表可能不是本backend, 应该返回空
+        if not self._check_union_id(union_id, cleaned_union_id):
+            self.queryset = self.queryset.none()
+            return
+        return self._perform_filter_union_id(union_id, cleaned_union_id)
+
+    def _check_union_id(self, union_id, cleaned_union_id):
+        return union_id and len(cleaned_union_id) == self.union_id_length
+
+    def _perform_filter_union_id(self, union_id, union_id_cleaned):
+        self.queryset = self.queryset.filter(union_id=union_id)
 
     def _filter_assets(self, assets):
         assets_id = self.make_assets_as_id(assets)
@@ -54,9 +78,6 @@ class DBBackend(BaseBackend):
     def _filter_id_in(self, ids):
         if ids and isinstance(ids, list):
             self.queryset = self.queryset.filter(union_id__in=ids)
-
-    def count(self):
-        return self.queryset.count()
 
     @staticmethod
     def clean_kwargs(kwargs):
@@ -84,14 +105,29 @@ class DBBackend(BaseBackend):
 class SystemUserBackend(DBBackend):
     model = SystemUser.assets.through
     backend = 'system_user'
+    prefer = backend
     base_score = 0
+    union_id_length = 2
 
     def _filter_prefer(self, prefer, prefer_id):
-        if prefer and prefer != self.backend:
+        if prefer and prefer != self.prefer:
             self.queryset = self.queryset.none()
 
         if prefer_id:
             self.queryset = self.queryset.filter(systemuser__id=prefer_id)
+
+    def _perform_filter_union_id(self, union_id, union_id_cleaned):
+        system_user_id, asset_id = union_id_cleaned
+        self.queryset = self.queryset.filter(
+            asset_id=asset_id, systemuser__id=system_user_id,
+        )
+
+    def _perform_delete_by_union_id(self, union_id_cleaned):
+        system_user_id, asset_id = union_id_cleaned
+        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        asset = get_object_or_none(Asset, pk=asset_id)
+        if all((system_user, asset)):
+            system_user.assets.remove(asset)
 
     def _filter_node(self, node):
         if node:
@@ -136,7 +172,9 @@ class SystemUserBackend(DBBackend):
 
 
 class DynamicSystemUserBackend(SystemUserBackend):
-    backend = 'system_user'
+    backend = 'system_user_dynamic'
+    prefer = 'system_user'
+    union_id_length = 3
 
     def get_annotate(self):
         kwargs = super().get_annotate()
@@ -156,6 +194,22 @@ class DynamicSystemUserBackend(SystemUserBackend):
         ))
         return kwargs
 
+    def _perform_filter_union_id(self, union_id, union_id_cleaned):
+        system_user_id, asset_id, user_id = union_id_cleaned
+        self.queryset = self.queryset.filter(
+            asset_id=asset_id, systemuser_id=system_user_id,
+            union_id=union_id,
+        )
+
+    def _perform_delete_by_union_id(self, union_id_cleaned):
+        system_user_id, asset_id, user_id = union_id_cleaned
+        system_user = get_object_or_none(SystemUser, pk=system_user_id)
+        if not system_user:
+            return
+        system_user.users.remove(user_id)
+        if system_user.users.count() == 0:
+            system_user.assets.remove(asset_id)
+
     def get_filter(self):
         return dict(
             users_count__gt=0,
@@ -166,6 +220,7 @@ class DynamicSystemUserBackend(SystemUserBackend):
 class AdminUserBackend(DBBackend):
     model = Asset
     backend = 'admin_user'
+    prefer = backend
     base_score = 200
 
     def _filter_prefer(self, prefer, prefer_id):
@@ -177,6 +232,15 @@ class AdminUserBackend(DBBackend):
     def _filter_node(self, node):
         if node:
             self.queryset = self.queryset.filter(nodes__id=node.id)
+
+    def _perform_filter_union_id(self, union_id, union_id_cleaned):
+        admin_user_id, asset_id = union_id_cleaned
+        self.queryset = self.queryset.filter(
+            id=asset_id, admin_user_id=admin_user_id,
+        )
+
+    def _perform_delete_by_union_id(self, union_id_cleaned):
+        raise PermissionError("Could remove asset admin user")
 
     def all(self):
         qs = self.model.objects.all().annotate(
@@ -199,6 +263,7 @@ class AdminUserBackend(DBBackend):
 class AuthbookBackend(DBBackend):
     model = AuthBook
     backend = 'db'
+    prefer = backend
     base_score = 400
 
     def _filter_node(self, node):
@@ -208,9 +273,9 @@ class AuthbookBackend(DBBackend):
     def _filter_prefer(self, prefer, prefer_id):
         if not prefer or not prefer_id:
             return
-        if prefer.lower() in ("admin_user", "adminuser"):
+        if prefer.lower() == "admin_user":
             model = AdminUser
-        elif prefer.lower() in ("system_user", "systemuser"):
+        elif prefer.lower() == "system_user":
             model = SystemUser
         else:
             self.queryset = self.queryset.none()
@@ -225,6 +290,19 @@ class AuthbookBackend(DBBackend):
         # dynamic system user return more username
         else:
             self.queryset = self.queryset.filter(username__in=username)
+
+    def _perform_filter_union_id(self, union_id, union_id_cleaned):
+        authbook_id, asset_id = union_id_cleaned
+        self.queryset = self.queryset.filter(
+            id=authbook_id, asset_id=asset_id,
+        )
+
+    def _perform_delete_by_union_id(self, union_id_cleaned):
+        authbook_id, asset_id = union_id_cleaned
+        authbook = get_object_or_none(AuthBook, pk=authbook_id)
+        if authbook.is_latest:
+            raise PermissionError("Latest version could be delete")
+        AuthBook.objects.filter(id=authbook_id).delete()
 
     def all(self):
         qs = self.model.objects.all().annotate(

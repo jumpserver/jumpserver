@@ -6,25 +6,25 @@
 <form class="form-horizontal" role="form" onkeydown="if(event.keyCode==13){ $('#btn_asset_user_auth_update_modal_confirm').trigger('click'); return false;}">
     {% csrf_token %}
     <div class="form-group">
-        <label class="col-sm-2 control-label">{% trans "Hostname" %}</label>
+        <label class="col-sm-2 control-label">{% trans "Hostname" %}: </label>
         <div class="col-sm-10">
             <p class="form-control-static" id="id_hostname_p"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">{% trans "Username" %}</label>
+        <label class="col-sm-2 control-label">{% trans "Username" %}: </label>
         <div class="col-sm-10">
             <p class="form-control-static" id="id_username_p"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">{% trans "Password" %}</label>
+        <label class="col-sm-2 control-label">{% trans "Password" %}: </label>
         <div class="col-sm-10">
             <input class="form-control" id="id_password_auth" type="password" name="password" placeholder="{% trans 'Please input password' %}"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">{% trans "Private key" %}</label>
+        <label class="col-sm-2 control-label">{% trans "Private key" %}: </label>
         <div class="col-sm-10">
             <div class="row bootstrap3-multi-input">
                 <div class="col-xs-12">

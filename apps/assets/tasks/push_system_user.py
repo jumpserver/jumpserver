@@ -125,7 +125,13 @@ def get_push_windows_system_user_tasks(system_user, username=None):
     return tasks
 
 
-def get_push_system_user_tasks(system_user, platform="unixlike"):
+def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
+    """
+    :param system_user:
+    :param platform:
+    :param username: 当动态时，近推送某个
+    :return:
+    """
     get_task_map = {
         "unixlike": get_push_unixlike_system_user_tasks,
         "windows": get_push_windows_system_user_tasks,
@@ -142,7 +148,7 @@ def get_push_system_user_tasks(system_user, platform="unixlike"):
 
 
 @org_aware_func("system_user")
-def push_system_user_util(system_user, assets, task_name):
+def push_system_user_util(system_user, assets, task_name, username=None):
     from ops.utils import update_or_create_ansible_task
     hosts = clean_ansible_task_hosts(assets, system_user=system_user)
     if not hosts:

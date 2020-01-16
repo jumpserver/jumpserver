@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
+from collections import defaultdict
 from celery import shared_task
 from django.utils.translation import ugettext as _
 
@@ -73,5 +74,17 @@ def test_asset_users_connectivity_manual(asset_users, run_as_admin=False):
     for asset_user in asset_users:
         task_name = _("Test asset user connectivity: {}").format(asset_user)
         test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=run_as_admin)
+
+#
+# @shared_task(queue="ansible")
+# def test_asset_user_connectivity_manual(asset_user):
+#     """
+#     :param asset_users: <AuthBook>对象
+#     """
+#     from .push_system_user import push_system_user_to_assets
+#     system_users_assets_map = defaultdict(list)
+#     for asset_user in asset_users:
+#         if asset_user.prefer != "system_user":
+#             continue
 
 
