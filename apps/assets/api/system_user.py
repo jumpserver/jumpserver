@@ -3,7 +3,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
-from common.serializers import CeleryTaskSerializer
 from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
@@ -15,17 +14,14 @@ from .. import serializers
 from ..serializers.base import AuthInfoSerializer
 from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
-    push_system_user_a_asset_manual, test_system_user_connectivity_a_asset,
+    push_system_user_a_asset_manual,
 )
 
 
 logger = get_logger(__file__)
 __all__ = [
     'SystemUserViewSet', 'SystemUserAuthInfoApi', 'SystemUserAssetAuthInfoApi',
-    'SystemUserPushApi', 'SystemUserTestConnectiveApi',
-    'SystemUserAssetsListView', 'SystemUserPushToAssetApi',
-    'SystemUserTestAssetConnectivityApi', 'SystemUserCommandFilterRuleListApi',
-
+    'SystemUserCommandFilterRuleListApi', 'SystemUserTaskApi',
 ]
 
 
@@ -78,78 +74,44 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
                 raise Http404
 
 
-class SystemUserPushApi(generics.RetrieveAPIView):
-    """
-    Push system user to cluster assets api
-    """
-    model = SystemUser
+class SystemUserTaskApi(generics.CreateAPIView):
     permission_classes = (IsOrgAdmin,)
-    serializer_class = CeleryTaskSerializer
+    serializer_class = serializers.SystemUserTaskSerializer
 
-    def retrieve(self, request, *args, **kwargs):
-        system_user = self.get_object()
-        nodes = system_user.nodes.all()
-        for node in nodes:
-            system_user.assets.add(*tuple(node.get_all_assets()))
-        task = push_system_user_to_assets_manual.delay(system_user)
-        return Response({"task": task.id})
+    def do_push(self, system_user, asset=None):
+        if asset is None:
+            task = push_system_user_to_assets_manual.delay(system_user)
+        else:
+            username = self.request.query_params.get('username')
+            task = push_system_user_a_asset_manual.delay(
+                system_user, asset, username=username
+            )
+        return task
 
-
-class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
-    """
-    Push system user to cluster assets api
-    """
-    model = SystemUser
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = CeleryTaskSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        system_user = self.get_object()
+    @staticmethod
+    def do_test(system_user, asset=None):
         task = test_system_user_connectivity_manual.delay(system_user)
-        return Response({"task": task.id})
-
-
-class SystemUserAssetsListView(generics.ListAPIView):
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.AssetSimpleSerializer
-    filter_fields = ("hostname", "ip")
-    http_method_names = ['get']
-    search_fields = filter_fields
+        return task
 
     def get_object(self):
         pk = self.kwargs.get('pk')
         return get_object_or_404(SystemUser, pk=pk)
 
-    def get_queryset(self):
+    def perform_create(self, serializer):
+        action = serializer.validated_data["action"]
+        asset = serializer.validated_data.get('asset')
         system_user = self.get_object()
-        return system_user.assets.all()
+        if action == 'push':
+            task = self.do_push(system_user, asset)
+        else:
+            task = self.do_test(system_user, asset)
+        return task
 
-
-class SystemUserPushToAssetApi(generics.RetrieveAPIView):
-    model = SystemUser
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.TaskIDSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        system_user = self.get_object()
-        asset_id = self.kwargs.get('aid')
-        username = request.query_params.get('username')
-        asset = get_object_or_404(Asset, id=asset_id)
-        task = push_system_user_a_asset_manual.delay(system_user, asset, username=username)
-        return Response({"task": task.id})
-
-
-class SystemUserTestAssetConnectivityApi(generics.RetrieveAPIView):
-    model = SystemUser
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.TaskIDSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        system_user = self.get_object()
-        asset_id = self.kwargs.get('aid')
-        asset = get_object_or_404(Asset, id=asset_id)
-        task = test_system_user_connectivity_a_asset.delay(system_user, asset)
-        return Response({"task": task.id})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        task = self.perform_create(serializer)
+        return Response({"task": task.id}, status=201)
 
 
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):

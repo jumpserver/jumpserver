@@ -63,14 +63,14 @@ def get_push_unixlike_system_user_tasks(system_user, username=None):
             'action': {
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
-                    system_user.username, system_user.shell,
+                    username, system_user.shell,
                     encrypt_password(password, salt="K3mIlKK"),
                 ),
             }
         })
     if public_key:
         tasks.append({
-            'name': 'Set {} authorized key'.format(system_user.username),
+            'name': 'Set {} authorized key'.format(username),
             'action': {
                 'module': 'authorized_key',
                 'args': "user={} state=present key='{}'".format(
@@ -118,9 +118,10 @@ def get_push_windows_system_user_tasks(system_user, username=None):
                     'password_never_expires=yes '
                     'groups="Users,Remote Desktop Users" '
                     'groups_action=add '
-                    ''.format(system_user.name, username, password),
+                    ''.format(username, username, password),
         }
     }
+    print(task)
     tasks.append(task)
     return tasks
 
@@ -145,7 +146,7 @@ def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
         tasks.extend(get_tasks(system_user, username))
         return tasks
     users = system_user.users.all().values_list('username', flat=True)
-    print("System user is dynamic: {}".format(list(users)))
+    print(_("System user is dynamic: {}").format(list(users)))
     for _username in users:
         tasks.extend(get_tasks(system_user, _username))
     return tasks

@@ -7,13 +7,13 @@ from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Node
-from ..models import SystemUser
+from ..models import SystemUser, Asset
 from .base import AuthSerializerMixin
 
 __all__ = [
     'SystemUserSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
-    'SystemUserNodeRelationSerializer',
+    'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
 ]
 
 
@@ -67,6 +67,18 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         elif protocol in [SystemUser.PROTOCOL_TELNET, SystemUser.PROTOCOL_VNC]:
             value = False
         return value
+
+    def validate_username_same_with_user(self, username_same_with_user):
+        if not username_same_with_user:
+            return username_same_with_user
+        protocol = self.initial_data.get("protocol", "ssh")
+        exists = SystemUser.objects.filter(
+            protocol=protocol, username_same_with_user=True
+        ).exists()
+        if not exists:
+            return username_same_with_user
+        error = _("Username same with user with protocol {} only allow 1").format(protocol)
+        raise serializers.ValidationError(error)
 
     def validate_username(self, username):
         if username:
@@ -172,3 +184,12 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
             return self.tree.get_node_full_tag(obj.node_key)
         else:
             return obj.node.full_value
+
+
+class SystemUserTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = ("test", "push")
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    asset = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, allow_null=True, required=False, write_only=True
+    )
+    task = serializers.CharField(read_only=True)

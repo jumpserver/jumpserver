@@ -70,12 +70,12 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
     for platform, _hosts in platform_hosts_map.items():
         if not _hosts:
             continue
-        if platform not in ["unlike", "windows"]:
+        if platform not in ["unixlike", "windows"]:
             continue
 
         tasks = platform_tasks_map[platform]
         print(_("Start test system user connectivity for platform: [{}]").format(platform))
-        print(_("Hosts count: {}").format(len(_hosts)))
+        print(_("Assets count: {}").format(len(_hosts)))
         # 用户名不是动态的，用户名则是一个
         if not system_user.username_same_with_user:
             logger.debug("System user not has special auth")
@@ -83,6 +83,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
         # 否则需要多个任务
         else:
             users = system_user.users.all().values_list('username', flat=True)
+            print(_("System user is dynamic: {}").format(list(users)))
             for username in users:
                 run_task(tasks, _hosts, username)
 

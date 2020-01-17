@@ -248,7 +248,7 @@ function formSubmit(props) {
                 noneFieldErrorRef.css('display', 'block');
                 noneFieldErrorRef.html(noneFieldErrorMsg);
             }
-            $('.has-error').get(0).scrollIntoView();
+            $('.has-error :visible').get(0).scrollIntoView();
         }
     })
 }
@@ -264,11 +264,15 @@ function requestApi(props) {
     if (props.flash_message === false) {
         flash_message = false;
     }
+    var dataBody = props.body || props.data;
+    if (typeof(dataBody) === "object") {
+        dataBody = JSON.stringify(dataBody)
+    }
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
-        data: props.body || props.data,
+        data: dataBody,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {
