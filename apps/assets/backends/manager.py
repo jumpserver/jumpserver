@@ -75,8 +75,11 @@ class AssetUserQueryset:
         self._distinct_queryset = final
         return self
 
-    def get(self, **kwargs):
-        queryset = list(self.filter(**kwargs))
+    def get(self, latest=False, **kwargs):
+        queryset = self.filter(**kwargs)
+        if latest:
+            queryset = queryset.distinct()
+        queryset = list(queryset)
         count = len(queryset)
         if count == 1:
             data = queryset[0]
@@ -87,6 +90,9 @@ class AssetUserQueryset:
         else:
             msg = 'Org is: {}'.format(current_org.name)
             raise ObjectDoesNotExist(msg)
+
+    def get_latest(self, **kwargs):
+        return self.get(latest=True, **kwargs)
 
     @staticmethod
     def to_asset_user(data):
@@ -135,9 +141,9 @@ class AssetUserManager:
 
     def delete(self, obj):
         name_backends_map = dict(self.support_backends)
-        backend_name = getattr(obj, 'backend', obj['backend'])
+        backend_name = obj.backend
         backend_cls = name_backends_map.get(backend_name)
-        union_id = getattr(obj, 'union_id', obj['union_id'])
+        union_id = obj.union_id
         if backend_cls:
             backend_cls().delete(union_id)
         else:

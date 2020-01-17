@@ -140,10 +140,14 @@ def get_push_system_user_tasks(system_user, platform="unixlike", username=None):
     if not system_user.username_same_with_user:
         return get_tasks(system_user)
     tasks = []
+    # 仅推送这个username
+    if username is not None:
+        tasks.extend(get_tasks(system_user, username))
+        return tasks
     users = system_user.users.all().values_list('username', flat=True)
     print("System user is dynamic: {}".format(list(users)))
-    for username in users:
-        tasks.extend(get_tasks(system_user, username))
+    for _username in users:
+        tasks.extend(get_tasks(system_user, _username))
     return tasks
 
 
@@ -160,7 +164,7 @@ def push_system_user_util(system_user, assets, task_name, username=None):
     for i in platform_hosts:
         platform_hosts_map[i[0]] = list(i[1])
 
-    def run_task(_tasks, _hosts, created_by):
+    def run_task(_tasks, _hosts):
         if not _tasks:
             return
         task, created = update_or_create_ansible_task(
@@ -174,16 +178,17 @@ def push_system_user_util(system_user, assets, task_name, username=None):
             continue
         print(_("Start push system user for platform: [{}]").format(platform))
         print(_("Hosts count: {}").format(len(_hosts)))
+
         if not system_user.has_special_auth():
             logger.debug("System user not has special auth")
-            tasks = get_push_system_user_tasks(system_user, platform)
-            run_task(tasks, _hosts, system_user.org_id)
+            tasks = get_push_system_user_tasks(system_user, platform, username=username)
+            run_task(tasks, _hosts)
             continue
 
         for _host in _hosts:
             system_user.load_asset_special_auth(_host)
-            tasks = get_push_system_user_tasks(system_user, platform)
-            run_task(tasks, [_host], system_user.org_id)
+            tasks = get_push_system_user_tasks(system_user, platform, username=username)
+            run_task(tasks, [_host])
 
 
 @shared_task(queue="ansible")
@@ -194,11 +199,13 @@ def push_system_user_to_assets_manual(system_user):
 
 
 @shared_task(queue="ansible")
-def push_system_user_a_asset_manual(system_user, asset):
-    task_name = _("Push system users to asset: {} => {}").format(
-        system_user.name, asset
+def push_system_user_a_asset_manual(system_user, asset, username=None):
+    if username is None:
+        username = system_user.username
+    task_name = _("Push system users to asset: {}({}) => {}").format(
+        system_user.name, username, asset
     )
-    return push_system_user_util(system_user, [asset], task_name=task_name)
+    return push_system_user_util(system_user, [asset], task_name=task_name, username=username)
 
 
 @shared_task(queue="ansible")

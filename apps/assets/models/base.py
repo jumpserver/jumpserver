@@ -166,7 +166,7 @@ class AuthMixin:
             username = self.username
         try:
             manager = AssetUserManager()
-            other = manager.get(
+            other = manager.get_latest(
                 username=username, asset=asset,
                 prefer_id=self.id, prefer=self._prefer,
             )

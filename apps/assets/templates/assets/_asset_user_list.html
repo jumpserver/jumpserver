@@ -43,6 +43,7 @@ var mfaVerifyTTL = "{{ SECURITY_MFA_VERIFY_TTL }}";
 var mfaNeedCheck = "{{ SECURITY_VIEW_AUTH_NEED_MFA }}" === "True";
 var onlyLatestEl = "<span style='padding-right:20px'><input type='checkbox' id='only_latest'> {% trans 'Only latest version' %}</span>";
 var onlyLatestChecked = false;
+var systemUserId = "";
 
 function initAssetUserTable(option) {
     if (!option) {
@@ -138,10 +139,9 @@ $(document).ready(function(){
     $("#asset_user_auth_update_modal").modal('show');
 })
 .on("click", '.btn-test-auth', function () {
-    authUsername = $(this).data("username") ;
-    authAssetId = $(this).data("asset");
     authUid = $(this).data('uid');
-    var theUrl = "{% url 'api-assets:asset-user-connective' %}?id=" + authUid;
+    var theUrl = "{% url 'api-assets:asset-user-task-create' pk=DEFAULT_PK %}"
+        .replace("{{ DEFAULT_PK }}", authUid);
 
     var success = function (data) {
         var taskId = data.task;
@@ -149,7 +149,8 @@ $(document).ready(function(){
     };
     requestApi({
         url: theUrl,
-        method: 'GET',
+        method: 'POST',
+        data: JSON.stringify({action: 'test'}),
         success: success,
         flash_message: false
     });

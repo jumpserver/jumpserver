@@ -133,8 +133,9 @@ class SystemUserPushToAssetApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
         asset_id = self.kwargs.get('aid')
+        username = request.query_params.get('username')
         asset = get_object_or_404(Asset, id=asset_id)
-        task = push_system_user_a_asset_manual.delay(system_user, asset)
+        task = push_system_user_a_asset_manual.delay(system_user, asset, username=username)
         return Response({"task": task.id})
 
 

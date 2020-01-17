@@ -236,9 +236,10 @@ $(document).ready(function () {
 })
 .on('click', '.btn-push-auth', function () {
     var $this = $(this);
-    var asset_id = $this.data('asset');
-    var theUrl = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}";
-    theUrl = theUrl.replace("{{ DEFAULT_PK }}", asset_id);
+    var assetId = $this.data('asset');
+    var username = $this.data("username");
+    var theUrl = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}?username=" + username;
+    theUrl = theUrl.replace("{{ DEFAULT_PK }}", assetId);
     var success = function (data) {
         var taskId = data.task;
         showCeleryTaskLog(taskId);

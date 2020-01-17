@@ -41,8 +41,7 @@ urlpatterns = [
     path('assets/<uuid:pk>/platform/',
          api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
-    path('asset-users/test-connective/',
-         api.AssetUserTestConnectiveApi.as_view(), name='asset-user-connective'),
+    path('asset-users/<str:pk>/tasks/', api.AssetUserTaskBaseView.as_view(), name='asset-user-task-create'),
 
     path('admin-users/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
@@ -63,8 +62,7 @@ urlpatterns = [
          api.SystemUserPushApi.as_view(), name='system-user-push'),
     path('system-users/<uuid:pk>/assets/<uuid:aid>/push/',
          api.SystemUserPushToAssetApi.as_view(), name='system-user-push-to-asset'),
-    path('system-users/<uuid:pk>/assets/<uuid:aid>/test/',
-         api.SystemUserTestAssetConnectivityApi.as_view(), name='system-user-test-to-asset'),
+
     path('system-users/<uuid:pk>/connective/',
          api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
     path('system-users/<uuid:pk>/cmd-filter-rules/',
