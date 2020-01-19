@@ -41,8 +41,7 @@ urlpatterns = [
     path('assets/<uuid:pk>/platform/',
          api.AssetPlatformRetrieveApi.as_view(), name='asset-platform-detail'),
 
-    path('asset-users/<str:pk>/tasks/', api.AssetUserTaskBaseView.as_view(), name='asset-user-task-create'),
-
+    path('asset-users/tasks/', api.AssetUserTaskCreateAPI.as_view(), name='asset-user-task-create'),
     path('admin-users/<uuid:pk>/nodes/',
          api.ReplaceNodesAdminUserApi.as_view(), name='replace-nodes-admin-user'),
     path('admin-users/<uuid:pk>/auth/',

@@ -140,7 +140,7 @@ $(document).ready(function(){
 })
 .on("click", '.btn-test-auth', function () {
     authUid = $(this).data('uid');
-    var theUrl = "{% url 'api-assets:asset-user-task-create' pk=DEFAULT_PK %}"
+    var theUrl = "{% url 'api-assets:asset-user-task-create'%}?id={{ DEFAULT_PK }}"
         .replace("{{ DEFAULT_PK }}", authUid);
 
     var success = function (data) {

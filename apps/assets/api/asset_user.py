@@ -17,7 +17,7 @@ from ..tasks import (
 
 
 __all__ = [
-    'AssetUserViewSet', 'AssetUserAuthInfoViewSet', 'AssetUserTaskBaseView',
+    'AssetUserViewSet', 'AssetUserAuthInfoViewSet', 'AssetUserTaskCreateAPI',
 ]
 
 
@@ -87,11 +87,11 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
         queryset = self.get_queryset()
         obj = queryset.get(id=pk)
         return obj
-    #
-    # def get_exception_handler(self):
-    #     def handler(e, context):
-    #         return Response({"error": str(e)}, status=400)
-    #     return handler
+
+    def get_exception_handler(self):
+        def handler(e, context):
+            return Response({"error": str(e)}, status=400)
+        return handler
 
     def perform_destroy(self, instance):
         manager = AssetUserManager()
@@ -114,32 +114,25 @@ class AssetUserAuthInfoViewSet(AssetUserViewSet):
         return super().get_permissions()
 
 
-class AssetUserTaskBaseView(generics.CreateAPIView):
+class AssetUserTaskCreateAPI(generics.CreateAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.AssetUserTaskSerializer
     filter_backends = AssetUserViewSet.filter_backends
     filter_fields = AssetUserViewSet.filter_fields
 
-    def get_object(self):
-        pk = self.kwargs.get('pk')
+    def get_asset_users(self):
         manager = AssetUserManager()
-        instance = manager.get(id=pk)
-        return instance
-
-    @staticmethod
-    def test_asset_user_connectivity(asset_user):
-        kwargs = {}
-        if asset_user.backend == "admin_user":
-            kwargs["run_as_admin"] = True
-        asset_users = [asset_user]
-        task = test_asset_users_connectivity_manual.delay(asset_users, **kwargs)
-        return task
+        queryset = manager.all()
+        for cls in self.filter_backends:
+            queryset = cls().filter_queryset(self.request, queryset, self)
+        return list(queryset)
 
     def perform_create(self, serializer):
-        asset_user = self.get_object()
-        #action = serializer.validated_data["action"]
-        #only this
-        task = self.test_asset_user_connectivity(asset_user)
+        asset_users = self.get_asset_users()
+        # action = serializer.validated_data["action"]
+        # only this
+        # if action == "test":
+        task = test_asset_users_connectivity_manual(asset_users)
         return task
 
     def get_exception_handler(self):
