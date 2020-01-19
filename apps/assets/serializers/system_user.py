@@ -32,7 +32,8 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'login_mode', 'login_mode_display',
             'priority', "username_same_with_user",
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'assets_amount', 'nodes_amount', 'auto_generate_key'
+            'assets_amount', 'nodes_amount', 'auto_generate_key',
+            'sftp_root',
         ]
         extra_kwargs = {
             'password': {"write_only": True},
@@ -93,6 +94,14 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
         return username
+
+    def validate_sftp_root(self, value):
+        if value in ['home', 'root']:
+            return value
+        if not value.startswith('/'):
+            error = _("Path should starts with /")
+            raise serializers.ValidationError(error)
+        return value
 
     def validate_password(self, password):
         super().validate_password(password)

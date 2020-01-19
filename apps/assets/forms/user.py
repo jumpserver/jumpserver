@@ -90,6 +90,7 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             'password', 'private_key', 'auto_push', 'sudo',
             'username_same_with_user',
             'comment', 'shell', 'priority', 'login_mode', 'cmd_filters',
+            'sftp_root',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -108,4 +109,5 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
             'login_mode': _('If you choose manual login mode, you do not '
                             'need to fill in the username and password.'),
             'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig"),
+            'sftp_root': _("SFTP root dir, tmp, home or custom"),
         }
