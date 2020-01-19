@@ -105,13 +105,9 @@ class SystemUserTaskApi(generics.CreateAPIView):
             task = self.do_push(system_user, asset)
         else:
             task = self.do_test(system_user, asset)
-        return task
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        task = self.perform_create(serializer)
-        return Response({"task": task.id}, status=201)
+        data = getattr(serializer, '_data', {})
+        data["task"] = task.id
+        setattr(serializer, '_data', data)
 
 
 class SystemUserCommandFilterRuleListApi(generics.ListAPIView):

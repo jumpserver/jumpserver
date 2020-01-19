@@ -18,7 +18,7 @@ logger = get_logger(__file__)
 disk_pattern = re.compile(r'^hd|sd|xvd|vd|nv')
 __all__ = [
     'update_assets_hardware_info_util', 'update_asset_hardware_info_manual',
-    'update_assets_hardware_info_period',
+    'update_assets_hardware_info_period',  'update_node_assets_hardware_info_manual',
 ]
 
 
@@ -123,3 +123,11 @@ def update_assets_hardware_info_period():
     if not const.PERIOD_TASK_ENABLED:
         logger.debug("Period task disabled, update assets hardware info pass")
         return
+
+
+@shared_task(queue="ansible")
+def update_node_assets_hardware_info_manual(node):
+    task_name = _("Update node asset hardware information: {}").format(node.name)
+    assets = node.get_all_assets()
+    result = update_assets_hardware_info_util.delay(assets, task_name=task_name)
+    return result

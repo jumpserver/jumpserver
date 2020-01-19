@@ -113,10 +113,11 @@ function initNodeTree(options) {
     $.get(treeUrl, function (data, status) {
         zTree = $.fn.zTree.init($("#nodeTree"), setting, data);
         rootNodeAddDom(zTree, function () {
-            const url = '{% url 'api-assets:refresh-nodes-cache' %}';
+            const url = '{% url 'api-assets:node-task-create' pk=DEFAULT_PK %}';
             requestApi({
                 url: url,
-                method: 'GET',
+                method: 'POST',
+                data: {action: "refresh_cache"},
                 flash_message: false,
                 success: function () {
                     initNodeTree(options);

@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import namedtuple
 from rest_framework import status
 from rest_framework.serializers import ValidationError
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, Http404
 
 from common.utils import get_logger, get_object_or_none
 from common.tree import TreeNodeSerializer
@@ -27,7 +27,8 @@ from orgs.mixins import generics
 from ..hands import IsOrgAdmin
 from ..models import Node
 from ..tasks import (
-    update_assets_hardware_info_util, test_asset_connectivity_util
+    update_node_assets_hardware_info_manual,
+    test_node_assets_connectivity_manual,
 )
 from .. import serializers
 
@@ -36,9 +37,9 @@ logger = get_logger(__file__)
 __all__ = [
     'NodeViewSet', 'NodeChildrenApi', 'NodeAssetsApi',
     'NodeAddAssetsApi', 'NodeRemoveAssetsApi', 'NodeReplaceAssetsApi',
-    'NodeAddChildrenApi', 'RefreshNodeHardwareInfoApi',
-    'TestNodeConnectiveApi', 'NodeListAsTreeApi',
-    'NodeChildrenAsTreeApi', 'RefreshNodesCacheApi',
+    'NodeAddChildrenApi', 'NodeListAsTreeApi',
+    'NodeChildrenAsTreeApi',
+    'NodeTaskCreateApi',
 ]
 
 
@@ -261,41 +262,41 @@ class NodeReplaceAssetsApi(generics.UpdateAPIView):
             asset.nodes.set([instance])
 
 
-class RefreshNodeHardwareInfoApi(APIView):
+class NodeTaskCreateApi(generics.CreateAPIView):
     model = Node
+    serializer_class = serializers.NodeTaskSerializer
     permission_classes = (IsOrgAdmin,)
 
-    def get(self, request, *args, **kwargs):
-        node_id = kwargs.get('pk')
-        node = get_object_or_404(self.model, id=node_id)
-        assets = node.get_all_assets()
-        # task_name = _("更新节点资产硬件信息: {}".format(node.name))
-        task_name = _("Update node asset hardware information: {}").format(node.name)
-        task = update_assets_hardware_info_util.delay(assets, task_name=task_name)
-        return Response({"task": task.id})
+    def get_object(self):
+        node_id = self.kwargs.get('pk')
+        node = get_object_or_none(self.model, id=node_id)
+        return node
 
+    @staticmethod
+    def set_serializer_data(s, task):
+        data = getattr(s, '_data', {})
+        data["task"] = task.id
+        setattr(s, '_data', data)
 
-class TestNodeConnectiveApi(APIView):
-    permission_classes = (IsOrgAdmin,)
-    model = Node
-
-    def get(self, request, *args, **kwargs):
-        node_id = kwargs.get('pk')
-        node = get_object_or_404(self.model, id=node_id)
-        assets = node.get_all_assets()
-        # task_name = _("测试节点下资产是否可连接: {}".format(node.name))
-        task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
-        task = test_asset_connectivity_util.delay(assets, task_name=task_name)
-        return Response({"task": task.id})
-
-
-class RefreshNodesCacheApi(APIView):
-    permission_classes = (IsOrgAdmin,)
-
-    def get(self, request, *args, **kwargs):
+    @staticmethod
+    def refresh_nodes_cache():
         Node.refresh_nodes()
-        return Response("Ok")
+        Task = namedtuple('Task', ['id'])
+        task = Task(id="0")
+        return task
 
-    def delete(self, *args, **kwargs):
-        self.get(*args, **kwargs)
-        return Response(status=204)
+    def perform_create(self, serializer):
+        action = serializer.validated_data["action"]
+        node = self.get_object()
+        if action == "refresh_cache" and node is None:
+            task = self.refresh_nodes_cache()
+            self.set_serializer_data(serializer, task)
+            return
+        if node is None:
+            raise Http404()
+        if action == "refresh":
+            task = update_node_assets_hardware_info_manual.delay(node)
+        else:
+            task = test_node_assets_connectivity_manual.delay(node)
+        self.set_serializer_data(serializer, task)
+

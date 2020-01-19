@@ -12,7 +12,10 @@ from .utils import clean_ansible_task_hosts, group_asset_by_platform
 
 
 logger = get_logger(__file__)
-__all__ = ['test_asset_connectivity_util', 'test_asset_connectivity_manual']
+__all__ = [
+    'test_asset_connectivity_util', 'test_asset_connectivity_manual',
+    'test_node_assets_connectivity_manual',
+]
 
 
 @shared_task(queue="ansible")
@@ -77,3 +80,12 @@ def test_asset_connectivity_manual(asset):
         return False, summary['dark']
     else:
         return True, ""
+
+
+@shared_task(queue="ansible")
+def test_node_assets_connectivity_manual(node):
+    task_name = _("Test if the assets under the node are connectable: {}".format(node.name))
+    assets = node.get_all_assets()
+    result = test_asset_connectivity_util(assets, task_name=task_name)
+    return result
+

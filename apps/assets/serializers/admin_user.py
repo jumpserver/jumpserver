@@ -58,6 +58,8 @@ class TaskIDSerializer(serializers.Serializer):
 
 
 class AssetUserTaskSerializer(serializers.Serializer):
-    ACTION_CHOICES = ('test',)
+    ACTION_CHOICES = (
+        ('test', 'test'),
+    )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     task = serializers.CharField(read_only=True)

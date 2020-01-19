@@ -133,17 +133,12 @@ class AssetUserTaskCreateAPI(generics.CreateAPIView):
         # only this
         # if action == "test":
         task = test_asset_users_connectivity_manual(asset_users)
+        data = getattr(serializer, '_data', {})
+        data["task"] = task.id
+        setattr(serializer, '_data', data)
         return task
 
     def get_exception_handler(self):
         def handler(e, context):
             return Response({"error": str(e)}, status=400)
         return handler
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        task = self.perform_create(serializer)
-        return Response({"task": task.id}, status=201)
-
-

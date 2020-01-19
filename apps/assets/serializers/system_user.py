@@ -187,7 +187,10 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
 
 
 class SystemUserTaskSerializer(serializers.Serializer):
-    ACTION_CHOICES = ("test", "push")
+    ACTION_CHOICES = (
+        ("test", "test"),
+        ("push", "push"),
+    )
     action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
     asset = serializers.PrimaryKeyRelatedField(
         queryset=Asset.objects, allow_null=True, required=False, write_only=True

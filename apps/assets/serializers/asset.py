@@ -13,7 +13,7 @@ from .base import ConnectivitySerializer
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
     'ProtocolsField', 'PlatformSerializer',
-    'AssetDetailSerializer',
+    'AssetDetailSerializer', 'AssetTaskSerializer',
 ]
 
 
@@ -151,3 +151,12 @@ class AssetSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = ['id', 'hostname', 'ip', 'connectivity', 'port']
+
+
+class AssetTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = (
+        ('refresh', 'refresh'),
+        ('test', 'test'),
+    )
+    task = serializers.CharField(read_only=True)
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
