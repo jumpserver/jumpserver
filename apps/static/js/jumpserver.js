@@ -248,7 +248,7 @@ function formSubmit(props) {
                 noneFieldErrorRef.css('display', 'block');
                 noneFieldErrorRef.html(noneFieldErrorMsg);
             }
-            $('.has-error').get(0).scrollIntoView();
+            $('.has-error :visible').get(0).scrollIntoView();
         }
     })
 }
@@ -264,11 +264,15 @@ function requestApi(props) {
     if (props.flash_message === false) {
         flash_message = false;
     }
+    var dataBody = props.body || props.data;
+    if (typeof(dataBody) === "object") {
+        dataBody = JSON.stringify(dataBody)
+    }
 
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
-        data: props.body || props.data,
+        data: dataBody,
         contentType: props.content_type || "application/json; charset=utf-8",
         dataType: props.data_type || "json"
     }).done(function (data, textStatue, jqXHR) {
@@ -628,7 +632,7 @@ jumpserver.initServerSideDataTable = function (options) {
         style: select_style,
         selector: 'td:first-child'
     };
-    var dom = '<"#uc.pull-left"> <"pull-right"<"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
+    var dom = '<"#uc.pull-left"> <"pull-right"<"#lb.inline"> <"inline"l> <"#fb.inline"> <"inline"f><"#fa.inline">>' +
         'tr' +
         '<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>';
     var table = ele.DataTable({
@@ -767,6 +771,7 @@ jumpserver.initServerSideDataTable = function (options) {
         $('#uc').html(options.uc_html || '');
         $('#fb').html(options.fb_html || '');
         $('#fa').html(options.fa_html || '');
+        $('#lb').html(options.lb_html || '');
     });
     var table_id = table.settings()[0].sTableId;
     $('#' + table_id + ' .ipt_check_all').on('click', function () {
@@ -1396,8 +1401,8 @@ function showCeleryTaskLog(taskId) {
 }
 
 function getUserLang(){
-    let userLangZh = document.cookie.indexOf('django_language=en');
-    if (userLangZh === -1){
+    let userLangEN = document.cookie.indexOf('django_language=en');
+    if (userLangEN === -1){
         return 'zh-CN'
     }
     else{

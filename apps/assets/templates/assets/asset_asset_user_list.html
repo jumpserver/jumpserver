@@ -73,19 +73,22 @@
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
-    assetUserListUrl = setUrlParam(assetUserListUrl, "asset_id", "{{ asset.id }}");
-    initAssetUserTable()
+    assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "asset_id", "{{ asset.id }}");
+    initAssetUserTable({assetUserListUrl: assetUserListUrl})
 })
 
 .on('click', '#btn-bulk-test-connective', function () {
-    var the_url = "{% url 'api-assets:asset-user-connective' %}" + "?asset_id={{ asset.id }}";
+    var assetId = "{{ asset.id }}";
+    var theUrl = "{% url 'api-assets:asset-user-task-create' %}?asset_id={{ DEFAULT_PK }}&latest=1"
+        .replace("{{ DEFAULT_PK }}", assetId);
     var success = function (data) {
         var task_id = data.task;
         showCeleryTaskLog(task_id);
     };
     requestApi({
-        url: the_url,
-        method: 'GET',
+        url: theUrl,
+        method: 'POST',
+        data: {action: "test"},
         success: success,
         flash_message: false
     });

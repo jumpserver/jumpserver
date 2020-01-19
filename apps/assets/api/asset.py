@@ -23,8 +23,8 @@ from ..filters import AssetByNodeFilterBackend, LabelFilterBackend
 logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetPlatformRetrieveApi',
-    'AssetRefreshHardwareApi', 'AssetAdminUserTestApi',
     'AssetGatewayApi', 'AssetPlatformViewSet',
+    'AssetTaskCreateApi',
 ]
 
 
@@ -80,38 +80,29 @@ class AssetPlatformViewSet(ModelViewSet):
             self.permission_denied(
                 request, message={"detail": "Internal platform"}
             )
-
         return super().check_object_permissions(request, obj)
 
 
-class AssetRefreshHardwareApi(generics.RetrieveAPIView):
-    """
-    Refresh asset hardware info
-    """
+class AssetTaskCreateApi(generics.CreateAPIView):
     model = Asset
-    serializer_class = serializers.AssetSerializer
+    serializer_class = serializers.AssetTaskSerializer
     permission_classes = (IsOrgAdmin,)
 
-    def retrieve(self, request, *args, **kwargs):
-        asset_id = kwargs.get('pk')
-        asset = get_object_or_404(Asset, pk=asset_id)
-        task = update_asset_hardware_info_manual.delay(asset)
-        return Response({"task": task.id})
+    def get_object(self):
+        pk = self.kwargs.get("pk")
+        instance = get_object_or_404(Asset, pk=pk)
+        return instance
 
-
-class AssetAdminUserTestApi(generics.RetrieveAPIView):
-    """
-    Test asset admin user assets_connectivity
-    """
-    model = Asset
-    permission_classes = (IsOrgAdmin,)
-    serializer_class = serializers.TaskIDSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        asset_id = kwargs.get('pk')
-        asset = get_object_or_404(Asset, pk=asset_id)
-        task = test_asset_connectivity_manual.delay(asset)
-        return Response({"task": task.id})
+    def perform_create(self, serializer):
+        asset = self.get_object()
+        action = serializer.validated_data["action"]
+        if action == "refresh":
+            task = update_asset_hardware_info_manual.delay(asset)
+        else:
+            task = test_asset_connectivity_manual.delay(asset)
+        data = getattr(serializer, '_data', {})
+        data["task"] = task.id
+        setattr(serializer, '_data', data)
 
 
 class AssetGatewayApi(generics.RetrieveAPIView):

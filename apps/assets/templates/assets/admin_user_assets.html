@@ -72,9 +72,9 @@
 <script>
 
 $(document).ready(function () {
-	assetUserListUrl = setUrlParam(assetUserListUrl, "admin_user_id", "{{ admin_user.id }}");
-    prefer = "admin_user";
-    initAssetUserTable();
+	var assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "prefer_id", "{{ admin_user.id }}");
+    assetUserListUrl = setUrlParam(assetUserListUrl, "prefer", "admin_user");
+    initAssetUserTable({assetUserListUrl: assetUserListUrl});
 })
 .on('click', '.btn-test-connective', function () {
     var the_url = "{% url 'api-assets:admin-user-connective' pk=admin_user.id %}";

@@ -72,8 +72,8 @@ class JMSBaseInventory(BaseInventory):
 
 class JMSInventory(JMSBaseInventory):
     """
-    JMS Inventory is the manager with jumpserver assets, so you can
-    write you own manager, construct you inventory,
+    JMS Inventory is the inventory with jumpserver assets, so you can
+    write you own inventory, construct you inventory,
     user_info  is obtained from admin_user or asset_user
     """
     def __init__(self, assets, run_as_admin=False, run_as=None, become_info=None):
@@ -110,7 +110,7 @@ class JMSInventory(JMSBaseInventory):
         try:
             asset = self.assets.get(id=host.get('id'))
             manager = AssetUserManager()
-            run_user = manager.get(self.run_as, asset)
+            run_user = manager.get_latest(username=self.run_as, asset=asset)
         except Exception as e:
             logger.error(e, exc_info=True)
             return {}
@@ -120,7 +120,7 @@ class JMSInventory(JMSBaseInventory):
 
 class JMSCustomInventory(JMSBaseInventory):
     """
-    JMS Custom Inventory is the manager with jumpserver assets,
+    JMS Custom Inventory is the inventory with jumpserver assets,
     user_info  is obtained from custom parameter
     """
 

@@ -131,26 +131,6 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        {% if system_user.auto_push %}
-                                        <tr class="only-ssh-rdp">
-                                            <td width="50%">{% trans 'Push system user now' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs btn-push" style="width: 54px">{% trans 'Push' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        {% if system_user.is_need_test_asset_connective %}
-                                        <tr>
-                                            <td width="50%">{% trans 'Test assets connective' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs btn-test-connective" style="width: 54px">{% trans 'Test' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -246,32 +226,7 @@ $(document).ready(function () {
     var redirect_url = "{% url 'assets:system-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })
-.on('click', '.btn-push', function () {
-    var the_url = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
-    var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
-    };
-    requestApi({
-        url: the_url,
-        method: 'GET',
-        success: success,
-        flash_message: false
-    });
-})
-.on('click', '.btn-test-connective', function () {
-    var the_url = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
-    var success = function (data) {
-        var task_id = data.task;
-        showCeleryTaskLog(task_id);
-    };
-    requestApi({
-        url: the_url,
-        method: 'GET',
-        success: success,
-        flash_message: false
-    });
-}).on('click', '#btn-binding-command-filters', function () {
+.on('click', '#btn-binding-command-filters', function () {
     var new_selected_cmd_filters = $.map($('#command_filters_selected').select2('data'), function (i) {
         return i.id;
     });

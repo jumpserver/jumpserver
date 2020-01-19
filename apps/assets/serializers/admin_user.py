@@ -55,3 +55,11 @@ class ReplaceNodeAdminUserSerializer(serializers.ModelSerializer):
 
 class TaskIDSerializer(serializers.Serializer):
     task = serializers.CharField(read_only=True)
+
+
+class AssetUserTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = (
+        ('test', 'test'),
+    )
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    task = serializers.CharField(read_only=True)

@@ -5,26 +5,24 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.models import OrgManager
-from .base import AssetUser
+from .base import BaseUser
 
 __all__ = ['AuthBook']
 
 
 class AuthBookQuerySet(models.QuerySet):
-
     def latest_version(self):
-        return self.filter(is_latest=True).filter(is_active=True)
+        return self.filter(is_latest=True)
 
 
 class AuthBookManager(OrgManager):
     pass
 
 
-class AuthBook(AssetUser):
+class AuthBook(BaseUser):
     asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, verbose_name=_('Asset'))
     is_latest = models.BooleanField(default=False, verbose_name=_('Latest version'))
     version = models.IntegerField(default=1, verbose_name=_('Version'))
-    is_active = models.BooleanField(default=True, verbose_name=_("Is active"))
 
     objects = AuthBookManager.from_queryset(AuthBookQuerySet)()
     backend = "db"

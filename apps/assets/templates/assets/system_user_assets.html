@@ -197,9 +197,12 @@ function initNodeTable() {
 $(document).ready(function () {
 	$('.select2').select2();
     nodesSelect2Init(".nodes-select2");
-	assetUserListUrl = setUrlParam(assetUserListUrl, "system_user_id", "{{ system_user.id }}");
-    needPush = true;
-    initAssetUserTable();
+	var assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "prefer_id", "{{ system_user.id }}");
+	assetUserListUrl = setUrlParam(assetUserListUrl, "prefer", "system_user");
+    initAssetUserTable({
+        assetUserListUrl: assetUserListUrl,
+        needPush: true
+    });
     initNodeTable();
 })
 .on('click', '.btn-remove-from-node', function() {
@@ -216,7 +219,7 @@ $(document).ready(function () {
     addObjects(nodes, "node");
 })
 .on('click', '.btn-push', function () {
-    var theUrl = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
@@ -224,18 +227,26 @@ $(document).ready(function () {
         var taskId = data.task;
         showCeleryTaskLog(taskId);
     };
+    var data = {
+        action: 'push'
+    };
     requestApi({
         url: theUrl,
         error: error,
-        method: 'GET',
+        data: data,
+        method: 'POST',
         success: success
     });
 })
 .on('click', '.btn-push-auth', function () {
     var $this = $(this);
-    var asset_id = $this.data('asset');
-    var theUrl = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}";
-    theUrl = theUrl.replace("{{ DEFAULT_PK }}", asset_id);
+    var assetId = $this.data('asset');
+    var username = $this.data("username");
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=object.id %}?username=" + username;
+    var data = {
+        action: 'push',
+        asset: assetId,
+    };
     var success = function (data) {
         var taskId = data.task;
         showCeleryTaskLog(taskId);
@@ -245,13 +256,15 @@ $(document).ready(function () {
     };
     requestApi({
         url: theUrl,
-        method: 'GET',
+        method: 'POST',
+        data: data,
         success: success,
+        flash_message: false,
         error: error
     })
 })
 .on('click', '.btn-test-connective', function () {
-    var theUrl = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
@@ -261,9 +274,11 @@ $(document).ready(function () {
     };
     requestApi({
         url: theUrl,
+        data: {action: "test"},
         error: error,
-        method: 'GET',
-        success: success
+        method: 'POST',
+        success: success,
+        flash_message: false,
     });
 })
 </script>
