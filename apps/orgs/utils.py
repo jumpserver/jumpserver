@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import uuid
 from inspect import signature
 from functools import wraps
 from werkzeug.local import LocalProxy
@@ -29,7 +30,7 @@ def get_org_from_request(request):
 
 
 def set_current_org(org):
-    if isinstance(org, str):
+    if isinstance(org, (str, uuid.UUID)):
         org = Organization.get_instance(org)
     setattr(thread_local, 'current_org_id', org.id)
 

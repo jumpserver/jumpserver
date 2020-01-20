@@ -35,22 +35,19 @@ class TreeService(Tree):
     @timeit
     def new(cls):
         from .models import Node
-        from orgs.utils import tmp_to_root_org
-
-        with tmp_to_root_org():
-            all_nodes = list(Node.objects.all().values("key", "value"))
-            all_nodes.sort(key=lambda x: len(x["key"].split(":")))
-            tree = cls()
-            tree.create_node(tag='', identifier='')
-            for node in all_nodes:
-                key = node["key"]
-                value = node["value"]
-                parent_key = ":".join(key.split(":")[:-1])
-                tree.safe_create_node(
-                    tag=value, identifier=key,
-                    parent=parent_key,
-                )
-            tree.init_assets()
+        all_nodes = list(Node.objects.all().values("key", "value"))
+        all_nodes.sort(key=lambda x: len(x["key"].split(":")))
+        tree = cls()
+        tree.create_node(tag='', identifier='')
+        for node in all_nodes:
+            key = node["key"]
+            value = node["value"]
+            parent_key = ":".join(key.split(":")[:-1])
+            tree.safe_create_node(
+                tag=value, identifier=key,
+                parent=parent_key,
+            )
+        tree.init_assets()
         return tree
 
     @timeit
