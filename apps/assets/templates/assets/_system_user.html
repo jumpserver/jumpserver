@@ -271,6 +271,7 @@ $(document).ready(function () {
     var checked = $(this).prop('checked');
     var usernameRef = $("#id_username");
     if (checked) {
+        usernameRef.val('');
         usernameRef.attr("disabled", true)
     } else {
         usernameRef.attr("disabled", false)
