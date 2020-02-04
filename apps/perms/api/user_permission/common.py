@@ -11,7 +11,7 @@ from rest_framework.generics import (
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAdmin
 from common.utils import get_logger
 from ...utils import (
-    AssetPermissionUtilV2
+    AssetPermissionUtil
 )
 from ...hands import User, Asset, SystemUser
 from ... import serializers
@@ -95,7 +95,7 @@ class RefreshAssetPermissionCacheApi(RetrieveAPIView):
     permission_classes = (IsOrgAdmin,)
 
     def retrieve(self, request, *args, **kwargs):
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
+        AssetPermissionUtil.expire_all_user_tree_cache()
         return Response({'msg': True}, status=200)
 
 

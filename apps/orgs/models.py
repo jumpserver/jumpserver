@@ -99,7 +99,7 @@ class Organization(models.Model):
         if self.is_real():
             return self.id
         elif self.is_root():
-            return None
+            return self.ROOT_ID
         else:
             return ''
 

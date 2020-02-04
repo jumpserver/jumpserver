@@ -4,7 +4,7 @@
 from rest_framework.generics import get_object_or_404
 from common.permissions import IsValidUser, IsOrgAdminOrAppUser
 from common.utils import get_logger
-from orgs.utils import set_to_root_org, get_current_org, set_current_org, tmp_to_root_org
+from orgs.utils import set_to_root_org, set_current_org
 from ..hands import User, UserGroup
 
 
@@ -22,8 +22,8 @@ class UserPermissionMixin:
 
     def initial(self, *args, **kwargs):
         super().initial(*args, *kwargs)
-        self.current_org = get_current_org()
-        set_to_root_org()
+        # self.current_org = get_current_org()
+        # set_to_root_org()
         self.obj = self.get_obj()
 
     # def dispatch(self, request, *args, **kwargs):
@@ -51,9 +51,9 @@ class UserPermissionMixin:
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
-        org = getattr(self, 'current_org', None)
-        if org:
-            set_current_org(org)
+        # org = getattr(self, 'current_org', None)
+        # if org:
+        #     set_current_org(org)
         return response
 
 

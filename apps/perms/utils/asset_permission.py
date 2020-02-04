@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 
-from orgs.utils import set_to_root_org
+from orgs.utils import set_to_root_org, current_org
 from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
@@ -19,8 +19,7 @@ logger = get_logger(__file__)
 
 
 __all__ = [
-    'is_obj_attr_has', 'sort_assets',
-    'ParserNode', 'AssetPermissionUtilV2',
+    'ParserNode', 'AssetPermissionUtil',
 ]
 
 
@@ -58,17 +57,42 @@ def get_system_user_permissions(system_user):
     )
 
 
-class AssetPermissionUtilCacheMixin:
-    user_tree_cache_key = 'USER_PERM_TREE_{}_{}'
+class UserTreeLocalCache:
+    user_tree_cache_key = 'USER_PERM_TREE_{}_{}_{}'
     user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
     user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
+    user_tree_map = {}
+
+    @classmethod
+    def delete_all(cls, org_id=None):
+        key = cls.user_tree_cache_key.format('*', '*', '*')
+        cache.delete_pattern()
+        pass
+
+    def get(self, obj_id, org_id=None):
+        pass
+
+    def set(self, obj_id, tree, org_id=None):
+        pass
+
+    def is_valid(self):
+        pass
+
+
+class AssetPermissionUtilCacheMixin:
+    user_tree_cache_key = 'USER_PERM_TREE_{}_{}_{}'
+    user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
+    user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
+    user_tree_map = {}
     cache_policy = '0'
     obj_id = ''
     _filter_id = 'None'
 
     @property
     def cache_key(self):
-        return self.user_tree_cache_key.format(self.obj_id, self._filter_id)
+        return self.user_tree_cache_key.format(
+            current_org.org_id(), self.obj_id, self._filter_id
+        )
 
     def expire_user_tree_cache(self):
         cache.delete(self.cache_key)
@@ -111,7 +135,7 @@ class AssetPermissionUtilCacheMixin:
         self.set_user_tree_to_cache(user_tree)
 
 
-class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
+class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     get_permissions_map = {
         "User": get_user_permissions,
         "UserGroup": get_user_group_permissions,
@@ -136,7 +160,8 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
 
     @staticmethod
     def change_org_if_need():
-        set_to_root_org()
+        pass
+        # set_to_root_org()
 
     @lazyproperty
     def full_tree(self):
@@ -412,27 +437,6 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
     def get_system_users(self):
         system_users_id = self.permissions.values_list('system_users', flat=True).distinct()
         return SystemUser.objects.filter(id__in=system_users_id)
-
-
-def is_obj_attr_has(obj, val, attrs=("hostname", "ip", "comment")):
-    if not attrs:
-        vals = [val for val in obj.__dict__.values() if isinstance(val, (str, int))]
-    else:
-        vals = [getattr(obj, attr) for attr in attrs if
-                hasattr(obj, attr) and isinstance(hasattr(obj, attr), (str, int))]
-
-    for v in vals:
-        if str(v).find(val) != -1:
-            return True
-    return False
-
-
-def sort_assets(assets, order_by='hostname', reverse=False):
-    if order_by == 'ip':
-        assets = sorted(assets, key=lambda asset: [int(d) for d in asset.ip.split('.') if d.isdigit()], reverse=reverse)
-    else:
-        assets = sorted(assets, key=lambda asset: getattr(asset, order_by), reverse=reverse)
-    return assets
 
 
 class ParserNode:

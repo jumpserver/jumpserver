@@ -8,7 +8,7 @@ from django.conf import settings
 
 from orgs.mixins.api import RootOrgViewMixin
 from common.permissions import IsValidUser
-from perms.utils import AssetPermissionUtilV2
+from perms.utils import AssetPermissionUtil
 from ..models import CommandExecution
 from ..serializers import CommandExecutionSerializer
 from ..tasks import run_command_execution
@@ -27,7 +27,7 @@ class CommandExecutionViewSet(RootOrgViewMixin, viewsets.ModelViewSet):
         data = serializer.validated_data
         assets = data["hosts"]
         system_user = data["run_as"]
-        util = AssetPermissionUtilV2(self.request.user)
+        util = AssetPermissionUtil(self.request.user)
         util.filter_permissions(system_users=system_user.id)
         permed_assets = util.get_assets().filter(id__in=[a.id for a in assets])
         invalid_assets = set(assets) - set(permed_assets)

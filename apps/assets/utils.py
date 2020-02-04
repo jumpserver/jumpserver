@@ -12,16 +12,6 @@ from .models import SystemUser, Asset
 logger = get_logger(__file__)
 
 
-def get_system_user_by_name(name):
-    system_user = get_object_or_none(SystemUser, name=name)
-    return system_user
-
-
-def get_system_user_by_id(id):
-    system_user = get_object_or_none(SystemUser, id=id)
-    return system_user
-
-
 class TreeService(Tree):
     tag_sep = ' / '
 

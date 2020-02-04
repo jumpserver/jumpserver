@@ -137,8 +137,8 @@ class TreeMixin:
         当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
         :return:
         """
-        from perms.utils.asset_permission import AssetPermissionUtilV2
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
+        from perms.utils.asset_permission import AssetPermissionUtil
+        AssetPermissionUtil.expire_all_user_tree_cache()
 
 
 class FamilyMixin:
@@ -433,15 +433,6 @@ class SomeNodesMixin:
             return obj
 
     @classmethod
-    def empty_node(cls):
-        with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.empty_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.empty_key
-            )
-            return obj
-
-    @classmethod
     def default_node(cls):
         with tmp_to_org(Organization.default()):
             defaults = {'value': cls.default_value}
@@ -469,7 +460,6 @@ class SomeNodesMixin:
     @classmethod
     def initial_some_nodes(cls):
         cls.default_node()
-        cls.empty_node()
         cls.ungrouped_node()
         cls.favorite_node()
 

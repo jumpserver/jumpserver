@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from common.utils import get_logger
 from common.decorator import on_transaction_commit
 from .models import AssetPermission, RemoteAppPermission
-from .utils.asset_permission import AssetPermissionUtilV2
+from .utils.asset_permission import AssetPermissionUtil
 
 
 logger = get_logger(__file__)
@@ -16,7 +16,7 @@ logger = get_logger(__file__)
 @on_transaction_commit
 def on_permission_change(sender, action='', **kwargs):
     logger.debug('Asset permission changed, refresh user tree cache')
-    AssetPermissionUtilV2.expire_all_user_tree_cache()
+    AssetPermissionUtil.expire_all_user_tree_cache()
 
 # Todo: 检查授权规则到期，从而修改授权规则
 
