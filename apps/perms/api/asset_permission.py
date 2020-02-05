@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.db.models import Q
-
 from common.permissions import IsOrgAdmin
 from orgs.mixins.api import OrgModelViewSet
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, union_queryset
 from ..models import AssetPermission
 from ..hands import (
     User, UserGroup, Asset, Node, SystemUser,
@@ -113,7 +111,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
             inherit_all_nodes.update(ancestor_keys)
         assets_queryset = queryset.filter(assets__in=assets)
         nodes_queryset = queryset.filter(nodes__key__in=inherit_all_nodes)
-        queryset = assets_queryset.union(nodes_queryset)
+        queryset = union_queryset(assets_queryset, nodes_queryset)
         return queryset
 
     def filter_user(self, queryset):
@@ -133,7 +131,7 @@ class AssetPermissionViewSet(OrgModelViewSet):
         groups = user.groups.all()
         users_queryset = queryset.filter(users=user)
         groups_queryset = queryset.filter(user_groups__in=groups)
-        queryset = users_queryset.union(groups_queryset)
+        queryset = union_queryset(users_queryset, groups_queryset)
         return queryset
 
     def filter_user_group(self, queryset):

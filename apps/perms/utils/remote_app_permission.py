@@ -1,10 +1,10 @@
 #  coding: utf-8
 #
 
-from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from common.tree import TreeNode
+from common.utils import union_queryset
 from orgs.utils import set_to_root_org
 
 from ..models import RemoteAppPermission
@@ -24,7 +24,7 @@ def get_user_remote_app_permissions(user, include_group=True):
         groups_permissions = RemoteAppPermission.objects.all().valid().filter(
             user_groups__in=groups
         )
-        permissions = permissions.union(groups_permissions)
+        permissions = union_queryset(permissions, groups_permissions)
     return permissions
 
 

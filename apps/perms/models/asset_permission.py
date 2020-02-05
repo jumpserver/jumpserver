@@ -93,7 +93,7 @@ class AssetPermission(BasePermission):
             models.Prefetch('nodes', queryset=Node.objects.all().only('key')),
             models.Prefetch('assets', queryset=Asset.objects.all().only('id')),
             models.Prefetch('system_users', queryset=SystemUser.objects.all().only('id'))
-        )
+        ).order_by()
 
     def get_all_assets(self):
         from assets.models import Node
