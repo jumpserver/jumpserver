@@ -111,9 +111,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
                 continue
             ancestor_keys = Node.get_node_ancestor_keys(key, with_self=True)
             inherit_all_nodes.update(ancestor_keys)
-        queryset = queryset.filter(
-            Q(assets__in=assets) | Q(nodes__key__in=inherit_all_nodes)
-        ).distinct()
+        assets_queryset = queryset.filter(assets__in=assets)
+        nodes_queryset = queryset.filter(nodes__key__in=inherit_all_nodes)
+        queryset = assets_queryset.union(nodes_queryset)
         return queryset
 
     def filter_user(self, queryset):
@@ -131,9 +131,9 @@ class AssetPermissionViewSet(OrgModelViewSet):
             queryset = queryset.filter(users=user)
             return queryset
         groups = user.groups.all()
-        queryset = queryset.filter(
-            Q(users=user) | Q(user_groups__in=groups)
-        ).distinct()
+        users_queryset = queryset.filter(users=user)
+        groups_queryset = queryset.filter(user_groups__in=groups)
+        queryset = users_queryset.union(groups_queryset)
         return queryset
 
     def filter_user_group(self, queryset):

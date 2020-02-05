@@ -18,12 +18,14 @@ __all__ = [
 
 
 def get_user_remote_app_permissions(user, include_group=True):
+    permissions = RemoteAppPermission.objects.all().valid().filter(users=user)
     if include_group:
         groups = user.groups.all()
-        arg = Q(users=user) | Q(user_groups__in=groups)
-    else:
-        arg = Q(users=user)
-    return RemoteAppPermission.objects.all().valid().filter(arg)
+        groups_permissions = RemoteAppPermission.objects.all().valid().filter(
+            user_groups__in=groups
+        )
+        permissions = permissions.union(groups_permissions)
+    return permissions
 
 
 def get_user_group_remote_app_permissions(user_group):

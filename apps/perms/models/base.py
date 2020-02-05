@@ -83,7 +83,8 @@ class BasePermission(OrgModelMixin):
         from users.models import User
         users_id = self.users.all().values_list('id', flat=True)
         groups_id = self.user_groups.all().values_list('id', flat=True)
-        users = User.objects.filter(
-            Q(id__in=users_id) | Q(groups__id__in=groups_id)
-        ).distinct()
+        users = User.objects.filter(id__in=users_id)
+        if groups_id:
+            groups_users = User.objects.filter(groups__id__in=groups_id)
+            users = users.union(groups_users)
         return users
