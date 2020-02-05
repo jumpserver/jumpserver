@@ -25,12 +25,14 @@ __all__ = [
 
 
 def get_user_permissions(user, include_group=True):
+    permissions = AssetPermission.get_queryset_with_prefetch().filter(users=user)
     if include_group:
         groups = user.groups.all()
-        arg = Q(users=user) | Q(user_groups__in=groups)
-    else:
-        arg = Q(users=user)
-    return AssetPermission.get_queryset_with_prefetch().filter(arg)
+        permissions_groups = AssetPermission.get_queryset_with_prefetch().filter(
+            user_groups__in=groups
+        )
+        permissions = permissions.union(permissions_groups)
+    return permissions
 
 
 def get_user_group_permissions(user_group):
@@ -40,12 +42,14 @@ def get_user_group_permissions(user_group):
 
 
 def get_asset_permissions(asset, include_node=True):
+    permissions = AssetPermission.get_queryset_with_prefetch().filter(asset=asset)
     if include_node:
         nodes = asset.get_all_nodes(flat=True)
-        arg = Q(assets=asset) | Q(nodes__in=nodes)
-    else:
-        arg = Q(assets=asset)
-    return AssetPermission.objects.valid().filter(arg)
+        permissions_nodes = AssetPermission.get_queryset_with_prefetch().filter(
+            nodes__in=nodes
+        )
+        permissions = permissions.union(permissions_nodes)
+    return permissions
 
 
 def get_node_permissions(node):
