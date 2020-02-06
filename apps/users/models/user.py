@@ -532,9 +532,17 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def is_local(self):
         return self.source == self.SOURCE_LOCAL
 
-    def save(self, *args, **kwargs):
+    def set_unprovide_attr_if_need(self):
         if not self.name:
             self.name = self.username
+        if not self.email or '@' not in self.email:
+            email = '{}@{}'.format(self.username, settings.EMAIL_SUFFIX)
+            if '@' in self.username:
+                email = self.username
+            self.email = email
+
+    def save(self, *args, **kwargs):
+        self.set_unprovide_attr_if_need()
         if self.username == 'admin':
             self.role = 'Admin'
             self.is_active = True

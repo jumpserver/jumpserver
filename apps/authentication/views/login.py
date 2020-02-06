@@ -52,17 +52,29 @@ class UserLoginView(mixins.AuthMixin, FormView):
         template_name = 'authentication/xpack_login.html'
         return template_name
 
+    def get_redirect_url_if_need(self, request):
+        redirect_url = ''
+        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
+        if self.request.GET.get("admin", 0):
+            return None
+        if settings.AUTH_OPENID:
+            redirect_url = reverse("authentication:openid:openid-login")
+        elif settings.AUTH_CAS:
+            redirect_url = reverse(settings.CAS_LOGIN_URL_NAME)
+
+        if redirect_url:
+            query_string = request.GET.urlencode()
+            redirect_url = "{}?{}".format(redirect_url, query_string)
+        return redirect_url
+
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
             return redirect(redirect_user_first_login_or_index(
                 request, self.redirect_field_name)
             )
-        # show jumpserver login page if request http://{JUMP-SERVER}/?admin=1
-        if settings.AUTH_OPENID and not self.request.GET.get('admin', 0):
-            query_string = request.GET.urlencode()
-            openid_login_url = reverse_lazy("authentication:openid:openid-login")
-            login_url = "{}?{}".format(openid_login_url, query_string)
-            return redirect(login_url)
+        redirect_url = self.get_redirect_url_if_need(request)
+        if redirect_url:
+            return redirect(redirect_url)
         request.session.set_test_cookie()
         return super().get(request, *args, **kwargs)
 
@@ -174,8 +186,17 @@ class UserLoginWaitConfirmView(TemplateView):
 class UserLogoutView(TemplateView):
     template_name = 'flash_message_standalone.html'
 
+    @staticmethod
+    def get_backend_logout_url():
+        if settings.AUTH_CAS:
+            return settings.CAS_LOGOUT_URL_NAME
+        return None
+
     def get(self, request, *args, **kwargs):
         auth_logout(request)
+        backend_logout_url = self.get_backend_logout_url()
+        if backend_logout_url:
+            return redirect(backend_logout_url)
         next_uri = request.COOKIES.get("next")
         if next_uri:
             return redirect(next_uri)

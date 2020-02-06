@@ -29,14 +29,8 @@ api_v2 = [
     path('users/', include('users.urls.api_urls_v2', namespace='api-users-v2')),
 ]
 
-import django_cas_ng.views
-
 
 app_view_patterns = [
-    path('accounts/login/', django_cas_ng.views.LoginView.as_view(), name='cas_ng_login'),
-    path('accounts/logout/', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
-    path('accounts/callback/', django_cas_ng.views.CallbackView.as_view(), name='cas_ng_proxy_callback'),
-
     path('users/', include('users.urls.views_urls', namespace='users')),
     path('assets/', include('assets.urls.views_urls', namespace='assets')),
     path('perms/', include('perms.urls.views_urls', namespace='perms')),
