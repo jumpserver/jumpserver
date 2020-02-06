@@ -424,11 +424,13 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     SOURCE_LDAP = 'ldap'
     SOURCE_OPENID = 'openid'
     SOURCE_RADIUS = 'radius'
+    SOURCE_CAS = 'cas'
     SOURCE_CHOICES = (
         (SOURCE_LOCAL, _('Local')),
         (SOURCE_LDAP, 'LDAP/AD'),
         (SOURCE_OPENID, 'OpenID'),
         (SOURCE_RADIUS, 'Radius'),
+        (SOURCE_CAS, 'CAS'),
     )
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
