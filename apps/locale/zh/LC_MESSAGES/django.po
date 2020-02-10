@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-04 11:03+0800\n"
+"POT-Creation-Date: 2020-02-10 18:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -145,7 +145,7 @@ msgstr "运行参数"
 #: terminal/models.py:351 terminal/templates/terminal/base_storage_list.html:31
 #: terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:30 users/forms/profile.py:20
-#: users/models/group.py:15 users/models/user.py:438
+#: users/models/group.py:15 users/models/user.py:440
 #: users/templates/users/_select_user_modal.html:13
 #: users/templates/users/user_asset_permission.html:37
 #: users/templates/users/user_asset_permission.html:154
@@ -252,7 +252,7 @@ msgstr "数据库"
 #: terminal/models.py:358 terminal/templates/terminal/base_storage_list.html:33
 #: terminal/templates/terminal/terminal_detail.html:63
 #: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:16
-#: users/models/user.py:471 users/templates/users/user_detail.html:115
+#: users/models/user.py:473 users/templates/users/user_detail.html:115
 #: users/templates/users/user_granted_database_app.html:38
 #: users/templates/users/user_granted_remote_app.html:37
 #: users/templates/users/user_group_detail.html:62
@@ -321,7 +321,7 @@ msgstr "参数"
 #: perms/templates/perms/asset_permission_detail.html:93
 #: perms/templates/perms/database_app_permission_detail.html:89
 #: perms/templates/perms/remote_app_permission_detail.html:85
-#: users/models/user.py:479 users/serializers/group.py:32
+#: users/models/user.py:481 users/serializers/group.py:32
 #: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:108
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
@@ -840,7 +840,7 @@ msgstr "SSH网关，支持代理SSH,RDP和VNC"
 #: ops/models/adhoc.py:187 perms/templates/perms/asset_permission_list.html:185
 #: perms/templates/perms/remote_app_permission_user.html:50
 #: settings/templates/settings/_ldap_list_users_modal.html:31
-#: users/forms/profile.py:19 users/models/user.py:436
+#: users/forms/profile.py:19 users/models/user.py:438
 #: users/templates/users/_select_user_modal.html:14
 #: users/templates/users/user_detail.html:53
 #: users/templates/users/user_list.html:15
@@ -907,7 +907,7 @@ msgstr "密码"
 
 #: assets/forms/user.py:29 assets/serializers/asset_user.py:80
 #: assets/templates/assets/_asset_user_auth_update_modal.html:27
-#: users/models/user.py:465
+#: users/models/user.py:467
 msgid "Private key"
 msgstr "ssh私钥"
 
@@ -1141,7 +1141,7 @@ msgstr "带宽"
 msgid "Contact"
 msgstr "联系人"
 
-#: assets/models/cluster.py:22 users/models/user.py:457
+#: assets/models/cluster.py:22 users/models/user.py:459
 #: users/templates/users/user_detail.html:62
 msgid "Phone"
 msgstr "手机"
@@ -1167,7 +1167,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:580
+#: users/models/user.py:590
 msgid "System"
 msgstr "系统"
 
@@ -1298,7 +1298,7 @@ msgstr "默认资产组"
 #: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:34
 #: tickets/templates/tickets/ticket_list.html:103 users/forms/group.py:15
-#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:568
+#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:578
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -1506,7 +1506,7 @@ msgid "Backend"
 msgstr "后端"
 
 #: assets/serializers/asset_user.py:76 users/forms/profile.py:148
-#: users/models/user.py:468 users/templates/users/first_login.html:42
+#: users/models/user.py:470 users/templates/users/first_login.html:42
 #: users/templates/users/user_password_update.html:49
 #: users/templates/users/user_profile.html:69
 #: users/templates/users/user_profile_update.html:46
@@ -2513,7 +2513,7 @@ msgstr "Agent"
 
 #: audits/models.py:86 audits/templates/audits/login_log_list.html:62
 #: authentication/templates/authentication/_mfa_confirm_modal.html:14
-#: users/forms/profile.py:52 users/models/user.py:460
+#: users/forms/profile.py:52 users/models/user.py:462
 #: users/templates/users/first_login.html:45
 msgid "MFA"
 msgstr "MFA"
@@ -2922,11 +2922,11 @@ msgstr "返回"
 msgid "Welcome back, please enter username and password to login"
 msgstr "欢迎回来，请输入用户名和密码登录"
 
-#: authentication/views/login.py:71
+#: authentication/views/login.py:83
 msgid "Please enable cookies and try again."
 msgstr "设置你的浏览器支持cookie"
 
-#: authentication/views/login.py:159
+#: authentication/views/login.py:171
 msgid ""
 "Wait for <b>{}</b> confirm, You also can copy link to her/him <br/>\n"
 "                  Don't close this page"
@@ -2934,15 +2934,15 @@ msgstr ""
 "等待 <b>{}</b> 确认, 你也可以复制链接发给他/她 <br/>\n"
 "                  不要关闭本页面"
 
-#: authentication/views/login.py:164
+#: authentication/views/login.py:176
 msgid "No ticket found"
 msgstr "没有发现工单"
 
-#: authentication/views/login.py:187
+#: authentication/views/login.py:208
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: authentication/views/login.py:188
+#: authentication/views/login.py:209
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
@@ -3446,7 +3446,7 @@ msgstr "提示：RDP 协议不支持单独控制上传或下载文件"
 #: perms/templates/perms/database_app_permission_list.html:16
 #: perms/templates/perms/remote_app_permission_list.html:16
 #: templates/_nav.html:21 users/forms/user.py:168 users/models/group.py:31
-#: users/models/user.py:444 users/templates/users/_select_user_modal.html:16
+#: users/models/user.py:446 users/templates/users/_select_user_modal.html:16
 #: users/templates/users/user_asset_permission.html:39
 #: users/templates/users/user_asset_permission.html:67
 #: users/templates/users/user_database_app_permission.html:38
@@ -3498,7 +3498,7 @@ msgstr "资产授权"
 #: perms/templates/perms/asset_permission_detail.html:85
 #: perms/templates/perms/database_app_permission_detail.html:81
 #: perms/templates/perms/remote_app_permission_detail.html:77
-#: users/models/user.py:476 users/templates/users/user_detail.html:93
+#: users/models/user.py:478 users/templates/users/user_detail.html:93
 #: users/templates/users/user_profile.html:120
 msgid "Date expired"
 msgstr "失效日期"
@@ -4153,7 +4153,7 @@ msgid "Refresh cache"
 msgstr "刷新缓存"
 
 #: settings/templates/settings/_ldap_list_users_modal.html:33
-#: users/forms/profile.py:89 users/models/user.py:440
+#: users/forms/profile.py:89 users/models/user.py:442
 #: users/templates/users/user_detail.html:57
 #: users/templates/users/user_profile.html:59
 msgid "Email"
@@ -5181,7 +5181,7 @@ msgstr "不能和原来的密钥相同"
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
-#: users/forms/user.py:27 users/models/user.py:448
+#: users/forms/user.py:27 users/models/user.py:450
 #: users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:73
 #: users/templates/users/user_list.html:16
@@ -5189,7 +5189,7 @@ msgstr "ssh密钥不合法"
 msgid "Role"
 msgstr "角色"
 
-#: users/forms/user.py:31 users/models/user.py:483
+#: users/forms/user.py:31 users/models/user.py:485
 #: users/templates/users/user_detail.html:89
 #: users/templates/users/user_list.html:18
 #: users/templates/users/user_profile.html:102
@@ -5224,7 +5224,7 @@ msgstr "设置密码"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/models/user.py:142 users/models/user.py:576
+#: users/models/user.py:142 users/models/user.py:586
 msgid "Administrator"
 msgstr "管理员"
 
@@ -5245,23 +5245,23 @@ msgstr "组织审计员"
 msgid "Force enable"
 msgstr "强制启用"
 
-#: users/models/user.py:428
+#: users/models/user.py:429
 msgid "Local"
 msgstr "数据库"
 
-#: users/models/user.py:451
+#: users/models/user.py:453
 msgid "Avatar"
 msgstr "头像"
 
-#: users/models/user.py:454 users/templates/users/user_detail.html:68
+#: users/models/user.py:456 users/templates/users/user_detail.html:68
 msgid "Wechat"
 msgstr "微信"
 
-#: users/models/user.py:487
+#: users/models/user.py:489
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:579
+#: users/models/user.py:589
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -6352,6 +6352,50 @@ msgstr "AWS (中国)"
 #: xpack/plugins/cloud/providers/aws.py:12
 msgid "AWS (International)"
 msgstr "AWS (国际)"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:15
+msgid "HuaweiCloud"
+msgstr "华为云"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:18
+msgid "CN North-Beijing4"
+msgstr "华北-北京4"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:19
+msgid "CN East-Shanghai1"
+msgstr "华东-上海1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:20
+msgid "CN East-Shanghai2"
+msgstr "华东-上海2"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:21
+msgid "CN South-Guangzhou"
+msgstr "华南-广州"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:22
+msgid "CN Southwest-Guiyang1"
+msgstr "西南-贵阳1"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:23
+msgid "AP-Hong-Kong"
+msgstr "亚太-香港"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:24
+msgid "AP-Bangkok"
+msgstr "亚太-曼谷"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:25
+msgid "AP-Singapore"
+msgstr "亚太-新加坡"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
+msgid "AF-Johannesburg"
+msgstr "非洲-约翰内斯堡"
+
+#: xpack/plugins/cloud/providers/huaweicloud.py:27
+msgid "LA-Santiago"
+msgstr "拉美-圣地亚哥"
 
 #: xpack/plugins/cloud/providers/qcloud.py:14
 msgid "Qcloud"
