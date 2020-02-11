@@ -237,9 +237,13 @@ $(document).ready(function() {
     var sessionID = $(this).data("session");
     var downloadUrl = "{% url 'terminal:session-replay-download' pk=DEFAULT_PK %}"
         .replace("{{ DEFAULT_PK }}", sessionID);
-    var help_text = "{% trans "Visit doc for replay play offline: " %}";
-    help_text += "http://docs.jumpserver.org";
-    var r = confirm(help_text);
+    var hasConfirm = getCookie('replayConfirm');
+    if (!hasConfirm) {
+        var help_text = "{% trans "Visit doc for replay play offline: " %}";
+        help_text += "http://docs.jumpserver.org";
+        var r = confirm(help_text);
+        setCookie("replayConfirm", "1")
+    }
     window.open(downloadUrl)
 })
 .on("click", '#session_table_filter input', function (e) {
