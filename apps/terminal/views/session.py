@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 #
+import os
 
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from django.utils import timezone
-from django.conf import settings
+from django.utils.encoding import escape_uri_path
+from django.http import FileResponse
+from django.core.files.storage import default_storage
 
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
-from common.mixins import DatetimeSearchMixin
-from ..models import Session, Command, Terminal
+from ..models import Session
 from ..backends import get_multi_command_storage
 from .. import utils
 
 
 __all__ = [
     'SessionOnlineListView', 'SessionOfflineListView',
-    'SessionDetailView',
+    'SessionDetailView', 'SessionReplayDownloadView',
 ]
 
 
@@ -81,3 +83,21 @@ class SessionDetailView(SingleObjectMixin, PermissionsMixin, ListView):
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
+
+class SessionReplayDownloadView(PermissionsMixin, DetailView):
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
+    model = Session
+
+    def get(self, request, *args, **kwargs):
+        session = self.get_object()
+        local_path, url = utils.get_session_replay_url(session)
+        full_path = default_storage.path(local_path)
+        file = open(full_path, 'rb')
+        response = FileResponse(file)
+        response['Content-Type'] = 'application/octet-stream'
+        # 这里要注意哦，网上查到的方法都是response['Content-Disposition']='attachment;filename="filename.py"',
+        # 但是如果文件名是英文名没问题，如果文件名包含中文，下载下来的文件名会被改为url中的path。
+        filename = escape_uri_path(os.path.basename(local_path))
+        disposition = "attachment; filename*=UTF-8''{}".format(filename)
+        response["Content-Disposition"] = disposition
+        return response

@@ -22,6 +22,7 @@ urlpatterns = [
     path('session-online/', views.SessionOnlineListView.as_view(), name='session-online-list'),
     path('session-offline/', views.SessionOfflineListView.as_view(), name='session-offline-list'),
     path('session/<uuid:pk>/', views.SessionDetailView.as_view(), name='session-detail'),
+    path('session/<uuid:pk>/replay/download/', views.SessionReplayDownloadView.as_view(), name='session-replay-download'),
 
     # Command view
     path('command/', views.CommandListView.as_view(), name='command-list'),

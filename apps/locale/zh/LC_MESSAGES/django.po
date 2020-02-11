@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-10 18:10+0800\n"
+"POT-Creation-Date: 2020-02-11 15:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -57,7 +57,7 @@ msgstr "自定义"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:54
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:13
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:14
-#: xpack/plugins/cloud/models.py:306
+#: xpack/plugins/cloud/models.py:309
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:60
 #: xpack/plugins/orgs/templates/orgs/org_list.html:17
 #: xpack/plugins/vault/forms.py:13 xpack/plugins/vault/forms.py:15
@@ -163,7 +163,7 @@ msgstr "运行参数"
 #: xpack/plugins/change_auth_plan/models.py:63
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:59
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:12
-#: xpack/plugins/cloud/models.py:58 xpack/plugins/cloud/models.py:143
+#: xpack/plugins/cloud/models.py:61 xpack/plugins/cloud/models.py:146
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:47
 #: xpack/plugins/cloud/templates/cloud/account_list.html:12
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:53
@@ -261,7 +261,7 @@ msgstr "数据库"
 #: xpack/plugins/change_auth_plan/models.py:104
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:115
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:19
-#: xpack/plugins/cloud/models.py:76 xpack/plugins/cloud/models.py:172
+#: xpack/plugins/cloud/models.py:79 xpack/plugins/cloud/models.py:175
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:67
 #: xpack/plugins/cloud/templates/cloud/account_list.html:15
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:102
@@ -325,7 +325,7 @@ msgstr "参数"
 #: users/templates/users/user_detail.html:97
 #: xpack/plugins/change_auth_plan/models.py:108
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:111
-#: xpack/plugins/cloud/models.py:79 xpack/plugins/cloud/models.py:178
+#: xpack/plugins/cloud/models.py:82 xpack/plugins/cloud/models.py:181
 #: xpack/plugins/gathered_user/models.py:46
 msgid "Created by"
 msgstr "创建者"
@@ -352,7 +352,7 @@ msgstr "创建者"
 #: tickets/templates/tickets/ticket_detail.html:52 users/models/group.py:18
 #: users/templates/users/user_group_detail.html:58
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:103
-#: xpack/plugins/cloud/models.py:82 xpack/plugins/cloud/models.py:181
+#: xpack/plugins/cloud/models.py:85 xpack/plugins/cloud/models.py:184
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:63
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:98
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:55
@@ -739,7 +739,7 @@ msgstr "节点"
 #: assets/models/cluster.py:19 assets/models/user.py:65
 #: assets/templates/assets/admin_user_list.html:62
 #: assets/templates/assets/asset_detail.html:72 templates/_nav.html:44
-#: xpack/plugins/cloud/models.py:160
+#: xpack/plugins/cloud/models.py:163
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:65
 #: xpack/plugins/orgs/templates/orgs/org_list.html:19
 msgid "Admin user"
@@ -781,7 +781,7 @@ msgstr "系统平台"
 #: xpack/plugins/change_auth_plan/forms.py:74
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:55
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:15
-#: xpack/plugins/cloud/models.py:156
+#: xpack/plugins/cloud/models.py:159
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:61
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:61
 msgid "Node"
@@ -2490,8 +2490,8 @@ msgstr "启用"
 msgid "-"
 msgstr ""
 
-#: audits/models.py:78 xpack/plugins/cloud/models.py:263
-#: xpack/plugins/cloud/models.py:286
+#: audits/models.py:78 xpack/plugins/cloud/models.py:266
+#: xpack/plugins/cloud/models.py:289
 msgid "Failed"
 msgstr "失败"
 
@@ -2521,7 +2521,7 @@ msgstr "MFA"
 #: audits/models.py:87 audits/templates/audits/login_log_list.html:63
 #: xpack/plugins/change_auth_plan/models.py:422
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_subtask_list.html:15
-#: xpack/plugins/cloud/models.py:277
+#: xpack/plugins/cloud/models.py:280
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:64
 msgid "Reason"
 msgstr "原因"
@@ -2530,7 +2530,7 @@ msgstr "原因"
 #: tickets/templates/tickets/ticket_detail.html:34
 #: tickets/templates/tickets/ticket_list.html:36
 #: tickets/templates/tickets/ticket_list.html:104
-#: xpack/plugins/cloud/models.py:274 xpack/plugins/cloud/models.py:309
+#: xpack/plugins/cloud/models.py:277 xpack/plugins/cloud/models.py:312
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:65
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:62
 msgid "Status"
@@ -3155,7 +3155,7 @@ msgstr "{} 任务结束"
 
 #: ops/models/command.py:23
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:56
-#: xpack/plugins/cloud/models.py:272
+#: xpack/plugins/cloud/models.py:275
 msgid "Result"
 msgstr "结果"
 
@@ -3626,7 +3626,7 @@ msgstr "刷新授权缓存"
 #: users/templates/users/user_database_app_permission.html:41
 #: users/templates/users/user_list.html:19
 #: users/templates/users/user_remote_app_permission.html:41
-#: xpack/plugins/cloud/models.py:73
+#: xpack/plugins/cloud/models.py:76
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:55
 #: xpack/plugins/cloud/templates/cloud/account_list.html:14
 msgid "Validity"
@@ -4381,8 +4381,8 @@ msgid "Command filters"
 msgstr "命令过滤"
 
 #: templates/_nav.html:97 terminal/views/command.py:21
-#: terminal/views/session.py:43 terminal/views/session.py:54
-#: terminal/views/session.py:78 terminal/views/terminal.py:32
+#: terminal/views/session.py:45 terminal/views/session.py:56
+#: terminal/views/session.py:80 terminal/views/terminal.py:32
 #: terminal/views/terminal.py:48 terminal/views/terminal.py:61
 msgid "Sessions"
 msgstr "会话管理"
@@ -4391,7 +4391,7 @@ msgstr "会话管理"
 msgid "Session online"
 msgstr "在线会话"
 
-#: templates/_nav.html:101 terminal/views/session.py:55
+#: templates/_nav.html:101 terminal/views/session.py:57
 msgid "Session offline"
 msgstr "历史会话"
 
@@ -4698,7 +4698,7 @@ msgid ""
 "            "
 msgstr ""
 
-#: terminal/forms/storage.py:143 xpack/plugins/cloud/models.py:303
+#: terminal/forms/storage.py:143 xpack/plugins/cloud/models.py:306
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:106
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:59
 msgid "Region"
@@ -4813,7 +4813,7 @@ msgid "Create replay storage"
 msgstr "创建录像存储"
 
 #: terminal/templates/terminal/session_detail.html:17
-#: terminal/views/session.py:79
+#: terminal/views/session.py:81
 msgid "Session detail"
 msgstr "会话详情"
 
@@ -4862,13 +4862,21 @@ msgstr "确认已完成"
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
 
-#: terminal/templates/terminal/session_list.html:141
+#: terminal/templates/terminal/session_list.html:137
+msgid "Download"
+msgstr "下载"
+
+#: terminal/templates/terminal/session_list.html:143
 msgid "Terminate"
 msgstr "终断"
 
-#: terminal/templates/terminal/session_list.html:172
+#: terminal/templates/terminal/session_list.html:174
 msgid "Finish session success"
 msgstr "标记会话完成成功"
+
+#: terminal/templates/terminal/session_list.html:240
+msgid "Visit doc for replay play offline: "
+msgstr "访问文档查看如何离线播放: "
 
 #: terminal/templates/terminal/terminal_detail.html:13
 #: terminal/views/terminal.py:62
@@ -4913,7 +4921,7 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:44
+#: terminal/views/session.py:46
 msgid "Session online list"
 msgstr "在线会话"
 
@@ -5315,7 +5323,7 @@ msgstr "安全令牌验证"
 
 #: users/templates/users/_base_otp.html:14 users/templates/users/_user.html:13
 #: users/templates/users/user_profile_update.html:55
-#: xpack/plugins/cloud/models.py:146
+#: xpack/plugins/cloud/models.py:149
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:57
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:13
 msgid "Account"
@@ -6082,7 +6090,7 @@ msgstr "所有资产使用不同的随机密码"
 #: xpack/plugins/change_auth_plan/models.py:78
 #: xpack/plugins/change_auth_plan/models.py:147
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:98
-#: xpack/plugins/cloud/models.py:164 xpack/plugins/cloud/models.py:218
+#: xpack/plugins/cloud/models.py:167 xpack/plugins/cloud/models.py:221
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:88
 #: xpack/plugins/gathered_user/models.py:35
 #: xpack/plugins/gathered_user/models.py:72
@@ -6092,7 +6100,7 @@ msgstr "周期执行"
 #: xpack/plugins/change_auth_plan/models.py:83
 #: xpack/plugins/change_auth_plan/models.py:145
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:90
-#: xpack/plugins/cloud/models.py:169 xpack/plugins/cloud/models.py:216
+#: xpack/plugins/cloud/models.py:172 xpack/plugins/cloud/models.py:219
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:80
 #: xpack/plugins/gathered_user/models.py:40
 #: xpack/plugins/gathered_user/models.py:70
@@ -6264,78 +6272,78 @@ msgstr "选择管理员"
 msgid "Cloud center"
 msgstr "云管中心"
 
-#: xpack/plugins/cloud/models.py:52
+#: xpack/plugins/cloud/models.py:55
 msgid "Available"
 msgstr "有效"
 
-#: xpack/plugins/cloud/models.py:53
+#: xpack/plugins/cloud/models.py:56
 msgid "Unavailable"
 msgstr "无效"
 
-#: xpack/plugins/cloud/models.py:62
+#: xpack/plugins/cloud/models.py:65
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:51
 #: xpack/plugins/cloud/templates/cloud/account_list.html:13
 msgid "Provider"
 msgstr "云服务商"
 
-#: xpack/plugins/cloud/models.py:65
+#: xpack/plugins/cloud/models.py:68
 msgid "Access key id"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:69
+#: xpack/plugins/cloud/models.py:72
 msgid "Access key secret"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:87
+#: xpack/plugins/cloud/models.py:90
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_create_update.html:26
 msgid "Cloud account"
 msgstr "云账号"
 
-#: xpack/plugins/cloud/models.py:149
+#: xpack/plugins/cloud/models.py:152
 msgid "Regions"
 msgstr "地域"
 
-#: xpack/plugins/cloud/models.py:152
+#: xpack/plugins/cloud/models.py:155
 msgid "Instances"
 msgstr "实例"
 
-#: xpack/plugins/cloud/models.py:175
+#: xpack/plugins/cloud/models.py:178
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:94
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:17
 msgid "Date last sync"
 msgstr "最后同步日期"
 
-#: xpack/plugins/cloud/models.py:186 xpack/plugins/cloud/models.py:270
+#: xpack/plugins/cloud/models.py:189 xpack/plugins/cloud/models.py:273
 msgid "Sync instance task"
 msgstr "同步实例任务"
 
-#: xpack/plugins/cloud/models.py:264 xpack/plugins/cloud/models.py:287
+#: xpack/plugins/cloud/models.py:267 xpack/plugins/cloud/models.py:290
 msgid "Succeed"
 msgstr "成功"
 
-#: xpack/plugins/cloud/models.py:265
+#: xpack/plugins/cloud/models.py:268
 msgid "Partial succeed"
 msgstr ""
 
-#: xpack/plugins/cloud/models.py:280 xpack/plugins/cloud/models.py:312
+#: xpack/plugins/cloud/models.py:283 xpack/plugins/cloud/models.py:315
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:66
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:63
 msgid "Date sync"
 msgstr "同步日期"
 
-#: xpack/plugins/cloud/models.py:288
+#: xpack/plugins/cloud/models.py:291
 msgid "Exist"
 msgstr "存在"
 
-#: xpack/plugins/cloud/models.py:293
+#: xpack/plugins/cloud/models.py:296
 msgid "Sync task"
 msgstr "同步任务"
 
-#: xpack/plugins/cloud/models.py:297
+#: xpack/plugins/cloud/models.py:300
 msgid "Sync instance task history"
 msgstr "同步实例任务历史"
 
-#: xpack/plugins/cloud/models.py:300
+#: xpack/plugins/cloud/models.py:303
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:114
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_instance.html:58
 msgid "Instance"
@@ -6353,47 +6361,47 @@ msgstr "AWS (中国)"
 msgid "AWS (International)"
 msgstr "AWS (国际)"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:15
+#: xpack/plugins/cloud/providers/huaweicloud.py:14
 msgid "HuaweiCloud"
 msgstr "华为云"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:18
+#: xpack/plugins/cloud/providers/huaweicloud.py:17
 msgid "CN North-Beijing4"
 msgstr "华北-北京4"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:19
+#: xpack/plugins/cloud/providers/huaweicloud.py:18
 msgid "CN East-Shanghai1"
 msgstr "华东-上海1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:20
+#: xpack/plugins/cloud/providers/huaweicloud.py:19
 msgid "CN East-Shanghai2"
 msgstr "华东-上海2"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:21
+#: xpack/plugins/cloud/providers/huaweicloud.py:20
 msgid "CN South-Guangzhou"
 msgstr "华南-广州"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:22
+#: xpack/plugins/cloud/providers/huaweicloud.py:21
 msgid "CN Southwest-Guiyang1"
 msgstr "西南-贵阳1"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:23
+#: xpack/plugins/cloud/providers/huaweicloud.py:22
 msgid "AP-Hong-Kong"
 msgstr "亚太-香港"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:24
+#: xpack/plugins/cloud/providers/huaweicloud.py:23
 msgid "AP-Bangkok"
 msgstr "亚太-曼谷"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:25
+#: xpack/plugins/cloud/providers/huaweicloud.py:24
 msgid "AP-Singapore"
 msgstr "亚太-新加坡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:26
+#: xpack/plugins/cloud/providers/huaweicloud.py:25
 msgid "AF-Johannesburg"
 msgstr "非洲-约翰内斯堡"
 
-#: xpack/plugins/cloud/providers/huaweicloud.py:27
+#: xpack/plugins/cloud/providers/huaweicloud.py:26
 msgid "LA-Santiago"
 msgstr "拉美-圣地亚哥"
 
@@ -7161,9 +7169,6 @@ msgstr "创建"
 
 #~ msgid "Template"
 #~ msgstr "模板"
-
-#~ msgid "Download"
-#~ msgstr "下载"
 
 #~ msgid "Asset csv file"
 #~ msgstr "资产csv文件"
