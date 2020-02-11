@@ -148,6 +148,11 @@ class Config(dict):
         'RADIUS_ENCRYPT_PASSWORD': True,
         'OTP_IN_RADIUS': False,
 
+        'AUTH_CAS': False,
+        'CAS_SERVER_URL': "http://host/cas/",
+        'CAS_LOGOUT_COMPLETELY': False,
+        'CAS_VERSION': 3,
+
         'OTP_VALID_WINDOW': 2,
         'OTP_ISSUER_NAME': 'Jumpserver',
         'EMAIL_SUFFIX': 'jumpserver.org',
@@ -280,9 +285,12 @@ class DynamicConfig:
         backends = [
             'authentication.backends.pubkey.PublicKeyAuthBackend',
             'django.contrib.auth.backends.ModelBackend',
+            'django_cas_ng.backends.CASBackend',
         ]
         if self.get('AUTH_LDAP'):
             backends.insert(0, 'authentication.backends.ldap.LDAPAuthorizationBackend')
+        if self.static_config.get('AUTH_CAS'):
+            backends.insert(0, 'authentication.backends.cas.CASBackend')
         if self.static_config.get('AUTH_OPENID'):
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationPasswordBackend')
             backends.insert(0, 'authentication.backends.openid.backends.OpenIDAuthorizationCodeBackend')

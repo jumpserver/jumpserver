@@ -132,11 +132,13 @@ function initTable() {
             }},
             {targets: 11, createdCell: function (td, cellData, rowData) {
                 var btnGroup = "";
-                var replayBtn = '<a disabled data-session="sessionID" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>'
-                    {#var replayBtn = '<a disabled onclick="window.open("url", "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no)" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>'#}
+                var replayBtn = '<a disabled data-session="sessionID" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>';
                 replayBtn = replayBtn.replace("sessionID", rowData.id);
+                var downloadBtn = ' <a disabled data-session="sessionID" class="btn btn-xs btn-info btn-download" >{% trans "Download" %}</a>';
+                downloadBtn = downloadBtn.replace("sessionID", rowData.id);
                 if (rowData.can_replay) {
-                    replayBtn = replayBtn.replace("disabled", "")
+                    replayBtn = replayBtn.replace("disabled", "");
+                    downloadBtn = downloadBtn.replace("disabled", "");
                 }
                 var termBtn = '<a class="btn btn-xs btn-danger btn-term" disabled value="sessionID" terminal="terminalID" >{% trans "Terminate" %}</a>';
                 if ("{{ request.user.can_admin_current_org }}" === "True") {
@@ -145,7 +147,7 @@ function initTable() {
                         .replace("terminalID", rowData.terminal)
                 }
                 if (rowData.is_finished) {
-                    btnGroup += replayBtn
+                    btnGroup += replayBtn + downloadBtn
                 } else {
                     btnGroup += termBtn;
                 }
@@ -230,6 +232,19 @@ $(document).ready(function() {
     var sessionID = $(this).data("session");
     var replayUrl = "/luna/replay/" + sessionID;
     window.open(replayUrl, "height=600, width=800, top=400, left=400, toolbar=no, menubar=no, scrollbars=no, location=no, status=no");
+})
+.on('click', '.btn-download', function () {
+    var sessionID = $(this).data("session");
+    var downloadUrl = "{% url 'terminal:session-replay-download' pk=DEFAULT_PK %}"
+        .replace("{{ DEFAULT_PK }}", sessionID);
+    var hasConfirm = getCookie('replayConfirm');
+    if (!hasConfirm) {
+        var help_text = "{% trans "Visit doc for replay play offline: " %}";
+        help_text += "http://docs.jumpserver.org";
+        var r = confirm(help_text);
+        setCookie("replayConfirm", "1")
+    }
+    window.open(downloadUrl)
 })
 .on("click", '#session_table_filter input', function (e) {
     e.preventDefault();
