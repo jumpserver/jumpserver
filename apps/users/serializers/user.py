@@ -74,8 +74,17 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             attrs['password_raw'] = password
         return attrs
 
+    @staticmethod
+    def clean_auth_fields(attrs):
+        for field in ('password', 'public_key'):
+            value = attrs.get(field)
+            if not value:
+                attrs.pop(field, None)
+        return attrs
+
     def validate(self, attrs):
         attrs = self.change_password_to_raw(attrs)
+        attrs = self.clean_auth_fields(attrs)
         return attrs
 
 
