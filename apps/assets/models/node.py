@@ -96,7 +96,6 @@ class TreeCache:
         logger.debug("Create node tree")
         if not org_id:
             org_id = current_org.id
-        print(">>>>>>>>>>>>>>>>>> {}".format(org_id))
         with tmp_to_org(org_id):
             tree = TreeService.new()
             tree.init_assets()
