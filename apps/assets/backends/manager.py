@@ -21,6 +21,9 @@ class NotSupportError(Exception):
 
 
 class AssetUserQueryset:
+    ObjectDoesNotExist = ObjectDoesNotExist
+    MultipleObjectsReturned = MultipleObjectsReturned
+
     def __init__(self, backends=()):
         self.backends = backends
         self._distinct_queryset = None
@@ -85,10 +88,10 @@ class AssetUserQueryset:
             data = queryset[0]
             return data
         elif count > 1:
-            msg = '{} get'.format(count)
+            msg = 'Should return 1 record, but get {}'.format(count)
             raise MultipleObjectsReturned(msg)
         else:
-            msg = 'Org is: {}'.format(current_org.name)
+            msg = 'No record found(org is {})'.format(current_org.name)
             raise ObjectDoesNotExist(msg)
 
     def get_latest(self, **kwargs):

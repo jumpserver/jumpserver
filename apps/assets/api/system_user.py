@@ -73,10 +73,13 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
 
         with tmp_to_org(asset.org_id):
             manager = AssetUserManager()
-            auth_info = manager.get(
-                asset=asset, username=username, prefer_id=instance.id
-            )
-            return auth_info
+            try:
+                auth_info = manager.get_latest(
+                    asset=asset, username=username, prefer_id=instance.id
+                )
+                return auth_info
+            except manager.ObjectDoesNotExist:
+                return instance
 
 
 class SystemUserTaskApi(generics.CreateAPIView):
