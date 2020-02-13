@@ -96,7 +96,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return username
 
     def validate_sftp_root(self, value):
-        if value in ['home', 'root']:
+        if value in ['home', 'tmp']:
             return value
         if not value.startswith('/'):
             error = _("Path should starts with /")
