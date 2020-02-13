@@ -9,8 +9,8 @@ from django.db.models import Q
 from django.conf import settings
 
 from orgs.utils import set_to_root_org
-from common.utils import get_logger, timeit, lazyproperty, union_queryset
-from orgs.utils import set_to_root_org, current_org
+from common.utils import union_queryset
+from orgs.utils import current_org
 from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
@@ -98,18 +98,24 @@ class AssetPermissionUtilCacheMixin:
 
     @property
     def cache_key(self):
-        return self.user_tree_cache_key.format(
-            current_org.org_id(), self.obj_id, self._filter_id
+        return self.get_cache_key()
+
+    def get_cache_key(self, org_id=None):
+        if org_id is None:
+            org_id = current_org.org_id()
+
+        key = self.user_tree_cache_key.format(
+            org_id, self.obj_id, self._filter_id
         )
+        return key
 
     def expire_user_tree_cache(self):
         cache.delete(self.cache_key)
 
     @classmethod
     def expire_all_user_tree_cache(cls):
-        key = cls.user_tree_cache_key.format('*', '*')
-        key = key.split('_')[:-1]
-        key = '_'.join(key)
+        key = cls.user_tree_cache_key.format('*', '1', '1')
+        key = key.replace('_1', '')
         cache.delete_pattern(key)
 
     def set_user_tree_to_cache(self, user_tree):
@@ -166,6 +172,9 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         self._user_tree = None
         self._user_tree_filter_id = 'None'
 
+        if not isinstance(obj, User):
+            self.cache_policy = '0'
+
     @staticmethod
     def change_org_if_need():
         pass
@@ -190,9 +199,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     @timeit
     def filter_permissions(self, **filters):
         self.cache_policy = '0'
-        # filters_json = json.dumps(filters, sort_keys=True)
         self._permissions = self.permissions.filter(**filters)
-        # self._filter_id = md5(filters_json.encode()).hexdigest()
 
     @lazyproperty
     def user_tree(self):
@@ -286,6 +293,8 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
 
         # 获取单独授权资产，并没有在授权的节点上
         for key, assets in nodes_single_assets.items():
+            if not self.full_tree.contains(key):
+                continue
             node = self.full_tree.get_node(key, deep=True)
             parent_id = self.full_tree.parent(key).identifier
             parent = user_tree.get_node(parent_id)
@@ -313,8 +322,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
             if not ancestors:
                 continue
             user_tree.safe_add_ancestors(child, ancestors)
-            # parent_id = ancestors[0].identifier
-            # user_tree.move_node(child.identifier, parent_id)
 
     @staticmethod
     def add_empty_node_if_need(user_tree):
@@ -355,12 +362,8 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     @timeit
     def get_user_tree(self):
         # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
-        user_tree = self.get_user_tree_from_local()
-        if user_tree:
-            return user_tree
         user_tree = self.get_user_tree_from_cache_if_need()
         if user_tree:
-            self.set_user_tree_to_local(user_tree)
             return user_tree
         user_tree = TreeService()
         user_tree._invalid_assets = self.full_tree._invalid_assets

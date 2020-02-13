@@ -5,8 +5,8 @@ from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
 from copy import deepcopy
 
-from common.utils import get_object_or_none, get_logger, timeit
-from .models import SystemUser, Asset
+from common.utils import get_logger, timeit
+from .models import Asset
 
 
 logger = get_logger(__file__)
