@@ -58,6 +58,11 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AuthInfoSerializer
 
+    def get_exception_handler(self):
+        def handler(e, context):
+            return Response({"error": str(e)}, status=400)
+        return handler
+
     def get_object(self):
         instance = super().get_object()
         username = self.request.query_params.get("username")
@@ -68,7 +73,9 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
 
         with tmp_to_org(asset.org_id):
             manager = AssetUserManager()
-            auth_info = manager.get(asset=asset, username=username)
+            auth_info = manager.get(
+                asset=asset, username=username, prefer_id=instance.id
+            )
             return auth_info
 
 
