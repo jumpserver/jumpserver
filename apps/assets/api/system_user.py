@@ -7,7 +7,7 @@ from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from ..models import SystemUser, Asset
 from ..backends import AssetUserManager
 from .. import serializers
@@ -64,14 +64,12 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         if not username:
             username = instance.username
         asset_id = self.kwargs.get('aid')
-        with tmp_to_root_org():
-            asset = get_object_or_404(Asset, pk=asset_id)
+        asset = get_object_or_404(Asset, pk=asset_id)
+
+        with tmp_to_org(asset.org_id):
             manager = AssetUserManager()
-            try:
-                auth_info = manager.get(asset=asset, username=username)
-                return auth_info
-            except:
-                raise Http404
+            auth_info = manager.get(asset=asset, username=username)
+            return auth_info
 
 
 class SystemUserTaskApi(generics.CreateAPIView):
