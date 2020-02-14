@@ -90,6 +90,14 @@ class Terminal(models.Model):
         config = self.get_replay_storage_config()
         return {"TERMINAL_REPLAY_STORAGE": config}
 
+    @staticmethod
+    def get_login_title_setting():
+        login_title = None
+        if settings.XPACK_ENABLED:
+            from xpack.plugins.interface.models import Interface
+            login_title = Interface.get_login_title()
+        return {'TERMINAL_HEADER_TITLE': login_title}
+
     @property
     def config(self):
         configs = {}
@@ -99,6 +107,7 @@ class Terminal(models.Model):
             configs[k] = getattr(settings, k)
         configs.update(self.get_command_storage_setting())
         configs.update(self.get_replay_storage_setting())
+        configs.update(self.get_login_title_setting())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
