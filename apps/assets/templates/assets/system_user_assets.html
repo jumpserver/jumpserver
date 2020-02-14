@@ -26,6 +26,13 @@
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets' %}
                                 </a>
                             </li>
+                            {% if system_user.username_same_with_user  %}
+                            <li>
+                                <a href="{% url 'assets:system-user-user' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Users' %}
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -84,6 +91,30 @@
                             </div>
                             <div class="panel panel-info">
                                 <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Assets' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="add-assets">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" id="id_assets" class="assets-select2 select2" style="width: 100%" multiple="" tabindex="4">
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-assets">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Nodes' %}
                                 </div>
                                 <div class="panel-body">
@@ -92,7 +123,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="nodes-select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select nodes' %}" id="node_selected" class="nodes-select2" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -114,6 +145,7 @@
             </div>
         </div>
     </div>
+    {% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -133,7 +165,7 @@ function getRelationUrl(type) {
     return theUrl;
 }
 
-function addObjects(objectsId, type) {
+function addObjects(objectsId, type, success, fail) {
     if (!objectsId || objectsId.length === 0) {
         return
     }
@@ -144,13 +176,21 @@ function addObjects(objectsId, type) {
         data[type] = v;
         body.push(data)
     });
-    requestApi({
+    if (!success) {
+        success = reloadPage
+    }
+    var option = {
         url: theUrl,
         body: JSON.stringify(body),
         method: "POST",
-        success: reloadPage
-    });
+        success: success,
+    };
+    if (fail) {
+        option.error = fail;
+    }
+    requestApi(option)
 }
+
 
 function removeObject(objectId, type, success) {
     if (!objectId)  {
@@ -197,6 +237,7 @@ function initNodeTable() {
 $(document).ready(function () {
 	$('.select2').select2();
     nodesSelect2Init(".nodes-select2");
+    initAssetTreeModel('#id_assets');
 	var assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "prefer_id", "{{ system_user.id }}");
 	assetUserListUrl = setUrlParam(assetUserListUrl, "prefer", "system_user");
     initAssetUserTable({
@@ -217,6 +258,29 @@ $(document).ready(function () {
 .on('click', '#btn-add-to-node', function() {
     var nodes = $("#node_selected").val();
     addObjects(nodes, "node");
+})
+.on('click', '#btn-add-to-assets', function () {
+    var assets = $("#id_assets").val();
+    var options = $("#id_assets").find(":selected");
+    var failed = function(s, data) {
+        var invalidIndex = [];
+        var validIndex = [];
+        $.each(data, function (k, v) {
+            if (isEmptyObject(v)) {
+                validIndex.push(k)
+            } else {
+                invalidIndex.push(k)
+            }
+        });
+        var invalidLabel = [];
+        $.each(invalidIndex, function (k, v) {
+            invalidLabel.push(options[v].text)
+        });
+        var errorMsg = "{% trans 'Have existed: ' %}";
+        errorMsg += invalidLabel.join(", ");
+        toastr.error(errorMsg)
+    };
+    addObjects(assets, "asset", null, failed);
 })
 .on('click', '.btn-push', function () {
     var theUrl = "{% url 'api-assets:system-user-task-create' pk=system_user.id %}";

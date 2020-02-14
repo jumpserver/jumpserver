@@ -252,7 +252,7 @@ $(document).ready(function () {
     var data = form.serializeObject();
 
     objectAttrsIsList(data, ['cmd_filters']);
-    objectAttrsIsBool(data, ["auto_generate_key", "auto_push"]);
+    objectAttrsIsBool(data, ["auto_generate_key", "auto_push", "username_same_with_user"]);
     data["private_key"] = $("#id_private_key").data('file');
 
     var props = {

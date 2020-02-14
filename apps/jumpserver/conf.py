@@ -184,6 +184,7 @@ class Config(dict):
         'HTTP_LISTEN_PORT': 8080,
         'WS_LISTEN_PORT': 8070,
         'LOGIN_LOG_KEEP_DAYS': 90,
+        'TASK_LOG_KEEP_DAYS': 10,
         'ASSETS_PERM_CACHE_TIME': 3600 * 24,
         'SECURITY_MFA_VERIFY_TTL': 3600,
         'ASSETS_PERM_CACHE_ENABLE': False,

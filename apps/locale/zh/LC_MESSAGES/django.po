@@ -1775,10 +1775,8 @@ msgid "Test datetime: "
 msgstr "测试日期: "
 
 #: assets/templates/assets/_asset_user_list.html:44
-#, fuzzy
-#| msgid "Latest version"
 msgid "Only latest version"
-msgstr "最新版本"
+msgstr "仅最新版本"
 
 #: assets/templates/assets/_asset_user_list.html:66
 msgid "View"

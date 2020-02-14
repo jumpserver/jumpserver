@@ -39,6 +39,7 @@ urlpatterns = [
     path('system-user/<uuid:pk>/update/', views.SystemUserUpdateView.as_view(), name='system-user-update'),
     path('system-user/<uuid:pk>/delete/', views.SystemUserDeleteView.as_view(), name='system-user-delete'),
     path('system-user/<uuid:pk>/asset/', views.SystemUserAssetView.as_view(), name='system-user-asset'),
+    path('system-user/<uuid:pk>/user/', views.SystemUserUserView.as_view(), name='system-user-user'),
 
     path('label/', views.LabelListView.as_view(), name='label-list'),
     path('label/create/', views.LabelCreateView.as_view(), name='label-create'),

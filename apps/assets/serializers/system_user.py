@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Count
 
 from common.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
@@ -11,9 +12,10 @@ from ..models import SystemUser, Asset
 from .base import AuthSerializerMixin
 
 __all__ = [
-    'SystemUserSerializer',
+    'SystemUserSerializer', 'SystemUserListSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
+    'SystemUserUserRelationSerializer',
 ]
 
 
@@ -31,8 +33,9 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'password', 'public_key', 'private_key',
             'login_mode', 'login_mode_display',
             'priority', "username_same_with_user",
+            'assets_amount',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'assets_amount', 'nodes_amount', 'auto_generate_key',
+            'auto_generate_key',
             'sftp_root',
         ]
         extra_kwargs = {
@@ -73,9 +76,12 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         if not username_same_with_user:
             return username_same_with_user
         protocol = self.initial_data.get("protocol", "ssh")
-        exists = SystemUser.objects.filter(
-            protocol=protocol, username_same_with_user=True
-        ).exists()
+        queryset = SystemUser.objects.filter(
+                protocol=protocol, username_same_with_user=True
+        )
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        exists = queryset.exists()
         if not exists:
             return username_same_with_user
         error = _("Username same with user with protocol {} only allow 1").format(protocol)
@@ -96,7 +102,7 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         return username
 
     def validate_sftp_root(self, value):
-        if value in ['home', 'root']:
+        if value in ['home', 'tmp']:
             return value
         if not value.startswith('/'):
             error = _("Path should starts with /")
@@ -137,10 +143,23 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             attrs["public_key"] = public_key
         return attrs
 
+
+class SystemUserListSerializer(SystemUserSerializer):
+    class Meta(SystemUserSerializer.Meta):
+        fields = [
+            'id', 'name', 'username', 'protocol',
+            'login_mode', 'login_mode_display',
+            'priority', "username_same_with_user",
+            'auto_push', 'sudo', 'shell', 'comment',
+            "assets_amount",
+            'auto_generate_key',
+            'sftp_root',
+        ]
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('cmd_filters', 'nodes')
+        queryset = queryset.annotate(assets_amount=Count("assets"))
         return queryset
 
 
@@ -193,6 +212,16 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
             return self.tree.get_node_full_tag(obj.node_key)
         else:
             return obj.node.full_value
+
+
+class SystemUserUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    user_display = serializers.ReadOnlyField()
+
+    class Meta(RelationMixin.Meta):
+        model = SystemUser.users.through
+        fields = [
+            'id', "user", "user_display",
+        ]
 
 
 class SystemUserTaskSerializer(serializers.Serializer):

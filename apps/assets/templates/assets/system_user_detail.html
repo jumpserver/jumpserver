@@ -19,6 +19,13 @@
                                 </a>
                             </li>
                             {% endif %}
+                            {% if system_user.username_same_with_user  %}
+                            <li>
+                                <a href="{% url 'assets:system-user-user' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Users' %}
+                                </a>
+                            </li>
+                            {% endif %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:system-user-update' pk=system_user.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
@@ -57,7 +64,11 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Username' %}:</td>
-                                            <td><b>{{ system_user.username }}</b></td>
+                                            {% if system_user.username_same_with_user %}
+                                                <td><b>{% trans 'Username same with user' %}</b></td>
+                                            {% else %}
+                                                <td><b>{{ system_user.username }}</b></td>
+                                            {% endif %}
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Login mode' %}:</td>

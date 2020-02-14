@@ -7,7 +7,7 @@ from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from ..models import SystemUser, Asset
 from ..backends import AssetUserManager
 from .. import serializers
@@ -33,6 +33,10 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     filter_fields = ("name", "username")
     search_fields = filter_fields
     serializer_class = serializers.SystemUserSerializer
+    serializer_classes = {
+        'default': serializers.SystemUserSerializer,
+        'list': serializers.SystemUserListSerializer,
+    }
     permission_classes = (IsOrgAdminOrAppUser,)
 
 
@@ -58,20 +62,29 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = AuthInfoSerializer
 
+    def get_exception_handler(self):
+        def handler(e, context):
+            return Response({"error": str(e)}, status=400)
+        return handler
+
     def get_object(self):
         instance = super().get_object()
-        username = self.request.query_params.get("username")
-        if not username:
-            username = instance.username
+        username = instance.username
+        if instance.username_same_with_user:
+            username = self.request.query_params.get("username")
         asset_id = self.kwargs.get('aid')
-        with tmp_to_root_org():
-            asset = get_object_or_404(Asset, pk=asset_id)
+        asset = get_object_or_404(Asset, pk=asset_id)
+
+        with tmp_to_org(asset.org_id):
             manager = AssetUserManager()
             try:
-                auth_info = manager.get(asset=asset, username=username)
+                auth_info = manager.get_latest(
+                    asset=asset, username=username, prefer_id=instance.id,
+                    prefer="system_user",
+                )
                 return auth_info
-            except:
-                raise Http404
+            except manager.ObjectDoesNotExist:
+                return instance
 
 
 class SystemUserTaskApi(generics.CreateAPIView):

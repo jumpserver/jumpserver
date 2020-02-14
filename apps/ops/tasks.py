@@ -75,17 +75,11 @@ def clean_tasks_adhoc_period():
 @after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
-    expire_days = 30
+    expire_days = settings.TASK_LOG_KEEP_DAYS
     logger.debug("Start clean celery task history")
     one_month_ago = timezone.now() - timezone.timedelta(days=expire_days)
     tasks = CeleryTask.objects.filter(date_start__lt=one_month_ago)
-    for task in tasks:
-        if os.path.isfile(task.full_log_path):
-            try:
-                os.remove(task.full_log_path)
-            except (FileNotFoundError, PermissionError):
-                pass
-        task.delete()
+    tasks.delete()
     tasks = CeleryTask.objects.filter(date_start__isnull=True)
     tasks.delete()
     command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
