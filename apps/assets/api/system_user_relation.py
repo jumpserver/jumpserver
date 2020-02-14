@@ -8,10 +8,13 @@ from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.utils import current_org
 from .. import models, serializers
 
-__all__ = ['SystemUserAssetRelationViewSet', 'SystemUserNodeRelationViewSet']
+__all__ = [
+    'SystemUserAssetRelationViewSet', 'SystemUserNodeRelationViewSet',
+    'SystemUserUserRelationViewSet',
+]
 
 
-class RelationMixin(OrgBulkModelViewSet):
+class RelationMixin:
     def get_queryset(self):
         queryset = self.model.objects.all()
         org_id = current_org.org_id()
@@ -24,7 +27,11 @@ class RelationMixin(OrgBulkModelViewSet):
         return queryset
 
 
-class SystemUserAssetRelationViewSet(RelationMixin):
+class BaseRelationViewSet(RelationMixin, OrgBulkModelViewSet):
+    pass
+
+
+class SystemUserAssetRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserAssetRelationSerializer
     model = models.SystemUser.assets.through
     permission_classes = (IsOrgAdmin,)
@@ -47,7 +54,7 @@ class SystemUserAssetRelationViewSet(RelationMixin):
         return queryset
 
 
-class SystemUserNodeRelationViewSet(RelationMixin):
+class SystemUserNodeRelationViewSet(BaseRelationViewSet):
     serializer_class = serializers.SystemUserNodeRelationSerializer
     model = models.SystemUser.nodes.through
     permission_classes = (IsOrgAdmin,)
@@ -63,3 +70,27 @@ class SystemUserNodeRelationViewSet(RelationMixin):
         queryset = queryset \
             .annotate(node_key=F('node__key'))
         return queryset
+
+
+class SystemUserUserRelationViewSet(BaseRelationViewSet):
+    serializer_class = serializers.SystemUserUserRelationSerializer
+    model = models.SystemUser.users.through
+    permission_classes = (IsOrgAdmin,)
+    filterset_fields = [
+        'id', 'user', 'systemuser',
+    ]
+    search_fields = [
+        "user__username", "user__name",
+        "systemuser__name", "systemuser__username",
+    ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.annotate(
+            user_display=Concat(
+                F('user__name'), Value('('),
+                F('user__username'), Value(')')
+            )
+        )
+        return queryset
+

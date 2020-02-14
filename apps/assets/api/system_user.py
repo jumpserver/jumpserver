@@ -33,6 +33,10 @@ class SystemUserViewSet(OrgBulkModelViewSet):
     filter_fields = ("name", "username")
     search_fields = filter_fields
     serializer_class = serializers.SystemUserSerializer
+    serializer_classes = {
+        'default': serializers.SystemUserSerializer,
+        'list': serializers.SystemUserListSerializer,
+    }
     permission_classes = (IsOrgAdminOrAppUser,)
 
 
@@ -65,9 +69,9 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
 
     def get_object(self):
         instance = super().get_object()
-        username = self.request.query_params.get("username")
-        if not username:
-            username = instance.username
+        username = instance.username
+        if instance.username_same_with_user:
+            username = self.request.query_params.get("username")
         asset_id = self.kwargs.get('aid')
         asset = get_object_or_404(Asset, pk=asset_id)
 
@@ -75,7 +79,8 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
             manager = AssetUserManager()
             try:
                 auth_info = manager.get_latest(
-                    asset=asset, username=username, prefer_id=instance.id
+                    asset=asset, username=username, prefer_id=instance.id,
+                    prefer="system_user",
                 )
                 return auth_info
             except manager.ObjectDoesNotExist:

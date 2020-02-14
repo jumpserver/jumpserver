@@ -26,6 +26,7 @@ router.register(r'gathered-users', api.GatheredUserViewSet, 'gathered-user')
 router.register(r'favorite-assets', api.FavoriteAssetViewSet, 'favorite-asset')
 router.register(r'system-users-assets-relations', api.SystemUserAssetRelationViewSet, 'system-users-assets-relation')
 router.register(r'system-users-nodes-relations', api.SystemUserNodeRelationViewSet, 'system-users-nodes-relation')
+router.register(r'system-users-users-relations', api.SystemUserUserRelationViewSet, 'system-users-users-relation')
 
 cmd_filter_router = routers.NestedDefaultRouter(router, r'cmd-filters', lookup='filter')
 cmd_filter_router.register(r'rules', api.CommandFilterRuleViewSet, 'cmd-filter-rule')

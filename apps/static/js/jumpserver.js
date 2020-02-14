@@ -1453,3 +1453,7 @@ function initDateRangePicker(selector, options) {
 function reloadPage() {
     setTimeout( function () {window.location.reload();}, 300);
 }
+
+function isEmptyObject(obj) {
+    return Object.keys(obj).length === 0
+}

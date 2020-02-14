@@ -121,7 +121,10 @@ class SystemUser(BaseUser):
     _prefer = 'system_user'
 
     def __str__(self):
-        return '{0.name}({0.username})'.format(self)
+        username = self.username
+        if self.username_same_with_user:
+            username = 'dynamic'
+        return '{0.name}({1})'.format(self, username)
 
     def get_username(self):
         if self.username_same_with_user:

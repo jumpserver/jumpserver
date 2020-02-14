@@ -248,6 +248,7 @@ class BaseUser(OrgModelMixin, AuthMixin, ConnectivityMixin):
 
     @lazyproperty
     def assets_amount(self):
+        return 0
         cache_key = self.ASSETS_AMOUNT_CACHE_KEY.format(self.id)
         cached = cache.get(cache_key)
         if not cached:
