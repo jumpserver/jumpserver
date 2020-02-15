@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils import timezone
 from orgs.mixins.models import OrgModelMixin
 
-from common.utils import date_expired_default, union_queryset
+from common.utils import date_expired_default
 from orgs.mixins.models import OrgManager
 
 
@@ -83,8 +83,7 @@ class BasePermission(OrgModelMixin):
         from users.models import User
         users_id = self.users.all().values_list('id', flat=True)
         groups_id = self.user_groups.all().values_list('id', flat=True)
-        users = User.objects.filter(id__in=users_id)
-        if groups_id:
-            groups_users = User.objects.filter(groups__id__in=groups_id)
-            users = union_queryset(users, groups_users)
+        users = User.objects.filter(
+            Q(id__in=users_id) | Q(groups__id__in=groups_id)
+        ).distinct()
         return users

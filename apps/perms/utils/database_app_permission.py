@@ -2,10 +2,10 @@
 #
 
 from django.utils.translation import ugettext as _
+from django.db.models import Q
 
 from orgs.utils import set_to_root_org
 from ..models import DatabaseAppPermission
-from common.utils import union_queryset
 from common.tree import TreeNode
 from applications.models import DatabaseApp
 from assets.models import SystemUser
@@ -19,13 +19,12 @@ __all__ = [
 
 
 def get_user_database_app_permissions(user, include_group=True):
-    permissions = DatabaseAppPermission.objects.all().valid().filter(users=user)
     if include_group:
         groups = user.groups.all()
-        groups_permissions = DatabaseAppPermission.objects.all().valid()\
-            .filter(user_groups__in=groups)
-        permissions = union_queryset(permissions, groups_permissions)
-    return permissions
+        arg = Q(users=user) | Q(user_groups__in=groups)
+    else:
+        arg = Q(users=user)
+    return DatabaseAppPermission.objects.all().valid().filter(arg)
 
 
 def get_user_group_database_app_permission(user_group):

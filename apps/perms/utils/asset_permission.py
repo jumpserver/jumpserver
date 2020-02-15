@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from orgs.utils import set_to_root_org
-from common.utils import get_logger, timeit, lazyproperty, union_queryset
+from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
 from assets.utils import TreeService
 from ..models import AssetPermission
@@ -25,17 +25,12 @@ __all__ = [
 
 
 def get_user_permissions(user, include_group=True):
-    permissions = AssetPermission.objects.filter(users=user)
     if include_group:
         groups = user.groups.all()
-        permissions_groups = AssetPermission.objects.filter(
-            user_groups__in=groups
-        )
-        base_queryset = AssetPermission.get_queryset_with_prefetch()
-        permissions = union_queryset(
-            permissions, permissions_groups, base_queryset=base_queryset
-        )
-    return permissions
+        arg = Q(users=user) | Q(user_groups__in=groups)
+    else:
+        arg = Q(users=user)
+    return AssetPermission.get_queryset_with_prefetch().filter(arg)
 
 
 def get_user_group_permissions(user_group):
@@ -45,13 +40,12 @@ def get_user_group_permissions(user_group):
 
 
 def get_asset_permissions(asset, include_node=True):
-    permissions = AssetPermission.objects.filter(asset=asset)
     if include_node:
         nodes = asset.get_all_nodes(flat=True)
-        base_queryset = AssetPermission.get_queryset_with_prefetch()
-        permissions_nodes = AssetPermission.objects.filter(nodes__in=nodes)
-        permissions = union_queryset(permissions, permissions_nodes, base_queryset=base_queryset)
-    return permissions
+        arg = Q(assets=asset) | Q(nodes__in=nodes)
+    else:
+        arg = Q(assets=asset)
+    return AssetPermission.objects.valid().filter(arg)
 
 
 def get_node_permissions(node):
