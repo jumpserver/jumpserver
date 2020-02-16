@@ -8,8 +8,6 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.conf import settings
 
-from orgs.utils import set_to_root_org
-from common.utils import union_queryset
 from orgs.utils import current_org
 from common.utils import get_logger, timeit, lazyproperty
 from common.tree import TreeNode
@@ -26,17 +24,12 @@ __all__ = [
 
 
 def get_user_permissions(user, include_group=True):
-    permissions = AssetPermission.objects.filter(users=user)
     if include_group:
         groups = user.groups.all()
-        permissions_groups = AssetPermission.objects.filter(
-            user_groups__in=groups
-        )
-        base_queryset = AssetPermission.get_queryset_with_prefetch()
-        permissions = union_queryset(
-            permissions, permissions_groups, base_queryset=base_queryset
-        )
-    return permissions
+        arg = Q(users=user) | Q(user_groups__in=groups)
+    else:
+        arg = Q(users=user)
+    return AssetPermission.get_queryset_with_prefetch().filter(arg)
 
 
 def get_user_group_permissions(user_group):
@@ -46,13 +39,12 @@ def get_user_group_permissions(user_group):
 
 
 def get_asset_permissions(asset, include_node=True):
-    permissions = AssetPermission.objects.filter(asset=asset)
     if include_node:
         nodes = asset.get_all_nodes(flat=True)
-        base_queryset = AssetPermission.get_queryset_with_prefetch()
-        permissions_nodes = AssetPermission.objects.filter(nodes__in=nodes)
-        permissions = union_queryset(permissions, permissions_nodes, base_queryset=base_queryset)
-    return permissions
+        arg = Q(assets=asset) | Q(nodes__in=nodes)
+    else:
+        arg = Q(assets=asset)
+    return AssetPermission.objects.valid().filter(arg)
 
 
 def get_node_permissions(node):
@@ -63,28 +55,6 @@ def get_system_user_permissions(system_user):
     return AssetPermission.objects.valid().filter(
         system_users=system_user
     )
-
-
-class UserTreeLocalCache:
-    user_tree_cache_key = 'USER_PERM_TREE_{}_{}_{}'
-    user_tree_cache_ttl = settings.ASSETS_PERM_CACHE_TIME
-    user_tree_cache_enable = settings.ASSETS_PERM_CACHE_ENABLE
-    user_tree_map = {}
-
-    @classmethod
-    def delete_all(cls, org_id=None):
-        key = cls.user_tree_cache_key.format('*', '*', '*')
-        cache.delete_pattern()
-        pass
-
-    def get(self, obj_id, org_id=None):
-        pass
-
-    def set(self, obj_id, tree, org_id=None):
-        pass
-
-    def is_valid(self):
-        pass
 
 
 class AssetPermissionUtilCacheMixin:
@@ -382,7 +352,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
-    def get_asset_system_users_with_actions(self, asset):
+    def get_asset_system_users_id_with_actions(self, asset):
         nodes = asset.get_nodes()
         nodes_keys_related = set()
         for node in nodes:
@@ -403,16 +373,16 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
             queryset = queryset.filter(args)
         else:
             queryset = queryset.none()
-        queryset = queryset.distinct().prefetch_related('system_users')
+        asset_protocols = asset.protocols_as_dict.keys()
+        print(asset_protocols)
+        values = queryset.filter(system_users__protocol__in=asset_protocols).distinct()\
+            .values_list('system_users', 'actions')
         system_users_actions = defaultdict(int)
-        for perm in queryset:
-            system_users = perm.system_users.all()
-            if not system_users or not perm.actions:
+        for system_user_id, actions in values:
+            if None in (system_user_id, actions):
                 continue
-            for s in system_users:
-                if not asset.has_protocol(s.protocol):
-                    continue
-                system_users_actions[s] |= perm.actions
+            for i, action in values:
+                system_users_actions[i] |= actions
         return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
