@@ -346,7 +346,7 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
         return user_tree
 
     # Todo: 是否可以获取多个资产的系统用户
-    def get_asset_system_users_with_actions(self, asset):
+    def get_asset_system_users_id_with_actions(self, asset):
         nodes = asset.get_nodes()
         nodes_keys_related = set()
         for node in nodes:
@@ -367,16 +367,16 @@ class AssetPermissionUtilV2(AssetPermissionUtilCacheMixin):
             queryset = queryset.filter(args)
         else:
             queryset = queryset.none()
-        queryset = queryset.distinct().prefetch_related('system_users')
+        asset_protocols = asset.protocols_as_dict.keys()
+        print(asset_protocols)
+        values = queryset.filter(system_users__protocol__in=asset_protocols).distinct()\
+            .values_list('system_users', 'actions')
         system_users_actions = defaultdict(int)
-        for perm in queryset:
-            system_users = perm.system_users.all()
-            if not system_users or not perm.actions:
+        for system_user_id, actions in values:
+            if None in (system_user_id, actions):
                 continue
-            for s in system_users:
-                if not asset.has_protocol(s.protocol):
-                    continue
-                system_users_actions[s] |= perm.actions
+            for i, action in values:
+                system_users_actions[i] |= actions
         return system_users_actions
 
     def get_permissions_nodes_and_assets(self):
