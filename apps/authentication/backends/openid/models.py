@@ -160,7 +160,8 @@ class Client(object):
                 defaults={
                     'email': userinfo.get('email', ''),
                     'first_name': userinfo.get('given_name', ''),
-                    'last_name': userinfo.get('family_name', '')
+                    'last_name': userinfo.get('family_name', ''),
+                    'name': userinfo.get('name', '')
                 }
             )
             oidt_profile = OpenIDTokenProfile(

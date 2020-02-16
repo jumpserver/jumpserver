@@ -111,6 +111,11 @@ class StatusViewSet(viewsets.ModelViewSet):
 
     def handle_sessions(self):
         sessions_id = self.request.data.get('sessions', [])
+        # guacamole 上报的 session 是字符串
+        # "[53cd3e47-210f-41d8-b3c6-a184f3, 53cd3e47-210f-41d8-b3c6-a184f4]"
+        if isinstance(sessions_id, str):
+            sessions_id = sessions_id[1:-1].split(',')
+            sessions_id = [sid.strip() for sid in sessions_id if sid.strip()]
         Session.set_sessions_active(sessions_id)
 
     def get_queryset(self):

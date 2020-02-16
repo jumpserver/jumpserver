@@ -90,6 +90,14 @@ class Terminal(models.Model):
         config = self.get_replay_storage_config()
         return {"TERMINAL_REPLAY_STORAGE": config}
 
+    @staticmethod
+    def get_login_title_setting():
+        login_title = None
+        if settings.XPACK_ENABLED:
+            from xpack.plugins.interface.models import Interface
+            login_title = Interface.get_login_title()
+        return {'TERMINAL_HEADER_TITLE': login_title}
+
     @property
     def config(self):
         configs = {}
@@ -99,6 +107,7 @@ class Terminal(models.Model):
             configs[k] = getattr(settings, k)
         configs.update(self.get_command_storage_setting())
         configs.update(self.get_replay_storage_setting())
+        configs.update(self.get_login_title_setting())
         configs.update({
             'SECURITY_MAX_IDLE_TIME': settings.SECURITY_MAX_IDLE_TIME
         })
@@ -181,7 +190,7 @@ class Session(OrgModelMixin):
     system_user_id = models.CharField(blank=True, default='', max_length=36, db_index=True)
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
     remote_addr = models.CharField(max_length=128, verbose_name=_("Remote addr"), blank=True, null=True)
-    is_finished = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False, db_index=True)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.SET_NULL)

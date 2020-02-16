@@ -1,8 +1,8 @@
 #  coding: utf-8
 #
 
-from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.db.models import Q
 
 from common.tree import TreeNode
 from orgs.utils import set_to_root_org
