@@ -102,13 +102,15 @@ def create_or_update_registered_periodic_tasks():
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
     usages = get_disk_usage()
-    usages = {path: usage for path, usage in usages.items()
-              if not path.startswith('/etc')}
+    uncheck_paths = ['/etc', '/boot']
 
     for path, usage in usages.items():
-        if usage.percent > 80:
+        need_check = True
+        for uncheck_path in uncheck_paths:
+            if path.startswith(uncheck_path):
+                need_check = False
+        if need_check and usage > 80:
             send_server_performance_mail(path, usage, usages)
-            return
 
 
 @shared_task(queue="ansible")
