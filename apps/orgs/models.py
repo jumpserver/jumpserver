@@ -209,3 +209,9 @@ class Organization(models.Model):
     def change_to(self):
         from .utils import set_current_org
         set_current_org(self)
+
+    @classmethod
+    def all_orgs(cls):
+        orgs = list(cls.objects.all())
+        orgs.append(cls.default())
+        return orgs

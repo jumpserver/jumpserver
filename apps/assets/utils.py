@@ -174,11 +174,11 @@ class TreeService(Tree):
             # logger.debug('Add node: {}'.format(node.identifier))
             self.add_node(node, parent)
 
-    #
-    # def __getstate__(self):
-    #     self.mutex = None
-    #     return self.__dict__
-    #
+    def __getstate__(self):
+        self.mutex = None
+        self.all_nodes_assets_map = {}
+        self.nodes_assets_map = {}
+        return self.__dict__
 
     def __setstate__(self, state):
         self.__dict__ = state

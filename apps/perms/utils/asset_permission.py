@@ -88,6 +88,14 @@ class AssetPermissionUtilCacheMixin:
         key = key.replace('_1', '')
         cache.delete_pattern(key)
 
+    @classmethod
+    def expire_org_tree_cache(cls, org_id=None):
+        if org_id is None:
+            org_id = current_org.org_id()
+        key = cls.user_tree_cache_key.format(org_id, '*', '1')
+        key = key.replace('_1', '')
+        cache.delete_pattern(key)
+
     def set_user_tree_to_cache(self, user_tree):
         data = pickle.dumps(user_tree)
         cache.set(self.cache_key, data, self.user_tree_cache_ttl)
@@ -293,19 +301,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
                 continue
             user_tree.safe_add_ancestors(child, ancestors)
 
-    @staticmethod
-    def add_empty_node_if_need(user_tree):
-        """
-        添加空节点，如果根节点没有子节点的话
-        """
-        if not user_tree.children(user_tree.root):
-            node_key = Node.empty_key
-            node_value = Node.empty_value
-            user_tree.create_node(
-                identifier=node_key, tag=node_value,
-                parent=user_tree.root,
-            )
-
     def add_favorite_node_if_need(self, user_tree):
         if not isinstance(self.object, User):
             return
@@ -331,7 +326,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
 
     @timeit
     def get_user_tree(self):
-        # 使用锁，保证多次获取tree的时候顺序执行，可以使用缓存
         user_tree = self.get_user_tree_from_cache_if_need()
         if user_tree:
             return user_tree
@@ -346,7 +340,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         self.add_single_assets_node_to_user_tree(user_tree)
         self.parse_user_tree_to_full_tree(user_tree)
         self.add_favorite_node_if_need(user_tree)
-        self.add_empty_node_if_need(user_tree)
         self.set_user_tree_to_cache_if_need(user_tree)
         self.set_user_tree_to_local(user_tree)
         return user_tree
@@ -374,7 +367,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         else:
             queryset = queryset.none()
         asset_protocols = asset.protocols_as_dict.keys()
-        print(asset_protocols)
         values = queryset.filter(system_users__protocol__in=asset_protocols).distinct()\
             .values_list('system_users', 'actions')
         system_users_actions = defaultdict(int)

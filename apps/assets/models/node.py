@@ -107,9 +107,14 @@ class TreeCache:
 class TreeMixin:
     _org_tree_map = {}
 
+    def root_tree(self):
+        from ..utils import TreeService
+        orgs = Organization.all_orgs()
+        tree = TreeService()
+
     @classmethod
     def tree(cls):
-        org_id = current_org.id
+        org_id = current_org.org_id()
         t = cls.get_local_tree_cache(org_id)
 
         if t is None:
