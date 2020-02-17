@@ -66,15 +66,15 @@ class TreeCache:
         return self._has_changed("tree")
 
     def set_tree_changed(self, t=None):
-        logger.debug("Refresh node tree")
-        self.__class__.set_changed(t=t, tp="tree", org_id=self.org_id)
+        logger.debug("Set tree tree changed")
+        self.__class__.set_changed(t=t, tp="tree")
 
     def assets_has_changed(self):
         return self._has_changed("assets")
 
     def set_tree_assets_changed(self, t=None):
-        logger.debug("Refresh node assets")
-        self.__class__.set_changed(t=t, tp="assets", org_id=self.org_id)
+        logger.debug("Set tree assets changed")
+        self.__class__.set_changed(t=t, tp="assets")
 
     def get(self):
         if self.tree_has_changed():
@@ -98,7 +98,6 @@ class TreeCache:
             org_id = current_org.id
         with tmp_to_org(org_id):
             tree = TreeService.new()
-            tree.init_assets()
             obj = cls(tree, org_id)
             obj.tree = tree
             return obj
@@ -106,11 +105,6 @@ class TreeCache:
 
 class TreeMixin:
     _org_tree_map = {}
-
-    def root_tree(self):
-        from ..utils import TreeService
-        orgs = Organization.all_orgs()
-        tree = TreeService()
 
     @classmethod
     def tree(cls):

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import pickle
+import os
 from collections import defaultdict
 from functools import reduce
 
@@ -104,6 +105,7 @@ class AssetPermissionUtilCacheMixin:
         data = cache.get(self.cache_key)
         if not data:
             return None
+
         user_tree = pickle.loads(data)
         return user_tree
 
