@@ -28,8 +28,8 @@ def on_user_groups_change(sender, instance=None, action='', **kwargs):
     """
     if action.startswith('post'):
         logger.debug("User group member change signal recv: {}".format(instance))
-        from perms.utils import AssetPermissionUtilV2
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
+        from perms.utils import AssetPermissionUtil
+        AssetPermissionUtil.expire_all_user_tree_cache()
 
 
 @receiver(cas_user_authenticated)

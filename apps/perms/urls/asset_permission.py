@@ -25,7 +25,7 @@ user_permission_urlpatterns = [
     path('nodes/', api.UserGrantedNodesApi.as_view(), name='my-nodes'),
 
     # Node children
-    path('<uuid:pk>/nodes/children/', api.UserGrantedNodesApi.as_view(), name='user-nodes-children'),
+    path('<uuid:pk>/nodes/children/', api.UserGrantedNodeChildrenApi.as_view(), name='user-nodes-children'),
     path('nodes/children/', api.UserGrantedNodesApi.as_view(), name='my-nodes-children'),
 
     # Node as tree

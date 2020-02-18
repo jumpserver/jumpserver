@@ -5,68 +5,53 @@ from treelib.exceptions import NodeIDAbsentError
 from collections import defaultdict
 from copy import deepcopy
 
-from common.utils import get_object_or_none, get_logger, timeit
-from .models import SystemUser, Asset
+from common.utils import get_logger, timeit, lazyproperty
+from .models import Asset, Node
 
 
 logger = get_logger(__file__)
 
 
-def get_system_user_by_name(name):
-    system_user = get_object_or_none(SystemUser, name=name)
-    return system_user
-
-
-def get_system_user_by_id(id):
-    system_user = get_object_or_none(SystemUser, id=id)
-    return system_user
-
-
 class TreeService(Tree):
     tag_sep = ' / '
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.nodes_assets_map = defaultdict(set)
-        self.all_nodes_assets_map = {}
-        self._invalid_assets = frozenset()
+    @staticmethod
+    @timeit
+    def get_nodes_assets_map():
+        nodes_assets_map = defaultdict(set)
+        asset_node_list = Node.assets.through.objects.values_list(
+            'asset', 'node__key'
+        )
+        for asset_id, key in asset_node_list:
+            nodes_assets_map[key].add(asset_id)
+        return nodes_assets_map
 
     @classmethod
     @timeit
     def new(cls):
         from .models import Node
-        from orgs.utils import tmp_to_root_org
-
-        with tmp_to_root_org():
-            all_nodes = list(Node.objects.all().values("key", "value"))
-            all_nodes.sort(key=lambda x: len(x["key"].split(":")))
-            tree = cls()
-            tree.create_node(tag='', identifier='')
-            for node in all_nodes:
-                key = node["key"]
-                value = node["value"]
-                parent_key = ":".join(key.split(":")[:-1])
-                tree.safe_create_node(
-                    tag=value, identifier=key,
-                    parent=parent_key,
-                )
-            tree.init_assets()
+        all_nodes = list(Node.objects.all().values("key", "value"))
+        all_nodes.sort(key=lambda x: len(x["key"].split(":")))
+        tree = cls()
+        tree.create_node(tag='', identifier='', data={})
+        for node in all_nodes:
+            key = node["key"]
+            value = node["value"]
+            parent_key = ":".join(key.split(":")[:-1])
+            tree.safe_create_node(
+                tag=value, identifier=key,
+                parent=parent_key,
+            )
+        tree.init_assets()
         return tree
 
-    @timeit
     def init_assets(self):
-        from orgs.utils import tmp_to_root_org
-        self.all_nodes_assets_map = {}
-        self.nodes_assets_map = defaultdict(set)
-        with tmp_to_root_org():
-            queryset = Asset.objects.all().values_list('id', 'nodes__key')
-            invalid_assets = Asset.objects.filter(is_active=False)\
-                .values_list('id', flat=True)
-            self._invalid_assets = frozenset(invalid_assets)
-            for asset_id, key in queryset:
-                if not key:
-                    continue
-                self.nodes_assets_map[key].add(asset_id)
+        node_assets_map = self.get_nodes_assets_map()
+        for node in self.all_nodes_itr():
+            key = node.identifier
+            assets = node_assets_map.get(key, set())
+            data = {"assets": assets, "all_assets": None}
+            node.data = data
 
     def safe_create_node(self, **kwargs):
         parent = kwargs.get("parent")
@@ -125,32 +110,43 @@ class TreeService(Tree):
             parent = self.copy_node(parent)
         return parent
 
-    def set_assets(self, nid, assets):
-        self.nodes_assets_map[nid] = set(assets)
-
-    def assets(self, nid):
-        assets = self.nodes_assets_map[nid]
+    @lazyproperty
+    def invalid_assets(self):
+        assets = Asset.objects.filter(is_active=False).values_list('id', flat=True)
         return assets
 
+    def set_assets(self, nid, assets):
+        node = self.get_node(nid)
+        if node.data is None:
+            node.data = {}
+        node.data["assets"] = assets
+
+    def assets(self, nid):
+        node = self.get_node(nid)
+        return node.data.get("assets", set())
+
     def valid_assets(self, nid):
-        return set(self.assets(nid)) - set(self._invalid_assets)
+        return set(self.assets(nid)) - set(self.invalid_assets)
 
     def all_assets(self, nid):
-        assets = self.all_nodes_assets_map.get(nid)
-        if assets:
-            return assets
-        assets = set(self.assets(nid))
+        node = self.get_node(nid)
+        if node.data is None:
+            node.data = {}
+        all_assets = node.data.get("all_assets")
+        if all_assets is not None:
+            return all_assets
+        all_assets = set(self.assets(nid))
         try:
             children = self.children(nid)
         except NodeIDAbsentError:
             children = []
         for child in children:
-            assets.update(self.all_assets(child.identifier))
-        self.all_nodes_assets_map[nid] = assets
-        return assets
+            all_assets.update(self.all_assets(child.identifier))
+        node.data["all_assets"] = all_assets
+        return all_assets
 
     def all_valid_assets(self, nid):
-        return set(self.all_assets(nid)) - set(self._invalid_assets)
+        return set(self.all_assets(nid)) - set(self.invalid_assets)
 
     def assets_amount(self, nid):
         return len(self.all_assets(nid))
@@ -186,15 +182,12 @@ class TreeService(Tree):
         else:
             # logger.debug('Add node: {}'.format(node.identifier))
             self.add_node(node, parent)
-
     #
     # def __getstate__(self):
     #     self.mutex = None
+    #     self.all_nodes_assets_map = {}
+    #     self.nodes_assets_map = {}
     #     return self.__dict__
-    #
 
-    def __setstate__(self, state):
-        self.__dict__ = state
-        if '_invalid_assets' not in state:
-            self._invalid_assets = frozenset()
-        # self.mutex = threading.Lock()
+    # def __setstate__(self, state):
+    #     self.__dict__ = state
