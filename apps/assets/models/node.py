@@ -11,9 +11,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from common.utils import get_logger, timeit, lazyproperty
+from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import set_current_org, get_current_org, tmp_to_org, current_org
+from orgs.utils import get_current_org, tmp_to_org, current_org
 from orgs.models import Organization
 
 
@@ -128,15 +128,6 @@ class TreeMixin:
     @classmethod
     def refresh_node_assets(cls, t=None):
         TreeCache.set_changed(tp="assets", t=t, org_id=current_org.id)
-
-    @staticmethod
-    def refresh_user_tree_cache():
-        """
-        当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
-        :return:
-        """
-        from perms.utils.asset_permission import AssetPermissionUtil
-        AssetPermissionUtil.expire_all_user_tree_cache()
 
 
 class FamilyMixin:

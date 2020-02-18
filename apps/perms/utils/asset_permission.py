@@ -1,7 +1,6 @@
 # coding: utf-8
-
+import time
 import pickle
-import os
 from collections import defaultdict
 from functools import reduce
 
@@ -85,9 +84,15 @@ class AssetPermissionUtilCacheMixin:
 
     @classmethod
     def expire_all_user_tree_cache(cls):
+        expire_cache_key = "USER_TREE_EXPIRED_AT"
+        latest_expired = cache.get(expire_cache_key, 0)
+        now = time.time()
+        if now - latest_expired < 60:
+            return
         key = cls.user_tree_cache_key.format('*', '1', '1')
         key = key.replace('_1', '')
         cache.delete_pattern(key)
+        cache.set(expire_cache_key, now)
 
     @classmethod
     def expire_org_tree_cache(cls, org_id=None):
@@ -105,7 +110,6 @@ class AssetPermissionUtilCacheMixin:
         data = cache.get(self.cache_key)
         if not data:
             return None
-
         user_tree = pickle.loads(data)
         return user_tree
 
@@ -158,7 +162,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
     @staticmethod
     def change_org_if_need():
         pass
-        # set_to_root_org()
 
     @lazyproperty
     def full_tree(self):
@@ -332,7 +335,6 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
         if user_tree:
             return user_tree
         user_tree = TreeService()
-        user_tree._invalid_assets = self.full_tree._invalid_assets
         full_tree_root = self.full_tree.root_node()
         user_tree.create_node(
             tag=full_tree_root.tag,
@@ -381,21 +383,22 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
 
     def get_permissions_nodes_and_assets(self):
         from assets.models import Node
-        permissions = self.permissions.values_list('assets', 'nodes__key').distinct()
-        nodes_keys = set()
-        assets_ids = set()
-        for asset_id, node_key in permissions:
-            if asset_id:
-                assets_ids.add(asset_id)
-            if node_key:
-                nodes_keys.add(node_key)
+        permissions = self.permissions
+        nodes_keys = permissions.exclude(nodes__isnull=True)\
+            .values_list('nodes__key', flat=True)
+        assets_ids = permissions.exclude(assets__isnull=True)\
+            .values_list('assets', flat=True)
+        nodes_keys = set(nodes_keys)
+        assets_ids = set(assets_ids)
         nodes_keys = Node.clean_children_keys(nodes_keys)
         return nodes_keys, assets_ids
 
     @timeit
     def get_assets(self):
         nodes_keys, assets_ids = self.get_permissions_nodes_and_assets()
-        queryset = Node.get_nodes_all_assets(nodes_keys, extra_assets_ids=assets_ids)
+        queryset = Node.get_nodes_all_assets(
+            nodes_keys, extra_assets_ids=assets_ids
+        )
         return queryset.valid()
 
     def get_nodes_assets(self, node, deep=False):

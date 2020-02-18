@@ -7,8 +7,9 @@ from django.db.models.signals import (
 from django.db.models.aggregates import Count
 from django.dispatch import receiver
 
-from common.utils import get_logger, timeit
+from common.utils import get_logger
 from common.decorator import on_transaction_commit
+from orgs.utils import tmp_to_root_org
 from .models import Asset, SystemUser, Node, AuthBook
 from .utils import TreeService
 from .tasks import (
@@ -135,6 +136,8 @@ def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
     if action.startswith('post'):
         logger.debug("Asset nodes change signal recv: {}".format(instance))
         Node.refresh_assets()
+        with tmp_to_root_org():
+            Node.refresh_assets()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
@@ -209,6 +212,8 @@ def on_asset_nodes_remove(sender, instance=None, action='', model=None,
 def on_node_update_or_created(sender, **kwargs):
     # 刷新节点
     Node.refresh_nodes()
+    with tmp_to_root_org():
+        Node.refresh_nodes()
 
 
 @receiver(post_save, sender=AuthBook)
