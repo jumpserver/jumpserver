@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import re
 from rest_framework import serializers
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F
+
 from django.utils.translation import ugettext_lazy as _
 
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
@@ -102,7 +102,8 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         queryset = queryset.prefetch_related(
             Prefetch('nodes', queryset=Node.objects.all().only('id')),
             Prefetch('labels', queryset=Label.objects.all().only('id')),
-        ).select_related('admin_user', 'domain', 'platform')
+        ).select_related('admin_user', 'domain', 'platform') \
+         .annotate(platform_base=F('platform__base'))
         return queryset
 
     def compatible_with_old_protocol(self, validated_data):

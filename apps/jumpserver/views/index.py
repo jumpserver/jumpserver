@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.cache import cache
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -12,6 +13,7 @@ from assets.models import Asset
 from terminal.models import Session
 from orgs.utils import current_org
 from common.permissions import PermissionsMixin, IsValidUser
+from common.utils import timeit
 
 __all__ = ['IndexView']
 
@@ -62,6 +64,10 @@ class IndexView(PermissionsMixin, TemplateView):
         return month_str
 
     def get_month_login_metrics(self):
+        cache_key = 'MON_LOGIN'
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
         data = []
         time_min = datetime.datetime.min.time()
         time_max = datetime.datetime.max.time()
@@ -69,21 +75,34 @@ class IndexView(PermissionsMixin, TemplateView):
             ds = datetime.datetime.combine(d, time_min).replace(tzinfo=timezone.get_current_timezone())
             de = datetime.datetime.combine(d, time_max).replace(tzinfo=timezone.get_current_timezone())
             data.append(self.session_month.filter(date_start__range=(ds, de)).count())
+        cache.set(cache_key, data, 3600)
         return data
 
     def get_month_active_user_metrics(self):
+        cache_key = 'MON_User'
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
         if self.session_month_dates_archive:
-            return [q.values('user').distinct().count()
+            data = [q.values('user').distinct().count()
                     for q in self.session_month_dates_archive]
         else:
-            return [0]
+            data = [0]
+        cache.set(cache_key, data)
+        return data
 
     def get_month_active_asset_metrics(self):
+        cache_key = 'MON_Asset'
+        data = cache.get(cache_key)
+        if data is not None:
+            return data
         if self.session_month_dates_archive:
-            return [q.values('asset').distinct().count()
+            data = [q.values('asset').distinct().count()
                     for q in self.session_month_dates_archive]
         else:
-            return [0]
+            data = [0]
+        cache.set(cache_key, data, 3600)
+        return data
 
     def get_month_active_user_total(self):
         return self.session_month.values('user').distinct().count()
@@ -111,6 +130,7 @@ class IndexView(PermissionsMixin, TemplateView):
     def get_asset_disabled_total():
         return Asset.objects.filter(is_active=False).count()
 
+    @timeit
     def get_week_top10_asset(self):
         assets = list(self.session_week.values('asset').annotate(total=Count('asset')).order_by('-total')[:10])
         for asset in assets:
@@ -118,6 +138,7 @@ class IndexView(PermissionsMixin, TemplateView):
             asset['last'] = last_login
         return assets
 
+    @timeit
     def get_week_top10_user(self):
         users = list(self.session_week.values('user').annotate(
             total=Count('asset')).order_by('-total')[:10])
@@ -126,6 +147,7 @@ class IndexView(PermissionsMixin, TemplateView):
             user['last'] = last_login
         return users
 
+    @timeit
     def get_last10_sessions(self):
         sessions = self.session_week.order_by('-date_start')[:10]
         for session in sessions:

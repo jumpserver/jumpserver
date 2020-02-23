@@ -40,10 +40,11 @@ def default_node():
 
 
 class AssetManager(OrgManager):
-    def get_queryset(self):
-        return super().get_queryset().annotate(
-            platform_base=models.F('platform__base')
-        )
+    # def get_queryset(self):
+    #     return super().get_queryset().annotate(
+    #         platform_base=models.F('platform__base')
+    #     )
+    pass
 
 
 class AssetQuerySet(models.QuerySet):

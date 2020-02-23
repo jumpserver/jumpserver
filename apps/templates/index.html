@@ -298,16 +298,16 @@ $(document).ready(function(){
                 ],
                 series : [
                     {
-                        name:"{% trans 'Login count' %}",
+                        name: "{% trans 'Login count' %}",
                         type:'line',
-                        smooth:true,
+                        smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_total_visit_count|safe}}
                     },
                     {
-                        name:"{% trans 'Active users' %}",
-                        type:'line',
-                        smooth:true,
+                        name: "{% trans 'Active users' %}",
+                        type: 'line',
+                        smooth: true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
                         data: {{ month_user|safe }}
                     },
