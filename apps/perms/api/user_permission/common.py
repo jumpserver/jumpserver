@@ -105,7 +105,6 @@ class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
     only_fields = serializers.AssetSystemUserSerializer.Meta.only_fields
 
     def get_queryset(self):
-        import time
         asset_id = self.kwargs.get('asset_id')
         asset = get_object_or_404(Asset, id=asset_id)
         system_users_with_actions = self.util.get_asset_system_users_with_actions(asset)
