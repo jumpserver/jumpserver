@@ -1,10 +1,10 @@
 # coding: utf-8
 #
 
-from django.db.models import Q
 from django.utils.translation import ugettext as _
-from orgs.utils import set_to_root_org
+from django.db.models import Q
 
+from orgs.utils import set_to_root_org
 from ..models import DatabaseAppPermission
 from common.tree import TreeNode
 from applications.models import DatabaseApp
@@ -16,6 +16,7 @@ __all__ = [
     'construct_database_apps_tree_root',
     'parse_database_app_to_tree_node'
 ]
+
 
 def get_user_database_app_permissions(user, include_group=True):
     if include_group:
