@@ -193,6 +193,7 @@ class Config(dict):
         'FORCE_SCRIPT_NAME': '',
         'LOGIN_CONFIRM_ENABLE': False,
         'WINDOWS_SKIP_ALL_MANUAL_PASSWORD': False,
+        'ORG_CHANGE_TO_URL': ''
     }
 
     def convert_type(self, k, v):
