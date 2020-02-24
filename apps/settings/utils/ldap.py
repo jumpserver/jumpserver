@@ -1,21 +1,34 @@
 # coding: utf-8
 #
 
-from ldap3 import Server, Connection
+from ldap3 import Server, Connection, SIMPLE
+from ldap3.core.exceptions import (
+    LDAPSocketOpenError,
+    LDAPSocketReceiveError,
+    LDAPSessionTerminatedByServerError,
+    LDAPUserNameIsMandatoryError,
+    LDAPPasswordIsMandatoryError,
+    LDAPInvalidDnError,
+    LDAPInvalidServerError,
+    LDAPBindError,
+    LDAPInvalidFilterError,
+)
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
+from copy import deepcopy
 
 from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
 from users.utils import construct_user_email
 from users.models import User
+from .exceptions import LDAPInvalidSearchOuOrFilterError
 
 logger = get_logger(__file__)
 
 __all__ = [
     'LDAPConfig', 'LDAPServerUtil', 'LDAPCacheUtil', 'LDAPImportUtil',
-    'LDAPSyncUtil', 'LDAP_USE_CACHE_FLAGS'
+    'LDAPSyncUtil', 'LDAP_USE_CACHE_FLAGS', 'LDAPTestUtil',
 ]
 
 LDAP_USE_CACHE_FLAGS = [1, '1', 'true', 'True', True]
@@ -93,7 +106,7 @@ class LDAPServerUtil(object):
             cookie = self.connection.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
             return cookie
         except Exception as e:
-            logger.error(e)
+            logger.error(e, exc_info=True)
             return None
 
     def get_search_filter_extra(self):
@@ -332,4 +345,113 @@ class LDAPImportUtil(object):
         return errors
 
 
+class LDAPTestUtil(object):
 
+    def __init__(self, config=None):
+        self.config = LDAPConfig(config)
+
+    def _test(self, authentication=None, user=None, password=None):
+        server = Server(self.config.server_uri)
+        connection = Connection(
+            server, user=user, password=password, authentication=authentication
+        )
+        ret = connection.bind()
+        return ret
+
+    # test server_uri
+
+    def _test_server_uri(self):
+        self._test()
+
+    def test_server_uri(self):
+        try:
+            self._test_server_uri()
+        except LDAPSocketOpenError as e:
+            error = _("Host or port is disconnected: {}".format(e))
+            logger.error(error, exc_info=True)
+        except LDAPSessionTerminatedByServerError as e:
+            error = _('The port is not the port of the LDAP service: {}'.format(e))
+            logger.error(error, exc_info=True)
+        except LDAPSocketReceiveError as e:
+            error = _('Please enter the certificate: {}'.format(e))
+            logger.error(error, exc_info=True)
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+            logger.error(error, exc_info=True)
+        else:
+            return
+        raise LDAPInvalidServerError(error)
+
+    # test bind dn
+
+    def _test_bind_dn(self):
+        user = self.config.bind_dn
+        password = self.config.password
+        ret = self._test(authentication=SIMPLE, user=user, password=password)
+        if not ret:
+            msg = _('bind dn or password incorrect')
+            raise LDAPInvalidDnError(msg)
+
+    def test_bind_dn(self):
+        try:
+            self._test_bind_dn()
+        except LDAPUserNameIsMandatoryError as e:
+            error = _('Please enter bind dn: {}'.format(e))
+        except LDAPPasswordIsMandatoryError as e:
+            error = _('Please enter password: {}'.format(e))
+        except LDAPInvalidDnError as e:
+            error = _('Please enter correct bind dn and password: {}'.format(e))
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise LDAPBindError(error)
+
+    # test search ou
+
+    def _test_search_ougroup_and_filter(self):
+        search_ous = str(self.config.search_ougroup).split('|')
+        config = deepcopy(self.config)
+        for search_ou in search_ous:
+            config.search_ougroup = search_ou
+            util = LDAPServerUtil(config=config)
+            user_entries = util.search_user_entries()
+            logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
+            if len(user_entries) == 0:
+                error = _('Invalid search ou or filter: {}'.format(search_ou))
+                raise LDAPInvalidSearchOuOrFilterError(error)
+
+    def test_search_ougroup_and_filter(self):
+        try:
+            self._test_search_ougroup_and_filter()
+        except LDAPInvalidFilterError as e:
+            error = e
+        except LDAPInvalidSearchOuOrFilterError as e:
+            error = e
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+            logger.error(error, exc_info=True)
+        else:
+            return
+        raise LDAPInvalidSearchOuOrFilterError(error)
+
+    # test
+
+    def test(self):
+        status = False
+        try:
+            self.test_server_uri()
+            self.test_bind_dn()
+            self.test_search_ougroup_and_filter()
+        except LDAPInvalidServerError as e:
+            msg = _('Error (Invalid server uri): {}'.format(e))
+        except LDAPBindError as e:
+            msg = _('Error (Invalid bind dn): {}'.format(e))
+        except LDAPInvalidSearchOuOrFilterError as e:
+            msg = _('Error (Invalid search ou or filter): {}'.format(e))
+        except Exception as e:
+            msg = _('Error (Unknown): {}').format(e)
+        else:
+            status = True
+            msg = _('Succeed')
+        return status, msg

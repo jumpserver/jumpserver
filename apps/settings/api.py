@@ -15,8 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from .models import Setting
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
-    LDAP_USE_CACHE_FLAGS
-
+    LDAP_USE_CACHE_FLAGS, LDAPTestUtil,
 )
 from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
@@ -73,7 +72,6 @@ class MailTestingAPI(APIView):
 class LDAPTestingAPI(APIView):
     permission_classes = (IsSuperUser,)
     serializer_class = LDAPTestSerializer
-    success_message = _("Test ldap success")
 
     @staticmethod
     def get_ldap_config(serializer):
@@ -107,13 +105,19 @@ class LDAPTestingAPI(APIView):
             return Response({"error": _("LDAP attr map not valid")}, status=401)
 
         config = self.get_ldap_config(serializer)
-        util = LDAPServerUtil(config=config)
-        try:
-            users = util.search()
-        except Exception as e:
-            return Response({"error": str(e)}, status=401)
 
-        return Response({"msg": _("Match {} s users").format(len(users))})
+        ok, msg = LDAPTestUtil(config).test()
+        status = 200 if ok else 401
+        return Response(msg, status=status)
+        #
+        # util = LDAPServerUtil(config=config)
+        # try:
+        #     users = util.search()
+        # except Exception as e:
+        #     logger.error(e, exc_info=True)
+        #     return Response({"error": str(e)}, status=401)
+        #
+        # return Response({"msg": _("Match {} s users").format(len(users))})
 
 
 class LDAPUserListApi(generics.ListAPIView):
