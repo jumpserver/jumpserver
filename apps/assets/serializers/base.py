@@ -79,6 +79,7 @@ class AuthInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetUser
         fields = [
-            'username', 'password', 'private_key', 'public_key',
+            'id', 'username', 'password',
+            'private_key', 'public_key',
             'date_updated',
         ]

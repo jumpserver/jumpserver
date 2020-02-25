@@ -76,15 +76,8 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
         asset = get_object_or_404(Asset, pk=asset_id)
 
         with tmp_to_org(asset.org_id):
-            manager = AssetUserManager()
-            try:
-                auth_info = manager.get_latest(
-                    asset=asset, username=username, prefer_id=instance.id,
-                    prefer="system_user",
-                )
-                return auth_info
-            except manager.ObjectDoesNotExist:
-                return instance
+            instance.load_asset_special_auth(asset=asset, username=username)
+            return instance
 
 
 class SystemUserTaskApi(generics.CreateAPIView):
