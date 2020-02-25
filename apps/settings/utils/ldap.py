@@ -1,6 +1,7 @@
 # coding: utf-8
 #
 
+import json
 from ldap3 import Server, Connection, SIMPLE
 from ldap3.core.exceptions import (
     LDAPSocketOpenError,
@@ -14,6 +15,7 @@ from ldap3.core.exceptions import (
     LDAPInvalidFilterError,
     LDAPExceptionError,
     LDAPConfigurationError,
+    LDAPAttributeError,
 )
 from django.conf import settings
 from django.core.cache import cache
@@ -354,6 +356,9 @@ class LDAPTestUtil(object):
     class LDAPInvalidSearchOuOrFilterError(LDAPExceptionError):
         pass
 
+    class LDAPInvalidAttributeMapError(LDAPExceptionError):
+        pass
+
     class LDAPNotEnabledAuthError(LDAPExceptionError):
         pass
 
@@ -442,6 +447,9 @@ class LDAPTestUtil(object):
             error = e
         except self.LDAPInvalidSearchOuOrFilterError as e:
             error = e
+        except LDAPAttributeError as e:
+            error = e
+            raise self.LDAPInvalidAttributeMapError(error)
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
             logger.error(error, exc_info=True)
@@ -451,8 +459,31 @@ class LDAPTestUtil(object):
 
     # test attr map
 
+    def _test_attr_map(self):
+        attr_map = self.config.attr_map
+        if not isinstance(attr_map, dict):
+            attr_map = json.loads(attr_map)
+            self.config.attr_map = attr_map
+
+        should_contain_attr = {'username', 'name', 'email'}
+        actually_contain_attr = set(attr_map.keys())
+        result = should_contain_attr - actually_contain_attr
+        if len(result) != 0:
+            error = _('LDAP attribute not include: {}'.format(result))
+            raise self.LDAPInvalidAttributeMapError(error)
+
     def test_attr_map(self):
-        pass
+        try:
+            self._test_attr_map()
+        except json.JSONDecodeError:
+            error = _('LDAP attribute map is not dict')
+        except self.LDAPInvalidAttributeMapError as e:
+            error = e
+        except Exception as e:
+            error = _('Unknown error: {}'.format(e))
+        else:
+            return
+        raise self.LDAPInvalidAttributeMapError(error)
 
     # test search
 
@@ -472,8 +503,8 @@ class LDAPTestUtil(object):
     def _test_config(self):
         self.test_server_uri()
         self.test_bind_dn()
-        self.test_search_ou_and_filter()
         self.test_attr_map()
+        self.test_search_ou_and_filter()
         self.test_search()
         self.test_enabled_auth_ldap()
 
@@ -485,6 +516,8 @@ class LDAPTestUtil(object):
             msg = _('Error (Invalid server uri): {}'.format(e))
         except LDAPBindError as e:
             msg = _('Error (Invalid bind dn): {}'.format(e))
+        except self.LDAPInvalidAttributeMapError as e:
+            msg = _('Error (Invalid attribute map): {}'.format(e))
         except self.LDAPInvalidSearchOuOrFilterError as e:
             msg = _('Error (Invalid search ou or filter): {}'.format(e))
         except self.LDAPNotEnabledAuthError as e:

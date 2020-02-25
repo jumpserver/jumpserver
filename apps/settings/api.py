@@ -77,13 +77,6 @@ class LDAPTestingConfigAPI(APIView):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=401)
-
-        attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
-        try:
-            json.loads(attr_map)
-        except json.JSONDecodeError:
-            return Response({"error": _("LDAP attr map not valid")}, status=401)
-
         config = self.get_ldap_config(serializer)
         ok, msg = LDAPTestUtil(config).test_config()
         status = 200 if ok else 401
@@ -106,7 +99,7 @@ class LDAPTestingConfigAPI(APIView):
             'use_ssl': use_ssl,
             'search_ou': search_ou,
             'search_filter': search_filter,
-            'attr_map': json.loads(attr_map),
+            'attr_map': attr_map,
             'auth_ldap': auth_ldap
         }
         return config
