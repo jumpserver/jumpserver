@@ -21,8 +21,8 @@ from .tasks import sync_ldap_user_task
 from common.permissions import IsOrgAdmin, IsSuperUser
 from common.utils import get_logger
 from .serializers import (
-    MailTestSerializer, LDAPTestSerializer, LDAPUserSerializer,
-    PublicSettingSerializer,
+    MailTestSerializer, LDAPTestConfigSerializer, LDAPUserSerializer,
+    PublicSettingSerializer, LDAPTestLoginSerializer,
 )
 from users.models import User
 
@@ -69,9 +69,25 @@ class MailTestingAPI(APIView):
             return Response({"error": str(serializer.errors)}, status=401)
 
 
-class LDAPTestingAPI(APIView):
+class LDAPTestingConfigAPI(APIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = LDAPTestSerializer
+    serializer_class = LDAPTestConfigSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return Response({"error": str(serializer.errors)}, status=401)
+
+        attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
+        try:
+            json.loads(attr_map)
+        except json.JSONDecodeError:
+            return Response({"error": _("LDAP attr map not valid")}, status=401)
+
+        config = self.get_ldap_config(serializer)
+        ok, msg = LDAPTestUtil(config).test_config()
+        status = 200 if ok else 401
+        return Response(msg, status=status)
 
     @staticmethod
     def get_ldap_config(serializer):
@@ -95,19 +111,18 @@ class LDAPTestingAPI(APIView):
         }
         return config
 
+
+class LDAPTestingLoginAPI(APIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = LDAPTestLoginSerializer
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response({"error": str(serializer.errors)}, status=401)
-
-        attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
-        try:
-            json.loads(attr_map)
-        except json.JSONDecodeError:
-            return Response({"error": _("LDAP attr map not valid")}, status=401)
-
-        config = self.get_ldap_config(serializer)
-        ok, msg = LDAPTestUtil(config).test_config()
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        ok, msg = LDAPTestUtil().test_login(username, password)
         status = 200 if ok else 401
         return Response(msg, status=status)
 
