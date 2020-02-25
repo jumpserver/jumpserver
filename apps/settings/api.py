@@ -79,17 +79,19 @@ class LDAPTestingAPI(APIView):
         bind_dn = serializer.validated_data["AUTH_LDAP_BIND_DN"]
         password = serializer.validated_data["AUTH_LDAP_BIND_PASSWORD"]
         use_ssl = serializer.validated_data.get("AUTH_LDAP_START_TLS", False)
-        search_ougroup = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
+        search_ou = serializer.validated_data["AUTH_LDAP_SEARCH_OU"]
         search_filter = serializer.validated_data["AUTH_LDAP_SEARCH_FILTER"]
         attr_map = serializer.validated_data["AUTH_LDAP_USER_ATTR_MAP"]
+        auth_ldap = serializer.validated_data.get('AUTH_LDAP', False)
         config = {
             'server_uri': server_uri,
             'bind_dn': bind_dn,
             'password': password,
             'use_ssl': use_ssl,
-            'search_ougroup': search_ougroup,
+            'search_ou': search_ou,
             'search_filter': search_filter,
             'attr_map': json.loads(attr_map),
+            'auth_ldap': auth_ldap
         }
         return config
 
@@ -105,19 +107,9 @@ class LDAPTestingAPI(APIView):
             return Response({"error": _("LDAP attr map not valid")}, status=401)
 
         config = self.get_ldap_config(serializer)
-
-        ok, msg = LDAPTestUtil(config).test()
+        ok, msg = LDAPTestUtil(config).test_config()
         status = 200 if ok else 401
         return Response(msg, status=status)
-        #
-        # util = LDAPServerUtil(config=config)
-        # try:
-        #     users = util.search()
-        # except Exception as e:
-        #     logger.error(e, exc_info=True)
-        #     return Response({"error": str(e)}, status=401)
-        #
-        # return Response({"msg": _("Match {} s users").format(len(users))})
 
 
 class LDAPUserListApi(generics.ListAPIView):

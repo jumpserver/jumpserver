@@ -22,7 +22,10 @@ from common.const import LDAP_AD_ACCOUNT_DISABLE
 from common.utils import timeit, get_logger
 from users.utils import construct_user_email
 from users.models import User
-from .exceptions import LDAPInvalidSearchOuOrFilterError
+from .exceptions import (
+    LDAPInvalidSearchOuOrFilterError,
+    LDAPNotEnabledAuthError
+)
 
 logger = get_logger(__file__)
 
@@ -41,9 +44,10 @@ class LDAPConfig(object):
         self.bind_dn = None
         self.password = None
         self.use_ssl = None
-        self.search_ougroup = None
+        self.search_ou = None
         self.search_filter = None
         self.attr_map = None
+        self.auth_ldap = None
         if isinstance(config, dict):
             self.load_from_config(config)
         else:
@@ -54,18 +58,20 @@ class LDAPConfig(object):
         self.bind_dn = config.get('bind_dn')
         self.password = config.get('password')
         self.use_ssl = config.get('use_ssl')
-        self.search_ougroup = config.get('search_ougroup')
+        self.search_ou = config.get('search_ou')
         self.search_filter = config.get('search_filter')
         self.attr_map = config.get('attr_map')
+        self.auth_ldap = config.get('auth_ldap')
 
     def load_from_settings(self):
         self.server_uri = settings.AUTH_LDAP_SERVER_URI
         self.bind_dn = settings.AUTH_LDAP_BIND_DN
         self.password = settings.AUTH_LDAP_BIND_PASSWORD
         self.use_ssl = settings.AUTH_LDAP_START_TLS
-        self.search_ougroup = settings.AUTH_LDAP_SEARCH_OU
+        self.search_ou = settings.AUTH_LDAP_SEARCH_OU
         self.search_filter = settings.AUTH_LDAP_SEARCH_FILTER
         self.attr_map = settings.AUTH_LDAP_USER_ATTR_MAP
+        self.auth_ldap = settings.AUTH_LDAP
 
 
 class LDAPServerUtil(object):
@@ -142,7 +148,7 @@ class LDAPServerUtil(object):
     def search_user_entries(self):
         logger.info("Search user entries")
         user_entries = list()
-        search_ous = str(self.config.search_ougroup).split('|')
+        search_ous = str(self.config.search_ou).split('|')
         for search_ou in search_ous:
             logger.info("Search user entries ou: {}".format(search_ou))
             self.search_user_entries_ou(search_ou)
@@ -349,6 +355,7 @@ class LDAPTestUtil(object):
 
     def __init__(self, config=None):
         self.config = LDAPConfig(config)
+        self.user_entries = []
 
     def _test(self, authentication=None, user=None, password=None):
         server = Server(self.config.server_uri)
@@ -358,7 +365,7 @@ class LDAPTestUtil(object):
         ret = connection.bind()
         return ret
 
-    # test server_uri
+    # test server uri
 
     def _test_server_uri(self):
         self._test()
@@ -409,21 +416,21 @@ class LDAPTestUtil(object):
 
     # test search ou
 
-    def _test_search_ougroup_and_filter(self):
-        search_ous = str(self.config.search_ougroup).split('|')
+    def _test_search_ou_and_filter(self):
+        search_ous = str(self.config.search_ou).split('|')
         config = deepcopy(self.config)
+        util = LDAPServerUtil(config=config)
         for search_ou in search_ous:
-            config.search_ougroup = search_ou
-            util = LDAPServerUtil(config=config)
+            util.config.search_ou = search_ou
             user_entries = util.search_user_entries()
             logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
             if len(user_entries) == 0:
                 error = _('Invalid search ou or filter: {}'.format(search_ou))
                 raise LDAPInvalidSearchOuOrFilterError(error)
 
-    def test_search_ougroup_and_filter(self):
+    def test_search_ou_and_filter(self):
         try:
-            self._test_search_ougroup_and_filter()
+            self._test_search_ou_and_filter()
         except LDAPInvalidFilterError as e:
             error = e
         except LDAPInvalidSearchOuOrFilterError as e:
@@ -435,23 +442,51 @@ class LDAPTestUtil(object):
             return
         raise LDAPInvalidSearchOuOrFilterError(error)
 
-    # test
+    # test attr map
 
-    def test(self):
+    def test_attr_map(self):
+        pass
+
+    # test search
+
+    def test_search(self):
+        util = LDAPServerUtil(config=self.config)
+        self.user_entries = util.search_user_entries()
+
+    # test auth ldap enabled
+
+    def test_enabled_auth_ldap(self):
+        if not self.config.auth_ldap:
+            error = _('LDAP authentication is not enabled')
+            raise LDAPNotEnabledAuthError(error)
+
+    # test config
+
+    def test_config(self):
         status = False
         try:
             self.test_server_uri()
             self.test_bind_dn()
-            self.test_search_ougroup_and_filter()
+            self.test_search_ou_and_filter()
+            self.test_attr_map()
+            self.test_search()
+            self.test_enabled_auth_ldap()
         except LDAPInvalidServerError as e:
             msg = _('Error (Invalid server uri): {}'.format(e))
         except LDAPBindError as e:
             msg = _('Error (Invalid bind dn): {}'.format(e))
         except LDAPInvalidSearchOuOrFilterError as e:
             msg = _('Error (Invalid search ou or filter): {}'.format(e))
+        except LDAPNotEnabledAuthError as e:
+            msg = _('Error (Not enabled LDAP authentication): {}'.format(e))
         except Exception as e:
             msg = _('Error (Unknown): {}').format(e)
         else:
             status = True
-            msg = _('Succeed')
+            msg = _('Succeed: Match {} s user'.format(len(self.user_entries)))
         return status, msg
+
+    # test login
+
+    def test_login(self):
+        pass
