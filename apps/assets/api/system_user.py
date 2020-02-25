@@ -1,5 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
@@ -7,11 +6,10 @@ from common.utils import get_logger
 from common.permissions import IsOrgAdmin, IsOrgAdminOrAppUser, IsAppUser
 from orgs.mixins.api import OrgBulkModelViewSet
 from orgs.mixins import generics
-from orgs.utils import tmp_to_root_org, tmp_to_org
+from orgs.utils import tmp_to_org
 from ..models import SystemUser, Asset
-from ..backends import AssetUserManager
 from .. import serializers
-from ..serializers.base import AuthInfoSerializer
+from ..serializers import SystemUserWithAuthInfoSerializer
 from ..tasks import (
     push_system_user_to_assets_manual, test_system_user_connectivity_manual,
     push_system_user_a_asset_manual,
@@ -46,7 +44,7 @@ class SystemUserAuthInfoApi(generics.RetrieveUpdateDestroyAPIView):
     """
     model = SystemUser
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = AuthInfoSerializer
+    serializer_class = SystemUserWithAuthInfoSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -60,7 +58,7 @@ class SystemUserAssetAuthInfoApi(generics.RetrieveAPIView):
     """
     model = SystemUser
     permission_classes = (IsOrgAdminOrAppUser,)
-    serializer_class = AuthInfoSerializer
+    serializer_class = SystemUserWithAuthInfoSerializer
 
     def get_exception_handler(self):
         def handler(e, context):

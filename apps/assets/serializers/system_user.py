@@ -15,7 +15,7 @@ __all__ = [
     'SystemUserSerializer', 'SystemUserListSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
     'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
-    'SystemUserUserRelationSerializer',
+    'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
 ]
 
 
@@ -32,11 +32,10 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             'id', 'name', 'username', 'protocol',
             'password', 'public_key', 'private_key',
             'login_mode', 'login_mode_display',
-            'priority', "username_same_with_user",
-            'assets_amount',
+            'priority', 'username_same_with_user',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'auto_generate_key',
-            'sftp_root',
+            'auto_generate_key', 'sftp_root',
+            'assets_amount',
         ]
         extra_kwargs = {
             'password': {"write_only": True},
@@ -161,6 +160,16 @@ class SystemUserListSerializer(SystemUserSerializer):
         """ Perform necessary eager loading of data. """
         queryset = queryset.annotate(assets_amount=Count("assets"))
         return queryset
+
+
+class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
+    class Meta(SystemUserSerializer.Meta):
+        extra_kwargs = {
+            'nodes_amount': {'label': _('Node')},
+            'assets_amount': {'label': _('Asset')},
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True},
+        }
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):
