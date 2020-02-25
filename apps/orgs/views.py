@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, reverse
+from django.conf import settings
 from django.http import HttpResponseForbidden
 
 from django.views.generic import DetailView, View
@@ -16,6 +17,9 @@ class SwitchOrgView(DetailView):
         self.object = Organization.get_instance(pk)
         oid = str(self.object.id)
         request.session['oid'] = oid
+        org_change_to_url = settings.ORG_CHANGE_TO_URL
+        if org_change_to_url:
+            return redirect(org_change_to_url)
         host = request.get_host()
         referer = request.META.get('HTTP_REFERER', '')
         if referer.find(host) == -1:

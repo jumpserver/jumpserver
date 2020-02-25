@@ -558,6 +558,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
     def set_avatar(self, f):
         self.avatar.save(self.username, f)
 
+    @classmethod
+    def get_avatar_url(cls, username):
+        user_default = settings.STATIC_URL + "img/avatar/user.png"
+        return user_default
+
     def avatar_url(self):
         admin_default = settings.STATIC_URL + "img/avatar/admin.png"
         user_default = settings.STATIC_URL + "img/avatar/user.png"
