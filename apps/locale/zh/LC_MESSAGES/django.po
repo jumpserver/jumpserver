@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 12:40+0800\n"
+"POT-Creation-Date: 2020-02-25 12:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -26,7 +26,7 @@ msgstr "自定义"
 #: applications/templates/applications/remote_app_list.html:27
 #: applications/templates/applications/user_remote_app_list.html:18
 #: assets/forms/domain.py:15 assets/forms/label.py:13
-#: assets/models/asset.py:342 assets/models/authbook.py:24
+#: assets/models/asset.py:343 assets/models/authbook.py:24
 #: assets/models/gathered_user.py:14 assets/serializers/admin_user.py:32
 #: assets/serializers/asset_user.py:82 assets/serializers/system_user.py:41
 #: assets/templates/assets/admin_user_list.html:23
@@ -42,7 +42,7 @@ msgstr "自定义"
 #: perms/templates/perms/asset_permission_create_update.html:57
 #: perms/templates/perms/asset_permission_list.html:35
 #: perms/templates/perms/asset_permission_list.html:87
-#: terminal/backends/command/models.py:13 terminal/models.py:178
+#: terminal/backends/command/models.py:13 terminal/models.py:187
 #: terminal/templates/terminal/command_list.html:30
 #: terminal/templates/terminal/command_list.html:66
 #: terminal/templates/terminal/session_list.html:26
@@ -109,7 +109,7 @@ msgstr "运行参数"
 #: applications/templates/applications/user_database_app_list.html:16
 #: applications/templates/applications/user_remote_app_list.html:16
 #: assets/forms/asset.py:20 assets/forms/domain.py:77 assets/forms/user.py:74
-#: assets/forms/user.py:94 assets/models/asset.py:144 assets/models/base.py:28
+#: assets/forms/user.py:94 assets/models/asset.py:145 assets/models/base.py:28
 #: assets/models/cluster.py:18 assets/models/cmd_filter.py:21
 #: assets/models/domain.py:20 assets/models/group.py:20
 #: assets/models/label.py:18 assets/templates/assets/_node_detail_modal.html:27
@@ -140,8 +140,8 @@ msgstr "运行参数"
 #: perms/templates/perms/remote_app_permission_user.html:49
 #: settings/models.py:26
 #: settings/templates/settings/_ldap_list_users_modal.html:32
-#: terminal/models.py:26 terminal/models.py:282 terminal/models.py:314
-#: terminal/models.py:351 terminal/templates/terminal/base_storage_list.html:31
+#: terminal/models.py:26 terminal/models.py:333 terminal/models.py:365
+#: terminal/models.py:402 terminal/templates/terminal/base_storage_list.html:31
 #: terminal/templates/terminal/terminal_detail.html:43
 #: terminal/templates/terminal/terminal_list.html:30 users/forms/profile.py:20
 #: users/models/group.py:15 users/models/user.py:438
@@ -182,7 +182,7 @@ msgstr "名称"
 #: assets/templates/assets/cmd_filter_rule_list.html:53
 #: audits/templates/audits/login_log_list.html:58
 #: perms/templates/perms/remote_app_permission_remote_app.html:50
-#: terminal/models.py:316 terminal/models.py:353
+#: terminal/models.py:367 terminal/models.py:404
 #: terminal/templates/terminal/base_storage_list.html:32
 #: tickets/models/ticket.py:43 tickets/templates/tickets/ticket_detail.html:33
 #: tickets/templates/tickets/ticket_list.html:35
@@ -202,7 +202,7 @@ msgstr "主机"
 #: applications/models/database_app.py:27
 #: applications/templates/applications/database_app_detail.html:60
 #: applications/templates/applications/database_app_list.html:26
-#: assets/forms/asset.py:24 assets/models/asset.py:190
+#: assets/forms/asset.py:24 assets/models/asset.py:191
 #: assets/models/domain.py:50
 #: assets/templates/assets/domain_gateway_list.html:64
 msgid "Port"
@@ -225,7 +225,7 @@ msgstr "数据库"
 #: applications/templates/applications/remote_app_list.html:28
 #: applications/templates/applications/user_database_app_list.html:20
 #: applications/templates/applications/user_remote_app_list.html:19
-#: assets/models/asset.py:149 assets/models/asset.py:225
+#: assets/models/asset.py:150 assets/models/asset.py:226
 #: assets/models/base.py:33 assets/models/cluster.py:29
 #: assets/models/cmd_filter.py:23 assets/models/cmd_filter.py:56
 #: assets/models/domain.py:21 assets/models/domain.py:53
@@ -247,8 +247,8 @@ msgstr "数据库"
 #: perms/templates/perms/asset_permission_detail.html:97
 #: perms/templates/perms/database_app_permission_detail.html:93
 #: perms/templates/perms/remote_app_permission_detail.html:89
-#: settings/models.py:31 terminal/models.py:36 terminal/models.py:321
-#: terminal/models.py:358 terminal/templates/terminal/base_storage_list.html:33
+#: settings/models.py:31 terminal/models.py:36 terminal/models.py:372
+#: terminal/models.py:409 terminal/templates/terminal/base_storage_list.html:33
 #: terminal/templates/terminal/terminal_detail.html:63
 #: tickets/templates/tickets/ticket_detail.html:104 users/models/group.py:16
 #: users/models/user.py:471 users/templates/users/user_detail.html:115
@@ -280,7 +280,8 @@ msgstr "备注"
 #: perms/templates/perms/database_app_permission_detail.html:22
 #: perms/templates/perms/database_app_permission_list.html:17
 #: perms/templates/perms/database_app_permission_user.html:23
-#: templates/_nav.html:66 templates/_nav.html:86 templates/_nav_user.html:22
+#: perms/utils/database_app_permission.py:77 templates/_nav.html:66
+#: templates/_nav.html:86 templates/_nav_user.html:22
 #: users/templates/users/user_database_app_permission.html:39
 #: users/templates/users/user_database_app_permission.html:64
 msgid "DatabaseApp"
@@ -306,7 +307,7 @@ msgstr "参数"
 #: applications/models/remote_app.py:39
 #: applications/templates/applications/database_app_detail.html:72
 #: applications/templates/applications/remote_app_detail.html:68
-#: assets/models/asset.py:223 assets/models/base.py:36
+#: assets/models/asset.py:224 assets/models/base.py:36
 #: assets/models/cluster.py:28 assets/models/cmd_filter.py:26
 #: assets/models/cmd_filter.py:59 assets/models/group.py:21
 #: assets/templates/assets/admin_user_detail.html:63
@@ -333,7 +334,7 @@ msgstr "创建者"
 #: applications/models/remote_app.py:42
 #: applications/templates/applications/database_app_detail.html:68
 #: applications/templates/applications/remote_app_detail.html:64
-#: assets/models/asset.py:224 assets/models/base.py:34
+#: assets/models/asset.py:225 assets/models/base.py:34
 #: assets/models/cluster.py:26 assets/models/domain.py:23
 #: assets/models/gathered_user.py:19 assets/models/group.py:22
 #: assets/models/label.py:25 assets/templates/assets/admin_user_detail.html:59
@@ -364,7 +365,8 @@ msgstr "创建日期"
 #: perms/templates/perms/remote_app_permission_list.html:17
 #: perms/templates/perms/remote_app_permission_remote_app.html:22
 #: perms/templates/perms/remote_app_permission_user.html:22
-#: templates/_nav.html:64 templates/_nav.html:82 templates/_nav_user.html:16
+#: perms/utils/remote_app_permission.py:76 templates/_nav.html:64
+#: templates/_nav.html:82 templates/_nav_user.html:16
 #: users/templates/users/user_remote_app_permission.html:39
 #: users/templates/users/user_remote_app_permission.html:64
 msgid "RemoteApp"
@@ -728,7 +730,7 @@ msgstr "更新节点资产硬件信息: {}"
 msgid "Test if the assets under the node are connectable: {}"
 msgstr "测试节点下资产是否可连接: {}"
 
-#: assets/forms/asset.py:65 assets/models/asset.py:194
+#: assets/forms/asset.py:65 assets/models/asset.py:195
 #: assets/models/user.py:111 assets/templates/assets/asset_detail.html:186
 #: assets/templates/assets/asset_detail.html:194
 #: assets/templates/assets/system_user_assets.html:87
@@ -739,7 +741,7 @@ msgstr "测试节点下资产是否可连接: {}"
 msgid "Nodes"
 msgstr "节点"
 
-#: assets/forms/asset.py:68 assets/models/asset.py:198
+#: assets/forms/asset.py:68 assets/models/asset.py:199
 #: assets/models/cluster.py:19 assets/models/user.py:67
 #: assets/templates/assets/admin_user_list.html:62
 #: assets/templates/assets/asset_detail.html:72 templates/_nav.html:44
@@ -757,7 +759,7 @@ msgstr "管理用户"
 msgid "Label"
 msgstr "标签"
 
-#: assets/forms/asset.py:74 assets/models/asset.py:193
+#: assets/forms/asset.py:74 assets/models/asset.py:194
 #: assets/models/domain.py:26 assets/models/domain.py:52
 #: assets/templates/assets/asset_detail.html:76
 #: assets/templates/assets/user_asset_list.html:80
@@ -765,8 +767,8 @@ msgstr "标签"
 msgid "Domain"
 msgstr "网域"
 
-#: assets/forms/asset.py:77 assets/models/asset.py:168
-#: assets/models/asset.py:192 assets/serializers/asset.py:66
+#: assets/forms/asset.py:77 assets/models/asset.py:169
+#: assets/models/asset.py:193 assets/serializers/asset.py:66
 #: assets/templates/assets/asset_detail.html:100
 #: assets/templates/assets/user_asset_list.html:78
 msgid "Platform"
@@ -951,24 +953,24 @@ msgstr "如果选择手动登录模式，用户名和密码可以不填写"
 msgid "Use comma split multi command, ex: /bin/whoami,/bin/ifconfig"
 msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 
-#: assets/models/asset.py:145
+#: assets/models/asset.py:146
 msgid "Base"
 msgstr "基础"
 
-#: assets/models/asset.py:146 assets/templates/assets/platform_detail.html:51
+#: assets/models/asset.py:147 assets/templates/assets/platform_detail.html:51
 msgid "Charset"
 msgstr "编码"
 
-#: assets/models/asset.py:147 assets/templates/assets/platform_detail.html:55
+#: assets/models/asset.py:148 assets/templates/assets/platform_detail.html:55
 #: tickets/models/ticket.py:38
 msgid "Meta"
 msgstr "元数据"
 
-#: assets/models/asset.py:148
+#: assets/models/asset.py:149
 msgid "Internal"
 msgstr "内部的"
 
-#: assets/models/asset.py:185 assets/models/domain.py:49
+#: assets/models/asset.py:186 assets/models/domain.py:49
 #: assets/serializers/asset_user.py:28
 #: assets/templates/assets/_asset_list_modal.html:47
 #: assets/templates/assets/_asset_user_list.html:20
@@ -985,7 +987,7 @@ msgstr "内部的"
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:186 assets/serializers/asset_user.py:27
+#: assets/models/asset.py:187 assets/serializers/asset_user.py:27
 #: assets/serializers/gathered_user.py:20
 #: assets/templates/assets/_asset_list_modal.html:46
 #: assets/templates/assets/_asset_user_auth_update_modal.html:9
@@ -1002,7 +1004,7 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:189 assets/models/domain.py:51
+#: assets/models/asset.py:190 assets/models/domain.py:51
 #: assets/models/user.py:114 assets/templates/assets/asset_detail.html:68
 #: assets/templates/assets/domain_gateway_list.html:65
 #: assets/templates/assets/system_user_detail.html:67
@@ -1013,85 +1015,85 @@ msgstr "主机名"
 msgid "Protocol"
 msgstr "协议"
 
-#: assets/models/asset.py:191 assets/serializers/asset.py:68
+#: assets/models/asset.py:192 assets/serializers/asset.py:68
 #: assets/templates/assets/asset_create.html:24
 #: assets/templates/assets/user_asset_list.html:77
 #: perms/serializers/user_permission.py:59
 msgid "Protocols"
 msgstr "协议组"
 
-#: assets/models/asset.py:195 assets/models/authbook.py:27
+#: assets/models/asset.py:196 assets/models/authbook.py:27
 #: assets/models/cmd_filter.py:22 assets/models/domain.py:54
 #: assets/models/label.py:22 assets/templates/assets/asset_detail.html:108
 #: authentication/models.py:45
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:201 assets/templates/assets/asset_detail.html:64
+#: assets/models/asset.py:202 assets/templates/assets/asset_detail.html:64
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:202 assets/templates/assets/asset_detail.html:116
+#: assets/models/asset.py:203 assets/templates/assets/asset_detail.html:116
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:205 assets/templates/assets/asset_detail.html:80
+#: assets/models/asset.py:206 assets/templates/assets/asset_detail.html:80
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:206 assets/templates/assets/asset_detail.html:84
+#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:84
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:207 assets/templates/assets/asset_detail.html:112
+#: assets/models/asset.py:208 assets/templates/assets/asset_detail.html:112
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:209
+#: assets/models/asset.py:210
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:210
+#: assets/models/asset.py:211
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:211
+#: assets/models/asset.py:212
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:212
+#: assets/models/asset.py:213
 msgid "CPU vcpus"
 msgstr "CPU总数"
 
-#: assets/models/asset.py:213 assets/templates/assets/asset_detail.html:92
+#: assets/models/asset.py:214 assets/templates/assets/asset_detail.html:92
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:214
+#: assets/models/asset.py:215
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:215
+#: assets/models/asset.py:216
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:217 assets/templates/assets/asset_detail.html:104
+#: assets/models/asset.py:218 assets/templates/assets/asset_detail.html:104
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:218
+#: assets/models/asset.py:219
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:219
+#: assets/models/asset.py:220
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:220
+#: assets/models/asset.py:221
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:222 assets/templates/assets/asset_create.html:46
+#: assets/models/asset.py:223 assets/templates/assets/asset_create.html:46
 #: assets/templates/assets/asset_detail.html:220 templates/_nav.html:46
 msgid "Labels"
 msgstr "标签管理"
@@ -1164,7 +1166,7 @@ msgid "Default"
 msgstr "默认"
 
 #: assets/models/cluster.py:36 assets/models/label.py:14
-#: users/models/user.py:580
+#: users/models/user.py:585
 msgid "System"
 msgstr "系统"
 
@@ -1193,7 +1195,7 @@ msgid "Regex"
 msgstr "正则表达式"
 
 #: assets/models/cmd_filter.py:40 ops/models/command.py:22
-#: ops/templates/ops/command_execution_list.html:67 terminal/models.py:186
+#: ops/templates/ops/command_execution_list.html:67 terminal/models.py:195
 #: terminal/templates/terminal/command_list.html:28
 #: terminal/templates/terminal/command_list.html:68
 #: terminal/templates/terminal/session_detail.html:48
@@ -1288,14 +1290,14 @@ msgstr "默认资产组"
 #: perms/templates/perms/remote_app_permission_create_update.html:41
 #: perms/templates/perms/remote_app_permission_list.html:15
 #: templates/index.html:87 terminal/backends/command/models.py:12
-#: terminal/models.py:176 terminal/templates/terminal/command_list.html:29
+#: terminal/models.py:185 terminal/templates/terminal/command_list.html:29
 #: terminal/templates/terminal/command_list.html:65
 #: terminal/templates/terminal/session_list.html:25
 #: terminal/templates/terminal/session_list.html:69 tickets/models/ticket.py:33
 #: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
 #: tickets/templates/tickets/ticket_list.html:34
 #: tickets/templates/tickets/ticket_list.html:103 users/forms/group.py:15
-#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:568
+#: users/models/user.py:143 users/models/user.py:159 users/models/user.py:573
 #: users/serializers/group.py:20
 #: users/templates/users/user_asset_permission.html:38
 #: users/templates/users/user_asset_permission.html:64
@@ -1409,7 +1411,7 @@ msgstr "登录模式"
 #: perms/templates/perms/remote_app_permission_detail.html:126
 #: perms/templates/perms/remote_app_permission_list.html:18
 #: templates/_nav.html:45 terminal/backends/command/models.py:14
-#: terminal/models.py:180 terminal/templates/terminal/command_list.html:31
+#: terminal/models.py:189 terminal/templates/terminal/command_list.html:31
 #: terminal/templates/terminal/command_list.html:67
 #: terminal/templates/terminal/session_list.html:27
 #: terminal/templates/terminal/session_list.html:71
@@ -1451,7 +1453,7 @@ msgstr "协议格式 {}/{}"
 msgid "Protocol duplicate: {}"
 msgstr "协议重复: {}"
 
-#: assets/serializers/asset.py:69 assets/serializers/asset.py:149
+#: assets/serializers/asset.py:69 assets/serializers/asset.py:150
 #: assets/serializers/asset_user.py:29
 #: assets/templates/assets/_asset_user_list.html:23
 msgid "Connectivity"
@@ -2357,7 +2359,7 @@ msgstr "系统用户资产"
 #: audits/templates/audits/ftp_log_list.html:77
 #: audits/templates/audits/operate_log_list.html:74
 #: audits/templates/audits/password_change_log_list.html:56
-#: terminal/models.py:183 terminal/templates/terminal/session_list.html:28
+#: terminal/models.py:192 terminal/templates/terminal/session_list.html:28
 #: terminal/templates/terminal/session_list.html:72
 #: terminal/templates/terminal/terminal_detail.html:47
 msgid "Remote addr"
@@ -2472,7 +2474,7 @@ msgstr "登录日期"
 #: perms/templates/perms/asset_permission_detail.html:81
 #: perms/templates/perms/database_app_permission_detail.html:77
 #: perms/templates/perms/remote_app_permission_detail.html:73
-#: terminal/models.py:189 terminal/templates/terminal/session_list.html:32
+#: terminal/models.py:198 terminal/templates/terminal/session_list.html:32
 #: xpack/plugins/change_auth_plan/models.py:249
 #: xpack/plugins/change_auth_plan/models.py:425
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:59
@@ -2940,7 +2942,7 @@ msgstr "字段必须唯一"
 msgid "<h1>Flow service unavailable, check it</h1>"
 msgstr ""
 
-#: jumpserver/views/index.py:178 templates/_nav.html:7
+#: jumpserver/views/index.py:242 templates/_nav.html:7
 msgid "Dashboard"
 msgstr "仪表盘"
 
@@ -4443,99 +4445,95 @@ msgstr "一周Top10资产"
 msgid "Login frequency and last login record."
 msgstr "登录次数及最近一次登录记录."
 
-#: templates/index.html:133 templates/index.html:221
+#: templates/index.html:133 templates/index.html:219
 msgid " times"
 msgstr " 次"
 
-#: templates/index.html:136
-msgid "The last time a user logged in"
-msgstr "最近一次登录用户"
+#: templates/index.html:136 templates/index.html:222
+msgid "The time last logged in"
+msgstr "最近一次登录"
 
-#: templates/index.html:138 templates/index.html:226
-msgid "At "
+#: templates/index.html:137 templates/index.html:223
+msgid "At"
 msgstr "于"
 
-#: templates/index.html:144 templates/index.html:183 templates/index.html:232
+#: templates/index.html:143 templates/index.html:181 templates/index.html:229
 msgid "(No)"
 msgstr "(暂无)"
 
-#: templates/index.html:152
+#: templates/index.html:151
 msgid "Last 10 login"
 msgstr "最近十次登录"
 
-#: templates/index.html:158
+#: templates/index.html:157
 msgid "Login record"
 msgstr "登录记录"
 
-#: templates/index.html:159
+#: templates/index.html:158
 msgid "Last 10 login records."
 msgstr "最近十次登录记录."
 
-#: templates/index.html:172 templates/index.html:174
+#: templates/index.html:171 templates/index.html:173
 msgid "Before"
 msgstr "前"
 
-#: templates/index.html:176
+#: templates/index.html:175
 msgid "Login in "
 msgstr "登录了"
 
-#: templates/index.html:194 templates/index.html:209
+#: templates/index.html:192 templates/index.html:207
 msgid "Top 10 users in a week"
 msgstr "一周Top10用户"
 
-#: templates/index.html:210
+#: templates/index.html:208
 msgid "User login frequency and last login record."
 msgstr "用户登录次数及最近一次登录记录"
 
-#: templates/index.html:224
-msgid "The last time logged on to the host"
-msgstr "最近一次登录主机"
-
-#: templates/index.html:268
+#: templates/index.html:265
 msgid "Monthly data overview"
 msgstr "月数据总览"
 
-#: templates/index.html:269
+#: templates/index.html:266
 msgid "History summary in one month"
 msgstr "一个月内历史汇总"
 
-#: templates/index.html:277 templates/index.html:301
+#: templates/index.html:274 templates/index.html:298
 msgid "Login count"
 msgstr "登录次数"
 
-#: templates/index.html:277 templates/index.html:308
+#: templates/index.html:274 templates/index.html:305
 msgid "Active users"
 msgstr "活跃用户"
 
-#: templates/index.html:277 templates/index.html:315
+#: templates/index.html:274 templates/index.html:312
 msgid "Active assets"
 msgstr "活跃资产"
 
-#: templates/index.html:342 templates/index.html:392
+#: templates/index.html:339 templates/index.html:389
 msgid "Monthly active users"
 msgstr "月活跃用户"
 
-#: templates/index.html:342 templates/index.html:393
+#: templates/index.html:339 templates/index.html:390
 msgid "Disable user"
 msgstr "禁用用户"
 
-#: templates/index.html:342 templates/index.html:394
+#: templates/index.html:339 templates/index.html:391
 msgid "Month not logged in user"
 msgstr "月未登录用户"
 
-#: templates/index.html:368 templates/index.html:444
+#: templates/index.html:365 templates/index.html:441
 msgid "Access to the source"
 msgstr "访问来源"
 
-#: templates/index.html:418 templates/index.html:468
+#: templates/index.html:415 templates/index.html:465
 msgid "Month is logged into the host"
 msgstr "月被登录主机"
 
-#: templates/index.html:418 templates/index.html:469
+#: templates/index.html:415 templates/index.html:466
 msgid "Disable host"
 msgstr "禁用主机"
 
-#: templates/index.html:418 templates/index.html:470
+#: templates/index.html:415 templates/index.html:467
 msgid "Month not logged on host"
 msgstr "月未登录主机"
 
@@ -4684,39 +4682,39 @@ msgstr "远端地址"
 msgid "HTTP Port"
 msgstr "HTTP端口"
 
-#: terminal/models.py:145
+#: terminal/models.py:154
 msgid "Session Online"
 msgstr "在线会话"
 
-#: terminal/models.py:146
+#: terminal/models.py:155
 msgid "CPU Usage"
 msgstr "CPU使用"
 
-#: terminal/models.py:147
+#: terminal/models.py:156
 msgid "Memory Used"
 msgstr "内存使用"
 
-#: terminal/models.py:148
+#: terminal/models.py:157
 msgid "Connections"
 msgstr "连接数"
 
-#: terminal/models.py:149
+#: terminal/models.py:158
 msgid "Threads"
 msgstr "线程数"
 
-#: terminal/models.py:150
+#: terminal/models.py:159
 msgid "Boot Time"
 msgstr "运行时间"
 
-#: terminal/models.py:185 terminal/templates/terminal/session_list.html:135
+#: terminal/models.py:194 terminal/templates/terminal/session_list.html:135
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models.py:190
+#: terminal/models.py:199
 msgid "Date end"
 msgstr "结束日期"
 
-#: terminal/models.py:283
+#: terminal/models.py:334
 msgid "Args"
 msgstr "参数"
 
@@ -5103,7 +5101,7 @@ msgid "Public key should not be the same as your old one."
 msgstr "不能和原来的密钥相同"
 
 #: users/forms/profile.py:137 users/forms/user.py:90
-#: users/serializers/user.py:122
+#: users/serializers/user.py:131
 msgid "Not a valid ssh public key"
 msgstr "ssh密钥不合法"
 
@@ -5150,7 +5148,7 @@ msgstr "设置密码"
 msgid "Password strategy"
 msgstr "密码策略"
 
-#: users/models/user.py:142 users/models/user.py:576
+#: users/models/user.py:142 users/models/user.py:581
 msgid "Administrator"
 msgstr "管理员"
 
@@ -5187,7 +5185,7 @@ msgstr "微信"
 msgid "Date password last updated"
 msgstr "最后更新密码日期"
 
-#: users/models/user.py:579
+#: users/models/user.py:584
 msgid "Administrator is the super user of system"
 msgstr "Administrator是初始的超级管理员"
 
@@ -5219,15 +5217,15 @@ msgstr "角色只能为 {}"
 msgid "Password does not match security rules"
 msgstr "密码不满足安全规则"
 
-#: users/serializers/user.py:107
+#: users/serializers/user.py:116
 msgid "Groups name"
 msgstr "用户组名"
 
-#: users/serializers/user.py:108
+#: users/serializers/user.py:117
 msgid "Source name"
 msgstr "用户来源名"
 
-#: users/serializers/user.py:109
+#: users/serializers/user.py:118
 msgid "Role name"
 msgstr "角色名"
 
@@ -6661,6 +6659,12 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "At "
+#~ msgstr "于"
+
+#~ msgid "The last time logged on to the host"
+#~ msgstr "最近一次登录主机"
 
 #~ msgid "Unlimited"
 #~ msgstr "无限制"
