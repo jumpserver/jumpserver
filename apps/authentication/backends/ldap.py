@@ -131,5 +131,5 @@ class LDAPUser(_LDAPUser):
                 setattr(self._user, field, value)
 
         email = getattr(self._user, 'email', '')
-        email = construct_user_email(email, self._user.username)
+        email = construct_user_email(self._user.username, email)
         setattr(self._user, 'email', email)
