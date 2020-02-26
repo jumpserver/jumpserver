@@ -387,16 +387,12 @@ class LDAPTestUtil(object):
             self._test_server_uri()
         except LDAPSocketOpenError as e:
             error = _("Host or port is disconnected: {}".format(e))
-            logger.error(error, exc_info=True)
         except LDAPSessionTerminatedByServerError as e:
             error = _('The port is not the port of the LDAP service: {}'.format(e))
-            logger.error(error, exc_info=True)
         except LDAPSocketReceiveError as e:
             error = _('Please enter the certificate: {}'.format(e))
-            logger.error(error, exc_info=True)
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
-            logger.error(error, exc_info=True)
         else:
             return
         raise LDAPInvalidServerError(error)
@@ -431,9 +427,9 @@ class LDAPTestUtil(object):
     # test search ou
 
     def _test_search_ou_and_filter(self):
-        search_ous = str(self.config.search_ou).split('|')
         config = deepcopy(self.config)
         util = LDAPServerUtil(config=config)
+        search_ous = str(self.config.search_ou).split('|')
         for search_ou in search_ous:
             util.config.search_ou = search_ou
             user_entries = util.search_user_entries()
@@ -454,7 +450,6 @@ class LDAPTestUtil(object):
             raise self.LDAPInvalidAttributeMapError(error)
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
-            logger.error(error, exc_info=True)
         else:
             return
         raise self.LDAPInvalidSearchOuOrFilterError(error)
@@ -529,11 +524,14 @@ class LDAPTestUtil(object):
         else:
             status = True
             msg = _('Succeed: Match {} s user'.format(len(self.user_entries)))
+
+        if not status:
+            logger.error(msg, exc_info=True)
         return status, msg
 
     # test login
 
-    def _test_login_check(self, username, password):
+    def _test_before_login_check(self, username, password):
         ok, msg = self.test_config()
         if not ok:
             raise LDAPConfigurationError(msg)
@@ -550,7 +548,7 @@ class LDAPTestUtil(object):
         ldap_user._authenticate_user_dn(password)
 
     def _test_login(self, username, password):
-        self._test_login_check(username, password)
+        self._test_before_login_check(username, password)
         self._test_login_auth(username, password)
 
     def test_login(self, username, password):
@@ -563,11 +561,12 @@ class LDAPTestUtil(object):
             msg = _('Authentication failed (before login check failed): {}'.format(e))
         except LDAPUser.AuthenticationFailed as e:
             msg = _('Authentication failed (username or password incorrect): {}'.format(e))
-            logger.error(e, exc_info=True)
         except Exception as e:
-            msg = _("Authentication failed: {}".format(e))
-            logger.error(e, exc_info=True)
+            msg = _("Authentication failed (Unknown): {}".format(e))
         else:
             status = True
             msg = _("Authentication success: {}".format(username))
+
+        if not status:
+            logger.error(msg, exc_info=True)
         return status, msg
