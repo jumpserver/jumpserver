@@ -41,9 +41,10 @@
                                     {% endfor %}
                                     <div class="hr-line-dashed"></div>
                                     <div class="form-group">
-                                        <div class="col-sm-4 col-sm-offset-2">
+                                        <div class="col-sm-9 col-sm-offset-2">
                                             <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-                                            <button class="btn btn-default btn-test" type="button"> {% trans 'Test connection' %}</button>
+                                            <button class="btn btn-default btn-test-config" type="button"> {% trans 'Test connection' %}</button>
+                                            <button class="btn btn-default btn-test-login" type="button"> {% trans 'Test login' %}</button>
                                             <button class="btn btn-default sync_button " data-toggle="modal" data-target="#ldap_list_users_modal" type="button">{% trans 'Bulk import' %}</button>
                                             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                         </div>
@@ -58,27 +59,28 @@
         </div>
     </div>
     {% include 'settings/_ldap_list_users_modal.html' %}
+    {% include 'settings/_ldap_test_user_login_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
 
 })
-.on("click", ".btn-test", function () {
+.on("click", ".btn-test-config", function () {
     var data = {};
     var form = $("form").serializeArray();
     $.each(form, function (i, field) {
         data[field.name] = field.value;
     });
 
-    var the_url = "{% url 'api-settings:ldap-testing' %}";
+    var the_url = "{% url 'api-settings:ldap-testing-config' %}";
 
     function error(message) {
         toastr.error(message)
     }
 
     function success(message) {
-        toastr.success(message.msg)
+        toastr.success(message)
     }
     requestApi({
         url: the_url,
@@ -89,6 +91,9 @@ $(document).ready(function () {
         error: error
     });
 })
+.on("click", ".btn-test-login", function () {
+    $('#test_user_login_modal').modal('show')
 
+})
 </script>
 {% endblock %}
