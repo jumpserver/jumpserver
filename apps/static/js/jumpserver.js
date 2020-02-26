@@ -319,16 +319,22 @@ function objectDelete(obj, name, url, redirectTo, title, success_message) {
     function doDelete() {
         var body = {};
         var success = function () {
-            // swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             if (!redirectTo) {
                 $(obj).parent().parent().remove();
             } else {
                 window.location.href = redirectTo;
             }
         };
-        var fail = function () {
-            // swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
-            swal(gettext('Error'), "[ " + name + " ]" + gettext("Being used by the asset, please unbind the asset first."), "error");
+        var fail = function (responseText, responseJSON, status) {
+            var errorMsg = '';
+            if (responseJSON && responseJSON.error) {
+                errorMsg = '';
+            } else if (status === 404) {
+                errorMsg = gettext("Not found")
+            } else {
+                errorMsg = gettext("Server error")
+            }
+            swal(gettext('Error'), "[ " + name + " ] " + errorMsg);
         };
         requestApi({
             url: url,

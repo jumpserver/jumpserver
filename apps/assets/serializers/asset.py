@@ -12,6 +12,7 @@ from .base import ConnectivitySerializer
 
 __all__ = [
     'AssetSerializer', 'AssetSimpleSerializer',
+    'AssetDisplaySerializer',
     'ProtocolsField', 'PlatformSerializer',
     'AssetDetailSerializer', 'AssetTaskSerializer',
 ]
@@ -66,8 +67,6 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
         slug_field='name', queryset=Platform.objects.all(), label=_("Platform")
     )
     protocols = ProtocolsField(label=_('Protocols'), required=False)
-    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
-
     """
     资产的数据结构
     """
@@ -81,7 +80,7 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
             'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
             'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
             'hostname_raw', 'comment', 'created_by', 'date_created',
-            'hardware_info', 'connectivity',
+            'hardware_info',
         ]
         read_only_fields = (
             'vendor', 'model', 'sn', 'cpu_model', 'cpu_count',
@@ -129,6 +128,28 @@ class AssetSerializer(BulkOrgResourceModelSerializer):
     def update(self, instance, validated_data):
         self.compatible_with_old_protocol(validated_data)
         return super().update(instance, validated_data)
+
+
+class AssetDisplaySerializer(AssetSerializer):
+    connectivity = ConnectivitySerializer(read_only=True, label=_("Connectivity"))
+
+    class Meta(AssetSerializer.Meta):
+        fields = [
+            'id', 'ip', 'hostname', 'protocol', 'port',
+            'protocols', 'is_active', 'public_ip',
+            'number', 'vendor', 'model', 'sn',
+            'cpu_model', 'cpu_count', 'cpu_cores', 'cpu_vcpus', 'memory',
+            'disk_total', 'disk_info', 'os', 'os_version', 'os_arch',
+            'hostname_raw', 'comment', 'created_by', 'date_created',
+            'hardware_info', 'connectivity',
+        ]
+
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """ Perform necessary eager loading of data. """
+        queryset = queryset\
+            .annotate(admin_user_username=F('admin_user__username'))
+        return queryset
 
 
 class PlatformSerializer(serializers.ModelSerializer):

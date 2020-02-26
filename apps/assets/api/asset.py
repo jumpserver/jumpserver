@@ -36,7 +36,10 @@ class AssetViewSet(OrgBulkModelViewSet):
     filter_fields = ("hostname", "ip", "systemuser__id", "admin_user__id")
     search_fields = ("hostname", "ip")
     ordering_fields = ("hostname", "ip", "port", "cpu_cores")
-    serializer_class = serializers.AssetSerializer
+    serializer_classes = {
+        'default': serializers.AssetSerializer,
+        'display': serializers.AssetDisplaySerializer,
+    }
     permission_classes = (IsOrgAdminOrAppUser,)
     extra_filter_backends = [AssetByNodeFilterBackend, LabelFilterBackend]
 

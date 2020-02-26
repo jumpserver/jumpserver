@@ -81,6 +81,11 @@ class ConnectivityMixin:
             cache.set(cache_key, amount, self.ASSET_USER_CACHE_TIME)
         return amount
 
+    @classmethod
+    def get_asset_username_connectivity(cls, asset, username):
+        key = cls.CONNECTIVITY_ASSET_CACHE_KEY.format(username, asset.id)
+        return Connectivity.get(key)
+
     def get_asset_connectivity(self, asset):
         key = self.get_asset_connectivity_key(asset)
         return Connectivity.get(key)
