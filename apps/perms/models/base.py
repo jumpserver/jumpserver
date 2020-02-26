@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils import timezone
 from orgs.mixins.models import OrgModelMixin
 
-from common.utils import date_expired_default, set_or_append_attr_bulk
+from common.utils import date_expired_default
 from orgs.mixins.models import OrgManager
 
 

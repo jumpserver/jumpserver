@@ -23,6 +23,7 @@ class TokenCreateApi(AuthMixin, CreateAPIView):
     def create_session_if_need(self):
         if self.request.session.is_empty():
             self.request.session.create()
+            self.request.session.set_expiry(600)
 
     def create(self, request, *args, **kwargs):
         self.create_session_if_need()

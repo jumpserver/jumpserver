@@ -114,3 +114,4 @@ class UserGrantedAssetSystemUsersApi(UserAssetPermissionMixin, ListAPIView):
             system_users.append(system_user)
         system_users.sort(key=lambda x: x.priority)
         return system_users
+
