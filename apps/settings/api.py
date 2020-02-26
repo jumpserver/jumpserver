@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
 import json
-import jms_storage
 
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
@@ -12,7 +10,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Setting
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS
@@ -250,11 +247,10 @@ class PublicSettingApi(generics.RetrieveAPIView):
     serializer_class = PublicSettingSerializer
 
     def get_object(self):
-        c = settings.CONFIG
         instance = {
             "data": {
-                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
-                "SECURITY_MAX_IDLE_TIME": c.SECURITY_MAX_IDLE_TIME,
+                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
+                "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
             }
         }
         return instance
