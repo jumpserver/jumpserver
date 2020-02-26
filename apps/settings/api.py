@@ -250,11 +250,10 @@ class PublicSettingApi(generics.RetrieveAPIView):
     serializer_class = PublicSettingSerializer
 
     def get_object(self):
-        c = settings.CONFIG
         instance = {
             "data": {
-                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": c.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
-                "SECURITY_MAX_IDLE_TIME": c.SECURITY_MAX_IDLE_TIME,
+                "WINDOWS_SKIP_ALL_MANUAL_PASSWORD": settings.WINDOWS_SKIP_ALL_MANUAL_PASSWORD,
+                "SECURITY_MAX_IDLE_TIME": settings.SECURITY_MAX_IDLE_TIME,
             }
         }
         return instance
