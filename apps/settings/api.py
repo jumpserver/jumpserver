@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-import os
 import json
-import jms_storage
 
 from smtplib import SMTPSenderRefused
 from rest_framework import generics
@@ -12,7 +10,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Setting
 from .utils import (
     LDAPServerUtil, LDAPCacheUtil, LDAPImportUtil, LDAPSyncUtil,
     LDAP_USE_CACHE_FLAGS
