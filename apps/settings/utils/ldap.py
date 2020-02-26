@@ -362,14 +362,14 @@ class LDAPTestUtil(object):
     class LDAPNotEnabledAuthError(LDAPExceptionError):
         pass
 
-    class LDAPPreCheckLoginError(LDAPExceptionError):
+    class LDAPBeforeLoginCheckError(LDAPExceptionError):
         pass
 
     def __init__(self, config=None):
         self.config = LDAPConfig(config)
         self.user_entries = []
 
-    def _test(self, authentication=None, user=None, password=None):
+    def _test_connection_bind(self, authentication=None, user=None, password=None):
         server = Server(self.config.server_uri)
         connection = Connection(
             server, user=user, password=password, authentication=authentication
@@ -380,7 +380,7 @@ class LDAPTestUtil(object):
     # test server uri
 
     def _test_server_uri(self):
-        self._test()
+        self._test_connection_bind()
 
     def test_server_uri(self):
         try:
@@ -406,7 +406,9 @@ class LDAPTestUtil(object):
     def _test_bind_dn(self):
         user = self.config.bind_dn
         password = self.config.password
-        ret = self._test(authentication=SIMPLE, user=user, password=password)
+        ret = self._test_connection_bind(
+            authentication=SIMPLE, user=user, password=password
+        )
         if not ret:
             msg = _('bind dn or password incorrect')
             raise LDAPInvalidDnError(msg)
@@ -539,9 +541,10 @@ class LDAPTestUtil(object):
         backend = LDAPAuthorizationBackend()
         ok, msg = backend.pre_check(username, password)
         if not ok:
-            raise self.LDAPPreCheckLoginError(msg)
+            raise self.LDAPBeforeLoginCheckError(msg)
 
-    def _test_login_auth(self, username, password):
+    @staticmethod
+    def _test_login_auth(username, password):
         backend = LDAPAuthorizationBackend()
         ldap_user = LDAPUser(backend, username=username.strip())
         ldap_user._authenticate_user_dn(password)
@@ -556,7 +559,7 @@ class LDAPTestUtil(object):
             self._test_login(username, password)
         except LDAPConfigurationError as e:
             msg = _('Authentication failed (configuration incorrect): {}'.format(e))
-        except self.LDAPPreCheckLoginError as e:
+        except self.LDAPBeforeLoginCheckError as e:
             msg = _('Authentication failed (before login check failed): {}'.format(e))
         except LDAPUser.AuthenticationFailed as e:
             msg = _('Authentication failed (username or password incorrect): {}'.format(e))
