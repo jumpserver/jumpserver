@@ -22,7 +22,10 @@ logger = get_logger(__name__)
 
 class SessionViewSet(OrgBulkModelViewSet):
     model = Session
-    serializer_class = serializers.SessionSerializer
+    serializer_classes = {
+        'default': serializers.SessionSerializer,
+        'display': serializers.SessionDisplaySerializer,
+    }
     permission_classes = (IsOrgAdminOrAppUser, )
     filterset_fields = [
         "user", "asset", "system_user", "remote_addr",
