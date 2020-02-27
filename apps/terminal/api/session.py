@@ -91,7 +91,13 @@ class SessionReplayViewSet(viewsets.ViewSet):
         if session.protocol in ('rdp', 'vnc'):
             tp = 'guacamole'
 
-        data = {'type': tp, 'src': ''}
+        data = {
+            'type': tp, 'src': '',
+            'user': session.user, 'asset': session.asset,
+            'system_user': session.system_user,
+            'date_start': session.date_start,
+            'date_end': session.date_end
+        }
         local_path, url = get_session_replay_url(session)
         if url:
             data['src'] = url
