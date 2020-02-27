@@ -61,7 +61,7 @@ class CommandStore(CommandBase):
     def make_filter_kwargs(
             date_from=None, date_to=None,
             user=None, asset=None, system_user=None,
-            input=None, session=None):
+            input=None, session=None, org_id=None):
         filter_kwargs = {}
         date_from_default = timezone.now() - datetime.timedelta(days=7)
         date_to_default = timezone.now()
@@ -89,15 +89,17 @@ class CommandStore(CommandBase):
             filter_kwargs['input__icontains'] = input
         if session:
             filter_kwargs['session'] = session
+        if org_id is not None:
+            filter_kwargs['org_id'] = org_id
         return filter_kwargs
 
     def filter(self, date_from=None, date_to=None,
                user=None, asset=None, system_user=None,
-               input=None, session=None):
+               input=None, session=None, org_id=None):
         filter_kwargs = self.make_filter_kwargs(
             date_from=date_from, date_to=date_to, user=user,
             asset=asset, system_user=system_user, input=input,
-            session=session,
+            session=session, org_id=org_id,
         )
         queryset = self.model.objects.filter(**filter_kwargs)
         return queryset
