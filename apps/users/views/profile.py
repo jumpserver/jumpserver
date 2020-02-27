@@ -1,10 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
-from __future__ import unicode_literals
-
-
 from django.contrib.auth import authenticate
-from django.core.cache import cache
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -12,9 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.utils.translation import ugettext as _
 from django.views import View
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import (
-    UpdateView, FormView
-)
+from django.views.generic.edit import UpdateView, FormView
 from django.contrib.auth import logout as auth_logout
 
 from common.utils import get_logger, ssh_key_gen
@@ -25,15 +19,15 @@ from common.permissions import (
 from .. import forms
 from ..models import User
 from ..utils import (
-    generate_otp_uri, check_otp_code, get_user_or_tmp_user,
-    delete_tmp_user_for_cache, check_password_rules, get_password_check_rules,
+    generate_otp_uri, check_otp_code, get_user_or_pre_auth_user,
+    check_password_rules, get_password_check_rules,
 )
 
 __all__ = [
     'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserPublicKeyGenerateView',
-    'UserCheckPasswordView', 'UserOtpEnableInstallAppView',
+    'UserVerifyPasswordView', 'UserOtpEnableInstallAppView',
     'UserOtpEnableBindView', 'UserOtpSettingsSuccessView',
     'UserDisableMFAView', 'UserOtpUpdateView',
 ]
@@ -133,21 +127,22 @@ class UserPublicKeyGenerateView(PermissionsMixin, View):
     permission_classes = [IsValidUser]
 
     def get(self, request, *args, **kwargs):
-        private, public = ssh_key_gen(username=request.user.username, hostname='jumpserver')
+        username = request.user.username
+        private, public = ssh_key_gen(username, hostname='jumpserver')
         request.user.public_key = public
         request.user.save()
         response = HttpResponse(private, content_type='text/plain')
-        filename = "{0}-jumpserver.pem".format(request.user.username)
+        filename = "{0}-jumpserver.pem".format(username)
         response['Content-Disposition'] = 'attachment; filename={}'.format(filename)
         return response
 
 
-class UserCheckPasswordView(FormView):
+class UserVerifyPasswordView(FormView):
     template_name = 'users/user_password_check.html'
     form_class = forms.UserCheckPasswordForm
 
     def form_valid(self, form):
-        user = get_user_or_tmp_user(self.request)
+        user = get_user_or_pre_auth_user(self.request)
         password = form.cleaned_data.get('password')
         user = authenticate(username=user.username, password=password)
         if not user:
@@ -156,6 +151,8 @@ class UserCheckPasswordView(FormView):
         if not user.mfa_is_otp():
             user.enable_mfa()
             user.save()
+        self.request.session['user_id'] = str(user.id)
+        self.request.session['auth_password'] = 1
         return redirect(self.get_success_url())
 
     def get_success_url(self):
@@ -167,7 +164,7 @@ class UserCheckPasswordView(FormView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'user': get_user_or_tmp_user(self.request)
+            'user': get_user_or_pre_auth_user(self.request)
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -177,7 +174,7 @@ class UserOtpEnableInstallAppView(TemplateView):
     template_name = 'users/user_otp_enable_install_app.html'
 
     def get_context_data(self, **kwargs):
-        user = get_user_or_tmp_user(self.request)
+        user = get_user_or_pre_auth_user(self.request)
         context = {
             'user': user
         }
@@ -192,25 +189,27 @@ class UserOtpEnableBindView(TemplateView, FormView):
 
     def form_valid(self, form):
         otp_code = form.cleaned_data.get('otp_code')
-        otp_secret_key = cache.get(self.request.session.session_key+'otp_key', '')
+        otp_secret_key = self.request.session.get('otp_secret_key', '')
 
-        if check_otp_code(otp_secret_key, otp_code):
+        valid = check_otp_code(otp_secret_key, otp_code)
+        if valid:
             self.save_otp(otp_secret_key)
             return super().form_valid(form)
-
         else:
-            form.add_error("otp_code", _("MFA code invalid, or ntp sync server time"))
+            error = _("MFA code invalid, or ntp sync server time")
+            form.add_error("otp_code", error)
             return self.form_invalid(form)
 
     def save_otp(self, otp_secret_key):
-        user = get_user_or_tmp_user(self.request)
+        user = get_user_or_pre_auth_user(self.request)
         user.enable_mfa()
         user.otp_secret_key = otp_secret_key
         user.save()
 
     def get_context_data(self, **kwargs):
-        user = get_user_or_tmp_user(self.request)
-        otp_uri, otp_secret_key = generate_otp_uri(self.request)
+        user = get_user_or_pre_auth_user(self.request)
+        otp_uri, otp_secret_key = generate_otp_uri(user.username)
+        self.request.session['otp_secret_key'] = otp_secret_key
         context = {
             'otp_uri': otp_uri,
             'otp_secret_key': otp_secret_key,
@@ -224,6 +223,7 @@ class UserDisableMFAView(FormView):
     template_name = 'users/user_disable_mfa.html'
     form_class = forms.UserCheckOtpCodeForm
     success_url = reverse_lazy('users:user-otp-settings-success')
+    permission_classes = [IsValidUser]
 
     def form_valid(self, form):
         user = self.request.user
@@ -235,7 +235,8 @@ class UserDisableMFAView(FormView):
             user.save()
             return super().form_valid(form)
         else:
-            form.add_error('otp_code', _('MFA code invalid, or ntp sync server time'))
+            error = _('MFA code invalid, or ntp sync server time')
+            form.add_error('otp_code', error)
             return super().form_invalid(form)
 
 
@@ -259,7 +260,7 @@ class UserOtpSettingsSuccessView(TemplateView):
         return super().get_context_data(**kwargs)
 
     def get_title_describe(self):
-        user = get_user_or_tmp_user(self.request)
+        user = get_user_or_pre_auth_user(self.request)
         if self.request.user.is_authenticated:
             auth_logout(self.request)
         title = _('MFA enable success')
@@ -267,6 +268,5 @@ class UserOtpSettingsSuccessView(TemplateView):
         if not user.mfa_enabled:
             title = _('MFA disable success')
             describe = _('MFA disable success, return login page')
-        delete_tmp_user_for_cache(self.request)
         return title, describe
 

@@ -3,12 +3,16 @@
 {% load static %}
 
 {% block small_title %}
-    {% trans 'Install' %}
+    {% trans 'Install app' %}
 {% endblock %}
 
 {% block content %}
     <div class="verify">
-        <p style="margin: 20px auto;"><strong style="color: #000000">{% trans 'Download and install the Google Authenticator application on your phone' %}</strong></p>
+        <p style="margin: 20px auto;">
+            <strong style="color: #000000">
+                {% trans 'Download and install the Google Authenticator application on your phone' %}
+            </strong>
+        </p>
         <div>
             <img src="{% static 'img/authenticator_android.png' %}" width="128" height="128" alt="">
             <p>{% trans 'Android downloads' %}</p>
@@ -27,7 +31,6 @@
     <script>
         $(function(){
             $('.change-color li:eq(1) i').css('color', '#1ab394')
-
         })
     </script>
 

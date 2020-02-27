@@ -412,11 +412,11 @@ class MFAMixin:
             return self.check_otp(code)
 
     def mfa_enabled_but_not_set(self):
-        if self.mfa_enabled and \
-                self.mfa_is_otp() and \
-                not self.otp_secret_key:
-            return True
-        return False
+        if not self.mfa_enabled:
+            return False, None
+        if self.mfa_is_otp() and not self.otp_secret_key:
+            return True, reverse('users:user-verify-password')
+        return False, None
 
 
 class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
