@@ -91,7 +91,13 @@ class SessionReplayViewSet(viewsets.ViewSet):
         if session.protocol in ('rdp', 'vnc'):
             tp = 'guacamole'
 
-        data = {'type': tp, 'src': ''}
+        data = {
+            'type': tp, 'src': '',
+            'user': session.user, 'asset': session.asset,
+            'system_user': session.system_user,
+            'date_start': session.date_start,
+            'date_end': session.date_end
+        }
 
         # 新版本和老版本的文件后缀不同
         session_path = session.get_rel_replay_path()  # 存在外部存储上的路径
