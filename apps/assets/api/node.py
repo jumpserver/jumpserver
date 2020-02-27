@@ -52,9 +52,9 @@ class NodeViewSet(OrgModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         node = self.get_object()
-        if node.has_children_or_contains_assets():
-            msg = _("Deletion failed and the node contains children or assets")
-            return Response(data={'msg': msg}, status=status.HTTP_403_FORBIDDEN)
+        if node.has_children_or_has_assets():
+            error = _("Deletion failed and the node contains children or assets")
+            return Response(data={'error': error}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
 

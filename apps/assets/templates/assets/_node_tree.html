@@ -174,20 +174,14 @@ function removeTreeNode() {
 	if (!current_node){
 	    return
     }
-	if (current_node.children && current_node.children.length > 0) {
-		toastr.error("{% trans 'Have child node, cancel' %}");
-	 } else if (current_node.meta.node.assets_amount !== 0) {
-        toastr.error("{% trans 'Have assets, cancel' %}");
-    } else {
-        var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
-		$.ajax({
-            url: url,
-            method: "DELETE",
-            success: function () {
-                zTree.removeNode(current_node);
-            }
-        });
-	}
+    var url = "{% url 'api-assets:node-detail' pk=DEFAULT_PK %}".replace("{{ DEFAULT_PK }}", current_node_id);
+    requestApi({
+        url: url,
+        method: "DELETE",
+        success: function () {
+            zTree.removeNode(current_node)
+        }
+    })
 }
 
 function editTreeNode() {
