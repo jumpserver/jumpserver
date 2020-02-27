@@ -13,7 +13,7 @@ class CommandStore(ESStorage, CommandBase):
 
     def filter(self, date_from=None, date_to=None,
                user=None, asset=None, system_user=None,
-               input=None, session=None):
+               input=None, session=None, org_id=None):
 
         if date_from is not None:
             if isinstance(date_from, float):
@@ -24,7 +24,7 @@ class CommandStore(ESStorage, CommandBase):
 
         data = super().filter(date_from=date_from, date_to=date_to,
                               user=user, asset=asset, system_user=system_user,
-                              input=input, session=session)
+                              input=input, session=session, org_id=org_id)
         return AbstractSessionCommand.from_multi_dict(
             [item["_source"] for item in data["hits"] if item]
         )
