@@ -415,7 +415,7 @@ class MFAMixin:
         if not self.mfa_enabled:
             return False, None
         if self.mfa_is_otp() and not self.otp_secret_key:
-            return True, reverse('users:user-verify-password')
+            return True, reverse('users:user-otp-enable-start')
         return False, None
 
 

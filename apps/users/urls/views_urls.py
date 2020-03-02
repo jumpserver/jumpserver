@@ -21,6 +21,8 @@ urlpatterns = [
     path('profile/password/update/', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     path('profile/pubkey/update/', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
     path('profile/pubkey/generate/', views.UserPublicKeyGenerateView.as_view(), name='user-pubkey-generate'),
+
+    path('profile/otp/enable/start/', views.UserOtpEnableStartView.as_view(), name='user-otp-enable-start'),
     path('profile/otp/enable/install-app/', views.UserOtpEnableInstallAppView.as_view(), name='user-otp-enable-install-app'),
     path('profile/otp/enable/bind/', views.UserOtpEnableBindView.as_view(), name='user-otp-enable-bind'),
     path('profile/otp/disable/authentication/', views.UserDisableMFAView.as_view(), name='user-otp-disable-authentication'),

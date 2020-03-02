@@ -2890,7 +2890,7 @@ msgstr "请打开 验证器，输入6位动态码"
 
 #: authentication/templates/authentication/login_otp.html:23
 msgid "One-time password"
-msgstr "设置密码"
+msgstr "一次性密码"
 
 #: authentication/templates/authentication/login_otp.html:29
 #: users/templates/users/first_login.html:108

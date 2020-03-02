@@ -58,13 +58,6 @@
                           <form action="" method="post" class="form col-sm-8 p-m" id="fl_form" style="padding-left: 40px;">
                               {% csrf_token %}
                               {{ wizard.management_form }}
-                              {#{% if wizard.form.forms %}#}
-                              {#{{ wizard.form.management_form }}#}
-                              {#{% for form in wizard.form %}#}
-                              {#{% bootstrap_form form %}#}
-                              {#{% endfor %}#}
-                              {#{% else %}#}
-                              {#{% endif %}#}
                               {% if form.finish_description %}
                                   <b>{{ form.finish_description }}</b>
                                   <br>
@@ -86,7 +79,6 @@
                               {% if form.pubkey_description and request.user.can_update_ssh_key %}
                                   <a type="button" id="btn-reset-pubkey">{{ form.pubkey_description }}</a>
                               {% endif %}
-
                           </form>
                           <div class="col-sm-4">
                               <div class="text-center">
@@ -111,11 +103,8 @@
                         {% endif %}
                     </ul>
                 </div>
-
               </div>
-
             </div>
-
         </div>
     </div>
   </div>

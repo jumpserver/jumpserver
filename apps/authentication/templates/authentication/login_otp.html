@@ -7,29 +7,26 @@
 {% endblock %}
 
 {% block content %}
-    <div class="form-group">
-        <p style="margin: 20px auto">
-            {% trans 'Open Authenticator and enter the 6-bit dynamic code' %}
-        </p>
-    </div>
-
     <form class="m-t" role="form" method="post" action="">
         {% csrf_token %}
         {% if 'otp_code' in form.errors %}
             <p class="red-fonts">{{ form.otp_code.errors.as_text }}</p>
         {% endif %}
-        <div class="form-group" style="display: none">
+        <div class="form-group">
             <select class="form-control">
-                <option value="otp">{% trans 'One-time password' %}</option>
+                <option value="otp" selected>{% trans 'One-time password' %}</option>
             </select>
         </div>
         <div class="form-group">
-            <input type="text" class="form-control" name="otp_code" placeholder="" required="">
+            <input type="text" class="form-control" name="otp_code" placeholder="" required="" autofocus="autofocus">
+            <span class="help-block">
+                {% trans 'Open Authenticator and enter the 6-bit dynamic code' %}
+            </span>
         </div>
         <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Next' %}</button>
 
         <div>
-            <small>{% trans "Can't provide security? Please contact the administrator!" %}</small>
+            <small class="red-fonts">{% trans "Can't provide security? Please contact the administrator!" %}</small>
         </div>
     </form>
 {% endblock %}
