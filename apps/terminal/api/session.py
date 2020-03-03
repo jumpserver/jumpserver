@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.shortcuts import get_object_or_404
 from django.core.files.storage import default_storage
 from rest_framework import viewsets
 from rest_framework.response import Response
 
 from common.utils import is_uuid, get_logger
+from common.mixins.api import AsyncApiMixin
 from common.permissions import IsOrgAdminOrAppUser, IsOrgAuditor
 from common.drf.filters import DatetimeRangeFilter
 from orgs.mixins.api import OrgBulkModelViewSet
-from ..utils import get_session_replay_url
+from ..utils import find_session_replay_local, download_session_replay
 from ..hands import SystemUser
 from ..models import Session
 from .. import serializers
@@ -59,10 +59,11 @@ class SessionViewSet(OrgBulkModelViewSet):
         return super().get_permissions()
 
 
-class SessionReplayViewSet(viewsets.ViewSet):
+class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
     serializer_class = serializers.ReplaySerializer
     permission_classes = (IsOrgAdminOrAppUser | IsOrgAuditor,)
     session = None
+    download_cache_key = "SESSION_REPLAY_DOWNLOAD_{}"
 
     def create(self, request, *args, **kwargs):
         session_id = kwargs.get('pk')
@@ -83,26 +84,34 @@ class SessionReplayViewSet(viewsets.ViewSet):
             logger.error(msg)
             return Response({'msg': serializer.errors}, status=401)
 
-    def retrieve(self, request, *args, **kwargs):
-        session_id = kwargs.get('pk')
-        session = get_object_or_404(Session, id=session_id)
-
+    @staticmethod
+    def get_replay_data(session, url):
         tp = 'json'
         if session.protocol in ('rdp', 'vnc'):
             tp = 'guacamole'
 
         data = {
-            'type': tp, 'src': '',
+            'type': tp, 'src': url,
             'user': session.user, 'asset': session.asset,
             'system_user': session.system_user,
             'date_start': session.date_start,
-            'date_end': session.date_end
+            'date_end': session.date_end,
         }
-        local_path, url = get_session_replay_url(session)
-        if url:
-            data['src'] = url
-            return Response(data)
-        else:
-            msg = "Session replay file not found"
-            return Response({"error": msg}, status=404)
+        return data
 
+    def is_need_async(self):
+        if self.action != 'retrieve':
+            return False
+        return True
+
+    def retrieve(self, request, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        session = get_object_or_404(Session, id=session_id)
+        local_path, url = find_session_replay_local(session)
+
+        if not local_path:
+            local_path, url = download_session_replay(session)
+            if not local_path:
+                return Response({"error": url})
+        data = self.get_replay_data(session, url)
+        return Response(data)

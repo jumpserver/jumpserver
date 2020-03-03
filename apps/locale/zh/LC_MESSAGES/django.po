@@ -2777,7 +2777,7 @@ msgstr "MFA验证码不正确，或者服务器端时间不对"
 
 #: authentication/errors.py:50
 msgid "MFA required"
-msgstr "需要对引子认证"
+msgstr "需要多因子认证"
 
 #: authentication/errors.py:51
 msgid "MFA not set, please set it first"

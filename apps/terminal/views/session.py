@@ -7,7 +7,7 @@ from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.utils.encoding import escape_uri_path
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.core.files.storage import default_storage
 
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
@@ -19,6 +19,7 @@ from .. import utils
 __all__ = [
     'SessionOnlineListView', 'SessionOfflineListView',
     'SessionDetailView', 'SessionReplayDownloadView',
+    'SessionCommandsView',
 ]
 
 
@@ -61,8 +62,22 @@ class SessionOfflineListView(SessionListView):
         return super().get_context_data(**kwargs)
 
 
-class SessionDetailView(SingleObjectMixin, PermissionsMixin, ListView):
+class SessionDetailView(PermissionsMixin, DetailView):
     template_name = 'terminal/session_detail.html'
+    model = Session
+    permission_classes = [IsOrgAdmin | IsOrgAuditor]
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Sessions'),
+            'action': _('Session detail'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class SessionCommandsView(SingleObjectMixin, PermissionsMixin, ListView):
+    template_name = 'terminal/session_commands.html'
     model = Session
     object = None
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
@@ -90,7 +105,10 @@ class SessionReplayDownloadView(PermissionsMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         session = self.get_object()
-        local_path, url = utils.get_session_replay_url(session)
+        local_path, url = utils.find_session_replay_local(session)
+        if local_path is None:
+            error = url
+            return HttpResponse(error)
         full_path = default_storage.path(local_path)
         file = open(full_path, 'rb')
         response = FileResponse(file)
