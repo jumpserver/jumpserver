@@ -23,7 +23,8 @@ class CommandStore(CommandBase):
             user=command["user"], asset=command["asset"],
             system_user=command["system_user"], input=command["input"],
             output=command["output"], session=command["session"],
-            org_id=command["org_id"], timestamp=command["timestamp"]
+            risk_level=command["risk_level"], org_id=command["org_id"],
+            timestamp=command["timestamp"]
         )
 
     def bulk_save(self, commands):
@@ -35,7 +36,8 @@ class CommandStore(CommandBase):
             _commands.append(self.model(
                 user=c["user"], asset=c["asset"], system_user=c["system_user"],
                 input=c["input"], output=c["output"], session=c["session"],
-                org_id=c["org_id"], timestamp=c["timestamp"]
+                risk_level=c["risk_level"], org_id=c["org_id"],
+                timestamp=c["timestamp"]
             ))
         error = False
         try:
@@ -61,7 +63,7 @@ class CommandStore(CommandBase):
     def make_filter_kwargs(
             date_from=None, date_to=None,
             user=None, asset=None, system_user=None,
-            input=None, session=None, org_id=None):
+            input=None, session=None, risk_level=None, org_id=None):
         filter_kwargs = {}
         date_from_default = timezone.now() - datetime.timedelta(days=7)
         date_to_default = timezone.now()
@@ -91,15 +93,17 @@ class CommandStore(CommandBase):
             filter_kwargs['session'] = session
         if org_id is not None:
             filter_kwargs['org_id'] = org_id
+        if risk_level is not None:
+            filter_kwargs['risk_level'] = risk_level
         return filter_kwargs
 
     def filter(self, date_from=None, date_to=None,
                user=None, asset=None, system_user=None,
-               input=None, session=None, org_id=None):
+               input=None, session=None, risk_level=None, org_id=None):
         filter_kwargs = self.make_filter_kwargs(
             date_from=date_from, date_to=date_to, user=user,
             asset=asset, system_user=system_user, input=input,
-            session=session, org_id=org_id,
+            session=session, risk_level=risk_level, org_id=org_id,
         )
         queryset = self.model.objects.filter(**filter_kwargs)
         return queryset

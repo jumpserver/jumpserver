@@ -26,6 +26,7 @@
         <tr>
             <th></th>
             <th>{% trans 'Command' %}</th>
+            <th>{% trans 'Risk level' %}</th>
             <th>{% trans 'User' %}</th>
             <th>{% trans 'Asset' %}</th>
             <th>{% trans 'System user'%}</th>
@@ -60,13 +61,7 @@
         </div>
         </div>
     </div>
-
-    <ul class="dropdown-menu search-help">
-        <li><a class="search-item" data-value="user">{% trans 'User' %}</a></li>
-        <li><a class="search-item" data-value="asset">{% trans 'Asset' %}</a></li>
-        <li><a class="search-item" data-value="system_user">{% trans 'System user' %}</a></li>
-        <li><a class="search-item" data-value="input">{% trans 'Command' %}</a></li>
-    </ul>
+{% include '_filter_dropdown.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
@@ -105,6 +100,19 @@ $(document).ready(function () {
             table.ajax.reload();
         });
     });
+
+    var filterMenu = [
+        {title: "{% trans 'User' %}", value: "user"},
+        {title: "{% trans 'Asset' %}", value: "asset"},
+        {title: "{% trans 'System user' %}", value: "system_user"},
+        {title: "{% trans 'Command' %}", value: "input"},
+        {title: "{% trans 'Risk level' %}", value: "risk_level", submenu: [
+                {title: "{% trans 'Ordinary' %}", value: "0"},
+                {title: "{% trans 'Dangerous' %}", value: "5"},
+            ]},
+    ];
+    initTableFilterDropdown('#command_table_filter input', filterMenu, 15, 50)
+
 })
 .on('click', '#btn_bulk_update', function(){
     // var action = $('#slct_bulk_update').val();
@@ -113,30 +121,6 @@ $(document).ready(function () {
     var exportPath = "{% url 'api-terminal:command-export' %}";
     var url = exportPath + "?" + params;
     window.open(url);
-}).on("click", '#command_table_filter input', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var offset1 = $('#command_table_filter input').offset();
-    var x = offset1.left;
-    var y = offset1.top;
-    var offset = $(".search-help").parent().offset();
-    x -= offset.left;
-    y -= offset.top;
-    x += 18;
-    y += 80;
-    $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
-    $('.dropdown-menu.search-help').show();
-})
-.on('click', '.search-item', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var keyword = $("#command_table_filter input");
-    var value = $(this).data('value');
-    var old_value = keyword.val();
-    var new_value = old_value + ' ' + value + ':';
-    keyword.val(new_value.trim());
-    $('.dropdown-menu.search-help').hide();
-    keyword.focus()
 })
 .on('click', 'body', function (e) {
     $('.dropdown-menu.search-help').hide()
@@ -201,12 +185,22 @@ function initTable() {
                 interHtml.html(data);
                 $(td).html(interHtml);
             }},
-            {targets: 5, createdCell: function (td, cellData) {
+            {targets: 2, createdCell: function (td, cellData){
+                let risk;
+                if(cellData === 5){
+                    risk = "{% trans 'Dangerous' %}";
+                }
+                else{
+                    risk = "{% trans 'Ordinary' %}";
+                }
+                $(td).html(risk)
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
                 var data = '<a href="{% url "terminal:session-detail" pk=DEFAULT_PK %}">{% trans "Goto" %}</a>'
                         .replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(data);
             }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 7, createdCell: function (td, cellData) {
                 var data = toSafeLocalDateStr(cellData*1000);
                 $(td).html(data);
             }},
@@ -214,7 +208,8 @@ function initTable() {
         toggle: true,
         ajax_url: commandListUrl,
         columns: [
-            {data: "id"}, {data: "input", orderable: false, width: "40%"}, {data: "user", orderable: false},
+            {data: "id"}, {data: "input", orderable: false, width: "40%"},
+            {data: "risk_level", orderable: false}, {data: "user", orderable: false},
             {data: "asset", orderable: false}, {data: "system_user", orderable: false},
             {data: "session", orderable: false}, {data: "timestamp", width: "160px", orderable: false},
         ],

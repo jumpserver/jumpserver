@@ -193,7 +193,7 @@ $(document).ready(function(){
             {title: "{% trans 'Exclude' %}", value: "0"},
         ]},
     ];
-    initTableFilterDropdown('#permission_list_table_filter input', filterMenu)
+    initTableFilterDropdown('#permission_list_table_filter input', filterMenu, 15)
 })
 .on('click', '.btn-del', function () {
     var $this = $(this);
