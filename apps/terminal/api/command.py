@@ -37,6 +37,14 @@ class CommandQueryMixin:
             org_id = current_org.id
         return org_id
 
+    def get_query_risk_level(self):
+        risk_level = self.request.query_params.get('risk_level')
+        if risk_level is None:
+            return None
+        if risk_level.isdigit():
+            return int(risk_level)
+        return None
+
     def get_queryset(self):
         # 解决访问 /docs/ 问题
         if hasattr(self, 'swagger_fake_view'):
@@ -47,7 +55,8 @@ class CommandQueryMixin:
         queryset = multi_command_storage.filter(
             date_from=date_from, date_to=date_to, input=q.get("input"),
             user=q.get("user"), asset=q.get("asset"),
-            system_user=q.get("system_user"), org_id=self.get_org_id()
+            system_user=q.get("system_user"),
+            risk_level=self.get_query_risk_level(), org_id=self.get_org_id(),
         )
         return queryset
 
