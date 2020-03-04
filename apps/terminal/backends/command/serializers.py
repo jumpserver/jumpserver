@@ -12,6 +12,7 @@ class SessionCommandSerializer(serializers.Serializer):
     input = serializers.CharField(max_length=128)
     output = serializers.CharField(max_length=1024, allow_blank=True)
     session = serializers.CharField(max_length=36)
+    risk_level = serializers.IntegerField(required=False)
     org_id = serializers.CharField(max_length=36, required=False, default='', allow_null=True, allow_blank=True)
     timestamp = serializers.IntegerField()
 

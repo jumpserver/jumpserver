@@ -17,7 +17,7 @@ class CommandStore(ESStorage, CommandBase):
 
     def filter(self, date_from=None, date_to=None,
                user=None, asset=None, system_user=None,
-               input=None, session=None, org_id=None):
+               input=None, session=None, risk_level=None, org_id=None):
 
         if date_from is not None:
             if isinstance(date_from, float):
@@ -29,7 +29,8 @@ class CommandStore(ESStorage, CommandBase):
         try:
             data = super().filter(date_from=date_from, date_to=date_to,
                                   user=user, asset=asset, system_user=system_user,
-                                  input=input, session=session, org_id=org_id)
+                                  input=input, session=session,
+                                  risk_level=risk_level, org_id=org_id)
         except Exception as e:
             logger.error(e, exc_info=True)
             return []
