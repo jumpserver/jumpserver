@@ -61,9 +61,6 @@ class AuthSerializerMixin:
             if not value:
                 validated_data.pop(field, None)
 
-        # print(validated_data)
-        # raise serializers.ValidationError(">>>>>>")
-
     def create(self, validated_data):
         self.clean_auth_fields(validated_data)
         return super().create(validated_data)

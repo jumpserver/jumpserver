@@ -18,12 +18,11 @@ class CommandStore(CommandBase):
         """
         保存命令到数据库
         """
-
         self.model.objects.create(
             user=command["user"], asset=command["asset"],
             system_user=command["system_user"], input=command["input"],
             output=command["output"], session=command["session"],
-            risk_level=command["risk_level"], org_id=command["org_id"],
+            risk_level=command.get("risk_level", 0), org_id=command["org_id"],
             timestamp=command["timestamp"]
         )
 
@@ -36,7 +35,7 @@ class CommandStore(CommandBase):
             _commands.append(self.model(
                 user=c["user"], asset=c["asset"], system_user=c["system_user"],
                 input=c["input"], output=c["output"], session=c["session"],
-                risk_level=c["risk_level"], org_id=c["org_id"],
+                risk_level=c.get("risk_level", 0), org_id=c["org_id"],
                 timestamp=c["timestamp"]
             ))
         error = False
