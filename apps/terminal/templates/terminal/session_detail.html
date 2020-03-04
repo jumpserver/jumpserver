@@ -190,7 +190,11 @@
         l.click(function () {
             l.ladda('start');
             interval = setInterval(getReplayDetail, 2000)
-        })
+        });
+        var downloadDirect = getUrlParam('download');
+        if (downloadDirect) {
+            $('.btn-download').trigger('click');
+        }
     }).on('click', '.btn-term', function () {
         var $this = $(this);
         var session_id = $this.attr('value');

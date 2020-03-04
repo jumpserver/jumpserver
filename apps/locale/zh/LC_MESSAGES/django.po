@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-02 13:49+0800\n"
+"POT-Creation-Date: 2020-03-03 19:32+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -46,6 +46,7 @@ msgstr "自定义"
 #: terminal/backends/command/models.py:13 terminal/models.py:187
 #: terminal/templates/terminal/command_list.html:30
 #: terminal/templates/terminal/command_list.html:66
+#: terminal/templates/terminal/session_detail.html:52
 #: terminal/templates/terminal/session_list.html:26
 #: terminal/templates/terminal/session_list.html:70
 #: users/templates/users/user_asset_permission.html:40
@@ -1021,6 +1022,7 @@ msgstr "主机名"
 #: assets/templates/assets/system_user_detail.html:78
 #: assets/templates/assets/system_user_list.html:26
 #: terminal/forms/storage.py:152
+#: terminal/templates/terminal/session_detail.html:60
 #: terminal/templates/terminal/session_list.html:29
 #: terminal/templates/terminal/session_list.html:73
 msgid "Protocol"
@@ -1208,7 +1210,7 @@ msgstr "正则表达式"
 #: ops/templates/ops/command_execution_list.html:67 terminal/models.py:196
 #: terminal/templates/terminal/command_list.html:28
 #: terminal/templates/terminal/command_list.html:68
-#: terminal/templates/terminal/session_detail.html:48
+#: terminal/templates/terminal/session_commands.html:49
 #: terminal/templates/terminal/session_list.html:31
 msgid "Command"
 msgstr "命令"
@@ -1303,6 +1305,7 @@ msgstr "默认资产组"
 #: templates/index.html:86 terminal/backends/command/models.py:12
 #: terminal/models.py:185 terminal/templates/terminal/command_list.html:29
 #: terminal/templates/terminal/command_list.html:65
+#: terminal/templates/terminal/session_detail.html:48
 #: terminal/templates/terminal/session_list.html:25
 #: terminal/templates/terminal/session_list.html:69 tickets/models/ticket.py:33
 #: tickets/models/ticket.py:128 tickets/templates/tickets/ticket_detail.html:32
@@ -1453,6 +1456,7 @@ msgstr "FTP日志"
 #: templates/_nav.html:45 terminal/backends/command/models.py:14
 #: terminal/models.py:189 terminal/templates/terminal/command_list.html:31
 #: terminal/templates/terminal/command_list.html:67
+#: terminal/templates/terminal/session_detail.html:56
 #: terminal/templates/terminal/session_list.html:27
 #: terminal/templates/terminal/session_list.html:71
 #: users/templates/users/_granted_assets.html:27
@@ -1782,7 +1786,7 @@ msgstr "关闭"
 #: audits/templates/audits/password_change_log_list.html:57
 #: ops/templates/ops/task_adhoc.html:61
 #: terminal/templates/terminal/command_list.html:33
-#: terminal/templates/terminal/session_detail.html:50
+#: terminal/templates/terminal/session_commands.html:51
 #: tickets/templates/tickets/ticket_list.html:37
 msgid "Datetime"
 msgstr "日期"
@@ -1951,7 +1955,7 @@ msgstr "选择节点"
 #: assets/templates/assets/system_user_detail.html:172
 #: assets/templates/assets/system_user_users.html:91
 #: authentication/templates/authentication/_mfa_confirm_modal.html:20
-#: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:112
+#: templates/_modal.html:23 terminal/templates/terminal/session_detail.html:122
 #: users/templates/users/user_detail.html:264
 #: users/templates/users/user_detail.html:417
 #: users/templates/users/user_detail.html:443
@@ -1997,7 +2001,7 @@ msgstr "资产用户"
 
 #: assets/templates/assets/asset_asset_user_list.html:47
 #: assets/templates/assets/asset_detail.html:140
-#: terminal/templates/terminal/session_detail.html:85
+#: terminal/templates/terminal/session_detail.html:87
 #: users/templates/users/user_detail.html:126
 #: users/templates/users/user_profile.html:150
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:126
@@ -2475,7 +2479,8 @@ msgstr "系统用户"
 #: audits/templates/audits/ftp_log_list.html:77
 #: audits/templates/audits/operate_log_list.html:74
 #: audits/templates/audits/password_change_log_list.html:56
-#: terminal/models.py:192 terminal/templates/terminal/session_list.html:28
+#: terminal/models.py:192 terminal/templates/terminal/session_detail.html:68
+#: terminal/templates/terminal/session_list.html:28
 #: terminal/templates/terminal/session_list.html:72
 #: terminal/templates/terminal/terminal_detail.html:47
 msgid "Remote addr"
@@ -2593,7 +2598,8 @@ msgstr "登录日期"
 #: perms/templates/perms/asset_permission_detail.html:81
 #: perms/templates/perms/database_app_permission_detail.html:77
 #: perms/templates/perms/remote_app_permission_detail.html:73
-#: terminal/models.py:199 terminal/templates/terminal/session_list.html:32
+#: terminal/models.py:199 terminal/templates/terminal/session_detail.html:72
+#: terminal/templates/terminal/session_list.html:32
 #: xpack/plugins/change_auth_plan/models.py:249
 #: xpack/plugins/change_auth_plan/models.py:425
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:59
@@ -3295,8 +3301,8 @@ msgid "Task log"
 msgstr "任务列表"
 
 #: ops/templates/ops/command_execution_create.html:93
-#: terminal/templates/terminal/session_detail.html:95
-#: terminal/templates/terminal/session_detail.html:104
+#: terminal/templates/terminal/session_detail.html:97
+#: terminal/templates/terminal/session_detail.html:114
 msgid "Go"
 msgstr ""
 
@@ -4532,9 +4538,10 @@ msgid "Command filters"
 msgstr "命令过滤"
 
 #: templates/_nav.html:97 terminal/views/command.py:21
-#: terminal/views/session.py:45 terminal/views/session.py:56
-#: terminal/views/session.py:80 terminal/views/terminal.py:32
-#: terminal/views/terminal.py:48 terminal/views/terminal.py:61
+#: terminal/views/session.py:46 terminal/views/session.py:57
+#: terminal/views/session.py:72 terminal/views/session.py:95
+#: terminal/views/terminal.py:32 terminal/views/terminal.py:48
+#: terminal/views/terminal.py:61
 msgid "Sessions"
 msgstr "会话管理"
 
@@ -4542,11 +4549,12 @@ msgstr "会话管理"
 msgid "Session online"
 msgstr "在线会话"
 
-#: templates/_nav.html:101 terminal/views/session.py:57
+#: templates/_nav.html:101 terminal/views/session.py:58
 msgid "Session offline"
 msgstr "历史会话"
 
-#: templates/_nav.html:102
+#: templates/_nav.html:102 terminal/templates/terminal/session_commands.html:21
+#: terminal/templates/terminal/session_detail.html:21
 msgid "Commands"
 msgstr "命令记录"
 
@@ -4933,7 +4941,7 @@ msgstr "运行时间"
 msgid "Replay"
 msgstr "回放"
 
-#: terminal/models.py:200
+#: terminal/models.py:200 terminal/templates/terminal/session_detail.html:76
 msgid "Date end"
 msgstr "结束日期"
 
@@ -4959,39 +4967,51 @@ msgstr "创建命令存储"
 msgid "Create replay storage"
 msgstr "创建录像存储"
 
-#: terminal/templates/terminal/session_detail.html:17
-#: terminal/views/session.py:81
+#: terminal/templates/terminal/session_commands.html:18
+#: terminal/templates/terminal/session_detail.html:18
+#: terminal/views/session.py:73 terminal/views/session.py:96
 msgid "Session detail"
 msgstr "会话详情"
 
-#: terminal/templates/terminal/session_detail.html:28
+#: terminal/templates/terminal/session_commands.html:29
+#: terminal/templates/terminal/session_detail.html:29
 #: terminal/views/command.py:22
 msgid "Command list"
 msgstr "命令记录列表"
 
-#: terminal/templates/terminal/session_detail.html:67
+#: terminal/templates/terminal/session_commands.html:68
 msgid "There is no command about this session"
 msgstr "该会话没有命令记录"
 
-#: terminal/templates/terminal/session_detail.html:92
-msgid "Replay session"
-msgstr "回放会话"
-
-#: terminal/templates/terminal/session_detail.html:101
-msgid "Monitor session"
-msgstr "监控"
-
-#: terminal/templates/terminal/session_detail.html:109
-msgid "Terminate session"
-msgstr "终止会话"
-
-#: terminal/templates/terminal/session_detail.html:144
-msgid "Terminate success"
-msgstr "终断成功"
-
+#: terminal/templates/terminal/session_detail.html:64
 #: terminal/templates/terminal/session_list.html:30
 msgid "Login from"
 msgstr "登录来源"
+
+#: terminal/templates/terminal/session_detail.html:94
+msgid "Replay session"
+msgstr "回放会话"
+
+#: terminal/templates/terminal/session_detail.html:102
+msgid "Download replay"
+msgstr "下载录像"
+
+#: terminal/templates/terminal/session_detail.html:105
+#: terminal/templates/terminal/session_list.html:137
+msgid "Download"
+msgstr "下载"
+
+#: terminal/templates/terminal/session_detail.html:111
+msgid "Monitor session"
+msgstr "监控"
+
+#: terminal/templates/terminal/session_detail.html:119
+msgid "Terminate session"
+msgstr "终止会话"
+
+#: terminal/templates/terminal/session_detail.html:161
+msgid "Terminate success"
+msgstr "终断成功"
 
 #: terminal/templates/terminal/session_list.html:33
 msgid "Duration"
@@ -5008,10 +5028,6 @@ msgstr "确认已完成"
 #: terminal/templates/terminal/session_list.html:90
 msgid "Terminate task send, waiting ..."
 msgstr "终断任务已发送，请等待"
-
-#: terminal/templates/terminal/session_list.html:137
-msgid "Download"
-msgstr "下载"
 
 #: terminal/templates/terminal/session_list.html:143
 msgid "Terminate"
@@ -5068,7 +5084,7 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:46
+#: terminal/views/session.py:47
 msgid "Session online list"
 msgstr "在线会话"
 

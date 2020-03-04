@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, reverse
 from django.core.files.storage import default_storage
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -90,12 +90,14 @@ class SessionReplayViewSet(AsyncApiMixin, viewsets.ViewSet):
         if session.protocol in ('rdp', 'vnc'):
             tp = 'guacamole'
 
+        download_url = reverse('terminal:session-replay-download', kwargs={'pk': session.id})
         data = {
             'type': tp, 'src': url,
             'user': session.user, 'asset': session.asset,
             'system_user': session.system_user,
             'date_start': session.date_start,
             'date_end': session.date_end,
+            'download_url': download_url,
         }
         return data
 

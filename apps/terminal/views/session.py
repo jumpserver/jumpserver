@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 import os
+import tarfile
 
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import SingleObjectMixin
@@ -11,6 +12,7 @@ from django.http import FileResponse, HttpResponse
 from django.core.files.storage import default_storage
 
 from common.permissions import PermissionsMixin, IsOrgAdmin, IsOrgAuditor
+from common.utils import model_to_json
 from ..models import Session
 from ..backends import get_multi_command_storage
 from .. import utils
@@ -103,19 +105,38 @@ class SessionReplayDownloadView(PermissionsMixin, DetailView):
     permission_classes = [IsOrgAdmin | IsOrgAuditor]
     model = Session
 
+    @staticmethod
+    def prepare_offline_file(session, local_path):
+        replay_path = default_storage.path(local_path)
+        current_dir = os.getcwd()
+        dir_path = os.path.dirname(replay_path)
+        replay_filename = os.path.basename(replay_path)
+        meta_filename = '{}.json'.format(session.id)
+        offline_filename = '{}.tar'.format(session.id)
+        os.chdir(dir_path)
+
+        with open(meta_filename, 'wt') as f:
+            f.write(model_to_json(session))
+
+        with tarfile.open(offline_filename, 'w') as f:
+            f.add(replay_filename)
+            f.add(meta_filename)
+        file = open(offline_filename, 'rb')
+        os.chdir(current_dir)
+        return file
+
     def get(self, request, *args, **kwargs):
         session = self.get_object()
-        local_path, url = utils.find_session_replay_local(session)
+        local_path, url = utils.get_session_replay_url(session)
         if local_path is None:
             error = url
             return HttpResponse(error)
-        full_path = default_storage.path(local_path)
-        file = open(full_path, 'rb')
+        file = self.prepare_offline_file(session, local_path)
         response = FileResponse(file)
         response['Content-Type'] = 'application/octet-stream'
         # 这里要注意哦，网上查到的方法都是response['Content-Disposition']='attachment;filename="filename.py"',
         # 但是如果文件名是英文名没问题，如果文件名包含中文，下载下来的文件名会被改为url中的path。
-        filename = escape_uri_path(os.path.basename(local_path))
+        filename = escape_uri_path('{}.tar'.format(session.id))
         disposition = "attachment; filename*=UTF-8''{}".format(filename)
         response["Content-Disposition"] = disposition
         return response
