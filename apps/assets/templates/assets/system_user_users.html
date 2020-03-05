@@ -61,7 +61,6 @@
                                                 <input type="checkbox" id="check_all" class="ipt_check_all">
                                             </th>
                                             <th class="text-center">{% trans 'User' %}</th>
-                                            <th class="text-center">{% trans 'System user' %}</th>
                                             <th class="text-center">{% trans 'Action' %}</th>
                                         </tr>
                                         </thead>
@@ -115,7 +114,7 @@ function initTable() {
         ajax_url: usersRelationUrl,
         columnDefs: [
             {
-                targets: 3, createdCell: function (td, cellData, rowData) {
+                targets: 2, createdCell: function (td, cellData, rowData) {
                     var removeBtn = '<button class="btn btn-xs btn-danger m-l-xs btn-remove" data-uid=UID>{% trans "Remove" %}</button>';
                     removeBtn = removeBtn.replace("UID", rowData.user);
 				    $(td).html(removeBtn);
@@ -124,7 +123,7 @@ function initTable() {
             }
         ],
         columns: [
-            {data: "id"}, {data: "user_display"}, {data: "systemuser_display"},
+            {data: "id"}, {data: "user_display"},
             {data: "id", orderable: false}
         ],
         op_html: $('#actions').html(),
