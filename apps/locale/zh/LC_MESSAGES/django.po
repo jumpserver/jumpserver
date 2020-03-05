@@ -6,12 +6,12 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Jumpserver 0.3.3\n"
+"Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-03-05 11:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
-"Language-Team: Jumpserver team<ibuler@qq.com>\n"
+"Language-Team: JumpServer team<ibuler@qq.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1963,9 +1963,9 @@ msgstr ""
 
 #: assets/templates/assets/admin_user_list.html:5
 msgid ""
-"Jumpserver users of the system using the user to `push system user`,  `get "
+"JumpServer users of the system using the user to `push system user`,  `get "
 "assets hardware information`, etc. "
-msgstr "Jumpserver 使用该用户来 `推送系统用户`、`获取资产硬件信息` 等。"
+msgstr "JumpServer 使用该用户来 `推送系统用户`、`获取资产硬件信息` 等。"
 
 #: assets/templates/assets/admin_user_list.html:13
 #: assets/views/admin_user.py:50
@@ -2288,30 +2288,30 @@ msgstr "绑定命令过滤器"
 
 #: assets/templates/assets/system_user_list.html:5
 msgid ""
-"System user is Jumpserver jump login assets used by the users, can be "
+"System user is JumpServer jump login assets used by the users, can be "
 "understood as the user login assets, such as web, sa, the dba (` ssh "
 "web@some-host `), rather than using a user the username login server jump (` "
 "ssh xiaoming@some-host `); "
 msgstr ""
-"系统用户是 Jumpserver 跳转登录资产时使用的用户，可以理解为登录资产用户，如 "
+"系统用户是 JumpServer 跳转登录资产时使用的用户，可以理解为登录资产用户，如 "
 "web，sa，dba（`ssh web@some-host`），而不是使用某个用户的用户名跳转登录服务器"
 "（`ssh xiaoming@some-host`）；"
 
 #: assets/templates/assets/system_user_list.html:6
 msgid ""
-"In simple terms, users log into Jumpserver using their own username, and "
-"Jumpserver uses system users to log into assets. "
+"In simple terms, users log into JumpServer using their own username, and "
+"JumpServer uses system users to log into assets. "
 msgstr ""
-"简单来说是用户使用自己的用户名登录 Jumpserver，Jumpserver 使用系统用户登录资"
+"简单来说是用户使用自己的用户名登录 JumpServer，JumpServer 使用系统用户登录资"
 "产。"
 
 #: assets/templates/assets/system_user_list.html:7
 msgid ""
-"When system users are created, if you choose auto push Jumpserver to use "
+"When system users are created, if you choose auto push JumpServer to use "
 "Ansible push system users into the asset, if the asset (Switch) does not "
 "support ansible, please manually fill in the account password."
 msgstr ""
-"系统用户创建时，如果选择了自动推送，Jumpserver 会使用 Ansible 自动推送系统用"
+"系统用户创建时，如果选择了自动推送，JumpServer 会使用 Ansible 自动推送系统用"
 "户到资产中，如果资产（交换机）不支持 Ansible，请手动填写账号密码。"
 
 #: assets/templates/assets/system_user_list.html:16
@@ -3814,7 +3814,7 @@ msgstr "Email主题前缀"
 
 #: settings/forms/basic.py:22
 msgid "Tips: Some word will be intercept by mail provider"
-msgstr "提示: 一些关键字可能会被邮件提供商拦截，如 跳板机、Jumpserver"
+msgstr "提示: 一些关键字可能会被邮件提供商拦截，如 跳板机、JumpServer"
 
 #: settings/forms/email.py:15
 msgid "SMTP host"
@@ -4308,8 +4308,8 @@ msgstr "更新设置成功"
 
 #: templates/_base_only_msg_content.html:28
 #: xpack/plugins/interface/models.py:36
-msgid "Welcome to the Jumpserver open source fortress"
-msgstr "欢迎使用Jumpserver开源堡垒机"
+msgid "Welcome to the JumpServer open source fortress"
+msgstr "欢迎使用JumpServer开源堡垒机"
 
 #: templates/_base_only_msg_content.html:33
 msgid ""
@@ -5517,7 +5517,7 @@ msgstr "上一步"
 
 #: users/templates/users/first_login_done.html:31
 msgid "Welcome to use jumpserver, visit "
-msgstr "欢迎使用Jumpserver开源跳板机系统"
+msgstr "欢迎使用JumpServer开源跳板机系统"
 
 #: users/templates/users/first_login_done.html:32
 msgid "Use guide"
@@ -6649,8 +6649,8 @@ msgstr "登录页面标题"
 #: xpack/plugins/interface/forms.py:19
 msgid ""
 "Tips: This will be displayed on the enterprise user login page. (eg: Welcome "
-"to the Jumpserver open source fortress)"
-msgstr "提示：将会显示在企业版用户登录页面（eg: 欢迎使用Jumpserver开源堡垒机）"
+"to the JumpServer open source fortress)"
+msgstr "提示：将会显示在企业版用户登录页面（eg: 欢迎使用JumpServer开源堡垒机）"
 
 #: xpack/plugins/interface/forms.py:25 xpack/plugins/interface/models.py:19
 msgid "Image of login page"
@@ -7000,11 +7000,11 @@ msgstr "创建"
 #~ msgstr "导入用户"
 
 #~ msgid ""
-#~ "Jumpserver is an open source desktop system developed using Python and "
+#~ "JumpServer is an open source desktop system developed using Python and "
 #~ "Django that helps Internet businesses with efficient users, assets, "
 #~ "permissions, and audit management"
 #~ msgstr ""
-#~ "Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互联网企业高"
+#~ "JumpServer是一款使用Python, Django开发的开源跳板机系统, 助力互联网企业高"
 #~ "效 用户、资产、权限、审计 管理"
 
 #~ msgid ""
@@ -7362,8 +7362,8 @@ msgstr "创建"
 #~ msgid "Invalid private key"
 #~ msgstr "ssh密钥不合法"
 
-#~ msgid "Login Jumpserver"
-#~ msgstr "登录 Jumpserver"
+#~ msgid "Login JumpServer"
+#~ msgstr "登录 JumpServer"
 
 #~ msgid "Valid"
 #~ msgstr "账户状态"

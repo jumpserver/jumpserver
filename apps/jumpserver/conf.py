@@ -154,7 +154,7 @@ class Config(dict):
         'CAS_VERSION': 3,
 
         'OTP_VALID_WINDOW': 2,
-        'OTP_ISSUER_NAME': 'Jumpserver',
+        'OTP_ISSUER_NAME': 'JumpServer',
         'EMAIL_SUFFIX': 'jumpserver.org',
 
         'TERMINAL_PASSWORD_AUTH': True,

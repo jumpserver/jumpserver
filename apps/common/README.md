@@ -16,7 +16,7 @@ provide this ability, not common, You should write it on your app utils.
 ## Celery usage 
 
 
-Jumpserver use celery to run task async. Using redis as the broker, so
+JumpServer use celery to run task async. Using redis as the broker, so
 you should run a redis instance
 
 #### Run redis

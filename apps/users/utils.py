@@ -214,7 +214,7 @@ def redirect_user_first_login_or_index(request, redirect_field_name):
     return url_in_get
 
 
-def generate_otp_uri(username, otp_secret_key=None, issuer="Jumpserver"):
+def generate_otp_uri(username, otp_secret_key=None, issuer="JumpServer"):
     if otp_secret_key is None:
         otp_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
     totp = pyotp.TOTP(otp_secret_key)
