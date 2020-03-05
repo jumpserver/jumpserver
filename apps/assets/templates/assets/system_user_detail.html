@@ -15,14 +15,14 @@
                             {% if system_user.can_perm_to_asset  %}
                             <li>
                                 <a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets' %}
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Asset list' %}
                                 </a>
                             </li>
                             {% endif %}
                             {% if system_user.username_same_with_user  %}
                             <li>
                                 <a href="{% url 'assets:system-user-user' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Users' %}
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'User list' %}
                                 </a>
                             </li>
                             {% endif %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 19:32+0800\n"
+"POT-Creation-Date: 2020-03-05 11:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -43,9 +43,9 @@ msgstr "自定义"
 #: perms/templates/perms/asset_permission_create_update.html:57
 #: perms/templates/perms/asset_permission_list.html:35
 #: perms/templates/perms/asset_permission_list.html:87
-#: terminal/backends/command/models.py:13 terminal/models.py:187
-#: terminal/templates/terminal/command_list.html:30
-#: terminal/templates/terminal/command_list.html:66
+#: terminal/backends/command/models.py:19 terminal/models.py:187
+#: terminal/templates/terminal/command_list.html:31
+#: terminal/templates/terminal/command_list.html:106
 #: terminal/templates/terminal/session_detail.html:52
 #: terminal/templates/terminal/session_list.html:26
 #: terminal/templates/terminal/session_list.html:70
@@ -440,7 +440,7 @@ msgstr "重置"
 #: settings/templates/settings/security_setting.html:55
 #: settings/templates/settings/terminal_setting.html:55
 #: terminal/templates/terminal/base_storage_create_update.html:13
-#: terminal/templates/terminal/command_list.html:47
+#: terminal/templates/terminal/command_list.html:48
 #: terminal/templates/terminal/session_list.html:50
 #: terminal/templates/terminal/terminal_update.html:44
 #: users/templates/users/_user.html:52
@@ -965,6 +965,10 @@ msgstr "使用逗号分隔多个命令，如: /bin/whoami,/sbin/ifconfig"
 msgid "SFTP root dir, tmp, home or custom"
 msgstr "SFTP的起始路径，tmp目录, 用户home目录或者自定义"
 
+#: assets/forms/user.py:113
+msgid "Username is dynamic, When connect asset, using current user's username"
+msgstr "用户名是动态的，登录资产时使用当前用户的用户名登录"
+
 #: assets/models/asset.py:147
 msgid "Base"
 msgstr "基础"
@@ -1209,7 +1213,7 @@ msgstr "正则表达式"
 #: assets/models/cmd_filter.py:40 ops/models/command.py:23
 #: ops/templates/ops/command_execution_list.html:67 terminal/models.py:196
 #: terminal/templates/terminal/command_list.html:28
-#: terminal/templates/terminal/command_list.html:68
+#: terminal/templates/terminal/command_list.html:108
 #: terminal/templates/terminal/session_commands.html:49
 #: terminal/templates/terminal/session_list.html:31
 msgid "Command"
@@ -1302,9 +1306,9 @@ msgstr "默认资产组"
 #: perms/templates/perms/database_app_permission_list.html:15
 #: perms/templates/perms/remote_app_permission_create_update.html:41
 #: perms/templates/perms/remote_app_permission_list.html:15
-#: templates/index.html:86 terminal/backends/command/models.py:12
-#: terminal/models.py:185 terminal/templates/terminal/command_list.html:29
-#: terminal/templates/terminal/command_list.html:65
+#: templates/index.html:86 terminal/backends/command/models.py:18
+#: terminal/models.py:185 terminal/templates/terminal/command_list.html:30
+#: terminal/templates/terminal/command_list.html:105
 #: terminal/templates/terminal/session_detail.html:48
 #: terminal/templates/terminal/session_list.html:25
 #: terminal/templates/terminal/session_list.html:69 tickets/models/ticket.py:33
@@ -1366,10 +1370,7 @@ msgstr "手动登录"
 
 #: assets/models/user.py:110
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:11
-#: assets/templates/assets/system_user_assets.html:26
 #: assets/templates/assets/system_user_assets.html:94
-#: assets/templates/assets/system_user_detail.html:18
-#: assets/templates/assets/system_user_users.html:25
 #: assets/views/admin_user.py:30 assets/views/admin_user.py:49
 #: assets/views/admin_user.py:67 assets/views/admin_user.py:84
 #: assets/views/admin_user.py:108 assets/views/asset.py:37
@@ -1391,17 +1392,14 @@ msgstr "手动登录"
 msgid "Assets"
 msgstr "资产管理"
 
-#: assets/models/user.py:111 assets/templates/assets/system_user_assets.html:32
-#: assets/templates/assets/system_user_detail.html:25
-#: assets/templates/assets/system_user_users.html:31
-#: assets/templates/assets/system_user_users.html:77 templates/_nav.html:17
-#: users/views/group.py:28 users/views/group.py:45 users/views/group.py:63
-#: users/views/group.py:82 users/views/group.py:99 users/views/login.py:158
-#: users/views/profile/password.py:40 users/views/profile/pubkey.py:36
-#: users/views/user.py:50 users/views/user.py:67 users/views/user.py:111
-#: users/views/user.py:178 users/views/user.py:206 users/views/user.py:220
-#: users/views/user.py:234 users/views/user.py:248 users/views/user.py:262
-#: users/views/user.py:276
+#: assets/models/user.py:111 assets/templates/assets/system_user_users.html:77
+#: templates/_nav.html:17 users/views/group.py:28 users/views/group.py:45
+#: users/views/group.py:63 users/views/group.py:82 users/views/group.py:99
+#: users/views/login.py:158 users/views/profile/password.py:40
+#: users/views/profile/pubkey.py:36 users/views/user.py:50
+#: users/views/user.py:67 users/views/user.py:111 users/views/user.py:178
+#: users/views/user.py:206 users/views/user.py:220 users/views/user.py:234
+#: users/views/user.py:248 users/views/user.py:262 users/views/user.py:276
 msgid "Users"
 msgstr "用户管理"
 
@@ -1431,10 +1429,8 @@ msgid "Login mode"
 msgstr "登录模式"
 
 #: assets/models/user.py:120
-#, fuzzy
-#| msgid "FTP log"
 msgid "SFTP Root"
-msgstr "FTP日志"
+msgstr "SFTP根路径"
 
 #: assets/models/user.py:190 assets/templates/assets/system_user_list.html:73
 #: assets/templates/assets/system_user_users.html:64
@@ -1453,9 +1449,9 @@ msgstr "FTP日志"
 #: perms/templates/perms/database_app_permission_list.html:18
 #: perms/templates/perms/remote_app_permission_detail.html:126
 #: perms/templates/perms/remote_app_permission_list.html:18
-#: templates/_nav.html:45 terminal/backends/command/models.py:14
-#: terminal/models.py:189 terminal/templates/terminal/command_list.html:31
-#: terminal/templates/terminal/command_list.html:67
+#: templates/_nav.html:45 terminal/backends/command/models.py:20
+#: terminal/models.py:189 terminal/templates/terminal/command_list.html:32
+#: terminal/templates/terminal/command_list.html:107
 #: terminal/templates/terminal/session_detail.html:56
 #: terminal/templates/terminal/session_list.html:27
 #: terminal/templates/terminal/session_list.html:71
@@ -1623,44 +1619,29 @@ msgstr "收集资产上的用户"
 
 #: assets/tasks/push_system_user.py:149
 #: assets/tasks/system_user_connectivity.py:86
-#, fuzzy
-#| msgid "System user detail"
 msgid "System user is dynamic: {}"
-msgstr "系统用户详情"
+msgstr "系统用户是动态的: {}"
 
 #: assets/tasks/push_system_user.py:180
-#, fuzzy
-#| msgid "Push system users to assets: {}"
 msgid "Start push system user for platform: [{}]"
-msgstr "推送系统用户到入资产: {}"
+msgstr "推送系统用户到平台: [{}]"
 
 #: assets/tasks/push_system_user.py:181
-#, fuzzy
-#| msgid "Host amount"
+#: assets/tasks/system_user_connectivity.py:78
 msgid "Hosts count: {}"
-msgstr "主机数量"
+msgstr "主机数量: {}"
 
 #: assets/tasks/push_system_user.py:198 assets/tasks/push_system_user.py:214
 msgid "Push system users to assets: {}"
 msgstr "推送系统用户到入资产: {}"
 
 #: assets/tasks/push_system_user.py:206
-#, fuzzy
-#| msgid "Push system users to asset: {} => {}"
 msgid "Push system users to asset: {}({}) => {}"
-msgstr "推送系统用户到入资产: {} => {}"
+msgstr "推送系统用户到入资产: {}({}) => {}"
 
 #: assets/tasks/system_user_connectivity.py:77
-#, fuzzy
-#| msgid "Test system user connectivity period: {}"
 msgid "Start test system user connectivity for platform: [{}]"
-msgstr "定期测试系统用户可连接性: {}"
-
-#: assets/tasks/system_user_connectivity.py:78
-#, fuzzy
-#| msgid "Asset count"
-msgid "Assets count: {}"
-msgstr "资产数量"
+msgstr "开始测试系统用户在该系统平台的可连接性: [{}]"
 
 #: assets/tasks/system_user_connectivity.py:97
 msgid "Test system user connectivity: {}"
@@ -1723,7 +1704,10 @@ msgstr "选择系统用户"
 msgid "Enable-MFA"
 msgstr "启用多因子认证"
 
-#: assets/templates/assets/_asset_list_modal.html:7 assets/views/asset.py:38
+#: assets/templates/assets/_asset_list_modal.html:7
+#: assets/templates/assets/system_user_assets.html:26
+#: assets/templates/assets/system_user_detail.html:18
+#: assets/templates/assets/system_user_users.html:25 assets/views/asset.py:38
 #: templates/_nav.html:42 xpack/plugins/change_auth_plan/views.py:118
 msgid "Asset list"
 msgstr "资产列表"
@@ -1785,7 +1769,7 @@ msgstr "关闭"
 #: audits/templates/audits/operate_log_list.html:75
 #: audits/templates/audits/password_change_log_list.html:57
 #: ops/templates/ops/task_adhoc.html:61
-#: terminal/templates/terminal/command_list.html:33
+#: terminal/templates/terminal/command_list.html:34
 #: terminal/templates/terminal/session_commands.html:51
 #: tickets/templates/tickets/ticket_list.html:37
 msgid "Datetime"
@@ -1819,8 +1803,6 @@ msgid "Push"
 msgstr "推送"
 
 #: assets/templates/assets/_asset_user_list.html:167
-#, fuzzy
-#| msgid "Delete succeed"
 msgid "Delete success"
 msgstr "删除成功"
 
@@ -2272,10 +2254,12 @@ msgstr "创建标签"
 msgid "Create platform"
 msgstr "创建系统平台"
 
-#: assets/templates/assets/system_user_assets.html:42
-#: assets/templates/assets/system_user_users.html:41
-msgid "Assets of "
-msgstr "资产"
+#: assets/templates/assets/system_user_assets.html:32
+#: assets/templates/assets/system_user_detail.html:25
+#: assets/templates/assets/system_user_users.html:31 templates/_nav.html:20
+#: users/views/user.py:51
+msgid "User list"
+msgstr "用户列表"
 
 #: assets/templates/assets/system_user_assets.html:71
 msgid "Test assets connective"
@@ -2287,10 +2271,8 @@ msgstr "立刻推送系统"
 
 #: assets/templates/assets/system_user_assets.html:279
 #: assets/templates/assets/system_user_users.html:206
-#, fuzzy
-#| msgid "Date expired"
 msgid "Have existed: "
-msgstr "失效日期"
+msgstr "已经存在: "
 
 #: assets/templates/assets/system_user_detail.html:93
 msgid "Home"
@@ -2350,8 +2332,6 @@ msgid "Remove"
 msgstr "移除"
 
 #: assets/templates/assets/system_user_users.html:177
-#, fuzzy
-#| msgid "Remove the success"
 msgid "Remove success"
 msgstr "移除成功"
 
@@ -2363,9 +2343,13 @@ msgstr "管理用户列表"
 msgid "Update admin user"
 msgstr "更新管理用户"
 
-#: assets/views/admin_user.py:85 assets/views/admin_user.py:109
+#: assets/views/admin_user.py:85
 msgid "Admin user detail"
 msgstr "管理用户详情"
+
+#: assets/views/admin_user.py:109
+msgid "Admin user assets"
+msgstr "管理用户关联资产"
 
 #: assets/views/asset.py:67 templates/_nav_user.html:4
 msgid "My assets"
@@ -2464,16 +2448,12 @@ msgid "assets"
 msgstr "资产管理"
 
 #: assets/views/system_user.py:104
-#, fuzzy
-#| msgid "System user asset"
 msgid "System user assets"
-msgstr "系统用户资产"
+msgstr "系统用户关联资产"
 
 #: assets/views/system_user.py:119
-#, fuzzy
-#| msgid "System users"
 msgid "System user users"
-msgstr "系统用户"
+msgstr "系统用户关联用户"
 
 #: audits/models.py:19 audits/models.py:42 audits/models.py:53
 #: audits/templates/audits/ftp_log_list.html:77
@@ -2731,10 +2711,8 @@ msgid "Username/password check failed"
 msgstr "用户名/密码 校验失败"
 
 #: authentication/errors.py:22
-#, fuzzy
-#| msgid "Failed"
 msgid "MFA failed"
-msgstr "失败"
+msgstr "多因子认证失败"
 
 #: authentication/errors.py:23
 msgid "MFA unset"
@@ -3190,8 +3168,6 @@ msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:20
 #: ops/templates/ops/adhoc_history.html:20 ops/views/adhoc.py:106
-#, fuzzy
-#| msgid "Version run history"
 msgid "Version run execution"
 msgstr "执行历史"
 
@@ -3250,8 +3226,8 @@ msgstr "最后运行成功主机"
 
 #: ops/templates/ops/adhoc_history.html:28
 #: ops/templates/ops/task_history.html:34
-msgid "History of "
-msgstr "执行历史"
+msgid "Executions of "
+msgstr "执行历史 "
 
 #: ops/templates/ops/adhoc_history.html:51
 #: ops/templates/ops/task_history.html:57
@@ -3264,19 +3240,17 @@ msgid "Ratio"
 msgstr "比例"
 
 #: ops/templates/ops/adhoc_history_detail.html:17 ops/views/adhoc.py:120
-#, fuzzy
-#| msgid "Run history detail"
-msgid "Run execution detail"
+msgid "Execution detail"
 msgstr "执行历史详情"
 
 #: ops/templates/ops/adhoc_history_detail.html:20
 #: ops/templates/ops/command_execution_list.html:69
-#: terminal/backends/command/models.py:16
+#: terminal/backends/command/models.py:22
 msgid "Output"
 msgstr "输出"
 
 #: ops/templates/ops/adhoc_history_detail.html:28
-msgid "History detail of"
+msgid "Execution detail of"
 msgstr "执行历史详情"
 
 #: ops/templates/ops/adhoc_history_detail.html:51
@@ -3356,15 +3330,13 @@ msgstr "任务各版本"
 
 #: ops/templates/ops/task_adhoc.html:23 ops/templates/ops/task_detail.html:24
 #: ops/templates/ops/task_history.html:23
-#, fuzzy
-#| msgid "Command execution"
-msgid "Run execution"
-msgstr "命令执行"
+msgid "Execution"
+msgstr "执行历史"
 
 #: ops/templates/ops/task_adhoc.html:26 ops/templates/ops/task_detail.html:27
 #: ops/templates/ops/task_history.html:26
-msgid "Last run output"
-msgstr "输出"
+msgid "Last execution output"
+msgstr "最后执行输出"
 
 #: ops/templates/ops/task_adhoc.html:34
 msgid "Versions of "
@@ -3411,10 +3383,8 @@ msgid "Task list"
 msgstr "任务列表"
 
 #: ops/views/adhoc.py:78
-#, fuzzy
-#| msgid "Command execution"
-msgid "Task run execution"
-msgstr "命令执行"
+msgid "Task execution list"
+msgstr "任务执行列表"
 
 #: ops/views/command.py:49
 msgid "Command execution list"
@@ -4163,22 +4133,16 @@ msgid "Import"
 msgstr "导入"
 
 #: settings/templates/settings/_ldap_test_user_login_modal.html:4
-#, fuzzy
-#| msgid "LDAP user list"
 msgid "Test LDAP user login"
-msgstr "LDAP 用户列表"
+msgstr "测试LDAP 用户登录"
 
 #: settings/templates/settings/_ldap_test_user_login_modal.html:5
-#, fuzzy
-#| msgid "Please submit the LDAP configuration before import"
 msgid "Save the configuration before testing the login"
-msgstr "请先提交LDAP配置再进行导入"
+msgstr "请先提交LDAP配置再进行测试登录"
 
 #: settings/templates/settings/_ldap_test_user_login_modal.html:12
-#, fuzzy
-#| msgid "Please input password"
 msgid "Please input username"
-msgstr "请输入密码"
+msgstr "请输入用户名"
 
 #: settings/templates/settings/_setting_tabs.html:4
 #: settings/templates/settings/terminal_setting.html:31 settings/views.py:20
@@ -4211,10 +4175,8 @@ msgid "Create User setting"
 msgstr "创建用户设置"
 
 #: settings/templates/settings/ldap_setting.html:47
-#, fuzzy
-#| msgid "Last login"
 msgid "Test login"
-msgstr "最后登录"
+msgstr "测试登录"
 
 #: settings/templates/settings/ldap_setting.html:48
 msgid "Bulk import"
@@ -4262,28 +4224,24 @@ msgid "Please enter bind dn: {}"
 msgstr ""
 
 #: settings/utils/ldap.py:418
-#, fuzzy
-#| msgid "Please input password"
 msgid "Please enter password: {}"
-msgstr "请输入密码"
+msgstr "请输入密码: {}"
 
 #: settings/utils/ldap.py:420
-#, fuzzy
-#| msgid "* Please enter the correct password length"
 msgid "Please enter correct bind dn and password: {}"
-msgstr "* 请输入正确的密码长度"
+msgstr "请输入正确的dn和密码: {}"
 
 #: settings/utils/ldap.py:438
 msgid "Invalid search ou or filter: {}"
-msgstr ""
+msgstr "不合法的ou或过滤器: {}"
 
 #: settings/utils/ldap.py:469
 msgid "LDAP attribute not include: {}"
-msgstr ""
+msgstr "LDAP属性映射没有包含: {}"
 
 #: settings/utils/ldap.py:476
 msgid "LDAP attribute map is not dict"
-msgstr ""
+msgstr "LDAP属性映射不合法"
 
 #: settings/utils/ldap.py:495
 msgid "LDAP authentication is not enabled"
@@ -4291,57 +4249,51 @@ msgstr "LDAP认证没有启用"
 
 #: settings/utils/ldap.py:513
 msgid "Error (Invalid server uri): {}"
-msgstr ""
+msgstr "错误 （不合法的服务器地址）: {}"
 
 #: settings/utils/ldap.py:515
 msgid "Error (Invalid bind dn): {}"
-msgstr ""
+msgstr "错误 (不合法的DN): {}"
 
 #: settings/utils/ldap.py:517
 msgid "Error (Invalid attribute map): {}"
-msgstr ""
+msgstr "错误 (不合法的属性映射): {}"
 
 #: settings/utils/ldap.py:519
 msgid "Error (Invalid search ou or filter): {}"
-msgstr ""
+msgstr "错误 (不合法的搜索OU或过滤器): {}"
 
 #: settings/utils/ldap.py:521
 msgid "Error (Not enabled LDAP authentication): {}"
-msgstr ""
+msgstr "错误 (没有启用LDAP认证): {}"
 
 #: settings/utils/ldap.py:523
 msgid "Error (Unknown): {}"
-msgstr ""
+msgstr "错误 （未知): {}"
 
 #: settings/utils/ldap.py:526
-#, fuzzy
-#| msgid "Match {} s users"
 msgid "Succeed: Match {} s user"
-msgstr "匹配 {} 个用户"
+msgstr "成功匹配 {} 个用户"
 
 #: settings/utils/ldap.py:559
 msgid "Authentication failed (configuration incorrect): {}"
-msgstr ""
+msgstr "认证失败 （配置错误): {}"
 
 #: settings/utils/ldap.py:561
 msgid "Authentication failed (before login check failed): {}"
-msgstr ""
+msgstr "认证失败 （登录前检查失败): {}"
 
 #: settings/utils/ldap.py:563
 msgid "Authentication failed (username or password incorrect): {}"
-msgstr ""
+msgstr "认证失败 (用户名或密码不正确): {}"
 
 #: settings/utils/ldap.py:565
-#, fuzzy
-#| msgid "Authentication failed"
 msgid "Authentication failed (Unknown): {}"
-msgstr "认证失败"
+msgstr "认证失败: (未知): {}"
 
 #: settings/utils/ldap.py:568
-#, fuzzy
-#| msgid "Authentication failed"
 msgid "Authentication success: {}"
-msgstr "认证失败"
+msgstr "认证成功: {}"
 
 #: settings/views.py:19 settings/views.py:46 settings/views.py:73
 #: settings/views.py:105 settings/views.py:134 settings/views.py:161
@@ -4529,17 +4481,13 @@ msgstr ""
 "\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
 "        "
 
-#: templates/_nav.html:20 users/views/user.py:51
-msgid "User list"
-msgstr "用户列表"
-
 #: templates/_nav.html:47
 msgid "Command filters"
 msgstr "命令过滤"
 
 #: templates/_nav.html:97 terminal/views/command.py:21
-#: terminal/views/session.py:46 terminal/views/session.py:57
-#: terminal/views/session.py:72 terminal/views/session.py:95
+#: terminal/views/session.py:48 terminal/views/session.py:59
+#: terminal/views/session.py:74 terminal/views/session.py:97
 #: terminal/views/terminal.py:32 terminal/views/terminal.py:48
 #: terminal/views/terminal.py:61
 msgid "Sessions"
@@ -4549,7 +4497,7 @@ msgstr "会话管理"
 msgid "Session online"
 msgstr "在线会话"
 
-#: templates/_nav.html:101 terminal/views/session.py:58
+#: templates/_nav.html:101 terminal/views/session.py:60
 msgid "Session offline"
 msgstr "历史会话"
 
@@ -4677,14 +4625,10 @@ msgid " times"
 msgstr " 次"
 
 #: templates/index.html:135 templates/index.html:221
-#, fuzzy
-#| msgid "The last time a user logged in"
 msgid "The time last logged in"
-msgstr "最近一次登录用户"
+msgstr "最近一次登录日期"
 
 #: templates/index.html:136 templates/index.html:222
-#, fuzzy
-#| msgid "At "
 msgid "At"
 msgstr "于"
 
@@ -4788,15 +4732,33 @@ msgstr "测试成功"
 msgid "Test failure: Account invalid"
 msgstr "测试失败: 账户无效"
 
+#: terminal/backends/command/models.py:14
+#: terminal/templates/terminal/command_list.html:110
+#: terminal/templates/terminal/command_list.html:194
+msgid "Ordinary"
+msgstr ""
+
 #: terminal/backends/command/models.py:15
+#: terminal/templates/terminal/command_list.html:111
+#: terminal/templates/terminal/command_list.html:191
+msgid "Dangerous"
+msgstr ""
+
+#: terminal/backends/command/models.py:21
 msgid "Input"
 msgstr "输入"
 
-#: terminal/backends/command/models.py:17
-#: terminal/templates/terminal/command_list.html:32
+#: terminal/backends/command/models.py:23
+#: terminal/templates/terminal/command_list.html:33
 #: terminal/templates/terminal/terminal_list.html:34
 msgid "Session"
 msgstr "会话"
+
+#: terminal/backends/command/models.py:24
+#: terminal/templates/terminal/command_list.html:29
+#: terminal/templates/terminal/command_list.html:109
+msgid "Risk level"
+msgstr ""
 
 #: terminal/forms/storage.py:41
 msgid "Container name"
@@ -4949,11 +4911,11 @@ msgstr "结束日期"
 msgid "Args"
 msgstr "参数"
 
-#: terminal/templates/terminal/command_list.html:43
+#: terminal/templates/terminal/command_list.html:44
 msgid "Export command"
 msgstr "导出命令"
 
-#: terminal/templates/terminal/command_list.html:205
+#: terminal/templates/terminal/command_list.html:199
 msgid "Goto"
 msgstr "转到"
 
@@ -4969,7 +4931,7 @@ msgstr "创建录像存储"
 
 #: terminal/templates/terminal/session_commands.html:18
 #: terminal/templates/terminal/session_detail.html:18
-#: terminal/views/session.py:73 terminal/views/session.py:96
+#: terminal/views/session.py:75 terminal/views/session.py:98
 msgid "Session detail"
 msgstr "会话详情"
 
@@ -5084,7 +5046,7 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:47
+#: terminal/views/session.py:49
 msgid "Session online list"
 msgstr "在线会话"
 
@@ -5836,10 +5798,8 @@ msgstr "安装完成后点击下一步进入绑定页面（如已安装，直接
 
 #: users/templates/users/user_password_verify.html:8
 #: users/templates/users/user_password_verify.html:9
-#, fuzzy
-#| msgid "New password"
 msgid "Verify password"
-msgstr "新密码"
+msgstr "校验密码"
 
 #: users/templates/users/user_profile.html:97
 msgid "Administrator Settings force MFA login"
@@ -6371,7 +6331,7 @@ msgstr "执行失败"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:31
 msgid "Execution list of plan"
-msgstr "执行列表"
+msgstr "执行历史列表"
 
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_execution_list.html:104
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_history.html:84
@@ -6909,6 +6869,18 @@ msgstr "密码匣子"
 #: xpack/plugins/vault/views.py:39
 msgid "vault create"
 msgstr "创建"
+
+#~ msgid "History detail of"
+#~ msgstr "执行历史详情"
+
+#~ msgid "History of "
+#~ msgstr "执行历史"
+
+#~ msgid "Assets count: {}"
+#~ msgstr "资产数量"
+
+#~ msgid "Assets of "
+#~ msgstr "资产"
 
 #~ msgid "MFA authentication failed"
 #~ msgstr "多因子认证失败"

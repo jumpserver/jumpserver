@@ -75,7 +75,7 @@ class TaskExecutionView(PermissionsMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Ops'),
-            'action': _('Task run execution'),
+            'action': _('Task execution list'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -117,7 +117,7 @@ class AdHocExecutionDetailView(PermissionsMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Ops'),
-            'action': _('Run execution detail'),
+            'action': _('Execution detail'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

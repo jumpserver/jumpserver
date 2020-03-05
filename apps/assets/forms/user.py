@@ -110,4 +110,6 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
                             'need to fill in the username and password.'),
             'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig"),
             'sftp_root': _("SFTP root dir, tmp, home or custom"),
+            'username_same_with_user': _("Username is dynamic, When connect asset, using current user's username"),
+            # 'username_same_with_user': _("用户名是动态的，登录资产时使用当前用户的用户名登录"),
         }

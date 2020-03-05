@@ -106,7 +106,7 @@ class AdminUserAssetsView(PermissionsMixin, SingleObjectMixin, ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Admin user detail'),
+            'action': _('Admin user assets'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

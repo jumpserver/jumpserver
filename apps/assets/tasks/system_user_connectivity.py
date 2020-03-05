@@ -75,7 +75,7 @@ def test_system_user_connectivity_util(system_user, assets, task_name):
 
         tasks = platform_tasks_map[platform]
         print(_("Start test system user connectivity for platform: [{}]").format(platform))
-        print(_("Assets count: {}").format(len(_hosts)))
+        print(_("Hosts count: {}").format(len(_hosts)))
         # 用户名不是动态的，用户名则是一个
         if not system_user.username_same_with_user:
             logger.debug("System user not has special auth")

@@ -21,10 +21,10 @@
                                 <a href="{% url 'ops:task-adhoc' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task versions' %} </a>
                             </li>
                             <li>
-                                <a href="{% url 'ops:task-execution' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run execution' %} </a>
+                                <a href="{% url 'ops:task-execution' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Execution' %} </a>
                             </li>
                             <li>
-                                <a class="text-center celery-task-log"><i class="fa fa-laptop"></i> {% trans 'Last run output' %} </a>
+                                <a class="text-center celery-task-log"><i class="fa fa-laptop"></i> {% trans 'Last execution output' %} </a>
                             </li>
                         </ul>
                     </div>
