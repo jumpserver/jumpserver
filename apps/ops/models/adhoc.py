@@ -10,7 +10,6 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_celery_beat.models import PeriodicTask
 
 from common.utils import get_logger, lazyproperty
 from common.fields.model import (
@@ -18,12 +17,9 @@ from common.fields.model import (
     JsonDictTextField,
 )
 from orgs.mixins.models import OrgModelMixin
-from ..celery.utils import (
-    delete_celery_periodic_task, create_or_update_celery_periodic_tasks,
-    disable_celery_periodic_task
-)
 from ..ansible import AdHocRunner, AnsibleError
 from ..inventory import JMSInventory
+from ..mixin import PeriodTaskMixin
 
 __all__ = ["Task", "AdHoc", "AdHocExecution"]
 
@@ -31,20 +27,16 @@ __all__ = ["Task", "AdHoc", "AdHocExecution"]
 logger = get_logger(__file__)
 
 
-class Task(OrgModelMixin):
+class Task(PeriodTaskMixin, OrgModelMixin):
     """
     This task is different ansible task, Task like 'push system user', 'get asset info' ..
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
-    interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
-    crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
-    is_periodic = models.BooleanField(default=False)
     callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
-    # org_id = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name=_("Date created"))
     date_updated = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
     latest_adhoc = models.ForeignKey('ops.AdHoc', on_delete=models.SET_NULL, null=True, related_name='task_latest')
@@ -116,46 +108,17 @@ class Task(OrgModelMixin):
         else:
             return {'error': 'No adhoc'}
 
-    def register_as_period_task(self):
-        from ..tasks import run_ansible_task
-        interval = None
-        crontab = None
-
-        if self.interval:
-            interval = self.interval
-        elif self.crontab:
-            crontab = self.crontab
-
-        tasks = {
-            self.__str__(): {
-                "task": run_ansible_task.name,
-                "interval": interval,
-                "crontab": crontab,
-                "args": (str(self.id),),
-                "kwargs": {"callback": self.callback},
-                "enabled": True,
-            }
-        }
-        create_or_update_celery_periodic_tasks(tasks)
-
-    def save(self, **kwargs):
-        instance = super().save(**kwargs)
-        if self.is_periodic:
-            self.register_as_period_task()
-        else:
-            disable_celery_periodic_task(self.__str__())
-        return instance
-
-    def delete(self, using=None, keep_parents=False):
-        super().delete(using=using, keep_parents=keep_parents)
-        delete_celery_periodic_task(self.__str__())
-
     @property
-    def schedule(self):
-        try:
-            return PeriodicTask.objects.get(name=str(self))
-        except PeriodicTask.DoesNotExist:
-            return None
+    def period_key(self):
+        return self.__str__()
+
+    def get_register_task(self):
+        from ..tasks import run_ansible_task
+        name = self.__str__()
+        task = run_ansible_task.name
+        args = (str(self.id),)
+        kwargs = {"callback": self.callback}
+        return name, task, args, kwargs
 
     def __str__(self):
         return self.name + '@' + str(self.org_id)
