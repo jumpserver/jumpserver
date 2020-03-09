@@ -155,8 +155,24 @@ class PeriodTaskFormMixin(forms.Form):
                     "give priority to Regularly perform"),
     )
     interval = forms.IntegerField(
-        required=False,
+        required=False, initial=24,
         help_text=_('Tips: (Units: hour)'), label=_("Cycle perform"),
     )
+
+    def get_initial_for_field(self, field, field_name):
+        """
+        Return initial data for field on form. Use initial data from the form
+        or the field, in that order. Evaluate callable values.
+        """
+        if field_name not in ['is_periodic', 'crontab', 'interval']:
+            return super().get_initial_for_field(field, field_name)
+        instance = getattr(self, 'instance', None)
+        if instance is None:
+            return super().get_initial_for_field(field, field_name)
+        init_attr_name = field_name + '_initial'
+        value = getattr(self, init_attr_name, None)
+        if value is None:
+            return super().get_initial_for_field(field, field_name)
+        return value
 
 
