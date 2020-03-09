@@ -3,26 +3,30 @@
 import abc
 import uuid
 from django.utils.translation import ugettext_lazy as _
-
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django import forms
+from rest_framework import serializers
 
 from .celery.utils import (
     create_or_update_celery_periodic_tasks, disable_celery_periodic_task,
     delete_celery_periodic_task,
 )
 
-__all__ = ['PeriodTaskMixin']
+__all__ = [
+    'PeriodTaskModelMixin', 'PeriodTaskSerializerMixin',
+    'PeriodTaskFormMixin',
+]
 
 
-class PeriodTaskMixin(models.Model):
+class PeriodTaskModelMixin(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(
         max_length=128, unique=False, verbose_name=_("Name")
     )
     is_periodic = models.BooleanField(default=False)
     interval = models.IntegerField(
-        default=24, null=True, blank=True, verbose_name=_("Cycle perform"),
+        default=24, null=True, blank=True,
+        verbose_name=_("Cycle perform"),
     )
     crontab = models.CharField(
         null=True, blank=True, max_length=128,
@@ -71,6 +75,7 @@ class PeriodTaskMixin(models.Model):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
+        self.set_period_schedule()
         return instance
 
     def delete(self, using=None, keep_parents=False):
@@ -78,6 +83,14 @@ class PeriodTaskMixin(models.Model):
         instance = super().delete(using=using, keep_parents=keep_parents)
         delete_celery_periodic_task(name)
         return instance
+
+    @property
+    def periodic_display(self):
+        if self.is_periodic and self.crontab:
+            return _('Regularly perform') + " ( {} )".format(self.crontab)
+        if self.is_periodic and self.interval:
+            return _('Cycle perform') + " ( {} h )".format(self.interval)
+        return '-'
 
     @property
     def schedule(self):
@@ -89,3 +102,61 @@ class PeriodTaskMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class PeriodTaskSerializerMixin(serializers.Serializer):
+    is_periodic = serializers.BooleanField(default=False, label=_("Periodic perform"))
+    crontab = serializers.CharField(max_length=128, allow_blank=True, allow_null=True, required=False, label=_('Regularly perform'))
+    interval = serializers.IntegerField(allow_null=True, required=False)
+
+    INTERVAL_MAX = 65535
+    INTERVAL_MIN = 1
+
+    def validate_crontab(self, crontab):
+        if not crontab:
+            return crontab
+        if isinstance(crontab, str) and len(crontab.strip().split()) != 5:
+            msg = _('* Please enter a valid crontab expression')
+            raise serializers.ValidationError(msg)
+        return crontab
+
+    def validate_interval(self, interval):
+        if not interval:
+            return interval
+        msg = _("Range {} to {}").format(self.INTERVAL_MIN, self.INTERVAL_MAX)
+        if interval > self.INTERVAL_MAX or interval < self.INTERVAL_MIN:
+            raise serializers.ValidationError(msg)
+        return interval
+
+    def validate_is_periodic(self, ok):
+        if not ok:
+            return ok
+        crontab = self.initial_data.get('crontab')
+        interval = self.initial_data.get('interval')
+        if ok and not any([crontab, interval]):
+            msg = _("Require periodic or regularly perform setting")
+            raise serializers.ValidationError(msg)
+        return ok
+
+
+class PeriodTaskFormMixin(forms.Form):
+    is_periodic = forms.BooleanField(
+        initial=True, required=False, label=_('Periodic perform')
+    )
+    crontab = forms.CharField(
+        max_length=128, required=False, label=_('Regularly perform'),
+        help_text=_("eg: Every Sunday 03:05 run <5 3 * * 0> <br> "
+                    "Tips: "
+                    "Using 5 digits linux crontab expressions "
+                    "<min hour day month week> "
+                    "(<a href='https://tool.lu/crontab/' target='_blank'>Online tools</a>) <br>"
+                    "Note: "
+                    "If both Regularly perform and Cycle perform are set, "
+                    "give priority to Regularly perform"),
+    )
+    interval = forms.IntegerField(
+        required=False,
+        help_text=_('Tips: (Units: hour)'), label=_("Cycle perform"),
+    )
+
+

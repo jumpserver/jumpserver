@@ -19,7 +19,7 @@ from common.fields.model import (
 from orgs.mixins.models import OrgModelMixin
 from ..ansible import AdHocRunner, AnsibleError
 from ..inventory import JMSInventory
-from ..mixin import PeriodTaskMixin
+from ..mixin import PeriodTaskModelMixin
 
 __all__ = ["Task", "AdHoc", "AdHocExecution"]
 
@@ -27,7 +27,7 @@ __all__ = ["Task", "AdHoc", "AdHocExecution"]
 logger = get_logger(__file__)
 
 
-class Task(PeriodTaskMixin, OrgModelMixin):
+class Task(PeriodTaskModelMixin, OrgModelMixin):
     """
     This task is different ansible task, Task like 'push system user', 'get asset info' ..
     One task can have some versions of adhoc, run a task only run the latest version adhoc

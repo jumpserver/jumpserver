@@ -1216,6 +1216,14 @@ function objectAttrsIsBool(obj, attrs) {
     })
 }
 
+function objectAttrsIsNumber(obj, attrs) {
+    attrs.forEach(function (attr) {
+        if (!obj[attr]) {
+            obj[attr] = null;
+        }
+    })
+}
+
 function cleanDateStr(d) {
     for (var i = 0; i < 3; i++) {
         if (!isNaN(Date.parse(d))) {
