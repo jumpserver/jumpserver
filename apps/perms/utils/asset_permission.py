@@ -419,7 +419,7 @@ class AssetPermissionUtil(AssetPermissionUtilCacheMixin):
 
 class ParserNode:
     nodes_only_fields = ("key", "value", "id")
-    assets_only_fields = ("hostname", "id", "ip", "protocols", "org_id")
+    assets_only_fields = ("hostname", "id", "ip", "protocols", "domain", "org_id")
     system_users_only_fields = (
         "id", "name", "username", "protocol", "priority", "login_mode",
     )
@@ -472,6 +472,7 @@ class ParserNode:
                     'ip': asset.ip,
                     'protocols': asset.protocols_as_list,
                     'platform': asset.platform_base,
+                    'domain': asset.domain_id,
                     'org_name': asset.org_name,
                 },
             }
