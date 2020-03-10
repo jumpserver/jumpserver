@@ -32,8 +32,6 @@ class Task(PeriodTaskModelMixin, OrgModelMixin):
     This task is different ansible task, Task like 'push system user', 'get asset info' ..
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
     callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))

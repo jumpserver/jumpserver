@@ -1471,3 +1471,30 @@ function reloadPage() {
 function isEmptyObject(obj) {
     return Object.keys(obj).length === 0
 }
+
+function getStatusIcon(status, mapping, title) {
+    var navy = '<i class="fa fa-circle text-navy" title=""></i>';
+    var danger = '<i class="fa fa-circle text-danger" title=""></i>';
+    var warning = '<i class="fa fa-circle text-warning" title=""></i>';
+    var icons = {
+        navy: navy,
+        danger: danger,
+        warning: warning
+    };
+    var defaultMapping = {
+        true: 'navy',
+        false: 'danger',
+        1: 'navy',
+        0: 'danger',
+        default: 'navy'
+    };
+    if (!mapping) {
+      mapping = defaultMapping;
+    }
+    var name = mapping[status] || mapping['default'];
+    var icon = icons[name];
+    if (title) {
+        icon = icon.replace('title=""', 'title="' + title + '"')
+    }
+    return icon;
+}

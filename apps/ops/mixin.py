@@ -106,7 +106,10 @@ class PeriodTaskModelMixin(models.Model):
 
 class PeriodTaskSerializerMixin(serializers.Serializer):
     is_periodic = serializers.BooleanField(default=False, label=_("Periodic perform"))
-    crontab = serializers.CharField(max_length=128, allow_blank=True, allow_null=True, required=False, label=_('Regularly perform'))
+    crontab = serializers.CharField(
+        max_length=128, allow_blank=True,
+        allow_null=True, required=False, label=_('Regularly perform')
+    )
     interval = serializers.IntegerField(allow_null=True, required=False)
 
     INTERVAL_MAX = 65535
