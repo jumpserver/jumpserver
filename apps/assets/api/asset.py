@@ -23,7 +23,7 @@ from ..filters import AssetByNodeFilterBackend, LabelFilterBackend
 logger = get_logger(__file__)
 __all__ = [
     'AssetViewSet', 'AssetPlatformRetrieveApi',
-    'AssetGatewayApi', 'AssetPlatformViewSet',
+    'AssetGatewayListApi', 'AssetPlatformViewSet',
     'AssetTaskCreateApi',
 ]
 
@@ -108,19 +108,15 @@ class AssetTaskCreateApi(generics.CreateAPIView):
         setattr(serializer, '_data', data)
 
 
-class AssetGatewayApi(generics.RetrieveAPIView):
+class AssetGatewayListApi(generics.ListAPIView):
     permission_classes = (IsOrgAdminOrAppUser,)
     serializer_class = serializers.GatewayWithAuthSerializer
     model = Asset
 
-    def retrieve(self, request, *args, **kwargs):
-        asset_id = kwargs.get('pk')
+    def get_queryset(self):
+        asset_id = self.kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-
-        if asset.domain and \
-                asset.domain.gateways.filter(protocol='ssh').exists():
-            gateway = random.choice(asset.domain.gateways.filter(protocol='ssh'))
-            serializer = serializers.GatewayWithAuthSerializer(instance=gateway)
-            return Response(serializer.data)
-        else:
-            return Response({"msg": "Not have gateway"}, status=404)
+        if not asset.domain:
+            return []
+        queryset = asset.domain.gateways.filter(protocol='ssh')
+        return queryset
