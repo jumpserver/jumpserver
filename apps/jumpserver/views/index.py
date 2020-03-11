@@ -71,6 +71,8 @@ class MonthLoginMetricMixin:
         for d in self.session_month_dates:
             count = self.get_date_login_count(d)
             data.append(count)
+        if len(data) == 0:
+            data = [0]
         return data
 
     def get_date_user_count(self, date):

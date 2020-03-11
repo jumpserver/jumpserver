@@ -54,7 +54,7 @@ def test_asset_user_connectivity_util(asset_user, task_name):
         return
 
     inventory = JMSCustomInventory(
-        asset_user.asset, username=asset_user.username,
+        [asset_user.asset], username=asset_user.username,
         password=asset_user.password, private_key=asset_user.private_key
     )
     runner = AdHocRunner(inventory, options=const.TASK_OPTIONS)
@@ -68,13 +68,13 @@ def test_asset_user_connectivity_util(asset_user, task_name):
 
 
 @shared_task(queue="ansible")
-def test_asset_users_connectivity_manual(asset_users, run_as_admin=False):
+def test_asset_users_connectivity_manual(asset_users):
     """
     :param asset_users: <AuthBook>对象
     """
     for asset_user in asset_users:
         task_name = _("Test asset user connectivity: {}").format(asset_user)
-        test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=run_as_admin)
+        test_asset_user_connectivity_util(asset_user, task_name)
 
 
 @shared_task(queue="ansible")
