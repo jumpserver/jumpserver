@@ -132,7 +132,7 @@ class AssetUserTaskCreateAPI(generics.CreateAPIView):
         # action = serializer.validated_data["action"]
         # only this
         # if action == "test":
-        task = test_asset_users_connectivity_manual(asset_users)
+        task = test_asset_users_connectivity_manual.delay(asset_users)
         data = getattr(serializer, '_data', {})
         data["task"] = task.id
         setattr(serializer, '_data', data)
