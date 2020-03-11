@@ -35,14 +35,15 @@ def get_test_asset_user_connectivity_tasks(asset):
 
 
 @org_aware_func("asset_user")
-def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False):
+def test_asset_user_connectivity_util(asset_user, task_name):
     """
     :param asset_user: <AuthBook>对象
     :param task_name:
     :param run_as_admin:
     :return:
     """
-    from ops.utils import update_or_create_ansible_task
+    from ops.ansible.runner import AdHocRunner
+    from ops.inventory import JMSCustomInventory
 
     if not check_asset_can_run_ansible(asset_user.asset):
         return
@@ -52,17 +53,17 @@ def test_asset_user_connectivity_util(asset_user, task_name, run_as_admin=False)
         logger.debug("No tasks ")
         return
 
-    args = (task_name,)
-    kwargs = {
-        'hosts': [asset_user.asset], 'tasks': tasks,
-        'options': const.TASK_OPTIONS,
-    }
-    if run_as_admin:
-        kwargs["run_as_admin"] = True
-    else:
-        kwargs["run_as"] = asset_user.username
-    task, created = update_or_create_ansible_task(*args, **kwargs)
-    raw, summary = task.run()
+    inventory = JMSCustomInventory(
+        asset_user.asset, username=asset_user.username,
+        password=asset_user.password, private_key=asset_user.private_key
+    )
+    runner = AdHocRunner(inventory, options=const.TASK_OPTIONS)
+    try:
+        result = runner.run(tasks, 'all', task_name)
+        raw, summary = result.results_raw, result.results_summary
+    except Exception as e:
+        logger.warn("Failed run adhoc {}, {}".format(task_name, e))
+        return
     asset_user.set_connectivity(summary)
 
 
