@@ -406,18 +406,18 @@ class LDAPTestUtil(object):
             authentication=SIMPLE, user=user, password=password
         )
         if not ret:
-            msg = _('bind dn or password incorrect')
+            msg = _('Bind DN or Password incorrect')
             raise LDAPInvalidDnError(msg)
 
     def test_bind_dn(self):
         try:
             self._test_bind_dn()
         except LDAPUserNameIsMandatoryError as e:
-            error = _('Please enter bind dn: {}'.format(e))
+            error = _('Please enter Bind DN: {}'.format(e))
         except LDAPPasswordIsMandatoryError as e:
-            error = _('Please enter password: {}'.format(e))
+            error = _('Please enter Password: {}'.format(e))
         except LDAPInvalidDnError as e:
-            error = _('Please enter correct bind dn and password: {}'.format(e))
+            error = _('Please enter Correct Bind DN and Password: {}'.format(e))
         except Exception as e:
             error = _('Unknown error: {}'.format(e))
         else:
@@ -435,7 +435,7 @@ class LDAPTestUtil(object):
             user_entries = util.search_user_entries()
             logger.debug('Search ou: {}, count user: {}'.format(search_ou, len(user_entries)))
             if len(user_entries) == 0:
-                error = _('Invalid search ou or filter: {}'.format(search_ou))
+                error = _('Invalid User OU or User search filter: {}'.format(search_ou))
                 raise self.LDAPInvalidSearchOuOrFilterError(error)
 
     def test_search_ou_and_filter(self):
@@ -466,14 +466,14 @@ class LDAPTestUtil(object):
         actually_contain_attr = set(attr_map.keys())
         result = should_contain_attr - actually_contain_attr
         if len(result) != 0:
-            error = _('LDAP attribute not include: {}'.format(result))
+            error = _('LDAP User attr map not include: {}'.format(result))
             raise self.LDAPInvalidAttributeMapError(error)
 
     def test_attr_map(self):
         try:
             self._test_attr_map()
         except json.JSONDecodeError:
-            error = _('LDAP attribute map is not dict')
+            error = _('LDAP User attr map is not dict')
         except self.LDAPInvalidAttributeMapError as e:
             error = e
         except Exception as e:
@@ -510,13 +510,13 @@ class LDAPTestUtil(object):
         try:
             self._test_config()
         except LDAPInvalidServerError as e:
-            msg = _('Error (Invalid server uri): {}'.format(e))
+            msg = _('Error (Invalid LDAP server): {}'.format(e))
         except LDAPBindError as e:
-            msg = _('Error (Invalid bind dn): {}'.format(e))
+            msg = _('Error (Invalid Bind DN): {}'.format(e))
         except self.LDAPInvalidAttributeMapError as e:
-            msg = _('Error (Invalid attribute map): {}'.format(e))
+            msg = _('Error (Invalid LDAP User attr map): {}'.format(e))
         except self.LDAPInvalidSearchOuOrFilterError as e:
-            msg = _('Error (Invalid search ou or filter): {}'.format(e))
+            msg = _('Error (Invalid User OU or User search filter): {}'.format(e))
         except self.LDAPNotEnabledAuthError as e:
             msg = _('Error (Not enabled LDAP authentication): {}'.format(e))
         except Exception as e:
