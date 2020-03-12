@@ -109,7 +109,7 @@ def check_server_performance_period():
         for uncheck_path in uncheck_paths:
             if path.startswith(uncheck_path):
                 need_check = False
-        if need_check and usage > 80:
+        if need_check and usage.percent > 80:
             send_server_performance_mail(path, usage, usages)
 
 
