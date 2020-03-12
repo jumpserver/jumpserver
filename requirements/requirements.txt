@@ -3,7 +3,7 @@ ansible==2.8.2
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.5.0.3
-boto3==1.6.5
+boto3==1.12.14
 botocore==1.9.5
 celery==4.1.1
 certifi==2018.1.18
