@@ -15,7 +15,8 @@ logger = get_logger(__file__)
 
 __all__ = [
     'test_asset_user_connectivity_util', 'test_asset_users_connectivity_manual',
-    'get_test_asset_user_connectivity_tasks',
+    'get_test_asset_user_connectivity_tasks', 'test_user_connectivity',
+    'run_adhoc',
 ]
 
 
@@ -34,33 +35,58 @@ def get_test_asset_user_connectivity_tasks(asset):
     return tasks
 
 
+def run_adhoc(task_name, tasks, inventory):
+    """
+    :param task_name
+    :param tasks
+    :param inventory
+    """
+    from ops.ansible.runner import AdHocRunner
+    runner = AdHocRunner(inventory, options=const.TASK_OPTIONS)
+    result = runner.run(tasks, 'all', task_name)
+    return result.results_raw, result.results_summary
+
+
+def test_user_connectivity(task_name, asset, username, password=None, private_key=None):
+    """
+    :param task_name
+    :param asset
+    :param username
+    :param password
+    :param private_key
+    """
+    from ops.inventory import JMSCustomInventory
+
+    tasks = get_test_asset_user_connectivity_tasks(asset)
+    if not tasks:
+        logger.debug("No tasks ")
+        return {}, {}
+    inventory = JMSCustomInventory(
+        assets=[asset], username=username, password=password,
+        private_key=private_key
+    )
+    raw, summary = run_adhoc(
+        task_name=task_name, tasks=tasks, inventory=inventory
+    )
+    return raw, summary
+
+
 @org_aware_func("asset_user")
 def test_asset_user_connectivity_util(asset_user, task_name):
     """
     :param asset_user: <AuthBook>对象
     :param task_name:
-    :param run_as_admin:
     :return:
     """
-    from ops.ansible.runner import AdHocRunner
-    from ops.inventory import JMSCustomInventory
-
     if not check_asset_can_run_ansible(asset_user.asset):
         return
 
-    tasks = get_test_asset_user_connectivity_tasks(asset_user.asset)
-    if not tasks:
-        logger.debug("No tasks ")
-        return
-
-    inventory = JMSCustomInventory(
-        [asset_user.asset], username=asset_user.username,
-        password=asset_user.password, private_key=asset_user.private_key
-    )
-    runner = AdHocRunner(inventory, options=const.TASK_OPTIONS)
     try:
-        result = runner.run(tasks, 'all', task_name)
-        raw, summary = result.results_raw, result.results_summary
+        raw, summary = test_user_connectivity(
+            task_name=task_name, asset=asset_user.asset,
+            username=asset_user.username, password=asset_user.password,
+            private_key=asset_user.private_key
+        )
     except Exception as e:
         logger.warn("Failed run adhoc {}, {}".format(task_name, e))
         return
