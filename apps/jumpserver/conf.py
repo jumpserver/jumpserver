@@ -84,11 +84,10 @@ class Config(dict):
     :param defaults: an optional dictionary of default values
     """
     defaults = {
-        # Django Config
+        # Django Config, Must set before start
         'SECRET_KEY': '',
         'BOOTSTRAP_TOKEN': '',
         'DEBUG': True,
-        'SITE_URL': 'http://localhost:8080',
         'LOG_LEVEL': 'DEBUG',
         'LOG_DIR': os.path.join(PROJECT_DIR, 'logs'),
         'DB_ENGINE': 'mysql',
@@ -100,10 +99,13 @@ class Config(dict):
         'REDIS_HOST': '127.0.0.1',
         'REDIS_PORT': 6379,
         'REDIS_PASSWORD': '',
+        # Default value
         'REDIS_DB_CELERY': 3,
         'REDIS_DB_CACHE': 4,
         'REDIS_DB_SESSION': 5,
         'REDIS_DB_WS': 6,
+
+        'SITE_URL': 'http://localhost:8080',
         'CAPTCHA_TEST_MODE': None,
         'TOKEN_EXPIRATION': 3600 * 24,
         'DISPLAY_PER_PAGE': 25,
