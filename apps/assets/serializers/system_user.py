@@ -1,20 +1,21 @@
-import re
 from rest_framework import serializers
 
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Count
 
 from common.serializers import AdaptedBulkListSerializer
 from common.mixins.serializers import BulkSerializerMixin
 from common.utils import ssh_pubkey_gen
 from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from assets.models import Node
-from ..models import SystemUser
-from .base import AuthSerializer, AuthSerializerMixin
+from ..models import SystemUser, Asset
+from .base import AuthSerializerMixin
 
 __all__ = [
-    'SystemUserSerializer', 'SystemUserAuthSerializer',
+    'SystemUserSerializer', 'SystemUserListSerializer',
     'SystemUserSimpleSerializer', 'SystemUserAssetRelationSerializer',
-    'SystemUserNodeRelationSerializer',
+    'SystemUserNodeRelationSerializer', 'SystemUserTaskSerializer',
+    'SystemUserUserRelationSerializer', 'SystemUserWithAuthInfoSerializer',
 ]
 
 
@@ -28,10 +29,13 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
         model = SystemUser
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            'id', 'name', 'username', 'password', 'public_key', 'private_key',
-            'login_mode', 'login_mode_display', 'priority', 'protocol',
+            'id', 'name', 'username', 'protocol',
+            'password', 'public_key', 'private_key',
+            'login_mode', 'login_mode_display',
+            'priority', 'username_same_with_user',
             'auto_push', 'cmd_filters', 'sudo', 'shell', 'comment',
-            'assets_amount', 'nodes_amount', 'auto_generate_key'
+            'auto_generate_key', 'sftp_root',
+            'assets_amount',
         ]
         extra_kwargs = {
             'password': {"write_only": True},
@@ -67,16 +71,42 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             value = False
         return value
 
+    def validate_username_same_with_user(self, username_same_with_user):
+        if not username_same_with_user:
+            return username_same_with_user
+        protocol = self.initial_data.get("protocol", "ssh")
+        queryset = SystemUser.objects.filter(
+                protocol=protocol, username_same_with_user=True
+        )
+        if self.instance:
+            queryset = queryset.exclude(id=self.instance.id)
+        exists = queryset.exists()
+        if not exists:
+            return username_same_with_user
+        error = _("Username same with user with protocol {} only allow 1").format(protocol)
+        raise serializers.ValidationError(error)
+
     def validate_username(self, username):
         if username:
             return username
         login_mode = self.initial_data.get("login_mode")
         protocol = self.initial_data.get("protocol")
+        username_same_with_user = self.initial_data.get("username_same_with_user")
+        if username_same_with_user:
+            return ''
         if login_mode == SystemUser.LOGIN_AUTO and \
                 protocol != SystemUser.PROTOCOL_VNC:
             msg = _('* Automatic login mode must fill in the username.')
             raise serializers.ValidationError(msg)
         return username
+
+    def validate_sftp_root(self, value):
+        if value in ['home', 'tmp']:
+            return value
+        if not value.startswith('/'):
+            error = _("Path should starts with /")
+            raise serializers.ValidationError(error)
+        return value
 
     def validate_password(self, password):
         super().validate_password(password)
@@ -112,29 +142,34 @@ class SystemUserSerializer(AuthSerializerMixin, BulkOrgResourceModelSerializer):
             attrs["public_key"] = public_key
         return attrs
 
+
+class SystemUserListSerializer(SystemUserSerializer):
+    class Meta(SystemUserSerializer.Meta):
+        fields = [
+            'id', 'name', 'username', 'protocol',
+            'login_mode', 'login_mode_display',
+            'priority', "username_same_with_user",
+            'auto_push', 'sudo', 'shell', 'comment',
+            "assets_amount",
+            'auto_generate_key',
+            'sftp_root',
+        ]
+
     @classmethod
     def setup_eager_loading(cls, queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.prefetch_related('cmd_filters', 'nodes')
+        queryset = queryset.annotate(assets_amount=Count("assets"))
         return queryset
 
 
-class SystemUserAuthSerializer(AuthSerializer):
-    """
-    系统用户认证信息
-    """
-    private_key = serializers.SerializerMethodField()
-
-    class Meta:
-        model = SystemUser
-        fields = [
-            "id", "name", "username", "protocol",
-            "login_mode", "password", "private_key",
-        ]
-
-    @staticmethod
-    def get_private_key(obj):
-        return obj.get_private_key()
+class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
+    class Meta(SystemUserSerializer.Meta):
+        extra_kwargs = {
+            'nodes_amount': {'label': _('Node')},
+            'assets_amount': {'label': _('Asset')},
+            'login_mode_display': {'label': _('Login mode display')},
+            'created_by': {'read_only': True},
+        }
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):
@@ -186,3 +221,25 @@ class SystemUserNodeRelationSerializer(RelationMixin, serializers.ModelSerialize
             return self.tree.get_node_full_tag(obj.node_key)
         else:
             return obj.node.full_value
+
+
+class SystemUserUserRelationSerializer(RelationMixin, serializers.ModelSerializer):
+    user_display = serializers.ReadOnlyField()
+
+    class Meta(RelationMixin.Meta):
+        model = SystemUser.users.through
+        fields = [
+            'id', "user", "user_display",
+        ]
+
+
+class SystemUserTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = (
+        ("test", "test"),
+        ("push", "push"),
+    )
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)
+    asset = serializers.PrimaryKeyRelatedField(
+        queryset=Asset.objects, allow_null=True, required=False, write_only=True
+    )
+    task = serializers.CharField(read_only=True)

@@ -4,20 +4,33 @@ from orgs.mixins.serializers import BulkOrgResourceModelSerializer
 from common.serializers import AdaptedBulkListSerializer
 from ..models import Session
 
+__all__ = [
+    'SessionSerializer', 'SessionDisplaySerializer',
+    'ReplaySerializer',
+]
+
 
 class SessionSerializer(BulkOrgResourceModelSerializer):
-    command_amount = serializers.IntegerField(read_only=True)
     org_id = serializers.CharField(allow_blank=True)
 
     class Meta:
         model = Session
         list_serializer_class = AdaptedBulkListSerializer
         fields = [
-            "id", "user", "asset", "system_user", "login_from",
-            "login_from_display", "remote_addr", "is_finished",
-            "has_replay", "can_replay", "protocol", "date_start", "date_end",
-            "terminal", "command_amount",
+            "id", "user", "asset", "system_user",
+            "user_id", "asset_id", "system_user_id",
+            "login_from", "login_from_display", "remote_addr",
+            "is_success",  "is_finished", "has_replay", "can_replay",
+            "protocol", "date_start", "date_end",
+            "terminal",
         ]
+
+
+class SessionDisplaySerializer(SessionSerializer):
+    command_amount = serializers.IntegerField(read_only=True)
+
+    class Meta(SessionSerializer.Meta):
+        fields = SessionSerializer.Meta.fields + ['command_amount']
 
 
 class ReplaySerializer(serializers.Serializer):

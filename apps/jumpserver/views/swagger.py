@@ -49,6 +49,16 @@ class CustomSwaggerAutoSchema(SwaggerAutoSchema):
         return fields
 
 
+api_info = openapi.Info(
+    title="JumpServer API Docs",
+    default_version='v1',
+    description="JumpServer Restful api docs",
+    terms_of_service="https://www.jumpserver.org",
+    contact=openapi.Contact(email="support@fit2cloud.com"),
+    license=openapi.License(name="GPLv2 License"),
+)
+
+
 def get_swagger_view(version='v1'):
     from ..urls import api_v1, api_v2
     from django.urls import path, include
@@ -65,14 +75,7 @@ def get_swagger_view(version='v1'):
     else:
         patterns = api_v1_patterns
     schema_view = get_schema_view(
-        openapi.Info(
-            title="Jumpserver API Docs",
-            default_version=version,
-            description="Jumpserver Restful api docs",
-            terms_of_service="https://www.jumpserver.org",
-            contact=openapi.Contact(email="support@fit2cloud.com"),
-            license=openapi.License(name="GPLv2 License"),
-        ),
+        api_info,
         public=True,
         patterns=patterns,
         permission_classes=(permissions.AllowAny,),

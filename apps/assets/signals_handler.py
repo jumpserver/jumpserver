@@ -7,8 +7,9 @@ from django.db.models.signals import (
 from django.db.models.aggregates import Count
 from django.dispatch import receiver
 
-from common.utils import get_logger, timeit
+from common.utils import get_logger
 from common.decorator import on_transaction_commit
+from orgs.utils import tmp_to_root_org
 from .models import Asset, SystemUser, Node, AuthBook
 from .utils import TreeService
 from .tasks import (
@@ -113,6 +114,20 @@ def on_system_user_nodes_change(sender, instance=None, action=None, model=None, 
     add_nodes_assets_to_system_users.delay(nodes_keys, system_users)
 
 
+@receiver(m2m_changed, sender=SystemUser.groups.through)
+def on_system_user_groups_change(sender, instance=None, action=None, model=None,
+                                 pk_set=None, reverse=False, **kwargs):
+    """
+    当系统用户和用户组关系发生变化时，应该将组下用户关联到新的系统用户上
+    """
+    if action != "post_add" or reverse:
+        return
+    logger.info("System user groups update signal recv: {}".format(instance))
+    groups = model.objects.filter(pk__in=pk_set).annotate(users_count=Count("users"))
+    users = groups.filter(users_count__gt=0).values_list('users', flat=True)
+    instance.users.add(*tuple(users))
+
+
 @receiver(m2m_changed, sender=Asset.nodes.through)
 def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
     """
@@ -121,6 +136,8 @@ def on_asset_nodes_change(sender, instance=None, action='', **kwargs):
     if action.startswith('post'):
         logger.debug("Asset nodes change signal recv: {}".format(instance))
         Node.refresh_assets()
+        with tmp_to_root_org():
+            Node.refresh_assets()
 
 
 @receiver(m2m_changed, sender=Asset.nodes.through)
@@ -195,6 +212,8 @@ def on_asset_nodes_remove(sender, instance=None, action='', model=None,
 def on_node_update_or_created(sender, **kwargs):
     # 刷新节点
     Node.refresh_nodes()
+    with tmp_to_root_org():
+        Node.refresh_nodes()
 
 
 @receiver(post_save, sender=AuthBook)

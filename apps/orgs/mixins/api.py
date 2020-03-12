@@ -33,10 +33,10 @@ class OrgQuerySetMixin:
 
         if hasattr(self, 'swagger_fake_view'):
             return queryset[:1]
-        if hasattr(self, 'action') and self.action == 'list' and \
-            hasattr(self, 'serializer_class') and \
-                hasattr(self.serializer_class, 'setup_eager_loading'):
-            queryset = self.serializer_class.setup_eager_loading(queryset)
+        if hasattr(self, 'action') and self.action == 'list':
+            serializer_class = self.get_serializer_class()
+            if serializer_class and hasattr(serializer_class, 'setup_eager_loading'):
+                queryset = serializer_class.setup_eager_loading(queryset)
         return queryset
 
 

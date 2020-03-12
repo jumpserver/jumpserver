@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <style>
+    .table.node_edit {
+        margin-bottom: 0;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'assets:system-user-detail' pk=system_user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Asset list' %}
+                                </a>
+                            </li>
+                            {% if system_user.username_same_with_user  %}
+                            <li class="active">
+                                <a href="{% url 'assets:system-user-user' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'User list' %}
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-8" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left"><b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-striped table-bordered table-hover" id="user_list_table" style="width: 100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_all" class="ipt_check_all">
+                                            </th>
+                                            <th class="text-center">{% trans 'User' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Users' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="add-users">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select users' %}" id="id_users" class="users-select2 select2" style="width: 100%" multiple="" tabindex="4">
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-users">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+var usersRelationUrl = "{% url 'api-assets:system-users-users-relation-list' %}?systemuser={{ system_user.id }}";
+var userTable = null;
+
+function initTable() {
+    var options = {
+        ele: $('#user_list_table'),
+        toggle: true,
+        ajax_url: usersRelationUrl,
+        columnDefs: [
+            {
+                targets: 2, createdCell: function (td, cellData, rowData) {
+                    var removeBtn = '<button class="btn btn-xs btn-danger m-l-xs btn-remove" data-uid=UID>{% trans "Remove" %}</button>';
+                    removeBtn = removeBtn.replace("UID", rowData.user);
+				    $(td).html(removeBtn);
+                },
+                width: '70px'
+            }
+        ],
+        columns: [
+            {data: "id"}, {data: "user_display"},
+            {data: "id", orderable: false}
+        ],
+        op_html: $('#actions').html(),
+    };
+    userTable = jumpserver.initServerSideDataTable(options);
+    return userTable
+}
+
+function addUsers(objectsId, success, fail) {
+    if (!objectsId || objectsId.length === 0) {
+        return
+    }
+    var theUrl = usersRelationUrl;
+    var body = [];
+    objectsId.forEach(function (v) {
+        var data = {systemuser: "{{ object.id }}"};
+        data.user = v;
+        body.push(data)
+    });
+    if (!success) {
+        success = reloadPage
+    }
+    var option = {
+        url: theUrl,
+        body: JSON.stringify(body),
+        method: "POST",
+        success: success,
+    };
+    if (fail) {
+        option.error = fail;
+    }
+    requestApi(option)
+}
+
+function removeUser(userId, success) {
+    if (!userId)  {
+        return
+    }
+    var theUrl = usersRelationUrl;
+    theUrl = setUrlParam(theUrl, 'user', userId);
+    if (!success) {
+        success = function () {
+            userTable.ajax.reload();
+        }
+    }
+    requestApi({
+        url: theUrl,
+        method: "DELETE",
+        success: success,
+        success_message: "{% trans "Remove success" %}"
+    });
+}
+
+$(document).ready(function () {
+	initTable();
+	usersSelect2Init('.users-select2');
+})
+.on('click', '.btn-remove', function() {
+    var userId = $(this).data("uid");
+    removeUser(userId);
+})
+.on('click', '#btn-add-users', function() {
+    var usersId = $('.users-select2').val();
+    var options = $(".users-select2").find(":selected");
+    var failed = function(s, data) {
+        var invalidIndex = [];
+        var validIndex = [];
+        $.each(data, function (k, v) {
+            if (isEmptyObject(v)) {
+                validIndex.push(k)
+            } else {
+                invalidIndex.push(k)
+            }
+        });
+        var invalidLabel = [];
+        $.each(invalidIndex, function (k, v) {
+            invalidLabel.push(options[v].text)
+        });
+        var errorMsg = "{% trans 'Have existed: ' %}";
+        errorMsg += invalidLabel.join(", ");
+        toastr.error(errorMsg)
+    };
+    addUsers(usersId, null, failed);
+})
+</script>
+{% endblock %}

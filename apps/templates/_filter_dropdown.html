@@ -30,7 +30,7 @@ function addItem(menuRef, menuItem, parent) {
         }
     })
 }
-function initTableFilterDropdown(selector, menu) {
+function initTableFilterDropdown(selector, menu, offset_x=0, offset_y=0) {
     /*
     menu =  [
         {title: "Title", value: "title"},
@@ -52,6 +52,8 @@ function initTableFilterDropdown(selector, menu) {
         y -= offset.top;
         {#x += 18;#}
         y += 30;
+        x += offset_x;
+        y += offset_y;
         $('.search-help').css({"top":y+"px", "left":x+"px", "position": "absolute"});
         $('.dropdown-menu.search-help').show();
     });

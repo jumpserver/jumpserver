@@ -11,9 +11,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from django.core.cache import cache
 
-from common.utils import get_logger, timeit, lazyproperty
+from common.utils import get_logger, lazyproperty
 from orgs.mixins.models import OrgModelMixin, OrgManager
-from orgs.utils import set_current_org, get_current_org, tmp_to_org
+from orgs.utils import get_current_org, tmp_to_org, current_org
 from orgs.models import Organization
 
 
@@ -26,63 +26,108 @@ class NodeQuerySet(models.QuerySet):
         raise PermissionError("Bulk delete node deny")
 
 
+class TreeCache:
+    updated_time_cache_key = 'NODE_TREE_UPDATED_AT_{}'
+    cache_time = 3600
+    assets_updated_time_cache_key = 'NODE_TREE_ASSETS_UPDATED_AT_{}'
+
+    def __init__(self, tree, org_id):
+        now = time.time()
+        self.created_time = now
+        self.assets_created_time = now
+        self.tree = tree
+        self.org_id = org_id
+
+    def _has_changed(self, tp="tree"):
+        if tp == "assets":
+            key = self.assets_updated_time_cache_key.format(self.org_id)
+        else:
+            key = self.updated_time_cache_key.format(self.org_id)
+        updated_time = cache.get(key, 0)
+        if updated_time > self.created_time:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def set_changed(cls, tp="tree", t=None, org_id=None):
+        if org_id is None:
+            org_id = current_org.id
+        if tp == "assets":
+            key = cls.assets_updated_time_cache_key.format(org_id)
+        else:
+            key = cls.updated_time_cache_key.format(org_id)
+        ttl = cls.cache_time
+        if not t:
+            t = time.time()
+        cache.set(key, t, ttl)
+
+    def tree_has_changed(self):
+        return self._has_changed("tree")
+
+    def set_tree_changed(self, t=None):
+        logger.debug("Set tree tree changed")
+        self.__class__.set_changed(t=t, tp="tree")
+
+    def assets_has_changed(self):
+        return self._has_changed("assets")
+
+    def set_tree_assets_changed(self, t=None):
+        logger.debug("Set tree assets changed")
+        self.__class__.set_changed(t=t, tp="assets")
+
+    def get(self):
+        if self.tree_has_changed():
+            self.renew()
+            return self.tree
+        if self.assets_has_changed():
+            self.tree.init_assets()
+        return self.tree
+
+    def renew(self):
+        new_obj = self.__class__.new(self.org_id)
+        self.tree = new_obj.tree
+        self.created_time = new_obj.created_time
+        self.assets_created_time = new_obj.assets_created_time
+
+    @classmethod
+    def new(cls, org_id=None):
+        from ..utils import TreeService
+        logger.debug("Create node tree")
+        if not org_id:
+            org_id = current_org.id
+        with tmp_to_org(org_id):
+            tree = TreeService.new()
+            obj = cls(tree, org_id)
+            obj.tree = tree
+            return obj
+
+
 class TreeMixin:
-    tree_created_time = None
-    tree_updated_time_cache_key = 'NODE_TREE_UPDATED_AT'
-    tree_cache_time = 3600
-    tree_assets_cache_key = 'NODE_TREE_ASSETS_UPDATED_AT'
-    tree_assets_created_time = None
-    _tree_service = None
+    _org_tree_map = {}
 
     @classmethod
     def tree(cls):
-        from ..utils import TreeService
-        tree_updated_time = cache.get(cls.tree_updated_time_cache_key, 0)
-        now = time.time()
-        # 什么时候重新初始化 _tree_service
-        if not cls.tree_created_time or \
-                tree_updated_time > cls.tree_created_time:
-            logger.debug("Create node tree")
-            tree = TreeService.new()
-            cls.tree_created_time = now
-            cls.tree_assets_created_time = now
-            cls._tree_service = tree
-            return tree
-        # 是否要重新初始化节点资产
-        node_assets_updated_time = cache.get(cls.tree_assets_cache_key, 0)
-        if not cls.tree_assets_created_time or \
-                node_assets_updated_time > cls.tree_assets_created_time:
-            cls._tree_service.init_assets()
-            cls.tree_assets_created_time = now
-            logger.debug("Refresh node tree assets")
-        return cls._tree_service
+        org_id = current_org.org_id()
+        t = cls.get_local_tree_cache(org_id)
+
+        if t is None:
+            t = TreeCache.new()
+            cls._org_tree_map[org_id] = t
+        return t.get()
+
+    @classmethod
+    def get_local_tree_cache(cls, org_id=None):
+        t = cls._org_tree_map.get(org_id)
+        return t
 
     @classmethod
     def refresh_tree(cls, t=None):
-        logger.debug("Refresh node tree")
-        key = cls.tree_updated_time_cache_key
-        ttl = cls.tree_cache_time
-        if not t:
-            t = time.time()
-        cache.set(key, t, ttl)
+        TreeCache.set_changed(tp="tree", t=t, org_id=current_org.id)
 
     @classmethod
     def refresh_node_assets(cls, t=None):
-        logger.debug("Refresh node assets")
-        key = cls.tree_assets_cache_key
-        ttl = cls.tree_cache_time
-        if not t:
-            t = time.time()
-        cache.set(key, t, ttl)
-
-    @staticmethod
-    def refresh_user_tree_cache():
-        """
-        当节点-节点关系，节点-资产关系发生变化时，应该刷新用户授权树缓存
-        :return:
-        """
-        from perms.utils.asset_permission import AssetPermissionUtilV2
-        AssetPermissionUtilV2.expire_all_user_tree_cache()
+        TreeCache.set_changed(tp="assets", t=t, org_id=current_org.id)
 
 
 class FamilyMixin:
@@ -377,15 +422,6 @@ class SomeNodesMixin:
             return obj
 
     @classmethod
-    def empty_node(cls):
-        with tmp_to_org(Organization.system()):
-            defaults = {'value': cls.empty_value}
-            obj, created = cls.objects.get_or_create(
-                defaults=defaults, key=cls.empty_key
-            )
-            return obj
-
-    @classmethod
     def default_node(cls):
         with tmp_to_org(Organization.default()):
             defaults = {'value': cls.default_value}
@@ -413,7 +449,6 @@ class SomeNodesMixin:
     @classmethod
     def initial_some_nodes(cls):
         cls.default_node()
-        cls.empty_node()
         cls.ungrouped_node()
         cls.favorite_node()
 
@@ -523,13 +558,13 @@ class Node(OrgModelMixin, SomeNodesMixin, TreeMixin, FamilyMixin, FullValueMixin
         tree_node = TreeNode(**data)
         return tree_node
 
-    def has_children_or_contains_assets(self):
-        if self.children or self.get_assets():
+    def has_children_or_has_assets(self):
+        if self.children or self.get_assets().exists():
             return True
         return False
 
     def delete(self, using=None, keep_parents=False):
-        if self.has_children_or_contains_assets():
+        if self.has_children_or_has_assets():
             return
         return super().delete(using=using, keep_parents=keep_parents)
 

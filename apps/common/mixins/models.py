@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-
 __all__ = [
     "NoDeleteManager", "NoDeleteModelMixin", "NoDeleteQuerySet",
     "CommonModelMixin"
@@ -65,3 +64,5 @@ class DebugQueryManager(models.Manager):
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         queryset = super().get_queryset()
         return queryset
+
+

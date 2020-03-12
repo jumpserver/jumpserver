@@ -350,7 +350,7 @@ $(document).ready(function(){
 }).on('click', '#menu_asset_move', function () {
     update_node_action = "move"
 }).on('click', '.btn-test-connective', function () {
-    var url = "{% url 'api-assets:node-test-connective' pk=DEFAULT_PK %}";
+    var url = "{% url 'api-assets:node-task-create' pk=DEFAULT_PK %}";
     if (!current_node_id) {
         return null;
     }
@@ -362,12 +362,13 @@ $(document).ready(function(){
     }
     requestApi({
         url: the_url,
-        method: "GET",
+        method: "POST",
+        data: {action: "test"},
         success: success,
         flash_message: false
     });
 }).on('click', '.btn-refresh-hardware', function () {
-    var url = "{% url 'api-assets:node-refresh-hardware-info' pk=DEFAULT_PK %}";
+    var url = "{% url 'api-assets:node-task-create' pk=DEFAULT_PK %}";
     var the_url = url.replace("{{ DEFAULT_PK }}", current_node_id);
     function success(data) {
         rMenu.css({"visibility" : "hidden"});
@@ -376,7 +377,8 @@ $(document).ready(function(){
     }
     requestApi({
         url: the_url,
-        method: "GET",
+        method: "POST",
+        data: {action: "refresh"},
         success: success,
         flash_message: false
     });

@@ -88,7 +88,9 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key',
             'password', 'private_key', 'auto_push', 'sudo',
+            'username_same_with_user',
             'comment', 'shell', 'priority', 'login_mode', 'cmd_filters',
+            'sftp_root',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -97,11 +99,17 @@ class SystemUserForm(OrgModelForm, PasswordAndKeyAuthForm):
                 'class': 'select2', 'data-placeholder': _('Command filter')
             }),
         }
+        labels = {
+            'username_same_with_user': _("Username same with user"),
+        }
         help_texts = {
             'auto_push': _('Auto push system user to asset'),
             'priority': _('1-100, High level will be using login asset as default, '
                           'if user was granted more than 2 system user'),
             'login_mode': _('If you choose manual login mode, you do not '
                             'need to fill in the username and password.'),
-            'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig")
+            'sudo': _("Use comma split multi command, ex: /bin/whoami,/bin/ifconfig"),
+            'sftp_root': _("SFTP root dir, tmp, home or custom"),
+            'username_same_with_user': _("Username is dynamic, When connect asset, using current user's username"),
+            # 'username_same_with_user': _("用户名是动态的，登录资产时使用当前用户的用户名登录"),
         }

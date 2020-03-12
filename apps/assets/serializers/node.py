@@ -8,7 +8,7 @@ from ..models import Asset, Node
 
 __all__ = [
     'NodeSerializer', "NodeAddChildrenSerializer",
-    "NodeAssetsSerializer",
+    "NodeAssetsSerializer", "NodeTaskSerializer",
 ]
 
 
@@ -51,3 +51,12 @@ class NodeAssetsSerializer(BulkOrgResourceModelSerializer):
 class NodeAddChildrenSerializer(serializers.Serializer):
     nodes = serializers.ListField()
 
+
+class NodeTaskSerializer(serializers.Serializer):
+    ACTION_CHOICES = (
+        ('refresh', 'refresh'),
+        ('test', 'test'),
+        ('refresh_cache', 'refresh_cache'),
+    )
+    task = serializers.CharField(read_only=True)
+    action = serializers.ChoiceField(choices=ACTION_CHOICES, write_only=True)

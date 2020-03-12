@@ -67,7 +67,7 @@ def clean_tasks_adhoc_period():
     for task in tasks:
         adhoc = task.adhoc.all().order_by('-date_created')[5:]
         for ad in adhoc:
-            ad.history.all().delete()
+            ad.execution.all().delete()
             ad.delete()
 
 
@@ -75,17 +75,11 @@ def clean_tasks_adhoc_period():
 @after_app_shutdown_clean_periodic
 @register_as_period_task(interval=3600*24, description=_("Clean celery log period"))
 def clean_celery_tasks_period():
-    expire_days = 30
+    expire_days = settings.TASK_LOG_KEEP_DAYS
     logger.debug("Start clean celery task history")
     one_month_ago = timezone.now() - timezone.timedelta(days=expire_days)
     tasks = CeleryTask.objects.filter(date_start__lt=one_month_ago)
-    for task in tasks:
-        if os.path.isfile(task.full_log_path):
-            try:
-                os.remove(task.full_log_path)
-            except (FileNotFoundError, PermissionError):
-                pass
-        task.delete()
+    tasks.delete()
     tasks = CeleryTask.objects.filter(date_start__isnull=True)
     tasks.delete()
     command = "find %s -mtime +%s -name '*.log' -type f -exec rm -f {} \\;" % (
@@ -108,13 +102,15 @@ def create_or_update_registered_periodic_tasks():
 @register_as_period_task(interval=3600)
 def check_server_performance_period():
     usages = get_disk_usage()
-    usages = {path: usage for path, usage in usages.items()
-              if not path.startswith('/etc')}
+    uncheck_paths = ['/etc', '/boot']
 
     for path, usage in usages.items():
-        if usage.percent > 80:
+        need_check = True
+        for uncheck_path in uncheck_paths:
+            if path.startswith(uncheck_path):
+                need_check = False
+        if need_check and usage.percent > 80:
             send_server_performance_mail(path, usage, usages)
-            return
 
 
 @shared_task(queue="ansible")

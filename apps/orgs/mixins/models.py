@@ -20,6 +20,18 @@ __all__ = [
 
 
 class OrgManager(models.Manager):
+    def all_group_by_org(self):
+        from ..models import Organization
+        orgs = list(Organization.objects.all())
+        orgs.append(Organization.default())
+        querysets = {}
+        for org in orgs:
+            if org.is_real():
+                org_id = org.id
+            else:
+                org_id = ''
+            querysets[org] = super(OrgManager, self).get_queryset().filter(org_id=org_id)
+        return querysets
 
     def get_queryset(self):
         queryset = super(OrgManager, self).get_queryset()

@@ -13,7 +13,7 @@ def jumpserver_processor(request):
         'LOGO_TEXT_URL': static('img/logo_text.png'),
         'LOGIN_IMAGE_URL': static('img/login_image.png'),
         'FAVICON_URL': static('img/facio.ico'),
-        'JMS_TITLE': 'Jumpserver',
+        'JMS_TITLE': 'JumpServer',
         'VERSION': settings.VERSION,
         'COPYRIGHT': 'FIT2CLOUD 飞致云' + ' © 2014-2020',
         'SECURITY_COMMAND_EXECUTION': settings.SECURITY_COMMAND_EXECUTION,

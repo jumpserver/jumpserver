@@ -23,16 +23,23 @@
                             </li>
                             <li class="active">
                                 <a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets' %}
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Asset list' %}
                                 </a>
                             </li>
+                            {% if system_user.username_same_with_user  %}
+                            <li>
+                                <a href="{% url 'assets:system-user-user' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'User list' %}
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content">
                         <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Assets of ' %} <b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
+                                    <span style="float: left"><b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -84,6 +91,30 @@
                             </div>
                             <div class="panel panel-info">
                                 <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Assets' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="add-assets">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" id="id_assets" class="assets-select2 select2" style="width: 100%" multiple="" tabindex="4">
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-assets">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Nodes' %}
                                 </div>
                                 <div class="panel-body">
@@ -92,7 +123,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add to node' %}" id="node_selected" class="nodes-select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select nodes' %}" id="node_selected" class="nodes-select2" style="width: 100%" multiple="" tabindex="4">
                                                     </select>
                                                 </td>
                                             </tr>
@@ -114,6 +145,7 @@
             </div>
         </div>
     </div>
+    {% include 'assets/_asset_list_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -133,7 +165,7 @@ function getRelationUrl(type) {
     return theUrl;
 }
 
-function addObjects(objectsId, type) {
+function addObjects(objectsId, type, success, fail) {
     if (!objectsId || objectsId.length === 0) {
         return
     }
@@ -144,13 +176,21 @@ function addObjects(objectsId, type) {
         data[type] = v;
         body.push(data)
     });
-    requestApi({
+    if (!success) {
+        success = reloadPage
+    }
+    var option = {
         url: theUrl,
         body: JSON.stringify(body),
         method: "POST",
-        success: reloadPage
-    });
+        success: success,
+    };
+    if (fail) {
+        option.error = fail;
+    }
+    requestApi(option)
 }
+
 
 function removeObject(objectId, type, success) {
     if (!objectId)  {
@@ -197,9 +237,13 @@ function initNodeTable() {
 $(document).ready(function () {
 	$('.select2').select2();
     nodesSelect2Init(".nodes-select2");
-	assetUserListUrl = setUrlParam(assetUserListUrl, "system_user_id", "{{ system_user.id }}");
-    needPush = true;
-    initAssetUserTable();
+    initAssetTreeModel('#id_assets');
+	var assetUserListUrl = setUrlParam(defaultAssetUserListUrl, "prefer_id", "{{ system_user.id }}");
+	assetUserListUrl = setUrlParam(assetUserListUrl, "prefer", "system_user");
+    initAssetUserTable({
+        assetUserListUrl: assetUserListUrl,
+        needPush: true
+    });
     initNodeTable();
 })
 .on('click', '.btn-remove-from-node', function() {
@@ -215,8 +259,31 @@ $(document).ready(function () {
     var nodes = $("#node_selected").val();
     addObjects(nodes, "node");
 })
+.on('click', '#btn-add-to-assets', function () {
+    var assets = $("#id_assets").val();
+    var options = $("#id_assets").find(":selected");
+    var failed = function(s, data) {
+        var invalidIndex = [];
+        var validIndex = [];
+        $.each(data, function (k, v) {
+            if (isEmptyObject(v)) {
+                validIndex.push(k)
+            } else {
+                invalidIndex.push(k)
+            }
+        });
+        var invalidLabel = [];
+        $.each(invalidIndex, function (k, v) {
+            invalidLabel.push(options[v].text)
+        });
+        var errorMsg = "{% trans 'Have existed: ' %}";
+        errorMsg += invalidLabel.join(", ");
+        toastr.error(errorMsg)
+    };
+    addObjects(assets, "asset", null, failed);
+})
 .on('click', '.btn-push', function () {
-    var theUrl = "{% url 'api-assets:system-user-push' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
@@ -224,18 +291,26 @@ $(document).ready(function () {
         var taskId = data.task;
         showCeleryTaskLog(taskId);
     };
+    var data = {
+        action: 'push'
+    };
     requestApi({
         url: theUrl,
         error: error,
-        method: 'GET',
+        data: data,
+        method: 'POST',
         success: success
     });
 })
 .on('click', '.btn-push-auth', function () {
     var $this = $(this);
-    var asset_id = $this.data('asset');
-    var theUrl = "{% url 'api-assets:system-user-push-to-asset' pk=object.id aid=DEFAULT_PK %}";
-    theUrl = theUrl.replace("{{ DEFAULT_PK }}", asset_id);
+    var assetId = $this.data('asset');
+    var username = $this.data("username");
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=object.id %}?username=" + username;
+    var data = {
+        action: 'push',
+        asset: assetId,
+    };
     var success = function (data) {
         var taskId = data.task;
         showCeleryTaskLog(taskId);
@@ -245,13 +320,15 @@ $(document).ready(function () {
     };
     requestApi({
         url: theUrl,
-        method: 'GET',
+        method: 'POST',
+        data: data,
         success: success,
+        flash_message: false,
         error: error
     })
 })
 .on('click', '.btn-test-connective', function () {
-    var theUrl = "{% url 'api-assets:system-user-connective' pk=system_user.id %}";
+    var theUrl = "{% url 'api-assets:system-user-task-create' pk=system_user.id %}";
     var error = function (data) {
         alert(data)
     };
@@ -261,9 +338,11 @@ $(document).ready(function () {
     };
     requestApi({
         url: theUrl,
+        data: {action: "test"},
         error: error,
-        method: 'GET',
-        success: success
+        method: 'POST',
+        success: success,
+        flash_message: false,
     });
 })
 </script>
