@@ -182,13 +182,6 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 - [演示视频](https://jumpserver.oss-cn-hangzhou.aliyuncs.com/jms-media/%E3%80%90%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%E3%80%91Jumpserver%20%E5%A0%A1%E5%9E%92%E6%9C%BA%20V1.5.0%20%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91%20-%20final.mp4)
 - [系统截图](http://docs.JumpServer.org/zh/docs/snapshot.html)
 
-## SDK
-
-我们编写了一些SDK，供您的其它系统快速和 JumpServer API 交互：
-
-- [Python](https://github.com/jumpserver/jumpserver-python-sdk) JumpServer 其它组件使用这个 SDK 完成交互
-- [Java](https://github.com/KaiJunYan/jumpserver-java-sdk.git) 恺珺同学提供的 Java 版本的 SDK
-
 ## License & Copyright
 
 Copyright (c) 2014-2019 飞致云 FIT2CLOUD, All rights reserved.
