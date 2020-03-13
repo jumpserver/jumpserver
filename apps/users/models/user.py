@@ -596,6 +596,11 @@ class User(AuthMixin, TokenMixin, RoleMixin, MFAMixin, AbstractUser):
         user.save()
         user.groups.add(UserGroup.initial())
 
+    def can_send_created_mail(self):
+        if self.email and self.source == self.SOURCE_LOCAL:
+            return True
+        return False
+
     @classmethod
     def generate_fake(cls, count=100):
         from random import seed, choice

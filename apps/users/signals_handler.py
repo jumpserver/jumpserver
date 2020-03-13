@@ -17,7 +17,7 @@ def on_user_create(sender, user=None, **kwargs):
     logger.debug("Receive user `{}` create signal".format(user.name))
     from .utils import send_user_created_mail
     logger.info("   - Sending welcome mail ...".format(user.name))
-    if user.email:
+    if user.can_send_created_mail():
         send_user_created_mail(user)
 
 
