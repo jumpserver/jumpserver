@@ -158,11 +158,10 @@ class SystemUser(BaseUser):
     def can_perm_to_asset(self):
         return self.protocol not in [self.PROTOCOL_MYSQL]
 
-    def load_asset_special_auth(self, asset=None, username=None):
-        instance = super().load_asset_special_auth(asset=asset, username=username)
+    def _merge_auth(self, other):
+        super()._merge_auth(other)
         if self.username_same_with_user:
-            instance.username = username
-        return instance
+            self.username = other.username
 
     @property
     def cmd_filter_rules(self):

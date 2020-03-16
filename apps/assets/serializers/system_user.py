@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 
@@ -164,6 +163,14 @@ class SystemUserListSerializer(SystemUserSerializer):
 
 class SystemUserWithAuthInfoSerializer(SystemUserSerializer):
     class Meta(SystemUserSerializer.Meta):
+        fields = [
+            'id', 'name', 'username', 'protocol',
+            'password', 'public_key', 'private_key',
+            'login_mode', 'login_mode_display',
+            'priority', 'username_same_with_user',
+            'auto_push', 'sudo', 'shell', 'comment',
+            'auto_generate_key', 'sftp_root',
+        ]
         extra_kwargs = {
             'nodes_amount': {'label': _('Node')},
             'assets_amount': {'label': _('Asset')},
