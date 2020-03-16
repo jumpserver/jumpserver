@@ -89,7 +89,7 @@ class AdHocDetailView(PermissionsMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Ops'),
-            'action': 'Task version detail',
+            'action': _('Task detail'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
