@@ -33,7 +33,12 @@ class CommandExecution(OrgModelMixin):
 
     @property
     def inventory(self):
-        return JMSInventory(self.hosts.all(), run_as=self.run_as.username)
+        if self.run_as.username_same_with_user:
+            username = self.user.username
+        else:
+            username = self.run_as.username
+        inv = JMSInventory(self.hosts.all(), run_as=username)
+        return inv
 
     @property
     def result(self):
