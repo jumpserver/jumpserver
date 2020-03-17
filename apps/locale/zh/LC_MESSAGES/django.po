@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JumpServer 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-12 17:27+0800\n"
+"POT-Creation-Date: 2020-03-17 13:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: JumpServer team<ibuler@qq.com>\n"
@@ -535,7 +535,7 @@ msgstr "详情"
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:20
 #: xpack/plugins/cloud/templates/cloud/account_list.html:40
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:26
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:57
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:60
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:46
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:20
 #: xpack/plugins/orgs/templates/orgs/org_list.html:93
@@ -587,7 +587,7 @@ msgstr "更新"
 #: xpack/plugins/cloud/templates/cloud/account_detail.html:24
 #: xpack/plugins/cloud/templates/cloud/account_list.html:42
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:30
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:58
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:61
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:47
 #: xpack/plugins/orgs/templates/orgs/org_detail.html:24
 #: xpack/plugins/orgs/templates/orgs/org_list.html:95
@@ -726,6 +726,14 @@ msgstr "不能修改根节点名称"
 #: assets/api/node.py:56
 msgid "Deletion failed and the node contains children or assets"
 msgstr "删除失败，节点包含子节点或资产"
+
+#: assets/backends/db.py:244
+msgid "Could not remove asset admin user"
+msgstr "不能移除资产的管理用户账号"
+
+#: assets/backends/db.py:305
+msgid "Latest version could not be delete"
+msgstr "最新版本的不能被删除"
 
 #: assets/forms/asset.py:83 assets/models/asset.py:196
 #: assets/models/user.py:109 assets/templates/assets/asset_detail.html:186
@@ -3169,23 +3177,23 @@ msgstr "{} 任务结束"
 msgid "Result"
 msgstr "结果"
 
-#: ops/models/command.py:59
+#: ops/models/command.py:64
 msgid "Task start"
 msgstr "任务开始"
 
-#: ops/models/command.py:81
+#: ops/models/command.py:86
 msgid "Command `{}` is forbidden ........"
 msgstr "命令 `{}` 不允许被执行 ......."
 
-#: ops/models/command.py:88
+#: ops/models/command.py:93
 msgid "Task end"
 msgstr "任务结束"
 
-#: ops/tasks.py:63
+#: ops/tasks.py:65
 msgid "Clean task history period"
 msgstr "定期清除任务历史"
 
-#: ops/tasks.py:76
+#: ops/tasks.py:78
 msgid "Clean celery log period"
 msgstr "定期清除Celery日志"
 
@@ -3349,6 +3357,7 @@ msgstr "结束"
 
 #: ops/templates/ops/task_adhoc.html:17 ops/templates/ops/task_detail.html:18
 #: ops/templates/ops/task_history.html:17 ops/views/adhoc.py:50
+#: ops/views/adhoc.py:92
 msgid "Task detail"
 msgstr "任务详情"
 
@@ -3383,7 +3392,7 @@ msgstr "内容"
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_detail.html:135
 #: xpack/plugins/change_auth_plan/templates/change_auth_plan/plan_list.html:54
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:138
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:55
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:58
 #: xpack/plugins/gathered_user/templates/gathered_user/task_list.html:44
 msgid "Run"
 msgstr "执行"
@@ -4261,7 +4270,9 @@ msgid "Please enter Password: {}"
 msgstr "请输入密码: {}"
 
 #: settings/utils/ldap.py:420
-msgid "Please enter correct Bind DN and Password: {}"
+#, fuzzy
+#| msgid "Please enter correct Bind DN and Password: {}"
+msgid "Please enter Correct Bind DN and Password: {}"
 msgstr "请输入正确的绑定DN和密码: {}"
 
 #: settings/utils/ldap.py:438
@@ -4970,7 +4981,6 @@ msgid "Session detail"
 msgstr "会话详情"
 
 #: terminal/templates/terminal/session_commands.html:29
-#: terminal/templates/terminal/session_detail.html:29
 #: terminal/views/command.py:22
 msgid "Command list"
 msgstr "命令记录列表"
@@ -6575,7 +6585,7 @@ msgid "Run task manually"
 msgstr "手动执行任务"
 
 #: xpack/plugins/cloud/templates/cloud/sync_instance_task_detail.html:178
-#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:99
+#: xpack/plugins/cloud/templates/cloud/sync_instance_task_list.html:102
 msgid "Sync success"
 msgstr "同步成功"
 
