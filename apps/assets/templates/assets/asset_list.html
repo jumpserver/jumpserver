@@ -258,6 +258,10 @@ $(document).ready(function(){
             confirmButtonText: "{% trans 'Confirm' %}",
             closeOnConfirm: false
         },function () {
+            function fail() {
+                var msg = "{% trans 'Asset Deleting failed.' %}";
+                swal("{% trans 'Asset Delete' %}", msg, "error");
+            }
             function success(data) {
                 url = setUrlParam(the_url, 'spm', data.spm);
                 requestApi({
@@ -268,12 +272,9 @@ $(document).ready(function(){
                         swal("{% trans 'Asset Delete' %}", msg, "success");
                         reloadTable();
                     },
+                    error: fail,
                     flash_message: false,
                 });
-            }
-            function fail() {
-                var msg = "{% trans 'Asset Deleting failed.' %}";
-                swal("{% trans 'Asset Delete' %}", msg, "error");
             }
             requestApi({
                 url: "{% url 'api-common:resources-cache' %}",
