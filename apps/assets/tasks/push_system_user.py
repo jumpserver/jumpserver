@@ -121,7 +121,6 @@ def get_push_windows_system_user_tasks(system_user, username=None):
                     ''.format(username, username, password),
         }
     }
-    print(task)
     tasks.append(task)
     return tasks
 
