@@ -182,6 +182,7 @@ class AdHoc(OrgModelMixin):
             id=hid, adhoc=self, task=self.task,
             task_display=str(self.task),
             date_start=timezone.now(),
+            hosts_amount=self.hosts.count(),
         )
         execution.save()
         return execution.start()

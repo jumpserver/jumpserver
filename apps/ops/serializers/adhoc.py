@@ -39,6 +39,7 @@ class AdHocExecutionExcludeResultSerializer(AdHocExecutionSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    summary = serializers.ReadOnlyField(source='history_summary')
     latest_execution = AdHocExecutionExcludeResultSerializer(read_only=True)
 
     class Meta:
@@ -46,12 +47,12 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'interval', 'crontab', 'is_periodic',
             'is_deleted', 'comment', 'date_created',
-            'date_updated', 'latest_execution',
+            'date_updated', 'latest_execution', 'summary',
         ]
         read_only_fields = [
             'is_deleted', 'date_created', 'date_updated',
             'latest_adhoc', 'latest_execution', 'total_run_amount',
-            'success_run_amount',
+            'success_run_amount', 'summary',
         ]
 
 
