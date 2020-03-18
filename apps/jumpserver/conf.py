@@ -142,6 +142,7 @@ class Config(dict):
         'AUTH_OPENID_CLIENT_SECRET': '',
         'AUTH_OPENID_IGNORE_SSL_VERIFICATION': True,
         'AUTH_OPENID_SHARE_SESSION': True,
+        'CAS_ROOT_PROXIED_AS': '',
 
         'AUTH_RADIUS': False,
         'RADIUS_SERVER': 'localhost',
@@ -152,7 +153,7 @@ class Config(dict):
 
         'AUTH_CAS': False,
         'CAS_SERVER_URL': "http://host/cas/",
-        'CAS_LOGOUT_COMPLETELY': False,
+        'CAS_LOGOUT_COMPLETELY': True,
         'CAS_VERSION': 3,
 
         'OTP_VALID_WINDOW': 2,
