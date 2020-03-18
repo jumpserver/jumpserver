@@ -33,7 +33,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
     <td>OpenID 认证（实现单点登录）</td>
   </tr>
   <tr>
-    <td>CSA 认证 （实现单点登录）</td>
+    <td>CAS 认证 （实现单点登录）</td>
   </tr>
   <tr>
     <td rowspan="2">MFA认证</td>
