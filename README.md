@@ -20,7 +20,7 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
 <table>
   <tr>
     <td rowspan="7">身份认证<br>Authentication</td>
-    <td rowspan="4">登录认证</td>
+    <td rowspan="5">登录认证</td>
     <td>资源统一登录与认证</td>
   </tr>
   <tr>
