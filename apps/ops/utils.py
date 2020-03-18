@@ -56,7 +56,7 @@ def update_or_create_ansible_task(
         new_hosts = set([str(asset.id) for asset in hosts])
         hosts_same = old_hosts == new_hosts
 
-    if not adhoc or adhoc != new_adhoc or not hosts_same:
+    if not adhoc or not adhoc.same_with(new_adhoc) or not hosts_same:
         logger.debug(_("Update task content: {}").format(task_name))
         new_adhoc.save()
         new_adhoc.hosts.set(hosts)

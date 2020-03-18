@@ -92,7 +92,7 @@ class JMSInventory(JMSBaseInventory):
 
         for asset in assets:
             host = self.convert_to_ansible(asset, run_as_admin=run_as_admin)
-            if run_as:
+            if run_as is not None:
                 run_user_info = self.get_run_user_info(host)
                 host.update(run_user_info)
             if become_info and asset.is_unixlike():
@@ -104,7 +104,7 @@ class JMSInventory(JMSBaseInventory):
     def get_run_user_info(self, host):
         from assets.backends import AssetUserManager
 
-        if not self.run_as:
+        if self.run_as is None:
             return {}
 
         try:

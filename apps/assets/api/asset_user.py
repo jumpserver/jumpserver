@@ -105,7 +105,7 @@ class AssetUserViewSet(CommonApiMixin, BulkModelViewSet):
 
 class AssetUserAuthInfoViewSet(AssetUserViewSet):
     serializer_classes = {"default": serializers.AssetUserAuthInfoSerializer}
-    http_method_names = ['get']
+    http_method_names = ['get', 'post']
     permission_classes = [IsOrgAdminOrAppUser]
 
     def get_permissions(self):

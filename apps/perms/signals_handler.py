@@ -62,6 +62,34 @@ def on_asset_permission_system_users_changed(sender, instance=None, action='',
             system_user.users.add(*tuple(users))
 
 
+@receiver(m2m_changed, sender=AssetPermission.users.through)
+def on_asset_permission_users_changed(sender, instance=None, action='',
+                                      reverse=False, **kwargs):
+    if action != 'post_add' and reverse:
+        return
+    logger.debug("Asset permission users change signal received")
+    users = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+    system_users = instance.system_users.all()
+
+    for system_user in system_users:
+        if system_user.username_same_with_user:
+            system_user.users.add(*tuple(users))
+
+
+@receiver(m2m_changed, sender=AssetPermission.user_groups.through)
+def on_asset_permission_user_groups_changed(sender, instance=None, action='',
+                                            reverse=False, **kwargs):
+    if action != 'post_add' and reverse:
+        return
+    logger.debug("Asset permission user groups change signal received")
+    groups = kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
+    system_users = instance.system_users.all()
+
+    for system_user in system_users:
+        if system_user.username_same_with_user:
+            system_user.groups.add(*tuple(groups))
+
+
 @receiver(m2m_changed, sender=RemoteAppPermission.system_users.through)
 def on_remote_app_permission_system_users_changed(sender, instance=None,
                                                   action='', reverse=False, **kwargs):
@@ -77,3 +105,17 @@ def on_remote_app_permission_system_users_changed(sender, instance=None,
         if system_user.username_same_with_user:
             system_user.groups.add(*tuple(groups))
             system_user.users.add(*tuple(users))
+
+
+@receiver(m2m_changed, sender=RemoteAppPermission.users.through)
+def on_remoteapps_permission_users_changed(sender, instance=None, action='',
+                                      reverse=False, **kwargs):
+    on_asset_permission_users_changed(sender, instance=instance, action=action,
+                                      reverse=reverse, **kwargs)
+
+
+@receiver(m2m_changed, sender=RemoteAppPermission.user_groups.through)
+def on_remoteapps_permission_user_groups_changed(sender, instance=None, action='',
+                                            reverse=False, **kwargs):
+    on_asset_permission_user_groups_changed(sender, instance=instance,
+                                            action=action, reverse=reverse, **kwargs)

@@ -16,6 +16,8 @@ from .tasks import (
     update_assets_hardware_info_util,
     test_asset_connectivity_util,
     push_system_user_to_assets,
+    push_system_user_to_assets_manual,
+    push_system_user_to_assets,
     add_nodes_assets_to_system_users
 )
 
@@ -93,6 +95,25 @@ def on_system_user_assets_change(sender, instance=None, action='', model=None, p
         assets = [instance]
     for system_user in system_users:
         push_system_user_to_assets.delay(system_user, assets)
+
+
+@receiver(m2m_changed, sender=SystemUser.users.through)
+def on_system_user_users_change(sender, instance=None, action='', model=None, pk_set=None, **kwargs):
+    """
+    当系统用户和用户关系发生变化时，应该重新推送系统用户资产中
+    """
+    if action != "post_add":
+        return
+    if not instance.username_same_with_user:
+        return
+    logger.debug("System user users change signal recv: {}".format(instance))
+    queryset = model.objects.filter(pk__in=pk_set)
+    if model == SystemUser:
+        system_users = queryset
+    else:
+        system_users = [instance]
+    for s in system_users:
+        push_system_user_to_assets_manual.delay(s)
 
 
 @receiver(m2m_changed, sender=SystemUser.nodes.through)

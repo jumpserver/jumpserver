@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, get_object_or_none, get_disk_usage
+from orgs.utils import tmp_to_root_org
 from .celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic,
     after_app_ready_start
@@ -44,7 +45,8 @@ def run_ansible_task(tid, callback=None, **kwargs):
 
 @shared_task(soft_time_limit=60, queue="ansible")
 def run_command_execution(cid, **kwargs):
-    execution = get_object_or_none(CommandExecution, id=cid)
+    with tmp_to_root_org():
+        execution = get_object_or_none(CommandExecution, id=cid)
     if execution:
         try:
             os.environ.update({

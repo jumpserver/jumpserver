@@ -206,7 +206,7 @@ class AdHoc(OrgModelMixin):
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)
 
-    def __eq__(self, other):
+    def same_with(self, other):
         if not isinstance(other, self.__class__):
             return False
         fields_check = []
