@@ -33,7 +33,8 @@ def run_ansible_task(tid, callback=None, **kwargs):
     :param callback: callback function name
     :return:
     """
-    task = get_object_or_none(Task, id=tid)
+    with tmp_to_root_org():
+        task = get_object_or_none(Task, id=tid)
     if task:
         result = task.run()
         if callback is not None:
