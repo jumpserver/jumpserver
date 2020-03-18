@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import get_logger, get_object_or_none, get_disk_usage
-from orgs.utils import tmp_to_root_org
+from orgs.utils import tmp_to_root_org, tmp_to_org
 from .celery.decorator import (
     register_as_period_task, after_app_shutdown_clean_periodic,
     after_app_ready_start
@@ -35,20 +35,24 @@ def run_ansible_task(tid, callback=None, **kwargs):
     """
     with tmp_to_root_org():
         task = get_object_or_none(Task, id=tid)
-    if task:
+    if not task:
+        logger.error("No task found")
+        return
+    with tmp_to_org(task.org):
         result = task.run()
         if callback is not None:
             subtask(callback).delay(result, task_name=task.name)
         return result
-    else:
-        logger.error("No task found")
 
 
 @shared_task(soft_time_limit=60, queue="ansible")
 def run_command_execution(cid, **kwargs):
     with tmp_to_root_org():
         execution = get_object_or_none(CommandExecution, id=cid)
-    if execution:
+    if not execution:
+        logger.error("Not found the execution id: {}".format(cid))
+        return
+    with tmp_to_org(execution.run_as.org):
         try:
             os.environ.update({
                 "TERM_ROWS": kwargs.get("rows", ""),
@@ -57,8 +61,6 @@ def run_command_execution(cid, **kwargs):
             execution.run()
         except SoftTimeLimitExceeded:
             logger.error("Run time out")
-    else:
-        logger.error("Not found the execution id: {}".format(cid))
 
 
 @shared_task
