@@ -5,7 +5,7 @@
 [![Ansible](https://img.shields.io/badge/ansible-2.4.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
 [![Paramiko](https://img.shields.io/badge/paramiko-2.4.1-green.svg?style=plastic)](http://www.paramiko.org/)
 
-JumpServer 是全球首款完全开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 机制的运维安全审计系统。
+JumpServer 是全球首款开源的堡垒机，使用 GNU GPL v2.0 开源协议，是符合 4A 机制的运维安全审计系统。
 
 JumpServer 使用 Python / Django 进行开发，遵循 Web 2.0 规范，配备了业界领先的 Web Terminal 方案，交互界面美观、用户体验好。
 
@@ -31,6 +31,9 @@ JumpServer 采纳分布式架构，支持多机房跨区域部署，支持横向
   </tr>
   <tr>
     <td>OpenID 认证（实现单点登录）</td>
+  </tr>
+  <tr>
+    <td>CSA 认证 （实现单点登录）</td>
   </tr>
   <tr>
     <td rowspan="2">MFA认证</td>
